@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static string GetDotNetSdkVersion()
+        internal static string? GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
             using (new ConsoleExitHandler(process, NullLogger.Instance))
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
+        internal static ProcessStartInfo BuildStartInfo(string? customDotNetCliPath, string workingDirectory, string arguments,
             IReadOnlyList<EnvironmentVariable>? environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true, bool redirectStandardOutput = true)
         {
             const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";

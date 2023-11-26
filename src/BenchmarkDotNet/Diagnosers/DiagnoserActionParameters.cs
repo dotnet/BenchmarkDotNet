@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserActionParameters
     {
-        public DiagnoserActionParameters(Process process, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId)
+        public DiagnoserActionParameters(Process? process, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId)
         {
             Process = process;
             BenchmarkCase = benchmarkCase;

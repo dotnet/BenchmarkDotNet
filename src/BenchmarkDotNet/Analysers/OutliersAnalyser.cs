@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Analysers
                 return $"{n} {words} {verb}";
             }
 
-            var rangeMessages = new List<string> { GetRangeMessage(lowerOutliers, cultureInfo), GetRangeMessage(upperOutliers, cultureInfo) };
+            var rangeMessages = new List<string?> { GetRangeMessage(lowerOutliers, cultureInfo), GetRangeMessage(upperOutliers, cultureInfo) };
             rangeMessages.RemoveAll(string.IsNullOrEmpty);
             string rangeMessage = rangeMessages.Any()
                 ? " (" + string.Join(", ", rangeMessages) + ")"

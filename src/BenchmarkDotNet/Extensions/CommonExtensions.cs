@@ -32,9 +32,11 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> value) => value == null || value.Count == 0;
+        public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
         public static bool IsEmpty<T>(this IEnumerable<T> value) => !value.Any();
+
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> values) => values.Where(value => value != null).Cast<T>();
 
         public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> collection)
         {
@@ -43,7 +45,7 @@ namespace BenchmarkDotNet.Extensions
         }
 
 #if NETSTANDARD2_0
-        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        public static TValue? GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
 #endif
 
@@ -97,7 +99,9 @@ namespace BenchmarkDotNet.Extensions
 
         internal static string EnsureFolderExists(this string filePath)
         {
-            string directoryPath = Path.GetDirectoryName(filePath);
+            string? directoryPath = Path.GetDirectoryName(filePath);
+            if (directoryPath == null)
+                throw new ArgumentException($"Can't get directory path from '{filePath}'");
 
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
@@ -105,7 +109,7 @@ namespace BenchmarkDotNet.Extensions
             return filePath;
         }
 
-        internal static bool IsNotNullButDoesNotExist(this FileSystemInfo fileInfo)
+        internal static bool IsNotNullButDoesNotExist(this FileSystemInfo? fileInfo)
             => fileInfo != null && !fileInfo.Exists;
     }
 }

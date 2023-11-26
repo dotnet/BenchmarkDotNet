@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Configs
 
         public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser() || HasExceptionDiagnoser();
 
-        public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
+        public IDiagnoser? GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
         {
             var diagnosersForGivenMode = diagnosers.Where(diagnoser => diagnoser.GetRunMode(benchmarkCase) == runMode).ToImmutableHashSet();
 

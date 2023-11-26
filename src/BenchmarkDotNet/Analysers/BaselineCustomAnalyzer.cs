@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Analysers
 
             foreach (var benchmarkCase in summary.BenchmarksCases)
             {
-                string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+                string? logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
                 var baseline = summary.GetBaseline(logicalGroupKey);
                 if (BaselineCustomColumn.ResultsAreInvalid(summary, benchmarkCase, baseline) == false)
                     continue;

@@ -186,19 +186,13 @@ namespace BenchmarkDotNet.Tests
         {
             const string programName = "testProgram";
             var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
-            var benchmarkMethod =
-                typeof(MockFactory.MockBenchmarkClass)
-                    .GetTypeInfo()
-                    .GetMethods()
-                    .Single(method => method.Name == nameof(MockFactory.MockBenchmarkClass.Foo));
-
 
             //Simulate loading an assembly from a stream
             var benchmarkDotNetAssembly = typeof(MockFactory.MockBenchmarkClass).GetTypeInfo().Assembly;
             var streamLoadedAssembly = Assembly.Load(File.ReadAllBytes(benchmarkDotNetAssembly.Location));
-            var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).FirstOrDefault();
+            var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).First();
 
-            var target = new Descriptor(assemblyType, benchmarkMethod);
+            var target = new Descriptor(assemblyType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999) };
@@ -213,12 +207,7 @@ namespace BenchmarkDotNet.Tests
         public void TestAssemblyFilePathIsUsedWhenTheAssemblyLocationIsNotEmpty()
         {
             const string programName = "testProgram";
-            var benchmarkMethod =
-                typeof(MockFactory.MockBenchmarkClass)
-                    .GetTypeInfo()
-                    .GetMethods()
-                    .Single(method => method.Name == nameof(MockFactory.MockBenchmarkClass.Foo));
-            var target = new Descriptor(typeof(MockFactory.MockBenchmarkClass), benchmarkMethod);
+            var target = new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) };
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null, true);
