@@ -29,6 +29,7 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
   <script type="module" src="./../public/docfx.min.js"></script>
@@ -184,7 +185,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BenchmarkCase BenchmarkCase { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public BenchmarkCase? BenchmarkCase { get; }</code></pre>
   </div>
 
 
@@ -273,7 +274,7 @@
   <a id="BenchmarkDotNet_Validators_ValidationError_Equals_" data-uid="BenchmarkDotNet.Validators.ValidationError.Equals*"></a>
 
   <h3 id="BenchmarkDotNet_Validators_ValidationError_Equals_BenchmarkDotNet_Validators_ValidationError_" data-uid="BenchmarkDotNet.Validators.ValidationError.Equals(BenchmarkDotNet.Validators.ValidationError)">
-  Equals(ValidationError)
+  Equals(ValidationError?)
   
   </h3>
 
@@ -281,7 +282,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool Equals(ValidationError other)</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Equals(ValidationError? other)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -309,7 +310,7 @@
   <a id="BenchmarkDotNet_Validators_ValidationError_Equals_" data-uid="BenchmarkDotNet.Validators.ValidationError.Equals*"></a>
 
   <h3 id="BenchmarkDotNet_Validators_ValidationError_Equals_System_Object_" data-uid="BenchmarkDotNet.Validators.ValidationError.Equals(System.Object)">
-  Equals(object)
+  Equals(object?)
   
   </h3>
 
@@ -317,7 +318,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+    <pre><code class="lang-csharp hljs">public override bool Equals(object? obj)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -498,7 +499,7 @@
 
     <div class="container-xxl search-results" id="search-results"></div>
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           Copyright &copy; 2013–2023 .NET Foundation and contributors

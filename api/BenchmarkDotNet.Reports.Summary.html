@@ -29,6 +29,7 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
   <script type="module" src="./../public/docfx.min.js"></script>
@@ -398,7 +399,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BenchmarkReport this[BenchmarkCase benchmarkCase] { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public BenchmarkReport? this[BenchmarkCase benchmarkCase] { get; }</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -709,7 +710,7 @@
   <a id="BenchmarkDotNet_Reports_Summary_GetBaseline_" data-uid="BenchmarkDotNet.Reports.Summary.GetBaseline*"></a>
 
   <h3 id="BenchmarkDotNet_Reports_Summary_GetBaseline_System_String_" data-uid="BenchmarkDotNet.Reports.Summary.GetBaseline(System.String)">
-  GetBaseline(string)
+  GetBaseline(string?)
   
   </h3>
 
@@ -717,7 +718,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BenchmarkCase? GetBaseline(string logicalGroupKey)</code></pre>
+    <pre><code class="lang-csharp hljs">public BenchmarkCase? GetBaseline(string? logicalGroupKey)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -962,7 +963,7 @@
 
     <div class="container-xxl search-results" id="search-results"></div>
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           Copyright &copy; 2013–2023 .NET Foundation and contributors

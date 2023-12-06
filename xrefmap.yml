@@ -3505,6 +3505,30 @@ references:
   fullName.vb: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.New
   nameWithType: OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute
   nameWithType.vb: OperatingSystemsFilterAttribute.New
+- uid: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute
+  name: OperationsPerSecondAttribute
+  href: api/BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.html
+  commentId: T:BenchmarkDotNet.Attributes.OperationsPerSecondAttribute
+  fullName: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute
+  nameWithType: OperationsPerSecondAttribute
+- uid: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.#ctor
+  name: OperationsPerSecondAttribute()
+  href: api/BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.html#BenchmarkDotNet_Attributes_OperationsPerSecondAttribute__ctor
+  commentId: M:BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.OperationsPerSecondAttribute()
+  fullName.vb: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.New()
+  nameWithType: OperationsPerSecondAttribute.OperationsPerSecondAttribute()
+  nameWithType.vb: OperationsPerSecondAttribute.New()
+- uid: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.#ctor*
+  name: OperationsPerSecondAttribute
+  href: api/BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.html#BenchmarkDotNet_Attributes_OperationsPerSecondAttribute__ctor_
+  commentId: Overload:BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.OperationsPerSecondAttribute
+  fullName.vb: BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.New
+  nameWithType: OperationsPerSecondAttribute.OperationsPerSecondAttribute
+  nameWithType.vb: OperationsPerSecondAttribute.New
 - uid: BenchmarkDotNet.Attributes.OrdererAttribute
   name: OrdererAttribute
   href: api/BenchmarkDotNet.Attributes.OrdererAttribute.html
@@ -13688,13 +13712,13 @@ references:
   fullName: BenchmarkDotNet.Diagnosers.DiagnoserActionParameters
   nameWithType: DiagnoserActionParameters
 - uid: BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.#ctor(System.Diagnostics.Process,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Running.BenchmarkId)
-  name: DiagnoserActionParameters(Process, BenchmarkCase, BenchmarkId)
+  name: DiagnoserActionParameters(Process?, BenchmarkCase, BenchmarkId)
   href: api/BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.html#BenchmarkDotNet_Diagnosers_DiagnoserActionParameters__ctor_System_Diagnostics_Process_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Running_BenchmarkId_
   commentId: M:BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.#ctor(System.Diagnostics.Process,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Running.BenchmarkId)
   name.vb: New(Process, BenchmarkCase, BenchmarkId)
-  fullName: BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.DiagnoserActionParameters(System.Diagnostics.Process, BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Running.BenchmarkId)
+  fullName: BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.DiagnoserActionParameters(System.Diagnostics.Process?, BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Running.BenchmarkId)
   fullName.vb: BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.New(System.Diagnostics.Process, BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Running.BenchmarkId)
-  nameWithType: DiagnoserActionParameters.DiagnoserActionParameters(Process, BenchmarkCase, BenchmarkId)
+  nameWithType: DiagnoserActionParameters.DiagnoserActionParameters(Process?, BenchmarkCase, BenchmarkId)
   nameWithType.vb: DiagnoserActionParameters.New(Process, BenchmarkCase, BenchmarkId)
 - uid: BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.#ctor*
   name: DiagnoserActionParameters
@@ -16347,11 +16371,14 @@ references:
   nameWithType: Consumer.Consume(long)
   nameWithType.vb: Consumer.Consume(Long)
 - uid: BenchmarkDotNet.Engines.Consumer.Consume(System.IntPtr)
-  name: Consume(IntPtr)
+  name: Consume(nint)
   href: api/BenchmarkDotNet.Engines.Consumer.html#BenchmarkDotNet_Engines_Consumer_Consume_System_IntPtr_
   commentId: M:BenchmarkDotNet.Engines.Consumer.Consume(System.IntPtr)
-  fullName: BenchmarkDotNet.Engines.Consumer.Consume(System.IntPtr)
-  nameWithType: Consumer.Consume(IntPtr)
+  name.vb: Consume(IntPtr)
+  fullName: BenchmarkDotNet.Engines.Consumer.Consume(nint)
+  fullName.vb: BenchmarkDotNet.Engines.Consumer.Consume(System.IntPtr)
+  nameWithType: Consumer.Consume(nint)
+  nameWithType.vb: Consumer.Consume(IntPtr)
 - uid: BenchmarkDotNet.Engines.Consumer.Consume(System.Object)
   name: Consume(object)
   href: api/BenchmarkDotNet.Engines.Consumer.html#BenchmarkDotNet_Engines_Consumer_Consume_System_Object_
@@ -16416,11 +16443,14 @@ references:
   nameWithType: Consumer.Consume(ulong)
   nameWithType.vb: Consumer.Consume(ULong)
 - uid: BenchmarkDotNet.Engines.Consumer.Consume(System.UIntPtr)
-  name: Consume(UIntPtr)
+  name: Consume(nuint)
   href: api/BenchmarkDotNet.Engines.Consumer.html#BenchmarkDotNet_Engines_Consumer_Consume_System_UIntPtr_
   commentId: M:BenchmarkDotNet.Engines.Consumer.Consume(System.UIntPtr)
-  fullName: BenchmarkDotNet.Engines.Consumer.Consume(System.UIntPtr)
-  nameWithType: Consumer.Consume(UIntPtr)
+  name.vb: Consume(UIntPtr)
+  fullName: BenchmarkDotNet.Engines.Consumer.Consume(nuint)
+  fullName.vb: BenchmarkDotNet.Engines.Consumer.Consume(System.UIntPtr)
+  nameWithType: Consumer.Consume(nuint)
+  nameWithType.vb: Consumer.Consume(UIntPtr)
 - uid: BenchmarkDotNet.Engines.Consumer.Consume(System.Void*)
   name: Consume(void*)
   href: api/BenchmarkDotNet.Engines.Consumer.html#BenchmarkDotNet_Engines_Consumer_Consume_System_Void__
@@ -23958,11 +23988,14 @@ references:
   fullName: BenchmarkDotNet.Jobs.JobExtensions.RunOncePerIteration
   nameWithType: JobExtensions.RunOncePerIteration
 - uid: BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job,System.IntPtr)
-  name: WithAffinity(Job, IntPtr)
+  name: WithAffinity(Job, nint)
   href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_BenchmarkDotNet_Jobs_Job_System_IntPtr_
   commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job,System.IntPtr)
-  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job, System.IntPtr)
-  nameWithType: JobExtensions.WithAffinity(Job, IntPtr)
+  name.vb: WithAffinity(Job, IntPtr)
+  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job, nint)
+  fullName.vb: BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job, System.IntPtr)
+  nameWithType: JobExtensions.WithAffinity(Job, nint)
+  nameWithType.vb: JobExtensions.WithAffinity(Job, IntPtr)
 - uid: BenchmarkDotNet.Jobs.JobExtensions.WithAffinity*
   name: WithAffinity
   href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_
@@ -29511,13 +29544,13 @@ references:
   fullName: BenchmarkDotNet.Reports.Summary.ColumnHidingRules
   nameWithType: Summary.ColumnHidingRules
 - uid: BenchmarkDotNet.Reports.Summary.GetBaseline(System.String)
-  name: GetBaseline(string)
+  name: GetBaseline(string?)
   href: api/BenchmarkDotNet.Reports.Summary.html#BenchmarkDotNet_Reports_Summary_GetBaseline_System_String_
   commentId: M:BenchmarkDotNet.Reports.Summary.GetBaseline(System.String)
   name.vb: GetBaseline(String)
-  fullName: BenchmarkDotNet.Reports.Summary.GetBaseline(string)
+  fullName: BenchmarkDotNet.Reports.Summary.GetBaseline(string?)
   fullName.vb: BenchmarkDotNet.Reports.Summary.GetBaseline(String)
-  nameWithType: Summary.GetBaseline(string)
+  nameWithType: Summary.GetBaseline(string?)
   nameWithType.vb: Summary.GetBaseline(String)
 - uid: BenchmarkDotNet.Reports.Summary.GetBaseline*
   name: GetBaseline
@@ -29814,13 +29847,13 @@ references:
   fullName: BenchmarkDotNet.Reports.SummaryStyle
   nameWithType: SummaryStyle
 - uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
-  name: SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle, TextJustification, TextJustification)
+  name: SummaryStyle(CultureInfo?, bool, SizeUnit?, TimeUnit?, bool, bool, int, RatioStyle, TextJustification, TextJustification)
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_
   commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
   name.vb: New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle, TextJustification, TextJustification)
-  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo?, bool, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, bool, bool, int, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo?, bool, BenchmarkDotNet.Columns.SizeUnit?, Perfolizer.Horology.TimeUnit?, bool, bool, int, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
   fullName.vb: BenchmarkDotNet.Reports.SummaryStyle.New(System.Globalization.CultureInfo, Boolean, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, Boolean, Boolean, Integer, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
-  nameWithType: SummaryStyle.SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
+  nameWithType: SummaryStyle.SummaryStyle(CultureInfo?, bool, SizeUnit?, TimeUnit?, bool, bool, int, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
   nameWithType.vb: SummaryStyle.New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
 - uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor*
   name: SummaryStyle
@@ -31470,19 +31503,22 @@ references:
   fullName: BenchmarkDotNet.Running.Descriptor.DisplayInfo
   nameWithType: Descriptor.DisplayInfo
 - uid: BenchmarkDotNet.Running.Descriptor.Equals(BenchmarkDotNet.Running.Descriptor)
-  name: Equals(Descriptor)
+  name: Equals(Descriptor?)
   href: api/BenchmarkDotNet.Running.Descriptor.html#BenchmarkDotNet_Running_Descriptor_Equals_BenchmarkDotNet_Running_Descriptor_
   commentId: M:BenchmarkDotNet.Running.Descriptor.Equals(BenchmarkDotNet.Running.Descriptor)
-  fullName: BenchmarkDotNet.Running.Descriptor.Equals(BenchmarkDotNet.Running.Descriptor)
-  nameWithType: Descriptor.Equals(Descriptor)
+  name.vb: Equals(Descriptor)
+  fullName: BenchmarkDotNet.Running.Descriptor.Equals(BenchmarkDotNet.Running.Descriptor?)
+  fullName.vb: BenchmarkDotNet.Running.Descriptor.Equals(BenchmarkDotNet.Running.Descriptor)
+  nameWithType: Descriptor.Equals(Descriptor?)
+  nameWithType.vb: Descriptor.Equals(Descriptor)
 - uid: BenchmarkDotNet.Running.Descriptor.Equals(System.Object)
-  name: Equals(object)
+  name: Equals(object?)
   href: api/BenchmarkDotNet.Running.Descriptor.html#BenchmarkDotNet_Running_Descriptor_Equals_System_Object_
   commentId: M:BenchmarkDotNet.Running.Descriptor.Equals(System.Object)
   name.vb: Equals(Object)
-  fullName: BenchmarkDotNet.Running.Descriptor.Equals(object)
+  fullName: BenchmarkDotNet.Running.Descriptor.Equals(object?)
   fullName.vb: BenchmarkDotNet.Running.Descriptor.Equals(Object)
-  nameWithType: Descriptor.Equals(object)
+  nameWithType: Descriptor.Equals(object?)
   nameWithType.vb: Descriptor.Equals(Object)
 - uid: BenchmarkDotNet.Running.Descriptor.Equals*
   name: Equals
@@ -31740,211 +31776,211 @@ references:
   fullName: BenchmarkDotNet.Running.TypeFilter.GetTypesWithRunnableBenchmarks
   nameWithType: TypeFilter.GetTypesWithRunnableBenchmarks
 - uid: BenchmarkDotNet.Samples.IntroArguments
-  name: 'Sample: IntroArguments'
+  name: BenchmarkDotNet.Samples.IntroArguments
   href: articles/samples/IntroArguments.html
 - uid: BenchmarkDotNet.Samples.IntroArgumentsPriority
-  name: 'Sample: IntroArgumentsPriority'
+  name: BenchmarkDotNet.Samples.IntroArgumentsPriority
   href: articles/samples/IntroArgumentsPriority.html
 - uid: BenchmarkDotNet.Samples.IntroArgumentsSource
-  name: 'Sample: IntroArgumentsSource'
+  name: BenchmarkDotNet.Samples.IntroArgumentsSource
   href: articles/samples/IntroArgumentsSource.html
 - uid: BenchmarkDotNet.Samples.IntroArrayParam
-  name: 'Sample: IntroArrayParam'
+  name: BenchmarkDotNet.Samples.IntroArrayParam
   href: articles/samples/IntroArrayParam.html
 - uid: BenchmarkDotNet.Samples.IntroBasic
   name: 'Sample: IntroBasic'
   href: articles/samples/IntroBasic.html
 - uid: BenchmarkDotNet.Samples.IntroBenchmarkBaseline
-  name: 'Sample: IntroBenchmarkBaseline'
+  name: BenchmarkDotNet.Samples.IntroBenchmarkBaseline
   href: articles/samples/IntroBenchmarkBaseline.html
 - uid: BenchmarkDotNet.Samples.IntroCategories
-  name: 'Sample: IntroCategories'
+  name: BenchmarkDotNet.Samples.IntroCategories
   href: articles/samples/IntroCategories.html
 - uid: BenchmarkDotNet.Samples.IntroCategoryBaseline
-  name: 'Sample: IntroCategoryBaseline'
+  name: BenchmarkDotNet.Samples.IntroCategoryBaseline
   href: articles/samples/IntroCategoryBaseline.html
 - uid: BenchmarkDotNet.Samples.IntroCategoryDiscoverer
-  name: 'Sample: IntroCategoryDiscoverer'
+  name: BenchmarkDotNet.Samples.IntroCategoryDiscoverer
   href: articles/samples/IntroCategoryDiscoverer.html
 - uid: BenchmarkDotNet.Samples.IntroColdStart
-  name: 'Sample: IntroColdStart'
+  name: BenchmarkDotNet.Samples.IntroColdStart
   href: articles/samples/IntroColdStart.html
 - uid: BenchmarkDotNet.Samples.IntroComparableComplexParam
-  name: 'Sample: IntroComparableComplexParam'
+  name: BenchmarkDotNet.Samples.IntroComparableComplexParam
   href: articles/samples/IntroComparableComplexParam.html
 - uid: BenchmarkDotNet.Samples.IntroConfigSource
-  name: 'Sample: IntroConfigSource'
+  name: BenchmarkDotNet.Samples.IntroConfigSource
   href: articles/samples/IntroConfigSource.html
 - uid: BenchmarkDotNet.Samples.IntroConfigUnion
-  name: 'Sample: IntroConfigUnion'
+  name: BenchmarkDotNet.Samples.IntroConfigUnion
   href: articles/samples/IntroConfigUnion.html
 - uid: BenchmarkDotNet.Samples.IntroCustomMono
-  name: 'Sample: IntroCustomMono'
+  name: BenchmarkDotNet.Samples.IntroCustomMono
   href: articles/samples/IntroCustomMono.html
 - uid: BenchmarkDotNet.Samples.IntroCustomMonoArguments
-  name: 'Sample: IntroCustomMonoArguments'
+  name: BenchmarkDotNet.Samples.IntroCustomMonoArguments
   href: articles/samples/IntroCustomMonoArguments.html
 - uid: BenchmarkDotNet.Samples.IntroDeferredExecution
-  name: 'Sample: IntroDeferredExecution'
+  name: BenchmarkDotNet.Samples.IntroDeferredExecution
   href: articles/samples/IntroDeferredExecution.html
 - uid: BenchmarkDotNet.Samples.IntroDisassembly
-  name: 'Sample: IntroDisassembly'
+  name: BenchmarkDotNet.Samples.IntroDisassembly
   href: articles/samples/IntroDisassembly.html
 - uid: BenchmarkDotNet.Samples.IntroDisassemblyAllJits
-  name: 'Sample: IntroDisassemblyAllJits'
+  name: BenchmarkDotNet.Samples.IntroDisassemblyAllJits
   href: articles/samples/IntroDisassemblyAllJits.html
 - uid: BenchmarkDotNet.Samples.IntroDisassemblyDry
-  name: 'Sample: IntroDisassemblyDry'
+  name: BenchmarkDotNet.Samples.IntroDisassemblyDry
   href: articles/samples/IntroDisassemblyDry.html
 - uid: BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
-  name: 'Sample: IntroDisassemblyRyuJit'
+  name: BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
   href: articles/samples/IntroDisassemblyRyuJit.html
 - uid: BenchmarkDotNet.Samples.IntroDotTraceDiagnoser
-  name: 'Sample: IntroDotTraceDiagnoser'
+  name: BenchmarkDotNet.Samples.IntroDotTraceDiagnoser
   href: articles/samples/IntroDotTraceDiagnoser.html
 - uid: BenchmarkDotNet.Samples.IntroEnvVars
-  name: 'Sample: IntroEnvVars'
+  name: BenchmarkDotNet.Samples.IntroEnvVars
   href: articles/samples/IntroEnvVars.html
 - uid: BenchmarkDotNet.Samples.IntroEventPipeProfiler
-  name: 'Sample: EventPipeProfiler'
+  name: BenchmarkDotNet.Samples.IntroEventPipeProfiler
   href: articles/samples/IntroEventPipeProfiler.html
 - uid: BenchmarkDotNet.Samples.IntroEventPipeProfilerAdvanced
-  name: 'Sample: EventPipeProfilerAdvanced'
+  name: BenchmarkDotNet.Samples.IntroEventPipeProfilerAdvanced
   href: articles/samples/IntroEventPipeProfilerAdvanced.html
 - uid: BenchmarkDotNet.Samples.IntroExceptionDiagnoser
-  name: 'Sample: IntroExceptionDiagnoser'
+  name: BenchmarkDotNet.Samples.IntroExceptionDiagnoser
   href: articles/samples/IntroExceptionDiagnoser.html
 - uid: BenchmarkDotNet.Samples.IntroExport
-  name: 'Sample: IntroExport'
+  name: BenchmarkDotNet.Samples.IntroExport
   href: articles/samples/IntroExport.html
 - uid: BenchmarkDotNet.Samples.IntroExportJson
-  name: 'Sample: IntroExportJson'
+  name: BenchmarkDotNet.Samples.IntroExportJson
   href: articles/samples/IntroExportJson.html
 - uid: BenchmarkDotNet.Samples.IntroExportXml
-  name: 'Sample: IntroExportXml'
+  name: BenchmarkDotNet.Samples.IntroExportXml
   href: articles/samples/IntroExportXml.html
 - uid: BenchmarkDotNet.Samples.IntroFilters
-  name: 'Sample: IntroFilters'
+  name: BenchmarkDotNet.Samples.IntroFilters
   href: articles/samples/IntroFilters.html
 - uid: BenchmarkDotNet.Samples.IntroFluentConfigBuilder
-  name: 'Sample: IntroFluentConfigBuilder'
+  name: BenchmarkDotNet.Samples.IntroFluentConfigBuilder
   href: articles/samples/IntroFluentConfigBuilder.html
 - uid: BenchmarkDotNet.Samples.IntroGcMode
-  name: 'Sample: IntroGcMode'
+  name: BenchmarkDotNet.Samples.IntroGcMode
   href: articles/samples/IntroGcMode.html
 - uid: BenchmarkDotNet.Samples.IntroGenericTypeArguments
-  name: 'Sample: IntroGenericTypeArguments'
+  name: BenchmarkDotNet.Samples.IntroGenericTypeArguments
   href: articles/samples/IntroGenericTypeArguments.html
 - uid: BenchmarkDotNet.Samples.IntroHardwareCounters
-  name: 'Sample: IntroHardwareCounters'
+  name: BenchmarkDotNet.Samples.IntroHardwareCounters
   href: articles/samples/IntroHardwareCounters.html
 - uid: BenchmarkDotNet.Samples.IntroInliningDiagnoser
-  name: 'Sample: IntroInliningDiagnoser'
+  name: BenchmarkDotNet.Samples.IntroInliningDiagnoser
   href: articles/samples/IntroInliningDiagnoser.html
 - uid: BenchmarkDotNet.Samples.IntroInProcess
-  name: 'Sample: IntroInProcess'
+  name: BenchmarkDotNet.Samples.IntroInProcess
   href: articles/samples/IntroInProcess.html
 - uid: BenchmarkDotNet.Samples.IntroInProcessWrongEnv
-  name: 'Sample: IntroInProcessWrongEnv'
+  name: BenchmarkDotNet.Samples.IntroInProcessWrongEnv
   href: articles/samples/IntroInProcessWrongEnv.html
 - uid: BenchmarkDotNet.Samples.IntroJitStatsDiagnoser
-  name: 'Sample: IntroJitStatsDiagnoser'
+  name: BenchmarkDotNet.Samples.IntroJitStatsDiagnoser
   href: articles/samples/IntroJitStatsDiagnoser.html
 - uid: BenchmarkDotNet.Samples.IntroJobBaseline
-  name: 'Sample: IntroJobBaseline'
+  name: BenchmarkDotNet.Samples.IntroJobBaseline
   href: articles/samples/IntroJobBaseline.html
 - uid: BenchmarkDotNet.Samples.IntroJoin
-  name: 'Sample: IntroJoin'
+  name: BenchmarkDotNet.Samples.IntroJoin
   href: articles/samples/IntroJoin.html
 - uid: BenchmarkDotNet.Samples.IntroLargeAddressAware
   name: 'Sample: IntroLargeAddressAware'
   href: articles/samples/IntroLargeAddressAware.html
 - uid: BenchmarkDotNet.Samples.IntroMonitoring
-  name: 'Sample: IntroMonitoring'
+  name: BenchmarkDotNet.Samples.IntroMonitoring
   href: articles/samples/IntroMonitoring.html
 - uid: BenchmarkDotNet.Samples.IntroMultimodal
-  name: 'Sample: IntroMultimodal'
+  name: BenchmarkDotNet.Samples.IntroMultimodal
   href: articles/samples/IntroMultimodal.html
 - uid: BenchmarkDotNet.Samples.IntroNativeMemory
-  name: 'Sample: IntroNativeMemory'
+  name: BenchmarkDotNet.Samples.IntroNativeMemory
   href: articles/samples/IntroNativeMemory.html
 - uid: BenchmarkDotNet.Samples.IntroNuGet
-  name: 'Sample: IntroNuGet'
+  name: BenchmarkDotNet.Samples.IntroNuGet
   href: articles/samples/IntroNuGet.html
 - uid: BenchmarkDotNet.Samples.IntroOrderAttr
-  name: 'Sample: IntroOrderAttr'
+  name: BenchmarkDotNet.Samples.IntroOrderAttr
   href: articles/samples/IntroOrderAttr.html
 - uid: BenchmarkDotNet.Samples.IntroOrderManual
-  name: 'Sample: IntroOrderManual'
+  name: BenchmarkDotNet.Samples.IntroOrderManual
   href: articles/samples/IntroOrderManual.html
 - uid: BenchmarkDotNet.Samples.IntroOutliers
-  name: 'Sample: IntroOutliers'
+  name: BenchmarkDotNet.Samples.IntroOutliers
   href: articles/samples/IntroOutliers.html
 - uid: BenchmarkDotNet.Samples.IntroParams
-  name: 'Sample: IntroParams'
+  name: BenchmarkDotNet.Samples.IntroParams
   href: articles/samples/IntroParams.html
 - uid: BenchmarkDotNet.Samples.IntroParamsAllValues
-  name: 'Sample: IntroParamsAllValues'
+  name: BenchmarkDotNet.Samples.IntroParamsAllValues
   href: articles/samples/IntroParamsAllValues.html
 - uid: BenchmarkDotNet.Samples.IntroParamsPriority
-  name: 'Sample: IntroParamsPriority'
+  name: BenchmarkDotNet.Samples.IntroParamsPriority
   href: articles/samples/IntroParamsPriority.html
 - uid: BenchmarkDotNet.Samples.IntroParamsSource
-  name: 'Sample: IntroParamsSource'
+  name: BenchmarkDotNet.Samples.IntroParamsSource
   href: articles/samples/IntroParamsSource.html
 - uid: BenchmarkDotNet.Samples.IntroPercentiles
-  name: 'Sample: IntroPercentiles'
+  name: BenchmarkDotNet.Samples.IntroPercentiles
   href: articles/samples/IntroPercentiles.html
 - uid: BenchmarkDotNet.Samples.IntroPowerPlan
-  name: 'Sample: IntroPowerPlan'
+  name: BenchmarkDotNet.Samples.IntroPowerPlan
   href: articles/samples/IntroPowerPlan.html
 - uid: BenchmarkDotNet.Samples.IntroRankColumn
-  name: 'Sample: IntroRankColumn'
+  name: BenchmarkDotNet.Samples.IntroRankColumn
   href: articles/samples/IntroRankColumn.html
 - uid: BenchmarkDotNet.Samples.IntroRatioSD
-  name: 'Sample: IntroRatioSD'
+  name: BenchmarkDotNet.Samples.IntroRatioSD
   href: articles/samples/IntroRatioSD.html
 - uid: BenchmarkDotNet.Samples.IntroRatioStyle
-  name: 'Sample: IntroRatioStyle'
+  name: BenchmarkDotNet.Samples.IntroRatioStyle
   href: articles/samples/IntroRatioStyle.html
 - uid: BenchmarkDotNet.Samples.IntroSetupCleanupGlobal
-  name: 'Sample: IntroSetupCleanupGlobal'
+  name: BenchmarkDotNet.Samples.IntroSetupCleanupGlobal
   href: articles/samples/IntroSetupCleanupGlobal.html
 - uid: BenchmarkDotNet.Samples.IntroSetupCleanupIteration
-  name: 'Sample: IntroSetupCleanupIteration'
+  name: BenchmarkDotNet.Samples.IntroSetupCleanupIteration
   href: articles/samples/IntroSetupCleanupIteration.html
 - uid: BenchmarkDotNet.Samples.IntroSetupCleanupTarget
-  name: 'Sample: IntroSetupCleanupTarget'
+  name: BenchmarkDotNet.Samples.IntroSetupCleanupTarget
   href: articles/samples/IntroSetupCleanupTarget.html
 - uid: BenchmarkDotNet.Samples.IntroStaThread
-  name: 'Sample: IntroStaThread'
+  name: BenchmarkDotNet.Samples.IntroStaThread
   href: articles/samples/IntroStaThread.html
 - uid: BenchmarkDotNet.Samples.IntroStatisticalTesting
-  name: 'Sample: IntroStatisticalTesting'
+  name: BenchmarkDotNet.Samples.IntroStatisticalTesting
   href: articles/samples/IntroStatisticalTesting.html
 - uid: BenchmarkDotNet.Samples.IntroStatisticsColumns
-  name: 'Sample: IntroStatisticsColumns'
+  name: BenchmarkDotNet.Samples.IntroStatisticsColumns
   href: articles/samples/IntroStatisticsColumns.html
 - uid: BenchmarkDotNet.Samples.IntroStopOnFirstError
-  name: 'Sample: IntroStopOnFirstError'
+  name: BenchmarkDotNet.Samples.IntroStopOnFirstError
   href: articles/samples/IntroStopOnFirstError.html
 - uid: BenchmarkDotNet.Samples.IntroTagColumn
-  name: 'Sample: IntroTagColumn'
+  name: BenchmarkDotNet.Samples.IntroTagColumn
   href: articles/samples/IntroTagColumn.html
 - uid: BenchmarkDotNet.Samples.IntroTailcall
-  name: 'Sample: IntroTailcall'
+  name: BenchmarkDotNet.Samples.IntroTailcall
   href: articles/samples/IntroTailcall.html
 - uid: BenchmarkDotNet.Samples.IntroThreadingDiagnoser
-  name: 'Sample: IntroThreadingDiagnoser'
+  name: BenchmarkDotNet.Samples.IntroThreadingDiagnoser
   href: articles/samples/IntroThreadingDiagnoser.html
 - uid: BenchmarkDotNet.Samples.IntroUnicode
-  name: 'Sample: IntroUnicode'
+  name: BenchmarkDotNet.Samples.IntroUnicode
   href: articles/samples/IntroUnicode.html
 - uid: BenchmarkDotNet.Samples.IntroWasm
-  name: 'Sample: IntroWasm'
+  name: BenchmarkDotNet.Samples.IntroWasm
   href: articles/samples/IntroWasm.html
 - uid: BenchmarkDotNet.Samples.Xamarin
-  name: 'Sample: IntroXamarin'
+  name: BenchmarkDotNet.Samples.Xamarin
   href: articles/samples/IntroXamarin.html
 - uid: BenchmarkDotNet.Toolchains
   name: BenchmarkDotNet.Toolchains
@@ -33645,13 +33681,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher
   nameWithType: DotNetCliPublisher
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})
-  name: DotNetCliPublisher(string?, string?, IReadOnlyList<EnvironmentVariable>)
+  name: DotNetCliPublisher(string?, string?, IReadOnlyList<EnvironmentVariable>?)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliPublisher__ctor_System_String_System_String_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})
   name.vb: New(String, String, IReadOnlyList(Of EnvironmentVariable))
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.DotNetCliPublisher(string?, string?, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Jobs.EnvironmentVariable>)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.DotNetCliPublisher(string?, string?, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Jobs.EnvironmentVariable>?)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.New(String, String, System.Collections.Generic.IReadOnlyList(Of BenchmarkDotNet.Jobs.EnvironmentVariable))
-  nameWithType: DotNetCliPublisher.DotNetCliPublisher(string?, string?, IReadOnlyList<EnvironmentVariable>)
+  nameWithType: DotNetCliPublisher.DotNetCliPublisher(string?, string?, IReadOnlyList<EnvironmentVariable>?)
   nameWithType.vb: DotNetCliPublisher.New(String, String, IReadOnlyList(Of EnvironmentVariable))
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.#ctor*
   name: DotNetCliPublisher
@@ -33681,13 +33717,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings
   nameWithType: NetCoreAppSettings
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
-  name: NetCoreAppSettings(string, string, string, string?, string?, string?, string?, MonoAotCompilerMode)
+  name: NetCoreAppSettings(string, string?, string, string?, string?, string?, string?, MonoAotCompilerMode)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
   name.vb: New(String, String, String, String, String, String, String, MonoAotCompilerMode)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(string, string, string, string?, string?, string?, string?, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(string, string?, string, string?, string?, string?, string?, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.New(String, String, String, String, String, String, String, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
-  nameWithType: NetCoreAppSettings.NetCoreAppSettings(string, string, string, string?, string?, string?, string?, MonoAotCompilerMode)
+  nameWithType: NetCoreAppSettings.NetCoreAppSettings(string, string?, string, string?, string?, string?, string?, MonoAotCompilerMode)
   nameWithType.vb: NetCoreAppSettings.New(String, String, String, String, String, String, String, MonoAotCompilerMode)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor*
   name: NetCoreAppSettings
@@ -37950,19 +37986,22 @@ references:
   fullName: BenchmarkDotNet.Validators.ValidationError.BenchmarkCase
   nameWithType: ValidationError.BenchmarkCase
 - uid: BenchmarkDotNet.Validators.ValidationError.Equals(BenchmarkDotNet.Validators.ValidationError)
-  name: Equals(ValidationError)
+  name: Equals(ValidationError?)
   href: api/BenchmarkDotNet.Validators.ValidationError.html#BenchmarkDotNet_Validators_ValidationError_Equals_BenchmarkDotNet_Validators_ValidationError_
   commentId: M:BenchmarkDotNet.Validators.ValidationError.Equals(BenchmarkDotNet.Validators.ValidationError)
-  fullName: BenchmarkDotNet.Validators.ValidationError.Equals(BenchmarkDotNet.Validators.ValidationError)
-  nameWithType: ValidationError.Equals(ValidationError)
+  name.vb: Equals(ValidationError)
+  fullName: BenchmarkDotNet.Validators.ValidationError.Equals(BenchmarkDotNet.Validators.ValidationError?)
+  fullName.vb: BenchmarkDotNet.Validators.ValidationError.Equals(BenchmarkDotNet.Validators.ValidationError)
+  nameWithType: ValidationError.Equals(ValidationError?)
+  nameWithType.vb: ValidationError.Equals(ValidationError)
 - uid: BenchmarkDotNet.Validators.ValidationError.Equals(System.Object)
-  name: Equals(object)
+  name: Equals(object?)
   href: api/BenchmarkDotNet.Validators.ValidationError.html#BenchmarkDotNet_Validators_ValidationError_Equals_System_Object_
   commentId: M:BenchmarkDotNet.Validators.ValidationError.Equals(System.Object)
   name.vb: Equals(Object)
-  fullName: BenchmarkDotNet.Validators.ValidationError.Equals(object)
+  fullName: BenchmarkDotNet.Validators.ValidationError.Equals(object?)
   fullName.vb: BenchmarkDotNet.Validators.ValidationError.Equals(Object)
-  nameWithType: ValidationError.Equals(object)
+  nameWithType: ValidationError.Equals(object?)
   nameWithType.vb: ValidationError.Equals(Object)
 - uid: BenchmarkDotNet.Validators.ValidationError.Equals*
   name: Equals
@@ -38241,6 +38280,9 @@ references:
 - uid: changelog.v0.13.10
   name: BenchmarkDotNet v0.13.10
   href: changelog/v0.13.10.html
+- uid: changelog.v0.13.11
+  name: BenchmarkDotNet v0.13.11
+  href: changelog/v0.13.11.html
 - uid: changelog.v0.13.2
   name: BenchmarkDotNet v0.13.2
   href: changelog/v0.13.2.html

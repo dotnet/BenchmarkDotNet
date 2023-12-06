@@ -29,6 +29,7 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
   <script type="module" src="./../public/docfx.min.js"></script>
@@ -137,7 +138,7 @@
   <a id="BenchmarkDotNet_Reports_SummaryStyle__ctor_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor*"></a>
 
   <h3 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)">
-  SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle, TextJustification, TextJustification)
+  SummaryStyle(CultureInfo?, bool, SizeUnit?, TimeUnit?, bool, bool, int, RatioStyle, TextJustification, TextJustification)
   
   </h3>
 
@@ -145,7 +146,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20, RatioStyle ratioStyle = RatioStyle.Value, SummaryTable.SummaryTableColumn.TextJustification textColumnJustification = TextJustification.Left, SummaryTable.SummaryTableColumn.TextJustification numericColumnJustification = TextJustification.Right)</code></pre>
+    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit? sizeUnit, TimeUnit? timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20, RatioStyle ratioStyle = RatioStyle.Value, SummaryTable.SummaryTableColumn.TextJustification textColumnJustification = TextJustification.Left, SummaryTable.SummaryTableColumn.TextJustification numericColumnJustification = TextJustification.Right)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -449,7 +450,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SizeUnit SizeUnit { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public SizeUnit? SizeUnit { get; }</code></pre>
   </div>
 
 
@@ -511,7 +512,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeUnit TimeUnit { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeUnit? TimeUnit { get; }</code></pre>
   </div>
 
 
@@ -943,7 +944,7 @@
 
     <div class="container-xxl search-results" id="search-results"></div>
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           Copyright &copy; 2013–2023 .NET Foundation and contributors

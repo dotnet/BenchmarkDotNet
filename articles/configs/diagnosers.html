@@ -27,6 +27,7 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
   <script type="module" src="./../../public/docfx.min.js"></script>
@@ -156,7 +157,6 @@ Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cr
 <li>In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.</li>
 <li>MemoryDiagnoser:
 <ul>
-<li>Mono currently <a href="https://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono">does not</a> expose any api to get the number of allocated bytes. That's why our Mono users will get <code>?</code> in Allocated column.</li>
 <li>In order to get the number of allocated bytes in cross platform way we are using <code>GC.GetAllocatedBytesForCurrentThread</code> which recently got <a href="https://github.com/dotnet/corefx/pull/12489">exposed</a> for netcoreapp1.1. That's why BenchmarkDotNet does not support netcoreapp1.0 from version 0.10.1.</li>
 <li>MemoryDiagnoser is <code>99.5%</code> accurate about allocated memory when using default settings or Job.ShortRun (or any longer job than it).</li>
 </ul>
@@ -301,7 +301,7 @@ namespace BenchmarkDotNet.Samples
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroHardwareCounters.html">Sample: IntroHardwareCounters</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroHardwareCounters.html">BenchmarkDotNet.Samples.IntroHardwareCounters</a></li>
 </ul>
 <hr>
 <h2 id="sample-introdisassemblyryujit">Sample: IntroDisassemblyRyuJit</h2>
@@ -346,7 +346,7 @@ namespace BenchmarkDotNet.Samples
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
 <li><a class="xref" href="../features/disassembler.html">Disassembler</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyRyuJit.html">Sample: IntroDisassemblyRyuJit</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyRyuJit.html">BenchmarkDotNet.Samples.IntroDisassemblyRyuJit</a></li>
 </ul>
 <hr>
 <h2 id="sample-introdisassembly">Sample: IntroDisassembly</h2>
@@ -473,7 +473,7 @@ retq
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
 <li><a class="xref" href="../features/disassembler.html">Disassembler</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassembly.html">Sample: IntroDisassembly</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassembly.html">BenchmarkDotNet.Samples.IntroDisassembly</a></li>
 </ul>
 <hr>
 <h2 id="sample-introdisassemblyalljits">Sample: IntroDisassemblyAllJits</h2>
@@ -542,7 +542,7 @@ The file was too big to embed it in this doc page.</p>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
 <li><a class="xref" href="../features/disassembler.html">Disassembler</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyAllJits.html">Sample: IntroDisassemblyAllJits</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyAllJits.html">BenchmarkDotNet.Samples.IntroDisassemblyAllJits</a></li>
 </ul>
 <hr>
 <h2 id="sample-introdisassemblydry">Sample: IntroDisassemblyDry</h2>
@@ -569,7 +569,7 @@ namespace BenchmarkDotNet.Samples
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
 <li><a class="xref" href="../features/disassembler.html">Disassembler</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyDry.html">Sample: IntroDisassemblyDry</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroDisassemblyDry.html">BenchmarkDotNet.Samples.IntroDisassemblyDry</a></li>
 </ul>
 <hr>
 <h2 id="sample-introtailcall">Sample: IntroTailcall</h2>
@@ -630,7 +630,7 @@ Tail call type: RecursiveLoop
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroTailcall.html">Sample: IntroTailcall</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroTailcall.html">BenchmarkDotNet.Samples.IntroTailcall</a></li>
 </ul>
 <hr>
 <h2 id="sample-introjitstatsdiagnoser">Sample: IntroJitStatsDiagnoser</h2>
@@ -685,7 +685,7 @@ namespace BenchmarkDotNet.Samples
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroJitStatsDiagnoser.html">Sample: IntroJitStatsDiagnoser</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroJitStatsDiagnoser.html">BenchmarkDotNet.Samples.IntroJitStatsDiagnoser</a></li>
 </ul>
 <hr>
 <h2 id="sample-intronativememory">Sample: IntroNativeMemory</h2>
@@ -825,7 +825,7 @@ You should redesign your benchmark and remove the side-effects. You can use `Ope
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroNativeMemory.html">Sample: IntroNativeMemory</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroNativeMemory.html">BenchmarkDotNet.Samples.IntroNativeMemory</a></li>
 </ul>
 <hr>
 <h2 id="sample-introthreadingdiagnoser">Sample: IntroThreadingDiagnoser</h2>
@@ -880,7 +880,7 @@ namespace BenchmarkDotNet.Samples
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroThreadingDiagnoser.html">Sample: IntroThreadingDiagnoser</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroThreadingDiagnoser.html">BenchmarkDotNet.Samples.IntroThreadingDiagnoser</a></li>
 </ul>
 <hr>
 <h2 id="sample-introexceptiondiagnoser">Sample: IntroExceptionDiagnoser</h2>
@@ -938,7 +938,7 @@ namespace BenchmarkDotNet.Samples
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="../samples/IntroExceptionDiagnoser.html">Sample: IntroExceptionDiagnoser</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroExceptionDiagnoser.html">BenchmarkDotNet.Samples.IntroExceptionDiagnoser</a></li>
 </ul>
 <hr>
 
@@ -956,7 +956,7 @@ namespace BenchmarkDotNet.Samples
 
     <div class="container-xxl search-results" id="search-results"></div>
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           Copyright &copy; 2013–2023 .NET Foundation and contributors

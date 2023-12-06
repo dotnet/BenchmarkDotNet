@@ -27,6 +27,7 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
   <script type="module" src="./../public/docfx.min.js"></script>
@@ -191,7 +192,7 @@ public class IntroNuGet
       new { hello = &quot;world&quot;, price = 1.99, now = DateTime.UtcNow });
 }
 </code></pre>
-<p>See also: <a class="xref" href="../articles/samples/IntroNuGet.html">Sample: IntroNuGet</a></p>
+<p>See also: <a class="xref" href="../articles/samples/IntroNuGet.html">BenchmarkDotNet.Samples.IntroNuGet</a></p>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/290">#290</a> Question: Any official way to benchmark same method between different assembly versions?</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/931">#931</a> Same NuGet version used when benchmarking different packages</li>
@@ -214,7 +215,7 @@ public class IntroNuGet
 </code></pre>
 <p>Don't worry! We are also providing you with a <code>Consume</code> extension method which can execute given <code>IEnumerable</code> or <code>IQueryable</code> and consume its results. All you need to do is to create a <a class="xref" href="../api/BenchmarkDotNet.Engines.Consumer.html"><code>Consumer</code></a> instance, preferably store it in a field (to exclude the cost of creating Consumer from the benchmark itself) and pass it to <code>Consume</code> extension method.</p>
 <p><strong>Do not call <code>.ToArray()</code> because it's an expensive operation and it might dominate given benchmark!</strong></p>
-<p>See also: <a class="xref" href="../articles/samples/IntroDeferredExecution.html">Sample: IntroDeferredExecution</a></p>
+<p>See also: <a class="xref" href="../articles/samples/IntroDeferredExecution.html">BenchmarkDotNet.Samples.IntroDeferredExecution</a></p>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/858">#858</a> Should the Engine iterate over and consume IEnumerable and IQueryable results? (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cebe2a0f84fa21acb6db9613fe3a4326d635f129">cebe2a</a> Deferred Execution Validator, fixes #858 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
@@ -715,7 +716,7 @@ public class IntroStatisticalTesting
 </code></pre>
 <p>The statistical testing is a work-in-progress feature.
 In future versions of BenchmarkDotNet, we are planning to improve API, fill missed docs, and introduce more parameters for customization.</p>
-<p>See also: <a class="xref" href="../articles/samples/IntroStatisticalTesting.html">Sample: IntroStatisticalTesting</a></p>
+<p>See also: <a class="xref" href="../articles/samples/IntroStatisticalTesting.html">BenchmarkDotNet.Samples.IntroStatisticalTesting</a></p>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/60eca005326970202a33891e5aecd2ef6b7e4cd0">60eca0</a> Threshold API for WelchTTest; Improve Student accuracy for small n (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/05cc8d15ef88e382bbb1827d766d7275c3e42abd">05cc8d</a> Statistical testing improvements (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
@@ -743,8 +744,8 @@ many developers interpreted it as the ratio of means (e.g., <code>50.46</code>/<
 The ratio of distribution means and the mean of the ratio distribution are pretty close to each other in most cases,
 but they are not equal.</p>
 <p>See also:
-<a class="xref" href="../articles/samples/IntroBenchmarkBaseline.html">Sample: IntroBenchmarkBaseline</a>,
-<a class="xref" href="../articles/samples/IntroRatioSD.html">Sample: IntroRatioSD</a>,
+<a class="xref" href="../articles/samples/IntroBenchmarkBaseline.html">BenchmarkDotNet.Samples.IntroBenchmarkBaseline</a>,
+<a class="xref" href="../articles/samples/IntroRatioSD.html">BenchmarkDotNet.Samples.IntroRatioSD</a>,
 <a class="xref" href="../articles/features/baselines.html">Benchmark and Job Baselines</a>.</p>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4e64c94cfe7b49bbdc06aabb6ee1f262bd370862">4e64c9</a> Ratio/RatioSD columns (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
@@ -955,7 +956,7 @@ This release includes 84 commits by 20 contributors.</p>
 
     <div class="container-xxl search-results" id="search-results"></div>
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           Copyright &copy; 2013–2023 .NET Foundation and contributors

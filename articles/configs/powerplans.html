@@ -27,6 +27,7 @@
       <meta name="loc:themeAuto" content="Auto">
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
   </head>
 
   <script type="module" src="./../../public/docfx.min.js"></script>
@@ -85,13 +86,13 @@
         <article data-uid="docs.powerplans">
 <h1 id="power-plans">Power Plans</h1>
 
-<p>BenchmarkDotNet forces Windows OS to execute on the High-Performance power plan. You can disable this feature by modify PowerPlanMode property. You can see it in the <a class="xref" href="../samples/IntroPowerPlan.html">Sample: IntroPowerPlan</a>.</p>
+<p>BenchmarkDotNet forces Windows OS to execute on the High-Performance power plan. You can disable this feature by modify PowerPlanMode property. You can see it in the <a class="xref" href="../samples/IntroPowerPlan.html">BenchmarkDotNet.Samples.IntroPowerPlan</a>.</p>
 <p>Please note. During an execution, BenchmarkDotNet saves the current power plan and applies it according to the PowerPlanMode property. When all of the benchmarks finish, a previous power plan comes back. However, if someone killed process or energy was plugged off, we could stay with the High-Performance power plan. In this situation, we should return it manually in Windows Control Panel or by powercfg command.</p>
 <h3 id="links">Links</h3>
 <ul>
 <li>Power policy settings: <a href="https://learn.microsoft.com/windows/win32/power/power-policy-settings">https://learn.microsoft.com/windows/win32/power/power-policy-settings</a></li>
 <li>Powercfg command: <a href="https://learn.microsoft.com/windows-hardware/design/device-experiences/powercfg-command-line-options">https://learn.microsoft.com/windows-hardware/design/device-experiences/powercfg-command-line-options</a></li>
-<li><a class="xref" href="../samples/IntroPowerPlan.html">Sample: IntroPowerPlan</a></li>
+<li><a class="xref" href="../samples/IntroPowerPlan.html">BenchmarkDotNet.Samples.IntroPowerPlan</a></li>
 </ul>
 <hr>
 
@@ -109,7 +110,7 @@
 
     <div class="container-xxl search-results" id="search-results"></div>
 
-    <footer class="border-top">
+    <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
           Copyright &copy; 2013–2023 .NET Foundation and contributors

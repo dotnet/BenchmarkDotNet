@@ -164,6 +164,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Analysers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Analysers.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Analysers.ZeroMeasurementAnalyser.yml",
       "output": {
         ".html": {
@@ -178,16 +188,6 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Analysers.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Analysers.html"
         }
       },
       "version": ""
@@ -644,20 +644,20 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.InProcessAttribute.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.InnerIterationCountAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.InProcessAttribute.html"
+          "relative_path": "api/BenchmarkDotNet.Attributes.InnerIterationCountAttribute.html"
         }
       },
       "version": ""
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.InnerIterationCountAttribute.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.InProcessAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.InnerIterationCountAttribute.html"
+          "relative_path": "api/BenchmarkDotNet.Attributes.InProcessAttribute.html"
         }
       },
       "version": ""
@@ -694,6 +694,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.IterationsColumnAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Attributes.IterationsColumnAttribute.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Attributes.IterationSetupAttribute.yml",
       "output": {
         ".html": {
@@ -708,16 +718,6 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.IterationTimeAttribute.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.IterationsColumnAttribute.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.IterationsColumnAttribute.html"
         }
       },
       "version": ""
@@ -848,16 +848,6 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.LongRunJobAttribute.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.MValueColumnAttribute.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.MValueColumnAttribute.html"
         }
       },
       "version": ""
@@ -1074,20 +1064,20 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.NamespaceColumnAttribute.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.MValueColumnAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.NamespaceColumnAttribute.html"
+          "relative_path": "api/BenchmarkDotNet.Attributes.MValueColumnAttribute.html"
         }
       },
       "version": ""
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.OS.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.NamespaceColumnAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.OS.html"
+          "relative_path": "api/BenchmarkDotNet.Attributes.NamespaceColumnAttribute.html"
         }
       },
       "version": ""
@@ -1114,10 +1104,30 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Attributes.OperationsPerSecondAttribute.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Attributes.OrdererAttribute.yml",
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.OrdererAttribute.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.OS.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Attributes.OS.html"
         }
       },
       "version": ""
@@ -1224,16 +1234,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.RPlotExporterAttribute.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.RPlotExporterAttribute.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Attributes.RankColumnAttribute.yml",
       "output": {
         ".html": {
@@ -1248,6 +1248,16 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ReturnValueValidatorAttribute.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.RPlotExporterAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Attributes.RPlotExporterAttribute.html"
         }
       },
       "version": ""
@@ -1934,20 +1944,20 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Columns.StatisticColumn.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Columns.StatisticalTestColumn.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Columns.StatisticColumn.html"
+          "relative_path": "api/BenchmarkDotNet.Columns.StatisticalTestColumn.html"
         }
       },
       "version": ""
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Columns.StatisticalTestColumn.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Columns.StatisticColumn.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Columns.StatisticalTestColumn.html"
+          "relative_path": "api/BenchmarkDotNet.Columns.StatisticColumn.html"
         }
       },
       "version": ""
@@ -3794,16 +3804,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Loggers.LogKind.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Loggers.LogKind.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Loggers.LoggerExtensions.yml",
       "output": {
         ".html": {
@@ -3818,6 +3818,16 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.LoggerWithPrefix.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Loggers.LogKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Loggers.LogKind.html"
         }
       },
       "version": ""
@@ -4104,16 +4114,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Portability.VMware.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Portability.VMware.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Portability.VirtualBox.yml",
       "output": {
         ".html": {
@@ -4128,6 +4128,16 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.VirtualMachineHypervisor.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Portability.VMware.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Portability.VMware.html"
         }
       },
       "version": ""
@@ -4734,16 +4744,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.IToolchain.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.IToolchain.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.yml",
       "output": {
         ".html": {
@@ -4958,6 +4958,16 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.IToolchain.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.IToolchain.html"
         }
       },
       "version": ""
@@ -5596,6 +5606,19 @@
       "version": ""
     },
     {
+      "type": "Toc",
+      "source_relative_path": "articles/configs/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/configs/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/configs/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "articles/configs/toolchains.md",
       "output": {
@@ -5676,6 +5699,19 @@
       "version": ""
     },
     {
+      "type": "Toc",
+      "source_relative_path": "articles/contributing/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/contributing/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/contributing/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "articles/faq.md",
       "output": {
@@ -5751,6 +5787,19 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/statistics.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/features/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/features/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/features/toc.json"
         }
       },
       "version": ""
@@ -5841,6 +5890,19 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/nuget.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/guides/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/guides/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/guides/toc.json"
         }
       },
       "version": ""
@@ -6207,6 +6269,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/samples/IntroInliningDiagnoser.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/samples/IntroInliningDiagnoser.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/samples/IntroInProcess.md",
       "output": {
         ".html": {
@@ -6221,16 +6293,6 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroInProcessWrongEnv.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Conceptual",
-      "source_relative_path": "articles/samples/IntroInliningDiagnoser.md",
-      "output": {
-        ".html": {
-          "relative_path": "articles/samples/IntroInliningDiagnoser.html"
         }
       },
       "version": ""
@@ -6566,6 +6628,19 @@
       "version": ""
     },
     {
+      "type": "Toc",
+      "source_relative_path": "articles/samples/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/samples/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/samples/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "articles/team.md",
       "output": {
@@ -6877,6 +6952,16 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.10.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.13.11.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.13.11.html"
         }
       },
       "version": ""
