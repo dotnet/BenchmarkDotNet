@@ -1,0 +1,35 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Workflow files stored in the default location of `.github/workflows`. (You don't need to specify `/.github/workflows` for `directory`. You can use `directory: "/"`.)
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
+  - package-ecosystem: "nuget"
+    directory: "/src"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
+    groups:
+      src_projects_minor_patch_updates:
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "nuget"
+    directory: "/tests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
+    groups:
+      tests_projects_minor_patch_updates:
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
