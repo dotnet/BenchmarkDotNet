@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
             (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
@@ -532,6 +532,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
                 case RuntimeMoniker.Net80:
+                case RuntimeMoniker.Net90:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
@@ -543,10 +544,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
 
                 case RuntimeMoniker.NativeAot70:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
 
                 case RuntimeMoniker.NativeAot80:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
+
+                case RuntimeMoniker.NativeAot90:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json");
 
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
@@ -563,6 +567,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.WasmNet80:
                     return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
 
+                case RuntimeMoniker.WasmNet90:
+                    return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
+
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
 
@@ -575,6 +582,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.MonoAOTLLVMNet80:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net8.0");
 
+                case RuntimeMoniker.MonoAOTLLVMNet90:
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net9.0");
+
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
 
@@ -583,6 +593,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.Mono80:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
+
+                case RuntimeMoniker.Mono90:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono90);
 
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
@@ -750,7 +763,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
         }
 
-        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
+        internal static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
         {
             int index = runtime.IndexOf('-');
 

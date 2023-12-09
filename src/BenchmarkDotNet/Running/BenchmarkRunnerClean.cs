@@ -242,7 +242,7 @@ namespace BenchmarkDotNet.Running
                         reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default));
 
                         if (buildResult.GenerateException != null)
-                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException}");
                         else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string reason))
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)

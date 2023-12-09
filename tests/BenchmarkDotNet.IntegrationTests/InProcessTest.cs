@@ -123,7 +123,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             bool isValueTask = typeof(T).IsConstructedGenericType && typeof(T).GetGenericTypeDefinition() == typeof(ValueTask<>);
 
-            object idleExpected;
+            object? idleExpected;
             if (isValueTask)
                 idleExpected = GetDefault(typeof(T).GetGenericArguments()[0]);
             else if (typeof(T).GetTypeInfo().IsValueType)
@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateInProcessConfig(OutputLogger logger = null)
+        private IConfig CreateInProcessConfig(OutputLogger? logger = null)
         {
             return new ManualConfig()
                 .AddJob(Job.Dry.WithToolchain(new InProcessNoEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))

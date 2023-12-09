@@ -213,7 +213,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Contains("SomeGeneric<Int32>.Create", benchmarks);
         }
 
-        private HashSet<string> Filter(Type[] types, string[] args, ILogger logger = null)
+        private HashSet<string> Filter(Type[] types, string[] args, ILogger? logger = null)
         {
             var nonNullLogger = logger ?? new OutputLogger(Output);
 

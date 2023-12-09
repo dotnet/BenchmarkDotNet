@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         internal string CustomDotNetCliPath { get; }
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null, string customDotNetCliPath = null)
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string? packagesPath = null, string? customDotNetCliPath = null)
             : base(name,
                 new CsProjGenerator(targetFrameworkMoniker, customDotNetCliPath, packagesPath, runtimeFrameworkVersion: null, isNetCore: false),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath),
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, string customDotNetCliPath = null)
+        public static IToolchain From(string targetFrameworkMoniker, string? packagesPath = null, string? customDotNetCliPath = null)
             => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath, customDotNetCliPath);
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)

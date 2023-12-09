@@ -20,9 +20,9 @@ namespace BenchmarkDotNet.Reports
         public bool PrintUnitsInContent { get; }
         public bool PrintZeroValuesInContent { get; }
         public int MaxParameterColumnWidth { get; }
-        public SizeUnit SizeUnit { get; }
+        public SizeUnit? SizeUnit { get; }
         internal SizeUnit CodeSizeUnit { get; }
-        public TimeUnit TimeUnit { get; }
+        public TimeUnit? TimeUnit { get; }
         public CultureInfo CultureInfo { get; }
 
         public RatioStyle RatioStyle { get; }
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Reports
         public TextJustification TextColumnJustification { get; }
         public TextJustification NumericColumnJustification { get; }
 
-        public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
+        public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit? sizeUnit, TimeUnit? timeUnit, bool printUnitsInContent = true,
             bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value,
             TextJustification textColumnJustification = TextJustification.Left, TextJustification numericColumnJustification = TextJustification.Right)
         {

@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [InlineData(null, typeof(ArgumentException))]
         [InlineData(" ", typeof(ArgumentException))]
         [InlineData("", typeof(ArgumentException))]
-        public void WithRootNameThrowsGivenNameIsNullOrWhiteSpace(string name, Type exception)
+        public void WithRootNameThrowsGivenNameIsNullOrWhiteSpace(string? name, Type exception)
         {
             Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
                                                     .WithRootName(name)
@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [InlineData(null, "MockItem", typeof(ArgumentException))]
         [InlineData(" ", "MockItem", typeof(ArgumentException))]
         [InlineData("", "MockItem", typeof(ArgumentException))]
-        public void WithCollectionItemNameThrowsGivenInvalidArguments(string collectionName, string itemName, Type exception)
+        public void WithCollectionItemNameThrowsGivenInvalidArguments(string? collectionName, string? itemName, Type exception)
         {
             Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
                                                     .WithCollectionItemName(collectionName, itemName)
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [InlineData(null, typeof(ArgumentException))]
         [InlineData(" ", typeof(ArgumentException))]
         [InlineData("", typeof(ArgumentException))]
-        public void WithExcludedPropertyThrowsGivenNameIsNullOrWhiteSpace(string name, Type exception)
+        public void WithExcludedPropertyThrowsGivenNameIsNullOrWhiteSpace(string? name, Type exception)
         {
             Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
                                                     .WithExcludedProperty(name)

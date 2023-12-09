@@ -22,9 +22,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 new[]
                 {
                     BenchmarkCase.Create(
-                        new Descriptor(
-                            typeof(CompilationValidatorTests),
-                            method.Method),
+                        new Descriptor(typeof(CompilationValidatorTests), method.Method),
                         Job.Dry,
                         null,
                         config
@@ -48,9 +46,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 new[]
                 {
                     BenchmarkCase.Create(
-                        new Descriptor(
-                            typeof(CompilationValidatorTests),
-                            method.Method),
+                        new Descriptor(typeof(CompilationValidatorTests), method.Method),
                         Job.Dry,
                         null,
                         config)

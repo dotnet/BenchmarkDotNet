@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains
                     || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
                     || job.HasValue(InfrastructureMode.ArgumentsCharacteristic));
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
         {
             switch (runtime)
             {
@@ -66,6 +66,7 @@ namespace BenchmarkDotNet.Toolchains
                                 RuntimeMoniker.Mono60 => GetToolchain(RuntimeMoniker.Net60),
                                 RuntimeMoniker.Mono70 => GetToolchain(RuntimeMoniker.Net70),
                                 RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
+                                RuntimeMoniker.Mono90 => GetToolchain(RuntimeMoniker.Net90),
                                 _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
                             };
                         }
@@ -152,6 +153,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net80:
                     return CsProjCoreToolchain.NetCoreApp80;
 
+                case RuntimeMoniker.Net90:
+                    return CsProjCoreToolchain.NetCoreApp90;
+
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
 
@@ -161,6 +165,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.NativeAot80:
                     return NativeAotToolchain.Net80;
 
+                case RuntimeMoniker.NativeAot90:
+                    return NativeAotToolchain.Net90;
+
                 case RuntimeMoniker.Mono60:
                     return MonoToolchain.Mono60;
 
@@ -169,6 +176,9 @@ namespace BenchmarkDotNet.Toolchains
 
                 case RuntimeMoniker.Mono80:
                     return MonoToolchain.Mono80;
+
+                case RuntimeMoniker.Mono90:
+                    return MonoToolchain.Mono90;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");

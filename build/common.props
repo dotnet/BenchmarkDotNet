@@ -18,6 +18,7 @@
     <UseSharedCompilation>false</UseSharedCompilation>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
@@ -35,11 +36,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' AND '$(IsFsharp)' != 'true' ">
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
-    <VersionPrefix>0.13.9</VersionPrefix>
+    <VersionPrefix>0.13.12</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">

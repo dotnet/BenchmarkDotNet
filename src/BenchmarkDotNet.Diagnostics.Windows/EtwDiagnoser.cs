@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void OnProcessExit(object sender, EventArgs e) => Session?.Dispose();
 
-        private static string GetSessionName(string prefix, BenchmarkCase benchmarkCase, ParameterInstances parameters = null)
+        private static string GetSessionName(string prefix, BenchmarkCase benchmarkCase, ParameterInstances? parameters = null)
         {
             if (parameters != null && parameters.Items.Count > 0)
                 return $"{prefix}-{benchmarkCase.FolderInfo}-{parameters.FolderInfo}";

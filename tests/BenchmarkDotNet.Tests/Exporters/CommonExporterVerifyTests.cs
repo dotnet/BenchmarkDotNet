@@ -5,12 +5,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Tests.Reports;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
@@ -51,7 +54,14 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
+                exporter.ExportToLog(
+                    MockFactory.CreateSummary(
+                        config.WithCultureInfo(cultureInfo),
+                        hugeSd: false,
+                        new[]
+                        {
+                            new Metric(new FakeMetricDescriptor("CacheMisses", "Hardware counter 'CacheMisses' per single operation", "N0"), 7)
+                        }), logger);
             }
 
             var settings = VerifySettingsFactory.Create();
@@ -98,6 +108,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             .AddColumn(StatisticColumn.Mean)
             .AddColumn(StatisticColumn.StdDev)
             .AddColumn(StatisticColumn.P67)
+            .AddHardwareCounters(HardwareCounter.CacheMisses)
+            .AddColumnProvider(DefaultColumnProviders.Metrics)
             .AddDiagnoser(Diagnosers.MemoryDiagnoser.Default);
 
         public void Dispose()

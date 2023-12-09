@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Columns
         }
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => getTag(benchmarkCase.Descriptor.WorkloadMethod.Name);
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => getTag(benchmarkCase.Descriptor?.WorkloadMethod?.Name ?? "");
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;

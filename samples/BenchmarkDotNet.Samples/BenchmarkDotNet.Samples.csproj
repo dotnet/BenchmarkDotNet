@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Samples</AssemblyTitle>
-    <TargetFrameworks>net7.0;net462</TargetFrameworks>
+    <TargetFrameworks>net8.0;net462</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.Samples</AssemblyName>
     <OutputType>Exe</OutputType>

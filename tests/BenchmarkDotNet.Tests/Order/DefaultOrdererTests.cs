@@ -11,6 +11,7 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Tests.Order
             "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
 
         private static BenchmarkCase CreateBenchmarkCase(string category, int parameter, params BenchmarkLogicalGroupRule[] rules) => new (
-            new Descriptor(null, null, categories: new[] { category }),
+            new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo, categories: new[] { category }),
             new Job(),
             new ParameterInstances(new[]
             {

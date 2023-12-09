@@ -16,7 +16,10 @@ namespace BenchmarkDotNet.Samples
                     throw new Exception();
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
     }
 }

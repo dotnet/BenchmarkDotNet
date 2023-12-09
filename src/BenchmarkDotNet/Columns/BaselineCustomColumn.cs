@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Columns
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        internal static bool ResultsAreInvalid(Summary summary, BenchmarkCase benchmarkCase, BenchmarkCase baseline)
+        internal static bool ResultsAreInvalid(Summary summary, BenchmarkCase benchmarkCase, BenchmarkCase? baseline)
         {
             return baseline == null ||
                    summary[baseline] == null ||

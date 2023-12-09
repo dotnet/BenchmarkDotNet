@@ -8,18 +8,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliPublisher : IBuilder
     {
-        public DotNetCliPublisher(string customDotNetCliPath = null, string extraArguments = null, IReadOnlyList<EnvironmentVariable> environmentVariables = null)
+        public DotNetCliPublisher(
+            string? customDotNetCliPath = null,
+            string? extraArguments = null,
+            IReadOnlyList<EnvironmentVariable>? environmentVariables = null)
         {
             CustomDotNetCliPath = customDotNetCliPath;
             ExtraArguments = extraArguments;
             EnvironmentVariables = environmentVariables;
         }
 
-        private string CustomDotNetCliPath { get; }
+        private string? CustomDotNetCliPath { get; }
 
-        private string ExtraArguments { get; }
+        private string? ExtraArguments { get; }
 
-        private IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
+        private IReadOnlyList<EnvironmentVariable>? EnvironmentVariables { get; }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             => new DotNetCliCommand(

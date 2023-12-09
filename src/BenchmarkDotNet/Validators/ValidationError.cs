@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Validators
 {
     public class ValidationError : IEquatable<ValidationError>
     {
-        public ValidationError(bool isCritical, string message, BenchmarkCase benchmarkCase = null)
+        public ValidationError(bool isCritical, string message, BenchmarkCase? benchmarkCase = null)
         {
             IsCritical = isCritical;
             Message = message;
@@ -15,11 +15,11 @@ namespace BenchmarkDotNet.Validators
 
         [PublicAPI] public bool IsCritical { get; }
         [PublicAPI] public string Message { get; }
-        [PublicAPI] public BenchmarkCase BenchmarkCase { get; }
+        [PublicAPI] public BenchmarkCase? BenchmarkCase { get; }
 
         public override string ToString() => Message;
 
-        public bool Equals(ValidationError other)
+        public bool Equals(ValidationError? other)
         {
             if (ReferenceEquals(null, other))
                 return false;
@@ -28,13 +28,13 @@ namespace BenchmarkDotNet.Validators
             return IsCritical == other.IsCritical && string.Equals(Message, other.Message) && Equals(BenchmarkCase, other.BenchmarkCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
                 return false;
             if (ReferenceEquals(this, obj))
                 return true;
-            if (obj.GetType() != this.GetType())
+            if (obj.GetType() != GetType())
                 return false;
             return Equals((ValidationError)obj);
         }

@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Helpers
         /// Run external process and return the console output.
         /// In the case of any exception, null will be returned.
         /// </summary>
-        internal static string? RunAndReadOutput(string fileName, string arguments = "", ILogger logger = null)
+        internal static string? RunAndReadOutput(string fileName, string arguments = "", ILogger? logger = null)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Helpers
         }
 
         internal static (int exitCode, ImmutableArray<string> output) RunAndReadOutputLineByLine(string fileName, string arguments = "", string workingDirectory = "",
-            Dictionary<string, string> environmentVariables = null, bool includeErrors = false, ILogger logger = null)
+            Dictionary<string, string>? environmentVariables = null, bool includeErrors = false, ILogger? logger = null)
         {
             var processStartInfo = new ProcessStartInfo
             {

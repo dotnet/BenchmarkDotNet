@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Reports
             CultureInfo cultureInfo,
             ImmutableArray<ValidationError> validationErrors,
             ImmutableArray<IColumnHidingRule> columnHidingRules,
-            SummaryStyle summaryStyle = null)
+            SummaryStyle? summaryStyle = null)
         {
             Title = title;
             ResultsDirectoryPath = resultsDirectoryPath;
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Reports
         /// <summary>
         /// Returns a report for the given benchmark or null if there is no a corresponded report.
         /// </summary>
-        public BenchmarkReport this[BenchmarkCase benchmarkCase] => ReportMap.GetValueOrDefault(benchmarkCase);
+        public BenchmarkReport? this[BenchmarkCase benchmarkCase] => ReportMap.GetValueOrDefault(benchmarkCase);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Reports
 
             foreach (var benchmarkReport in reports)
             {
-                string runtime = benchmarkReport.GetRuntimeInfo();
+                string? runtime = benchmarkReport.GetRuntimeInfo();
                 if (runtime != null)
                 {
                     string jobId = benchmarkReport.BenchmarkCase.Job.ResolvedId;
@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Reports
         public bool IsBaseline(BenchmarkCase benchmarkCase)
             => BaseliningStrategy.IsBaseline(benchmarkCase);
 
-        public BenchmarkCase? GetBaseline(string logicalGroupKey)
+        public BenchmarkCase? GetBaseline(string? logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .FirstOrDefault(IsBaseline);
@@ -158,7 +158,11 @@ namespace BenchmarkDotNet.Reports
         private static SummaryStyle GetConfiguredSummaryStyleOrDefaultOne(ImmutableArray<BenchmarkCase> benchmarkCases)
             => benchmarkCases
                    .Where(benchmark => benchmark.Config.SummaryStyle != SummaryStyle.Default
-                          && benchmark.Config.SummaryStyle != null) // Paranoid
+#nullable disable
+                                       // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract ConditionIsAlwaysTrueOrFalse
+                                       // TODO: remove this check once the nullability migration is finished
+                                       && benchmark.Config.SummaryStyle != null) // Paranoid
+#nullable enable
                    .Select(benchmark => benchmark.Config.SummaryStyle)
                    .Distinct()
                    .SingleOrDefault()

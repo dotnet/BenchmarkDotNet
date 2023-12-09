@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
         }
 
         private int lastProgress;
-        private Stopwatch stopwatch;
+        private Stopwatch? stopwatch;
 
         public void Report(double value)
         {

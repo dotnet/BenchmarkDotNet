@@ -90,35 +90,22 @@
         "datatype": "string",
         "cases": [
           {
-            "condition": "(framework == '' && consoleApp == true)",
+            "condition": "(consoleApp == true)",
             "value": "net6.0"
           },
           {
-            "condition": "(framework == '' && consoleApp == false)",
+            "condition": "(consoleApp == false)",
             "value": "netstandard2.0"
-          },
-          {
-            "condition": "(framework != '')",
-            "value": ""
           }
         ]
       }
     },
     "frameworkValue": {
       "type": "generated",
-      "generator": "join",
-      "description": "join framework and frameworkDefault",
+      "generator": "coalesce",
       "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "framework"
-          },
-          {
-            "type": "ref",
-            "value": "frameworkDefault"
-          }
-        ]
+        "sourceVariableName": "framework",
+        "fallbackVariableName": "frameworkDefault"
       },
       "replaces": "$(Framework)"
     },
@@ -144,7 +131,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Version of BenchmarkDotNet that will be referenced.",
-      "defaultValue": "0.13.9",
+      "defaultValue": "0.13.12",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
   },

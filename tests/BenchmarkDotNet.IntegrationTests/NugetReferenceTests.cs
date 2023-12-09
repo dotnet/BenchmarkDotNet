@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [FactEnvSpecific("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI", EnvRequirement.NonLinux)]
+        [Fact]
         public void UserCanSpecifyCustomNuGetPackageDependency()
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);

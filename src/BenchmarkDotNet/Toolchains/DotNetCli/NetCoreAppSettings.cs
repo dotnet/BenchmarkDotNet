@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp60 = new ("net6.0", null, ".NET 6.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp70 = new ("net7.0", null, ".NET 7.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp80 = new ("net8.0", null, ".NET 8.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp90 = new ("net9.0", null, ".NET 9.0");
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
@@ -42,12 +43,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public NetCoreAppSettings(
             string targetFrameworkMoniker,
-            string runtimeFrameworkVersion,
+            string? runtimeFrameworkVersion,
             string name,
-            string customDotNetCliPath = null,
-            string packagesPath = null,
-            string customRuntimePack = null,
-            string aotCompilerPath = null,
+            string? customDotNetCliPath = null,
+            string? packagesPath = null,
+            string? customRuntimePack = null,
+            string? aotCompilerPath = null,
             MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini
             )
         {
@@ -67,39 +68,39 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public string TargetFrameworkMoniker { get; }
 
-        public string RuntimeFrameworkVersion { get; }
+        public string? RuntimeFrameworkVersion { get; }
 
         /// <summary>
         /// display name used for showing the results
         /// </summary>
         public string Name { get; }
 
-        public string CustomDotNetCliPath { get; }
+        public string? CustomDotNetCliPath { get; }
 
         /// <summary>
         /// The directory to restore packages to.
         /// </summary>
-        public string PackagesPath { get; }
+        public string? PackagesPath { get; }
 
         /// <summary>
         /// Path to a custom runtime pack.
         /// </summary>
-        public string CustomRuntimePack { get; }
+        public string? CustomRuntimePack { get; }
 
         /// <summary>
         /// Path to the Mono AOT Compiler
         /// </summary>
-        public string AOTCompilerPath { get; }
+        public string? AOTCompilerPath { get; }
 
         /// <summary>
         /// Mono AOT Compiler mode, either 'mini' or 'llvm'
         /// </summary>
         public MonoAotCompilerMode AOTCompilerMode { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string? displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath);
 
-        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string? displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath);
     }
 }

@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Any());
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
-            Assert.Contains(".NET 7.0", summary.AllRuntimes);
+            Assert.Contains(".NET 8.0", summary.AllRuntimes);
         }
     }
 

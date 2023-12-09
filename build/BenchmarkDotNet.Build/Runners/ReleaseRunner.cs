@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
@@ -34,9 +33,15 @@ public class ReleaseRunner
         else
             EnvVar.NuGetToken.SetEmpty();
 
-        var nextVersion = KnownOptions.NextVersion.AssertHasValue(context);
         var currentVersion = context.VersionHistory.CurrentVersion;
         var tag = "v" + currentVersion;
+        var nextVersion = KnownOptions.NextVersion.Resolve(context);
+        if (nextVersion == "")
+        {
+            var version = Version.Parse(currentVersion);
+            nextVersion = $"{version.Major}.{version.Minor}.{version.Build + 1}";
+            context.Information($"Evaluated NextVersion: {nextVersion}");
+        }
 
         context.GitRunner.Tag(tag);
 

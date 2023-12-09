@@ -24,19 +24,19 @@ namespace BenchmarkDotNet.Validators
                                                  BindingFlags.FlattenHierarchy;
             foreach (var memberInfo in type.GetMembers(reflectionFlags))
             {
-                var attributes = new Attribute[]
+                var attributes = new Attribute?[]
                     {
                         memberInfo.ResolveAttribute<ParamsAttribute>(),
                         memberInfo.ResolveAttribute<ParamsAllValuesAttribute>(),
                         memberInfo.ResolveAttribute<ParamsSourceAttribute>()
                     }
-                    .Where(attribute => attribute != null)
+                    .WhereNotNull()
                     .ToList();
                 if (attributes.IsEmpty())
                     continue;
 
                 string name = $"{type.Name}.{memberInfo.Name}";
-                string? attributeString = string.Join(", ", attributes.Select(attribute => $"[{attribute.GetType().Name.Replace(nameof(Attribute), "")}]"));
+                string attributeString = string.Join(", ", attributes.Select(attribute => $"[{attribute.GetType().Name.Replace(nameof(Attribute), "")}]"));
 
                 if (attributes.Count > 1)
                     yield return new ValidationError(TreatsWarningsAsErrors,
