@@ -17,17 +17,17 @@ namespace BenchmarkDotNet.TestAdapter
         private readonly CancellationTokenSource cts = new ();
 
         /// <summary>
-        /// Runs all the benchmarks in the given source, updating the TestExecutionRecorder as they get run.
+        /// Runs all the benchmarks in the given assembly, updating the TestExecutionRecorder as they get run.
         /// </summary>
-        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <param name="recorder">The interface used to record the current test execution progress.</param>
         /// <param name="benchmarkIds">
         /// An optional list of benchmark IDs specifying which benchmarks to run.
         /// These IDs are the same as the ones generated for the VSTest TestCase.
         /// </param>
-        public void RunBenchmarks(string source, TestExecutionRecorderWrapper recorder, HashSet<Guid>? benchmarkIds = null)
+        public void RunBenchmarks(string assemblyPath, TestExecutionRecorderWrapper recorder, HashSet<Guid>? benchmarkIds = null)
         {
-            var benchmarks = BenchmarkEnumerator.GetBenchmarksFromSource(source);
+            var benchmarks = BenchmarkEnumerator.GetBenchmarksFromAssemblyPath(assemblyPath);
             var testCases = new List<TestCase>();
 
             var filteredBenchmarks = new List<BenchmarkRunInfo>();
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.TestAdapter
                     if (benchmarkIds != null && benchmarkIds.Contains(testId))
                     {
                         filteredCases.Add(benchmarkCase);
-                        testCases.Add(benchmarkCase.ToVSTestCase(source, needsJobInfo));
+                        testCases.Add(benchmarkCase.ToVSTestCase(assemblyPath, needsJobInfo));
                     }
                 }
 

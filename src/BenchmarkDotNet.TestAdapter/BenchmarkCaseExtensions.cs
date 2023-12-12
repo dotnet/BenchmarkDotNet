@@ -4,10 +4,8 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using Microsoft.TestPlatform.AdapterUtilities;
-using Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System;
-using System.Linq;
 
 namespace BenchmarkDotNet.TestAdapter
 {
@@ -20,35 +18,28 @@ namespace BenchmarkDotNet.TestAdapter
         /// Converts a BDN BenchmarkCase to a VSTest TestCase.
         /// </summary>
         /// <param name="benchmarkCase">The BenchmarkCase to convert.</param>
-        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <param name="includeJobInName">Whether or not the display name should include the job name.</param>
         /// <returns>The VSTest TestCase.</returns>
-        internal static TestCase ToVSTestCase(this BenchmarkCase benchmarkCase, string source, bool includeJobInName=false)
+        internal static TestCase ToVSTestCase(this BenchmarkCase benchmarkCase, string assemblyPath, bool includeJobInName=false)
         {
             var benchmarkMethod = benchmarkCase.Descriptor.WorkloadMethod;
-            var fullClassName = benchmarkCase.Descriptor.Type.FullName;
-            var benchmarkMethodName = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
+            var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName();
+            var benchmarkMethodName = benchmarkCase.Descriptor.WorkloadMethod.Name;
             var benchmarkFullName = $"{fullClassName}.{benchmarkMethodName}";
 
-            ManagedNameHelper.GetManagedName(benchmarkMethod, out var managedType, out var managedMethod, out var hierarchyValues);
-            hierarchyValues[HierarchyConstants.Levels.ContainerIndex] = null; // Gets set by the test explorer window to the test project name
+            // Display name has arguments as well.
+            var displayMethodName = FullNameProvider.GetMethodName(benchmarkCase);
             if (includeJobInName)
-            {
-                hierarchyValues[HierarchyConstants.Levels.TestGroupIndex] += $" [{benchmarkCase.GetUnrandomizedJobDisplayInfo()}]";
-            }
+                displayMethodName += $" [{benchmarkCase.GetUnrandomizedJobDisplayInfo()}]";
 
-            var hasManagedMethodAndTypeProperties = !string.IsNullOrWhiteSpace(managedType) && !string.IsNullOrWhiteSpace(managedMethod);
+            var displayName = $"{fullClassName}.{displayMethodName}";
 
-            var vsTestCase = new TestCase(benchmarkFullName, VSTestAdapter.ExecutorUri, source)
+            var vsTestCase = new TestCase(benchmarkFullName, VSTestAdapter.ExecutorUri, assemblyPath)
             {
-                DisplayName = FullNameProvider.GetBenchmarkName(benchmarkCase),
-                Id = GetTestCaseId(benchmarkCase),
+                DisplayName = displayName,
+                Id = GetTestCaseId(benchmarkCase)
             };
-
-            if (includeJobInName)
-            {
-                vsTestCase.DisplayName += $" [{benchmarkCase.GetUnrandomizedJobDisplayInfo()}]";
-            }
 
             var benchmarkAttribute = benchmarkMethod.ResolveAttribute<BenchmarkAttribute>();
             if (benchmarkAttribute != null)
@@ -57,18 +48,11 @@ namespace BenchmarkDotNet.TestAdapter
                 vsTestCase.LineNumber = benchmarkAttribute.SourceCodeLineNumber;
             }
 
-            vsTestCase.SetPropertyValue(VSTestProperties.HierarchyProperty, hierarchyValues.ToArray());
-            vsTestCase.SetPropertyValue(VSTestProperties.TestCategoryProperty, benchmarkCase.Descriptor.Categories);
-            if (hasManagedMethodAndTypeProperties)
-            {
-                vsTestCase.SetPropertyValue(VSTestProperties.ManagedTypeProperty, managedType);
-                vsTestCase.SetPropertyValue(VSTestProperties.ManagedMethodProperty, managedMethod);
-                vsTestCase.SetPropertyValue(VSTestProperties.TestClassNameProperty, managedType);
-            }
-            else
-            {
-                vsTestCase.SetPropertyValue(VSTestProperties.TestClassNameProperty, fullClassName);
-            }
+            var categories = DefaultCategoryDiscoverer.Instance.GetCategories(benchmarkMethod);
+            foreach (var category in categories)
+                vsTestCase.Traits.Add("Category", category);
+
+            vsTestCase.Traits.Add("", "BenchmarkDotNet");
 
             return vsTestCase;
         }

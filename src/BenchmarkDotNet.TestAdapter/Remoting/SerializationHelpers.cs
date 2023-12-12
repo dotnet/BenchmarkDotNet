@@ -7,14 +7,18 @@ namespace BenchmarkDotNet.TestAdapter.Remoting
     /// </summary>
     internal static class SerializationHelpers
     {
+        // Version number of the VSTest protocol that the adapter supports. Only needs to be updated when
+        // the VSTest protocol has a change and this test adapter wishes to take a dependency on it.
+        private const int VSTestProtocolVersion = 7;
+
         public static string Serialize<T>(T data)
         {
-            return JsonDataSerializer.Instance.Serialize(data, version: 7);
+            return JsonDataSerializer.Instance.Serialize(data, version: VSTestProtocolVersion);
         }
 
         public static T Deserialize<T>(string data)
         {
-            return JsonDataSerializer.Instance.Deserialize<T>(data, version: 7)!;
+            return JsonDataSerializer.Instance.Deserialize<T>(data, version: VSTestProtocolVersion)!;
         }
     }
 }

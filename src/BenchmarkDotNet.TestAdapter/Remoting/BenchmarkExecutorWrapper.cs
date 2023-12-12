@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.TestAdapter.Remoting
     {
         private readonly BenchmarkExecutor benchmarkExecutor = new ();
 
-        public void RunBenchmarks(string source, TestExecutionRecorderWrapper recorder, HashSet<Guid>? benchmarkIds = null)
+        public void RunBenchmarks(string assemblyPath, TestExecutionRecorderWrapper recorder, HashSet<Guid>? benchmarkIds = null)
         {
-            benchmarkExecutor.RunBenchmarks(source, recorder, benchmarkIds);
+            benchmarkExecutor.RunBenchmarks(assemblyPath, recorder, benchmarkIds);
         }
 
         public void Cancel()

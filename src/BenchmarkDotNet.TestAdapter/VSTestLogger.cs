@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.TestAdapter
     /// <summary>
     /// A class to send logs from BDN to the VSTest output log.
     /// </summary>
-    internal class VSTestLogger : ILogger
+    internal sealed class VSTestLogger : ILogger
     {
         private readonly IMessageLogger messageLogger;
         private readonly StringBuilder currentLine = new StringBuilder();
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.TestAdapter
         {
             currentLine.Append(text);
 
-            // Assume that if the log kind if an error, that the whole line is treated as an error
+            // Assume that if the log kind is an error, that the whole line is treated as an error
             // The level will be reset to Informational when WriteLine() is called.
             if (logKind == LogKind.Error)
                 currentLevel = TestMessageLevel.Error;

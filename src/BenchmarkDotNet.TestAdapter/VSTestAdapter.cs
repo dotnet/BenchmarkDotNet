@@ -44,8 +44,8 @@ namespace BenchmarkDotNet.TestAdapter
         {
             foreach (var source in sources)
             {
-                ValidateSourceOrThrow(source);
-                foreach (var testCase in GetVSTestCasesFromSource(source, logger))
+                ValidateSourceIsAssemblyOrThrow(source);
+                foreach (var testCase in GetVSTestCasesFromAssembly(source, logger))
                 {
                     discoverySink.SendTestCase(testCase);
                 }
@@ -67,8 +67,8 @@ namespace BenchmarkDotNet.TestAdapter
 
             cts ??= new CancellationTokenSource();
 
-            foreach (var testsPerSource in tests.GroupBy(t => t.Source))
-                RunBenchmarks(testsPerSource.Key, frameworkHandle, testsPerSource);
+            foreach (var testsPerAssembly in tests.GroupBy(t => t.Source))
+                RunBenchmarks(testsPerAssembly.Key, frameworkHandle, testsPerAssembly);
 
             cts = null;
         }
@@ -103,21 +103,19 @@ namespace BenchmarkDotNet.TestAdapter
         }
 
         /// <summary>
-        /// Gets the VSTest test cases in the given source.
+        /// Gets the VSTest test cases in the given assembly.
         /// </summary>
-        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <param name="logger">A logger that sends logs to VSTest.</param>
-        /// <returns>The VSTest test cases inside the given source.</returns>
-        private static List<TestCase> GetVSTestCasesFromSource(string source, IMessageLogger logger)
+        /// <returns>The VSTest test cases inside the given assembly.</returns>
+        private static List<TestCase> GetVSTestCasesFromAssembly(string assemblyPath, IMessageLogger logger)
         {
-            ValidateSourceOrThrow(source);
-
             try
             {
                 // Ensure that the test enumeration is done inside the context of the source directory.
-                var enumerator = (BenchmarkEnumeratorWrapper)CreateIsolatedType(typeof(BenchmarkEnumeratorWrapper), source);
+                var enumerator = (BenchmarkEnumeratorWrapper)CreateIsolatedType(typeof(BenchmarkEnumeratorWrapper), assemblyPath);
                 var testCases = enumerator
-                    .GetTestCasesFromSourceSerialized(source)
+                    .GetTestCasesFromAssemblyPathSerialized(assemblyPath)
                     .Select(SerializationHelpers.Deserialize<TestCase>)
                     .ToList();
 
@@ -135,7 +133,7 @@ namespace BenchmarkDotNet.TestAdapter
             }
             catch (Exception ex)
             {
-                logger.SendMessage(TestMessageLevel.Error, $"Failed to load benchmarks from source\n{ex}");
+                logger.SendMessage(TestMessageLevel.Error, $"Failed to load benchmarks from assembly\n{ex}");
                 throw;
             }
         }
@@ -151,7 +149,7 @@ namespace BenchmarkDotNet.TestAdapter
         /// </param>
         private void RunBenchmarks(string source, IFrameworkHandle frameworkHandle, IEnumerable<TestCase>? testCases = null)
         {
-            ValidateSourceOrThrow(source);
+            ValidateSourceIsAssemblyOrThrow(source);
 
             // Create a HashSet of all the TestCase IDs to be run if specified.
             var caseIds = testCases == null ? null : new HashSet<Guid>(testCases.Select(c => c.Id));
@@ -166,7 +164,7 @@ namespace BenchmarkDotNet.TestAdapter
             }
             catch (Exception ex)
             {
-                frameworkHandle.SendMessage(TestMessageLevel.Error, $"Failed to run benchmarks in source\n{ex}");
+                frameworkHandle.SendMessage(TestMessageLevel.Error, $"Failed to run benchmarks in assembly\n{ex}");
                 throw;
             }
         }
@@ -176,12 +174,12 @@ namespace BenchmarkDotNet.TestAdapter
         /// If not in the .NET Framework, it will use the current
         /// </summary>
         /// <param name="type">The type to create.</param>
-        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <returns>The created object.</returns>
-        private static object CreateIsolatedType(Type type, string source)
+        private static object CreateIsolatedType(Type type, string assemblyPath)
         {
 #if NETFRAMEWORK
-            var appBase = Path.GetDirectoryName(source);
+            var appBase = Path.GetDirectoryName(assemblyPath);
             var setup = new AppDomainSetup { ApplicationBase = appBase };
             var domainName = $"Isolated Domain for {type.Name}";
             var appDomain = AppDomain.CreateDomain(domainName, null, setup);
@@ -192,7 +190,7 @@ namespace BenchmarkDotNet.TestAdapter
 #endif
         }
 
-        private static void ValidateSourceOrThrow(string source)
+        private static void ValidateSourceIsAssemblyOrThrow(string source)
         {
             if (string.IsNullOrEmpty(source))
                 throw new ArgumentException($"'{nameof(source)}' cannot be null or whitespace.", nameof(source));
