@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
@@ -15,6 +17,7 @@ using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
+using MethodInfo = System.Reflection.MethodInfo;
 
 namespace BenchmarkDotNet.Tests.Mocks
 {
@@ -123,5 +126,10 @@ namespace BenchmarkDotNet.Tests.Mocks
 
             [Benchmark] public void Bar() { }
         }
+
+        public static readonly Type MockType = typeof(MockBenchmarkClass);
+
+        public static readonly MethodInfo MockMethodInfo = MockType.GetTypeInfo().GetMethods()
+            .Single(method => method.Name == nameof(MockBenchmarkClass.Foo));
     }
 }

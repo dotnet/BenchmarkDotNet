@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(" a ", " a")]
         [InlineData("        a        ", " a")]
         [InlineData("   \r\n  a   \r\n", " a")]
-        public void AppendArgumentMakesSureOneSpaceBeforeStringArgument(string input, string expectedOutput)
+        public void AppendArgumentMakesSureOneSpaceBeforeStringArgument(string? input, string expectedOutput)
         {
             var stringBuilder = new StringBuilder();
             var result = stringBuilder.AppendArgument(input).ToString();
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("http://test.com/ ", " http://test.com/")]
         [InlineData(" http://test.com/ ", " http://test.com/")]
         [InlineData("\r\n  http://test.com/  \r\n", " http://test.com/")]
-        public void AppendArgumentMakesSureOneSpaceBeforeObjectArgument(string input, string expectedOutput)
+        public void AppendArgumentMakesSureOneSpaceBeforeObjectArgument(string? input, string expectedOutput)
         {
             Uri uri = input != null ? new Uri(input) : null; // Use Uri for our object type since that is what is used in code
             var stringBuilder = new StringBuilder();

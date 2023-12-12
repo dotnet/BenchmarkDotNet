@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
@@ -159,7 +161,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         private string GetTrimmingSettings()
             => rootAllApplicationAssemblies
-                ? "" // use the defaults
+                // Use the defaults
+                ? ""
                 // TrimMode is set in explicit way as for older versions it might have different default value
                 : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
 
@@ -219,8 +222,20 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             => string.Join(",", GetCurrentProcessInstructionSets(platform));
 
         // based on https://github.com/dotnet/runtime/blob/ce61c09a5f6fc71d8f717d3fc4562f42171869a0/src/coreclr/tools/Common/JitInterface/CorInfoInstructionSet.cs#L727
-        private static IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
+        private IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
         {
+            if (!ConfigParser.TryParse(TargetFrameworkMoniker, out RuntimeMoniker runtimeMoniker))
+            {
+                throw new NotSupportedException($"Invalid TFM: '{TargetFrameworkMoniker}'");
+            }
+
+            if (platform == RuntimeInformation.GetCurrentPlatform() // "native" does not support cross-compilation (so does BDN for now)
+                && runtimeMoniker >= RuntimeMoniker.NativeAot80)
+            {
+                yield return "native"; // added in .NET 8 https://github.com/dotnet/runtime/pull/87865
+                yield break;
+            }
+
             switch (platform)
             {
                 case Platform.X86:
@@ -234,6 +249,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
                     if (HardwareIntrinsics.IsX86Avx2Supported) yield return "avx2";
+                    if (HardwareIntrinsics.IsX86Avx512FSupported) yield return "avx-512f";
+                    if (HardwareIntrinsics.IsX86Avx512BWSupported) yield return "avx-512bw";
+                    if (HardwareIntrinsics.IsX86Avx512CDSupported) yield return "avx-512cd";
+                    if (HardwareIntrinsics.IsX86Avx512DQSupported) yield return "avx-512dq";
+                    if (HardwareIntrinsics.IsX86Avx512VbmiSupported) yield return "avx-512vbmi";
                     if (HardwareIntrinsics.IsX86AesSupported) yield return "aes";
                     if (HardwareIntrinsics.IsX86Bmi1Supported) yield return "bmi";
                     if (HardwareIntrinsics.IsX86Bmi2Supported) yield return "bmi2";
@@ -242,7 +262,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86PclmulqdqSupported) yield return "pclmul";
                     if (HardwareIntrinsics.IsX86PopcntSupported) yield return "popcnt";
                     if (HardwareIntrinsics.IsX86AvxVnniSupported) yield return "avxvnni";
-                    if (HardwareIntrinsics.IsX86SerializeSupported) yield return "serialize";
+                    if (HardwareIntrinsics.IsX86SerializeSupported && runtimeMoniker > RuntimeMoniker.NativeAot70) yield return "serialize"; // https://github.com/dotnet/BenchmarkDotNet/issues/2463#issuecomment-1809625008
                     break;
                 case Platform.Arm64:
                     if (HardwareIntrinsics.IsArmBaseSupported) yield return "base";

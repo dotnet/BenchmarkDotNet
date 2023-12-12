@@ -1,3 +1,4 @@
+#nullable disable
 // ReSharper disable All
 //-----------------------------------------------------------------------
 // <copyright file="SimpleJson.cs" company="The Outercurve Foundation">

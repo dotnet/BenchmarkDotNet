@@ -20,8 +20,9 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core60 = new (RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
         public static readonly CoreRuntime Core70 = new (RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
         public static readonly CoreRuntime Core80 = new (RuntimeMoniker.Net80, "net8.0", ".NET 8.0");
+        public static readonly CoreRuntime Core90 = new (RuntimeMoniker.Net90, "net9.0", ".NET 9.0");
 
-        public static CoreRuntime Latest => Core80; // when dotnet/runtime branches for 9.0, this will need to get updated
+        public static CoreRuntime Latest => Core90; // when dotnet/runtime branches for 10.0, this will need to get updated
 
         private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -72,6 +73,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
                 case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
                 case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80);
+                case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90);
                 default:
                     return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
             }

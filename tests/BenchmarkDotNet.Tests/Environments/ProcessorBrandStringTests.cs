@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [Theory]
         [InlineData("", "Unknown processor")]
         [InlineData(null, "Unknown processor")]
-        public void UnknownProcessorDoesNotThrow(string originalName, string prettifiedName)
+        public void UnknownProcessorDoesNotThrow(string? originalName, string prettifiedName)
         {
             var cpuInfo = new CpuInfo(originalName, nominalFrequency: null);
 

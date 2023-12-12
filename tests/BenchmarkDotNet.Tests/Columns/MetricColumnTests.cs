@@ -11,6 +11,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using Xunit;
@@ -37,7 +38,7 @@ namespace BenchmarkDotNet.Tests.Columns
             var summaryStyle = new SummaryStyle(TestCultureInfo.Instance, printUnitsInHeader, null, timeUnit, printUnitsInContent);
             var config = new ManualConfig().WithSummaryStyle(summaryStyle);
             var benchmarkCase = new BenchmarkCase(
-                new Descriptor(null, null),
+                new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                 Job.Dry,
                 new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
                 ImmutableConfigBuilder.Create(config));

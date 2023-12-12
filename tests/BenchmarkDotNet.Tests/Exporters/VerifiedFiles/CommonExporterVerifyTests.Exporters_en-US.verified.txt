@@ -5,17 +5,17 @@ AsciiDocExporter
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-  [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  LongRun : extra output line
+.NET Core SDK 1.0.x.mock
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 ....
 [options="header"]
 |===
-|Method  |Mean      |Error  |StdDev    |P67       
-|Foo     |  1.000 ns|     NA|  0.000 ns|  1.000 ns
-|Bar     |  1.000 ns|     NA|  0.000 ns|  1.000 ns
+|Method  |Mean      |Error     |StdDev    |P67       |CacheMisses  
+|Foo     |  1.000 ns|  0.000 ns|  0.000 ns|  1.000 ns|            7
+|Bar     |  1.000 ns|  0.000 ns|  0.000 ns|  1.000 ns|            7
 |===
 ############################################
 HtmlExporter
@@ -38,18 +38,18 @@ HtmlExporter
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-  [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  LongRun : extra output line
+.NET Core SDK 1.0.x.mock
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 </code></pre>
 <pre><code>Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 </code></pre>
 
 <table>
-<thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>P67</th>
+<thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>P67</th><th>CacheMisses</th>
 </tr>
-</thead><tbody><tr><td>Foo</td><td>1.000 ns</td><td>NA</td><td>0.000 ns</td><td>1.000 ns</td>
-</tr><tr><td>Bar</td><td>1.000 ns</td><td>NA</td><td>0.000 ns</td><td>1.000 ns</td>
+</thead><tbody><tr><td>Foo</td><td>1.000 ns</td><td>0.000 ns</td><td>0.000 ns</td><td>1.000 ns</td><td>7</td>
+</tr><tr><td>Bar</td><td>1.000 ns</td><td>0.000 ns</td><td>0.000 ns</td><td>1.000 ns</td><td>7</td>
 </tr></tbody></table>
 </body>
 </html>
@@ -71,7 +71,7 @@ JsonExporter-brief
       "HasAttachedDebugger":false,
       "HasRyuJit":true,
       "Configuration":"CONFIGURATION",
-      "DotNetCliVersion":null,
+      "DotNetCliVersion":"1.0.x.mock",
       "ChronometerFrequency":{
          "Hertz":2531248
       },
@@ -89,9 +89,9 @@ JsonExporter-brief
          "HardwareIntrinsics":"",
          "Statistics":{
             "OriginalValues":[
-               1
+               1,1,1,1,1,1
             ],
-            "N":1,
+            "N":6,
             "Min":1,
             "LowerFence":1,
             "Q1":1,
@@ -116,13 +116,13 @@ JsonExporter-brief
             "Skewness":"",
             "Kurtosis":"",
             "ConfidenceInterval":{
-               "N":1,
+               "N":6,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":"",
-               "Lower":"",
-               "Upper":""
+               "Margin":0,
+               "Lower":1,
+               "Upper":1
             },
             "Percentiles":{
                "P0":1,
@@ -154,9 +154,9 @@ JsonExporter-brief
          "HardwareIntrinsics":"",
          "Statistics":{
             "OriginalValues":[
-               1
+               1,1,1,1,1,1
             ],
-            "N":1,
+            "N":6,
             "Min":1,
             "LowerFence":1,
             "Q1":1,
@@ -181,13 +181,13 @@ JsonExporter-brief
             "Skewness":"",
             "Kurtosis":"",
             "ConfidenceInterval":{
-               "N":1,
+               "N":6,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":"",
-               "Lower":"",
-               "Upper":""
+               "Margin":0,
+               "Lower":1,
+               "Upper":1
             },
             "Percentiles":{
                "P0":1,
@@ -214,7 +214,7 @@ JsonExporter-brief
 ############################################
 JsonExporter-brief-compressed
 ############################################
-{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":null,"ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null}},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null}}]}
+{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":"1.0.x.mock","ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1,1,1,1,1,1],"N":6,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":6,"Mean":1,"StandardError":0,"Level":12,"Margin":0,"Lower":1,"Upper":1},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null}},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1,1,1,1,1,1],"N":6,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":6,"Mean":1,"StandardError":0,"Level":12,"Margin":0,"Lower":1,"Upper":1},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null}}]}
 ############################################
 JsonExporter-full
 ############################################
@@ -233,7 +233,7 @@ JsonExporter-full
       "HasAttachedDebugger":false,
       "HasRyuJit":true,
       "Configuration":"CONFIGURATION",
-      "DotNetCliVersion":null,
+      "DotNetCliVersion":"1.0.x.mock",
       "ChronometerFrequency":{
          "Hertz":2531248
       },
@@ -251,9 +251,9 @@ JsonExporter-full
          "HardwareIntrinsics":"",
          "Statistics":{
             "OriginalValues":[
-               1
+               1,1,1,1,1,1
             ],
-            "N":1,
+            "N":6,
             "Min":1,
             "LowerFence":1,
             "Q1":1,
@@ -278,13 +278,13 @@ JsonExporter-full
             "Skewness":"",
             "Kurtosis":"",
             "ConfidenceInterval":{
-               "N":1,
+               "N":6,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":"",
-               "Lower":"",
-               "Upper":""
+               "Margin":0,
+               "Lower":1,
+               "Upper":1
             },
             "Percentiles":{
                "P0":1,
@@ -313,6 +313,56 @@ JsonExporter-full
                "IterationIndex":1,
                "Operations":1,
                "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":2,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":3,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":4,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":5,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":6,
+               "Operations":1,
+               "Nanoseconds":1
+            }
+         ],
+         "Metrics":[
+            {
+               "Value":7,
+               "Descriptor":{
+                  "Id":"CacheMisses",
+                  "DisplayName":"CacheMisses",
+                  "Legend":"Hardware counter 'CacheMisses' per single operation",
+                  "NumberFormat":"N0",
+                  "UnitType":0,
+                  "Unit":null,
+                  "TheGreaterTheBetter":false,
+                  "PriorityInCategory":0
+               }
             }
          ]
       },{
@@ -326,9 +376,9 @@ JsonExporter-full
          "HardwareIntrinsics":"",
          "Statistics":{
             "OriginalValues":[
-               1
+               1,1,1,1,1,1
             ],
-            "N":1,
+            "N":6,
             "Min":1,
             "LowerFence":1,
             "Q1":1,
@@ -353,13 +403,13 @@ JsonExporter-full
             "Skewness":"",
             "Kurtosis":"",
             "ConfidenceInterval":{
-               "N":1,
+               "N":6,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":"",
-               "Lower":"",
-               "Upper":""
+               "Margin":0,
+               "Lower":1,
+               "Upper":1
             },
             "Percentiles":{
                "P0":1,
@@ -388,6 +438,56 @@ JsonExporter-full
                "IterationIndex":1,
                "Operations":1,
                "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":2,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":3,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":4,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":5,
+               "Operations":1,
+               "Nanoseconds":1
+            },{
+               "IterationMode":"Workload",
+               "IterationStage":"Result",
+               "LaunchIndex":1,
+               "IterationIndex":6,
+               "Operations":1,
+               "Nanoseconds":1
+            }
+         ],
+         "Metrics":[
+            {
+               "Value":7,
+               "Descriptor":{
+                  "Id":"CacheMisses",
+                  "DisplayName":"CacheMisses",
+                  "Legend":"Hardware counter 'CacheMisses' per single operation",
+                  "NumberFormat":"N0",
+                  "UnitType":0,
+                  "Unit":null,
+                  "TheGreaterTheBetter":false,
+                  "PriorityInCategory":0
+               }
             }
          ]
       }
@@ -396,7 +496,7 @@ JsonExporter-full
 ############################################
 JsonExporter-full-compressed
 ############################################
-{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":null,"ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]}]}
+{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":"1.0.x.mock","ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1,1,1,1,1,1],"N":6,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":6,"Mean":1,"StandardError":0,"Level":12,"Margin":0,"Lower":1,"Upper":1},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":2,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":3,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":4,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":5,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":6,"Operations":1,"Nanoseconds":1}],"Metrics":[{"Value":7,"Descriptor":{"Id":"CacheMisses","DisplayName":"CacheMisses","Legend":"Hardware counter 'CacheMisses' per single operation","NumberFormat":"N0","UnitType":0,"Unit":null,"TheGreaterTheBetter":false,"PriorityInCategory":0}}]},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","HardwareIntrinsics":"","Statistics":{"OriginalValues":[1,1,1,1,1,1],"N":6,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":6,"Mean":1,"StandardError":0,"Level":12,"Margin":0,"Lower":1,"Upper":1},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Memory":{"Gen0Collections":0,"Gen1Collections":0,"Gen2Collections":0,"TotalOperations":0,"BytesAllocatedPerOperation":null},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":2,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":3,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":4,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":5,"Operations":1,"Nanoseconds":1},{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":6,"Operations":1,"Nanoseconds":1}],"Metrics":[{"Value":7,"Descriptor":{"Id":"CacheMisses","DisplayName":"CacheMisses","Legend":"Hardware counter 'CacheMisses' per single operation","NumberFormat":"N0","UnitType":0,"Unit":null,"TheGreaterTheBetter":false,"PriorityInCategory":0}}]}]}
 ############################################
 MarkdownExporter-default
 ############################################
@@ -404,16 +504,16 @@ MarkdownExporter-default
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-  [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  LongRun : extra output line
+.NET Core SDK 1.0.x.mock
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 
- Method | Mean     | Error | StdDev   | P67      |
-------- |---------:|------:|---------:|---------:|
- Foo    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
- Bar    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+ Method | Mean     | Error    | StdDev   | P67      | CacheMisses |
+------- |---------:|---------:|---------:|---------:|------------:|
+ Foo    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
+ Bar    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
 ############################################
 MarkdownExporter-atlassian
 ############################################
@@ -422,16 +522,16 @@ MarkdownExporter-atlassian
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-  [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  LongRun : extra output line
+.NET Core SDK 1.0.x.mock
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 
 {noformat}
-||Method ||Mean     ||Error ||StdDev   ||P67      ||
-| Foo    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-| Bar    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+||Method ||Mean     ||Error    ||StdDev   ||P67      ||CacheMisses ||
+| Foo    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
+| Bar    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
 ############################################
 MarkdownExporter-console
 ############################################
@@ -439,16 +539,16 @@ MarkdownExporter-console
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-  [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  LongRun : extra output line
+.NET Core SDK 1.0.x.mock
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 
-| Method | Mean     | Error | StdDev   | P67      |
-|------- |---------:|------:|---------:|---------:|
-| Foo    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-| Bar    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+| Method | Mean     | Error    | StdDev   | P67      | CacheMisses |
+|------- |---------:|---------:|---------:|---------:|------------:|
+| Foo    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
+| Bar    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
 ############################################
 MarkdownExporter-github
 ############################################
@@ -457,17 +557,17 @@ MarkdownExporter-github
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-  [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  LongRun : extra output line
+.NET Core SDK 1.0.x.mock
+  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 
 ```
-| Method | Mean     | Error | StdDev   | P67      |
-|------- |---------:|------:|---------:|---------:|
-| Foo    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-| Bar    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+| Method | Mean     | Error    | StdDev   | P67      | CacheMisses |
+|------- |---------:|---------:|---------:|---------:|------------:|
+| Foo    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
+| Bar    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
 ############################################
 MarkdownExporter-stackoverflow
 ############################################
@@ -475,44 +575,54 @@ MarkdownExporter-stackoverflow
     BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
     MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
     Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
-      [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-      LongRun : extra output line
+    .NET Core SDK 1.0.x.mock
+      [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
 
     Job=LongRun  IterationCount=100  LaunchCount=3  
     WarmupCount=15  
 
-     Method | Mean     | Error | StdDev   | P67      |
-    ------- |---------:|------:|---------:|---------:|
-     Foo    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-     Bar    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+     Method | Mean     | Error    | StdDev   | P67      | CacheMisses |
+    ------- |---------:|---------:|---------:|---------:|------------:|
+     Foo    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
+     Bar    | 1.000 ns | 0.000 ns | 0.000 ns | 1.000 ns |           7 |
 ############################################
 PlainExporter
 ############################################
 *** MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15) ***
 * Raw *
 WorkloadResult   1: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   2: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   3: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   4: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   5: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   6: 1 op, 1.00 ns, 1.0000 ns/op
 
 * Statistics for WorkloadResult
-Mean = 1.000 ns, StdErr = 0.000 ns (0.00%), N = 1, StdDev = 0.000 ns
+Mean = 1.000 ns, StdErr = 0.000 ns (0.00%), N = 6, StdDev = 0.000 ns
 Min = 1.000 ns, Q1 = 1.000 ns, Median = 1.000 ns, Q3 = 1.000 ns, Max = 1.000 ns
 IQR = 0.000 ns, LowerFence = 1.000 ns, UpperFence = 1.000 ns
-ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
+ConfidenceInterval = [1.000 ns; 1.000 ns] (CI 99.9%), Margin = 0.000 ns (0.00% of Mean)
 Skewness = NaN, Kurtosis = NaN, MValue = 2
 -------------------- Histogram --------------------
-[0.500 ns ; 1.500 ns) | @
+[0.500 ns ; 1.500 ns) | @@@@@@
 ---------------------------------------------------
 *** MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15) ***
 * Raw *
 WorkloadResult   1: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   2: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   3: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   4: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   5: 1 op, 1.00 ns, 1.0000 ns/op
+WorkloadResult   6: 1 op, 1.00 ns, 1.0000 ns/op
 
 * Statistics for WorkloadResult
-Mean = 1.000 ns, StdErr = 0.000 ns (0.00%), N = 1, StdDev = 0.000 ns
+Mean = 1.000 ns, StdErr = 0.000 ns (0.00%), N = 6, StdDev = 0.000 ns
 Min = 1.000 ns, Q1 = 1.000 ns, Median = 1.000 ns, Q3 = 1.000 ns, Max = 1.000 ns
 IQR = 0.000 ns, LowerFence = 1.000 ns, UpperFence = 1.000 ns
-ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
+ConfidenceInterval = [1.000 ns; 1.000 ns] (CI 99.9%), Margin = 0.000 ns (0.00% of Mean)
 Skewness = NaN, Kurtosis = NaN, MValue = 2
 -------------------- Histogram --------------------
-[0.500 ns ; 1.500 ns) | @
+[0.500 ns ; 1.500 ns) | @@@@@@
 ---------------------------------------------------
 ############################################
 XmlExporter-brief
@@ -533,6 +643,7 @@ XmlExporter-brief
     <HasAttachedDebugger>False</HasAttachedDebugger>
     <HasRyuJit>True</HasRyuJit>
     <Configuration>CONFIGURATION</Configuration>
+    <DotNetSdkVersion>1.0.x.mock</DotNetSdkVersion>
     <ChronometerFrequency>
       <Hertz>2531248</Hertz>
     </ChronometerFrequency>
@@ -548,8 +659,13 @@ XmlExporter-brief
       <Statistics>
         <OriginalValues>
           <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
         </OriginalValues>
-        <N>1</N>
+        <N>6</N>
         <Min>1</Min>
         <LowerFence>1</LowerFence>
         <Q1>1</Q1>
@@ -565,13 +681,13 @@ XmlExporter-brief
         <Skewness>NaN</Skewness>
         <Kurtosis>NaN</Kurtosis>
         <ConfidenceInterval>
-          <N>1</N>
+          <N>6</N>
           <Mean>1</Mean>
           <StandardError>0</StandardError>
           <Level>L999</Level>
-          <Margin>NaN</Margin>
-          <Lower>NaN</Lower>
-          <Upper>NaN</Upper>
+          <Margin>0</Margin>
+          <Lower>1</Lower>
+          <Upper>1</Upper>
         </ConfidenceInterval>
         <Percentiles>
           <P0>1</P0>
@@ -585,6 +701,20 @@ XmlExporter-brief
           <P100>1</P100>
         </Percentiles>
       </Statistics>
+      <Metrics>
+        <Item>
+          <Value>7</Value>
+          <Descriptor>
+            <Id>CacheMisses</Id>
+            <DisplayName>CacheMisses</DisplayName>
+            <Legend>Hardware counter 'CacheMisses' per single operation</Legend>
+            <NumberFormat>N0</NumberFormat>
+            <UnitType>Dimensionless</UnitType>
+            <TheGreaterTheBetter>False</TheGreaterTheBetter>
+            <PriorityInCategory>0</PriorityInCategory>
+          </Descriptor>
+        </Item>
+      </Metrics>
       <Memory>
         <Gen0Collections>0</Gen0Collections>
         <Gen1Collections>0</Gen1Collections>
@@ -602,8 +732,13 @@ XmlExporter-brief
       <Statistics>
         <OriginalValues>
           <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
         </OriginalValues>
-        <N>1</N>
+        <N>6</N>
         <Min>1</Min>
         <LowerFence>1</LowerFence>
         <Q1>1</Q1>
@@ -619,13 +754,13 @@ XmlExporter-brief
         <Skewness>NaN</Skewness>
         <Kurtosis>NaN</Kurtosis>
         <ConfidenceInterval>
-          <N>1</N>
+          <N>6</N>
           <Mean>1</Mean>
           <StandardError>0</StandardError>
           <Level>L999</Level>
-          <Margin>NaN</Margin>
-          <Lower>NaN</Lower>
-          <Upper>NaN</Upper>
+          <Margin>0</Margin>
+          <Lower>1</Lower>
+          <Upper>1</Upper>
         </ConfidenceInterval>
         <Percentiles>
           <P0>1</P0>
@@ -639,6 +774,20 @@ XmlExporter-brief
           <P100>1</P100>
         </Percentiles>
       </Statistics>
+      <Metrics>
+        <Item>
+          <Value>7</Value>
+          <Descriptor>
+            <Id>CacheMisses</Id>
+            <DisplayName>CacheMisses</DisplayName>
+            <Legend>Hardware counter 'CacheMisses' per single operation</Legend>
+            <NumberFormat>N0</NumberFormat>
+            <UnitType>Dimensionless</UnitType>
+            <TheGreaterTheBetter>False</TheGreaterTheBetter>
+            <PriorityInCategory>0</PriorityInCategory>
+          </Descriptor>
+        </Item>
+      </Metrics>
       <Memory>
         <Gen0Collections>0</Gen0Collections>
         <Gen1Collections>0</Gen1Collections>
@@ -652,7 +801,7 @@ XmlExporter-brief
 ############################################
 XmlExporter-brief-compressed
 ############################################
-<?xml version="1.0" encoding="utf-8"?><Summary><Title>MockSummary</Title><HostEnvironmentInfo><BenchmarkDotNetCaption>BenchmarkDotNet</BenchmarkDotNetCaption><BenchmarkDotNetVersion>0.10.x-mock</BenchmarkDotNetVersion><OsVersion>Microsoft Windows NT 10.0.x.mock</OsVersion><ProcessorName>MockIntel Core i7-6700HQ CPU 2.60GHz</ProcessorName><PhysicalProcessorCount>1</PhysicalProcessorCount><PhysicalCoreCount>4</PhysicalCoreCount><LogicalCoreCount>8</LogicalCoreCount><RuntimeVersion>Clr 4.0.x.mock</RuntimeVersion><Architecture>64mock</Architecture><HasAttachedDebugger>False</HasAttachedDebugger><HasRyuJit>True</HasRyuJit><Configuration>CONFIGURATION</Configuration><ChronometerFrequency><Hertz>2531248</Hertz></ChronometerFrequency><HardwareTimerKind>Tsc</HardwareTimerKind></HostEnvironmentInfo><Benchmarks><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Foo</Method><MethodTitle>Foo</MethodTitle><Statistics><OriginalValues><Item>1</Item></OriginalValues><N>1</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>1</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>NaN</Margin><Lower>NaN</Lower><Upper>NaN</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory></BenchmarkCase><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Bar</Method><MethodTitle>Bar</MethodTitle><Statistics><OriginalValues><Item>1</Item></OriginalValues><N>1</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>1</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>NaN</Margin><Lower>NaN</Lower><Upper>NaN</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory></BenchmarkCase></Benchmarks></Summary>
+<?xml version="1.0" encoding="utf-8"?><Summary><Title>MockSummary</Title><HostEnvironmentInfo><BenchmarkDotNetCaption>BenchmarkDotNet</BenchmarkDotNetCaption><BenchmarkDotNetVersion>0.10.x-mock</BenchmarkDotNetVersion><OsVersion>Microsoft Windows NT 10.0.x.mock</OsVersion><ProcessorName>MockIntel Core i7-6700HQ CPU 2.60GHz</ProcessorName><PhysicalProcessorCount>1</PhysicalProcessorCount><PhysicalCoreCount>4</PhysicalCoreCount><LogicalCoreCount>8</LogicalCoreCount><RuntimeVersion>Clr 4.0.x.mock</RuntimeVersion><Architecture>64mock</Architecture><HasAttachedDebugger>False</HasAttachedDebugger><HasRyuJit>True</HasRyuJit><Configuration>CONFIGURATION</Configuration><DotNetSdkVersion>1.0.x.mock</DotNetSdkVersion><ChronometerFrequency><Hertz>2531248</Hertz></ChronometerFrequency><HardwareTimerKind>Tsc</HardwareTimerKind></HostEnvironmentInfo><Benchmarks><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Foo</Method><MethodTitle>Foo</MethodTitle><Statistics><OriginalValues><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item></OriginalValues><N>6</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>6</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>0</Margin><Lower>1</Lower><Upper>1</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Metrics><Item><Value>7</Value><Descriptor><Id>CacheMisses</Id><DisplayName>CacheMisses</DisplayName><Legend>Hardware counter 'CacheMisses' per single operation</Legend><NumberFormat>N0</NumberFormat><UnitType>Dimensionless</UnitType><TheGreaterTheBetter>False</TheGreaterTheBetter><PriorityInCategory>0</PriorityInCategory></Descriptor></Item></Metrics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory></BenchmarkCase><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Bar</Method><MethodTitle>Bar</MethodTitle><Statistics><OriginalValues><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item></OriginalValues><N>6</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>6</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>0</Margin><Lower>1</Lower><Upper>1</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Metrics><Item><Value>7</Value><Descriptor><Id>CacheMisses</Id><DisplayName>CacheMisses</DisplayName><Legend>Hardware counter 'CacheMisses' per single operation</Legend><NumberFormat>N0</NumberFormat><UnitType>Dimensionless</UnitType><TheGreaterTheBetter>False</TheGreaterTheBetter><PriorityInCategory>0</PriorityInCategory></Descriptor></Item></Metrics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory></BenchmarkCase></Benchmarks></Summary>
 ############################################
 XmlExporter-full
 ############################################
@@ -672,6 +821,7 @@ XmlExporter-full
     <HasAttachedDebugger>False</HasAttachedDebugger>
     <HasRyuJit>True</HasRyuJit>
     <Configuration>CONFIGURATION</Configuration>
+    <DotNetSdkVersion>1.0.x.mock</DotNetSdkVersion>
     <ChronometerFrequency>
       <Hertz>2531248</Hertz>
     </ChronometerFrequency>
@@ -687,8 +837,13 @@ XmlExporter-full
       <Statistics>
         <OriginalValues>
           <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
         </OriginalValues>
-        <N>1</N>
+        <N>6</N>
         <Min>1</Min>
         <LowerFence>1</LowerFence>
         <Q1>1</Q1>
@@ -704,13 +859,13 @@ XmlExporter-full
         <Skewness>NaN</Skewness>
         <Kurtosis>NaN</Kurtosis>
         <ConfidenceInterval>
-          <N>1</N>
+          <N>6</N>
           <Mean>1</Mean>
           <StandardError>0</StandardError>
           <Level>L999</Level>
-          <Margin>NaN</Margin>
-          <Lower>NaN</Lower>
-          <Upper>NaN</Upper>
+          <Margin>0</Margin>
+          <Lower>1</Lower>
+          <Upper>1</Upper>
         </ConfidenceInterval>
         <Percentiles>
           <P0>1</P0>
@@ -724,6 +879,20 @@ XmlExporter-full
           <P100>1</P100>
         </Percentiles>
       </Statistics>
+      <Metrics>
+        <Item>
+          <Value>7</Value>
+          <Descriptor>
+            <Id>CacheMisses</Id>
+            <DisplayName>CacheMisses</DisplayName>
+            <Legend>Hardware counter 'CacheMisses' per single operation</Legend>
+            <NumberFormat>N0</NumberFormat>
+            <UnitType>Dimensionless</UnitType>
+            <TheGreaterTheBetter>False</TheGreaterTheBetter>
+            <PriorityInCategory>0</PriorityInCategory>
+          </Descriptor>
+        </Item>
+      </Metrics>
       <Memory>
         <Gen0Collections>0</Gen0Collections>
         <Gen1Collections>0</Gen1Collections>
@@ -737,6 +906,46 @@ XmlExporter-full
           <IterationStage>Result</IterationStage>
           <LaunchIndex>1</LaunchIndex>
           <IterationIndex>1</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>2</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>3</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>4</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>5</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>6</IterationIndex>
           <Operations>1</Operations>
           <Nanoseconds>1</Nanoseconds>
         </Measurement>
@@ -751,8 +960,13 @@ XmlExporter-full
       <Statistics>
         <OriginalValues>
           <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
+          <Item>1</Item>
         </OriginalValues>
-        <N>1</N>
+        <N>6</N>
         <Min>1</Min>
         <LowerFence>1</LowerFence>
         <Q1>1</Q1>
@@ -768,13 +982,13 @@ XmlExporter-full
         <Skewness>NaN</Skewness>
         <Kurtosis>NaN</Kurtosis>
         <ConfidenceInterval>
-          <N>1</N>
+          <N>6</N>
           <Mean>1</Mean>
           <StandardError>0</StandardError>
           <Level>L999</Level>
-          <Margin>NaN</Margin>
-          <Lower>NaN</Lower>
-          <Upper>NaN</Upper>
+          <Margin>0</Margin>
+          <Lower>1</Lower>
+          <Upper>1</Upper>
         </ConfidenceInterval>
         <Percentiles>
           <P0>1</P0>
@@ -788,6 +1002,20 @@ XmlExporter-full
           <P100>1</P100>
         </Percentiles>
       </Statistics>
+      <Metrics>
+        <Item>
+          <Value>7</Value>
+          <Descriptor>
+            <Id>CacheMisses</Id>
+            <DisplayName>CacheMisses</DisplayName>
+            <Legend>Hardware counter 'CacheMisses' per single operation</Legend>
+            <NumberFormat>N0</NumberFormat>
+            <UnitType>Dimensionless</UnitType>
+            <TheGreaterTheBetter>False</TheGreaterTheBetter>
+            <PriorityInCategory>0</PriorityInCategory>
+          </Descriptor>
+        </Item>
+      </Metrics>
       <Memory>
         <Gen0Collections>0</Gen0Collections>
         <Gen1Collections>0</Gen1Collections>
@@ -804,6 +1032,46 @@ XmlExporter-full
           <Operations>1</Operations>
           <Nanoseconds>1</Nanoseconds>
         </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>2</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>3</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>4</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>5</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
+        <Measurement>
+          <IterationMode>Workload</IterationMode>
+          <IterationStage>Result</IterationStage>
+          <LaunchIndex>1</LaunchIndex>
+          <IterationIndex>6</IterationIndex>
+          <Operations>1</Operations>
+          <Nanoseconds>1</Nanoseconds>
+        </Measurement>
       </Measurements>
     </BenchmarkCase>
   </Benchmarks>
@@ -811,4 +1079,4 @@ XmlExporter-full
 ############################################
 XmlExporter-full-compressed
 ############################################
-<?xml version="1.0" encoding="utf-8"?><Summary><Title>MockSummary</Title><HostEnvironmentInfo><BenchmarkDotNetCaption>BenchmarkDotNet</BenchmarkDotNetCaption><BenchmarkDotNetVersion>0.10.x-mock</BenchmarkDotNetVersion><OsVersion>Microsoft Windows NT 10.0.x.mock</OsVersion><ProcessorName>MockIntel Core i7-6700HQ CPU 2.60GHz</ProcessorName><PhysicalProcessorCount>1</PhysicalProcessorCount><PhysicalCoreCount>4</PhysicalCoreCount><LogicalCoreCount>8</LogicalCoreCount><RuntimeVersion>Clr 4.0.x.mock</RuntimeVersion><Architecture>64mock</Architecture><HasAttachedDebugger>False</HasAttachedDebugger><HasRyuJit>True</HasRyuJit><Configuration>CONFIGURATION</Configuration><ChronometerFrequency><Hertz>2531248</Hertz></ChronometerFrequency><HardwareTimerKind>Tsc</HardwareTimerKind></HostEnvironmentInfo><Benchmarks><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Foo</Method><MethodTitle>Foo</MethodTitle><Statistics><OriginalValues><Item>1</Item></OriginalValues><N>1</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>1</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>NaN</Margin><Lower>NaN</Lower><Upper>NaN</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory><Measurements><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>1</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement></Measurements></BenchmarkCase><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Bar</Method><MethodTitle>Bar</MethodTitle><Statistics><OriginalValues><Item>1</Item></OriginalValues><N>1</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>1</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>NaN</Margin><Lower>NaN</Lower><Upper>NaN</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory><Measurements><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>1</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement></Measurements></BenchmarkCase></Benchmarks></Summary>
+<?xml version="1.0" encoding="utf-8"?><Summary><Title>MockSummary</Title><HostEnvironmentInfo><BenchmarkDotNetCaption>BenchmarkDotNet</BenchmarkDotNetCaption><BenchmarkDotNetVersion>0.10.x-mock</BenchmarkDotNetVersion><OsVersion>Microsoft Windows NT 10.0.x.mock</OsVersion><ProcessorName>MockIntel Core i7-6700HQ CPU 2.60GHz</ProcessorName><PhysicalProcessorCount>1</PhysicalProcessorCount><PhysicalCoreCount>4</PhysicalCoreCount><LogicalCoreCount>8</LogicalCoreCount><RuntimeVersion>Clr 4.0.x.mock</RuntimeVersion><Architecture>64mock</Architecture><HasAttachedDebugger>False</HasAttachedDebugger><HasRyuJit>True</HasRyuJit><Configuration>CONFIGURATION</Configuration><DotNetSdkVersion>1.0.x.mock</DotNetSdkVersion><ChronometerFrequency><Hertz>2531248</Hertz></ChronometerFrequency><HardwareTimerKind>Tsc</HardwareTimerKind></HostEnvironmentInfo><Benchmarks><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Foo</Method><MethodTitle>Foo</MethodTitle><Statistics><OriginalValues><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item></OriginalValues><N>6</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>6</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>0</Margin><Lower>1</Lower><Upper>1</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Metrics><Item><Value>7</Value><Descriptor><Id>CacheMisses</Id><DisplayName>CacheMisses</DisplayName><Legend>Hardware counter 'CacheMisses' per single operation</Legend><NumberFormat>N0</NumberFormat><UnitType>Dimensionless</UnitType><TheGreaterTheBetter>False</TheGreaterTheBetter><PriorityInCategory>0</PriorityInCategory></Descriptor></Item></Metrics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory><Measurements><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>1</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>2</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>3</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>4</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>5</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>6</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement></Measurements></BenchmarkCase><BenchmarkCase><DisplayInfo>MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)</DisplayInfo><Namespace>BenchmarkDotNet.Tests.Mocks</Namespace><Type>MockBenchmarkClass</Type><Method>Bar</Method><MethodTitle>Bar</MethodTitle><Statistics><OriginalValues><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item><Item>1</Item></OriginalValues><N>6</N><Min>1</Min><LowerFence>1</LowerFence><Q1>1</Q1><Median>1</Median><Mean>1</Mean><Q3>1</Q3><UpperFence>1</UpperFence><Max>1</Max><InterquartileRange>0</InterquartileRange><StandardError>0</StandardError><Variance>0</Variance><StandardDeviation>0</StandardDeviation><Skewness>NaN</Skewness><Kurtosis>NaN</Kurtosis><ConfidenceInterval><N>6</N><Mean>1</Mean><StandardError>0</StandardError><Level>L999</Level><Margin>0</Margin><Lower>1</Lower><Upper>1</Upper></ConfidenceInterval><Percentiles><P0>1</P0><P25>1</P25><P50>1</P50><P67>1</P67><P80>1</P80><P85>1</P85><P90>1</P90><P95>1</P95><P100>1</P100></Percentiles></Statistics><Metrics><Item><Value>7</Value><Descriptor><Id>CacheMisses</Id><DisplayName>CacheMisses</DisplayName><Legend>Hardware counter 'CacheMisses' per single operation</Legend><NumberFormat>N0</NumberFormat><UnitType>Dimensionless</UnitType><TheGreaterTheBetter>False</TheGreaterTheBetter><PriorityInCategory>0</PriorityInCategory></Descriptor></Item></Metrics><Memory><Gen0Collections>0</Gen0Collections><Gen1Collections>0</Gen1Collections><Gen2Collections>0</Gen2Collections><TotalOperations>0</TotalOperations><BytesAllocatedPerOperation /></Memory><Measurements><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>1</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>2</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>3</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>4</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>5</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement><Measurement><IterationMode>Workload</IterationMode><IterationStage>Result</IterationStage><LaunchIndex>1</LaunchIndex><IterationIndex>6</IterationIndex><Operations>1</Operations><Nanoseconds>1</Nanoseconds></Measurement></Measurements></BenchmarkCase></Benchmarks></Summary>

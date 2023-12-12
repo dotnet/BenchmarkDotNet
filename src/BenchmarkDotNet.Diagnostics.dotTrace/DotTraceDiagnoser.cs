@@ -97,12 +97,14 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
                 case RuntimeMoniker.Net80:
+                case RuntimeMoniker.Net90:
                     return true;
                 case RuntimeMoniker.NotRecognized:
                 case RuntimeMoniker.Mono:
                 case RuntimeMoniker.NativeAot60:
                 case RuntimeMoniker.NativeAot70:
                 case RuntimeMoniker.NativeAot80:
+                case RuntimeMoniker.NativeAot90:
                 case RuntimeMoniker.Wasm:
                 case RuntimeMoniker.WasmNet50:
                 case RuntimeMoniker.WasmNet60:
@@ -113,9 +115,11 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 case RuntimeMoniker.MonoAOTLLVMNet60:
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                 case RuntimeMoniker.MonoAOTLLVMNet80:
+                case RuntimeMoniker.MonoAOTLLVMNet90:
                 case RuntimeMoniker.Mono60:
                 case RuntimeMoniker.Mono70:
                 case RuntimeMoniker.Mono80:
+                case RuntimeMoniker.Mono90:
 #pragma warning disable CS0618 // Type or member is obsolete
                 case RuntimeMoniker.NetCoreApp50:
 #pragma warning restore CS0618 // Type or member is obsolete

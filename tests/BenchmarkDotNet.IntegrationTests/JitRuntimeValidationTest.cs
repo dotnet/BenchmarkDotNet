@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.LegacyJit, Platform.X64, null)]
         [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
         [InlineData(Jit.RyuJit, Platform.X64, null)]
-        public void CheckClrOnWindows(Jit jit, Platform platform, string errorMessage)
+        public void CheckClrOnWindows(Jit jit, Platform platform, string? errorMessage)
         {
             Verify(ClrRuntime.Net462, jit, platform, errorMessage);
         }
@@ -51,10 +51,10 @@ namespace BenchmarkDotNet.IntegrationTests
         [MemberData(nameof(CheckCore_Arguments))]
         public void CheckCore(Jit jit, Platform platform, string errorMessage)
         {
-            Verify(CoreRuntime.Core70, jit, platform, errorMessage);
+            Verify(CoreRuntime.Core80, jit, platform, errorMessage);
         }
 
-        private void Verify(Runtime runtime, Jit jit, Platform platform, string errorMessage)
+        private void Verify(Runtime runtime, Jit jit, Platform platform, string? errorMessage)
         {
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
