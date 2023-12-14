@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System;
 
-namespace BenchmarkDotNet.TestAdapter
+namespace BenchmarkDotNet.TestAdapter.Remoting
 {
     /// <summary>
     /// A wrapper around an IMessageLogger that works across AppDomain boundaries.

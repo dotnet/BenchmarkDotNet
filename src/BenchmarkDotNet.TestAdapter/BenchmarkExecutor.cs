@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.TestAdapter
                     if (benchmarkIds != null && benchmarkIds.Contains(testId))
                     {
                         filteredCases.Add(benchmarkCase);
-                        testCases.Add(benchmarkCase.ToVSTestCase(assemblyPath, needsJobInfo));
+                        testCases.Add(benchmarkCase.ToVsTestCase(assemblyPath, needsJobInfo));
                     }
                 }
 
@@ -57,10 +57,10 @@ namespace BenchmarkDotNet.TestAdapter
                 return;
 
             // Create an event processor which will subscribe to events and push them to VSTest
-            var eventProcessor = new VSTestEventProcessor(testCases, recorder, cts.Token);
+            var eventProcessor = new VsTestEventProcessor(testCases, recorder, cts.Token);
 
             // Create a logger which will forward all log messages in BDN to the VSTest logger.
-            var logger = new VSTestLogger(recorder.GetLogger());
+            var logger = new VsTestLogger(recorder.GetLogger());
 
             // Modify all the benchmarks so that the event process and logger is added.
             benchmarks = benchmarks

@@ -21,12 +21,12 @@ namespace BenchmarkDotNet.TestAdapter
         /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <param name="includeJobInName">Whether or not the display name should include the job name.</param>
         /// <returns>The VSTest TestCase.</returns>
-        internal static TestCase ToVSTestCase(this BenchmarkCase benchmarkCase, string assemblyPath, bool includeJobInName=false)
+        internal static TestCase ToVsTestCase(this BenchmarkCase benchmarkCase, string assemblyPath, bool includeJobInName = false)
         {
             var benchmarkMethod = benchmarkCase.Descriptor.WorkloadMethod;
             var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName();
             var benchmarkMethodName = benchmarkCase.Descriptor.WorkloadMethod.Name;
-            var benchmarkFullName = $"{fullClassName}.{benchmarkMethodName}";
+            var benchmarkFullMethodName = $"{fullClassName}.{benchmarkMethodName}";
 
             // Display name has arguments as well.
             var displayMethodName = FullNameProvider.GetMethodName(benchmarkCase);
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.TestAdapter
 
             var displayName = $"{fullClassName}.{displayMethodName}";
 
-            var vsTestCase = new TestCase(benchmarkFullName, VSTestAdapter.ExecutorUri, assemblyPath)
+            var vsTestCase = new TestCase(benchmarkFullMethodName, VsTestAdapter.ExecutorUri, assemblyPath)
             {
                 DisplayName = displayName,
                 Id = GetTestCaseId(benchmarkCase)
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.TestAdapter
         internal static Guid GetTestCaseId(this BenchmarkCase benchmarkCase)
         {
             var testIdProvider = new TestIdProvider();
-            testIdProvider.AppendString(VSTestAdapter.ExecutorUriString);
+            testIdProvider.AppendString(VsTestAdapter.ExecutorUriString);
             testIdProvider.AppendString(benchmarkCase.Descriptor.DisplayInfo);
             testIdProvider.AppendString(benchmarkCase.GetUnrandomizedJobDisplayInfo());
             testIdProvider.AppendString(benchmarkCase.Parameters.DisplayInfo);

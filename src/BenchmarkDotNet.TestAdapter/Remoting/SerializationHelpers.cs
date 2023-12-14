@@ -9,16 +9,18 @@ namespace BenchmarkDotNet.TestAdapter.Remoting
     {
         // Version number of the VSTest protocol that the adapter supports. Only needs to be updated when
         // the VSTest protocol has a change and this test adapter wishes to take a dependency on it.
-        private const int VSTestProtocolVersion = 7;
+        // A list of protocol versions and a summary of the changes that were made in them can be found here:
+        //    https://github.com/microsoft/vstest/blob/main/docs/Overview.md#protocolversion-request
+        private const int VsTestProtocolVersion = 7;
 
         public static string Serialize<T>(T data)
         {
-            return JsonDataSerializer.Instance.Serialize(data, version: VSTestProtocolVersion);
+            return JsonDataSerializer.Instance.Serialize(data, version: VsTestProtocolVersion);
         }
 
         public static T Deserialize<T>(string data)
         {
-            return JsonDataSerializer.Instance.Deserialize<T>(data, version: VSTestProtocolVersion)!;
+            return JsonDataSerializer.Instance.Deserialize<T>(data, version: VsTestProtocolVersion)!;
         }
     }
 }

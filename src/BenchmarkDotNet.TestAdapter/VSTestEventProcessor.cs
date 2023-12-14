@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.TestAdapter
     /// <summary>
     /// An event processor which will pass on benchmark execution information to VSTest.
     /// </summary>
-    internal class VSTestEventProcessor : EventProcessor
+    internal class VsTestEventProcessor : EventProcessor
     {
         private readonly Dictionary<Guid, TestCase> cases;
         private readonly TestExecutionRecorderWrapper recorder;
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.TestAdapter
         private readonly Dictionary<Guid, TestResult> testResults = new ();
         private readonly HashSet<Guid> sentTestResults = new ();
 
-        public VSTestEventProcessor(
+        public VsTestEventProcessor(
             List<TestCase> cases,
             TestExecutionRecorderWrapper recorder,
             CancellationToken cancellationToken)
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.TestAdapter
             var resultRuns = report.GetResultRuns();
 
             // Provide the raw result runs data.
-            testResult.SetPropertyValue(VSTestProperties.Measurement, resultRuns.Select(m => m.Nanoseconds.ToString()).ToArray());
+            testResult.SetPropertyValue(VsTestProperties.Measurement, resultRuns.Select(m => m.Nanoseconds.ToString()).ToArray());
 
             // Add a message to the TestResult which contains the results summary.
             testResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, report.BenchmarkCase.DisplayInfo + "\n"));

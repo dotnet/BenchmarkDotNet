@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.TestAdapter
     [DefaultExecutorUri(ExecutorUriString)]
     [FileExtension(".dll")]
     [FileExtension(".exe")]
-    public class VSTestAdapter : ITestExecutor, ITestDiscoverer
+    public class VsTestAdapter : ITestExecutor, ITestDiscoverer
     {
         // This URI is used to identify the adapter.
         internal const string ExecutorUriString = "executor://BenchmarkDotNet.TestAdapter";
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.TestAdapter
             foreach (var source in sources)
             {
                 ValidateSourceIsAssemblyOrThrow(source);
-                foreach (var testCase in GetVSTestCasesFromAssembly(source, logger))
+                foreach (var testCase in GetVsTestCasesFromAssembly(source, logger))
                 {
                     discoverySink.SendTestCase(testCase);
                 }
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.TestAdapter
         /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <param name="logger">A logger that sends logs to VSTest.</param>
         /// <returns>The VSTest test cases inside the given assembly.</returns>
-        private static List<TestCase> GetVSTestCasesFromAssembly(string assemblyPath, IMessageLogger logger)
+        private static List<TestCase> GetVsTestCasesFromAssembly(string assemblyPath, IMessageLogger logger)
         {
             try
             {
@@ -171,13 +171,20 @@ namespace BenchmarkDotNet.TestAdapter
 
         /// <summary>
         /// This will create the given type in a child AppDomain when used in .NET Framework.
-        /// If not in the .NET Framework, it will use the current
+        /// If not in the .NET Framework, it will use the current AppDomain.
         /// </summary>
         /// <param name="type">The type to create.</param>
         /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
         /// <returns>The created object.</returns>
         private static object CreateIsolatedType(Type type, string assemblyPath)
         {
+            // .NET Framework runs require a custom AppDomain to be set up to run the benchmarks in because otherwise,
+            // all the assemblies will be loaded from the VSTest console rather than from the directory that the BDN
+            // program under test lives in. .NET Core assembly resolution is smarter and will correctly load the right
+            // assembly versions as needed and does not require a custom AppDomain. Unfortunately, the APIs needed to
+            // create the AppDomain for .NET Framework are not part of .NET Standard, and so a multi-targeting solution
+            // such as this is required to get this to work. This same approach is also used by other .NET unit testing
+            // libraries as well, further justifying this approach to solving how to get the correct assemblies loaded.
 #if NETFRAMEWORK
             var appBase = Path.GetDirectoryName(assemblyPath);
             var setup = new AppDomainSetup { ApplicationBase = appBase };
@@ -199,7 +206,7 @@ namespace BenchmarkDotNet.TestAdapter
                 throw new NotSupportedException($"Missing extension on source '{source}', must have the extension '.dll' or '.exe'.");
 
             var extension = Path.GetExtension(source);
-            if (!string.Equals(extension, ".dll") && !string.Equals(extension, ".exe"))
+            if (!string.Equals(extension, ".dll", StringComparison.OrdinalIgnoreCase) && !string.Equals(extension, ".exe", StringComparison.OrdinalIgnoreCase))
                 throw new NotSupportedException($"Unsupported extension on source '{source}', must have the extension '.dll' or '.exe'.");
         }
     }

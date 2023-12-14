@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.TestAdapter.Remoting
                 var needsJobInfo = runInfo.BenchmarksCases.Select(c => c.Job.DisplayInfo).Distinct().Count() > 1;
                 foreach (var benchmarkCase in runInfo.BenchmarksCases)
                 {
-                    var testCase = benchmarkCase.ToVSTestCase(assemblyPath, needsJobInfo);
+                    var testCase = benchmarkCase.ToVsTestCase(assemblyPath, needsJobInfo);
                     serializedTestCases.Add(SerializationHelpers.Serialize(testCase));
                 }
             }

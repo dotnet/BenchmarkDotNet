@@ -7,18 +7,18 @@ namespace BenchmarkDotNet.TestAdapter
     /// <summary>
     /// A class to send logs from BDN to the VSTest output log.
     /// </summary>
-    internal sealed class VSTestLogger : ILogger
+    internal sealed class VsTestLogger : ILogger
     {
         private readonly IMessageLogger messageLogger;
         private readonly StringBuilder currentLine = new StringBuilder();
         private TestMessageLevel currentLevel = TestMessageLevel.Informational;
 
-        public VSTestLogger(IMessageLogger logger)
+        public VsTestLogger(IMessageLogger logger)
         {
             messageLogger = logger;
         }
 
-        public string Id => nameof(VSTestLogger);
+        public string Id => nameof(VsTestLogger);
 
         public int Priority => 0;
 
