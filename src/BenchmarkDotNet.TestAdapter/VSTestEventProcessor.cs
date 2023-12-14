@@ -6,11 +6,13 @@ using BenchmarkDotNet.TestAdapter.Remoting;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Perfolizer.Mathematics.Histograms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace BenchmarkDotNet.TestAdapter
@@ -127,8 +129,17 @@ namespace BenchmarkDotNet.TestAdapter
             var statistics = resultRuns.GetStatistics();
             var cultureInfo = CultureInfo.InvariantCulture;
             var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
-            var statisticsOutput = statistics.ToString(cultureInfo, formatter, calcHistogram: true);
-            testResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, statisticsOutput));
+
+            var builder = new StringBuilder();
+            var histogram = HistogramBuilder.Adaptive.Build(statistics.OriginalValues);
+            builder.AppendLine("-------------------- Histogram --------------------");
+            builder.AppendLine(histogram.ToString(formatter));
+            builder.AppendLine("---------------------------------------------------");
+
+            var statisticsOutput = statistics.ToString(cultureInfo, formatter, calcHistogram: false);
+            builder.AppendLine(statisticsOutput);
+
+            testResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, builder.ToString()));
 
             RecordEnd(testResult.TestCase, testResult.Outcome);
             RecordResult(testResult);

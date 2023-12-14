@@ -1,7 +1,9 @@
 ﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -21,11 +23,24 @@ namespace BenchmarkDotNet.TestAdapter
         {
             var assembly = Assembly.LoadFrom(assemblyPath);
 
-            if (assembly.IsDebug() ?? false)
-                return Array.Empty<BenchmarkRunInfo>();
+            var isDebugAssembly = assembly.IsDebug() ?? false;
 
             return GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks())
-                .Select(type => BenchmarkConverter.TypeToBenchmarks(type))
+                .Select(type =>
+                {
+                    var benchmarkRunInfo = BenchmarkConverter.TypeToBenchmarks(type);
+                    if (isDebugAssembly)
+                    {
+                        // If the assembly is a debug assembly, then only display them if they will run in-process
+                        // This will allow people to debug their benchmarks using VSTest if they wish.
+                        benchmarkRunInfo = new BenchmarkRunInfo(
+                            benchmarkRunInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
+                            benchmarkRunInfo.Type,
+                            benchmarkRunInfo.Config);
+                    }
+
+                    return benchmarkRunInfo;
+                })
                 .Where(runInfo => runInfo.BenchmarksCases.Length > 0)
                 .ToArray();
         }
