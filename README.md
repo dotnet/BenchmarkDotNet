@@ -268,3 +268,13 @@ Let's build the best tool for benchmarking together!
 This project has adopted the code of conduct defined by the [Contributor Covenant](https://www.contributor-covenant.org/)
 to clarify expected behavior in our community.
 For more information, see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct).
+
+## Sponsors
+
+BenchmarkDotNet is supported by the [AWS Open Source Software Fund](https://github.com/aws/dotnet-foss).
+
+<div align="center">
+
+  [![](https://gist.githubusercontent.com/AndreyAkinshin/f08c77960c064233348157215781b13b/raw/9d00f0ba4acb8861f9287de5d43b0ec60d7a55ac/aws-logo-small.png)](https://github.com/aws/dotnet-foss)
+
+</div>
