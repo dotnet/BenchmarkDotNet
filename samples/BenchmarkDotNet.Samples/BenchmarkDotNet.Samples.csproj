@@ -11,10 +11,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>$(NoWarn);CA1018;CA5351;CA1825</NoWarn>
-    <!-- 
-      GenerateProgramFile is set to false automatically when BenchmarkDotNet.TestAdapter is a PackageReference. 
-      It needs to be set manually here because it is referenced via ProjectReference.
-    -->
+    <!-- Disable entry point generation as this project has it's own entry point -->
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
