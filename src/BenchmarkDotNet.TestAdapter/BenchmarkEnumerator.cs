@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.TestAdapter
         {
             var assembly = Assembly.LoadFrom(assemblyPath);
 
-            var isDebugAssembly = assembly.IsDebug() ?? false;
+            var isDebugAssembly = assembly.IsJitOptimizationDisabled() ?? false;
 
             return GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks())
                 .Select(type =>

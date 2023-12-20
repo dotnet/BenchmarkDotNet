@@ -19,4 +19,10 @@
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
 
+  <!-- Include files in nuget package for generating entry point -->
+  <ItemGroup>
+    <Compile Remove="Package\EntryPoint.*" />
+    <None Include="Package\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
+    <None Include="Package\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
+  </ItemGroup>
 </Project>

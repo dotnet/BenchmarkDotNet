@@ -1,0 +1,12 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- Disables generation of MSTest entrypoint -->
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <EntryPointSourceDirectory>$(MSBuildThisFileDirectory)..\entrypoints\</EntryPointSourceDirectory>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(GenerateBDNEntryPoint)' == 'true'">
+    <Compile Include="$(EntryPointSourceDirectory)EntryPoint.cs" Condition="'$(Language)' == 'C#'" Visible="false"/>
+    <CompileAfter Include="$(EntryPointSourceDirectory)EntryPoint.fs" Condition="'$(Language)' == 'F#'" Visible="false"/>
+    <Compile Include="$(EntryPointSourceDirectory)EntryPoint.vb" Condition="'$(Language)' == 'VB'" Visible="false"/>
+  </ItemGroup>
+</Project>
