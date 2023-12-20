@@ -11,6 +11,10 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>$(NoWarn);CA1018;CA5351;CA1825</NoWarn>
+    <!-- 
+      GenerateProgramFile is set to false automatically when BenchmarkDotNet.TestAdapter is a PackageReference. 
+      It needs to be set manually here because it is referenced via ProjectReference.
+    -->
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
@@ -20,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.2" />
+    <!-- The Test SDK is required only for the VSTest Adapter to work -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
   </ItemGroup>
   <ItemGroup>

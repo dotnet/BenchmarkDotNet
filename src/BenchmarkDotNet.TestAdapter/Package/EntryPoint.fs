@@ -2,7 +2,8 @@
 open System.Reflection;
 open BenchmarkDotNet.Running
 
+type internal __Marker = interface end // Used to help locale current assembly
 [<EntryPoint>]
 let main argv =
-    BenchmarkSwitcher.FromAssembly(Assembly.GetEntryAssembly()).Run(argv) |> ignore
+    BenchmarkSwitcher.FromAssembly(typeof<__Marker>.Assembly).Run(argv) |> ignore
     0 // return an integer exit code
