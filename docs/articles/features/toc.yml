@@ -12,3 +12,5 @@
   href: etwprofiler.md
 - name: EventPipeProfiler
   href: event-pipe-profiler.md
+- name: VSTest
+  href: vstest.md
