@@ -6,7 +6,7 @@ name: Running with VSTest
 # Running with VSTest
 BenchmarkDotNet has support for discovering and executing benchmarks through VSTest. This provides an alternative user experience to running benchmarks with the CLI and may be preferable for those who like their IDE's VSTest integrations that they may have used when running unit tests.
 
-Below is an example showing the experience of running some benchmarks in the BenchmarkDotNet samples project in Visual Studio's Test Explorer.
+Below is an example of running some benchmarks from the BenchmarkDotNet samples project in Visual Studio's Test Explorer.
 
 ![](../../images/vs-testexplorer-demo.png)
 
@@ -44,19 +44,18 @@ After doing this, you can set your build configuration to `Release`, run a build
 
 ## Setting a default configuration
 
-Previously, it was common for the default configuration to be defined inside the entry point. Since the entry point is not used when running benchmarks through VSTest, the default configuration must be specified using a custom `IConfigSource` attribute instead that is set on the assembly. 
+Previously, it was common for the default configuration to be defined inside the entry point. Since the entry point is not used when running benchmarks through VSTest, the default configuration must be specified using a `Config` attribute instead that is set on the assembly. 
 
-First, create a custom attribute that implements `IConfigSource` like below, making sure that it has `Assembly` as one of the attribute targets:
+First, create a class that extends `ManualConfig` or `IConfig` which sets the default configuration you want:
 
 ```csharp
-class MyDefaultConfigSourceAttribute : Attribute, IConfigSource
+class MyDefaultConfig : ManualConfig
 {
-    public IConfig Config { get; }
-
-    public MyDefaultConfigSourceAttribute()
+    public MyDefaultConfig()
     {
-        // define your config here
-        Config = ManualConfig.CreateEmpty().AddJob(...);
+        AddJob(Job.Dry);
+        AddLogger(Loggers.ConsoleLogger.Default); 
+        AddValidator(JitOptimizationsValidator.DontFailOnError); 
     }
 }
 ```
@@ -64,12 +63,12 @@ class MyDefaultConfigSourceAttribute : Attribute, IConfigSource
 Then, set an assembly attribute with the following.
 
 ```csharp
-[assembly: MyDefaultConfigSource]
+[assembly: Config(typeof(MyDefaultConfig))]
 ```
 
 By convention, assembly attributes are usually defined inside `AssemblyInfo.cs` in a directory called `Properties`.
 
 ## Viewing the results
-The full output from BenchmarkDotNet that you would have been used to seeing in the past will be sent to the "Tests" Output of your IDE. Use this view if you want to see the tabular view that compares multiple benchmarks with each other, or if you want to see the results for each individual iteration.
+The full output from BenchmarkDotNet that you would have been used to seeing in the past will be sent to the "Tests" output of your IDE. Use this view if you want to see the tabular view that compares multiple benchmarks with each other, or if you want to see the results for each individual iteration.
 
-One more place where you can view the results is in each individual test's output messages. In Visual Studio this can be viewed by clicking on the test in the Test Explorer after running it, and looking at the Test Detail Summary. Since this only displays statistics for a single benchmark case, it does not show the tabulated view that compares multiple benchmark cases, but instead displays a histogram and various other useful statistics
+One more place where you can view the results is in each individual test's output messages. In Visual Studio this can be viewed by clicking on the test in the Test Explorer after running it, and looking at the Test Detail Summary. Since this only displays statistics for a single benchmark case, it does not show the tabulated view that compares multiple benchmark cases, but instead displays a histogram and various other useful statistics. Not all IDEs support displaying these output messages, so you may only be able to view the results using the "Tests" output.
