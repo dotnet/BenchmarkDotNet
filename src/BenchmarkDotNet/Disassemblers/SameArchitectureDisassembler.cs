@@ -8,16 +8,16 @@ namespace BenchmarkDotNet.Disassemblers
     internal class SameArchitectureDisassembler
     {
         private readonly DisassemblyDiagnoserConfig config;
-        private ClrMdV2Disassembler? clrMdV2Disassembler;
+        private ClrMdV3Disassembler? clrMdV3Disassembler;
 
         internal SameArchitectureDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
 
         internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
         // delay the creation to avoid exceptions at DisassemblyDiagnoser ctor
-            => (clrMdV2Disassembler ??= CreateDisassemblerForCurrentArchitecture())
+            => (clrMdV3Disassembler ??= CreateDisassemblerForCurrentArchitecture())
                     .AttachAndDisassemble(BuildDisassemblerSettings(parameters));
 
-        private static ClrMdV2Disassembler CreateDisassemblerForCurrentArchitecture()
+        private static ClrMdV3Disassembler CreateDisassemblerForCurrentArchitecture()
             => RuntimeInformation.GetCurrentPlatform() switch
             {
                 Platform.X86 or Platform.X64 => new IntelDisassembler(),
