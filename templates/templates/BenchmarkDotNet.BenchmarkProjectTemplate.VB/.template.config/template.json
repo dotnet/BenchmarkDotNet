@@ -91,7 +91,7 @@
         "cases": [
           {
             "condition": "(consoleApp == true)",
-            "value": "net6.0"
+            "value": "net8.0"
           },
           {
             "condition": "(consoleApp == false)",
