@@ -474,6 +474,20 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(expected, j.Infrastructure.NuGetReferences); // ensure that the list's equality operator returns true when the contents are the same
         }
 
+        [Fact]
+        public static void UnfreezeCopy_PreservesIdCharacteristic()
+        {
+            // Arrange
+            var original = new Job();
+            original.SetValue(Job.IdCharacteristic, "TestID");
+
+            // Act
+            var copy = original.UnfreezeCopy();
+
+            // Assert
+            Assert.Equal("TestID", copy.GetValue(Job.IdCharacteristic));
+        }
+
         private static bool IsSubclassOfobModeOfItself(Type type)
         {
             Type jobModeOfT;
