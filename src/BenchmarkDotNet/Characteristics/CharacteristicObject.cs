@@ -402,6 +402,12 @@ namespace BenchmarkDotNet.Characteristics
             var newRoot = (CharacteristicObject)Activator.CreateInstance(GetType());
             newRoot.ApplyCore(this);
 
+            // Preserve the IdCharacteristic of the original object
+            if (this.HasValue(IdCharacteristic))
+            {
+                newRoot.SetValue(IdCharacteristic, this.GetValue(IdCharacteristic));
+            }
+
             return newRoot;
         }
         #endregion
