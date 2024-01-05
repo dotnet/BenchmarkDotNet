@@ -21,8 +21,8 @@
 
   <!-- Include files in nuget package for generating entry point -->
   <ItemGroup>
-    <Compile Remove="Package\EntryPoint.*" />
-    <None Include="Package\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
-    <None Include="Package\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
+    <Compile Remove="entrypoints\EntryPoint.*" />
+    <None Include="entrypoints\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
+    <None Include="build\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
   </ItemGroup>
 </Project>
