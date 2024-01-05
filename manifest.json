@@ -5806,6 +5806,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/features/vstest.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/features/vstest.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/guides/choosing-run-strategy.md",
       "output": {
         ".html": {
@@ -6968,6 +6978,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "changelog/v0.13.12.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.13.12.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "changelog/v0.13.2.md",
       "output": {
         ".html": {
@@ -7292,6 +7312,16 @@
       "output": {
         "resource": {
           "relative_path": "images/v0.12.0/rplot.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/vs-testexplorer-demo.png",
+      "output": {
+        "resource": {
+          "relative_path": "images/vs-testexplorer-demo.png"
         }
       },
       "version": ""

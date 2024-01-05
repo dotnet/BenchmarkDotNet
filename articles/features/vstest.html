@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Running with VSTest | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Running with VSTest | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../../logo/icon-32.png">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/articles/features/vstest.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="docs.vstest">
+<h1 id="running-with-vstest">Running with VSTest</h1>
+
+<p>BenchmarkDotNet supports discovering and executing benchmarks through VSTest.
+This provides an alternative user experience to running benchmarks with the CLI
+and may be preferable for those who like their IDE's VSTest integrations that they may have used when running unit tests.</p>
+<p>Below is an example of running some benchmarks from the BenchmarkDotNet samples project in Visual Studio's Test Explorer.</p>
+<p><img src="../../images/vs-testexplorer-demo.png" alt=""></p>
+<h2 id="about-vstest">About VSTest</h2>
+<p>VSTest is one of the most popular test platforms in use in the .NET ecosystem,
+with test frameworks such as MSTest, xUnit, and NUnit providing support for it.
+Many IDEs, including Visual Studio and Rider, provide UIs for running tests through VSTest
+which some users may find more accessible than running them through the command line.</p>
+<p>It may seem counterintuitive to run performance tests on a platform
+that is designed for unit tests that expect a boolean outcome of &quot;Passed&quot; or &quot;Failed&quot;.
+However, VSTest provides good value as a protocol for discovering and executing tests.
+In addition, we can still make use of this boolean output to indicate
+if the benchmark had validation errors that caused it to fail to run.</p>
+<h2 id="caveats-and-things-to-know">Caveats and things to know</h2>
+<ul>
+<li><strong>The benchmark measurements may be affected by the VSTest host and your IDE!</strong><br>
+If you want to have accurate measurements,
+it is recommended to run benchmarks through the CLI without other processes on the machine impacting performance.
+This does not mean that the measurements are useless though,
+it will still be able to provide useful measurements during development when comparing different approaches.</li>
+<li><strong>The test adapter will not display or execute benchmarks if optimizations are disabled.</strong><br>
+Please ensure you are compiling in Release mode or with <code>Optimize</code> set to true.
+Using an <code>InProcess</code> toolchain will let you run your benchmarks with optimizations disabled
+and will let you attach the debugger as well.</li>
+<li><strong>The VSTest adapter will not call your application's entry point.</strong><br>
+If you use the entry point to customize how your benchmarks are run,
+you will need to do this through other means such as an assembly-level <code>IConfigSource</code>,
+as shown <a href="#setting-a-default-configuration">here</a>.</li>
+<li><strong>The test adapter will generate an entry point for you automatically.</strong><br>
+The generated entry point will pass the command line arguments
+and the current assembly into <code>BenchmarkSwitcher</code>,
+so you can still use it in your CLI as well as in VSTest.
+This means you can delete your entry point and only need to define your benchmarks.
+If you want to use a custom entry point, you can still do so by setting <code>GenerateProgramFile</code> to <code>false</code> in your project file.</li>
+</ul>
+<h2 id="getting-started">Getting started</h2>
+<ul>
+<li><strong>Step 1.</strong> Install the NuGet packages.<br>
+You need to install two packages into your benchmark project:
+<ul>
+<li><code>BenchmarkDotNet.TestAdapter</code>: Implements the VSTest protocol for BenchmarkDotNet</li>
+<li><code>Microsoft.NET.Test.Sdk</code>: Includes all the pieces needed for the VSTest host to run and load the VSTest adapter.</li>
+</ul>
+</li>
+<li><strong>Step 2.</strong> Make sure that the entry point is configured correctly.<br>
+As mentioned in the caveats section, <code>BenchmarkDotNet.TestAdapter</code> will generate an entry point for you automatically.
+So, if you have an entry point already,
+you will either need to delete it or set <code>GenerateProgramFile</code> to <code>false</code> in your project file to continue using your existing one.
+Here is an example of a <code>.csproj</code> file based on the default Console Application template:</li>
+</ul>
+<pre><code class="lang-xml">&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
+    &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+    &lt;!-- Disable entry point generation as this project has it's own entry point --&gt;
+    &lt;GenerateProgramFile&gt;false&lt;/GenerateProgramFile&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemGroup&gt;
+    &lt;PackageReference Include=&quot;BenchmarkDotNet.TestAdapter&quot; Version=&quot;0.13.12&quot; /&gt;
+    &lt;PackageReference Include=&quot;Microsoft.NET.Test.Sdk&quot; Version=&quot;17.8.0&quot; /&gt;
+  &lt;/ItemGroup&gt;
+
+&lt;/Project&gt;
+</code></pre>
+<ul>
+<li><strong>Step 3.</strong> Make sure that your IDE supports VSTest integration.<br>
+In Visual Studio, everything works out of the box.
+In Rider/R# 2023.3, the VSTest integration should be activated:
+<ul>
+<li>Go to the &quot;Unit Testing&quot; settings page.
+<ul>
+<li>Rider: Settings -&gt; Build, Execution, Deployment -&gt; Unit Testing -&gt; VSTest</li>
+<li>R#: Extensions -&gt; ReSharper -&gt; Options -&gt; Tools -&gt; Unit Testing -&gt; Test Frameworks -&gt; VSTest</li>
+</ul>
+</li>
+<li>Make sure that the &quot;Enable VSTest adapter support&quot; checkbox is checked.</li>
+<li>Add your project name to the &quot;Projects with Unit Tests&quot; list (or <code>*</code> to enable it for all projects).
+In future versions of Rider, this should be enabled by default.</li>
+</ul>
+</li>
+<li><strong>Step 4.</strong> Switch to the <code>Release</code> configuration.<br>
+As mentioned above, the TestAdapter is not able to discover and run benchmarks with optimizations disabled (by design).</li>
+<li><strong>Step 5.</strong> Build the project.<br>
+In order to discover the benchmarks, the VSTest adapter needs to be able to find the assembly.
+Once you build the project, you should observe the discovered benchmarks in your IDE's Unit Test Explorer.</li>
+</ul>
+<p>If you correctly performed all the steps above, you should be able to run your benchmarks in your IDE using embedded unit testing features.
+If this doesn't work for you, don't hesitate to file <a href="https://github.com/dotnet/BenchmarkDotNet/issues/new">a new GitHub issue</a>.</p>
+<h2 id="setting-a-default-configuration">Setting a default configuration</h2>
+<p>Previously, it was common for the default configuration to be defined inside the entry point.
+Since the entry point is not used when running benchmarks through VSTest,
+the default configuration must be specified using a <code>Config</code> attribute that is set on the assembly instead.</p>
+<p>First, create a class that extends <code>ManualConfig</code> or <code>IConfig</code> which sets the default configuration you want:</p>
+<pre><code class="lang-csharp">class MyDefaultConfig : ManualConfig
+{
+    public MyDefaultConfig()
+    {
+        AddJob(Job.Dry);
+        AddLogger(Loggers.ConsoleLogger.Default);
+        AddValidator(JitOptimizationsValidator.DontFailOnError);
+    }
+}
+</code></pre>
+<p>Then, set an assembly attribute with the following.</p>
+<pre><code class="lang-csharp">[assembly: Config(typeof(MyDefaultConfig))]
+</code></pre>
+<p>By convention, assembly attributes are usually defined inside <code>AssemblyInfo.cs</code> in a directory called <code>Properties</code>.</p>
+<h2 id="viewing-the-results">Viewing the results</h2>
+<p>The full output from BenchmarkDotNet that you would have been used to seeing in the past will be sent to the &quot;Tests&quot; output of your IDE.
+Use this view if you want to see the tabular view that compares multiple benchmarks with each other or
+if you want to see the results for each individual iteration.</p>
+<p>One more place where you can view the results is in each individual test's output messages.
+In Visual Studio, this can be viewed by clicking on the test in the Test Explorer after running it and looking at the Test Detail Summary.
+Since this only displays statistics for a single benchmark case,
+it does not show the tabulated view that compares multiple benchmark cases.
+Instead, it displays a histogram and various other useful statistics.
+Not all IDEs support displaying these output messages, so you may only be able to view the results using the &quot;Tests&quot; output.</p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

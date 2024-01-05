@@ -38283,6 +38283,9 @@ references:
 - uid: changelog.v0.13.11
   name: BenchmarkDotNet v0.13.11
   href: changelog/v0.13.11.html
+- uid: changelog.v0.13.12
+  name: BenchmarkDotNet v0.13.12
+  href: changelog/v0.13.12.html
 - uid: changelog.v0.13.2
   name: BenchmarkDotNet v0.13.2
   href: changelog/v0.13.2.html
@@ -38457,3 +38460,6 @@ references:
 - uid: docs.validators
   name: Validators
   href: articles/configs/validators.html
+- uid: docs.vstest
+  name: Running with VSTest
+  href: articles/features/vstest.html
