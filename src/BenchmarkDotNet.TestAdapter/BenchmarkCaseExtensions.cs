@@ -25,17 +25,17 @@ namespace BenchmarkDotNet.TestAdapter
         {
             var benchmarkMethod = benchmarkCase.Descriptor.WorkloadMethod;
             var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName();
-            var benchmarkMethodName = benchmarkCase.Descriptor.WorkloadMethod.Name;
-            var benchmarkFullMethodName = $"{fullClassName}.{benchmarkMethodName}";
+            var parametrizedMethodName = FullNameProvider.GetMethodName(benchmarkCase);
 
-            // Display name has arguments as well.
-            var displayMethodName = FullNameProvider.GetMethodName(benchmarkCase);
-            if (includeJobInName)
-                displayMethodName += $" [{benchmarkCase.GetUnrandomizedJobDisplayInfo()}]";
-
+            var displayJobInfo = benchmarkCase.GetUnrandomizedJobDisplayInfo();
+            var displayMethodName = parametrizedMethodName + (includeJobInName ? $" [{displayJobInfo}]" : "");
             var displayName = $"{fullClassName}.{displayMethodName}";
 
-            var vsTestCase = new TestCase(benchmarkFullMethodName, VsTestAdapter.ExecutorUri, assemblyPath)
+            // We use displayName as FQN to workaround the Rider/R# problem with FQNs processing
+            // See: https://github.com/dotnet/BenchmarkDotNet/issues/2494
+            var fullyQualifiedName = displayName;
+
+            var vsTestCase = new TestCase(fullyQualifiedName, VsTestAdapter.ExecutorUri, assemblyPath)
             {
                 DisplayName = displayName,
                 Id = GetTestCaseId(benchmarkCase)
@@ -67,7 +67,8 @@ namespace BenchmarkDotNet.TestAdapter
         internal static string GetUnrandomizedJobDisplayInfo(this BenchmarkCase benchmarkCase)
         {
             var jobDisplayInfo = benchmarkCase.Job.DisplayInfo;
-            if (!benchmarkCase.Job.HasValue(CharacteristicObject.IdCharacteristic) && benchmarkCase.Job.ResolvedId.StartsWith("Job-", StringComparison.OrdinalIgnoreCase))
+            if (!benchmarkCase.Job.HasValue(CharacteristicObject.IdCharacteristic) &&
+                benchmarkCase.Job.ResolvedId.StartsWith("Job-", StringComparison.OrdinalIgnoreCase))
             {
                 // Replace Job-ABCDEF with Job
                 jobDisplayInfo = "Job" + jobDisplayInfo.Substring(benchmarkCase.Job.ResolvedId.Length);
