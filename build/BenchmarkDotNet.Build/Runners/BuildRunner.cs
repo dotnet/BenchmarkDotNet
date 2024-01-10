@@ -24,8 +24,7 @@ public class BuildRunner
         context.DotNetRestore(context.SolutionFile.FullPath,
             new DotNetRestoreSettings
             {
-                MSBuildSettings = context.MsBuildSettingsRestore,
-                Verbosity = DotNetVerbosity.Normal
+                MSBuildSettings = context.MsBuildSettingsRestore
             });
     }
 
