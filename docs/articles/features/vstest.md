@@ -87,7 +87,6 @@ In addition, we can still make use of this boolean output to indicate
     * Rider: Settings -> Build, Execution, Deployment -> Unit Testing -> VSTest
     * R#: Extensions -> ReSharper -> Options -> Tools -> Unit Testing -> Test Frameworks -> VSTest
   * Make sure that the "Enable VSTest adapter support" checkbox is checked.
-  * Add your project name to the "Projects with Unit Tests" list (or `*` to enable it for all projects).
   In future versions of Rider, this should be enabled by default.
 * **Step 4.** Switch to the `Release` configuration.  
   As mentioned above, the TestAdapter is not able to discover and run benchmarks with optimizations disabled (by design).
