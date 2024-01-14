@@ -15,12 +15,12 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         /// </summary>
         /// <param name="coreRun">the path to CoreRun</param>
         /// /<param name="createCopy">should a copy of CoreRun be performed? True by default. <remarks>The toolchain replaces old dependencies in CoreRun folder with newer versions if used by the benchmarks.</remarks></param>
-        /// <param name="targetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
+        /// <param name="targetFrameworkMoniker">TFM, net8.0 is the default</param>
         /// <param name="customDotNetCliPath">path to dotnet cli, if not provided the one from PATH will be used</param>
         /// <param name="displayName">display name, CoreRun is the default value</param>
         /// <param name="restorePath">the directory to restore packages to</param>
         public CoreRunToolchain(FileInfo coreRun, bool createCopy = true,
-            string targetFrameworkMoniker = "netcoreapp2.1",
+            string targetFrameworkMoniker = "net8.0",
             FileInfo? customDotNetCliPath = null, DirectoryInfo? restorePath = null,
             string displayName = "CoreRun")
         {

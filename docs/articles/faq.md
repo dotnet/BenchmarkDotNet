@@ -13,9 +13,9 @@ See also: [BenchmarkDotNet#237](https://github.com/dotnet/BenchmarkDotNet/issues
 
 * **Q** Why can't I install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?
 
-    **A** BenchmarkDotNet supports only netcoreapp2.0+.
+    **A** BenchmarkDotNet supports only netcoreapp3.1+.
 Some old Visual Studio 2017 can create a new application which targets netcoreapp1.0.
-You should upgrade it up to 2.0.
+You should upgrade it up to 3.1.
 If you want to target netcoreapp1.0 in your main assembly, it's recommended to create a separated project for benchmarks.
 
 * **Q** I created a new .NET Core Console App in Visual Studio 2017. Now I want to run my code on CoreCLR, full .NET Framework, and Mono. How can I do it?
@@ -23,7 +23,7 @@ If you want to target netcoreapp1.0 in your main assembly, it's recommended to c
     **A** Use the following lines in your `.csproj` file:
 
     ```xml
-    <TargetFrameworks>netcoreapp2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net46</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     ```
 
@@ -33,7 +33,7 @@ If you want to target netcoreapp1.0 in your main assembly, it's recommended to c
     [CoreJob, ClrJob, MonoJob]
     ```
 
-* **Q** My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires `net461` and `netcoreapp2.0`. How can I run benchmarks in this case?
+* **Q** My source code targets old versions of .NET Framework or .NET Core, but BenchmarkDotNet requires `net461` and `netcoreapp3.1`. How can I run benchmarks in this case?
 
     **A** It's a good practice to introduce an additional console application (e.g. `MyAwesomeLibrary.Benchmarks`) which will depend on your code and BenchmarkDotNet.
 Due to the fact that users usually run benchmarks in a develop environment and don't distribute benchmarks for users, it shouldn't be a problem.

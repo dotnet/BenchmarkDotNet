@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Tests.Running
                     typeof(WithMutator),
                     DefaultConfig.Instance
                         .AddJob(Job.Default.WithRuntime(ClrRuntime.Net462))
-                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21)));
+                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80)));
 
             Assert.Equal(2, info.BenchmarksCases.Length);
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
