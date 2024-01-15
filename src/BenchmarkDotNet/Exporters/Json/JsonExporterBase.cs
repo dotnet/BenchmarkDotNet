@@ -74,6 +74,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Method", report.BenchmarkCase.Descriptor.WorkloadMethod.Name },
                 { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
                 { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
+                { "EnvironmentVariables", report.BenchmarkCase.Job.Environment.EnvironmentVariables ?? new List<Jobs.EnvironmentVariable>() },
                 {
                     "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase)
                 }, // do NOT remove this property, it is used for xunit-performance migration
@@ -83,40 +84,40 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Statistics", report.ResultStatistics }
             };
 
-                // We show MemoryDiagnoser's results only if it is being used
-                if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
+            // We show MemoryDiagnoser's results only if it is being used
+            if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
+            {
+                benchmark.Add("Memory", new
                 {
-                    benchmark.Add("Memory", new
-                    {
-                        report.GcStats.Gen0Collections,
-                        report.GcStats.Gen1Collections,
-                        report.GcStats.Gen2Collections,
-                        report.GcStats.TotalOperations,
-                        BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
-                    });
-                }
+                    report.GcStats.Gen0Collections,
+                    report.GcStats.Gen1Collections,
+                    report.GcStats.Gen2Collections,
+                    report.GcStats.TotalOperations,
+                    BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
+                });
+            }
 
-                if (ExcludeMeasurements == false)
+            if (ExcludeMeasurements == false)
+            {
+                // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
+                benchmark.Add("Measurements",
+                    report.AllMeasurements.Select(m => new
+                    {
+                        IterationMode = m.IterationMode.ToString(),
+                        IterationStage = m.IterationStage.ToString(),
+                        m.LaunchIndex,
+                        m.IterationIndex,
+                        m.Operations,
+                        m.Nanoseconds
+                    }));
+
+                if (report.Metrics.Any())
                 {
-                    // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
-                    benchmark.Add("Measurements",
-                        report.AllMeasurements.Select(m => new
-                        {
-                            IterationMode = m.IterationMode.ToString(),
-                            IterationStage = m.IterationStage.ToString(),
-                            m.LaunchIndex,
-                            m.IterationIndex,
-                            m.Operations,
-                            m.Nanoseconds
-                        }));
-
-                    if (report.Metrics.Any())
-                    {
-                        benchmark.Add("Metrics", report.Metrics.Values);
-                    }
+                    benchmark.Add("Metrics", report.Metrics.Values);
                 }
+            }
 
-                return benchmark;
+            return benchmark;
         }
     }
 }

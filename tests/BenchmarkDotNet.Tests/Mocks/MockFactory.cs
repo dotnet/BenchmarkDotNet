@@ -9,6 +9,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Builders;
@@ -131,5 +132,23 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         public static readonly MethodInfo MockMethodInfo = MockType.GetTypeInfo().GetMethods()
             .Single(method => method.Name == nameof(MockBenchmarkClass.Foo));
+
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
+        public class LongRunJobWithEnvironmentAttribute : JobConfigBaseAttribute
+        {
+            public LongRunJobWithEnvironmentAttribute(string key, string value) :
+                base(Job.LongRun.WithEnvironmentVariables(new EnvironmentVariable(key, value)))
+            {
+
+            }
+        }
+
+        [LongRunJobWithEnvironment("foo", "bar")]
+        public class MockBenchmarkClassWithEnvironment
+        {
+            [Benchmark] public void Foo() { }
+            [Benchmark] public void Bar() { }
+        }
     }
 }

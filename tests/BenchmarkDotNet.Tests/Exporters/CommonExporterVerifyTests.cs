@@ -17,6 +17,7 @@ using BenchmarkDotNet.Tests.Reports;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
+using static BenchmarkDotNet.Tests.Mocks.MockFactory;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
@@ -55,7 +56,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 PrintTitle(logger, exporter);
                 exporter.ExportToLog(
-                    MockFactory.CreateSummary(
+                    MockFactory.CreateSummary<MockBenchmarkClassWithEnvironment>(
                         config.WithCultureInfo(cultureInfo),
                         hugeSd: false,
                         new[]
