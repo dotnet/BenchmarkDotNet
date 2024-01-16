@@ -65,6 +65,8 @@ namespace BenchmarkDotNet.Exporters.Json
 
         protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(BenchmarkReport report)
         {
+            var environmentVariables = report.BenchmarkCase.Job.Environment.EnvironmentVariables ?? new List<Jobs.EnvironmentVariable>();
+
             var benchmark = new Dictionary<string, object>
             {
                 // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
@@ -74,7 +76,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Method", report.BenchmarkCase.Descriptor.WorkloadMethod.Name },
                 { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
                 { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
-                { "EnvironmentVariables", report.BenchmarkCase.Job.Environment.EnvironmentVariables ?? new List<Jobs.EnvironmentVariable>() },
+                { "EnvironmentVariables",  environmentVariables.ToDictionary(envVar => envVar.Key, envVar => envVar.Value) },
                 {
                     "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase)
                 }, // do NOT remove this property, it is used for xunit-performance migration
