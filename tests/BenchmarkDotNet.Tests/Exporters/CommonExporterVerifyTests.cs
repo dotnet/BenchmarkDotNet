@@ -66,6 +66,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             }
 
             var settings = VerifySettingsFactory.Create();
+            // this is present when the test is run under .NET Core, but not under .NET Framework
+            settings.ScrubLinesContaining(".NET Core SDK 1.0.x.mock");
             settings.UseTextForParameters(GetName(cultureInfo));
             return Verifier.Verify(logger.GetLog(), settings);
         }
