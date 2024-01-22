@@ -7,14 +7,21 @@ using System.IO;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal static class SourceCodeProvider
+    internal class SourceCodeProvider : IDisposable
     {
-        private static readonly Dictionary<SourceFile, string[]> SourceFileCache = new Dictionary<SourceFile, string[]>();
-        private static readonly Dictionary<SourceFile, string> SourceFilePathsCache = new Dictionary<SourceFile, string>();
+        private readonly Dictionary<SourceFile, string[]> sourceFileCache = new Dictionary<SourceFile, string[]>();
+        private readonly Dictionary<SourceFile, string> sourceFilePathsCache = new Dictionary<SourceFile, string>();
+        private readonly Dictionary<PdbInfo, ManagedSymbolModule> pdbReaders = new Dictionary<PdbInfo, ManagedSymbolModule>();
+        private readonly SymbolReader symbolReader = new SymbolReader(TextWriter.Null) { SymbolPath = SymbolPath.MicrosoftSymbolServerPath };
 
-        internal static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        public void Dispose()
         {
-            var sourceLocation = method.GetSourceLocation(map.ILOffset);
+            symbolReader.Dispose();
+        }
+
+        internal IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        {
+            var sourceLocation = GetSourceLocation(method, map.ILOffset);
             if (sourceLocation == null)
                 yield break;
 
@@ -39,12 +46,12 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static string GetFilePath(SourceFile sourceFile)
-            => SourceFilePathsCache.TryGetValue(sourceFile, out string filePath) ? filePath : sourceFile.Url;
+        private string GetFilePath(SourceFile sourceFile)
+            => sourceFilePathsCache.TryGetValue(sourceFile, out string filePath) ? filePath : sourceFile.Url;
 
-        private static string ReadSourceLine(SourceFile file, int line)
+        private string ReadSourceLine(SourceFile file, int line)
         {
-            if (!SourceFileCache.TryGetValue(file, out string[] contents))
+            if (!sourceFileCache.TryGetValue(file, out string[] contents))
             {
                 // GetSourceFile method returns path when file is stored on the same machine
                 // otherwise it downloads it from the Symbol Server and returns the source code ;)
@@ -56,14 +63,14 @@ namespace BenchmarkDotNet.Disassemblers
                 if (File.Exists(wholeFileOrJustPath))
                 {
                     contents = File.ReadAllLines(wholeFileOrJustPath);
-                    SourceFilePathsCache.Add(file, wholeFileOrJustPath);
+                    sourceFilePathsCache.Add(file, wholeFileOrJustPath);
                 }
                 else
                 {
                     contents = wholeFileOrJustPath.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
                 }
 
-                SourceFileCache.Add(file, contents);
+                sourceFileCache.Add(file, contents);
             }
 
             return line - 1 < contents.Length
@@ -99,17 +106,8 @@ namespace BenchmarkDotNet.Disassemblers
 
             return new string(prefix);
         }
-    }
 
-    internal static class ClrSourceExtensions
-    {
-        // TODO Not sure we want this to be a shared dictionary, especially without
-        //      any synchronization. Probably want to put this hanging off the Context
-        //      somewhere, or inside SymbolCache.
-        private static readonly Dictionary<PdbInfo, ManagedSymbolModule> s_pdbReaders = new Dictionary<PdbInfo, ManagedSymbolModule>();
-        private static readonly SymbolReader symbolReader = new SymbolReader(TextWriter.Null) { SymbolPath = SymbolPath.MicrosoftSymbolServerPath };
-
-        internal static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
+        internal SourceLocation GetSourceLocation(ClrMethod method, int ilOffset)
         {
             var reader = GetReaderForMethod(method);
             if (reader == null)
@@ -118,7 +116,7 @@ namespace BenchmarkDotNet.Disassemblers
             return reader.SourceLocationForManagedCode((uint)method.MetadataToken, ilOffset);
         }
 
-        internal static SourceLocation GetSourceLocation(this ClrStackFrame frame)
+        internal SourceLocation GetSourceLocation(ClrStackFrame frame)
         {
             var reader = GetReaderForMethod(frame.Method);
             if (reader == null)
@@ -145,7 +143,7 @@ namespace BenchmarkDotNet.Disassemblers
             return last;
         }
 
-        private static ManagedSymbolModule GetReaderForMethod(ClrMethod method)
+        private ManagedSymbolModule GetReaderForMethod(ClrMethod method)
         {
             ClrModule module = method?.Type?.Module;
             PdbInfo info = module?.Pdb;
@@ -153,7 +151,7 @@ namespace BenchmarkDotNet.Disassemblers
             ManagedSymbolModule? reader = null;
             if (info != null)
             {
-                if (!s_pdbReaders.TryGetValue(info, out reader))
+                if (!pdbReaders.TryGetValue(info, out reader))
                 {
                     string pdbPath = info.Path;
                     if (pdbPath != null)
@@ -173,7 +171,7 @@ namespace BenchmarkDotNet.Disassemblers
                         }
                     }
 
-                    s_pdbReaders[info] = reader;
+                    pdbReaders[info] = reader;
                 }
             }
 

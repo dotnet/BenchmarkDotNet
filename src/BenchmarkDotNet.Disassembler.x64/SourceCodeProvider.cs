@@ -8,13 +8,34 @@ using System.IO;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal static class SourceCodeProvider
-    {
-        private static readonly Dictionary<string, string[]> SourceFileCache = new Dictionary<string, string[]>();
+    // This is taken from the Samples\FileAndLineNumbers projects from microsoft/clrmd,
+    // and replaces the previously-available SourceLocation functionality.
 
-        internal static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+    internal class SourceLocation
+    {
+        public string FilePath;
+        public int LineNumber;
+        public int LineNumberEnd;
+        public int ColStart;
+        public int ColEnd;
+    }
+
+    internal class SourceCodeProvider : IDisposable
+    {
+        private readonly Dictionary<string, string[]> sourceFileCache = new Dictionary<string, string[]>();
+        private readonly Dictionary<PdbInfo, PdbReader> pdbReaders = new Dictionary<PdbInfo, PdbReader>();
+
+        public void Dispose()
         {
-            var sourceLocation = method.GetSourceLocation(map.ILOffset);
+            foreach (var reader in pdbReaders.Values)
+            {
+                reader?.Dispose();
+            }
+        }
+
+        internal IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        {
+            var sourceLocation = GetSourceLocation(method, map.ILOffset);
             if (sourceLocation == null)
                 yield break;
 
@@ -39,16 +60,16 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static string ReadSourceLine(string file, int line)
+        private string ReadSourceLine(string file, int line)
         {
-            if (!SourceFileCache.TryGetValue(file, out string[] contents))
+            if (!sourceFileCache.TryGetValue(file, out string[] contents))
             {
                 // sometimes the symbols report some disk location from MS CI machine like "E:\A\_work\308\s\src\mscorlib\shared\System\Random.cs" for .NET Core 2.0
                 if (!File.Exists(file))
                     return null;
 
                 contents = File.ReadAllLines(file);
-                SourceFileCache.Add(file, contents);
+                sourceFileCache.Add(file, contents);
             }
 
             return line - 1 < contents.Length
@@ -84,29 +105,8 @@ namespace BenchmarkDotNet.Disassemblers
 
             return new string(prefix);
         }
-    }
 
-
-    // This is taken from the Samples\FileAndLineNumbers projects from microsoft/clrmd,
-    // and replaces the previously-available SourceLocation functionality.
-
-    internal class SourceLocation
-    {
-        public string FilePath;
-        public int LineNumber;
-        public int LineNumberEnd;
-        public int ColStart;
-        public int ColEnd;
-    }
-
-    internal static class ClrSourceExtensions
-    {
-        // TODO Not sure we want this to be a shared dictionary, especially without
-        //      any synchronization. Probably want to put this hanging off the Context
-        //      somewhere, or inside SymbolCache.
-        private static readonly Dictionary<PdbInfo, PdbReader> s_pdbReaders = new Dictionary<PdbInfo, PdbReader>();
-
-        internal static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
+        internal SourceLocation GetSourceLocation(ClrMethod method, int ilOffset)
         {
             PdbReader reader = GetReaderForMethod(method);
             if (reader == null)
@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Disassemblers
             return FindNearestLine(function, ilOffset);
         }
 
-        internal static SourceLocation GetSourceLocation(this ClrStackFrame frame)
+        internal SourceLocation GetSourceLocation(ClrStackFrame frame)
         {
             PdbReader reader = GetReaderForMethod(frame.Method);
             if (reader == null)
@@ -178,7 +178,7 @@ namespace BenchmarkDotNet.Disassemblers
             return last;
         }
 
-        private static PdbReader GetReaderForMethod(ClrMethod method)
+        private PdbReader GetReaderForMethod(ClrMethod method)
         {
             ClrModule module = method?.Type?.Module;
             PdbInfo info = module?.Pdb;
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Disassemblers
             PdbReader? reader = null;
             if (info != null)
             {
-                if (!s_pdbReaders.TryGetValue(info, out reader))
+                if (!pdbReaders.TryGetValue(info, out reader))
                 {
                     SymbolLocator locator = GetSymbolLocator(module);
                     string pdbPath = locator.FindPdb(info);
@@ -207,7 +207,7 @@ namespace BenchmarkDotNet.Disassemblers
                         }
                     }
 
-                    s_pdbReaders[info] = reader;
+                    pdbReaders[info] = reader;
                 }
             }
 

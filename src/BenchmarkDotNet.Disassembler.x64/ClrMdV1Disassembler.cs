@@ -93,6 +93,7 @@ namespace BenchmarkDotNet.Disassemblers
         {
             var result = new List<DisassembledMethod>();
 
+            using var sourceCodeProvider = new SourceCodeProvider();
             while (state.Todo.Count != 0)
             {
                 var methodInfo = state.Todo.Dequeue();
@@ -101,7 +102,7 @@ namespace BenchmarkDotNet.Disassemblers
                     continue; // already handled
 
                 if (settings.MaxDepth >= methodInfo.Depth)
-                    result.Add(DisassembleMethod(methodInfo, state, settings));
+                    result.Add(DisassembleMethod(methodInfo, state, settings, sourceCodeProvider));
             }
 
             return result.ToArray();
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.Disassemblers
         private static bool CanBeDisassembled(ClrMethod method)
             => !((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0 || method.HotColdInfo.HotSize == 0));
 
-        private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
+        private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings, SourceCodeProvider sourceCodeProvider)
         {
             var method = methodInfo.Method;
 
@@ -133,7 +134,7 @@ namespace BenchmarkDotNet.Disassemblers
                 var uniqueSourceCodeLines = new HashSet<Sharp>(new SharpComparer());
                 // for getting C# code we always use the original ILOffsetMap
                 foreach (var map in method.ILOffsetMap.Where(map => map.StartAddress < map.EndAddress && map.ILOffset >= 0).OrderBy(map => map.StartAddress))
-                    foreach (var sharp in SourceCodeProvider.GetSource(method, map))
+                    foreach (var sharp in sourceCodeProvider.GetSource(method, map))
                         uniqueSourceCodeLines.Add(sharp);
 
                 codes.AddRange(uniqueSourceCodeLines);
