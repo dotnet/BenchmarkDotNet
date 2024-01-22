@@ -43,10 +43,17 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programName);
 
         /// <summary>
-        /// returns a path where executable should be found after the build
+        /// returns a path where executable should be found after the build (usually \bin)
         /// </summary>
         [PublicAPI] protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => buildArtifactsDirectoryPath;
+
+        /// <summary>
+        /// returns a path where intermediate files should be found after the build (usually \obj)
+        /// </summary>
+        [PublicAPI]
+        protected virtual string GetIntermediateDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+            => string.Empty;
 
         /// <summary>
         /// returns OS-specific executable extension
@@ -128,6 +135,7 @@ namespace BenchmarkDotNet.Toolchains
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,
+                intermediateDirectoryPath: GetIntermediateDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration),
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),

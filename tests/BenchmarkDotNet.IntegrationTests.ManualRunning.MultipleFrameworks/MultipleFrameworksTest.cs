@@ -6,7 +6,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using Xunit;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
     // Note: To properly test this locally, modify
     // BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.csproj,
