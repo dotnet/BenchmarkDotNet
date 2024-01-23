@@ -26,7 +26,7 @@ You can customize the summary report by specifying various properties of `Summar
 
 ### Example Output
 
-Using SummarySyle options:
+Using SummaryStyle options:
 
 ```markdown
 | Method | N   | Mean [ns]     | Error [ns] | StdDev [ns] |
@@ -46,6 +46,6 @@ Default:
 
 ### Links
 
-* @docs.summarystyle
+* @docs.SummaryStyle
 * The permanent link to this sample: @BenchmarkDotNet.Samples.IntroSummaryStyle
 
