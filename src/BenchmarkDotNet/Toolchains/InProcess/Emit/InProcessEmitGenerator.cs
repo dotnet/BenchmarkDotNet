@@ -52,6 +52,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 appConfigPath: null,
                 nuGetConfigPath: null,
                 projectFilePath: null,
+                buildForReferencesProjectFilePath: null,
                 buildScriptFilePath: null,
                 executablePath: executablePath,
                 programName: programName,
