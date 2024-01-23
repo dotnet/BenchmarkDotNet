@@ -12,7 +12,7 @@ You can customize the summary report by specifying various properties of `Summar
 
 ### Source Code
 
-[!code-csharp[SummaryStyle.cs](../../../samples/BenchmarkDotNet.Samples/IntroSummaryStyle.cs)]
+[!code-csharp[IntroSummaryStyle.cs](../../../samples/BenchmarkDotNet.Samples/IntroSummaryStyle.cs)]
 
 ### Properties
 
