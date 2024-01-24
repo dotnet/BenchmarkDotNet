@@ -1,16 +1,20 @@
 ﻿using BenchmarkDotNet.Jobs;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace BenchmarkDotNet.Validators
 {
     public class SdkValidator : IValidator
     {
-        public static readonly SdkValidator Instance = new SdkValidator();
+        private readonly ISdkProvider sdkProvider;
 
-        private SdkValidator()
-        { }
+        public static readonly SdkValidator Instance = new SdkValidator(new DotNetSdkProvider());
+
+        public SdkValidator(ISdkProvider sdkProvider)
+        {
+            this.sdkProvider = sdkProvider;
+        }
 
         public bool TreatsWarningsAsErrors => true;
 
@@ -36,23 +40,10 @@ namespace BenchmarkDotNet.Validators
 
         private bool IsSdkInstalled(RuntimeMoniker runtimeMoniker)
         {
-            var startInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = "--list-sdks",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-
-            var process = new System.Diagnostics.Process { StartInfo = startInfo };
-            process.Start();
-
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
             string requiredSdkVersion = GetSdkVersionFromMoniker(runtimeMoniker);
-            return output.Contains(requiredSdkVersion);
+            var installedSdks = sdkProvider.GetInstalledSdks();
+
+            return installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion + ".") || sdk == requiredSdkVersion);
         }
 
         private string GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)

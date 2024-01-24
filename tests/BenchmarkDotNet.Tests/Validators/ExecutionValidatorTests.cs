@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -562,6 +563,39 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [Benchmark]
             public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void MissingSdksAreDiscovered()
+        {
+            var fakeSdkProvider = new FakeSdkProvider(new string[0]); // No SDKs are installed.
+
+            var validator = new SdkValidator(fakeSdkProvider);
+
+            var validationErrors = validator.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkWithNet461))).ToList();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.StartsWith("The required SDK for Net461 is not installed", validationErrors.Single().Message);
+        }
+
+        [Fact]
+        public void InstalledSdksAreDetected()
+        {
+            var fakeSdkProvider = new FakeSdkProvider(new[] { "4.6.1" });
+
+            var validator = new SdkValidator(fakeSdkProvider);
+
+            var validationErrors = validator.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkWithNet461))).ToList();
+
+            Assert.Empty(validationErrors);
+        }
+
+        [DryJob(RuntimeMoniker.Net461)]
+        public class BenchmarkWithNet461
+        {
+            [Benchmark]
+            public void Method()
+            { }
         }
     }
 }
