@@ -366,8 +366,12 @@ namespace BenchmarkDotNet.Running
             var sdkValidator = SdkValidator.Instance;
             foreach (var benchmarkRunInfo in benchmarks)
             {
-                var sdkValidationErrors = sdkValidator.Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config));
-                validationErrors.AddRange(sdkValidationErrors);
+                var validators = benchmarkRunInfo.Config.GetValidators().ToList();
+                validators.Add(sdkValidator);
+                var compositeValidator = new CompositeValidator(validators.ToImmutableHashSet());
+
+                var currentValidationErrors = compositeValidator.Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config));
+                validationErrors.AddRange(currentValidationErrors);
             }
 
             return validationErrors.ToImmutableArray();
