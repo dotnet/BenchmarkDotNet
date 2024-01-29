@@ -20,12 +20,15 @@ namespace BenchmarkDotNet.Toolchains
 
         public virtual bool IsInProcess => false;
 
-        public Toolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor)
+        private readonly SdkValidator sdkValidator;
+
+        public Toolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, ISdkProvider sdkProvider)
         {
             Name = name;
             Generator = generator;
             Builder = builder;
             Executor = executor;
+            sdkValidator = new SdkValidator(sdkProvider);
         }
 
         public virtual IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -54,6 +57,13 @@ namespace BenchmarkDotNet.Toolchains
                         $"We could not find Mono in provided path ({mono.CustomPath}), benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
                         benchmarkCase);
                 }
+
+            }
+
+            var sdkValidationErrors = sdkValidator.Validate(new ValidationParameters(new[] { benchmarkCase }, null));
+            foreach (var validationError in sdkValidationErrors)
+            {
+                yield return validationError;
             }
         }
 

@@ -26,7 +26,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 nameof(InProcessEmitToolchain),
                 new InProcessEmitGenerator(),
                 new InProcessEmitBuilder(),
-                new InProcessEmitExecutor(timeout, logOutput))
+                new InProcessEmitExecutor(timeout, logOutput),
+                null)
         {
         }
 

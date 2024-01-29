@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData,
                     ilcOptimizationPreference, ilcInstructionSet),
                 new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
-                new Executor())
+                new Executor(), null)
         {
             CustomDotNetCliPath = customDotNetCliPath;
         }

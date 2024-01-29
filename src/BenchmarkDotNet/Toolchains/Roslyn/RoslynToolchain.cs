@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         public static readonly IToolchain Instance = new RoslynToolchain();
 
         [PublicAPI]
-        public RoslynToolchain() : base("Roslyn", new Generator(), Roslyn.Builder.Instance, new Executor())
+        public RoslynToolchain() : base("Roslyn", new Generator(), Roslyn.Builder.Instance, new Executor(), null)
         {
         }
 

@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
     public class MonoAotLLVMToolChain : Toolchain
     {
         public MonoAotLLVMToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor)
-            : base(name, generator, builder, executor)
+            : base(name, generator, builder, executor, null)
         {
         }
 

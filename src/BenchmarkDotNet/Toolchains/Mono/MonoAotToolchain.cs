@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
         public static readonly IToolchain Instance = new MonoAotToolchain();
 
         [PublicAPI]
-        public MonoAotToolchain() : base("MonoAot", new Generator(), new MonoAotBuilder(), new Executor())
+        public MonoAotToolchain() : base("MonoAot", new Generator(), new MonoAotBuilder(), new Executor(), null)
         {
         }
 

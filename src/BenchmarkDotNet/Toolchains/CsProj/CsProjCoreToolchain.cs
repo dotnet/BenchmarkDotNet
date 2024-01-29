@@ -26,8 +26,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain NetCoreApp80 = From(NetCoreAppSettings.NetCoreApp80);
         [PublicAPI] public static readonly IToolchain NetCoreApp90 = From(NetCoreAppSettings.NetCoreApp90);
 
-        internal CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
-            : base(name, generator, builder, executor)
+        internal CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath, ISdkProvider sdkProvider)
+            : base(name, generator, builder, executor, sdkProvider)
         {
             CustomDotNetCliPath = customDotNetCliPath;
         }
@@ -40,7 +40,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 new CsProjGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
                 new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath),
                 new DotNetCliExecutor(settings.CustomDotNetCliPath),
-                settings.CustomDotNetCliPath);
+                settings.CustomDotNetCliPath,
+                new DotNetSdkProvider());
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {

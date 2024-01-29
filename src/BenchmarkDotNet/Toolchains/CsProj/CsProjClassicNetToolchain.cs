@@ -29,7 +29,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             : base(name,
                 new CsProjGenerator(targetFrameworkMoniker, customDotNetCliPath, packagesPath, runtimeFrameworkVersion: null, isNetCore: false),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath),
-                new Executor())
+                new Executor(),
+                new DotNetSdkProvider())
         {
             CustomDotNetCliPath = customDotNetCliPath;
         }

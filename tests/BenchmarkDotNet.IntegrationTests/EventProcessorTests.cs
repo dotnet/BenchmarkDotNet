@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUsingEventProcessorWithBuildFailures()
         {
-            var toolchain = new Toolchain("Build Failure", new AllFailsGenerator(), null, null);
+            var toolchain = new Toolchain("Build Failure", new AllFailsGenerator(), null, null, null);
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassA) }, toolchain: toolchain);
 
             Assert.Equal(9, events.Count);
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllUnsupportedToolchain : Toolchain
         {
-            public AllUnsupportedToolchain() : base("AllUnsupported", null, null, null)
+            public AllUnsupportedToolchain() : base("AllUnsupported", null, null, null, null)
             {
             }
 
