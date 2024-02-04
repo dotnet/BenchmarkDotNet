@@ -9,10 +9,6 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
-    /// <summary>
-    /// this toolchain is designed for the new .csprojs, to build .NET 4.x benchmarks from the context of .NET Core host process
-    /// it does not work with the old .csprojs or project.json!
-    /// </summary>
     [PublicAPI]
     public class CsProjClassicNetToolchain : Toolchain
     {
