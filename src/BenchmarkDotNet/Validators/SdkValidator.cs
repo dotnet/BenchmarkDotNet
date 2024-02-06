@@ -43,7 +43,17 @@ namespace BenchmarkDotNet.Validators
             string requiredSdkVersion = GetSdkVersionFromMoniker(runtimeMoniker);
             var installedSdks = sdkProvider.GetInstalledSdks();
 
-            return installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion + ".") || sdk == requiredSdkVersion);
+            // If the required SDK version is for .NET Framework
+            if (requiredSdkVersion.StartsWith("4"))
+            {
+                // Check if the required .NET Framework version (or a later version) is installed
+                return installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion) || string.Compare(sdk, requiredSdkVersion) > 0);
+            }
+            else
+            {
+                // For .NET Core and .NET 5+
+                return installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion + ".") || sdk == requiredSdkVersion);
+            }
         }
 
         private string GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)
