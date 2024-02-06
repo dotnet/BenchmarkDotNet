@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
@@ -50,7 +51,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData,
                     ilcOptimizationPreference, ilcInstructionSet),
                 new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
-                new Executor(), null)
+                new Executor(), new DotNetSdkProvider())
         {
             CustomDotNetCliPath = customDotNetCliPath;
         }
