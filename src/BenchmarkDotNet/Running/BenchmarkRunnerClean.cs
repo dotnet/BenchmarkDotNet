@@ -363,6 +363,7 @@ namespace BenchmarkDotNet.Running
                         .Validate(new ValidationParameters(joinedCases, null))
                     );
             }
+
             foreach (var benchmarkRunInfo in benchmarks)
                 validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
 
