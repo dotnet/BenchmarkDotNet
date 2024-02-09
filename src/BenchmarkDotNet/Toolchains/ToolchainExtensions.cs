@@ -28,9 +28,7 @@ namespace BenchmarkDotNet.Toolchains
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
                     descriptor,
-                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
-                    || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
-                    || job.HasValue(InfrastructureMode.ArgumentsCharacteristic));
+                    job.HasDynamicBuildCharacteristic());
 
         internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
         {

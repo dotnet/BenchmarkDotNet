@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<NeedsMoreThan2GB>(
                     ManualConfig.CreateEmpty()
-                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core70).WithPlatform(Platform.X64).WithId("Core"))
+                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core80).WithPlatform(Platform.X64).WithId("Core"))
                         .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithPlatform(Platform.X86).WithGcServer(false).WithLargeAddressAware().WithId("Framework"))
                         .AddColumnProvider(DefaultColumnProviders.Instance)
                         .AddLogger(new OutputLogger(output)));

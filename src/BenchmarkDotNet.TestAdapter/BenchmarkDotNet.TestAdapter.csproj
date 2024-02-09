@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <AssemblyTitle>BenchmarkDotNet.TestAdapter</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.TestAdapter</AssemblyName>
+    <PackageId>BenchmarkDotNet.TestAdapter</PackageId>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TestPlatform.AdapterUtilities" Version="17.7.2" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.7.2" />
+    <PackageReference Include="Microsoft.TestPlatform.TranslationLayer" Version="17.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+
+  <!-- Include files in nuget package for generating entry point -->
+  <ItemGroup>
+    <Compile Remove="entrypoints\EntryPoint.*" />
+    <None Include="entrypoints\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
+    <None Include="build\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
+  </ItemGroup>
+</Project>

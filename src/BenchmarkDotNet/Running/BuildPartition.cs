@@ -4,8 +4,12 @@ using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
@@ -71,5 +75,20 @@ namespace BenchmarkDotNet.Running
             // in case of SingleFile, location.Length returns 0, so we use GetName() and
             // manually construct the path.
             assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
+
+        internal bool ForcedNoDependenciesForIntegrationTests
+        {
+            get
+            {
+                if (!XUnitHelper.IsIntegrationTest.Value || !RuntimeInformation.IsNetCore)
+                    return false;
+
+                var job = RepresentativeBenchmarkCase.Job;
+                if (job.GetToolchain().Builder is not DotNetCliBuilder)
+                    return false;
+
+                return !job.HasDynamicBuildCharacteristic();
+            }
+        }
     }
 }

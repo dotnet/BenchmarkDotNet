@@ -91,7 +91,21 @@ jobs:
         with:
           name: test-macos-trx
           path: "**/*.trx"
-  
+
+  test-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
+          platform: x64
+      - name: Set up zlib-static
+        run: sudo apt-get install -y libkrb5-dev
+      - name: Run task 'pack'
+        run: ./build.cmd pack
+
   spellcheck-docs:
     runs-on: ubuntu-latest
     steps:

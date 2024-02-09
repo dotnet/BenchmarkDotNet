@@ -143,6 +143,7 @@ public class ReleaseRunner
                 Draft = false,
                 Prerelease = false,
                 GenerateReleaseNotes = false,
+                DiscussionCategoryName = "Announcements",
                 Body = notes
             }).Wait();
             context.Information("  Success");

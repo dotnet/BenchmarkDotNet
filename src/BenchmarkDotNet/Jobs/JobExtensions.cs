@@ -436,5 +436,10 @@ namespace BenchmarkDotNet.Jobs
             updateCallback(newJob);
             return newJob;
         }
+
+        internal static bool HasDynamicBuildCharacteristic(this Job job) =>
+            job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
+            || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
+            || job.HasValue(InfrastructureMode.ArgumentsCharacteristic);
     }
 }

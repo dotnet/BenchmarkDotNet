@@ -1,0 +1,21 @@
+﻿<Project InitialTargets="GenerateBDNEntryPoint" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <EntryPointSourceDirectory>$(MSBuildThisFileDirectory)..\entrypoints\</EntryPointSourceDirectory>
+  </PropertyGroup>
+  <!-- 
+    Microsoft.NET.Test.Sdk uses a property called "GenerateProgramFile" to determine whether it generates an entry 
+    point automatically. We don't want to use the entry point that Microsoft.NET.Test.Sdk generates, so we generate 
+    our own and set this property to false.
+  -->
+  <Target Name="GenerateBDNEntryPoint">
+    <ItemGroup Condition="'$(GenerateProgramFile)' != 'false'">
+      <Compile Include="$(EntryPointSourceDirectory)EntryPoint.cs" Condition="'$(Language)' == 'C#'" Visible="false"/>
+      <CompileAfter Include="$(EntryPointSourceDirectory)EntryPoint.fs" Condition="'$(Language)' == 'F#'" Visible="false"/>
+      <Compile Include="$(EntryPointSourceDirectory)EntryPoint.vb" Condition="'$(Language)' == 'VB'" Visible="false"/>
+    </ItemGroup>
+    <PropertyGroup>
+      <!-- Disables generation of MSTest entrypoint -->
+      <GenerateProgramFile>false</GenerateProgramFile>
+    </PropertyGroup>
+  </Target>
+</Project>

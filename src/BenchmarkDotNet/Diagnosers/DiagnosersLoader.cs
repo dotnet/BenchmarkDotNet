@@ -80,6 +80,11 @@ namespace BenchmarkDotNet.Diagnosers
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.NativeMemoryProfiler")
                 };
             }
+            catch (Exception ex) when (ex is FileNotFoundException || ex is BadImageFormatException)
+            {
+                // Return an array of UnresolvedDiagnoser objects when the assembly does not contain the requested diagnoser
+                return new[] { GetUnresolvedDiagnoser<IDiagnoser>() };
+            }
             catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
             {
                 ConsoleLogger.Default.WriteLineError($"Error loading {WindowsDiagnosticAssemblyFileName}: {ex.GetType().Name} - {ex.Message}");

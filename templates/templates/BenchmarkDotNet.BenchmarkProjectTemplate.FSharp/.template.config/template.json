@@ -91,7 +91,7 @@
         "cases": [
           {
             "condition": "(consoleApp == true)",
-            "value": "net6.0"
+            "value": "net8.0"
           },
           {
             "condition": "(consoleApp == false)",
@@ -131,7 +131,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Version of BenchmarkDotNet that will be referenced.",
-      "defaultValue": "0.13.12",
+      "defaultValue": "0.13.13",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
   },
