@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -37,23 +38,29 @@ namespace BenchmarkDotNet.Validators
         private IEnumerable<string> GetInstalledFrameworkSdks()
         {
             var versions = new List<string>();
-#pragma warning disable CA1416
-            using (var ndpKey = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
-                .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\"))
+
+            // Skip .NET Framework check on macOS and Linux
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                foreach (var versionKeyName in ndpKey.GetSubKeyNames())
+#pragma warning disable CA1416
+                using (var ndpKey = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+                    .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\"))
                 {
-                    if (versionKeyName.StartsWith("v"))
+                    foreach (var versionKeyName in ndpKey.GetSubKeyNames())
                     {
-                        var versionKey = ndpKey.OpenSubKey(versionKeyName);
-                        var version = versionKey.GetValue("Version", "").ToString();
-                        var sp = versionKey.GetValue("SP", "").ToString();
-                        if (!string.IsNullOrEmpty(version))
-                            versions.Add(version + (string.IsNullOrEmpty(sp) ? "" : $" SP{sp}"));
+                        if (versionKeyName.StartsWith("v"))
+                        {
+                            var versionKey = ndpKey.OpenSubKey(versionKeyName);
+                            var version = versionKey.GetValue("Version", "").ToString();
+                            var sp = versionKey.GetValue("SP", "").ToString();
+                            if (!string.IsNullOrEmpty(version))
+                                versions.Add(version + (string.IsNullOrEmpty(sp) ? "" : $" SP{sp}"));
+                        }
                     }
                 }
-            }
 #pragma warning restore CA1416
+            }
+
             return versions;
         }
     }
