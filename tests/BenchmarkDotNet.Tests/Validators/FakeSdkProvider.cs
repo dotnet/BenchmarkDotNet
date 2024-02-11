@@ -16,11 +16,6 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public IEnumerable<string> GetInstalledSdks()
         {
-            if (!string.IsNullOrEmpty(CustomDotNetCliPath))
-            {
-                return installedSdks;
-            }
-
             return installedSdks;
         }
     }

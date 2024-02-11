@@ -11,12 +11,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmToolchain : Toolchain
     {
-        private string CustomDotNetCliPath { get; }
+        private readonly string CustomDotNetCliPath;
 
-        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath, ISdkProvider sdkProvider)
+        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, ISdkProvider sdkProvider)
             : base(name, generator, builder, executor, sdkProvider)
         {
-            CustomDotNetCliPath = customDotNetCliPath;
+            CustomDotNetCliPath = sdkProvider.CustomDotNetCliPath;
         }
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -51,7 +51,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                         // aot builds can be very slow
                         logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
                     new WasmExecutor(),
-                    netCoreAppSettings.CustomDotNetCliPath,
                     new DotNetSdkProvider());
     }
 }

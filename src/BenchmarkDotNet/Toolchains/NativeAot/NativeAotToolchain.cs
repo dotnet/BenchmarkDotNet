@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly ISdkProvider sdkProvider;
 #pragma warning restore CS0649
 
-        public ISdkProvider SdkProvider => sdkProvider;
+        internal ISdkProvider SdkProvider => sdkProvider;
 
         internal NativeAotToolchain(string displayName,
             string ilCompilerVersion,

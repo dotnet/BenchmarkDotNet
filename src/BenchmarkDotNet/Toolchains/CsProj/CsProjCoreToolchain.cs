@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         private readonly ISdkProvider sdkProvider;
 
-        public ISdkProvider SdkProvider => sdkProvider;
+        internal ISdkProvider SdkProvider => sdkProvider;
 
         internal CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, ISdkProvider sdkProvider)
             : base(name, generator, builder, executor, sdkProvider)

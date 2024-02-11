@@ -26,20 +26,26 @@ namespace BenchmarkDotNet.Validators
 
         private IEnumerable<string> GetInstalledDotNetSdk()
         {
-            var startInfo = new ProcessStartInfo("dotnet", "--list-sdks")
+            string dotnetExecutable = string.IsNullOrEmpty(CustomDotNetCliPath) ? "dotnet" : CustomDotNetCliPath;
+
+            var startInfo = new ProcessStartInfo(dotnetExecutable, "--list-sdks")
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            var process = Process.Start(startInfo);
-            process.WaitForExit();
+            using (var process = Process.Start(startInfo))
+            {
+                if (process == null) throw new InvalidOperationException("Failed to start the dotnet process.");
 
-            var output = process.StandardOutput.ReadToEnd();
-            var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                process.WaitForExit();
 
-            return lines.Select(line => line.Split(' ')[0]); // The SDK version is the first part of each line.
+                var output = process.StandardOutput.ReadToEnd();
+                var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                return lines.Select(line => line.Split(' ')[0]); // The SDK version is the first part of each line.
+            }
         }
 
         private IEnumerable<string> GetInstalledFrameworkSdks()
