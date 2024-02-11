@@ -590,6 +590,34 @@ namespace BenchmarkDotNet.Tests.Validators
             Assert.Empty(validationErrors);
         }
 
+        [Fact]
+        public void SdkDetectionWithCustomDotNetCliPath()
+        {
+            string customDotNetCliPath = "/custom/path/to/dotnet";
+
+            var fakeSdkProvider = new FakeSdkProvider(new[] { "6.0.100" }, customDotNetCliPath);
+
+            var detectedSdks = fakeSdkProvider.GetInstalledSdks().ToList();
+
+            Assert.Contains("6.0.100", detectedSdks);
+        }
+
+        [Fact]
+        public void BenchmarkValidationWithCustomDotNetCliPath()
+        {
+            string customDotNetCliPath = "/custom/path/to/dotnet";
+
+            var fakeSdkProvider = new FakeSdkProvider(new string[0], customDotNetCliPath);
+            var validator = new SdkValidator(fakeSdkProvider);
+
+            var validationErrors = validator.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkWithNet461))).ToList();
+
+            Assert.NotEmpty(validationErrors);
+
+            Assert.Contains(validationErrors, ve => ve.Message.Contains("The required SDK for Net461 is not installed"));
+        }
+
+
         [DryJob(RuntimeMoniker.Net461)]
         public class BenchmarkWithNet461
         {

@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Tests
             CsProjCoreToolchain coreToolchain = (CsProjCoreToolchain)runtimeJob.GetToolchain();
             generator = (DotNetCliGenerator)coreToolchain.Generator;
             Assert.Equal(runtime, ((DotNetCliGenerator)coreToolchain.Generator).TargetFrameworkMoniker);
-            Assert.Equal(fakeDotnetCliPath, coreToolchain.CustomDotNetCliPath);
+            Assert.Equal(fakeDotnetCliPath, coreToolchain.SdkProvider.CustomDotNetCliPath);
             Assert.Equal(fakeRestorePackages, generator.PackagesPath);
         }
 
@@ -286,7 +286,7 @@ namespace BenchmarkDotNet.Tests
             if (isCore)
             {
                 Assert.True(toolchain is CsProjCoreToolchain);
-                Assert.Equal(fakeDotnetCliPath, ((CsProjCoreToolchain) toolchain).CustomDotNetCliPath);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjCoreToolchain) toolchain).SdkProvider.CustomDotNetCliPath);
             }
             else
             {

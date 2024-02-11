@@ -14,19 +14,29 @@ namespace BenchmarkDotNet.Toolchains.Mono
         [PublicAPI] public static readonly IToolchain Mono80 = From(new NetCoreAppSettings("net8.0", null, "mono80"));
         [PublicAPI] public static readonly IToolchain Mono90 = From(new NetCoreAppSettings("net9.0", null, "mono90"));
 
-        private MonoToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath, ISdkProvider sdkProvider)
-            : base(name, generator, builder, executor, customDotNetCliPath, sdkProvider)
+        private MonoToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, ISdkProvider sdkProvider)
+            : base(name, generator, builder, executor, sdkProvider)
         {
+
+        }
+
+        public static ISdkProvider ConfigureSdkProviderForMono(string customDotNetCliPath)
+        {
+            var sdkProvider = new DotNetSdkProvider();
+            sdkProvider.CustomDotNetCliPath = customDotNetCliPath;
+            return sdkProvider;
         }
 
         [PublicAPI]
         public static new IToolchain From(NetCoreAppSettings settings)
         {
+            var sdkProvider = ConfigureSdkProviderForMono(settings.CustomDotNetCliPath);
+
             return new MonoToolchain(settings.Name,
                         new MonoGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
                         new MonoPublisher(settings.CustomDotNetCliPath),
                         new DotNetCliExecutor(settings.CustomDotNetCliPath),
-                        settings.CustomDotNetCliPath, new DotNetSdkProvider());
+                        sdkProvider);
         }
 
         public override bool Equals(object obj) => obj is MonoToolchain typed && Equals(typed);

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot
@@ -10,6 +11,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
     {
         public static NativeAotToolchainBuilder Create() => new NativeAotToolchainBuilder();
 
+        private ISdkProvider sdkProvider;
         private string ilCompilerVersion;
         private string packagesRestorePath;
         // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
@@ -144,11 +146,38 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return this;
         }
 
+        /// <summary>
+        /// Configures the SDK provider with a custom path to the .NET CLI.
+        /// This path is used by the toolchain to locate and use the specified .NET CLI for operations such as building and publishing.
+        /// </summary>
+        /// <param name="customDotNetCliPath">The file system path to the custom .NET CLI executable.
+        /// This path should point to the 'dotnet' executable on your system.</param>
+        /// <returns>The <see cref="NativeAotToolchainBuilder"/> instance for fluent configuration.</returns>
+        /// <remarks>
+        /// This method allows for the configuration of a custom .NET CLI path, which can be useful in environments where multiple versions of the .NET SDK are installed,
+        /// or when there is a need to use a .NET CLI located outside of the standard installation paths.
+        /// </remarks>
+
+        [PublicAPI]
+        public NativeAotToolchainBuilder WithCustomDotNetCliPath(string customDotNetCliPath)
+        {
+            this.sdkProvider = new DotNetSdkProvider { CustomDotNetCliPath = customDotNetCliPath };
+
+            return this;
+        }
+
+
         [PublicAPI]
         public override IToolchain ToToolchain()
         {
             if (!isIlCompilerConfigured)
                 throw new InvalidOperationException("You need to use UseNuGet or UseLocalBuild methods to tell us which ILCompiler to use.");
+
+            // Ensure sdkProvider is initialized
+            if (this.sdkProvider == null)
+            {
+                throw new InvalidOperationException("SDK Provider must be set before building the toolchain.");
+            }
 
             return new NativeAotToolchain(
                 displayName: displayName,
@@ -156,7 +185,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 runtimeFrameworkVersion: runtimeFrameworkVersion,
                 targetFrameworkMoniker: GetTargetFrameworkMoniker(),
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
-                customDotNetCliPath: customDotNetCliPath,
+                sdkProvider: sdkProvider,
                 packagesRestorePath: packagesRestorePath,
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,

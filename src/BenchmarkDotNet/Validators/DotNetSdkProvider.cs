@@ -8,6 +8,13 @@ namespace BenchmarkDotNet.Validators
 {
     public class DotNetSdkProvider : ISdkProvider
     {
+        private string _customDotNetCliPath;
+
+        public string CustomDotNetCliPath
+        {
+            get => _customDotNetCliPath;
+            set => _customDotNetCliPath = value;
+        }
         public IEnumerable<string> GetInstalledSdks()
         {
             var installedDotNetSdks = GetInstalledDotNetSdk();

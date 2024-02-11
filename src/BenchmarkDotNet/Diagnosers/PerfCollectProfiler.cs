@@ -201,8 +201,8 @@ namespace BenchmarkDotNet.Diagnosers
 
             string cliPath = parameters.BenchmarkCase.GetToolchain() switch
             {
-                CsProjCoreToolchain core => core.CustomDotNetCliPath,
-                NativeAotToolchain nativeAot => nativeAot.CustomDotNetCliPath,
+                CsProjCoreToolchain core => core.SdkProvider.CustomDotNetCliPath,
+                NativeAotToolchain nativeAot => nativeAot.SdkProvider.CustomDotNetCliPath,
                 _ => DotNetCliCommandExecutor.DefaultDotNetCliPath.Value
             };
 

@@ -38,25 +38,29 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             .TargetFrameworkMoniker("net9.0")
             .ToToolchain();
 
+#pragma warning disable CS0649
+        private readonly ISdkProvider sdkProvider;
+#pragma warning restore CS0649
+
+        public ISdkProvider SdkProvider => sdkProvider;
+
         internal NativeAotToolchain(string displayName,
             string ilCompilerVersion,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
-            string customDotNetCliPath, string packagesRestorePath,
+            ISdkProvider sdkProvider,
+            string packagesRestorePath,
             Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore,
             bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData,
             string ilcOptimizationPreference, string ilcInstructionSet)
             : base(displayName,
-                new Generator(ilCompilerVersion, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath,
+                new Generator(ilCompilerVersion, runtimeFrameworkVersion, targetFrameworkMoniker, sdkProvider.CustomDotNetCliPath,
                     runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath,
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData,
                     ilcOptimizationPreference, ilcInstructionSet),
-                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
-                new Executor(), new DotNetSdkProvider())
+                new DotNetCliPublisher(sdkProvider.CustomDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
+                new Executor(), sdkProvider)
         {
-            CustomDotNetCliPath = customDotNetCliPath;
         }
-
-        internal string CustomDotNetCliPath { get; }
 
         public static NativeAotToolchainBuilder CreateBuilder() => NativeAotToolchainBuilder.Create();
 
