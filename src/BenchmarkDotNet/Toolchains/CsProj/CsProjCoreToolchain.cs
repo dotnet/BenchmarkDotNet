@@ -80,6 +80,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     $"Currently CsProjCoreToolchain does not support LINQPad 6+. Please use {nameof(InProcessEmitToolchain)} instead.",
                     benchmarkCase);
             }
+
+            var dotNetSdkVersionValidator = new DotNetSdkVersionValidator(CustomDotNetCliPath);
+            var benchmarkCases = new List<BenchmarkCase> { benchmarkCase };
+            foreach (var validationError in dotNetSdkVersionValidator.Validate(new ValidationParameters(benchmarkCases, benchmarkCase.Config)))
+            {
+                yield return validationError;
+            }
         }
 
         public override bool Equals(object obj) => obj is CsProjCoreToolchain typed && Equals(typed);
