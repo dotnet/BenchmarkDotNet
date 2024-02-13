@@ -86,6 +86,7 @@ namespace BenchmarkDotNet.TestAdapter
         {
             var testIdProvider = new TestIdProvider();
             testIdProvider.AppendString(VsTestAdapter.ExecutorUriString);
+            testIdProvider.AppendString(benchmarkCase.Descriptor.Type.Namespace ?? string.Empty);
             testIdProvider.AppendString(benchmarkCase.Descriptor.DisplayInfo);
             testIdProvider.AppendString(benchmarkCase.GetUnrandomizedJobDisplayInfo());
             testIdProvider.AppendString(benchmarkCase.Parameters.DisplayInfo);
