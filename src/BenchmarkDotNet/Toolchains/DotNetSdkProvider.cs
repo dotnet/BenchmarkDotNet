@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             var versions = new List<string>();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) //Should fail a few macOS tests
             {
                 using (var ndpKey = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
                     .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\"))
