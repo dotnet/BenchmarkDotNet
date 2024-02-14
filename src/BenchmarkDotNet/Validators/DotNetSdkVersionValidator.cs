@@ -124,6 +124,18 @@ namespace BenchmarkDotNet.Validators
                 case RuntimeMoniker.NativeAot90:
                     return "9.0";
 
+                case RuntimeMoniker.Mono60:
+                    return "6.0";
+
+                case RuntimeMoniker.Mono70:
+                    return "7.0";
+
+                case RuntimeMoniker.Mono80:
+                    return "8.0";
+
+                case RuntimeMoniker.Mono90:
+                    return "9.0";
+
                 default:
                     throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}");
             }
