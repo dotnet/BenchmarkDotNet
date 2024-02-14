@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
@@ -60,5 +63,20 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         public static NativeAotToolchainBuilder CreateBuilder() => NativeAotToolchainBuilder.Create();
 
         public static string GetExtraArguments(string runtimeIdentifier) => $"-r {runtimeIdentifier}";
+
+        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        {
+            foreach (var error in base.Validate(benchmarkCase, resolver))
+            {
+                yield return error;
+            }
+
+            var dotNetSdkVersionValidator = new DotNetSdkVersionValidator(CustomDotNetCliPath);
+            var validationParameters = new ValidationParameters(new[] { benchmarkCase }, benchmarkCase.Config);
+            foreach (var error in dotNetSdkVersionValidator.Validate(validationParameters))
+            {
+                yield return error;
+            }
+        }
     }
 }

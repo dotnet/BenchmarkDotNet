@@ -36,6 +36,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 yield return invalidCliError;
             }
+
+            var dotNetSdkVersionValidator = new DotNetSdkVersionValidator(CustomDotNetCliPath);
+            var validationParameters = new ValidationParameters(new[] { benchmarkCase }, benchmarkCase.Config);
+            foreach (var error in dotNetSdkVersionValidator.Validate(validationParameters))
+            {
+                yield return error;
+            }
         }
 
         [PublicAPI]
