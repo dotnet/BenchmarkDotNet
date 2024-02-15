@@ -130,8 +130,8 @@ namespace BenchmarkDotNet.Validators
                 case RuntimeMoniker.Mono70:
                     return "7.0";
 
-                case RuntimeMoniker.Mono80:
-                    return "8.0";
+                //case RuntimeMoniker.Mono80:
+                //    return "8.0";
 
                 case RuntimeMoniker.Mono90:
                     return "9.0";
