@@ -57,89 +57,43 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
+        private static readonly Dictionary<RuntimeMoniker, string> SdkVersionMap = new Dictionary<RuntimeMoniker, string>
+        {
+            { RuntimeMoniker.Net461, "4.6.1" },
+            { RuntimeMoniker.Net462, "4.6.2" },
+            { RuntimeMoniker.Net47, "4.7" },
+            { RuntimeMoniker.Net471, "4.7.1" },
+            { RuntimeMoniker.Net472, "4.7.2" },
+            { RuntimeMoniker.Net48, "4.8" },
+            { RuntimeMoniker.Net481, "4.8.1" },
+            { RuntimeMoniker.NetCoreApp20, "2.0" },
+            { RuntimeMoniker.NetCoreApp21, "2.1" },
+            { RuntimeMoniker.NetCoreApp22, "2.2" },
+            { RuntimeMoniker.NetCoreApp30, "3.0" },
+            { RuntimeMoniker.NetCoreApp31, "3.1" },
+            { RuntimeMoniker.Net50, "5.0" },
+            { RuntimeMoniker.Net60, "6.0" },
+            { RuntimeMoniker.Net70, "7.0" },
+            { RuntimeMoniker.Net80, "8.0" },
+            { RuntimeMoniker.Net90, "9.0" },
+            { RuntimeMoniker.NativeAot60, "6.0" },
+            { RuntimeMoniker.NativeAot70, "7.0" },
+            { RuntimeMoniker.NativeAot80, "8.0" },
+            { RuntimeMoniker.NativeAot90, "9.0" },
+            { RuntimeMoniker.Mono60, "6.0" },
+            { RuntimeMoniker.Mono70, "7.0" },
+            { RuntimeMoniker.Mono80, "8.0" },
+            { RuntimeMoniker.Mono90, "9.0" },
+        };
+
         private string GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)
         {
-            switch (runtimeMoniker)
+            if (SdkVersionMap.TryGetValue(runtimeMoniker, out var version))
             {
-                case RuntimeMoniker.Net461:
-                    return "4.6.1";
-
-                case RuntimeMoniker.Net462:
-                    return "4.6.2";
-
-                case RuntimeMoniker.Net47:
-                    return "4.7";
-
-                case RuntimeMoniker.Net471:
-                    return "4.7.1";
-
-                case RuntimeMoniker.Net472:
-                    return "4.7.2";
-
-                case RuntimeMoniker.Net48:
-                    return "4.8";
-
-                case RuntimeMoniker.Net481:
-                    return "4.8.1";
-
-                case RuntimeMoniker.NetCoreApp20:
-                    return "2.0";
-
-                case RuntimeMoniker.NetCoreApp21:
-                    return "2.1";
-
-                case RuntimeMoniker.NetCoreApp22:
-                    return "2.2";
-
-                case RuntimeMoniker.NetCoreApp30:
-                    return "3.0";
-
-                case RuntimeMoniker.NetCoreApp31:
-                    return "3.1";
-
-                case RuntimeMoniker.Net50:
-                    return "5.0";
-
-                case RuntimeMoniker.Net60:
-                    return "6.0";
-
-                case RuntimeMoniker.Net70:
-                    return "7.0";
-
-                case RuntimeMoniker.Net80:
-                    return "8.0";
-
-                case RuntimeMoniker.Net90:
-                    return "9.0";
-
-                case RuntimeMoniker.NativeAot60:
-                    return "6.0";
-
-                case RuntimeMoniker.NativeAot70:
-                    return "7.0";
-
-                case RuntimeMoniker.NativeAot80:
-                    return "8.0";
-
-                case RuntimeMoniker.NativeAot90:
-                    return "9.0";
-
-                case RuntimeMoniker.Mono60:
-                    return "6.0";
-
-                case RuntimeMoniker.Mono70:
-                    return "7.0";
-
-                case RuntimeMoniker.Mono80:
-                    return "8.0";
-
-                case RuntimeMoniker.Mono90:
-                    return "9.0";
-
-                default:
-                    throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}");
+                return version;
             }
 
+            throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}");
         }
     }
 }
