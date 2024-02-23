@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
@@ -260,10 +261,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => excludeOutput
                 ? stringBuilder
                 : stringBuilder
-                    .AppendArgument($"/p:IntermediateOutputPath=\"{artifactsPaths.IntermediateDirectoryPath}\"\\")
-                    .AppendArgument($"/p:OutDir=\"{artifactsPaths.BinariesDirectoryPath}\"")
+                    // Use AltDirectorySeparatorChar so it's not interpreted as an escaped quote `\"`.
+                    .AppendArgument($"/p:IntermediateOutputPath=\"{artifactsPaths.IntermediateDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
+                    .AppendArgument($"/p:OutDir=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
                     // OutputPath is legacy, per-project version of OutDir. We set both just in case. https://github.com/dotnet/msbuild/issues/87
-                    .AppendArgument($"/p:OutputPath=\"{artifactsPaths.BinariesDirectoryPath}\"")
-                    .AppendArgument(isRestore ? string.Empty : $"--output \"{artifactsPaths.BinariesDirectoryPath}\"");
+                    .AppendArgument($"/p:OutputPath=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
+                    .AppendArgument(isRestore ? string.Empty : $"--output \"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"");
     }
 }
