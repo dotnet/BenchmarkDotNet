@@ -153,8 +153,8 @@ public class CustomPathsConfig : ManualConfig
             .NetCoreApp20
             .WithCustomDotNetCliPath(@"C:\Program Files\dotnet\dotnet.exe", "64 bit cli");
 
-        Add(Job.RyuJitX86.With(CsProjCoreToolchain.From(dotnetCli32bit)).WithId("32 bit cli"));
-        Add(Job.RyuJitX64.With(CsProjCoreToolchain.From(dotnetCli64bit)).WithId("64 bit cli"));
+        AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(dotnetCli32bit)).WithId("32 bit cli"));
+        AddJob(Job.RyuJitX64.WithToolchain(CsProjCoreToolchain.From(dotnetCli64bit)).WithId("64 bit cli"));
     }
 }
 ```
