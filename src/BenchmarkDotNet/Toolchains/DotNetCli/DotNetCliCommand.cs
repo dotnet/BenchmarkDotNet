@@ -159,7 +159,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string csProjPath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
-                .AppendArgument($"restore {csProjPath}")
+                .AppendArgument("restore")
+                .AppendArgument(string.IsNullOrEmpty(csProjPath) ? string.Empty : $"\"{csProjPath}\"")
                 .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
@@ -170,7 +171,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string csProjPath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
-                .AppendArgument($"build {csProjPath} -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
+                .AppendArgument("build")
+                .AppendArgument(string.IsNullOrEmpty(csProjPath) ? string.Empty : $"\"{csProjPath}\"")
+                .AppendArgument($"-c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -181,7 +184,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string csProjPath, string? extraArguments = null, string? binLogSuffix = null)
             => new StringBuilder()
-                .AppendArgument($"publish {csProjPath} -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
+                .AppendArgument("publish")
+                .AppendArgument(string.IsNullOrEmpty(csProjPath) ? string.Empty : $"\"{csProjPath}\"")
+                .AppendArgument($"-c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -235,9 +240,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static string BuildAddPackageCommand(NuGetReference reference, string csProjPath)
         {
-            var commandBuilder = new StringBuilder();
-            commandBuilder.AppendArgument($"add {csProjPath} package");
-            commandBuilder.AppendArgument(reference.PackageName);
+            var commandBuilder = new StringBuilder()
+                .AppendArgument("add")
+                .AppendArgument(string.IsNullOrEmpty(csProjPath) ? string.Empty : $"\"{csProjPath}\"")
+                .AppendArgument("package")
+                .AppendArgument(reference.PackageName);
             if (!string.IsNullOrWhiteSpace(reference.PackageVersion))
             {
                 commandBuilder.AppendArgument("-v");
