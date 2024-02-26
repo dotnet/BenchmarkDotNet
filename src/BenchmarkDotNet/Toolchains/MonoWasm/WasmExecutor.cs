@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 FileName = runtime.JavaScriptEngine,
                 Arguments = $"{runtime.JavaScriptEngineArguments} {mainJs} -- --run {artifactsPaths.ProgramName}.dll {args} ",
-                WorkingDirectory = artifactsPaths.BinariesDirectoryPath,
+                WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "AppBundle"),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = false, // not supported by WASM!
