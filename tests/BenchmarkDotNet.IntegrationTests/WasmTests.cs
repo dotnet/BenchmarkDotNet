@@ -25,14 +25,11 @@ namespace BenchmarkDotNet.IntegrationTests
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm");
             var mainJsPath = Path.Combine(AppContext.BaseDirectory, "AppBundle", "test-main.js");
 
-            // Since WasmExecutor uses ShellExecute=false, it is not searching the path and needs a full path
-            // Maybe ShellExecute should be true? Otherwise not sure of a good way to get the v8 path in the integration test.
-            var v8Path = "/home/caaavik/.jsvu/bin/v8";
             var config = ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
                     .WithArguments([new MsBuildArgument($"/p:WasmMainJSPath={mainJsPath}")])
-                    .WithRuntime(new WasmRuntime(dotnetVersion, javaScriptEngine: v8Path, moniker: RuntimeMoniker.WasmNet70, javaScriptEngineArguments: "--expose_wasm --module"))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet70, javaScriptEngineArguments: "--expose_wasm --module"))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);
 
