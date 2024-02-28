@@ -12,6 +12,6 @@
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.0.2" PrivateAssets="contentfiles;analyzers" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.8" PrivateAssets="contentfiles;analyzers" />
   </ItemGroup>
 </Project>
