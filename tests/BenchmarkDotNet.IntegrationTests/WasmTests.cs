@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 // See if there are any other checks to run to make sure the benchmark is running in a WASM environment.
 
-                if (RuntimeInformation.GetCurrentRuntime().RuntimeMoniker != RuntimeMoniker.WasmNet70)
+                if (RuntimeInformation.GetCurrentRuntime().RuntimeMoniker != RuntimeMoniker.WasmNet80)
                 {
                     throw new Exception("Incorrect runtime detection");
                 }
