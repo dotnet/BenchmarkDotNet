@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddLogger(logger)
                 .AddJob(Job.Dry
                     .WithArguments([new MsBuildArgument($"/p:WasmMainJSPath={mainJsPath}")])
-                    .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet70, javaScriptEngineArguments: "--expose_wasm --module"))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet80, javaScriptEngineArguments: "--expose_wasm --module"))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);
 
