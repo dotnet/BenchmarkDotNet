@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Environments;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -18,15 +19,13 @@ namespace BenchmarkDotNet.Toolchains
             _customDotNetCliPath = customDotNetCliPath;
         }
 
-        public IEnumerable<string> GetInstalledSdks()
+        public IEnumerable<string> GetInstalledDotNetSdks()
         {
-            var installedDotNetSdks = GetInstalledDotNetSdk();
-            var installedFrameworkSdks = GetInstalledFrameworkSdks();
-            return installedDotNetSdks.Concat(installedFrameworkSdks);
-        }
+            if (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            {
+                return Enumerable.Empty<string>();
+            }
 
-        private IEnumerable<string> GetInstalledDotNetSdk()
-        {
             string dotnetExecutable = string.IsNullOrEmpty(CustomDotNetCliPath) ? "dotnet" : CustomDotNetCliPath;
             var startInfo = new ProcessStartInfo(dotnetExecutable, "--list-sdks")
             {
@@ -37,39 +36,13 @@ namespace BenchmarkDotNet.Toolchains
 
             using (var process = Process.Start(startInfo))
             {
-                if (process == null) throw new InvalidOperationException("Failed to start the dotnet process.");
+                if (process == null) return Enumerable.Empty<string>();
                 process.WaitForExit();
 
                 var output = process.StandardOutput.ReadToEnd();
                 var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 return lines.Select(line => line.Split(' ')[0]); // The SDK version is the first part of each line.
             }
-        }
-
-        private IEnumerable<string> GetInstalledFrameworkSdks()
-        {
-            var versions = new List<string>();
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                using (var ndpKey = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
-                    .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\"))
-                {
-                    foreach (var versionKeyName in ndpKey.GetSubKeyNames())
-                    {
-                        if (versionKeyName.StartsWith("v"))
-                        {
-                            var versionKey = ndpKey.OpenSubKey(versionKeyName);
-                            var version = versionKey.GetValue("Version", "").ToString();
-                            var sp = versionKey.GetValue("SP", "").ToString();
-                            if (!string.IsNullOrEmpty(version))
-                                versions.Add(version + (string.IsNullOrEmpty(sp) ? "" : $" SP{sp}"));
-                        }
-                    }
-                }
-            }
-
-            return versions;
         }
     }
 }

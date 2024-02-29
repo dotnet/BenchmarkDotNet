@@ -11,11 +11,13 @@ namespace BenchmarkDotNet.Validators
     {
         private readonly string _customDotNetCliPath;
         private readonly IDotNetSdkProvider _dotNetSdkProvider;
+        private readonly IDotNetFrameworkSdkProvider _dotNetFrameworkSdkProvider;
 
-        public DotNetSdkVersionValidator(string customDotNetCliPath)
+        public DotNetSdkVersionValidator(string customDotNetCliPath = null)
         {
             _customDotNetCliPath = customDotNetCliPath;
             _dotNetSdkProvider = new DotNetSdkProvider(_customDotNetCliPath);
+            _dotNetFrameworkSdkProvider = new DotNetFrameworkSdkProvider();
         }
 
         public bool TreatsWarningsAsErrors => true;
@@ -43,16 +45,17 @@ namespace BenchmarkDotNet.Validators
         private bool IsSdkInstalled(RuntimeMoniker runtimeMoniker)
         {
             string requiredSdkVersion = GetSdkVersionFromMoniker(runtimeMoniker);
-            var installedSdks = _dotNetSdkProvider.GetInstalledSdks();
 
             // If the required SDK version is for .NET Framework
             if (requiredSdkVersion.StartsWith("4"))
             {
+                var installedSdks = _dotNetFrameworkSdkProvider.GetInstalledFrameworkSdks();
                 return installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion) || string.Compare(sdk, requiredSdkVersion) > 0);
             }
             else
             {
                 // For .NET Core and .NET 5+
+                var installedSdks = _dotNetSdkProvider.GetInstalledDotNetSdks();
                 return installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion + ".") || sdk == requiredSdkVersion);
             }
         }

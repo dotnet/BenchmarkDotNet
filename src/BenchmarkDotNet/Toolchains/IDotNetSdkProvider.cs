@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Toolchains
 {
     public interface IDotNetSdkProvider
     {
-        IEnumerable<string> GetInstalledSdks();
         string CustomDotNetCliPath { get; }
+        IEnumerable<string> GetInstalledDotNetSdks();
     }
 }
