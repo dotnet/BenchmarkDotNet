@@ -81,9 +81,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     benchmarkCase);
             }
 
-            var dotNetSdkVersionValidator = new DotNetSdkVersionValidator(CustomDotNetCliPath);
-            var benchmarkCases = new List<BenchmarkCase> { benchmarkCase };
-            foreach (var validationError in dotNetSdkVersionValidator.Validate(new ValidationParameters(benchmarkCases, benchmarkCase.Config)))
+            foreach (var validationError in DotNetSdkVersionValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
             {
                 yield return validationError;
             }

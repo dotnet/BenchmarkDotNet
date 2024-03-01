@@ -55,9 +55,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return invalidCliError;
             }
 
-            var dotNetFrameworkSdkVersionValidator = new DotNetSdkVersionValidator();
-            var benchmarkCases = new List<BenchmarkCase> { benchmarkCase };
-            foreach (var validationError in dotNetFrameworkSdkVersionValidator.Validate(new ValidationParameters(benchmarkCases, benchmarkCase.Config)))
+            foreach (var validationError in DotNetSdkVersionValidator.ValidateFrameworkSdks(benchmarkCase))
             {
                 yield return validationError;
             }

@@ -36,10 +36,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 yield return validationError;
             }
 
-            var dotNetSdkVersionValidator = new DotNetSdkVersionValidator(_customDotNetCliPath);
-
-            var benchmarkCases = new List<BenchmarkCase> { benchmarkCase };
-            foreach (var validationError in dotNetSdkVersionValidator.Validate(new ValidationParameters(benchmarkCases, benchmarkCase.Config)))
+            foreach (var validationError in DotNetSdkVersionValidator.ValidateCoreSdks(_customDotNetCliPath, benchmarkCase))
             {
                 yield return validationError;
             }
