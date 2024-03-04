@@ -49,11 +49,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return validationError;
             }
 
-            if (DotNetSdkValidator.IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
-            {
-                yield return invalidCliError;
-            }
-
             if (benchmarkCase.Job.HasValue(EnvironmentMode.JitCharacteristic) && benchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
                 yield return new ValidationError(true,

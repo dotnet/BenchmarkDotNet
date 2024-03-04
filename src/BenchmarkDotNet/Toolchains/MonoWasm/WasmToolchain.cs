@@ -32,10 +32,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     $"{nameof(WasmToolchain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly",
                     benchmarkCase);
             }
-            else if (DotNetSdkValidator.IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
-            {
-                yield return invalidCliError;
-            }
 
             foreach (var validationError in DotNetSdkValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
             {

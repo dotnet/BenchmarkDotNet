@@ -13,54 +13,43 @@ namespace BenchmarkDotNet.Validators
 {
     internal static class DotNetSdkValidator
     {
-        private static readonly Lazy<IEnumerable<string>> cachedFrameworkSdks = new Lazy<IEnumerable<string>>(GetInstalledFrameworkSdks, true);
+        private static readonly Lazy<List<string>> cachedFrameworkSdks = new Lazy<List<string>>(GetInstalledFrameworkSdks, true);
 
         public static IEnumerable<ValidationError> ValidateCoreSdks(string? customDotNetCliPath, BenchmarkCase benchmark)
         {
             if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
             {
-                return new ValidationError[] { cliPathError };
+                yield return cliPathError;
             }
-
-            if (!HasRuntimeMoniker(benchmark))
+            else if (TryGetSdkVersion(benchmark, out string requiredSdkVersion))
             {
-                return Enumerable.Empty<ValidationError>();
-            }
-
-            var runtimeMoniker = benchmark.Job.Environment.Runtime.RuntimeMoniker;
-            string requiredSdkVersion = GetSdkVersionFromMoniker(runtimeMoniker);
-
-            var installedSdks = GetInstalledDotNetSdks(customDotNetCliPath);
-
-            if (!installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion)))
-            {
-                return new ValidationError[]
+                var installedSdks = GetInstalledDotNetSdks(customDotNetCliPath);
+                if (!installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion)))
                 {
-                    new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} for runtime moniker {runtimeMoniker} is not installed.", benchmark)
-                };
+                    yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} for runtime moniker {benchmark.Job.Environment.Runtime.RuntimeMoniker} is not installed.", benchmark);
+                }
             }
-
-            return Enumerable.Empty<ValidationError>();
         }
 
         public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
         {
-            if (!HasRuntimeMoniker(benchmark))
+            if (!TryGetSdkVersion(benchmark, out string requiredSdkVersionString))
             {
-                return Enumerable.Empty<ValidationError>();
+                yield break;
             }
 
-            var runtimeMoniker = benchmark.Job.Environment.Runtime.RuntimeMoniker;
-            var requiredSdkVersion = GetSdkVersionFromMoniker(runtimeMoniker);
-            if (!cachedFrameworkSdks.Value.Any(sdk => sdk.StartsWith(requiredSdkVersion)))
+            if (!Version.TryParse(requiredSdkVersionString, out var requiredSdkVersion))
             {
-                return new ValidationError[]
-                {
-                    new ValidationError(true, $"The required .NET Framework SDK version {requiredSdkVersion} for runtime moniker {runtimeMoniker} is not installed.", benchmark)
-                };
+                yield return new ValidationError(true, $"Invalid .NET Framework SDK version format: {requiredSdkVersionString}", benchmark);
+                yield break;
             }
 
-            return Enumerable.Empty<ValidationError>();
+            var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();
+
+            if (installedVersionString == null || Version.TryParse(installedVersionString, out var installedVersion) && installedVersion < requiredSdkVersion)
+            {
+                yield return new ValidationError(true, $"The required .NET Framework SDK version {requiredSdkVersionString} or higher is not installed.", benchmark);
+            }
         }
 
         public static bool IsCliPathInvalid(string customDotNetCliPath, BenchmarkCase benchmarkCase, out ValidationError? validationError)
@@ -88,9 +77,15 @@ namespace BenchmarkDotNet.Validators
             return false;
         }
 
-        private static bool HasRuntimeMoniker(BenchmarkCase benchmark)
+        private static bool TryGetSdkVersion(BenchmarkCase benchmark, out string sdkVersion)
         {
-            return !(benchmark == null || benchmark.Job == null || benchmark.Job.Environment?.Runtime?.RuntimeMoniker == null);
+            sdkVersion = string.Empty;
+            if (benchmark?.Job?.Environment?.Runtime?.RuntimeMoniker != null)
+            {
+                sdkVersion = GetSdkVersionFromMoniker(benchmark.Job.Environment.Runtime.RuntimeMoniker);
+                return true;
+            }
+            return false;
         }
 
         private static IEnumerable<string> GetInstalledDotNetSdks(string? customDotNetCliPath)
@@ -132,7 +127,7 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        public static IEnumerable<string> GetInstalledFrameworkSdks()
+        public static List<string> GetInstalledFrameworkSdks()
         {
             var versions = new List<string>();
 
