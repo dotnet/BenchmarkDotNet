@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return validationError;
             }
 
-            if (IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
+            if (DotNetSdkValidator.IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
             {
                 yield return invalidCliError;
             }
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     benchmarkCase);
             }
 
-            foreach (var validationError in DotNetSdkVersionValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
+            foreach (var validationError in DotNetSdkValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
             {
                 yield return validationError;
             }

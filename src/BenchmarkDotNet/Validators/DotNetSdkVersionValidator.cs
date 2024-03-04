@@ -1,21 +1,27 @@
-﻿using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Validators
 {
-    public static class DotNetSdkVersionValidator
+    internal static class DotNetSdkValidator
     {
-        private static readonly Lazy<List<string>> cachedFrameworkSdks =
-        new Lazy<List<string>>(() => GetInstalledFrameworkSdks().ToList(), true);
+        private static readonly Lazy<IEnumerable<string>> cachedFrameworkSdks = new Lazy<IEnumerable<string>>(GetInstalledFrameworkSdks, true);
 
         public static IEnumerable<ValidationError> ValidateCoreSdks(string? customDotNetCliPath, BenchmarkCase benchmark)
         {
+            if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
+            {
+                return new ValidationError[] { cliPathError };
+            }
+
             if (!HasRuntimeMoniker(benchmark))
             {
                 return Enumerable.Empty<ValidationError>();
@@ -55,6 +61,31 @@ namespace BenchmarkDotNet.Validators
             }
 
             return Enumerable.Empty<ValidationError>();
+        }
+
+        public static bool IsCliPathInvalid(string customDotNetCliPath, BenchmarkCase benchmarkCase, out ValidationError? validationError)
+        {
+            validationError = null;
+
+            if (string.IsNullOrEmpty(customDotNetCliPath) && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            {
+                validationError = new ValidationError(true,
+                    $"BenchmarkDotNet requires dotnet SDK to be installed or path to local dotnet cli provided in explicit way using `--cli` argument, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
+
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
+            {
+                validationError = new ValidationError(true,
+                    $"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
+
+                return true;
+            }
+
+            return false;
         }
 
         private static bool HasRuntimeMoniker(BenchmarkCase benchmark)
@@ -107,82 +138,10 @@ namespace BenchmarkDotNet.Validators
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Get1To45VersionFromRegistry(versions);
                 Get45PlusFromRegistry(versions);
             }
 
             return versions;
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "This code is protected with a runtime OS platform check")]
-        private static void Get1To45VersionFromRegistry(List<string> versions)
-        {
-            using (var ndpKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\\"))
-            {
-                if (ndpKey == null)
-                {
-                    return;
-                }
-
-                foreach (string versionKeyName in ndpKey.GetSubKeyNames())
-                {
-                    if (versionKeyName == "v4")
-                    {
-                        continue;
-                    }
-
-                    if (versionKeyName.StartsWith("v"))
-                    {
-                        var versionKey = ndpKey.OpenSubKey(versionKeyName);
-                        string name = (string)versionKey.GetValue("Version", "");
-                        string sp = versionKey.GetValue("SP", "").ToString();
-                        string install = versionKey.GetValue("Install", "").ToString();
-                        if (string.IsNullOrEmpty(install))
-                        {
-                            versions.Add(name);
-                        }
-                        else
-                        {
-                            if (!(string.IsNullOrEmpty(sp)) && install == "1")
-                            {
-                                versions.Add(name + " SP" + sp);
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(name))
-                        {
-                            continue;
-                        }
-
-                        foreach (string subKeyName in versionKey.GetSubKeyNames())
-                        {
-                            var subKey = versionKey.OpenSubKey(subKeyName);
-                            name = (string)subKey.GetValue("Version", "");
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                sp = subKey.GetValue("SP", "").ToString();
-                            }
-
-                            install = subKey.GetValue("Install", "").ToString();
-                            if (string.IsNullOrEmpty(install))
-                            {
-                                versions.Add(name);
-                            }
-                            else
-                            {
-                                if (!(string.IsNullOrEmpty(sp)) && install == "1")
-                                {
-                                    versions.Add(name + " SP" + sp);
-                                }
-                                else if (install == "1")
-                                {
-                                    versions.Add(name);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "This code is protected with a runtime OS platform check")]
@@ -241,86 +200,35 @@ namespace BenchmarkDotNet.Validators
 
         private static string GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)
         {
-            switch (runtimeMoniker)
+            return runtimeMoniker switch
             {
-                case RuntimeMoniker.Net461:
-                    return "4.6.1";
-
-                case RuntimeMoniker.Net462:
-                    return "4.6.2";
-
-                case RuntimeMoniker.Net47:
-                    return "4.7";
-
-                case RuntimeMoniker.Net471:
-                    return "4.7.1";
-
-                case RuntimeMoniker.Net472:
-                    return "4.7.2";
-
-                case RuntimeMoniker.Net48:
-                    return "4.8";
-
-                case RuntimeMoniker.Net481:
-                    return "4.8.1";
-
-                case RuntimeMoniker.NetCoreApp20:
-                    return "2.0";
-
-                case RuntimeMoniker.NetCoreApp21:
-                    return "2.1";
-
-                case RuntimeMoniker.NetCoreApp22:
-                    return "2.2";
-
-                case RuntimeMoniker.NetCoreApp30:
-                    return "3.0";
-
-                case RuntimeMoniker.NetCoreApp31:
-                    return "3.1";
-
-                case RuntimeMoniker.Net50:
-                    return "5.0";
-
-                case RuntimeMoniker.Net60:
-                    return "6.0";
-
-                case RuntimeMoniker.Net70:
-                    return "7.0";
-
-                case RuntimeMoniker.Net80:
-                    return "8.0";
-
-                case RuntimeMoniker.Net90:
-                    return "9.0";
-
-                case RuntimeMoniker.NativeAot60:
-                    return "6.0";
-
-                case RuntimeMoniker.NativeAot70:
-                    return "7.0";
-
-                case RuntimeMoniker.NativeAot80:
-                    return "8.0";
-
-                case RuntimeMoniker.NativeAot90:
-                    return "9.0";
-
-                case RuntimeMoniker.Mono60:
-                    return "6.0";
-
-                case RuntimeMoniker.Mono70:
-                    return "7.0";
-
-                case RuntimeMoniker.Mono80:
-                    return "8.0";
-
-                case RuntimeMoniker.Mono90:
-                    return "9.0";
-
-                default:
-                    throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}");
-            }
+                RuntimeMoniker.Net461 => "4.6.1",
+                RuntimeMoniker.Net462 => "4.6.2",
+                RuntimeMoniker.Net47 => "4.7",
+                RuntimeMoniker.Net471 => "4.7.1",
+                RuntimeMoniker.Net472 => "4.7.2",
+                RuntimeMoniker.Net48 => "4.8",
+                RuntimeMoniker.Net481 => "4.8.1",
+                RuntimeMoniker.NetCoreApp20 => "2.0",
+                RuntimeMoniker.NetCoreApp21 => "2.1",
+                RuntimeMoniker.NetCoreApp22 => "2.2",
+                RuntimeMoniker.NetCoreApp30 => "3.0",
+                RuntimeMoniker.NetCoreApp31 => "3.1",
+                RuntimeMoniker.Net50 => "5.0",
+                RuntimeMoniker.Net60 => "6.0",
+                RuntimeMoniker.Net70 => "7.0",
+                RuntimeMoniker.Net80 => "8.0",
+                RuntimeMoniker.Net90 => "9.0",
+                RuntimeMoniker.NativeAot60 => "6.0",
+                RuntimeMoniker.NativeAot70 => "7.0",
+                RuntimeMoniker.NativeAot80 => "8.0",
+                RuntimeMoniker.NativeAot90 => "9.0",
+                RuntimeMoniker.Mono60 => "6.0",
+                RuntimeMoniker.Mono70 => "7.0",
+                RuntimeMoniker.Mono80 => "8.0",
+                RuntimeMoniker.Mono90 => "9.0",
+                _ => throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}")
+            };
         }
     }
 }

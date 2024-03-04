@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 yield return error;
             }
 
-            foreach (var validationError in DotNetSdkVersionValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
+            foreach (var validationError in DotNetSdkValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
             {
                 yield return validationError;
             }

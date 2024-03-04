@@ -57,31 +57,6 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        internal static bool IsCliPathInvalid(string customDotNetCliPath, BenchmarkCase benchmarkCase, out ValidationError? validationError)
-        {
-            validationError = null;
-
-            if (string.IsNullOrEmpty(customDotNetCliPath) && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
-            {
-                validationError = new ValidationError(true,
-                    $"BenchmarkDotNet requires dotnet SDK to be installed or path to local dotnet cli provided in explicit way using `--cli` argument, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
-                    benchmarkCase);
-
-                return true;
-            }
-
-            if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
-            {
-                validationError = new ValidationError(true,
-                    $"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
-                    benchmarkCase);
-
-                return true;
-            }
-
-            return false;
-        }
-
         public override string ToString() => Name;
     }
 }
