@@ -5,6 +5,7 @@ using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.Pack;
 using Cake.Common.Tools.DotNet.Restore;
+using Cake.Common.Tools.DotNet.Workload.Install;
 using Cake.Core;
 using Cake.Core.IO;
 
@@ -25,6 +26,16 @@ public class BuildRunner
             new DotNetRestoreSettings
             {
                 MSBuildSettings = context.MsBuildSettingsRestore
+            });
+    }
+
+    public void InstallWorkload(string workloadId)
+    {
+        context.DotNetWorkloadInstall(workloadId,
+            new DotNetWorkloadInstallSettings
+            {
+                IncludePreviews = true,
+                NoCache = true
             });
     }
 

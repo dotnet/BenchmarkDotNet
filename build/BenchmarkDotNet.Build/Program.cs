@@ -57,6 +57,26 @@ public class BuildTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Install wasm-tools workload")]
+public class InstallWasmToolsWorkload : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "install-wasm-tools";
+
+    public override void Run(BuildContext context) => context.BuildRunner.InstallWorkload("wasm-tools");
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples = new[]
+            {
+                new Example(Name)
+            }
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Run unit tests (fast)")]
 [IsDependentOn(typeof(BuildTask))]
 public class UnitTestsTask : FrostingTask<BuildContext>, IHelpProvider
