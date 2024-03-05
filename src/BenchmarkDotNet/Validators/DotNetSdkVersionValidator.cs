@@ -222,6 +222,11 @@ namespace BenchmarkDotNet.Validators
                 RuntimeMoniker.Mono70 => "7.0",
                 RuntimeMoniker.Mono80 => "8.0",
                 RuntimeMoniker.Mono90 => "9.0",
+                RuntimeMoniker.WasmNet50 => "5.0",
+                RuntimeMoniker.WasmNet60 => "6.0",
+                RuntimeMoniker.WasmNet70 => "7.0",
+                RuntimeMoniker.WasmNet80 => "8.0",
+                RuntimeMoniker.WasmNet90 => "9.0",
                 _ => throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}")
             };
         }
