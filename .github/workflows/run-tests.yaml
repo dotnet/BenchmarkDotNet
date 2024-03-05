@@ -67,7 +67,7 @@ jobs:
         with:
           node-version: "20"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=linux64 --engines=v8
+        run: npm install jsvu -g && jsvu --os=linux64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Install wasm-tools workload
@@ -92,7 +92,7 @@ jobs:
         with:
           node-version: "20"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=mac64 --engines=v8
+        run: npm install jsvu -g && jsvu --os=mac64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Install wasm-tools workload
