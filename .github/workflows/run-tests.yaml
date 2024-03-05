@@ -71,7 +71,7 @@ jobs:
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Install wasm-tools workload
-        run: dotnet workload install wasm-tools --skip-manifest-update
+        run: ${GITHUB_WORKSPACE}/.dotnet/dotnet workload install wasm-tools --skip-manifest-update
       - name: Run task 'unit-tests'
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
@@ -96,7 +96,7 @@ jobs:
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Install wasm-tools workload
-        run: dotnet workload install wasm-tools --skip-manifest-update
+        run: ${GITHUB_WORKSPACE}/.dotnet/dotnet workload install wasm-tools --skip-manifest-update
       - name: Run task 'unit-tests'
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
