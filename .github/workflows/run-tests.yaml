@@ -62,6 +62,14 @@ jobs:
           platform: x64
       - name: Set up zlib-static
         run: sudo apt-get install -y libkrb5-dev
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Set up v8
+        run: npm install jsvu -g && jsvu --os=linux64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+      - name: Install wasm-tools workload
+        run: ./build.cmd install-wasm-tools
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Run task 'unit-tests'
@@ -79,6 +87,14 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Set up v8
+        run: npm install jsvu -g && jsvu --os=mac64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+      - name: Install wasm-tools workload
+        run: ./build.cmd install-wasm-tools
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Run task 'unit-tests'
