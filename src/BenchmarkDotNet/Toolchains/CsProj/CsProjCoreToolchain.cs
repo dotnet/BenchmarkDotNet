@@ -49,11 +49,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return validationError;
             }
 
-            if (IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
-            {
-                yield return invalidCliError;
-            }
-
             if (benchmarkCase.Job.HasValue(EnvironmentMode.JitCharacteristic) && benchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
                 yield return new ValidationError(true,
@@ -79,6 +74,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return new ValidationError(true,
                     $"Currently CsProjCoreToolchain does not support LINQPad 6+. Please use {nameof(InProcessEmitToolchain)} instead.",
                     benchmarkCase);
+            }
+
+            foreach (var validationError in DotNetSdkValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
+            {
+                yield return validationError;
             }
         }
 
