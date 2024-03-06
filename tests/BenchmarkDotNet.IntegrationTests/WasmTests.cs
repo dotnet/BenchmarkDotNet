@@ -13,10 +13,16 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class WasmTests : BenchmarkTestExecutor
+    /// <summary>
+    /// In order to run WasmTests locally, the following prerequisites are required:
+    /// * Install wasm-tools workload: `BenchmarkDotNet/build.cmd install-wasm-tools`
+    /// * Install npm
+    /// * Install v8: `npm install jsvu -g && jsvu --os=default --engines=v8`
+    /// * Add `$HOME/.jsvu/bin` to PATH
+    /// * Run tests using .NET SDK from `BenchmarkDotNet/.dotnet/`
+    /// </summary>
+    public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        public WasmTests(ITestOutputHelper output) : base(output) { }
-
         [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
         public void WasmIsSupported()
         {
