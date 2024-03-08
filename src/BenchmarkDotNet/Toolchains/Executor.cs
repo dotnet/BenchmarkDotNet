@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoAotLLVMRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
-                    start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
+                    start.WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "publish");
                     break;
                 case CustomRuntime _:
                     start.FileName = exePath;
