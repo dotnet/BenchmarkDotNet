@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
+using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -9,10 +10,7 @@ namespace BenchmarkDotNet.Mathematics
     {
         public static int[] GetRanks(params Statistics[] stats)
         {
-            var values = stats.
-                Select((s, index) => new { Stats = s, Index = index }).
-                OrderBy(pair => pair.Stats.Mean).
-                ToArray();
+            var values = stats.Select((s, index) => new { Stats = s, Index = index }).OrderBy(pair => pair.Stats.Mean).ToArray();
 
             int n = values.Length;
             var ranks = new int[n];
@@ -33,14 +31,9 @@ namespace BenchmarkDotNet.Mathematics
 
         private static bool AreSame(Statistics x, Statistics y)
         {
-            if (x.N >= 3 && y.N >= 3)
-            {
-                var tost = StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x.SortedValues.ToArray(), y.SortedValues.ToArray(), RelativeThreshold.Default);
-                if (tost.Conclusion != EquivalenceTestConclusion.Unknown)
-                    return tost.Conclusion == EquivalenceTestConclusion.Same;
-            }
-
-            return Math.Abs(x.Mean - y.Mean) < Math.Abs(x.Mean + y.Mean) / 2 * 0.01;
+            var test = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
+            var comparisonResult = test.Perform(x.Sample, y.Sample, MathHelper.DefaultThreshold, MathHelper.DefaultSignificanceLevel);
+            return comparisonResult == ComparisonResult.Indistinguishable;
         }
     }
 }

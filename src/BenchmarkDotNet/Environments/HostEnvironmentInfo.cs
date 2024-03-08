@@ -11,6 +11,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -25,9 +26,9 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// Logger to use when there's no config available.
         /// </summary>
-        public static ILogger FallbackLogger { get; } = ConsoleLogger.Default;
+        public static ILogger FallbackLogger => ConsoleLogger.Default;
 
-        private static HostEnvironmentInfo current;
+        private static HostEnvironmentInfo? current;
 
         public string BenchmarkDotNetVersion { get; protected set; }
 
@@ -57,6 +58,7 @@ namespace BenchmarkDotNet.Environments
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
         [PublicAPI] public Frequency ChronometerFrequency { get; protected set; }
+
         [PublicAPI] public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
 
         public HardwareTimerKind HardwareTimerKind { get; protected set; }
@@ -78,7 +80,7 @@ namespace BenchmarkDotNet.Environments
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
         }
 
-        public new static HostEnvironmentInfo GetCurrent() => current ?? (current = new HostEnvironmentInfo());
+        public new static HostEnvironmentInfo GetCurrent() => current ??= new HostEnvironmentInfo();
 
         public override IEnumerable<string> ToFormattedString()
         {
@@ -92,9 +94,13 @@ namespace BenchmarkDotNet.Environments
                 yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value}";
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
-            var cultureInfo = DefaultCultureInfo.Instance;
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
-                yield return $"Frequency: {ChronometerFrequency}, Resolution: {ChronometerResolution.ToString(cultureInfo)}, Timer: {HardwareTimerKind.ToString().ToUpper()}";
+            {
+                string frequency = ChronometerFrequency.ToString(FrequencyUnit.Hz, unitPresentation: UnitHelper.DefaultPresentation);
+                string resolution = ChronometerResolution.ToString(UnitHelper.DefaultPresentation);
+                string timer = HardwareTimerKind.ToString().ToUpper();
+                yield return $"Frequency: {frequency}, Resolution: {resolution}, Timer: {timer}";
+            }
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
             {

@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.TestAdapter
             var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
 
             var builder = new StringBuilder();
-            var histogram = HistogramBuilder.Adaptive.Build(statistics.OriginalValues);
+            var histogram = HistogramBuilder.Adaptive.Build(statistics.Sample.Values);
             builder.AppendLine("-------------------- Histogram --------------------");
             builder.AppendLine(histogram.ToString(formatter));
             builder.AppendLine("---------------------------------------------------");

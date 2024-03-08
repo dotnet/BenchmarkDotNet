@@ -28,9 +28,8 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
-using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
 using BenchmarkDotNet.Toolchains.Mono;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -361,7 +360,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.DisplayAllStatistics)
                 config.AddColumn(StatisticColumn.AllStatistics);
             if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
-                config.AddColumn(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
+                config.AddColumn(new StatisticalTestColumn(threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;

@@ -20,7 +20,7 @@
     <PackageReference Include="Gee.External.Capstone" Version="2.3.0" />
     <PackageReference Include="Iced" Version="1.17.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.2.332302" />
-    <PackageReference Include="Perfolizer" Version="[0.2.1]" />
+    <PackageReference Include="Perfolizer" Version="[0.3.16]" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.8" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <!-- Do not update these packages, or else netcoreapp3.0 and older will no longer work -->

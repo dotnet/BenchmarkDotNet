@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static readonly IDictionary<string, TestData> Data = new Dictionary<string, TestData>
         {
             { "Percentage", new TestData(RatioStyle.Percentage, new[] { 100, 15, 115 }, 1, new[] { "baseline", "-85%", "+15%" }) },
-            { "Trend", new TestData(RatioStyle.Trend, new[] { 100, 15, 115 }, 1, new[] { "baseline", "6.83x faster", "1.15x slower" }) }
+            { "Trend", new TestData(RatioStyle.Trend, new[] { 100, 15, 115 }, 1, new[] { "baseline", "6.84x faster", "1.15x slower" }) }
         };
 
         [UsedImplicitly]

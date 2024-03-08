@@ -21,9 +21,7 @@ namespace BenchmarkDotNet.Tests.Exporters
     [UsesVerify]
     public class MarkdownExporterVerifyTests : IDisposable
     {
-        private readonly CultureInfo initCulture;
-
-        public MarkdownExporterVerifyTests() => initCulture = Thread.CurrentThread.CurrentCulture;
+        private readonly CultureInfo initCulture = Thread.CurrentThread.CurrentCulture;
 
         [UsedImplicitly]
         public static TheoryData<Type> GetGroupBenchmarkTypes()

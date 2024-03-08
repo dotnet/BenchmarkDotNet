@@ -26,13 +26,13 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// 99.9% confidence interval in nanoseconds.
         /// </summary>
-        public ConfidenceInterval ConfidenceInterval { get; }
+        public ConfidenceInterval LegacyConfidenceInterval { get; }
 
-        private MeasurementsStatistics(double standardError, double mean, ConfidenceInterval confidenceInterval)
+        private MeasurementsStatistics(double standardError, double mean, ConfidenceInterval legacyConfidenceInterval)
         {
             StandardError = standardError;
             Mean = mean;
-            ConfidenceInterval = confidenceInterval;
+            LegacyConfidenceInterval = legacyConfidenceInterval;
         }
 
         public static MeasurementsStatistics Calculate(List<Measurement> measurements, OutlierMode outlierMode)
@@ -47,7 +47,8 @@ namespace BenchmarkDotNet.Mathematics
             double variance = Variance(measurements, n, mean);
             double standardDeviation = Math.Sqrt(variance);
             double standardError = standardDeviation / Math.Sqrt(n);
-            var confidenceInterval = new ConfidenceInterval(mean, standardError, n);
+            var confidenceIntervalEstimator = new ConfidenceIntervalEstimator(n, mean, standardError);
+            var confidenceInterval = confidenceIntervalEstimator.ConfidenceInterval(ConfidenceLevel.L999);
 
             if (outlierMode == OutlierMode.DontRemove) // most simple scenario is done without allocations! but this is not the default case
                 return new MeasurementsStatistics(standardError, mean, confidenceInterval);
@@ -74,7 +75,8 @@ namespace BenchmarkDotNet.Mathematics
             variance = VarianceWithoutOutliers(outlierMode, measurements, n, mean, lowerFence, upperFence);
             standardDeviation = Math.Sqrt(variance);
             standardError = standardDeviation / Math.Sqrt(n);
-            confidenceInterval = new ConfidenceInterval(mean, standardError, n);
+            confidenceIntervalEstimator = new ConfidenceIntervalEstimator(n, mean, standardError);
+            confidenceInterval = confidenceIntervalEstimator.ConfidenceInterval(ConfidenceLevel.L999);
 
             return new MeasurementsStatistics(standardError, mean, confidenceInterval);
         }
@@ -113,7 +115,8 @@ namespace BenchmarkDotNet.Mathematics
             return variance;
         }
 
-        private static double VarianceWithoutOutliers(OutlierMode outlierMode, List<Measurement> measurements, int n, double mean, double lowerFence, double upperFence)
+        private static double VarianceWithoutOutliers(OutlierMode outlierMode, List<Measurement> measurements, int n, double mean, double lowerFence,
+            double upperFence)
         {
             if (n == 1)
                 return 0;

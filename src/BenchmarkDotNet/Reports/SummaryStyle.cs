@@ -3,6 +3,7 @@ using System.Globalization;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
+using Perfolizer.Metrology;
 using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
 
 // ReSharper disable MemberCanBePrivate.Global

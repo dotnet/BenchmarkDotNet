@@ -22,11 +22,12 @@ namespace BenchmarkDotNet.Reports
 
         public IReadOnlyList<ExecuteResult> ExecuteResults { get; }
 
-        public Statistics? ResultStatistics => resultStatistics ?? (resultStatistics = GetResultRuns().Any()
-            ? new Statistics(GetResultRuns().Select(r => r.GetAverageTime().Nanoseconds))
-            : null);
+        public Statistics? ResultStatistics => resultStatistics ??=
+            GetResultRuns().Any()
+                ? new Statistics(GetResultRuns().Select(r => r.GetAverageTime().Nanoseconds))
+                : null;
 
-        private Statistics resultStatistics;
+        private Statistics? resultStatistics = null;
 
         public BenchmarkReport(
             bool success,
@@ -44,7 +45,7 @@ namespace BenchmarkDotNet.Reports
             AllMeasurements = ExecuteResults.SelectMany((results, index) => results.Measurements).ToArray();
             GcStats = ExecuteResults.Count > 0 ? ExecuteResults[ExecuteResults.Count - 1].GcStats : default;
             Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id)
-                ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
+                      ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }
 
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";

@@ -16,6 +16,7 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
+using Perfolizer.Metrology;
 using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
 using MethodInfo = System.Reflection.MethodInfo;
 
@@ -28,7 +29,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
             return new Summary(
                 "MockSummary",
-                runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToImmutableArray(),
+                runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 30, (index + 1) * 100)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
                 string.Empty,
                 string.Empty,
@@ -77,7 +78,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             ImmutableArray<IColumnHidingRule>.Empty);
 
         public static SummaryStyle CreateSummaryStyle(bool printUnitsInHeader = false, bool printUnitsInContent = true, bool printZeroValuesInContent = false,
-            SizeUnit sizeUnit = null, TimeUnit timeUnit = null, TextJustification textColumnJustification = TextJustification.Left,
+            SizeUnit? sizeUnit = null, TimeUnit? timeUnit = null, TextJustification textColumnJustification = TextJustification.Left,
             TextJustification numericColumnJustification = TextJustification.Left)
             => new SummaryStyle(DefaultCultureInfo.Instance, printUnitsInHeader, sizeUnit, timeUnit, printUnitsInContent: printUnitsInContent,
                 printZeroValuesInContent: printZeroValuesInContent, textColumnJustification: textColumnJustification,

@@ -1,30 +1,34 @@
+using BenchmarkDotNet.Mathematics;
+using Perfolizer;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.GenericEstimators;
 using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
+using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Analysers
 {
-    public static class ZeroMeasurementHelper
+    internal static class ZeroMeasurementHelper
     {
-        /// <summary>
-        /// Checks distribution against Zero Measurement hypothesis in case of known threshold
-        /// </summary>
-        /// <returns>True if measurement is ZeroMeasurement</returns>
-        public static bool CheckZeroMeasurementOneSample(double[] results, double threshold)
+        public static bool IsNegligible(Sample results, double threshold) => HodgesLehmannEstimator.Instance.Median(results) < threshold;
+        public static bool IsNoticeable(Sample results, double threshold) => !IsNegligible(results, threshold);
+
+        public static bool AreIndistinguishable(double[] workload, double[] overhead, Threshold? threshold = null) =>
+            AreIndistinguishable(new Sample(workload), new Sample(overhead), threshold);
+
+        public static bool AreIndistinguishable(Sample workload, Sample overhead, Threshold? threshold = null)
         {
-            if (results.Length < 3)
+            threshold ??= MathHelper.DefaultThreshold;
+            var tost = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
+            if (workload.Size == 1 || overhead.Size == 1)
                 return false;
-            return !StudentTest.Instance.IsGreater(results, threshold).NullHypothesisIsRejected;
+            return tost.Perform(workload, overhead, threshold, SignificanceLevel.P1E5) == ComparisonResult.Indistinguishable;
         }
 
-        /// <summary>
-        /// Checks distribution against Zero Measurement hypothesis in case of two samples
-        /// </summary>
-        /// <returns>True if measurement is ZeroMeasurement</returns>
-        public static bool CheckZeroMeasurementTwoSamples(double[] workload, double[] overhead, Threshold? threshold = null)
-        {
-            if (workload.Length < 3 || overhead.Length < 3)
-                return false;
-            return !WelchTest.Instance.IsGreater(workload, overhead, threshold).NullHypothesisIsRejected;
-        }
+        public static bool AreDistinguishable(double[] workload, double[] overhead, Threshold? threshold = null) =>
+            !AreIndistinguishable(workload, overhead, threshold);
+
+        public static bool AreDistinguishable(Sample workload, Sample overhead, Threshold? threshold = null) =>
+            !AreIndistinguishable(workload, overhead, threshold);
     }
 }

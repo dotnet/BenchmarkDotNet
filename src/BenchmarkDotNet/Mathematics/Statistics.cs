@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
+using Perfolizer;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.QuantileEstimators;
@@ -11,8 +12,8 @@ namespace BenchmarkDotNet.Mathematics
 {
     public class Statistics
     {
+        internal Sample Sample { get; }
         public IReadOnlyList<double> OriginalValues { get; }
-        internal IReadOnlyList<double> SortedValues { get; }
         public int N { get; }
         public double Min { get; }
         public double LowerFence { get; }
@@ -31,26 +32,28 @@ namespace BenchmarkDotNet.Mathematics
         public double StandardDeviation { get; }
         public double Skewness { get; }
         public double Kurtosis { get; }
-        public ConfidenceInterval ConfidenceInterval { get; }
+        private ConfidenceIntervalEstimator ConfidenceIntervalEstimator { get; }
+        internal ConfidenceInterval PerfolizerConfidenceInterval { get; }
+        public LegacyConfidenceInterval ConfidenceInterval { get; }
         public PercentileValues Percentiles { get; }
 
-        private OutlierDetector outlierDetector;
+        private readonly TukeyOutlierDetector outlierDetector;
 
         public Statistics(params double[] values) :
             this(values.ToList()) { }
 
         public Statistics(IEnumerable<int> values) :
-            this(values.Select(value => (double) value)) { }
+            this(values.Select(value => (double)value)) { }
 
-        public Statistics(IEnumerable<double> values)
+        public Statistics(IEnumerable<double> values) : this(new Sample(values.ToArray())) { }
+
+        public Statistics(Sample sample)
         {
-            OriginalValues = values.Where(d => !double.IsNaN(d)).ToArray();
-            SortedValues = OriginalValues.OrderBy(value => value).ToArray();
-            N = SortedValues.Count;
-            if (N == 0)
-                throw new InvalidOperationException("Sequence of values contains no elements, Statistics can't be calculated");
+            Sample = sample;
+            OriginalValues = sample.Values;
+            N = Sample.Size;
 
-            var quartiles = Quartiles.FromSorted(SortedValues);
+            var quartiles = Quartiles.Create(Sample);
             Min = quartiles.Min;
             Q1 = quartiles.Q1;
             Median = quartiles.Median;
@@ -58,33 +61,35 @@ namespace BenchmarkDotNet.Mathematics
             Max = quartiles.Max;
             InterquartileRange = quartiles.InterquartileRange;
 
-            var moments = Moments.Create(SortedValues);
+            var moments = Moments.Create(Sample);
             Mean = moments.Mean;
             StandardDeviation = moments.StandardDeviation;
             Variance = moments.Variance;
             Skewness = moments.Skewness;
             Kurtosis = moments.Kurtosis;
 
-            var tukey = TukeyOutlierDetector.FromQuartiles(quartiles);
+            var tukey = TukeyOutlierDetector.Create(Sample);
             LowerFence = tukey.LowerFence;
             UpperFence = tukey.UpperFence;
-            AllOutliers = SortedValues.Where(tukey.IsOutlier).ToArray();
-            LowerOutliers = SortedValues.Where(tukey.IsLowerOutlier).ToArray();
-            UpperOutliers = SortedValues.Where(tukey.IsUpperOutlier).ToArray();
+            AllOutliers = Sample.SortedValues.Where(tukey.IsOutlier).ToArray();
+            LowerOutliers = Sample.SortedValues.Where(tukey.IsLowerOutlier).ToArray();
+            UpperOutliers = Sample.SortedValues.Where(tukey.IsUpperOutlier).ToArray();
             outlierDetector = tukey;
 
             StandardError = StandardDeviation / Math.Sqrt(N);
-            ConfidenceInterval = new ConfidenceInterval(Mean, StandardError, N);
-            Percentiles = new PercentileValues(SortedValues);
+            ConfidenceIntervalEstimator = new ConfidenceIntervalEstimator(Sample.Size, Mean, StandardError);
+            PerfolizerConfidenceInterval = ConfidenceIntervalEstimator.ConfidenceInterval(ConfidenceLevel.L999);
+            ConfidenceInterval = new LegacyConfidenceInterval(PerfolizerConfidenceInterval.Estimation, StandardError, N, LegacyConfidenceLevel.L999);
+            Percentiles = new PercentileValues(Sample.SortedValues);
         }
 
-        [PublicAPI] public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
+        [PublicAPI] public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level) => ConfidenceIntervalEstimator.ConfidenceInterval(level);
         [PublicAPI] public bool IsLowerOutlier(double value) => outlierDetector.IsLowerOutlier(value);
         [PublicAPI] public bool IsUpperOutlier(double value) => outlierDetector.IsUpperOutlier(value);
         [PublicAPI] public bool IsOutlier(double value) => outlierDetector.IsOutlier(value);
-        [PublicAPI] public double[] WithoutOutliers() => SortedValues.Where(value => !IsOutlier(value)).ToArray();
+        [PublicAPI] public double[] WithoutOutliers() => outlierDetector.WithoutAllOutliers(Sample.Values).ToArray();
 
-        [PublicAPI] public double CalcCentralMoment(int k) => SortedValues.Average(x => (x - Mean).Pow(k));
+        [PublicAPI] public double CalcCentralMoment(int k) => Sample.SortedValues.Average(x => (x - Mean).Pow(k));
 
         public bool IsActualOutlier(double value, OutlierMode outlierMode)
         {
@@ -121,18 +126,7 @@ namespace BenchmarkDotNet.Mathematics
             }
         }
 
-        public override string ToString()
-        {
-            switch (N)
-            {
-                case 1:
-                    return $"{SortedValues[0]} (N = 1)";
-                case 2:
-                    return $"{SortedValues[0]},{SortedValues[1]} (N = 2)";
-                default:
-                    return $"{Mean} +- {ConfidenceInterval.Margin} (N = {N})";
-            }
-        }
+        public override string ToString() => Sample.ToString();
 
         /// <summary>
         /// Returns true, if this statistics can be inverted (see <see cref="Invert"/>).
@@ -142,7 +136,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
         /// </summary>
-        public Statistics Invert() => CanBeInverted() ? new Statistics(SortedValues.Select(x => 1 / x)) : null;
+        public Statistics Invert() => CanBeInverted() ? new Statistics(Sample.SortedValues.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Mean for [X*Y].
@@ -168,13 +162,15 @@ namespace BenchmarkDotNet.Mathematics
                 throw new ArgumentOutOfRangeException(nameof(x), "Argument doesn't contain any values");
             if (y.N < 1)
                 throw new ArgumentOutOfRangeException(nameof(y), "Argument doesn't contain any values");
-            int n = Math.Min(x.N, y.N);
-            var z = new double[n];
-            for (int i = 0; i < n; i++)
+
+            double[]? z = new double[x.N * y.N];
+            int k = 0;
+            for (int i = 0; i < x.N; i++)
+            for (int j = 0; j < y.N; j++)
             {
-                if (Math.Abs(y.OriginalValues[i]) < 1e-9)
-                    throw new DivideByZeroException($"y[{i}] is {y.OriginalValues[i]}");
-                z[i] = x.OriginalValues[i] / y.OriginalValues[i];
+                if (Math.Abs(y.Sample.Values[j]) < 1e-9)
+                    throw new DivideByZeroException($"y[{j}] is {y.Sample.Values[j]}");
+                z[k++] = x.Sample.Values[i] / y.Sample.Values[j];
             }
 
             return new Statistics(z);

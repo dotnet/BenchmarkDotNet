@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.Diagnosers
         public string Legend => $"Allocated native memory per single operation";
         public string NumberFormat => "N0";
         public UnitType UnitType => UnitType.Size;
-        public string Unit => SizeUnit.B.Name;
+        public string Unit => SizeUnit.B.Abbreviation;
         public bool TheGreaterTheBetter => false;
         public int PriorityInCategory => 0;
         public bool GetIsAvailable(Metric metric) => true;
@@ -27,7 +28,7 @@ namespace BenchmarkDotNet.Diagnosers
         public string Legend => $"Native memory leak size in byte.";
         public string NumberFormat => "N0";
         public UnitType UnitType => UnitType.Size;
-        public string Unit => SizeUnit.B.Name;
+        public string Unit => SizeUnit.B.Abbreviation;
         public bool TheGreaterTheBetter => false;
         public int PriorityInCategory => 0;
         public bool GetIsAvailable(Metric metric) => true;

@@ -5,6 +5,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Reports
 {

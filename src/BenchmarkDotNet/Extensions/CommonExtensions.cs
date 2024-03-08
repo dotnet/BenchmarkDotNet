@@ -20,11 +20,11 @@ namespace BenchmarkDotNet.Extensions
             switch (column.UnitType)
             {
                 case UnitType.CodeSize:
-                    return $"{column.ColumnName} [{style.CodeSizeUnit.Name}]";
+                    return $"{column.ColumnName} [{style.CodeSizeUnit.Abbreviation}]";
                 case UnitType.Size:
-                    return $"{column.ColumnName} [{style.SizeUnit.Name}]";
+                    return $"{column.ColumnName} [{style.SizeUnit.Abbreviation}]";
                 case UnitType.Time:
-                    return $"{column.ColumnName} [{style.TimeUnit.Name}]";
+                    return $"{column.ColumnName} [{style.TimeUnit.Abbreviation}]";
                 case UnitType.Dimensionless:
                     return column.ColumnName;
                 default:

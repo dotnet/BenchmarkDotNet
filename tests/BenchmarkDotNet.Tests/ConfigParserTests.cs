@@ -23,8 +23,6 @@ using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
-using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -76,7 +74,7 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(new[]
             {
                 "--LaunchCount", launchCount.ToString(),
-                "--warmupCount",  warmupCount.ToString(),
+                "--warmupCount", warmupCount.ToString(),
                 "--iterationTime", iterationTime.ToString(),
                 "--iterationCount", iterationCount.ToString()
             }, new OutputLogger(Output)).config;
@@ -141,12 +139,14 @@ namespace BenchmarkDotNet.Tests
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var fakeCoreRunPath = typeof(ConfigParserTests).Assembly.Location;
             var fakeRestorePackages = Path.GetTempPath();
-            var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath, "--cli", fakeDotnetCliPath, "--packages", fakeRestorePackages }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath, "--cli", fakeDotnetCliPath, "--packages", fakeRestorePackages },
+                new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CoreRunToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRunToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the current was used
+            Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
+                ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the current was used
             Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
@@ -172,7 +172,9 @@ namespace BenchmarkDotNet.Tests
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var fakeCoreRunPath = typeof(ConfigParserTests).Assembly.Location;
             var fakeRestorePackages = Path.GetTempPath();
-            var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath, "--cli", fakeDotnetCliPath, "--packages", fakeRestorePackages, "-r", runtime }, new OutputLogger(Output)).config;
+            var config = ConfigParser
+                .Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath, "--cli", fakeDotnetCliPath, "--packages", fakeRestorePackages, "-r", runtime },
+                    new OutputLogger(Output)).config;
 
             Assert.Equal(2, config.GetJobs().Count());
 
@@ -233,7 +235,6 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(2, jobs.Length);
             Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1));
             Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2));
-
         }
 
         [Fact]
@@ -259,7 +260,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void IlCompilerPathParsedCorrectly()
         {
-            var fakePath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
+            var fakePath = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
             var config = ConfigParser.Parse(new[] { "-r", "nativeaot60", "--ilcPackages", fakePath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
@@ -286,12 +287,12 @@ namespace BenchmarkDotNet.Tests
             if (isCore)
             {
                 Assert.True(toolchain is CsProjCoreToolchain);
-                Assert.Equal(fakeDotnetCliPath, ((CsProjCoreToolchain) toolchain).CustomDotNetCliPath);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjCoreToolchain)toolchain).CustomDotNetCliPath);
             }
             else
             {
                 Assert.True(toolchain is CsProjClassicNetToolchain);
-                Assert.Equal(fakeDotnetCliPath, ((CsProjClassicNetToolchain) toolchain).CustomDotNetCliPath);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjClassicNetToolchain)toolchain).CustomDotNetCliPath);
             }
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
         }
@@ -301,7 +302,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.KeepBenchmarkFiles, "--keepFiles")]
         [InlineData(ConfigOptions.DontOverwriteResults, "--noOverwrite")]
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
-        [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
+        [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile")]
         [InlineData(ConfigOptions.LogBuildOutput, "--logBuildOutput")]
         [InlineData(ConfigOptions.GenerateMSBuildBinLog | ConfigOptions.KeepBenchmarkFiles, "--generateBinLog")]
         [InlineData(
@@ -413,52 +414,59 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0" }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0" },
+                new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80));
+            Assert.Single(config.GetJobs().Where(job =>
+                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" &&
+                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
+            Assert.Single(config.GetJobs().Where(job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
+            Assert.Single(config.GetJobs().Where(job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
+            Assert.Single(config.GetJobs().Where(job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80));
         }
 
         [Theory]
-        [InlineData(ThresholdUnit.Ratio, 5)]
-        [InlineData(ThresholdUnit.Milliseconds, 10)]
-        public void CanUseStatisticalTestsToCompareFewDifferentRuntimes(ThresholdUnit thresholdUnit, double thresholdValue)
+        [InlineData("5%")]
+        [InlineData("10ms")]
+        public void CanUseStatisticalTestsToCompareFewDifferentRuntimes(string threshold)
         {
-            var config = ConfigParser.Parse(new[]
-            {
-                "--runtimes", "netcoreapp2.1", "netcoreapp2.2",
-                "--statisticalTest", $"{thresholdValue.ToString(CultureInfo.InvariantCulture)}{thresholdUnit.ToShortName()}"
-            }, new OutputLogger(Output)).config;
+            string[] arguments = ["--runtimes", "netcoreapp2.1", "netcoreapp2.2", "--statisticalTest", threshold];
+            var config = ConfigParser.Parse(arguments, new OutputLogger(Output)).config;
 
             var mockSummary = MockFactory.CreateSummary(config);
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.False(config.GetJobs().Last().Meta.Baseline);
 
-            var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary)).OfType<StatisticalTestColumn>().Single();
+            var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary))
+                .OfType<StatisticalTestColumn>().Single();
 
-            Assert.Equal(StatisticalTestKind.MannWhitney, statisticalTestColumn.Kind);
-            Assert.Equal(Threshold.Create(thresholdUnit, thresholdUnit == ThresholdUnit.Ratio ? thresholdValue / 100.0 : thresholdValue), statisticalTestColumn.Threshold);
+            Assert.Equal(threshold, statisticalTestColumn.Threshold.ToString());
         }
 
         [Fact]
         public void SpecifyingInvalidStatisticalTestsThresholdMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "not a number" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1unknownUnit" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1 unknownUnit" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "%1" }, new OutputLogger(Output)).isSuccess); // reverse order - a typo
+            Assert.False(ConfigParser.Parse(["--statisticalTest", "not a number"], new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--statisticalTest", "1unknownUnit"], new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--statisticalTest", "1 unknownUnit"], new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--statisticalTest", "%1"], new OutputLogger(Output)).isSuccess); // reverse order - a typo
         }
 
         [Fact]
         public void CanParseHardwareCounters()
         {
-            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}" },
+                new OutputLogger(Output)).config;
 
             Assert.Equal(2, config.GetHardwareCounters().Count());
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
@@ -482,7 +490,7 @@ namespace BenchmarkDotNet.Tests
         {
             const int depth = 123;
 
-            var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString()}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString() }, new OutputLogger(Output)).config;
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
@@ -518,7 +526,7 @@ namespace BenchmarkDotNet.Tests
                     .WithWarmupCount(1)
                     .AsDefault());
 
-            var parsedConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
+            var parsedConfig = ConfigParser.Parse(new[] { "--warmupCount", "2" }, new OutputLogger(Output), globalConfig).config;
 
             Assert.Equal(2, parsedConfig.GetJobs().Single().Run.WarmupCount);
             Assert.False(parsedConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
