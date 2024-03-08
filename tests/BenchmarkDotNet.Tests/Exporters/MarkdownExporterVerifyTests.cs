@@ -15,6 +15,8 @@ using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
 
+using static BenchmarkDotNet.Tests.Exporters.MarkdownExporterVerifyTests.BaselinesBenchmarks;
+
 namespace BenchmarkDotNet.Tests.Exporters
 {
     [Collection("VerifyTests")]
@@ -56,6 +58,29 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var settings = VerifySettingsFactory.Create();
             settings.UseTextForParameters(benchmarkType.Name);
+            return Verifier.Verify(logger.GetLog(), settings);
+        }
+
+        [Fact]
+        public Task GroupExporterMultipleTypesTest()
+        {
+            Type[] benchmarkTypes = new Type[] { typeof(JobBaseline_MethodsJobs_WithAttribute), typeof(JobBaseline_MethodsJobs) };
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            var logger = new AccumulationLogger();
+            logger.WriteLine("=== " + benchmarkTypes + " ===");
+
+            var exporter = MarkdownExporter.Mock;
+            var summary = MockFactory.CreateSummary(benchmarkTypes);
+            exporter.ExportToLog(summary, logger);
+
+            var validator = BaselineValidator.FailOnError;
+            var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToList();
+            logger.WriteLine();
+            logger.WriteLine("Errors: " + errors.Count);
+            foreach (var error in errors)
+                logger.WriteLineError("* " + error.Message);
+
+            var settings = VerifySettingsFactory.Create();
             return Verifier.Verify(logger.GetLog(), settings);
         }
 

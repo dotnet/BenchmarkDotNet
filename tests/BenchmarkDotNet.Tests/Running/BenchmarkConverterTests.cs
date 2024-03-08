@@ -212,6 +212,29 @@ namespace BenchmarkDotNet.Tests.Running
                 Assert.Equal(nameof(BAC.C), info.BenchmarksCases[2].Descriptor.WorkloadMethod.Name);
             }
         }
+        [Fact]
+        public void OnlyOneOfAttributeDescriptionIsUsed()
+        {
+            Assert.Throws<InvalidOperationException>(() => BenchmarkConverter.TypeToBenchmarks(typeof(BothAttributeDescriptionTests)));
+        }
+        [Fact]
+        public void DescriptorDescriptionNameOverride()
+        {
+            var description = BenchmarkConverter.TypeToBenchmarks(typeof(MethodDescriptionOverrideTests));
+
+            Assert.Equal("VoidTest", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("\'from Benchmark\'", description.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("OverrideFromAttribute", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+        }
+        [Fact]
+        public void ClassDescriptorDescriptionNameOverride()
+        {
+            var description = BenchmarkConverter.TypeToBenchmarks(typeof(ClassDescriptionOverrideTests));
+
+            Assert.Equal("FromClassDescription", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("\'from Benchmark\'", description.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("OverrideFromAttribute", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+        }
 
         public class BAC
         {
@@ -277,6 +300,37 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [IterationCleanup] private void X() { }
             [Benchmark] public void A() { }
+        }
+        public class BothAttributeDescriptionTests
+        {
+            [Benchmark(Description = "BenchmarkAttributeDescription")]
+            [BenchmarkDescription("BenchmarkDescriptionAttributeDescription")]
+            public void BothDescriptionsUsed() { }
+        }
+        public class MethodDescriptionOverrideTests
+        {
+            [Benchmark]
+            public void VoidTest() { }
+
+            [Benchmark(Description = "from Benchmark")]
+            public void BenchmarkAttributeOverride() {}
+
+            [Benchmark]
+            [BenchmarkDescription("OverrideFromAttribute")]
+            public void BenchmarkDescriptionAttributeOverride() { }
+        }
+        [BenchmarkDescription("FromClassDescription")]
+        public class ClassDescriptionOverrideTests
+        {
+            [Benchmark]
+            public void VoidTest() { }
+
+            [Benchmark(Description = "from Benchmark")]
+            public void ClassBenchmarkAttributeOverride() { }
+
+            [Benchmark]
+            [BenchmarkDescription("OverrideFromAttribute")]
+            public void ClassBenchmarkDescriptionAttributeOverride() { }
         }
     }
 }

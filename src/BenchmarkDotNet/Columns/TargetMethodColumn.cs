@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Columns
     public class TargetMethodColumn : IColumn
     {
         public static readonly IColumn Namespace = new TargetMethodColumn(Column.Namespace, benchmark => benchmark.Descriptor.Type.Namespace);
-        public static readonly IColumn Type = new TargetMethodColumn(Column.Type, benchmark => benchmark.Descriptor.Type.GetDisplayName());
+        public static readonly IColumn Type = new TargetMethodColumn(Column.Type, benchmark => benchmark.Descriptor.TypeInfo);
         public static readonly IColumn Method = new TargetMethodColumn(Column.Method, benchmark => benchmark.Descriptor.WorkloadMethodDisplayInfo, true);
 
         private readonly Func<BenchmarkCase, string> valueProvider;

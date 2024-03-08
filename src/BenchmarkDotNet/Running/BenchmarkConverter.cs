@@ -127,6 +127,7 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
+                                                   methodInfo.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    targetMethods,
                                                    config));
         }
@@ -155,10 +156,15 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
+            BenchmarkDescriptionAttribute? methodDescription,
             MethodInfo[] targetMethods,
             IConfig config)
         {
             var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
+            if (attr?.Description != null && methodDescription?.Description != null)
+                throw new InvalidOperationException($"Benchmark {methodInfo.Name} has 2 descriptions from different attributes");
+            string description = attr?.Description;
+            description ??= methodDescription?.Description;
             var target = new Descriptor(
                 type,
                 methodInfo,
@@ -166,7 +172,7 @@ namespace BenchmarkDotNet.Running
                 globalCleanupMethod,
                 iterationSetupMethod,
                 iterationCleanupMethod,
-                attr.Description,
+                description,
                 baseline: attr.Baseline,
                 categories: categoryDiscoverer.GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
