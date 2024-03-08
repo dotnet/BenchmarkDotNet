@@ -639,7 +639,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
         {
-            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, aotCompilerMode: options.AOTCompilerMode, msBuildMoniker: msBuildMoniker);
+            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, aotCompilerMode: options.AOTCompilerMode, msBuildMoniker: msBuildMoniker, moniker: moniker);
 
             var toolChain = MonoAotLLVMToolChain.From(
             new NetCoreAppSettings(
