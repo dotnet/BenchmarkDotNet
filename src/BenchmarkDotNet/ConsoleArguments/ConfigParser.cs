@@ -571,19 +571,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVM:
-                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet60:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet70:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet80:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet90:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net9.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net9.0", runtimeMoniker);
 
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
@@ -637,7 +637,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                         packagesPath: options.RestorePath?.FullName)));
         }
 
-        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
+        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
         {
             var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, aotCompilerMode: options.AOTCompilerMode, msBuildMoniker: msBuildMoniker);
 
