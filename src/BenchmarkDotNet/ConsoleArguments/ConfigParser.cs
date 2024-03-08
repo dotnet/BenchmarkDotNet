@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
+        private static readonly IDictionary<string, IExporter[]> AvailableExporters =
             new Dictionary<string, IExporter[]>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "csv", new[] { CsvExporter.Default } },
@@ -71,6 +71,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "briefxml", new[] { XmlExporter.Brief } },
                 { "fullxml", new[] { XmlExporter.Full } }
             };
+
+
+        private static bool TryCreateCustomExporter(string customExporterName)
+        {
+            try
+            {
+                var customExporter = Activator.CreateInstance(Type.GetType(customExporterName));
+                AvailableExporters.Add(customExporterName, new IExporter[] { (IExporter)customExporter });
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
@@ -253,11 +268,17 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string exporter in options.Exporters)
-                if (!AvailableExporters.ContainsKey(exporter))
+            {
+                if (AvailableExporters.ContainsKey(exporter) || TryCreateCustomExporter(exporter))
                 {
-                    logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}.");
+                    continue;
+                }
+                else
+                {
+                    logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)} or custom exporter by assembly-qualified name.");
                     return false;
                 }
+            }
 
             if (options.CliPath.IsNotNullButDoesNotExist())
             {
