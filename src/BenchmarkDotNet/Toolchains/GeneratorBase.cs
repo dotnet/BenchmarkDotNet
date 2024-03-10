@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -59,8 +60,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns OS-specific executable extension
         /// </summary>
-        [PublicAPI] protected virtual string GetExecutableExtension()
-            => RuntimeInformation.ExecutableExtension;
+        [PublicAPI] protected virtual string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
         /// <summary>
         /// returns a path to the auto-generated .csproj file
@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.Toolchains
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
-                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
+                buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{OsDetector.ScriptFileExtension}"),
                 executablePath: executablePath,
                 programName: programName,
                 packagesDirectoryName: GetPackagesDirectoryPath(buildArtifactsDirectoryPath));

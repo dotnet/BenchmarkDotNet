@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
@@ -90,7 +91,7 @@ namespace BenchmarkDotNet.Configs
         {
             get
             {
-                var root = RuntimeInformation.IsAndroid() ?
+                var root = OsDetector.IsAndroid() ?
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
                     Directory.GetCurrentDirectory();
                 return Path.Combine(root, "BenchmarkDotNet.Artifacts");

@@ -1,0 +1,58 @@
+﻿[Keys]
+  .benchmark
+  .benchmark.method
+  .benchmark.type
+  .meta
+  .meta.table
+  .meta.table.columnDefinitions
+  .meta.table.columnDefinitions.capacity
+  .meta.table.columnDefinitions.count
+  .meta.table.filters
+  .meta.table.filters.capacity
+  .meta.table.filters.count
+  .meta.table.sortPolicies
+  .meta.table.sortPolicies.capacity
+  .meta.table.sortPolicies.count
+
+[Entry0]
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 4
+  .meta.table.columnDefinitions.count = 2
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 4
+  .meta.table.sortPolicies.count = 1
+[Entry1]
+  .benchmark = BenchmarkDotNet.Phd.BdnBenchmark
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 4
+  .meta.table.columnDefinitions.count = 2
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 4
+  .meta.table.sortPolicies.count = 1
+[Entry2]
+  .benchmark = BenchmarkDotNet.Phd.BdnBenchmark
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 4
+  .meta.table.columnDefinitions.count = 2
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 4
+  .meta.table.sortPolicies.count = 1

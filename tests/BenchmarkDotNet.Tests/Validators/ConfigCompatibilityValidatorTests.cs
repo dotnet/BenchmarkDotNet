@@ -7,6 +7,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Validators;
 using System.Linq;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact]
         public void RunningBenchmarksWithIncompatibleConfigsMustFailWithCriticalError()
         {
-            if (!KnownIssue.Issue2299.IsFixed && RuntimeInformation.IsMono && RuntimeInformation.IsLinux())
+            if (!KnownIssue.Issue2299.IsFixed && RuntimeInformation.IsMono && OsDetector.IsLinux())
             {
                 Output.WriteLine(KnownIssue.Issue2299.IgnoreMessage);
                 return;

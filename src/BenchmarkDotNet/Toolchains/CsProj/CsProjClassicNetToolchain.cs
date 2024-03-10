@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -44,7 +45,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return validationError;
             }
 
-            if (!RuntimeInformation.IsWindows())
+            if (!OsDetector.IsWindows())
             {
                 yield return new ValidationError(true,
                     $"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",

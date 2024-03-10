@@ -18,6 +18,7 @@ using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
 using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
+using Measurement = BenchmarkDotNet.Reports.Measurement;
 using MethodInfo = System.Reflection.MethodInfo;
 
 namespace BenchmarkDotNet.Tests.Mocks

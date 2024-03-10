@@ -4,6 +4,7 @@ using BenchmarkDotNet.Portability;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using BenchmarkDotNet.Detectors;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.Tests
             var runtime = RuntimeInformation.GetCurrentRuntime();
 
 #if NETFRAMEWORK
-            if (RuntimeInformation.IsWindows())
+            if (OsDetector.IsWindows())
                 Assert.True(runtime is ClrRuntime);
             else
                 Assert.True(runtime is MonoRuntime);

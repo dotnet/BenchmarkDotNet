@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Analysers
 
         protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
-            var currentFrequency = summary.HostEnvironmentInfo.CpuInfo.Value.MaxFrequency;
+            var currentFrequency = summary.HostEnvironmentInfo.Cpu.Value.GetMaxFrequency();
             if (!currentFrequency.HasValue || currentFrequency <= 0)
                 currentFrequency = FallbackCpuResolutionValue.ToFrequency();
 

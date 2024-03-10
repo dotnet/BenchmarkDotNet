@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -53,7 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            if (!RuntimeInformation.IsLinux())
+            if (!OsDetector.IsLinux())
             {
                 yield return new ValidationError(true, "The PerfCollectProfiler works only on Linux!");
                 yield break;

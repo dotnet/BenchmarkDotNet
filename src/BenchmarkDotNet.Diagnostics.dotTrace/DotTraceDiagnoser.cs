@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -127,10 +128,10 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
                 case RuntimeMoniker.NetCoreApp22:
-                    return RuntimeInformation.IsWindows();
+                    return OsDetector.IsWindows();
                 case RuntimeMoniker.NetCoreApp30:
                 case RuntimeMoniker.NetCoreApp31:
-                    return RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux();
+                    return OsDetector.IsWindows() || OsDetector.IsLinux();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, $"Runtime moniker {runtimeMoniker} is not supported");
             }

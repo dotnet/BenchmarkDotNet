@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            if (!RuntimeInformation.IsWindows())
+            if (!OsDetector.IsWindows())
             {
                 yield return new ValidationError(true, $"{GetType().Name} is supported only on Windows");
             }

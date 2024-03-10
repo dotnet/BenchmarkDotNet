@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.Helpers
 {
     internal class TaskbarProgress : IDisposable
     {
-        private static readonly bool OsVersionIsSupported = Portability.RuntimeInformation.IsWindows()
-            // Must be windows 7 or greater
-            && Environment.OSVersion.Version >= new Version(6, 1);
+        private static readonly bool OsVersionIsSupported =
+            OsDetector.IsWindows() &&
+            Environment.OSVersion.Version >= new Version(6, 1); // Must be Windows 7 or greater
 
         private IntPtr consoleWindowHandle = IntPtr.Zero;
         private IntPtr consoleHandle = IntPtr.Zero;
 
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetStdHandle(int nStdHandle);
 
@@ -76,6 +78,7 @@ namespace BenchmarkDotNet.Helpers
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out ConsoleModes lpMode);
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleMode(IntPtr hConsoleHandle, ConsoleModes dwMode);
 
@@ -107,12 +110,16 @@ namespace BenchmarkDotNet.Helpers
             // ITaskbarList
             [PreserveSig]
             void HrInit();
+
             [PreserveSig]
             void AddTab(IntPtr hwnd);
+
             [PreserveSig]
             void DeleteTab(IntPtr hwnd);
+
             [PreserveSig]
             void ActivateTab(IntPtr hwnd);
+
             [PreserveSig]
             void SetActiveAlt(IntPtr hwnd);
 
@@ -123,6 +130,7 @@ namespace BenchmarkDotNet.Helpers
             // ITaskbarList3
             [PreserveSig]
             void SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
+
             [PreserveSig]
             void SetProgressState(IntPtr hwnd, TaskbarProgressState state);
         }
@@ -130,11 +138,9 @@ namespace BenchmarkDotNet.Helpers
         [Guid("56FDF344-FD6D-11d0-958A-006097C9A090")]
         [ClassInterface(ClassInterfaceType.None)]
         [ComImport]
-        private class TaskbarInstance
-        {
-        }
+        private class TaskbarInstance { }
 
-        private static readonly ITaskbarList3 s_taskbarInstance = (ITaskbarList3) new TaskbarInstance();
+        private static readonly ITaskbarList3 s_taskbarInstance = (ITaskbarList3)new TaskbarInstance();
 
         internal static void SetState(IntPtr consoleWindowHandle, IntPtr consoleHandle, TaskbarProgressState taskbarState)
         {
@@ -177,7 +183,7 @@ namespace BenchmarkDotNet.Helpers
             {
                 throw new ArgumentOutOfRangeException(nameof(progressValue), "progressValue must be between 0 and 1 inclusive.");
             }
-            uint value = (uint) (progressValue * 100);
+            uint value = (uint)(progressValue * 100);
 
             if (consoleWindowHandle != IntPtr.Zero)
             {

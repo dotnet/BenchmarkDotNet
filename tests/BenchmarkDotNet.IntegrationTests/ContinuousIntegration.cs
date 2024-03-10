@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Portability;
 using System;
+using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -8,7 +9,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private static bool IsGitHubActions() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTION"));
 
         internal static bool IsGitHubActionsOnWindows()
-            => RuntimeInformation.IsWindows() && IsGitHubActions();
+            => OsDetector.IsWindows() && IsGitHubActions();
 
         internal static bool IsLocalRun() => !IsGitHubActions();
     }

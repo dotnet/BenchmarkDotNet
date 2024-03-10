@@ -1,0 +1,209 @@
+﻿BenchmarkDotNet v0.1729.0-mock, macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+
+Type = Bench
+
+@Net481LegacyJit: Runtime = Net481, Jit = LegacyJit
+@Net70RyuJit:     Runtime = Net70, Jit = RyuJit
+
+| Method | Job             | Average | Spread  |
+|:-------|:----------------|:--------|:--------|
+| Foo    | Net481LegacyJit | 11.0 ns | 0.81 ns |
+| Bar    | Net481LegacyJit | 21.0 ns | 0.81 ns |
+| Foo    | Net70RyuJit     | 31.0 ns | 0.81 ns |
+| Bar    | Net70RyuJit     | 41.0 ns | 0.81 ns |
+
+{
+  "attributes": {
+    "meta": {
+      "table": {
+        "columnDefinitions": [
+          {
+            "selector": ".engine",
+            "cloud": "primary",
+            "isSelfExplanatory": true
+          },
+          {
+            "selector": ".host.os",
+            "cloud": "primary",
+            "isSelfExplanatory": true
+          },
+          {
+            "selector": ".host.cpu",
+            "cloud": "primary",
+            "isSelfExplanatory": true
+          },
+          {
+            "selector": ".benchmark",
+            "cloud": "secondary"
+          },
+          {
+            "selector": ".job",
+            "cloud": "secondary",
+            "compressed": true
+          },
+          {
+            "selector": "=average"
+          },
+          {
+            "selector": "=spread"
+          }
+        ]
+      }
+    },
+    "engine": {
+      "name": "BenchmarkDotNet",
+      "version": "0.1729.0-mock",
+      "display": "BenchmarkDotNet v0.1729.0-mock"
+    },
+    "host": {
+      "runtimeVersion": ".NET 8.0.0 (8.0.23.53103)",
+      "hasAttachedDebugger": false,
+      "hasRyuJit": true,
+      "configuration": "RELEASE",
+      "dotNetSdkVersion": "8.0.100",
+      "chronometerFrequency": 1000000000,
+      "hardwareTimerKind": "Unknown",
+      "os": {
+        "name": "macOS",
+        "version": "macOS 14.2.1 (23C71)",
+        "kernelVersion": "Darwin 23.2.0",
+        "display": "macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]"
+      },
+      "cpu": {
+        "processorName": "Apple M1 Max",
+        "physicalProcessorCount": 1,
+        "physicalCoreCount": 10,
+        "logicalCoreCount": 10,
+        "architecture": "Arm64",
+        "display": "Apple M1 Max, 1 CPU, 10 logical and 10 physical cores"
+      }
+    }
+  },
+  "children": [
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net481",
+            "jit": "legacyJit"
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 10,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 11,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 12,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 20,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 21,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 22,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net70",
+            "jit": "ryuJit"
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 30,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 31,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 32,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 40,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 41,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 42,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

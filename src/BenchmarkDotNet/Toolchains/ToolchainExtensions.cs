@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -46,9 +47,9 @@ namespace BenchmarkDotNet.Toolchains
                         : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
 
                 case MonoRuntime mono:
-                    if (RuntimeInformation.IsAndroid())
+                    if (OsDetector.IsAndroid())
                         return InProcessEmitToolchain.Instance;
-                    if (RuntimeInformation.IsIOS())
+                    if (OsDetector.IsIOS())
                         return InProcessNoEmitToolchain.Instance;
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;

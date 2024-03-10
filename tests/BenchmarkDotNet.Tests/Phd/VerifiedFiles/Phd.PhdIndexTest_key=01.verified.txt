@@ -1,0 +1,158 @@
+﻿[Keys]
+  .benchmark
+  .benchmark.method
+  .benchmark.type
+  .engine
+  .engine.display
+  .engine.name
+  .engine.version
+  .host
+  .host.chronometerFrequency
+  .host.configuration
+  .host.cpu
+  .host.cpu.architecture
+  .host.cpu.display
+  .host.cpu.logicalCoreCount
+  .host.cpu.physicalCoreCount
+  .host.cpu.physicalProcessorCount
+  .host.cpu.processorName
+  .host.dotNetSdkVersion
+  .host.hardwareTimerKind
+  .host.hasAttachedDebugger
+  .host.hasRyuJit
+  .host.os
+  .host.os.display
+  .host.os.kernelVersion
+  .host.os.name
+  .host.os.version
+  .host.runtimeVersion
+  .meta
+  .meta.table
+  .meta.table.columnDefinitions
+  .meta.table.columnDefinitions.capacity
+  .meta.table.columnDefinitions.count
+  .meta.table.filters
+  .meta.table.filters.capacity
+  .meta.table.filters.count
+  .meta.table.maxAnchorLength
+  .meta.table.sortPolicies
+  .meta.table.sortPolicies.capacity
+  .meta.table.sortPolicies.count
+
+[Entry0]
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.display = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = BenchmarkDotNet.Phd.BdnHost
+  .host.chronometerFrequency = 1000000000
+  .host.configuration = RELEASE
+  .host.cpu = Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+  .host.cpu.architecture = Arm64
+  .host.cpu.display = Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+  .host.cpu.logicalCoreCount = 10
+  .host.cpu.physicalCoreCount = 10
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = Apple M1 Max
+  .host.dotNetSdkVersion = 8.0.100
+  .host.hardwareTimerKind = Unknown
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+  .host.os.display = macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+  .host.os.kernelVersion = Darwin 23.2.0
+  .host.os.name = macOS
+  .host.os.version = macOS 14.2.1 (23C71)
+  .host.runtimeVersion = .NET 8.0.0 (8.0.23.53103)
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 7
+  .meta.table.columnDefinitions.count = 7
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.maxAnchorLength = 20
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 0
+  .meta.table.sortPolicies.count = 0
+[Entry1]
+  .benchmark = BenchmarkDotNet.Phd.BdnBenchmark
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.display = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = BenchmarkDotNet.Phd.BdnHost
+  .host.chronometerFrequency = 1000000000
+  .host.configuration = RELEASE
+  .host.cpu = Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+  .host.cpu.architecture = Arm64
+  .host.cpu.display = Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+  .host.cpu.logicalCoreCount = 10
+  .host.cpu.physicalCoreCount = 10
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = Apple M1 Max
+  .host.dotNetSdkVersion = 8.0.100
+  .host.hardwareTimerKind = Unknown
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+  .host.os.display = macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+  .host.os.kernelVersion = Darwin 23.2.0
+  .host.os.name = macOS
+  .host.os.version = macOS 14.2.1 (23C71)
+  .host.runtimeVersion = .NET 8.0.0 (8.0.23.53103)
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 7
+  .meta.table.columnDefinitions.count = 7
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.maxAnchorLength = 20
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 0
+  .meta.table.sortPolicies.count = 0
+[Entry2]
+  .benchmark = BenchmarkDotNet.Phd.BdnBenchmark
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.display = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = BenchmarkDotNet.Phd.BdnHost
+  .host.chronometerFrequency = 1000000000
+  .host.configuration = RELEASE
+  .host.cpu = Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+  .host.cpu.architecture = Arm64
+  .host.cpu.display = Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+  .host.cpu.logicalCoreCount = 10
+  .host.cpu.physicalCoreCount = 10
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = Apple M1 Max
+  .host.dotNetSdkVersion = 8.0.100
+  .host.hardwareTimerKind = Unknown
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+  .host.os.display = macOS Sonoma 14.2.1 (23C71) [Darwin 23.2.0]
+  .host.os.kernelVersion = Darwin 23.2.0
+  .host.os.name = macOS
+  .host.os.version = macOS 14.2.1 (23C71)
+  .host.runtimeVersion = .NET 8.0.0 (8.0.23.53103)
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 7
+  .meta.table.columnDefinitions.count = 7
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.maxAnchorLength = 20
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 0
+  .meta.table.sortPolicies.count = 0

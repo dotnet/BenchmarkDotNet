@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
-            if (!RuntimeInformation.IsWindows())
+            if (!OsDetector.IsWindows())
             {
                 yield return new ValidationError(true, "Hardware Counters and EtwProfiler are supported only on Windows");
                 yield break;

@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
             if (ContinuousIntegration.IsGitHubActionsOnWindows()) // no native dependencies installed
                 return;
-            if (RuntimeInformation.IsMacOS())
+            if (OsDetector.IsMacOS())
                 return; // currently not supported
 
             var toolchain = NativeAotToolchain.CreateBuilder().UseNuGet().IlcInstructionSet(IsAvx2Supported() ? "avx2" : "").ToToolchain();

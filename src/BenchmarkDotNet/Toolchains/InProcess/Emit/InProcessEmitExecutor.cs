@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -59,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod
                 .GetCustomAttributes<STAThreadAttribute>(false)
                 .Any() &&
-                Portability.RuntimeInformation.IsWindows())
+                OsDetector.IsWindows())
             {
                 runThread.SetApartmentState(ApartmentState.STA);
             }

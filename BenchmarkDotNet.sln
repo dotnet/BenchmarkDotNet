@@ -53,6 +53,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.TestAdapter", "src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj", "{4C9C89B8-7C4E-4ECF-B3C9-324C8772EDAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfolizer", "..\perfolizer\src\Perfolizer\Perfolizer\Perfolizer.csproj", "{FDA97251-79A8-40ED-8418-243D168ADB5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perfolizer.Tests", "..\perfolizer\src\Perfolizer\Perfolizer.Tests\Perfolizer.Tests.csproj", "{8D1A850F-E081-4293-A779-FA58B426ECA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +147,14 @@ Global
 		{4C9C89B8-7C4E-4ECF-B3C9-324C8772EDAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C9C89B8-7C4E-4ECF-B3C9-324C8772EDAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C9C89B8-7C4E-4ECF-B3C9-324C8772EDAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDA97251-79A8-40ED-8418-243D168ADB5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA97251-79A8-40ED-8418-243D168ADB5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA97251-79A8-40ED-8418-243D168ADB5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA97251-79A8-40ED-8418-243D168ADB5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D1A850F-E081-4293-A779-FA58B426ECA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D1A850F-E081-4293-A779-FA58B426ECA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D1A850F-E081-4293-A779-FA58B426ECA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D1A850F-E081-4293-A779-FA58B426ECA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,6 +181,8 @@ Global
 		{C5BDA61F-3A56-4B59-901D-0A17E78F4076} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
 		{AACA2C63-A85B-47AB-99FC-72C3FF408B14} = {14195214-591A-45B7-851A-19D3BA2413F9}
 		{4C9C89B8-7C4E-4ECF-B3C9-324C8772EDAC} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{FDA97251-79A8-40ED-8418-243D168ADB5A} = {D6597E3A-6892-4A68-8E14-042FC941FDA2}
+		{8D1A850F-E081-4293-A779-FA58B426ECA0} = {14195214-591A-45B7-851A-19D3BA2413F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4D9AF12B-1F7F-45A7-9E8C-E4E46ADCBD1F}

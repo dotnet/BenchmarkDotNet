@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
@@ -36,12 +37,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     yield return new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core80 }; // .NET Core x64
                 }
-                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64 && RuntimeInformation.IsLinux())
+                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64 && OsDetector.IsLinux())
                 {
                     yield return new object[] { Jit.RyuJit, Platform.Arm64, CoreRuntime.Core80 }; // .NET Core arm64
                 }
             }
-            if (RuntimeInformation.IsMacOS())
+            if (OsDetector.IsMacOS())
             {
                 // This scope of tests is not supported on macOS
                 // However, when the MemberData method provides no data, xUnit throws an "No data found" InvalidOperationException
@@ -91,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
-            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+            if (OsDetector.IsMacOS()) return; // currently not supported
 
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, Runtime runtime)
         {
-            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+            if (OsDetector.IsMacOS()) return; // currently not supported
 
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
@@ -135,7 +136,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
-            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+            if (OsDetector.IsMacOS()) return; // currently not supported
 
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
@@ -157,7 +158,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
         {
-            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+            if (OsDetector.IsMacOS()) return; // currently not supported
 
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));

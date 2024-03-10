@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Xml;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -54,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
         }
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
-            => Portability.RuntimeInformation.IsWindows()
+            => OsDetector.IsWindows()
                 ? Path.Combine(binariesDirectoryPath, "publish", $"{programName}.exe")
                 : Path.Combine(binariesDirectoryPath, "publish", programName);
 

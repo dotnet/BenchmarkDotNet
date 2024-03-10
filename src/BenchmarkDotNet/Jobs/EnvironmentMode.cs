@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
@@ -107,7 +108,7 @@ namespace BenchmarkDotNet.Jobs
             get => LargeAddressAwareCharacteristic[this];
             set
             {
-                if (value && !RuntimeInformation.IsWindows())
+                if (value && !OsDetector.IsWindows())
                 {
                     throw new NotSupportedException("LargeAddressAware is a Windows-specific concept.");
                 }
