@@ -11,8 +11,9 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
-    internal abstract class ClrMdV2Disassembler
+    // This Disassembler uses ClrMd v3x. Please keep it in sync with ClrMdV1Disassembler (if possible).
+    internal abstract class ClrMdV3Disassembler
+
     {
         private static readonly ulong MinValidAddress = GetMinValidAddress();
 
@@ -64,7 +65,7 @@ namespace BenchmarkDotNet.Disassemblers
                     state.Todo.Enqueue(
                         new MethodInfo(
                             // the Disassembler Entry Method is always parameterless, so check by name is enough
-                            typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName),
+                            typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == settings.MethodName),
                             0));
                 }
 
@@ -149,9 +150,10 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (!CanBeDisassembled(method))
             {
-                if (method.IsPInvoke)
+                if (method.Attributes.HasFlag(System.Reflection.MethodAttributes.PinvokeImpl))
                     return CreateEmpty(method, "PInvoke method");
-                if (method.IL is null || method.IL.Length == 0)
+                var ilInfo = method.GetILInfo();
+                if (ilInfo is null || ilInfo.Length == 0)
                     return CreateEmpty(method, "Extern method");
                 if (method.CompilationType == MethodCompilationType.None)
                     return CreateEmpty(method, "Method was not JITted yet.");
@@ -214,59 +216,29 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
         {
-            if (!TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress))
+            // it's better to use one single map rather than few small ones
+            // it's simply easier to get next instruction when decoding ;)
+
+            var hotColdInfo = method.HotColdInfo;
+            if (hotColdInfo.HotSize > 0 && hotColdInfo.HotStart > 0)
             {
-                startAddress = method.NativeCode;
-                endAddress = ulong.MaxValue;
+                return hotColdInfo.ColdSize <= 0
+                    ? new[] { new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 } }
+                    : new[]
+                      {
+                            new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
+                            new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
+                      };
             }
 
-            ILToNativeMap[] sortedMaps = method.ILOffsetMap // CanBeDisassembled ensures that there is at least one map in ILOffsetMap
-                .Where(map => map.StartAddress >= startAddress && map.StartAddress < endAddress) // can be false for Tier 0 maps, EndAddress is not checked on purpose here
-                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length (they don't have corresponding assembly code?)
+            return method.ILOffsetMap
+                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
                 .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
-                .Select(map => new ILToNativeMap()
-                {
-                    StartAddress = map.StartAddress,
-                    // some maps have EndAddress > codeHeaderData.MethodStart + codeHeaderData.MethodSize and contain garbage (#2074). They need to be fixed!
-                    EndAddress = Math.Min(map.EndAddress, endAddress),
-                    ILOffset = map.ILOffset
-                })
                 .ToArray();
-
-            if (sortedMaps.Length == 0)
-            {
-                // In such situation ILOffsetMap most likely describes Tier 0, while CodeHeaderData Tier 1.
-                // Since we care about Tier 1 (if it's present), we "fake" a Tier 1 map.
-                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
-            }
-            else if (sortedMaps[0].StartAddress != startAddress || (sortedMaps[sortedMaps.Length - 1].EndAddress != endAddress && endAddress != ulong.MaxValue))
-            {
-                // In such situation ILOffsetMap most likely is missing few bytes. We just "extend" it to avoid producing "bad" instructions.
-                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
-            }
-
-            return sortedMaps;
         }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
-
-        protected static bool TryReadNativeCodeAddresses(ClrRuntime runtime, ClrMethod method, out ulong startAddress, out ulong endAddress)
-        {
-            if (method is not null
-                && runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
-                && codeHeaderData.MethodSize > 0) // false for extern methods!
-            {
-                // HotSize can be missing or be invalid (https://github.com/microsoft/clrmd/issues/1036).
-                // So we fetch the method size on our own.
-                startAddress = codeHeaderData.MethodStart;
-                endAddress = codeHeaderData.MethodStart + codeHeaderData.MethodSize;
-                return true;
-            }
-
-            startAddress = endAddress = 0;
-            return false;
-        }
 
         protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, ClrMethod currentMethod)
         {
@@ -283,18 +255,10 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var method = runtime.GetMethodByInstructionPointer(address);
-            if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
+            if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0
+                && runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
             {
-                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
-                {
-                    method = runtime.GetMethodByInstructionPointer(newAddress);
-
-                    method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, newAddress);
-                }
-            }
-            else
-            {
-                method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, address);
+                method = runtime.GetMethodByInstructionPointer(newAddress);
             }
 
             if (method is null)
@@ -313,7 +277,7 @@ namespace BenchmarkDotNet.Disassemblers
                     return;
                 }
 
-                var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
+                var methodTableName = runtime.GetTypeByMethodTable(address)?.Name;
                 if (!string.IsNullOrEmpty(methodTableName))
                 {
                     state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
@@ -348,13 +312,6 @@ namespace BenchmarkDotNet.Disassemblers
                 }
             }
         }
-
-        // GetMethodByInstructionPointer sometimes returns wrong methods.
-        // In case given address does not belong to the methods range, null is returned.
-        private static ClrMethod WorkaroundGetMethodByInstructionPointerBug(ClrRuntime runtime, ClrMethod method, ulong newAddress)
-            => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
-            ? null
-            : method;
 
         private class SharpComparer : IEqualityComparer<Sharp>
         {
