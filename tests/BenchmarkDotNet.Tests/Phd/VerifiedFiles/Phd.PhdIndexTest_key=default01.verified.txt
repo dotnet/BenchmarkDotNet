@@ -1,0 +1,146 @@
+﻿[Keys]
+  .benchmark
+  .benchmark.method
+  .benchmark.type
+  .engine
+  .engine.display
+  .engine.name
+  .engine.version
+  .host
+  .host.chronometerFrequency
+  .host.configuration
+  .host.cpu
+  .host.cpu.logicalCoreCount
+  .host.cpu.maxFrequencyHz
+  .host.cpu.minFrequencyHz
+  .host.cpu.nominalFrequencyHz
+  .host.cpu.physicalCoreCount
+  .host.cpu.physicalProcessorCount
+  .host.cpu.processorName
+  .host.dotNetSdkVersion
+  .host.hardwareTimerKind
+  .host.hasAttachedDebugger
+  .host.hasRyuJit
+  .host.os
+  .host.os.display
+  .host.runtimeVersion
+  .meta
+  .meta.table
+  .meta.table.columnDefinitions
+  .meta.table.columnDefinitions.capacity
+  .meta.table.columnDefinitions.count
+  .meta.table.filters
+  .meta.table.filters.capacity
+  .meta.table.filters.count
+  .meta.table.sortPolicies
+  .meta.table.sortPolicies.capacity
+  .meta.table.sortPolicies.count
+
+[Entry0]
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.display = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = BenchmarkDotNet.Phd.BdnHost
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.minFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 7
+  .meta.table.columnDefinitions.count = 7
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 0
+  .meta.table.sortPolicies.count = 0
+[Entry1]
+  .benchmark = BenchmarkDotNet.Phd.BdnBenchmark
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.display = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = BenchmarkDotNet.Phd.BdnHost
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.minFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 7
+  .meta.table.columnDefinitions.count = 7
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 0
+  .meta.table.sortPolicies.count = 0
+[Entry2]
+  .benchmark = BenchmarkDotNet.Phd.BdnBenchmark
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.display = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = BenchmarkDotNet.Phd.BdnHost
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.minFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .meta = Perfolizer.Phd.Base.PhdMeta
+  .meta.table = Perfolizer.Phd.Tables.PhdTableConfig
+  .meta.table.columnDefinitions = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdColumnDefinition]
+  .meta.table.columnDefinitions.capacity = 7
+  .meta.table.columnDefinitions.count = 7
+  .meta.table.filters = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdFilter]
+  .meta.table.filters.capacity = 0
+  .meta.table.filters.count = 0
+  .meta.table.sortPolicies = System.Collections.Generic.List`1[Perfolizer.Phd.Tables.PhdSortPolicy]
+  .meta.table.sortPolicies.capacity = 0
+  .meta.table.sortPolicies.count = 0

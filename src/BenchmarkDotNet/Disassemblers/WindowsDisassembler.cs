@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -165,7 +166,7 @@ namespace BenchmarkDotNet.Disassemblers
                 if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") == "x86")
                     return false;
 
-                if (RuntimeInformation.IsWindows())
+                if (OsDetector.IsWindows())
                 {
                     IsWow64Process(process.Handle, out bool isWow64);
 

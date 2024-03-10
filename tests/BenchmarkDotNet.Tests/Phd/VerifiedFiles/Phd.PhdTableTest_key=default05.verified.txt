@@ -1,0 +1,1397 @@
+﻿BenchmarkDotNet v0.1729.0-mock, Microsoft Windows NT 10.0.x.mock
+MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz, 1, 4, 8, 3100000000, 3100000000, 3100000000
+
+Type = Bench, Jit = RyuJit
+
+@HostProcess_0:   Runtime = HostProcess, Affinity = 0
+@NotRecognized_1: Runtime = NotRecognized, Affinity = 1
+@Mono_2:          Runtime = Mono, Affinity = 2
+@Net461_3:        Runtime = Net461, Affinity = 3
+@Net462_4:        Runtime = Net462, Affinity = 4
+@Net47_5:         Runtime = Net47, Affinity = 5
+@Net471_6:        Runtime = Net471, Affinity = 6
+@Net472_7:        Runtime = Net472, Affinity = 7
+@Net48_8:         Runtime = Net48, Affinity = 8
+@Net481_9:        Runtime = Net481, Affinity = 9
+@NetCoreApp20_10: Runtime = NetCoreApp20, Affinity = 10
+@NetCoreApp21_11: Runtime = NetCoreApp21, Affinity = 11
+@NetCoreApp22_12: Runtime = NetCoreApp22, Affinity = 12
+@NetCoreApp30_13: Runtime = NetCoreApp30, Affinity = 13
+@NetCoreApp31_14: Runtime = NetCoreApp31, Affinity = 14
+@NetCoreApp50_15: Runtime = NetCoreApp50, Affinity = 15
+@Net50_16:        Runtime = Net50, Affinity = 16
+@Net60_17:        Runtime = Net60, Affinity = 17
+@Net70_18:        Runtime = Net70, Affinity = 18
+@Net80_19:        Runtime = Net80, Affinity = 19
+
+| Method | Job             |   Average |  Spread |
+|:-------|:----------------|----------:|--------:|
+| Foo    | HostProcess_0   |   2.00 ns | 0.81 ns |
+| Bar    | HostProcess_0   |   7.00 ns | 0.81 ns |
+| Foo    | NotRecognized_1 |  12.00 ns | 0.81 ns |
+| Bar    | NotRecognized_1 |  17.00 ns | 0.81 ns |
+| Foo    | Mono_2          |  22.00 ns | 0.81 ns |
+| Bar    | Mono_2          |  27.00 ns | 0.81 ns |
+| Foo    | Net461_3        |  32.00 ns | 0.81 ns |
+| Bar    | Net461_3        |  37.00 ns | 0.81 ns |
+| Foo    | Net462_4        |  42.00 ns | 0.81 ns |
+| Bar    | Net462_4        |  47.00 ns | 0.81 ns |
+| Foo    | Net47_5         |  52.00 ns | 0.81 ns |
+| Bar    | Net47_5         |  57.00 ns | 0.81 ns |
+| Foo    | Net471_6        |  62.00 ns | 0.81 ns |
+| Bar    | Net471_6        |  67.00 ns | 0.81 ns |
+| Foo    | Net472_7        |  72.00 ns | 0.81 ns |
+| Bar    | Net472_7        |  77.00 ns | 0.81 ns |
+| Foo    | Net48_8         |  82.00 ns | 0.81 ns |
+| Bar    | Net48_8         |  87.00 ns | 0.81 ns |
+| Foo    | Net481_9        |  92.00 ns | 0.81 ns |
+| Bar    | Net481_9        |  97.00 ns | 0.81 ns |
+| Foo    | NetCoreApp20_10 | 102.00 ns | 0.81 ns |
+| Bar    | NetCoreApp20_10 | 107.00 ns | 0.81 ns |
+| Foo    | NetCoreApp21_11 | 112.00 ns | 0.81 ns |
+| Bar    | NetCoreApp21_11 | 117.00 ns | 0.81 ns |
+| Foo    | NetCoreApp22_12 | 122.00 ns | 0.81 ns |
+| Bar    | NetCoreApp22_12 | 127.00 ns | 0.81 ns |
+| Foo    | NetCoreApp30_13 | 132.00 ns | 0.81 ns |
+| Bar    | NetCoreApp30_13 | 137.00 ns | 0.81 ns |
+| Foo    | NetCoreApp31_14 | 142.00 ns | 0.81 ns |
+| Bar    | NetCoreApp31_14 | 147.00 ns | 0.81 ns |
+| Foo    | NetCoreApp50_15 | 152.00 ns | 0.81 ns |
+| Bar    | NetCoreApp50_15 | 157.00 ns | 0.81 ns |
+| Foo    | Net50_16        | 162.00 ns | 0.81 ns |
+| Bar    | Net50_16        | 167.00 ns | 0.81 ns |
+| Foo    | Net60_17        | 172.00 ns | 0.81 ns |
+| Bar    | Net60_17        | 177.00 ns | 0.81 ns |
+| Foo    | Net70_18        | 182.00 ns | 0.81 ns |
+| Bar    | Net70_18        | 187.00 ns | 0.81 ns |
+| Foo    | Net80_19        | 192.00 ns | 0.81 ns |
+| Bar    | Net80_19        | 197.00 ns | 0.81 ns |
+
+{
+  "attributes": {
+    "meta": {
+      "table": {
+        "columnDefinitions": [
+          {
+            "selector": ".engine",
+            "cloud": "primary",
+            "isSelfExplanatory": true
+          },
+          {
+            "selector": ".host.os",
+            "cloud": "primary",
+            "isSelfExplanatory": true
+          },
+          {
+            "selector": ".host.cpu",
+            "cloud": "primary",
+            "isSelfExplanatory": true
+          },
+          {
+            "selector": ".benchmark",
+            "cloud": "secondary"
+          },
+          {
+            "selector": ".job",
+            "cloud": "secondary",
+            "compressed": true
+          },
+          {
+            "selector": "=average"
+          },
+          {
+            "selector": "=spread"
+          }
+        ]
+      }
+    },
+    "engine": {
+      "name": "BenchmarkDotNet",
+      "version": "0.1729.0-mock",
+      "display": "BenchmarkDotNet v0.1729.0-mock"
+    },
+    "host": {
+      "runtimeVersion": "Clr 4.0.x.mock",
+      "hasAttachedDebugger": false,
+      "hasRyuJit": true,
+      "configuration": "CONFIGURATION",
+      "dotNetSdkVersion": "1.0.x.mock",
+      "chronometerFrequency": 2531248,
+      "hardwareTimerKind": "Tsc",
+      "os": {
+        "display": "Microsoft Windows NT 10.0.x.mock"
+      },
+      "cpu": {
+        "processorName": "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+        "physicalProcessorCount": 1,
+        "physicalCoreCount": 4,
+        "logicalCoreCount": 8,
+        "nominalFrequencyHz": 3100000000,
+        "minFrequencyHz": 3100000000,
+        "maxFrequencyHz": 3100000000
+      }
+    }
+  },
+  "children": [
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "hostProcess",
+            "jit": "ryuJit",
+            "affinity": 0
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 1,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 2,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 3,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 6,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 7,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 8,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "notRecognized",
+            "jit": "ryuJit",
+            "affinity": 1
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 11,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 12,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 13,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 16,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 17,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 18,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "mono",
+            "jit": "ryuJit",
+            "affinity": 2
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 21,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 22,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 23,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 26,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 27,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 28,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net461",
+            "jit": "ryuJit",
+            "affinity": 3
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 31,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 32,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 33,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 36,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 37,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 38,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net462",
+            "jit": "ryuJit",
+            "affinity": 4
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 41,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 42,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 43,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 46,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 47,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 48,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net47",
+            "jit": "ryuJit",
+            "affinity": 5
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 51,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 52,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 53,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 56,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 57,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 58,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net471",
+            "jit": "ryuJit",
+            "affinity": 6
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 61,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 62,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 63,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 66,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 67,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 68,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net472",
+            "jit": "ryuJit",
+            "affinity": 7
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 71,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 72,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 73,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 76,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 77,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 78,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net48",
+            "jit": "ryuJit",
+            "affinity": 8
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 81,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 82,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 83,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 86,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 87,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 88,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net481",
+            "jit": "ryuJit",
+            "affinity": 9
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 91,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 92,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 93,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 96,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 97,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 98,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "netCoreApp20",
+            "jit": "ryuJit",
+            "affinity": 10
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 101,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 102,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 103,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 106,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 107,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 108,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "netCoreApp21",
+            "jit": "ryuJit",
+            "affinity": 11
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 111,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 112,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 113,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 116,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 117,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 118,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "netCoreApp22",
+            "jit": "ryuJit",
+            "affinity": 12
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 121,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 122,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 123,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 126,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 127,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 128,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "netCoreApp30",
+            "jit": "ryuJit",
+            "affinity": 13
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 131,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 132,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 133,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 136,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 137,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 138,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "netCoreApp31",
+            "jit": "ryuJit",
+            "affinity": 14
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 141,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 142,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 143,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 146,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 147,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 148,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "netCoreApp50",
+            "jit": "ryuJit",
+            "affinity": 15
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 151,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 152,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 153,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 156,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 157,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 158,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net50",
+            "jit": "ryuJit",
+            "affinity": 16
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 161,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 162,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 163,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 166,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 167,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 168,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net60",
+            "jit": "ryuJit",
+            "affinity": 17
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 171,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 172,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 173,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 176,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 177,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 178,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net70",
+            "jit": "ryuJit",
+            "affinity": 18
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 181,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 182,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 183,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 186,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 187,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 188,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "job": {
+          "environment": {
+            "runtime": "net80",
+            "jit": "ryuJit",
+            "affinity": 19
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 191,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 192,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 193,
+              "unit": "ns"
+            }
+          ]
+        },
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 196,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 1,
+              "value": 197,
+              "unit": "ns"
+            },
+            {
+              "iterationIndex": 2,
+              "value": 198,
+              "unit": "ns"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

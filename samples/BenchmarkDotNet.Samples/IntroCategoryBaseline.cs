@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
 {
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     [CategoriesColumn]
+    [DryJob]
     public class IntroCategoryBaseline
     {
         [BenchmarkCategory("Fast"), Benchmark(Baseline = true)]

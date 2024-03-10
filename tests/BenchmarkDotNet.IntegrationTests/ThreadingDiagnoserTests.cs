@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Portability;
 using Xunit;
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
             yield return new object[] { Job.Default.GetToolchain() };
 
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !RuntimeInformation.IsMacOS()) // currently not supported
+                && !OsDetector.IsMacOS()) // currently not supported
             {
                 yield return new object[]{ NativeAotToolchain.Net80 };
             }

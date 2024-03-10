@@ -8,10 +8,14 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Phd;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using Perfolizer.Phd;
+using Perfolizer.Phd.Base;
+using Perfolizer.Phd.Dto;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -62,7 +66,8 @@ namespace BenchmarkDotNet.Reports
 
             DisplayPrecisionManager = new DisplayPrecisionManager(this);
             Orderer = GetConfiguredOrdererOrDefaultOne(reports.Select(report => report.BenchmarkCase.Config));
-            BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
+            BenchmarksCases =
+                Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
             BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
             Style = (summaryStyle ?? GetConfiguredSummaryStyleOrDefaultOne(BenchmarksCases)).WithCultureInfo(cultureInfo);
@@ -84,8 +89,10 @@ namespace BenchmarkDotNet.Reports
         public bool IsMultipleRuntimes
             => isMultipleRuntimes ??= BenchmarksCases.Length > 1 ? BenchmarksCases.Select(benchmark => benchmark.GetRuntime()).Distinct().Count() > 1 : false;
 
-        internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError>? validationErrors = null)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors ?? ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
+        internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath,
+            ImmutableArray<ValidationError>? validationErrors = null)
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero,
+                DefaultCultureInfo.Instance, validationErrors ?? ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
@@ -167,5 +174,22 @@ namespace BenchmarkDotNet.Reports
                    .Distinct()
                    .SingleOrDefault()
                ?? SummaryStyle.Default;
+
+        // TODO: GcStats
+        public PhdEntry ToPhd()
+        {
+            var root = new PhdEntry
+            {
+                Engine = new PhdEngine
+                {
+                    Name = HostEnvironmentInfo.BenchmarkDotNetCaption,
+                    Version = HostEnvironmentInfo.BenchmarkDotNetVersion,
+                },
+                Host = HostEnvironmentInfo.ToPhd()
+            };
+            foreach (var benchmarkReport in Reports)
+                root.Add(benchmarkReport.ToPhd());
+            return root;
+        }
     }
 }

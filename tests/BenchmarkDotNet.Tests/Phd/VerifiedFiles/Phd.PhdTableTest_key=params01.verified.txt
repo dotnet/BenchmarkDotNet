@@ -1,0 +1,80 @@
+﻿| Method |  A |  B | Average |
+|:-------|---:|---:|--------:|
+| Foo    |  1 |  2 | 10.0 ms |
+| Bar    | 10 | 20 | 20.0 ms |
+
+{
+  "attributes": {
+    "meta": {
+      "table": {
+        "columnDefinitions": [
+          {
+            "selector": ".benchmark.method"
+          },
+          {
+            "selector": ".parameters.values"
+          },
+          {
+            "selector": "=average"
+          }
+        ]
+      }
+    }
+  },
+  "children": [
+    {
+      "attributes": {
+        "parameters": {
+          "values": {
+            "a": 1,
+            "b": 2
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Foo"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 10,
+              "unit": "ms"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "parameters": {
+          "values": {
+            "a": 10,
+            "b": 20
+          }
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "benchmark": {
+              "type": "Bench",
+              "method": "Bar"
+            }
+          },
+          "metrics": [
+            {
+              "iterationIndex": 0,
+              "value": 20,
+              "unit": "ms"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

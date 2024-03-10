@@ -8,12 +8,16 @@ using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 using Microsoft.Win32;
+using Perfolizer.Helpers;
+using Perfolizer.Phd;
+using Perfolizer.Phd.Dto;
 using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
@@ -28,7 +32,8 @@ namespace BenchmarkDotNet.Portability
         /// <summary>
         /// returns true for both the old (implementation of .NET Framework) and new Mono (.NET 6+ flavour)
         /// </summary>
-        public static bool IsMono { get; } = Type.GetType("Mono.RuntimeStructs") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
+        public static bool IsMono { get; } =
+            Type.GetType("Mono.RuntimeStructs") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
         public static bool IsOldMono { get; } = Type.GetType("Mono.Runtime") != null;
 
@@ -46,12 +51,12 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsNetCore
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-                && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
+               && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
         public static bool IsNativeAOT
             => Environment.Version.Major >= 5
-                && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
-                && !IsWasm; // Wasm also returns "" for assembly locations
+               && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
+               && !IsWasm; // Wasm also returns "" for assembly locations
 
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
@@ -87,170 +92,8 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
-        internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
-
-        internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
-
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
-#endif
-        internal static bool IsWindows() =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsWindows(); // prefer linker-friendly OperatingSystem APIs
-#else
-            IsOSPlatform(OSPlatform.Windows);
-#endif
-
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]
-#endif
-        internal static bool IsLinux() =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsLinux();
-#else
-            IsOSPlatform(OSPlatform.Linux);
-#endif
-
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("macos")]
-#endif
-        internal static bool IsMacOS() =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsMacOS();
-#else
-            IsOSPlatform(OSPlatform.OSX);
-#endif
-
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("android")]
-#endif
-        internal static bool IsAndroid() =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsAndroid();
-#else
-            Type.GetType("Java.Lang.Object, Mono.Android") != null;
-#endif
-
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("ios")]
-#endif
-        internal static bool IsIOS() =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsIOS();
-#else
-            Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
-#endif
-
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("tvos")]
-#endif
-        internal static bool IsTvOS() =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsTvOS();
-#else
-            IsOSPlatform(OSPlatform.Create("TVOS"));
-#endif
-
-        public static string GetOsVersion()
-        {
-            if (IsMacOS())
-            {
-                string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
-                string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
-                if (!string.IsNullOrEmpty(systemVersion) && !string.IsNullOrEmpty(kernelVersion))
-                    return OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion);
-            }
-
-            if (IsLinux())
-            {
-                string? version = GetLinuxOsVersion();
-                if (version != null && version.Trim() != "")
-                    return version;
-            }
-
-            string operatingSystem = RuntimeEnvironment.OperatingSystem;
-            string operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
-
-            return OsBrandStringHelper.Prettify(
-                operatingSystem,
-                operatingSystemVersion,
-                GetWindowsUbr());
-        }
-
-        private static string? GetLinuxOsVersion()
-        {
-            if (!IsLinux())
-                return null;
-            try
-            {
-                string version = LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
-                bool wsl = IsUnderWsl();
-                return wsl ? version + " WSL" : version;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static bool IsUnderWsl()
-        {
-            if (!IsLinux())
-                return false;
-            try
-            {
-                return File.Exists("/proc/sys/fs/binfmt_misc/WSLInterop"); // https://superuser.com/a/1749811
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        // TODO: Introduce a common util API for registry calls, use it also in BenchmarkDotNet.Toolchains.CsProj.GetCurrentVersionBasedOnWindowsRegistry
-        /// <summary>
-        /// On Windows, this method returns UBR (Update Build Revision) based on Registry.
-        /// Returns null if the value is not available
-        /// </summary>
-        /// <returns></returns>
-        private static int? GetWindowsUbr()
-        {
-            if (IsWindows())
-            {
-                try
-                {
-                    using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
-                    {
-                        if (ndpKey == null)
-                            return null;
-
-                        return Convert.ToInt32(ndpKey.GetValue("UBR"));
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-            return null;
-        }
-
-        internal static CpuInfo GetCpuInfo()
-        {
-            if (IsWindows() && IsFullFramework && !IsMono)
-                return MosCpuInfoProvider.MosCpuInfo.Value;
-            if (IsWindows())
-                return WmicCpuInfoProvider.WmicCpuInfo.Value;
-            if (IsLinux())
-                return ProcCpuInfoProvider.ProcCpuInfo.Value;
-            if (IsMacOS())
-                return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
-
-            return null;
-        }
 
         internal static string GetRuntimeVersion()
         {
@@ -315,7 +158,7 @@ namespace BenchmarkDotNet.Portability
 
         private static string GetNetCoreVersion()
         {
-            if (IsAndroid())
+            if (OsDetector.IsAndroid())
             {
                 return $".NET {Environment.Version}";
             }
@@ -423,7 +266,7 @@ namespace BenchmarkDotNet.Portability
             if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
                 return "RyuJIT";
             if (IsFullFramework)
-                return  "LegacyJIT";
+                return "LegacyJIT";
 
             return Unknown;
         }
@@ -476,7 +319,7 @@ namespace BenchmarkDotNet.Portability
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {
             var products = new List<Antivirus>();
-            if (IsWindows())
+            if (OsDetector.IsWindows())
             {
                 try
                 {
@@ -484,7 +327,7 @@ namespace BenchmarkDotNet.Portability
                     using (var data = wmi.Get())
                         foreach (var o in data)
                         {
-                            var av = (ManagementObject) o;
+                            var av = (ManagementObject)o;
                             if (av != null)
                             {
                                 string name = av["displayName"].ToString();
@@ -502,11 +345,11 @@ namespace BenchmarkDotNet.Portability
             return products;
         }
 
-        internal static VirtualMachineHypervisor GetVirtualMachineHypervisor()
+        internal static VirtualMachineHypervisor? GetVirtualMachineHypervisor()
         {
-            VirtualMachineHypervisor[] hypervisors = { HyperV.Default, VirtualBox.Default, VMware.Default };
+            VirtualMachineHypervisor[] hypervisors = [HyperV.Default, VirtualBox.Default, VMware.Default];
 
-            if (IsWindows())
+            if (OsDetector.IsWindows())
             {
                 try
                 {

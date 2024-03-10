@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
@@ -69,7 +70,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)", EnvRequirement.DotNetCoreOnly)]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            if (RuntimeInformation.IsMacOS())
+            if (OsDetector.IsMacOS())
                 return; // currently not supported
 
             MemoryDiagnoserIsAccurate(NativeAotToolchain.Net80);
