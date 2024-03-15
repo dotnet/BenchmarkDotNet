@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [StatisticalTestColumn("1us")]
+    [StatisticalTestColumn("500us")]
     [StatisticalTestColumn("3%")]
     [SimpleJob(warmupCount: 0, iterationCount: 5)]
     public class IntroStatisticalTesting

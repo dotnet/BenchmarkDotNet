@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Perfolizer;
+using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.QuantileEstimators;
@@ -45,7 +46,7 @@ namespace BenchmarkDotNet.Mathematics
         public Statistics(IEnumerable<int> values) :
             this(values.Select(value => (double)value)) { }
 
-        public Statistics(IEnumerable<double> values) : this(new Sample(values.ToArray())) { }
+        public Statistics(IEnumerable<double> values) : this(new Sample(values.ToArray(), TimeUnit.Nanosecond)) { }
 
         public Statistics(Sample sample)
         {

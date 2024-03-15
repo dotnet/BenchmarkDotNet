@@ -36,12 +36,12 @@ namespace BenchmarkDotNet.Columns
             Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
         {
             if (baseline.Sample.Values.SequenceEqual(current.Sample.Values))
-                return "Base";
+                return "Baseline";
             if (current.Sample.Size == 1 && baseline.Sample.Size == 1)
                 return "?";
 
-            var tost = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
-            var comparisonResult = tost.Perform(current.Sample, baseline.Sample, Threshold, SignificanceLevel);
+            var test = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
+            var comparisonResult = test.Perform(current.Sample, baseline.Sample, Threshold, SignificanceLevel);
             return comparisonResult switch
             {
                 ComparisonResult.Greater => "Slower",
@@ -55,7 +55,6 @@ namespace BenchmarkDotNet.Columns
         public override bool IsNumeric => false;
         public override UnitType UnitType => UnitType.Dimensionless;
 
-        public override string Legend =>
-            $"MannWhitney-based TOST equivalence test (threshold={Threshold}, alpha = {SignificanceLevel}";
+        public override string Legend => $"MannWhitney-based equivalence test (threshold={Threshold}, alpha = {SignificanceLevel})";
     }
 }
