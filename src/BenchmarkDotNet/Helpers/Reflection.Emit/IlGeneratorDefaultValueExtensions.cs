@@ -12,32 +12,19 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                 : null;
         }
 
-        public static void EmitSetLocalToDefault(this ILGenerator ilBuilder, LocalBuilder local)
-        {
-            var resultType = local.LocalType;
-            switch (resultType)
-            {
-                case Type t when t == typeof(void):
-                    break;
-                case Type t when t.IsClass || t.IsInterface:
-                    ilBuilder.Emit(OpCodes.Ldnull);
-                    ilBuilder.EmitStloc(local);
-                    break;
-                case Type t when t.UseInitObjForInitLocal():
-                    EmitInitObj(ilBuilder, resultType, local);
-                    break;
-                default:
-                    EmitLoadDefaultPrimitive(ilBuilder, resultType);
-                    ilBuilder.EmitStloc(local);
-                    break;
-            }
-        }
-
         public static void EmitReturnDefault(this ILGenerator ilBuilder, Type resultType, LocalBuilder optionalLocalForInitobj)
         {
             switch (resultType)
             {
                 case Type t when t == typeof(void):
+                    break;
+                case Type t when t.IsPointer: // Type.IsClass returns true for pointers, so we have to check for pointer type first.
+                    /*
+                        IL_0000: ldc.i4.0
+                        IL_0001: conv.u
+                     */
+                    ilBuilder.Emit(OpCodes.Ldc_I4_0);
+                    ilBuilder.Emit(OpCodes.Conv_U);
                     break;
                 case Type t when t.IsClass || t.IsInterface:
                     ilBuilder.Emit(OpCodes.Ldnull);
