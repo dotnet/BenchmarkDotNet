@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Tests.Columns
         public void NoDifferenceIfValuesAreTheSame(string threshold)
         {
             double[] values = Enumerable.Repeat(100.0, 20).ToArray();
-            Compare(threshold, values, values, "Base");
+            Compare(threshold, values, values, "Baseline");
         }
 
         [Theory]
