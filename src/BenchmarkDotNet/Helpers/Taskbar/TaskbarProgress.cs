@@ -7,7 +7,9 @@ namespace BenchmarkDotNet.Helpers
     {
         private static readonly bool OsVersionIsSupported = Portability.RuntimeInformation.IsWindows()
             // Must be windows 7 or greater
-            && Environment.OSVersion.Version >= new Version(6, 1);
+            && Environment.OSVersion.Version >= new Version(6, 1)
+            // Taskbar COM Object not avilable
+            && !Portability.RuntimeInformation.IsRunningInContainer;
 
         private IntPtr consoleWindowHandle = IntPtr.Zero;
         private IntPtr consoleHandle = IntPtr.Zero;
