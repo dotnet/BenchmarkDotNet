@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Code
                     (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
                      method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
             {
-                return $"() => {method.Name}().GetAwaiter().GetResult()";
+                return $"() => BenchmarkDotNet.Helpers.AwaitHelper.GetResult({method.Name}())";
             }
 
             return method.Name;
@@ -149,12 +149,10 @@ namespace BenchmarkDotNet.Code
     {
         public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
-        // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
+            => $"({passArguments}) => {{ BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
+        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
 
         protected override Type WorkloadMethodReturnType => typeof(void);
     }
@@ -168,11 +166,9 @@ namespace BenchmarkDotNet.Code
 
         protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
-        // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ return {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
+            => $"({passArguments}) => {{ return BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
+        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
     }
 }

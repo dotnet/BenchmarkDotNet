@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private void Overhead() { }
 
             // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
-            private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
+            private void ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
 
             [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             private void WorkloadActionUnroll(long repeatCount)
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+            private T ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
 
             private void InvokeSingleHardcoded() => result = callback();
 
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+            private T ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
 
             private void InvokeSingleHardcoded() => result = callback();
 
