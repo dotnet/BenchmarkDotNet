@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Engines
 
         [PublicAPI] public IHost Host { get; }
         [PublicAPI] public Action<long> WorkloadAction { get; }
+        [PublicAPI] public Action<long> WorkloadActionNoUnroll { get; }
         [PublicAPI] public Action Dummy1Action { get; }
         [PublicAPI] public Action Dummy2Action { get; }
         [PublicAPI] public Action Dummy3Action { get; }
@@ -44,19 +45,22 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
-        private readonly bool includeExtraStats;
         private readonly Random random;
+        private readonly bool includeExtraStats, includeSurvivedMemory;
+
+        private long? survivedBytes;
+        private bool survivedBytesMeasured;
 
         internal Engine(
             IHost host,
             IResolver resolver,
-            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Action<long> workloadActionNoUnroll, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, string benchmarkName)
+            bool includeExtraStats, bool includeSurvivedMemory, string benchmarkName)
         {
-
             Host = host;
             OverheadAction = overheadAction;
+            WorkloadActionNoUnroll = workloadActionNoUnroll;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
             Dummy3Action = dummy3Action;
@@ -69,6 +73,7 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeExtraStats = includeExtraStats;
             BenchmarkName = benchmarkName;
+            this.includeSurvivedMemory = includeSurvivedMemory;
 
             Resolver = resolver;
 
@@ -84,6 +89,14 @@ namespace BenchmarkDotNet.Engines
             actualStage = new EngineActualStage(this);
 
             random = new Random(12345); // we are using constant seed to try to get repeatable results
+        }
+
+        internal Engine WithInitialData(Engine other)
+        {
+            // Copy the survived bytes from the other engine so we only measure it once.
+            survivedBytes = other.survivedBytes;
+            survivedBytesMeasured = other.survivedBytesMeasured;
+            return this;
         }
 
         public void Dispose()
@@ -168,6 +181,17 @@ namespace BenchmarkDotNet.Engines
 
             Span<byte> stackMemory = randomizeMemory ? stackalloc byte[random.Next(32)] : Span<byte>.Empty;
 
+            bool needsSurvivedMeasurement = includeSurvivedMemory && !isOverhead && !survivedBytesMeasured;
+            if (needsSurvivedMeasurement && GcStats.InitTotalBytes())
+            {
+                // Measure survived bytes for only the first invocation.
+                survivedBytesMeasured = true;
+                long beforeBytes = GcStats.GetTotalBytes();
+                WorkloadActionNoUnroll(1);
+                long afterBytes = GcStats.GetTotalBytes();
+                survivedBytes = afterBytes - beforeBytes;
+            }
+
             // Measure
             var clock = Clock.Start();
             action(invokeCount / unrollFactor);
@@ -218,8 +242,8 @@ namespace BenchmarkDotNet.Engines
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
             var totalOperationsCount = data.InvokeCount * OperationsPerInvoke;
-            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(totalOperationsCount);
-            ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperationsAndSurvivedBytes(totalOperationsCount, survivedBytes);
+            ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(totalOperationsCount);
 
             return (gcStats, threadingStats, exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
         }
@@ -253,7 +277,7 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        private static void ForceGcCollect()
+        internal static void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();

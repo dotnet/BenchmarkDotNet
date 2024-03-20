@@ -72,6 +72,10 @@ namespace BenchmarkDotNet.Exporters.Csv
                 new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString(summary.GetCultureInfo())),
                 new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)?.ToString(summary.GetCultureInfo()) ?? MetricColumn.UnknownRepresentation)
             };
+            if (summary.BenchmarksCases.Any(benchmark => benchmark.Config.HasSurvivedMemoryDiagnoser()))
+            {
+                columns.Add(new MeasurementColumn("Survived_Bytes", (_, report, __) => report.GcStats.SurvivedBytes?.ToString(summary.GetCultureInfo()) ?? MetricColumn.UnknownRepresentation));
+            }
 
             return columns.ToArray();
         }
