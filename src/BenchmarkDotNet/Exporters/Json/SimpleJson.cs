@@ -69,6 +69,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using SimpleJson.Reflection;
+using System.IO;
 
 // ReSharper disable LoopCanBeConvertedToQuery
 // ReSharper disable RedundantExplicitArrayCreation
@@ -525,7 +526,7 @@ namespace SimpleJson
         static SimpleJson()
         {
             EscapeTable = new char[93];
-            EscapeTable['"']  = '"';
+            EscapeTable['"'] = '"';
             EscapeTable['\\'] = '\\';
             EscapeTable['\b'] = 'b';
             EscapeTable['\f'] = 'f';
@@ -559,7 +560,7 @@ namespace SimpleJson
         /// <returns>
         /// Returns true if successful otherwise false.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Need to support .NET 2")]
         public static bool TryDeserializeObject(string json, out object obj)
         {
             bool success = true;
@@ -611,6 +612,41 @@ namespace SimpleJson
             ResetIndentationText();
             return (success ? builder.ToString() : null);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="json"></param>
+        /// <param name="jsonSerializerStrategy"></param>
+        /// <returns></returns>
+        public static bool SerializeObject(StringBuilder builder, object json, IJsonSerializerStrategy jsonSerializerStrategy = null)
+        {
+            if (jsonSerializerStrategy == null)
+            {
+                jsonSerializerStrategy = CurrentJsonSerializerStrategy;
+            }
+            bool success = SerializeValue(jsonSerializerStrategy, json, builder);
+            ResetIndentationText();
+            return success;
+        }
+
+        /// <summary>
+        /// Converts a IDictionary&lt;string,object> / IList&lt;object> object into a JSON string
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="json"></param>
+        /// <param name="jsonSerializerStrategy"></param>
+        /// <returns></returns>
+        public static bool SerializeObject(TextWriter writer, object json, IJsonSerializerStrategy jsonSerializerStrategy = null)
+        {
+            if (jsonSerializerStrategy == null)
+            {
+                jsonSerializerStrategy = CurrentJsonSerializerStrategy;
+            }
+            bool success = SerializeValue(jsonSerializerStrategy, json, writer);
+            ResetIndentationText();
+            return success;
+        }
 
         public static string SerializeObject(object json)
         {
@@ -625,7 +661,7 @@ namespace SimpleJson
             StringBuilder sb = new StringBuilder();
             char c;
 
-            for (int i = 0; i < jsonString.Length; )
+            for (int i = 0; i < jsonString.Length;)
             {
                 c = jsonString[i++];
 
@@ -1008,6 +1044,50 @@ namespace SimpleJson
             return TOKEN_NONE;
         }
 
+        static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, TextWriter builder)
+        {
+            bool success = true;
+            string stringValue = value as string;
+            if (stringValue != null)
+                success = SerializeString(stringValue, builder);
+            else
+            {
+                IDictionary<string, object> dict = value as IDictionary<string, object>;
+                if (dict != null)
+                {
+                    success = SerializeObject(jsonSerializerStrategy, dict.Keys, dict.Values, builder);
+                }
+                else
+                {
+                    IDictionary<string, string> stringDictionary = value as IDictionary<string, string>;
+                    if (stringDictionary != null)
+                    {
+                        success = SerializeObject(jsonSerializerStrategy, stringDictionary.Keys, stringDictionary.Values, builder);
+                    }
+                    else
+                    {
+                        IEnumerable enumerableValue = value as IEnumerable;
+                        if (enumerableValue != null)
+                            success = SerializeArray(jsonSerializerStrategy, enumerableValue, builder);
+                        else if (IsNumeric(value))
+                            success = SerializeNumber(value, builder);
+                        else if (value is bool)
+                            builder.Write((bool)value ? "true" : "false");
+                        else if (value == null)
+                            builder.Write("null");
+                        else
+                        {
+                            object serializedObject;
+                            success = jsonSerializerStrategy.TrySerializeNonPrimitiveObject(value, out serializedObject);
+                            if (success)
+                                SerializeValue(jsonSerializerStrategy, serializedObject, builder);
+                        }
+                    }
+                }
+            }
+            return success;
+        }
+
         static bool SerializeValue(IJsonSerializerStrategy jsonSerializerStrategy, object value, StringBuilder builder)
         {
             bool success = true;
@@ -1094,6 +1174,48 @@ namespace SimpleJson
             return true;
         }
 
+        static bool SerializeObject(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable keys, IEnumerable values, TextWriter builder)
+        {
+            builder.Write('{');
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(+1);
+                builder.Write(indentationText);
+            }
+            IEnumerator ke = keys.GetEnumerator();
+            IEnumerator ve = values.GetEnumerator();
+            bool first = true;
+            while (ke.MoveNext() && ve.MoveNext())
+            {
+                object key = ke.Current;
+                object value = ve.Current;
+                if (!first)
+                {
+                    builder.Write(',');
+                    if (jsonSerializerStrategy.Indent)
+                    {
+                        builder.Write(indentationText);
+                    }
+                }
+                string stringKey = key as string;
+                if (stringKey != null)
+                    SerializeString(stringKey, builder);
+                else
+                    if (!SerializeValue(jsonSerializerStrategy, value, builder)) return false;
+                builder.Write(':');
+                if (!SerializeValue(jsonSerializerStrategy, value, builder))
+                    return false;
+                first = false;
+            }
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(-1);
+                builder.Write(indentationText);
+            }
+            builder.Write('}');
+            return true;
+        }
+
         static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, StringBuilder builder)
         {
             builder.Append("[");
@@ -1117,6 +1239,81 @@ namespace SimpleJson
                 builder.Append(indentationText);
             }
             builder.Append("]");
+            return true;
+        }
+
+        static bool SerializeArray(IJsonSerializerStrategy jsonSerializerStrategy, IEnumerable anArray, TextWriter builder)
+        {
+            builder.Write('[');
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(+1);
+                builder.Write(indentationText);
+            }
+            bool first = true;
+            foreach (object value in anArray)
+            {
+                if (!first)
+                    builder.Write(',');
+                if (!SerializeValue(jsonSerializerStrategy, value, builder))
+                    return false;
+                first = false;
+            }
+            if (jsonSerializerStrategy.Indent)
+            {
+                HandleIndent(-1);
+                builder.Write(indentationText);
+            }
+            builder.Write(']');
+            return true;
+        }
+
+        static bool SerializeString(string aString, TextWriter builder)
+        {
+            // Happy path if there's nothing to be escaped. IndexOfAny is highly optimized (and unmanaged)
+            if (aString.IndexOfAny(EscapeCharacters) == -1)
+            {
+                builder.Write('"');
+                builder.Write(aString);
+                builder.Write('"');
+
+                return true;
+            }
+
+            builder.Write('"');
+            int safeCharacterCount = 0;
+            char[] charArray = aString.ToCharArray();
+
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                char c = charArray[i];
+
+                // Non ascii characters are fine, buffer them up and send them to the builder
+                // in larger chunks if possible. The escape table is a 1:1 translation table
+                // with \0 [default(char)] denoting a safe character.
+                if (c >= EscapeTable.Length || EscapeTable[c] == default(char))
+                {
+                    safeCharacterCount++;
+                }
+                else
+                {
+                    if (safeCharacterCount > 0)
+                    {
+                        builder.Write(charArray, i - safeCharacterCount, safeCharacterCount);
+                        safeCharacterCount = 0;
+                    }
+
+                    builder.Write('\\');
+                    builder.Write(EscapeTable[c]);
+                }
+            }
+
+            if (safeCharacterCount > 0)
+            {
+                builder.Write(charArray, charArray.Length - safeCharacterCount, safeCharacterCount);
+            }
+
+            builder.Write('"');
             return true;
         }
 
@@ -1199,8 +1396,43 @@ namespace SimpleJson
                         break;
                 }
             }
-           
+
             builder.Append(value);
+            return true;
+        }
+
+        static bool SerializeNumber(object number, TextWriter builder)
+        {
+            object value = ReplaceUnsupportedNumericValues(number);
+            if (!value.Equals(JSON_EMPTY_STRING))
+            {
+                switch (value)
+                {
+                    case long num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case ulong num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case int num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case uint num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case decimal num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case float num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    default:
+                        value = Convert.ToDouble(value, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture);
+                        break;
+                }
+            }
+
+            builder.Write(value);
             return true;
         }
 
@@ -1300,7 +1532,7 @@ namespace SimpleJson
 
 #endif
     }
-    
+
     [GeneratedCode("simple-json", "1.0.0")]
 #if SIMPLE_JSON_INTERNAL
     internal
@@ -1309,7 +1541,7 @@ namespace SimpleJson
 #endif
  interface IJsonSerializerStrategy
     {
-        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Need to support .NET 2")]
         bool TrySerializeNonPrimitiveObject(object input, out object output);
         object DeserializeObject(object value, Type type);
         bool Indent { get; set; }
@@ -1411,12 +1643,12 @@ namespace SimpleJson
             if (type == null) throw new ArgumentNullException("type");
             string str = value as string;
 
-            if (type == typeof (Guid) && string.IsNullOrEmpty(str))
+            if (type == typeof(Guid) && string.IsNullOrEmpty(str))
                 return default(Guid);
 
             if (value == null)
                 return null;
-            
+
             object obj = null;
 
             if (str != null)
@@ -1431,19 +1663,19 @@ namespace SimpleJson
                         return new Guid(str);
                     if (type == typeof(Uri))
                     {
-                        bool isValid =  Uri.IsWellFormedUriString(str, UriKind.RelativeOrAbsolute);
+                        bool isValid = Uri.IsWellFormedUriString(str, UriKind.RelativeOrAbsolute);
 
                         Uri result;
                         if (isValid && Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out result))
                             return result;
 
-												return null;
+                        return null;
                     }
-                  
-									if (type == typeof(string))  
-										return str;
 
-									return Convert.ChangeType(str, type, CultureInfo.InvariantCulture);
+                    if (type == typeof(string))
+                        return str;
+
+                    return Convert.ChangeType(str, type, CultureInfo.InvariantCulture);
                 }
                 else
                 {
@@ -1460,7 +1692,7 @@ namespace SimpleJson
             }
             else if (value is bool)
                 return value;
-            
+
             bool valueIsLong = value is long;
             bool valueIsDouble = value is double;
             if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)))
@@ -1550,7 +1782,7 @@ namespace SimpleJson
             return Convert.ToDouble(p, CultureInfo.InvariantCulture);
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Need to support .NET 2")]
         protected virtual bool TrySerializeKnownTypes(object input, out object output)
         {
             bool returnValue = true;
@@ -1575,7 +1807,7 @@ namespace SimpleJson
             }
             return returnValue;
         }
-        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
+        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Need to support .NET 2")]
         protected virtual bool TrySerializeUnknownTypes(object input, out object output)
         {
             if (input == null) throw new ArgumentNullException("input");
@@ -1583,12 +1815,29 @@ namespace SimpleJson
             Type type = input.GetType();
             if (type.FullName == null)
                 return false;
+            if (typeof(Type).IsAssignableFrom(type))
+            {
+                return false;
+            }
             IDictionary<string, object> obj = new JsonObject();
             IDictionary<string, ReflectionUtils.GetDelegate> getters = GetCache[type];
             foreach (KeyValuePair<string, ReflectionUtils.GetDelegate> getter in getters)
             {
-                if (getter.Value != null)
-                    obj.Add(MapClrMemberNameToJsonFieldName(getter.Key), getter.Value(input));
+                if (getter.Key == "DeclaringMethod")
+                {
+                    continue;
+                }
+                else if (getter.Value != null)
+                {
+                    try
+                    {
+                        obj.Add(MapClrMemberNameToJsonFieldName(getter.Key), getter.Value(input));
+                    }
+                    catch
+                    {
+
+                    }
+                }
             }
             output = obj;
             return true;
@@ -1677,7 +1926,7 @@ namespace SimpleJson
     namespace Reflection
     {
         // This class is meant to be copied into other libraries. So we want to exclude it from Code Analysis rules
- 	    // that might be in place in the target project.
+        // that might be in place in the target project.
         [GeneratedCode("reflection-utils", "1.0.0")]
 #if SIMPLE_JSON_REFLECTION_UTILS_PUBLIC
         public
@@ -1730,7 +1979,7 @@ namespace SimpleJson
                 foreach (Type implementedInterface in interfaces)
                 {
                     if (IsTypeGeneric(implementedInterface) &&
-                        implementedInterface.GetGenericTypeDefinition() == typeof (IList<>))
+                        implementedInterface.GetGenericTypeDefinition() == typeof(IList<>))
                     {
                         return GetGenericTypeArguments(implementedInterface)[0];
                     }
@@ -1913,7 +2162,7 @@ namespace SimpleJson
 
             public static ConstructorDelegate GetConstructorByReflection(ConstructorInfo constructorInfo)
             {
-                return delegate(object[] args) { return constructorInfo.Invoke(args); };
+                return delegate (object[] args) { return constructorInfo.Invoke(args); };
             }
 
             public static ConstructorDelegate GetConstructorByReflection(Type type, params Type[] argsType)
@@ -1940,7 +2189,7 @@ namespace SimpleJson
                 NewExpression newExp = Expression.New(constructorInfo, argsExp);
                 Expression<Func<object[], object>> lambda = Expression.Lambda<Func<object[], object>>(newExp, param);
                 Func<object[], object> compiledLambda = lambda.Compile();
-                return delegate(object[] args) { return compiledLambda(args); };
+                return delegate (object[] args) { return compiledLambda(args); };
             }
 
             public static ConstructorDelegate GetConstructorByExpression(Type type, params Type[] argsType)
@@ -1972,12 +2221,12 @@ namespace SimpleJson
             public static GetDelegate GetGetMethodByReflection(PropertyInfo propertyInfo)
             {
                 MethodInfo methodInfo = GetGetterMethodInfo(propertyInfo);
-                return delegate(object source) { return methodInfo.Invoke(source, EmptyObjects); };
+                return delegate (object source) { return methodInfo.Invoke(source, EmptyObjects); };
             }
 
             public static GetDelegate GetGetMethodByReflection(FieldInfo fieldInfo)
             {
-                return delegate(object source) { return fieldInfo.GetValue(source); };
+                return delegate (object source) { return fieldInfo.GetValue(source); };
             }
 
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
@@ -1988,7 +2237,7 @@ namespace SimpleJson
                 ParameterExpression instance = Expression.Parameter(typeof(object), "instance");
                 UnaryExpression instanceCast = (!IsValueType(propertyInfo.DeclaringType)) ? Expression.TypeAs(instance, propertyInfo.DeclaringType) : Expression.Convert(instance, propertyInfo.DeclaringType);
                 Func<object, object> compiled = Expression.Lambda<Func<object, object>>(Expression.TypeAs(Expression.Call(instanceCast, getMethodInfo), typeof(object)), instance).Compile();
-                return delegate(object source) { return compiled(source); };
+                return delegate (object source) { return compiled(source); };
             }
 
             public static GetDelegate GetGetMethodByExpression(FieldInfo fieldInfo)
@@ -1996,7 +2245,7 @@ namespace SimpleJson
                 ParameterExpression instance = Expression.Parameter(typeof(object), "instance");
                 MemberExpression member = Expression.Field(Expression.Convert(instance, fieldInfo.DeclaringType), fieldInfo);
                 GetDelegate compiled = Expression.Lambda<GetDelegate>(Expression.Convert(member, typeof(object)), instance).Compile();
-                return delegate(object source) { return compiled(source); };
+                return delegate (object source) { return compiled(source); };
             }
 
 #endif
@@ -2022,12 +2271,12 @@ namespace SimpleJson
             public static SetDelegate GetSetMethodByReflection(PropertyInfo propertyInfo)
             {
                 MethodInfo methodInfo = GetSetterMethodInfo(propertyInfo);
-                return delegate(object source, object value) { methodInfo.Invoke(source, new object[] { value }); };
+                return delegate (object source, object value) { methodInfo.Invoke(source, new object[] { value }); };
             }
 
             public static SetDelegate GetSetMethodByReflection(FieldInfo fieldInfo)
             {
-                return delegate(object source, object value) { fieldInfo.SetValue(source, value); };
+                return delegate (object source, object value) { fieldInfo.SetValue(source, value); };
             }
 
 #if !SIMPLE_JSON_NO_LINQ_EXPRESSION
@@ -2040,7 +2289,7 @@ namespace SimpleJson
                 UnaryExpression instanceCast = (!IsValueType(propertyInfo.DeclaringType)) ? Expression.TypeAs(instance, propertyInfo.DeclaringType) : Expression.Convert(instance, propertyInfo.DeclaringType);
                 UnaryExpression valueCast = (!IsValueType(propertyInfo.PropertyType)) ? Expression.TypeAs(value, propertyInfo.PropertyType) : Expression.Convert(value, propertyInfo.PropertyType);
                 Action<object, object> compiled = Expression.Lambda<Action<object, object>>(Expression.Call(instanceCast, setMethodInfo, valueCast), new ParameterExpression[] { instance, value }).Compile();
-                return delegate(object source, object val) { compiled(source, val); };
+                return delegate (object source, object val) { compiled(source, val); };
             }
 
             public static SetDelegate GetSetMethodByExpression(FieldInfo fieldInfo)
@@ -2049,7 +2298,7 @@ namespace SimpleJson
                 ParameterExpression value = Expression.Parameter(typeof(object), "value");
                 Action<object, object> compiled = Expression.Lambda<Action<object, object>>(
                     Assign(Expression.Field(Expression.Convert(instance, fieldInfo.DeclaringType), fieldInfo), Expression.Convert(value, fieldInfo.FieldType)), instance, value).Compile();
-                return delegate(object source, object val) { compiled(source, val); };
+                return delegate (object source, object val) { compiled(source, val); };
             }
 
             public static BinaryExpression Assign(Expression left, Expression right)

@@ -17,6 +17,7 @@ using BenchmarkDotNet.Properties;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ManualRunning,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.TestAdapter,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Snapshot,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 #else
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Tests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
@@ -25,4 +26,5 @@ using BenchmarkDotNet.Properties;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ManualRunning")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.TestAdapter")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.Snapshot")]
 #endif
