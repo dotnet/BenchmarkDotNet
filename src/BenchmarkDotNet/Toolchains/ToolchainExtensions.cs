@@ -36,7 +36,12 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case ClrRuntime clrRuntime:
                     if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework
-                        && RuntimeInformation.GetCurrentRuntime().MsBuildMoniker == runtime.MsBuildMoniker)
+                        && RuntimeInformation.GetCurrentRuntime().MsBuildMoniker == runtime.MsBuildMoniker
+                        // If dotnet SDK is installed, we use CsProjClassicNetToolchain.
+                        && (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled()
+                            // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
+                            // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
+                            || XUnitHelper.IsIntegrationTest.Value))
                     {
                         return RoslynToolchain.Instance;
                     }
