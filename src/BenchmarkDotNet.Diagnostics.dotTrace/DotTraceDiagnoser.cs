@@ -124,11 +124,6 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 case RuntimeMoniker.NetCoreApp50:
 #pragma warning restore CS0618 // Type or member is obsolete
                     return false;
-                case RuntimeMoniker.NetCoreApp20:
-                case RuntimeMoniker.NetCoreApp21:
-                case RuntimeMoniker.NetCoreApp22:
-                    return RuntimeInformation.IsWindows();
-                case RuntimeMoniker.NetCoreApp30:
                 case RuntimeMoniker.NetCoreApp31:
                     return RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux();
                 default:

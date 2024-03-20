@@ -15,9 +15,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjCoreToolchain : Toolchain, IEquatable<CsProjCoreToolchain>
     {
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp22 = From(NetCoreAppSettings.NetCoreApp22);
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp30 = From(NetCoreAppSettings.NetCoreApp30);
         [PublicAPI] public static readonly IToolchain NetCoreApp31 = From(NetCoreAppSettings.NetCoreApp31);
         [PublicAPI] public static readonly IToolchain NetCoreApp50 = From(NetCoreAppSettings.NetCoreApp50);

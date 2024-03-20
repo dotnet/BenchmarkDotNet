@@ -403,7 +403,7 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public static void MutatorAppliedToOtherJobOverwritesOnlyTheConfiguredSettings()
         {
-            var jobBefore = Job.Default.WithRuntime(CoreRuntime.Core30); // this is a default job with Runtime set to Core
+            var jobBefore = Job.Default.WithRuntime(CoreRuntime.Core80); // this is a default job with Runtime set to Core
             var copy = jobBefore.UnfreezeCopy();
 
             Assert.False(copy.HasValue(RunMode.MaxIterationCountCharacteristic));

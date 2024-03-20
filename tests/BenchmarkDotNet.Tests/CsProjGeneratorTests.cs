@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests
 
         [Theory]
         [InlineData("net471", false)]
-        [InlineData("netcoreapp3.0", true)]
+        [InlineData("netcoreapp3.1", true)]
         public void ItsPossibleToCustomizeProjectSdkBasedOnProjectSdkFromTheProjectFile(string targetFrameworkMoniker, bool isNetCore)
         {
             const string withCustomProjectSdk = @"
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Tests
         {
             const string withCustomProjectImport = @"
 <Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.0'""/>
+  <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.1'""/>
 </Project>
 ";
             AssertParsedSdkName(withCustomProjectImport, "net471", "Microsoft.NET.Sdk", false);
@@ -52,10 +52,10 @@ namespace BenchmarkDotNet.Tests
         {
             const string withCustomProjectImport = @"
 <Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.0'""/>
+  <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.1'""/>
 </Project>
 ";
-            AssertParsedSdkName(withCustomProjectImport, "netcoreapp3.0", "Microsoft.NET.Sdk.WindowsDesktop", true);
+            AssertParsedSdkName(withCustomProjectImport, "netcoreapp3.1", "Microsoft.NET.Sdk.WindowsDesktop", true);
         }
 
         [AssertionMethod]
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(withUseWpfTrue);
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Tests
   <Import Project=""{propsFilePath}"" />
 </Project>";
 
-            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(importingAbsolutePath);
@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.Tests
   <Import Project="".{Path.DirectorySeparatorChar}test.props"" />
 </Project>";
 
-            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(importingRelativePath);
@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Tests
 {runtimeHostConfigurationOptionChunk}
 </Project>";
 
-            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(source);
@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Tests
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999) };
-            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null, true);
+            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", null, null, null, true);
             string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
             string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
@@ -210,7 +210,7 @@ namespace BenchmarkDotNet.Tests
             var target = new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) };
-            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null, true);
+            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", null, null, null, true);
             var buildPartition = new BuildPartition(benchmarks, new Resolver());
             string binariesPath = projectGenerator.ResolvePathForBinaries(buildPartition, programName);
 
