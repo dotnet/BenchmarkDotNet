@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Running
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
                 eventProcessor.OnStartBuildStage(buildPartitions);
-                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor);
+                var buildResults = Build(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor);
 
                 var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
 
@@ -370,52 +370,24 @@ namespace BenchmarkDotNet.Running
             return validationErrors.ToImmutableArray();
         }
 
-        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
+        private static Dictionary<BuildPartition, BuildResult> Build(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
-            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
+            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s): Start   *****");
 
-            var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
-
-            var beforeParallelBuild = globalChronometer.GetElapsed();
+            var beforeBuild = globalChronometer.GetElapsed();
 
             var buildResults = buildPartitions
-                .AsParallel()
-                .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
-                .AsSequential() // Ensure that build completion events are processed sequentially
-                .Select(build =>
+                .Select(buildPartition =>
                 {
-                    // If the generation was successful, but the build was not, we will try building sequentially
-                    // so don't send the OnBuildComplete event yet.
-                    if (buildPartitions.Length <= 1 || !build.Result.IsGenerateSuccess || build.Result.IsBuildSuccess)
-                        eventProcessor.OnBuildComplete(build.Partition, build.Result);
-
-                    return build;
+                    var buildResult = Build(buildPartition, rootArtifactsFolderPath, logger);
+                    eventProcessor.OnBuildComplete(buildPartition, buildResult);
+                    return (buildPartition, buildResult);
                 })
-                .ToDictionary(build => build.Partition, build => build.Result);
+                .ToDictionary(result => result.buildPartition, result => result.buildResult);
 
-            var afterParallelBuild = globalChronometer.GetElapsed();
+            var afterBuild = globalChronometer.GetElapsed();
 
-            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeParallelBuild, afterParallelBuild)}   *****");
-
-            if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
-                return buildResults;
-
-            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
-
-            foreach (var buildPartition in buildPartitions)
-            {
-                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
-                {
-                    if (!buildResults[buildPartition].TryToExplainFailureReason(out string _))
-                        buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
-
-                    eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
-                }
-            }
-
-            var afterSequentialBuild = globalChronometer.GetElapsed();
-
-            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)}   *****");
+            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeBuild, afterBuild)}   *****");
 
             return buildResults;
 
