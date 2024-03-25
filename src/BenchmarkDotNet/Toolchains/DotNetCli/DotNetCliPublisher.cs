@@ -25,14 +25,34 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private IReadOnlyList<EnvironmentVariable>? EnvironmentVariables { get; }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-            => new DotNetCliCommand(
-                    CustomDotNetCliPath,
-                    ExtraArguments,
-                    generateResult,
-                    logger,
-                    buildPartition,
-                    EnvironmentVariables,
-                    buildPartition.Timeout)
+        {
+            var cliCommand = new DotNetCliCommand(
+                generateResult.ArtifactsPaths.BuildForReferencesProjectFilePath,
+                CustomDotNetCliPath,
+                ExtraArguments,
+                generateResult,
+                logger,
+                buildPartition,
+                EnvironmentVariables,
+                buildPartition.Timeout);
+
+            // We build the original project first to obtain all dlls.
+            var buildResult = cliCommand.RestoreThenBuild();
+
+            if (!buildResult.IsBuildSuccess)
+                return buildResult;
+
+            // After the dlls are built, we gather the assembly references, then build the benchmark project.
+            DotNetCliBuilder.GatherReferences(generateResult.ArtifactsPaths);
+            buildResult = cliCommand.WithCsProjPath(generateResult.ArtifactsPaths.ProjectFilePath)
                 .RestoreThenBuildThenPublish();
+
+            if (buildResult.IsBuildSuccess &&
+                buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
+            {
+                LargeAddressAware.SetLargeAddressAware(generateResult.ArtifactsPaths.ExecutablePath);
+            }
+            return buildResult;
+        }
     }
 }

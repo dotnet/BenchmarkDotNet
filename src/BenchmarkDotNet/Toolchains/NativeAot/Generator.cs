@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -72,8 +73,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, extraArguments)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.BuildForReferencesProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.BuildForReferencesProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -110,6 +113,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
+            var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(projectFile.FullName);
+            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+
+            GenerateBuildForReferencesProject(buildPartition, artifactsPaths, projectFile.FullName, customProperties, sdkName);
+
             File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger));
             GenerateReflectionFile(artifactsPaths);
         }

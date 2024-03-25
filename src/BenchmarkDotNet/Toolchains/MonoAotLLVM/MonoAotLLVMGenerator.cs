@@ -35,6 +35,8 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
+            GenerateBuildForReferencesProject(buildPartition, artifactsPaths, projectFile.FullName, customProperties, sdkName);
+
             string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
