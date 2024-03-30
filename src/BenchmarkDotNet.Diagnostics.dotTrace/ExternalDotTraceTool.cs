@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
             }
 
             if (!attachWaitingTask.Task.Wait(AttachTimeout))
-                throw new Exception($"Failed to attach dotTrace to the target process (timeout: {AttachTimeout.TotalSeconds} sec");
+                throw new Exception($"Failed to attach dotTrace to the target process (timeout: {AttachTimeout.TotalSeconds} sec)");
             if (!attachWaitingTask.Task.Result)
                 throw new Exception($"Failed to attach dotTrace to the target process (ExitCode={process.ExitCode})");
         }

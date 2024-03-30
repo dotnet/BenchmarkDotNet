@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj" />
