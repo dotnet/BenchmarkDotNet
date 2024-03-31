@@ -46,17 +46,26 @@ namespace BenchmarkDotNet.IntegrationTests
             Output.WriteLine("Snapshots:");
             foreach (string snapshot in snapshots)
                 Output.WriteLine("* " + snapshot);
-            Assert.Equal(2, snapshots.Count);
+            Assert.Equal(4, snapshots.Count);
         }
 
         [DotMemoryDiagnoser]
         public class Benchmarks
         {
             [Benchmark]
-            public int Foo()
+            public int Foo0()
             {
                 var list = new List<object>();
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 1000; i++)
+                    list.Add(new object());
+                return list.Count;
+            }
+
+            [Benchmark]
+            public int Foo1()
+            {
+                var list = new List<object>();
+                for (int i = 0; i < 1000; i++)
                     list.Add(new object());
                 return list.Count;
             }

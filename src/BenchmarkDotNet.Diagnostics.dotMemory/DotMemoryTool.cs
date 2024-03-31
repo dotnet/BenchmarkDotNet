@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using BenchmarkDotNet.Diagnosers;
@@ -8,14 +9,14 @@ using JetBrains.Profiler.SelfApi;
 
 namespace BenchmarkDotNet.Diagnostics.dotMemory
 {
-    internal abstract class DotMemoryToolBase
+    internal sealed class DotMemoryTool
     {
         private readonly ILogger logger;
         private readonly Uri? nugetUrl;
         private readonly NuGetApi nugetApi;
         private readonly string? downloadTo;
 
-        protected DotMemoryToolBase(ILogger logger, Uri? nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string? downloadTo = null)
+        public DotMemoryTool(ILogger logger, Uri? nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string? downloadTo = null)
         {
             this.logger = logger;
             this.nugetUrl = nugetUrl;
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             this.downloadTo = downloadTo;
         }
 
-        public void Init(DiagnoserActionParameters parameters)
+        public void Init()
         {
             try
             {
@@ -38,10 +39,6 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
                 logger.WriteLineError(e.ToString());
             }
         }
-
-        protected abstract void Attach(DiagnoserActionParameters parameters, string snapshotFile);
-        protected abstract void Snapshot(DiagnoserActionParameters parameters);
-        protected abstract void Detach();
 
         public string Start(DiagnoserActionParameters parameters)
         {
@@ -76,12 +73,12 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             return snapshotFile;
         }
 
-        public void Stop(DiagnoserActionParameters parameters)
+        public void Stop()
         {
             try
             {
                 logger.WriteLineInfo("Taking dotMemory snapshot...");
-                Snapshot(parameters);
+                Snapshot();
                 logger.WriteLineInfo("dotMemory snapshot is successfully taken");
             }
             catch (Exception e)
@@ -101,7 +98,24 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             }
         }
 
-        protected string GetRunnerPath()
+        private void Attach(DiagnoserActionParameters parameters, string snapshotFile)
+        {
+            var config = new DotMemory.Config();
+
+            var pid = parameters.Process.Id;
+            var currentPid = Process.GetCurrentProcess().Id;
+            if (pid != currentPid)
+                config = config.ProfileExternalProcess(pid);
+
+            config = config.SaveToFile(snapshotFile);
+            DotMemory.Attach(config);
+        }
+
+        private void Snapshot() => DotMemory.GetSnapshot();
+
+        private void Detach() => DotMemory.Detach();
+
+        private string GetRunnerPath()
         {
             var consoleRunnerPackageField = typeof(DotMemory).GetField("ConsoleRunnerPackage", BindingFlags.NonPublic | BindingFlags.Static);
             if (consoleRunnerPackageField == null)

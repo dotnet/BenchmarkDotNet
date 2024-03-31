@@ -11,7 +11,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Validators;
 using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
@@ -22,7 +21,7 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
         private readonly Uri? nugetUrl;
         private readonly string? toolsDownloadFolder;
 
-        private DotMemoryToolBase? tool;
+        private DotMemoryTool? tool;
 
         public DotMemoryDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
         {
@@ -44,13 +43,6 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
         {
             var logger = parameters.Config.GetCompositeLogger();
             var job = parameters.BenchmarkCase.Job;
-            bool isInProcess = job.GetToolchain().IsInProcess;
-            if (tool is null || (isInProcess ? tool is ExternalDotMemoryTool : tool is InProcessDotMemoryTool))
-            {
-                tool = isInProcess
-                    ? new InProcessDotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder)
-                    : new ExternalDotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
-            }
 
             var runtimeMoniker = job.Environment.GetRuntime().RuntimeMoniker;
             if (!IsSupported(runtimeMoniker))
@@ -62,13 +54,21 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             switch (signal)
             {
                 case HostSignal.BeforeAnythingElse:
-                    tool.Init(parameters);
+                    if (tool is not null)
+                        throw new InvalidOperationException("DotMemory tool is already initialized");
+                    tool = new DotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
+                    tool.Init();
                     break;
                 case HostSignal.BeforeActualRun:
+                    if (tool is null)
+                        throw new InvalidOperationException("DotMemory tool is not initialized");
                     snapshotFilePaths.Add(tool.Start(parameters));
                     break;
                 case HostSignal.AfterActualRun:
-                    tool.Stop(parameters);
+                    if (tool is null)
+                        throw new InvalidOperationException("DotMemory tool is not initialized");
+                    tool.Stop();
+                    tool = null;
                     break;
             }
         }
