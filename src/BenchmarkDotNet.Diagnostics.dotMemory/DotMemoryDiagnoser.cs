@@ -44,10 +44,10 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
         {
             var logger = parameters.Config.GetCompositeLogger();
             var job = parameters.BenchmarkCase.Job;
-            if (tool is null)
+            bool isInProcess = job.GetToolchain().IsInProcess;
+            if (tool is null || (isInProcess ? tool is ExternalDotMemoryTool : tool is InProcessDotMemoryTool))
             {
-                bool isInProcess = job.GetToolchain().IsInProcess;
-                tool ??= isInProcess
+                tool = isInProcess
                     ? new InProcessDotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder)
                     : new ExternalDotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
             }
