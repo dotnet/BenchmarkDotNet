@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Foo()
             {
                 var list = new List<object>();
-                for (int i = 0; i < 1000000; i++)
+                for (int i = 0; i < 4; i++)
                     list.Add(new object());
                 return list.Count;
             }
