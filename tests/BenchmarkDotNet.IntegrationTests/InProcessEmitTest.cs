@@ -154,6 +154,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
+            public async ValueTask InvokeOnceValueTaskAsync()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [Benchmark]
             public string InvokeOnceRefType()
             {
                 Interlocked.Increment(ref Counter);
@@ -190,6 +197,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public static async Task InvokeOnceStaticTaskAsync()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [Benchmark]
+            public static async ValueTask InvokeOnceStaticValueTaskAsync()
             {
                 await Task.Yield();
                 Interlocked.Increment(ref Counter);
