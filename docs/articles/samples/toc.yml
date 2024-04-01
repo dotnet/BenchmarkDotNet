@@ -38,6 +38,8 @@
   href: IntroDisassemblyRyuJit.md
 - name: IntroDotTraceDiagnoser
   href: IntroDotTraceDiagnoser.md
+- name: IntroDotMemoryDiagnoser
+  href: IntroDotMemoryDiagnoser.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
 - name: IntroEventPipeProfiler
