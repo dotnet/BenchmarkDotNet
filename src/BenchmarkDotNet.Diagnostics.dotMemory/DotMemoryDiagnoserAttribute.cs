@@ -13,9 +13,10 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotMemoryDiagnoser());
         }
 
-        public DotMemoryDiagnoserAttribute(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
+        public DotMemoryDiagnoserAttribute(string? nugetUrl = null, string? toolsDownloadFolder = null)
         {
-            Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotMemoryDiagnoser(nugetUrl, toolsDownloadFolder));
+            var nugetUri = nugetUrl == null ? null : new Uri(nugetUrl);
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotMemoryDiagnoser(nugetUri, toolsDownloadFolder));
         }
     }
 }

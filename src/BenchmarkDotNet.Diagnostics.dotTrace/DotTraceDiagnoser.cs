@@ -17,17 +17,8 @@ using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.Diagnostics.dotTrace
 {
-    public class DotTraceDiagnoser : IProfiler
+    public class DotTraceDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null) : IProfiler
     {
-        private readonly Uri? nugetUrl;
-        private readonly string? toolsDownloadFolder;
-
-        public DotTraceDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
-        {
-            this.nugetUrl = nugetUrl;
-            this.toolsDownloadFolder = toolsDownloadFolder;
-        }
-
         public IEnumerable<string> Ids => new[] { "DotTrace" };
         public string ShortName => "dotTrace";
 

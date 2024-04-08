@@ -16,18 +16,9 @@ using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.Diagnostics.dotMemory
 {
-    public class DotMemoryDiagnoser : IProfiler
+    public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null) : IProfiler
     {
-        private readonly Uri? nugetUrl;
-        private readonly string? toolsDownloadFolder;
-
         private DotMemoryTool? tool;
-
-        public DotMemoryDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
-        {
-            this.nugetUrl = nugetUrl;
-            this.toolsDownloadFolder = toolsDownloadFolder;
-        }
 
         public IEnumerable<string> Ids => new[] { "DotMemory" };
         public string ShortName => "dotMemory";
