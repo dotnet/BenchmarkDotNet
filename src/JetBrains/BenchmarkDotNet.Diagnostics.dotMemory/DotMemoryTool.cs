@@ -6,6 +6,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Profiler.SelfApi;
+using BenchmarkDotNet.JetBrains.Shared;
 
 namespace BenchmarkDotNet.Diagnostics.dotMemory
 {
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
                 var progress = new Progress(logger, "Installing DotMemory");
                 DotMemory.EnsurePrerequisiteAsync(progress, nugetUrl, nugetApi, downloadTo).Wait();
                 logger.WriteLineInfo("dotMemory prerequisite is installed");
-                logger.WriteLineInfo($"dotMemory runner path: {GetRunnerPath()}");
+                logger.WriteLineInfo($"dotMemory runner path: {Helper.GetRunnerPath(typeof(DotMemory))}");
             }
             catch (Exception e)
             {
@@ -114,27 +115,5 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
         private void Snapshot() => DotMemory.GetSnapshot();
 
         private void Detach() => DotMemory.Detach();
-
-        private string GetRunnerPath()
-        {
-            var consoleRunnerPackageField = typeof(DotMemory).GetField("ConsoleRunnerPackage", BindingFlags.NonPublic | BindingFlags.Static);
-            if (consoleRunnerPackageField == null)
-                throw new InvalidOperationException("Field 'ConsoleRunnerPackage' not found.");
-
-            object? consoleRunnerPackage = consoleRunnerPackageField.GetValue(null);
-            if (consoleRunnerPackage == null)
-                throw new InvalidOperationException("Unable to get value of 'ConsoleRunnerPackage'.");
-
-            var consoleRunnerPackageType = consoleRunnerPackage.GetType();
-            var getRunnerPathMethod = consoleRunnerPackageType.GetMethod("GetRunnerPath");
-            if (getRunnerPathMethod == null)
-                throw new InvalidOperationException("Method 'GetRunnerPath' not found.");
-
-            string? runnerPath = getRunnerPathMethod.Invoke(consoleRunnerPackage, null) as string;
-            if (runnerPath == null)
-                throw new InvalidOperationException("Unable to invoke 'GetRunnerPath'.");
-
-            return runnerPath;
-        }
     }
 }

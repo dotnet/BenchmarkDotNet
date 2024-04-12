@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
+    <Import Project="..\..\..\build\common.props" />
     <PropertyGroup>
         <TargetFrameworks>net6.0;net462;netcoreapp3.1</TargetFrameworks>
         <NoWarn>$(NoWarn);1591</NoWarn>
@@ -10,7 +10,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+        <ProjectReference Include="..\..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\BenchmarkDotNet.JetBrains.Shared\*.cs" />
     </ItemGroup>
     
     <ItemGroup>
