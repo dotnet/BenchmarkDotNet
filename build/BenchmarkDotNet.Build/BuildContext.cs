@@ -68,7 +68,7 @@ public class BuildContext : FrostingContext
         TemplatesTestsProjectFile = RootDirectory.Combine("templates")
             .CombineWithFilePath("BenchmarkDotNet.Templates.csproj");
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
-            .Where(p => !p.FullPath.Contains("Disassembler") && !p.FullPath.Contains("Shared")));
+            .Where(p => !p.FullPath.Contains("Disassembler")));
 
         VersionsFile = BuildDirectory.CombineWithFilePath("versions.txt");
         CommonPropsFile = BuildDirectory.CombineWithFilePath("common.props");
@@ -141,7 +141,7 @@ public class BuildContext : FrostingContext
         var jetBrainsNugetPackages = this
             .GetSubDirectories(RootDirectory.Combine("src/JetBrains"))
             .Select(directoryPath => directoryPath.GetDirectoryName())
-            .Where(name => !name.Contains("Shared", StringComparison.OrdinalIgnoreCase));
+            .Where(name => name != "Shared");
         nuGetPackageNames.AddRange(jetBrainsNugetPackages);
 
         nuGetPackageNames.Add("BenchmarkDotNet.Templates");
