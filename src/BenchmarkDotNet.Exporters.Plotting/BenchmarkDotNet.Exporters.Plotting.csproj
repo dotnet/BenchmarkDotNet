@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003</NoWarn>
+    <AssemblyName>BenchmarkDotNet.Exporters.Plotting</AssemblyName>
+    <PackageId>BenchmarkDotNet.Exporters.Plotting</PackageId>
+    <RootNamespace>BenchmarkDotNet.Exporters.Plotting</RootNamespace>
+    <!-- needed for docfx xref resolver -->
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ScottPlot" Version="5.0.25" />
+  </ItemGroup>
+</Project>
