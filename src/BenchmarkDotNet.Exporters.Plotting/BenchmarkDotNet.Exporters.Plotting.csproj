@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet plotting export support.</AssemblyTitle>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702</NoWarn>
     <AssemblyName>BenchmarkDotNet.Exporters.Plotting</AssemblyName>
     <PackageId>BenchmarkDotNet.Exporters.Plotting</PackageId>
     <RootNamespace>BenchmarkDotNet.Exporters.Plotting</RootNamespace>
