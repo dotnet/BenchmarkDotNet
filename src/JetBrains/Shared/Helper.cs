@@ -3,7 +3,7 @@ using System.Reflection;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 
-namespace BenchmarkDotNet.JetBrains.Shared
+namespace BenchmarkDotNet.JetBrains
 {
     internal static class Helper
     {

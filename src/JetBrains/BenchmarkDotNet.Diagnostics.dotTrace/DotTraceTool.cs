@@ -5,7 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Profiler.SelfApi;
-using BenchmarkDotNet.JetBrains.Shared;
+using BenchmarkDotNet.JetBrains;
 
 namespace BenchmarkDotNet.Diagnostics.dotTrace
 {

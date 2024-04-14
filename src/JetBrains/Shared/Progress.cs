@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.JetBrains.Shared
+namespace BenchmarkDotNet.JetBrains
 {
 
     internal sealed class Progress : IProgress<double>
