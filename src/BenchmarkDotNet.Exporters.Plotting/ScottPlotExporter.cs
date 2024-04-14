@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
     public class ScottPlotExporter : IExporter
     {
         public static readonly IExporter Default = new ScottPlotExporter();
-        
+
         public string Name => nameof(ScottPlotExporter);
 
         public ScottPlotExporter(int width = 1920, int height = 1080)
@@ -24,12 +24,26 @@ namespace BenchmarkDotNet.Exporters.Plotting
             this.RotateLabels = true;
         }
 
+        /// <summary>
+        /// Gets or sets the width of all plots in pixels.
+        /// </summary>
         public int Width { get; set; }
 
+        /// <summary>
+        /// Gets or sets the height of all plots in pixels.
+        /// </summary>
         public int Height { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether labels for Plot X-axis should be rotated.
+        /// This allows for longer labels at the expense of chart height.
+        /// </summary>
         public bool RotateLabels { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether a bar plot for time-per-op
+        /// measurement values should be exported.
+        /// </summary>
         public bool IncludeBarPlot { get; set; }
 
         public void ExportToLog(Summary summary, ILogger logger)
