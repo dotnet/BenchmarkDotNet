@@ -10,12 +10,26 @@ using ScottPlot.Plottables;
 
 namespace BenchmarkDotNet.Exporters.Plotting
 {
+    /// <summary>
+    /// Provides plot exports as .png files.
+    /// </summary>
     public class ScottPlotExporter : IExporter
     {
+        /// <summary>
+        /// Default instance of the exporter with default configuration.
+        /// </summary>
         public static readonly IExporter Default = new ScottPlotExporter();
 
+        /// <summary>
+        /// Gets the name of the Exporter type.
+        /// </summary>
         public string Name => nameof(ScottPlotExporter);
 
+        /// <summary>
+        /// Initializes a new instance of ScottPlotExporter.
+        /// </summary>
+        /// <param name="width">The width of all plots in pixels (optional). Defaults to 1920.</param>
+        /// <param name="height">The height of all plots in pixels (optional). Defaults to 1080.</param>
         public ScottPlotExporter(int width = 1920, int height = 1080)
         {
             this.Width = width;
@@ -46,11 +60,23 @@ namespace BenchmarkDotNet.Exporters.Plotting
         /// </summary>
         public bool IncludeBarPlot { get; set; }
 
+        /// <summary>
+        /// Not supported.
+        /// </summary>
+        /// <param name="summary">This parameter is not used.</param>
+        /// <param name="logger">This parameter is not used.</param>
+        /// <exception cref="NotSupportedException"></exception>
         public void ExportToLog(Summary summary, ILogger logger)
         {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Exports plots to .png file.
+        /// </summary>
+        /// <param name="summary">The summary to be exported.</param>
+        /// <param name="consoleLogger">Logger to output to.</param>
+        /// <returns>The file paths of every plot exported.</returns>
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
             var title = summary.Title;
