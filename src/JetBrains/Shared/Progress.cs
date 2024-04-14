@@ -4,7 +4,6 @@ using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.JetBrains
 {
-
     internal sealed class Progress : IProgress<double>
     {
         private static readonly TimeSpan ReportInterval = TimeSpan.FromSeconds(0.1);
