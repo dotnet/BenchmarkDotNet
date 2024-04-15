@@ -20,6 +20,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected bool IsNetCore { get; }
 
+        // Whether to use ArtifactsPath or IntermediateOutputPath. ArtifactsPath is only supported in dotnet sdk 8+.
+        private protected readonly bool _useArtifactsPath;
+
         [PublicAPI]
         protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore)
         {
@@ -27,6 +30,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CliPath = cliPath;
             PackagesPath = packagesPath;
             IsNetCore = isNetCore;
+
+            _useArtifactsPath = DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(cliPath);
         }
 
         protected override string GetExecutableExtension() => IsNetCore ? ".dll" : ".exe";
@@ -101,8 +106,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, _useArtifactsPath)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, _useArtifactsPath)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
