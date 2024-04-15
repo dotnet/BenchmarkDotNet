@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -32,6 +33,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public bool LogOutput { get; }
 
+        // Whether to use ArtifactsPath or IntermediateOutputPath. ArtifactsPath is only supported in dotnet sdk 8+.
+        private readonly bool _useArtifactsPath;
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
@@ -43,6 +47,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             EnvironmentVariables = environmentVariables;
             Timeout = timeout;
             LogOutput = logOutput || (buildPartition is not null && buildPartition.LogBuildOutput);
+
+            _useArtifactsPath = DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(cliPath);
         }
 
         public DotNetCliCommand WithArguments(string arguments)
@@ -71,12 +77,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (BuildPartition.ForcedNoDependenciesForIntegrationTests)
             {
                 var restoreResult = DotNetCliCommandExecutor.Execute(WithArguments(
-                    GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-dependencies", "restore-no-deps", excludeOutput: true)));
+                    GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, $"{Arguments} --no-dependencies", "restore-no-deps", excludeOutput: true)));
                 if (!restoreResult.IsSuccess)
                     return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
                 return DotNetCliCommandExecutor.Execute(WithArguments(
-                    GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)))
+                    GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)))
                     .ToBuildResult(GenerateResult);
             }
             else
@@ -130,29 +136,30 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public DotNetCliCommandResult Restore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments, "restore")));
+                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, Arguments, "restore")));
 
         public DotNetCliCommandResult Build()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments, "build")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, Arguments, "build")));
 
         public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore", "build-no-restore")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, $"{Arguments} --no-restore", "build-no-restore")));
 
         public DotNetCliCommandResult Publish()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments, "publish")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, Arguments, "publish")));
 
         // PublishNoBuildAndNoRestore was removed because we set --output in the build step. We use the implicit build included in the publish command.
         public DotNetCliCommandResult PublishNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore", "publish-no-restore")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, _useArtifactsPath, $"{Arguments} --no-restore", "publish-no-restore")));
 
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
             => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition,
+            bool useArtifactsPath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
                 .AppendArgument("restore")
                 .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
@@ -160,10 +167,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths, true, excludeOutput)
+                .MaybeAppendOutputPaths(artifactsPaths, useArtifactsPath, true, excludeOutput)
                 .ToString();
 
-        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition,
+            bool useArtifactsPath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
                 .AppendArgument($"build -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
@@ -171,10 +179,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths, excludeOutput: excludeOutput)
+                .MaybeAppendOutputPaths(artifactsPaths, useArtifactsPath, excludeOutput: excludeOutput)
                 .ToString();
 
-        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null)
+        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition,
+            bool useArtifactsPath, string? extraArguments = null, string? binLogSuffix = null)
             => new StringBuilder()
                 .AppendArgument($"publish -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
@@ -182,7 +191,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths)
+                .MaybeAppendOutputPaths(artifactsPaths, useArtifactsPath)
                 .ToString();
 
         private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string suffix)
@@ -257,15 +266,22 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         // We force the project to output binaries to a new directory.
         // Specifying --output and --no-dependencies breaks the build (because the previous build was not done using the custom output path),
         // so we don't include it if we're building no-deps (only supported for integration tests).
-        internal static StringBuilder MaybeAppendOutputPaths(this StringBuilder stringBuilder, ArtifactsPaths artifactsPaths, bool isRestore = false, bool excludeOutput = false)
+        internal static StringBuilder MaybeAppendOutputPaths(this StringBuilder stringBuilder, ArtifactsPaths artifactsPaths, bool useArtifactsPath, bool isRestore = false, bool excludeOutput = false)
             => excludeOutput
                 ? stringBuilder
                 : stringBuilder
                     // Use AltDirectorySeparatorChar so it's not interpreted as an escaped quote `\"`.
-                    .AppendArgument($"/p:IntermediateOutputPath=\"{artifactsPaths.IntermediateDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
+                    .AppendArgument(useArtifactsPath
+                        // We set ArtifactsPath for dotnet sdk 8+, fallback to IntermediateOutputPath for older sdks.
+                        ? $"/p:ArtifactsPath=\"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}\""
+                        // This is technically incorrect (#2664, #2425), but it's the best we can do for older sdks.
+                        // MSBuild does not support setting BaseIntermediateOutputPath from command line. https://github.com/dotnet/sdk/issues/2003#issuecomment-369408964
+                        : $"/p:IntermediateOutputPath=\"{artifactsPaths.IntermediateDirectoryPath}{Path.AltDirectorySeparatorChar}\""
+                    )
                     .AppendArgument($"/p:OutDir=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
                     // OutputPath is legacy, per-project version of OutDir. We set both just in case. https://github.com/dotnet/msbuild/issues/87
                     .AppendArgument($"/p:OutputPath=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
+                    .AppendArgument($"/p:PublishDir=\"{artifactsPaths.PublishDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
                     .AppendArgument(isRestore ? string.Empty : $"--output \"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"");
     }
 }
