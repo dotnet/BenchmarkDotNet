@@ -22,6 +22,7 @@ using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -361,15 +362,40 @@ namespace BenchmarkDotNet.Running
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
-            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
+            var parallelPartitions = new List<BuildPartition[]>();
+            var sequentialPartitions = new List<BuildPartition>();
+            foreach (var partition in buildPartitions)
+            {
+                // If dotnet sdk does not support ArtifactsPath, it's unsafe to build the same project in parallel.
+                // We cannot rely on falling back to sequential after failure, because the builds can be corrupted.
+                // Therefore we have to build them sequentially. #2425
+                if (partition.RepresentativeBenchmarkCase.GetToolchain().Builder is DotNetCliBuilderBase dotnetBuilder
+                    && !DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(dotnetBuilder.CustomDotNetCliPath))
+                {
+                    sequentialPartitions.Add(partition);
+                }
+                else
+                {
+                    parallelPartitions.Add([partition]);
+                }
+            }
+            if (sequentialPartitions.Count > 0)
+            {
+                // We build the sequential partitions in parallel with the other partitions to complete as fast as possible.
+                // Place them first to make sure they are started first.
+                parallelPartitions.Insert(0, [.. sequentialPartitions]);
+            }
 
-            var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
+            logger.WriteLineHeader($"// ***** Building {parallelPartitions.Count} exe(s) in Parallel{(sequentialPartitions.Count <= 1 ? "" : $", {sequentialPartitions.Count} sequentially")}   *****");
+
+            var buildLogger = parallelPartitions.Count == 1 ? logger : NullLogger.Instance; // when we have just one parallel partition we can print to std out
 
             var beforeParallelBuild = globalChronometer.GetElapsed();
 
-            var buildResults = buildPartitions
+            var buildResults = parallelPartitions
                 .AsParallel()
-                .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
+                .SelectMany(partitions => partitions
+                    .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger))))
                 .AsSequential() // Ensure that build completion events are processed sequentially
                 .Select(build =>
                 {

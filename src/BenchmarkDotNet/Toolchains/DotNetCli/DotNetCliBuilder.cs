@@ -7,23 +7,25 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    [PublicAPI]
-    public class DotNetCliBuilder : IBuilder
+    public abstract class DotNetCliBuilderBase : IBuilder
     {
-        private string TargetFrameworkMoniker { get; }
+        public string? CustomDotNetCliPath { get; protected set; }
+        public abstract BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger);
+    }
 
-        private string CustomDotNetCliPath { get; }
+    [PublicAPI]
+    public class DotNetCliBuilder : DotNetCliBuilderBase
+    {
         private bool LogOutput { get; }
 
         [PublicAPI]
         public DotNetCliBuilder(string targetFrameworkMoniker, string? customDotNetCliPath = null, bool logOutput = false)
         {
-            TargetFrameworkMoniker = targetFrameworkMoniker;
             CustomDotNetCliPath = customDotNetCliPath;
             LogOutput = logOutput;
         }
 
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
             BuildResult buildResult = new DotNetCliCommand(
                     CustomDotNetCliPath,

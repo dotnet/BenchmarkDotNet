@@ -6,7 +6,7 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    public class DotNetCliPublisher : IBuilder
+    public class DotNetCliPublisher : DotNetCliBuilderBase
     {
         public DotNetCliPublisher(
             string? customDotNetCliPath = null,
@@ -18,13 +18,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             EnvironmentVariables = environmentVariables;
         }
 
-        private string? CustomDotNetCliPath { get; }
-
         private string? ExtraArguments { get; }
 
         private IReadOnlyList<EnvironmentVariable>? EnvironmentVariables { get; }
 
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             => new DotNetCliCommand(
                     CustomDotNetCliPath,
                     ExtraArguments,
