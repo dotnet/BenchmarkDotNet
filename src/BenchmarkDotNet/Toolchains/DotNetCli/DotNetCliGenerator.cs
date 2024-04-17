@@ -20,13 +20,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected bool IsNetCore { get; }
 
+        protected bool UseArtifactsPathIfSupported { get; set; }
+
         [PublicAPI]
-        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore, bool useArtifactsPathIfSupported = true)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             CliPath = cliPath;
             PackagesPath = packagesPath;
             IsNetCore = isNetCore;
+            UseArtifactsPathIfSupported = useArtifactsPathIfSupported;
         }
 
         protected override string GetExecutableExtension() => IsNetCore ? ".dll" : ".exe";
@@ -100,9 +103,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
+            bool useArtifactsPath = UseArtifactsPathIfSupported && DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(CliPath);
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(CliPath))}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(CliPath))}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, useArtifactsPath)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, useArtifactsPath)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);

@@ -183,5 +183,13 @@ namespace BenchmarkDotNet.Toolchains
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
             }
         }
+
+        internal static bool IsSafeToBuildInParallel(this IToolchain toolchain)
+            // Toolchains that do not use dotnet sdk are assumed to be safe to build in parallel.
+            // This might not be true for custom toolchains, but the old behavior was to build everything in parallel, so it's at least not a regression.
+            => toolchain.Builder is not DotNetCliBuilderBase dotnetBuilder
+                // If the builder does not use ArtifactsPath, or the dotnet sdk does not support it, it's unsafe to build the same project in parallel.
+                // We cannot rely on falling back to sequential after failure, because the builds can be corrupted. #2425
+                || (dotnetBuilder.UseArtifactsPathIfSupported && DotNetCliCommandExecutor.DotNetSdkSupportsArtifactsPath(dotnetBuilder.CustomDotNetCliPath));
     }
 }

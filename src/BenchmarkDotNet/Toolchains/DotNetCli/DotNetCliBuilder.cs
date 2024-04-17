@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     public abstract class DotNetCliBuilderBase : IBuilder
     {
         public string? CustomDotNetCliPath { get; protected set; }
+        internal bool UseArtifactsPathIfSupported { get; private protected set; } = true;
         public abstract BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger);
     }
 
@@ -25,6 +26,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             LogOutput = logOutput;
         }
 
+        internal DotNetCliBuilder(string? customDotNetCliPath, bool logOutput, bool useArtifactsPathIfSupported)
+        {
+            CustomDotNetCliPath = customDotNetCliPath;
+            LogOutput = logOutput;
+            UseArtifactsPathIfSupported = useArtifactsPathIfSupported;
+        }
+
         public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
             BuildResult buildResult = new DotNetCliCommand(
@@ -36,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     Array.Empty<EnvironmentVariable>(),
                     buildPartition.Timeout,
                     logOutput: LogOutput)
-                .RestoreThenBuild();
+                .RestoreThenBuild(UseArtifactsPathIfSupported);
             if (buildResult.IsBuildSuccess &&
                 buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
             {

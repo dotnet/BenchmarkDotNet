@@ -31,6 +31,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     buildPartition,
                     EnvironmentVariables,
                     buildPartition.Timeout)
-                .RestoreThenBuildThenPublish();
+                .RestoreThenBuildThenPublish(UseArtifactsPathIfSupported);
     }
 }

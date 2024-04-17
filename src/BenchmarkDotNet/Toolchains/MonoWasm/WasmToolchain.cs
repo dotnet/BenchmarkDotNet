@@ -48,10 +48,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                         netCoreAppSettings.PackagesPath,
                         netCoreAppSettings.CustomRuntimePack,
                         netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
-                    new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
-                        netCoreAppSettings.CustomDotNetCliPath,
+                    new DotNetCliBuilder(netCoreAppSettings.CustomDotNetCliPath,
                         // aot builds can be very slow
-                        logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
+                        logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm,
+                        // Building wasm with ArtifactsPath set fails for some reason (haven't figured out why yet).
+                        useArtifactsPathIfSupported: false),
                     new WasmExecutor(),
                     netCoreAppSettings.CustomDotNetCliPath);
     }

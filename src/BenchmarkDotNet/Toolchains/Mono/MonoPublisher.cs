@@ -7,7 +7,7 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.Mono
 {
-    public class MonoPublisher : IBuilder
+    public class MonoPublisher : DotNetCliBuilderBase
     {
         public MonoPublisher(string customDotNetCliPath)
         {
@@ -18,13 +18,11 @@ namespace BenchmarkDotNet.Toolchains.Mono
             ExtraArguments = $"--self-contained -r {runtimeIdentifier} /p:UseMonoRuntime=true /p:RuntimeIdentifiers={runtimeIdentifier}";
         }
 
-        private string CustomDotNetCliPath { get; }
-
         private string ExtraArguments { get; }
 
         private IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
 
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             => new DotNetCliCommand(
                     CustomDotNetCliPath,
                     ExtraArguments,
@@ -33,6 +31,6 @@ namespace BenchmarkDotNet.Toolchains.Mono
                     buildPartition,
                     EnvironmentVariables,
                     buildPartition.Timeout)
-                .Publish().ToBuildResult(generateResult);
+                .Publish(UseArtifactsPathIfSupported).ToBuildResult(generateResult);
     }
 }
