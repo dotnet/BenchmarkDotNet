@@ -16,7 +16,6 @@
     <ProjectReference Include="..\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Microsoft.NET.Test.Sdk breaks netcoreapp2.0 -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.6.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
