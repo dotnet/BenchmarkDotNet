@@ -14,6 +14,7 @@ using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
+using BenchmarkDotNet.Columns;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             logger.WriteLine("=== " + benchmarkType.Name + " ===");
             bool hasHideColumnsAttribute = benchmarkType.IsDefined(typeof(HideColumnsAttribute), false);
             var exporter = MarkdownExporter.Mock;
-            var summary = MockFactory.CreateSummary(benchmarkType, hasHideColumnsAttribute);
+            var summary = hasHideColumnsAttribute ? MockFactory.CreateSummary(benchmarkType, new ColumnHidingByNameRule("StdDev")) : MockFactory.CreateSummary(benchmarkType);
             exporter.ExportToLog(summary, logger);
 
             var validator = BaselineValidator.FailOnError;
