@@ -263,7 +263,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             }
 
             /* Hide Column */
-            [HideColumns("StdDev")]
+            [HideColumns(Column.StdDev)]
             public class HideColumns_TableMarkDown
             {
                 [Benchmark] public void Foo() { }
