@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Tests.Mocks
 {
     public static class MockFactory
     {
-        public static Summary CreateSummary(Type benchmarkType)
+        public static Summary CreateSummary(Type benchmarkType, params IColumnHidingRule[] columHidingRules)
         {
             var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
             return new Summary(
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                ImmutableArray.Create<IColumnHidingRule>(columHidingRules));
         }
 
         public static Summary CreateSummary(IConfig config) => new Summary(
