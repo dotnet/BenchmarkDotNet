@@ -49,10 +49,16 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 yield return new ValidationError(true,
                     $"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
                     benchmarkCase);
+                yield break;
             }
-            else if (IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
+            else if (DotNetSdkValidator.IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
             {
                 yield return invalidCliError;
+            }
+
+            foreach (var validationError in DotNetSdkValidator.ValidateFrameworkSdks(benchmarkCase))
+            {
+                yield return validationError;
             }
         }
     }

@@ -2,7 +2,7 @@
 
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
-Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
+Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   Job1   : extra output line
   Job2   : extra output line
@@ -10,13 +10,13 @@ Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
 
  Method | Job  | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                 | Baseline |
 ------- |----- |---------:|--------:|--------:|------:|--------:|-----:|----------------------------- |--------- |
- Base   | Job1 | 102.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | JobBaseline_MethodsJobs.Base | Yes      |
- Base   | Job2 | 402.0 ns | 6.09 ns | 1.58 ns |  3.94 |    0.05 |    2 | JobBaseline_MethodsJobs.Base | No       |
+ Base   | Job1 | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | JobBaseline_MethodsJobs.Base | Yes      |
+ Base   | Job2 | 414.5 ns | 5.88 ns | 8.80 ns |  3.64 |    0.29 |    2 | JobBaseline_MethodsJobs.Base | No       |
         |      |          |         |         |       |         |      |                              |          |
- Foo    | Job1 | 202.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | JobBaseline_MethodsJobs.Foo  | Yes      |
- Foo    | Job2 | 502.0 ns | 6.09 ns | 1.58 ns |  2.49 |    0.01 |    2 | JobBaseline_MethodsJobs.Foo  | No       |
+ Foo    | Job1 | 214.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.06 |    1 | JobBaseline_MethodsJobs.Foo  | Yes      |
+ Foo    | Job2 | 514.5 ns | 5.88 ns | 8.80 ns |  2.40 |    0.11 |    2 | JobBaseline_MethodsJobs.Foo  | No       |
         |      |          |         |         |       |         |      |                              |          |
- Bar    | Job1 | 302.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | JobBaseline_MethodsJobs.Bar  | Yes      |
- Bar    | Job2 | 602.0 ns | 6.09 ns | 1.58 ns |  1.99 |    0.01 |    2 | JobBaseline_MethodsJobs.Bar  | No       |
+ Bar    | Job1 | 314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.04 |    1 | JobBaseline_MethodsJobs.Bar  | Yes      |
+ Bar    | Job2 | 614.5 ns | 5.88 ns | 8.80 ns |  1.96 |    0.06 |    2 | JobBaseline_MethodsJobs.Bar  | No       |
 
 Errors: 0

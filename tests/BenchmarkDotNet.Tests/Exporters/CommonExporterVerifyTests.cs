@@ -58,10 +58,8 @@ namespace BenchmarkDotNet.Tests.Exporters
                     MockFactory.CreateSummary(
                         config.WithCultureInfo(cultureInfo),
                         hugeSd: false,
-                        new[]
-                        {
-                            new Metric(new FakeMetricDescriptor("CacheMisses", "Hardware counter 'CacheMisses' per single operation", "N0"), 7)
-                        }), logger);
+                        [new Metric(new FakeMetricDescriptor("CacheMisses", "Hardware counter 'CacheMisses' per single operation", "N0"), 7)]),
+                    logger);
             }
 
             var settings = VerifySettingsFactory.Create();

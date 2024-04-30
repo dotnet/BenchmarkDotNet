@@ -248,11 +248,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
                     if (HardwareIntrinsics.IsX86Avx2Supported) yield return "avx2";
-                    if (HardwareIntrinsics.IsX86Avx512FSupported) yield return "avx-512f";
-                    if (HardwareIntrinsics.IsX86Avx512BWSupported) yield return "avx-512bw";
-                    if (HardwareIntrinsics.IsX86Avx512CDSupported) yield return "avx-512cd";
-                    if (HardwareIntrinsics.IsX86Avx512DQSupported) yield return "avx-512dq";
-                    if (HardwareIntrinsics.IsX86Avx512VbmiSupported) yield return "avx-512vbmi";
+                    if (HardwareIntrinsics.IsX86Avx512FSupported) yield return "avx512f";
+                    if (HardwareIntrinsics.IsX86Avx512BWSupported) yield return "avx512bw";
+                    if (HardwareIntrinsics.IsX86Avx512CDSupported) yield return "avx512cd";
+                    if (HardwareIntrinsics.IsX86Avx512DQSupported) yield return "avx512dq";
+                    if (HardwareIntrinsics.IsX86Avx512VbmiSupported) yield return "avx512vbmi";
                     if (HardwareIntrinsics.IsX86AesSupported) yield return "aes";
                     if (HardwareIntrinsics.IsX86Bmi1Supported) yield return "bmi";
                     if (HardwareIntrinsics.IsX86Bmi2Supported) yield return "bmi2";

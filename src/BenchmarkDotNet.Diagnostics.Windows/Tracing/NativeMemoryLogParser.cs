@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -12,6 +11,7 @@ using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Microsoft.Diagnostics.Tracing.Stacks;
+using Perfolizer.Metrology;
 using Address = System.UInt64;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
@@ -246,12 +246,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             var memoryAllocatedPerOperation = totalAllocation / totalOperation;
             var memoryLeakPerOperation = nativeLeakSize / totalOperation;
 
-            logger.WriteLine($"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
+            logger.WriteLine(
+                $"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, null, benchmarkCase.Config.CultureInfo)}");
             logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
 
             if (nativeLeakSize != 0)
             {
-                logger.WriteLine($"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
+                logger.WriteLine(
+                    $"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, null, benchmarkCase.Config.CultureInfo)}");
             }
 
             var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });
@@ -267,7 +269,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             };
         }
 
-        private static Dictionary<Address, long> CreateHeapCache(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps, ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
+        private static Dictionary<Address, long> CreateHeapCache(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps,
+            ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
         {
             Dictionary<Address, long> ret;
 

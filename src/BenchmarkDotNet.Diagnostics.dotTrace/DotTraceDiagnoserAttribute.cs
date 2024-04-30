@@ -13,9 +13,10 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
             Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotTraceDiagnoser());
         }
 
-        public DotTraceDiagnoserAttribute(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
+        public DotTraceDiagnoserAttribute(string? nugetUrl = null, string? toolsDownloadFolder = null)
         {
-            Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotTraceDiagnoser(nugetUrl, toolsDownloadFolder));
+            var nugetUri = nugetUrl == null ? null : new Uri(nugetUrl);
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotTraceDiagnoser(nugetUri, toolsDownloadFolder));
         }
     }
 }

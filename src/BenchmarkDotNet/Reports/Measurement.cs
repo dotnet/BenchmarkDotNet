@@ -1,5 +1,7 @@
 ﻿using System;
+#if DEBUG
 using System.Diagnostics;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -95,7 +97,7 @@ namespace BenchmarkDotNet.Reports
             builder.Append(NsSymbol);
             builder.Append(", ");
 
-            builder.Append(GetAverageTime().ToString(MainCultureInfo).ToAscii());
+            builder.Append(GetAverageTime().ToDefaultString("0.0000").ToAscii());
             builder.Append("/op");
 
             return builder.ToString();

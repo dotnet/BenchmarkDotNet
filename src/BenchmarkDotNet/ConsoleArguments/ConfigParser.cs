@@ -28,9 +28,8 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
-using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
 using BenchmarkDotNet.Toolchains.Mono;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -361,7 +360,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.DisplayAllStatistics)
                 config.AddColumn(StatisticColumn.AllStatistics);
             if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
-                config.AddColumn(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
+                config.AddColumn(new StatisticalTestColumn(threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;
@@ -571,19 +570,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVM:
-                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet60:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet70:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet80:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVMNet90:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net9.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net9.0", runtimeMoniker);
 
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
@@ -637,9 +636,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                         packagesPath: options.RestorePath?.FullName)));
         }
 
-        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
+        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
         {
-            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, aotCompilerMode: options.AOTCompilerMode, msBuildMoniker: msBuildMoniker);
+            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, aotCompilerMode: options.AOTCompilerMode, msBuildMoniker: msBuildMoniker, moniker: moniker);
 
             var toolChain = MonoAotLLVMToolChain.From(
             new NetCoreAppSettings(

@@ -2,7 +2,7 @@
 
 BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
-Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
+Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   Job1   : extra output line
   Job2   : extra output line
@@ -10,20 +10,20 @@ Frequency: 2531248 Hz, Resolution: 395.0620 ns, Timer: TSC
 
  Method | Job  | Param | Mean       | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup    | Baseline |
 ------- |----- |------ |-----------:|--------:|--------:|------:|--------:|-----:|---------------- |--------- |
- Base   | Job1 | 2     |   102.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | [Param=2]-Job1  | Yes      | ^
- Foo    | Job1 | 2     |   202.0 ns | 6.09 ns | 1.58 ns |  1.98 |    0.02 |    2 | [Param=2]-Job1  | No       |
- Bar    | Job1 | 2     |   302.0 ns | 6.09 ns | 1.58 ns |  2.96 |    0.03 |    3 | [Param=2]-Job1  | No       |
+ Base   | Job1 | 2     |   114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | [Param=2]-Job1  | Yes      | ^
+ Foo    | Job1 | 2     |   214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | [Param=2]-Job1  | No       |
+ Bar    | Job1 | 2     |   314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | [Param=2]-Job1  | No       |
         |      |       |            |         |         |       |         |      |                 |          |
- Base   | Job2 | 2     |   402.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | [Param=2]-Job2  | Yes      |
- Foo    | Job2 | 2     |   502.0 ns | 6.09 ns | 1.58 ns |  1.25 |    0.00 |    2 | [Param=2]-Job2  | No       |
- Bar    | Job2 | 2     |   602.0 ns | 6.09 ns | 1.58 ns |  1.50 |    0.00 |    3 | [Param=2]-Job2  | No       |
+ Base   | Job2 | 2     |   414.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.03 |    1 | [Param=2]-Job2  | Yes      |
+ Foo    | Job2 | 2     |   514.5 ns | 5.88 ns | 8.80 ns |  1.24 |    0.03 |    2 | [Param=2]-Job2  | No       |
+ Bar    | Job2 | 2     |   614.5 ns | 5.88 ns | 8.80 ns |  1.48 |    0.04 |    3 | [Param=2]-Job2  | No       |
         |      |       |            |         |         |       |         |      |                 |          |
- Base   | Job1 | 10    |   702.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | [Param=10]-Job1 | Yes      | ^
- Foo    | Job1 | 10    |   802.0 ns | 6.09 ns | 1.58 ns |  1.14 |    0.00 |    2 | [Param=10]-Job1 | No       |
- Bar    | Job1 | 10    |   902.0 ns | 6.09 ns | 1.58 ns |  1.28 |    0.00 |    3 | [Param=10]-Job1 | No       |
+ Base   | Job1 | 10    |   714.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | [Param=10]-Job1 | Yes      | ^
+ Foo    | Job1 | 10    |   814.5 ns | 5.88 ns | 8.80 ns |  1.14 |    0.02 |    2 | [Param=10]-Job1 | No       |
+ Bar    | Job1 | 10    |   914.5 ns | 5.88 ns | 8.80 ns |  1.28 |    0.02 |    3 | [Param=10]-Job1 | No       |
         |      |       |            |         |         |       |         |      |                 |          |
- Base   | Job2 | 10    | 1,002.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 | [Param=10]-Job2 | Yes      |
- Foo    | Job2 | 10    | 1,102.0 ns | 6.09 ns | 1.58 ns |  1.10 |    0.00 |    2 | [Param=10]-Job2 | No       |
- Bar    | Job2 | 10    | 1,202.0 ns | 6.09 ns | 1.58 ns |  1.20 |    0.00 |    3 | [Param=10]-Job2 | No       |
+ Base   | Job2 | 10    | 1,014.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | [Param=10]-Job2 | Yes      |
+ Foo    | Job2 | 10    | 1,114.5 ns | 5.88 ns | 8.80 ns |  1.10 |    0.01 |    2 | [Param=10]-Job2 | No       |
+ Bar    | Job2 | 10    | 1,214.5 ns | 5.88 ns | 8.80 ns |  1.20 |    0.01 |    3 | [Param=10]-Job2 | No       |
 
 Errors: 0

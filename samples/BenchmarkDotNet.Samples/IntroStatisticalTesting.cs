@@ -1,14 +1,10 @@
 using System.Threading;
 using BenchmarkDotNet.Attributes;
-using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Samples
 {
-    [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Microseconds, 1, true)]
-    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 1, true)]
-    [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.03, true)]
-    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.03, true)]
+    [StatisticalTestColumn("500us")]
+    [StatisticalTestColumn("3%")]
     [SimpleJob(warmupCount: 0, iterationCount: 5)]
     public class IntroStatisticalTesting
     {

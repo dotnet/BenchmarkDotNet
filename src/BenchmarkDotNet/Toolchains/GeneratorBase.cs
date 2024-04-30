@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -103,6 +104,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
             string sourcePath = buildPartition.AssemblyLocation + ".config";
+            artifactsPaths.AppConfigPath.EnsureFolderExists();
 
             using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
             using (var destination = new StreamWriter(File.Create(artifactsPaths.AppConfigPath), Encoding.UTF8))

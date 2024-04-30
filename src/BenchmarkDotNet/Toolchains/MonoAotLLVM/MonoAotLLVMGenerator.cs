@@ -55,10 +55,10 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
             => Portability.RuntimeInformation.IsWindows()
-                ? Path.Combine(binariesDirectoryPath, $"{programName}.exe")
-                : Path.Combine(binariesDirectoryPath, programName);
+                ? Path.Combine(binariesDirectoryPath, "publish", $"{programName}.exe")
+                : Path.Combine(binariesDirectoryPath, "publish", programName);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier(), "publish");
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier());
     }
 }

@@ -4,50 +4,57 @@ using System.Linq;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
+using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Columns
 {
-    public class StatisticalTestColumn : BaselineCustomColumn
+    public class StatisticalTestColumn(Threshold threshold, SignificanceLevel? significanceLevel = null) : BaselineCustomColumn
     {
-        public static StatisticalTestColumn Create(StatisticalTestKind kind, Threshold threshold, bool showPValues = false)
-            => new StatisticalTestColumn(kind, threshold, showPValues);
+        private static readonly SignificanceLevel DefaultSignificanceLevel = SignificanceLevel.P1E5;
 
-        public StatisticalTestKind Kind { get; }
-        public Threshold Threshold { get; }
-        public bool ShowPValues { get; }
+        public static StatisticalTestColumn CreateDefault() => new (new PercentValue(10).ToThreshold());
 
-        public StatisticalTestColumn(StatisticalTestKind kind, Threshold threshold, bool showPValues = false)
+        public static StatisticalTestColumn Create(Threshold threshold, SignificanceLevel? significanceLevel = null) => new (threshold, significanceLevel);
+
+        public static StatisticalTestColumn Create(string threshold, SignificanceLevel? significanceLevel = null)
         {
-            Kind = kind;
-            Threshold = threshold;
-            ShowPValues = showPValues;
+            if (!Threshold.TryParse(threshold, out var parsedThreshold))
+                throw new ArgumentException($"Can't parse threshold '{threshold}'");
+            return new StatisticalTestColumn(parsedThreshold, significanceLevel);
         }
 
-        public override string Id => nameof(StatisticalTestColumn) + "." + Kind + "." + Threshold + "." + (ShowPValues ? "WithDetails" : "WithoutDetails");
-        public override string ColumnName => $"{Kind}({Threshold.ToString().Replace(" ", "")}){(ShowPValues ? "/p-values" : "")}";
+        public Threshold Threshold { get; } = threshold;
+        public SignificanceLevel SignificanceLevel { get; } = significanceLevel ?? DefaultSignificanceLevel;
+
+        public override string Id => $"{nameof(StatisticalTestColumn)}/{Threshold}";
+        public override string ColumnName => $"MannWhitney({Threshold})";
 
         public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
             Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
         {
-            var x = baseline.OriginalValues.ToArray();
-            var y = current.OriginalValues.ToArray();
-            switch (Kind)
+            if (baseline.Sample.Values.SequenceEqual(current.Sample.Values))
+                return "Baseline";
+            if (current.Sample.Size == 1 && baseline.Sample.Size == 1)
+                return "?";
+
+            var test = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
+            var comparisonResult = test.Perform(current.Sample, baseline.Sample, Threshold, SignificanceLevel);
+            return comparisonResult switch
             {
-                case StatisticalTestKind.Welch:
-                    return StatisticalTestHelper.CalculateTost(WelchTest.Instance, x, y, Threshold).ToString(ShowPValues);
-                case StatisticalTestKind.MannWhitney:
-                    return StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x, y, Threshold).ToString(ShowPValues);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                ComparisonResult.Greater => "Slower",
+                ComparisonResult.Indistinguishable => "Same",
+                ComparisonResult.Lesser => "Faster",
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
-        public override int PriorityInCategory => (int) Kind;
+        public override int PriorityInCategory => 0;
         public override bool IsNumeric => false;
         public override UnitType UnitType => UnitType.Dimensionless;
 
-        public override string Legend => $"{Kind}-based TOST equivalence test with {Threshold} threshold{(ShowPValues ? ". Format: 'Result: p-value(Slower)|p-value(Faster)'" : "")}";
+        public override string Legend => $"MannWhitney-based equivalence test (threshold={Threshold}, alpha = {SignificanceLevel})";
     }
 }

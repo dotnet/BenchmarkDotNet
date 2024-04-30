@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Engines
                 measurementsForStatistics.Add(measurement);
 
                 var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, outlierMode);
-                double actualError = statistics.ConfidenceInterval.Margin;
+                double actualError = statistics.LegacyConfidenceInterval.Margin;
 
                 double maxError1 = effectiveMaxRelativeError * statistics.Mean;
                 double maxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;

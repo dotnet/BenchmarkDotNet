@@ -13,7 +13,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Perfolizer.Horology;
-using Perfolizer.Mathematics.Thresholds;
+using Perfolizer.Metrology;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -111,18 +111,15 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             );
 
             var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
-            var threshold = Threshold.Create(ThresholdUnit.Nanoseconds, cpuResolution.Nanoseconds);
+            var threshold = new NumberValue(cpuResolution.Nanoseconds).ToThreshold();
 
             foreach (var report in summary.Reports)
             {
-                var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
-                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().WithoutOutliers();
+                var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().Sample;
+                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().Sample;
 
-                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements, threshold);
+                bool isZero = ZeroMeasurementHelper.AreIndistinguishable(workloadMeasurements, overheadMeasurements, threshold);
                 Assert.True(isZero, $"Actual time was not 0.");
-
-                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements, threshold);
-                Assert.True(isZero, "Overhead took more time than workload.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
             }
@@ -167,18 +164,15 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             );
 
             var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
-            var threshold = Threshold.Create(ThresholdUnit.Nanoseconds, cpuResolution.Nanoseconds);
+            var threshold = (cpuResolution / 2).ToThreshold();
 
             foreach (var report in summary.Reports)
             {
-                var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
-                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().WithoutOutliers();
+                var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().Sample;
+                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().Sample;
 
-                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements, threshold);
+                bool isZero = ZeroMeasurementHelper.AreIndistinguishable(workloadMeasurements, overheadMeasurements, threshold);
                 Assert.False(isZero, $"Actual time was 0.");
-
-                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements, threshold);
-                Assert.True(isZero, "Overhead took more time than workload.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
             }
@@ -197,16 +191,12 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 
     public struct Struct64
     {
-        public long l1, l2, l3, l4,
-                    l5, l6, l7, l8;
+        public long l1, l2, l3, l4, l5, l6, l7, l8;
     }
 
     public struct Struct128
     {
-        public long l1, l2, l3, l4,
-                    l5, l6, l7, l8,
-                    l9, l10, l11, l12,
-                    l13, l14, l15, l16;
+        public long l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16;
     }
 
     public class DifferentSizedStructs
@@ -218,17 +208,72 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     }
 }
 
-public class EmptyVoid { [Benchmark] public void Void() { } }
-public class EmptyByte { [Benchmark] public byte Byte() => default; }
-public class EmptySByte { [Benchmark] public sbyte SByte() => default; }
-public class EmptyShort { [Benchmark] public short Short() => default; }
-public class EmptyUShort { [Benchmark] public ushort UShort() => default; }
-public class EmptyChar { [Benchmark] public char Char() => default; }
-public class EmptyInt32 { [Benchmark] public int Int32() => default; }
-public class EmptyUInt32 { [Benchmark] public uint UInt32() => default; }
-public class EmptyInt64 { [Benchmark] public long Int64() => default; }
-public class EmptyUInt64 { [Benchmark] public ulong UInt64() => default; }
-public class EmptyIntPtr { [Benchmark] public IntPtr IntPtr() => default; }
-public class EmptyUIntPtr { [Benchmark] public UIntPtr UIntPtr() => default; }
-public class EmptyVoidPointer { [Benchmark] public unsafe void* VoidPointer() => default; }
-public class EmptyClass { [Benchmark] public object Class() => default; }
+public class EmptyVoid
+{
+    [Benchmark] public void Void() { }
+}
+
+public class EmptyByte
+{
+    [Benchmark] public byte Byte() => default;
+}
+
+public class EmptySByte
+{
+    [Benchmark] public sbyte SByte() => default;
+}
+
+public class EmptyShort
+{
+    [Benchmark] public short Short() => default;
+}
+
+public class EmptyUShort
+{
+    [Benchmark] public ushort UShort() => default;
+}
+
+public class EmptyChar
+{
+    [Benchmark] public char Char() => default;
+}
+
+public class EmptyInt32
+{
+    [Benchmark] public int Int32() => default;
+}
+
+public class EmptyUInt32
+{
+    [Benchmark] public uint UInt32() => default;
+}
+
+public class EmptyInt64
+{
+    [Benchmark] public long Int64() => default;
+}
+
+public class EmptyUInt64
+{
+    [Benchmark] public ulong UInt64() => default;
+}
+
+public class EmptyIntPtr
+{
+    [Benchmark] public IntPtr IntPtr() => default;
+}
+
+public class EmptyUIntPtr
+{
+    [Benchmark] public UIntPtr UIntPtr() => default;
+}
+
+public class EmptyVoidPointer
+{
+    [Benchmark] public unsafe void* VoidPointer() => default;
+}
+
+public class EmptyClass
+{
+    [Benchmark] public object Class() => default;
+}

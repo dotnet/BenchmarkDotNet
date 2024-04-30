@@ -1,8 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using JetBrains.Annotations;
-using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
+using Perfolizer.Mathematics.Common;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -10,17 +9,11 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute
     {
-        public StatisticalTestColumnAttribute(StatisticalTestKind testKind, ThresholdUnit thresholdUnit, double value, bool showPValues = false)
-            : base(StatisticalTestColumn.Create(testKind, Threshold.Create(thresholdUnit, value), showPValues)) { }
+        public StatisticalTestColumnAttribute() : base(StatisticalTestColumn.Create("10%", null)) { }
 
-        public StatisticalTestColumnAttribute(StatisticalTestKind testKind, bool showPValues = false) : this(testKind, ThresholdUnit.Ratio, 0.1, showPValues) { }
+        public StatisticalTestColumnAttribute(string threshold) : base(StatisticalTestColumn.Create(threshold, null)) { }
 
-        public StatisticalTestColumnAttribute(bool showPValues = false) : this(StatisticalTestKind.MannWhitney, showPValues) {}
-    }
-
-    [Obsolete("Use StatisticalTestAttribute")]
-    public class WelchTTestPValueColumnAttribute : StatisticalTestColumnAttribute
-    {
-        public WelchTTestPValueColumnAttribute() : base(StatisticalTestKind.Welch) { }
+        public StatisticalTestColumnAttribute(string threshold, SignificanceLevel significanceLevel)
+            : base(StatisticalTestColumn.Create(threshold, significanceLevel)) { }
     }
 }

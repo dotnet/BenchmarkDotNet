@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Columns
                 if (NeedToShow(summary, s => s.Percentiles.P95 > s.Mean + 3 * s.StandardDeviation))
                     yield return StatisticColumn.P95;
                 if (NeedToShow(summary, s => s.N >= 3 &&
-                                             (!s.GetConfidenceInterval(ConfidenceLevel.L99, s.N).Contains(s.Median) ||
+                                             (!s.GetConfidenceInterval(ConfidenceLevel.L99).Contains(s.Median) ||
                                               Math.Abs(s.Median - s.Mean) > s.Mean * 0.2)))
                     yield return StatisticColumn.Median;
                 if (NeedToShow(summary, s => s.StandardDeviation > 1e-9))

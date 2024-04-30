@@ -8,12 +8,10 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class DryRunTests : BenchmarkTestExecutor
+    public class DryRunTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        public DryRunTests(ITestOutputHelper output) : base(output) { }
-
         [Fact]
-        public void WelchTTest() => CanExecute<WelchTTestBench>();
+        public void BenchWithStatTest() => CanExecute<WelchTTestBench>();
 
         [DryJob, StatisticalTestColumn]
         public class WelchTTestBench

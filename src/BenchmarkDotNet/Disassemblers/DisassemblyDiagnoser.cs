@@ -16,6 +16,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -194,7 +195,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Legend => "Native code size of the disassembled method(s)";
             public string NumberFormat => "N0";
             public UnitType UnitType => UnitType.CodeSize;
-            public string Unit => SizeUnit.B.Name;
+            public string Unit => SizeUnit.B.Abbreviation;
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
             public bool GetIsAvailable(Metric metric) => true;

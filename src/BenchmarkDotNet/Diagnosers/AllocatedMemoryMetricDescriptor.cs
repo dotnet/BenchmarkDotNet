@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.Diagnosers
         public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
         public string NumberFormat => "0.##";
         public UnitType UnitType => UnitType.Size;
-        public string Unit => SizeUnit.B.Name;
+        public string Unit => SizeUnit.B.Abbreviation;
         public bool TheGreaterTheBetter => false;
         public int PriorityInCategory => GC.MaxGeneration + 1;
         public bool GetIsAvailable(Metric metric) => true;

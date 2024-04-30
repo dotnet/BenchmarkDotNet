@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -53,7 +54,7 @@ namespace BenchmarkDotNet.Analysers
                 return $"{n} {words} {verb}";
             }
 
-            var rangeMessages = new List<string?> { GetRangeMessage(lowerOutliers, cultureInfo), GetRangeMessage(upperOutliers, cultureInfo) };
+            var rangeMessages = new List<string?> { GetRangeMessage(lowerOutliers), GetRangeMessage(upperOutliers) };
             rangeMessages.RemoveAll(string.IsNullOrEmpty);
             string rangeMessage = rangeMessages.Any()
                 ? " (" + string.Join(", ", rangeMessages) + ")"
@@ -66,20 +67,17 @@ namespace BenchmarkDotNet.Analysers
             return Format(actualOutliers.Length, "removed") + ", " + Format(allOutliers.Length, "detected") + rangeMessage;
         }
 
-        private static string? GetRangeMessage(double[] values, CultureInfo cultureInfo)
+        private static string? GetRangeMessage(double[] values)
         {
-            string Format(double value) => TimeInterval.FromNanoseconds(value).ToString(cultureInfo, "N2");
+            string Format(double value) => TimeInterval.FromNanoseconds(value).ToDefaultString("N2");
 
-            switch (values.Length) {
-                case 0:
-                    return null;
-                case 1:
-                    return Format(values.First());
-                case 2:
-                    return Format(values.Min()) + ", " + Format(values.Max());
-                default:
-                    return Format(values.Min()) + ".." + Format(values.Max());
-            }
+            return values.Length switch
+            {
+                0 => null,
+                1 => Format(values.First()),
+                2 => Format(values.Min()) + ", " + Format(values.Max()),
+                _ => Format(values.Min()) + ".." + Format(values.Max())
+            };
         }
     }
 }

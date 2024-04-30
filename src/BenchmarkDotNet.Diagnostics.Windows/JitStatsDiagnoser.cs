@@ -6,6 +6,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -97,7 +98,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public bool TheGreaterTheBetter => false;
             public string NumberFormat => "N0";
             public UnitType UnitType => UnitType.Size;
-            public string Unit => SizeUnit.B.Name;
+            public string Unit => SizeUnit.B.Abbreviation;
             public int PriorityInCategory => 0;
             public bool GetIsAvailable(Metric metric) => true;
         }

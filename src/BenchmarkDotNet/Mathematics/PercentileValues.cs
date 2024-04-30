@@ -4,42 +4,14 @@ using System.Globalization;
 using System.Text;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
+using Perfolizer;
 using Perfolizer.Mathematics.QuantileEstimators;
 
 namespace BenchmarkDotNet.Mathematics
 {
     public class PercentileValues
     {
-        /// <summary>
-        /// Calculates the Nth percentile from the set of values
-        /// </summary>
-        /// <remarks>
-        /// The implementation is expected to be consistent with the one from Excel.
-        /// It's a quite common to export bench output into .csv for further analysis
-        /// And it's a good idea to have same results from all tools being used.
-        /// </remarks>
-        /// <param name="sortedValues">Sequence of the values to be calculated</param>
-        /// <param name="percentile">Value in range 0..100</param>
-        /// <returns>Percentile from the set of values</returns>
-        // Based on: http://stackoverflow.com/a/8137526
-        private static double Percentile(IReadOnlyList<double> sortedValues, int percentile)
-        {
-            if (sortedValues == null)
-                throw new ArgumentNullException(nameof(sortedValues));
-            if (percentile < 0 || percentile > 100)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(percentile), percentile,
-                    "The percentile arg should be in range of 0 - 100.");
-            }
-
-            if (sortedValues.Count == 0)
-                return 0;
-
-            return SimpleQuantileEstimator.Instance.GetQuantileFromSorted(sortedValues, percentile / 100.0);
-        }
-
-        [PublicAPI] public double Percentile(int percentile) => Percentile(SortedValues, percentile);
+        [PublicAPI] public double Percentile(int percentile) => SimpleQuantileEstimator.Instance.Quantile(new Sample(SortedValues), percentile / 100.0);
 
         private IReadOnlyList<double> SortedValues { get; }
 

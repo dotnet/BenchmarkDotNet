@@ -434,7 +434,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
                 Type argLocalsType;
                 Type argFieldType;
-                MethodInfo? opConversion = null;
+                MethodInfo opConversion = null;
                 if (parameterType.IsByRef)
                 {
                     argLocalsType = parameterType;
@@ -582,42 +582,28 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 workloadInvokeMethod.ReturnParameter,
                 args);
             args = methodBuilder.GetEmitParameters(args);
-            var callResultType = consumableInfo.OriginMethodReturnType;
-            var awaiterType = consumableInfo.GetAwaiterMethod?.ReturnType
-                ?? throw new InvalidOperationException($"Bug: {nameof(consumableInfo.GetAwaiterMethod)} is null");
 
             var ilBuilder = methodBuilder.GetILGenerator();
 
             /*
-                .locals init (
-                    [0] valuetype [mscorlib]System.Runtime.CompilerServices.TaskAwaiter`1<int32>
-                )
-             */
-            var callResultLocal =
-                ilBuilder.DeclareOptionalLocalForInstanceCall(callResultType, consumableInfo.GetAwaiterMethod);
-            var awaiterLocal =
-                ilBuilder.DeclareOptionalLocalForInstanceCall(awaiterType, consumableInfo.GetResultMethod);
-
-            /*
-                // return TaskSample(arg0). ... ;
-                IL_0000: ldarg.0
-                IL_0001: ldarg.1
-                IL_0002: call instance class [mscorlib]System.Threading.Tasks.Task`1<int32> [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::TaskSample(int64)
-             */
+                IL_0026: ldarg.0
+                IL_0027: ldloc.0
+                IL_0028: ldloc.1
+                IL_0029: ldloc.2
+                IL_002a: ldloc.3
+                IL_002b: call instance class [System.Private.CoreLib]System.Threading.Tasks.Task`1<object> BenchmarkDotNet.Helpers.Runnable_0::WorkloadMethod(string, string, string, string)
+            */
             if (!Descriptor.WorkloadMethod.IsStatic)
                 ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.EmitLdargs(args);
             ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
 
             /*
-                // ... .GetAwaiter().GetResult();
-                IL_0007: callvirt instance valuetype [mscorlib]System.Runtime.CompilerServices.TaskAwaiter`1<!0> class [mscorlib]System.Threading.Tasks.Task`1<int32>::GetAwaiter()
-                IL_000c: stloc.0
-                IL_000d: ldloca.s 0
-                IL_000f: call instance !0 valuetype [mscorlib]System.Runtime.CompilerServices.TaskAwaiter`1<int32>::GetResult()
-             */
-            ilBuilder.EmitInstanceCallThisValueOnStack(callResultLocal, consumableInfo.GetAwaiterMethod);
-            ilBuilder.EmitInstanceCallThisValueOnStack(awaiterLocal, consumableInfo.GetResultMethod);
+                // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
+                IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
+            */
+
+            ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
 
             /*
                 IL_0014: ret
@@ -833,19 +819,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var skipFirstArg = workloadMethod.IsStatic;
             var argLocals = EmitDeclareArgLocals(ilBuilder, skipFirstArg);
 
-            LocalBuilder? callResultLocal = null;
-            LocalBuilder? awaiterLocal = null;
-            if (consumableInfo.IsAwaitable)
-            {
-                var callResultType = consumableInfo.OriginMethodReturnType;
-                var awaiterType = consumableInfo.GetAwaiterMethod?.ReturnType
-                    ?? throw new InvalidOperationException($"Bug: {nameof(consumableInfo.GetAwaiterMethod)} is null");
-                callResultLocal =
-                    ilBuilder.DeclareOptionalLocalForInstanceCall(callResultType, consumableInfo.GetAwaiterMethod);
-                awaiterLocal =
-                    ilBuilder.DeclareOptionalLocalForInstanceCall(awaiterType, consumableInfo.GetResultMethod);
-            }
-
             consumeEmitter.DeclareDisassemblyDiagnoserLocals(ilBuilder);
 
             var notElevenLabel = ilBuilder.DefineLabel();
@@ -870,29 +843,27 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 EmitLoadArgFieldsToLocals(ilBuilder, argLocals, skipFirstArg);
 
                 /*
-                    // return TaskSample(_argField) ... ;
-                    IL_0011: ldarg.0
-                    IL_0012: ldloc.0
-                    IL_0013: call instance class [mscorlib]System.Threading.Tasks.Task`1<int32> [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::TaskSample(int64)
-                    IL_0018: ret
+                    IL_0026: ldarg.0
+                    IL_0027: ldloc.0
+                    IL_0028: ldloc.1
+                    IL_0029: ldloc.2
+                    IL_002a: ldloc.3
+                    IL_002b: call instance class [System.Private.CoreLib]System.Threading.Tasks.Task`1<object> BenchmarkDotNet.Helpers.Runnable_0::WorkloadMethod(string, string, string, string)
                 */
-
                 if (!workloadMethod.IsStatic)
+                {
                     ilBuilder.Emit(OpCodes.Ldarg_0);
+                }
                 ilBuilder.EmitLdLocals(argLocals);
                 ilBuilder.Emit(OpCodes.Call, workloadMethod);
 
                 if (consumableInfo.IsAwaitable)
                 {
                     /*
-                        // ... .GetAwaiter().GetResult();
-                        IL_0007: callvirt instance valuetype [mscorlib]System.Runtime.CompilerServices.TaskAwaiter`1<!0> class [mscorlib]System.Threading.Tasks.Task`1<int32>::GetAwaiter()
-                        IL_000c: stloc.0
-                        IL_000d: ldloca.s 0
-                        IL_000f: call instance !0 valuetype [mscorlib]System.Runtime.CompilerServices.TaskAwaiter`1<int32>::GetResult()
-                     */
-                    ilBuilder.EmitInstanceCallThisValueOnStack(callResultLocal, consumableInfo.GetAwaiterMethod);
-                    ilBuilder.EmitInstanceCallThisValueOnStack(awaiterLocal, consumableInfo.GetResultMethod);
+                        // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
+                        IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
+                    */
+                    ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
                 }
 
                 /*
