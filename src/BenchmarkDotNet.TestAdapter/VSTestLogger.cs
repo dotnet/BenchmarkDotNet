@@ -33,8 +33,12 @@ namespace BenchmarkDotNet.TestAdapter
 
             // Assume that if the log kind is an error, that the whole line is treated as an error
             // The level will be reset to Informational when WriteLine() is called.
-            if (logKind == LogKind.Error)
-                currentLevel = TestMessageLevel.Error;
+            currentLevel = logKind switch
+            {
+                LogKind.Error => TestMessageLevel.Error,
+                LogKind.Warning => TestMessageLevel.Warning,
+                _ => currentLevel
+            };
         }
 
         public void WriteLine()

@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Analysers
         public static void Print(ILogger logger, IEnumerable<Conclusion> conclusions)
         {
             PrintFiltered(conclusions, ConclusionKind.Error, "Errors", logger.WriteLineError);
-            PrintFiltered(conclusions, ConclusionKind.Warning, "Warnings", logger.WriteLineError);
+            PrintFiltered(conclusions, ConclusionKind.Warning, "Warnings", logger.WriteLineWarning);
             PrintFiltered(conclusions, ConclusionKind.Hint, "Hints", logger.WriteLineHint);
         }
 

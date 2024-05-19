@@ -18,6 +18,8 @@ namespace BenchmarkDotNet.Loggers
 
         public static void WriteLineError(this ILogger logger, string text) => logger.WriteLine(LogKind.Error, text);
 
+        public static void WriteLineWarning(this ILogger logger, string text) => logger.WriteLine(LogKind.Warning, text);
+
         public static void WriteLineHint(this ILogger logger, string text) => logger.WriteLine(LogKind.Hint, text);
 
         public static void Write(this ILogger logger, string text) => logger.Write(LogKind.Default, text);
@@ -35,6 +37,8 @@ namespace BenchmarkDotNet.Loggers
         public static void WriteInfo(this ILogger logger, string text) => logger.Write(LogKind.Info, text);
 
         public static void WriteError(this ILogger logger, string text) => logger.Write(LogKind.Error, text);
+
+        public static void WriteWarning(this ILogger logger, string text) => logger.Write(LogKind.Warning, text);
 
         [PublicAPI]
         public static void WriteHint(this ILogger logger, string text) => logger.Write(LogKind.Hint, text);
