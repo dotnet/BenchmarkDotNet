@@ -79,6 +79,7 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Statistic, ConsoleColor.Cyan },
                 { LogKind.Info, ConsoleColor.DarkYellow },
                 { LogKind.Error, ConsoleColor.Red },
+                { LogKind.Warning, ConsoleColor.Yellow },
                 { LogKind.Hint, ConsoleColor.DarkCyan }
             };
 
