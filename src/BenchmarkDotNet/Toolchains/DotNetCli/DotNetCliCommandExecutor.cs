@@ -157,6 +157,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         internal static string GetSdkPath(string cliPath)
         {
             DotNetCliCommand cliCommand = new (
+                csProjPath: string.Empty,
                 cliPath: cliPath,
                 arguments: "--info",
                 generateResult: null,
