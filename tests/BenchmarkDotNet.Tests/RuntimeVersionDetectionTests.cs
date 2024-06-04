@@ -11,12 +11,12 @@ namespace BenchmarkDotNet.Tests
     public class RuntimeVersionDetectionTests
     {
         [Theory]
-        [InlineData(".NETCoreApp,Version=v2.0", RuntimeMoniker.NetCoreApp20, "netcoreapp2.0")]
-        [InlineData(".NETCoreApp,Version=v2.1", RuntimeMoniker.NetCoreApp21, "netcoreapp2.1")]
-        [InlineData(".NETCoreApp,Version=v2.2", RuntimeMoniker.NetCoreApp22, "netcoreapp2.2")]
-        [InlineData(".NETCoreApp,Version=v3.0", RuntimeMoniker.NetCoreApp30, "netcoreapp3.0")]
         [InlineData(".NETCoreApp,Version=v3.1", RuntimeMoniker.NetCoreApp31, "netcoreapp3.1")]
         [InlineData(".NETCoreApp,Version=v5.0", RuntimeMoniker.Net50, "net5.0")]
+        [InlineData(".NETCoreApp,Version=v6.0", RuntimeMoniker.Net60, "net6.0")]
+        [InlineData(".NETCoreApp,Version=v7.0", RuntimeMoniker.Net70, "net7.0")]
+        [InlineData(".NETCoreApp,Version=v8.0", RuntimeMoniker.Net80, "net8.0")]
+        [InlineData(".NETCoreApp,Version=v9.0", RuntimeMoniker.Net90, "net9.0")]
         [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "net123.0")]
         public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
         {
@@ -39,9 +39,6 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", "Microsoft .NET Framework", "4.6.27817.01 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.1 @SrcCode: https://github.com/dotnet/coreclr/tree/6f78fbb3f964b4f407a2efb713a186384a167e5c")]
-        [InlineData(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", "Microsoft .NET Framework", "4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7")]
-        [InlineData(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", "Microsoft .NET Core", "3.0.0-preview8-28379-12")]
         [InlineData(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", "Microsoft .NET Core", "3.1.0-something")]
         [InlineData(RuntimeMoniker.Net50, "net5.0", "Microsoft .NET Core", "5.0.0-alpha1.19415.3")]
         [InlineData(RuntimeMoniker.NotRecognized, "net123.0", "Microsoft .NET Core", "123.0.0-future")]
@@ -69,10 +66,6 @@ namespace BenchmarkDotNet.Tests
         {
             string directoryPrefix = Path.GetTempPath(); // this test runs on Unix, it can not be hardcoded due to / \ difference
 
-            yield return new object[] { Path.Combine(directoryPrefix, "2.0.9") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp20, "netcoreapp2.0" };
-            yield return new object[] { Path.Combine(directoryPrefix, "2.1.12") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp21, "netcoreapp2.1" };
-            yield return new object[] { Path.Combine(directoryPrefix, "2.2.6") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp22, "netcoreapp2.2" };
-            yield return new object[] { Path.Combine(directoryPrefix, "3.0.0-preview8-28379-12") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp30, "netcoreapp3.0" };
             yield return new object[] { Path.Combine(directoryPrefix, "5.0.0-alpha1.19422.13") + Path.DirectorySeparatorChar, RuntimeMoniker.Net50, "net5.0" };
             yield return new object[] { Path.Combine(directoryPrefix, "123.0.0") + Path.DirectorySeparatorChar, RuntimeMoniker.NotRecognized, "net123.0" };
         }
@@ -114,16 +107,12 @@ namespace BenchmarkDotNet.Tests
                 Assert.True(runtime is ClrRuntime);
             else
                 Assert.True(runtime is MonoRuntime);
-#elif NETCOREAPP2_1
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp21);
-#elif NETCOREAPP2_2
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp22);
-#elif NETCOREAPP3_0
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30);
 #elif NETCOREAPP3_1
             Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
 #elif NETCOREAPP5_0
             Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp50);
+#elif NET8_0
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net80);
 #endif
         }
     }

@@ -117,28 +117,29 @@ You can also filter the benchmarks by categories:
 The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are:
 
 * Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app).
-* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1.
+* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use net8.0.
 * Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`.
-* net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version.
-* netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0, netcoreapp3.1, net5.0, net6.0, net7.0 - to build and run benchmarks against specific .NET Core version.
-* nativeaot5.0, nativeaot6.0, nativeaot7.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: `--ilcPath`, `--ilCompilerVersion`.
+* net46, net461, net462, net47, net471, net472, net48, net481 - to build and run benchmarks against specific .NET Framework version.
+* netcoreapp3.1, net5.0, net6.0, net7.0, net8.0 - to build and run benchmarks against specific .NET (Core) version.
+* nativeaot5.0, nativeaot6.0, nativeaot7.0, nativeaot8.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: `--ilcPath`, `--ilCompilerVersion`.
+* mono6.0, mono7.0, mono8.0 - to build and run benchmarks with .Net 6+ using MonoVM.
 
-Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:
+Example: run the benchmarks for .NET 4.7.2 and .NET 8.0:
 
 ```log
-dotnet run -c Release -- --runtimes net472 netcoreapp2.1
+dotnet run -c Release -- --runtimes net472 net8.0
 ```
 
-Example: run the benchmarks for .NET Core 3.0 and latest .NET SDK installed on your PC:
+Example: run the benchmarks for .NET Core 3.1 and latest .NET SDK installed on your PC:
 
 ```log
-dotnet run -c Release -f netcoreapp3.0 -- --runtimes clr core
+dotnet run -c Release -f netcoreapp3.1 -- --runtimes clr core
 ```
 
-But same command executed with `-f netcoreapp2.0` is going to run the benchmarks for .NET Core 2.0:
+But same command executed with `-f net6.0` is going to run the benchmarks for .NET 6.0:
 
 ```log
-dotnet run -c Release -f netcoreapp2.0 -- --runtimes clr core
+dotnet run -c Release -f net6.0 -- --runtimes clr core
 ```
 
 ## Number of invocations and iterations
@@ -207,10 +208,10 @@ To perform a Mann–Whitney U Test and display the results in a dedicated column
 
 * `--statisticalTest`- Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s
 
-Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.
+Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET 6.0 will be baseline because it was first.
 
 ```log
-dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --statisticalTest 5%
+dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5%
 ```
 
 ## More

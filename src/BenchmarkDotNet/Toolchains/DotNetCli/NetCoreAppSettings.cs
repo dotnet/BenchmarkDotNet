@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
+using System;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -9,9 +10,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new ("netcoreapp2.0", null, ".NET Core 2.0");
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new ("netcoreapp2.1", null, ".NET Core 2.1");
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new ("netcoreapp2.2", null, ".NET Core 2.2");
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp30 = new ("netcoreapp3.0", null, ".NET Core 3.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp31 = new ("netcoreapp3.1", null, ".NET Core 3.1");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new ("net5.0", null, ".NET 5.0");
@@ -22,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
-        /// sample values: netcoreapp2.0, netcoreapp2.1
+        /// sample values: net6.0, net8.0
         /// </param>
         /// <param name="runtimeFrameworkVersion">
         /// used in the auto-generated .csproj file
@@ -64,7 +69,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <summary>
-        /// sample values: netcoreapp2.0, netcoreapp2.1
+        /// sample values: net6.0, net8.0
         /// </summary>
         public string TargetFrameworkMoniker { get; }
 

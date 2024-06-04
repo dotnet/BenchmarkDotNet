@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static IConfig CreateConfig()
         {
             // We use runtime as selector later. It is chosen as selector just to be close to initial issue. Nothing particularly special about it.
-            Job coreJob = new Job(Job.Default).WithRuntime(CoreRuntime.Core20).ApplyAndFreeze(RunMode.Dry);
+            Job coreJob = new Job(Job.Default).WithRuntime(CoreRuntime.Core80).ApplyAndFreeze(RunMode.Dry);
             Job clrJob = new Job(Job.Default).WithRuntime(ClrRuntime.Net462).ApplyAndFreeze(RunMode.Dry);
             return ManualConfig.Create(DefaultConfig.Instance).AddJob(coreJob).AddJob(clrJob);
         }

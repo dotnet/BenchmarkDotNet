@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     /// to run these tests please clone and build NativeAOT first,
     /// then update the hardcoded path
     /// and run following command from console:
-    /// dotnet test -c Release -f netcoreapp2.1 --filter "FullyQualifiedName~BenchmarkDotNet.IntegrationTests.ManualRunning.LocalNativeAotToolchainTests"
+    /// dotnet test -c Release -f net8.0 --filter "FullyQualifiedName~BenchmarkDotNet.IntegrationTests.ManualRunning.LocalNativeAotToolchainTests"
     ///
     /// in perfect world we would do this OOB for you, but building NativeAOT
     /// so it's not part of our CI jobs
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithRuntime(NativeAotRuntime.Net60)
+                    .WithRuntime(NativeAotRuntime.Net80)
                     .WithToolchain(
                         NativeAotToolchain.CreateBuilder()
                             .UseLocalBuild(new System.IO.DirectoryInfo(IlcPath))
