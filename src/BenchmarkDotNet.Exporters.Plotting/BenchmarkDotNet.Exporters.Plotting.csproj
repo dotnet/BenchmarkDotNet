@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet plotting export support.</AssemblyTitle>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <AssemblyName>BenchmarkDotNet.Exporters.Plotting</AssemblyName>
+    <PackageId>BenchmarkDotNet.Exporters.Plotting</PackageId>
+    <RootNamespace>BenchmarkDotNet.Exporters.Plotting</RootNamespace>
+    <!-- needed for docfx xref resolver -->
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ScottPlot" Version="5.0.25" />
+  </ItemGroup>
+</Project>
