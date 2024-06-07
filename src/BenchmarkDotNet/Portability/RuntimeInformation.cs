@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsNativeAOT
             => Environment.Version.Major >= 5
-                && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
+                && !RuntimeFeature.IsDynamicCodeSupported // is false on NativeAOT
                 && !IsWasm; // Wasm also returns "" for assembly locations
 
 #if NET6_0_OR_GREATER
