@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
+                    .Replace("$MeasureSurvivedMemory$", buildInfo.Config.HasSurvivedMemoryDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
                     .RemoveRedundantIfDefines(compilationId);
