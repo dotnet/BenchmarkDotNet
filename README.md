@@ -125,7 +125,7 @@ Four aspects define the design of these features:
 
 ### Simplicity
 
-You shouldn't be an experienced performance engineer if you want to write benchmarks.
+You shouldn't have to be an experienced performance engineer if you want to write benchmarks.
 You can design very complicated performance experiments in the declarative style using simple APIs.
 
 For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/features/parameterization.html) your benchmark,
