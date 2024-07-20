@@ -7,10 +7,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Exporters.Plotting.Tests
 {
-    public class ScottPlotExporterTests
+    public class ScottPlotExporterTests(ITestOutputHelper output)
     {
         public static TheoryData<Type> GetGroupBenchmarkTypes()
         {
@@ -32,6 +33,10 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
             var filePaths = exporter.ExportToFiles(summary, logger).ToList();
             Assert.NotEmpty(filePaths);
             Assert.All(filePaths, f => File.Exists(f));
+
+            foreach (string filePath in filePaths)
+                logger.WriteLine($"* {filePath}");
+            output.WriteLine(logger.GetLog());
         }
 
         [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -233,6 +238,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
                 [Arguments('\t')]
                 [Arguments('\n')]
                 [Benchmark] public void Foo(char charArg) { }
+
                 [Benchmark] public void Bar() { }
             }
         }
