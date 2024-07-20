@@ -2,8 +2,8 @@ using System.Globalization;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Columns;
 using Perfolizer.Horology;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Samples
 {
