@@ -7,28 +7,25 @@ using Cake.Core.IO;
 
 namespace BenchmarkDotNet.Build.Runners;
 
-public class UnitTestRunner
+public class UnitTestRunner(BuildContext context)
 {
-    private readonly BuildContext context;
+    private FilePath UnitTestsProjectFile { get; } = context.RootDirectory
+        .Combine("tests")
+        .Combine("BenchmarkDotNet.Tests")
+        .CombineWithFilePath("BenchmarkDotNet.Tests.csproj");
 
-    private FilePath UnitTestsProjectFile { get; }
-    private FilePath IntegrationTestsProjectFile { get; }
-    private DirectoryPath TestOutputDirectory { get; }
+    private FilePath ExporterTestsProjectFile { get; } = context.RootDirectory
+        .Combine("tests")
+        .Combine("BenchmarkDotNet.Exporters.Plotting.Tests")
+        .CombineWithFilePath("BenchmarkDotNet.Exporters.Plotting.Tests.csproj");
 
-    public UnitTestRunner(BuildContext context)
-    {
-        this.context = context;
-        UnitTestsProjectFile = context.RootDirectory
-            .Combine("tests")
-            .Combine("BenchmarkDotNet.Tests")
-            .CombineWithFilePath("BenchmarkDotNet.Tests.csproj");
-        IntegrationTestsProjectFile = context.RootDirectory
-            .Combine("tests")
-            .Combine("BenchmarkDotNet.IntegrationTests")
-            .CombineWithFilePath("BenchmarkDotNet.IntegrationTests.csproj");
-        TestOutputDirectory = context.RootDirectory
-            .Combine("TestResults");
-    }
+    private FilePath IntegrationTestsProjectFile { get; } = context.RootDirectory
+        .Combine("tests")
+        .Combine("BenchmarkDotNet.IntegrationTests")
+        .CombineWithFilePath("BenchmarkDotNet.IntegrationTests.csproj");
+
+    private DirectoryPath TestOutputDirectory { get; } = context.RootDirectory
+        .Combine("TestResults");
 
     private DotNetTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
@@ -58,14 +55,15 @@ public class UnitTestRunner
         context.DotNetTest(projectFile.FullPath, settings);
     }
 
-    private void RunUnitTests(string tfm) => RunTests(UnitTestsProjectFile, "unit", tfm);
+    private void RunUnitTests(string tfm)
+    {
+        RunTests(UnitTestsProjectFile, "unit", tfm);
+        RunTests(ExporterTestsProjectFile, "exporters", tfm);
+    }
 
     public void RunUnitTests()
     {
-        var targetFrameworks = context.IsRunningOnWindows()
-            ? new[] { "net462", "net8.0" }
-            : new[] { "net8.0" };
-
+        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net462", "net8.0"] : ["net8.0"];
         foreach (var targetFramework in targetFrameworks)
             RunUnitTests(targetFramework);
     }
