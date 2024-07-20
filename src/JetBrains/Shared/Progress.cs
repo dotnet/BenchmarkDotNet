@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.Diagnostics.dotMemory
+namespace BenchmarkDotNet.JetBrains
 {
-    public class Progress : IProgress<double>
+    internal sealed class Progress : IProgress<double>
     {
         private static readonly TimeSpan ReportInterval = TimeSpan.FromSeconds(0.1);
 

@@ -137,6 +137,13 @@ public class BuildContext : FrostingContext
             .GetSubDirectories(RootDirectory.Combine("src"))
             .Select(directoryPath => directoryPath.GetDirectoryName())
             .Where(name => !name.Contains("Disassembler", StringComparison.OrdinalIgnoreCase)));
+        
+        var jetBrainsNugetPackages = this
+            .GetSubDirectories(RootDirectory.Combine("src/JetBrains"))
+            .Select(directoryPath => directoryPath.GetDirectoryName())
+            .Where(name => name != "Shared");
+        nuGetPackageNames.AddRange(jetBrainsNugetPackages);
+
         nuGetPackageNames.Add("BenchmarkDotNet.Templates");
         nuGetPackageNames.Sort();
         NuGetPackageNames = nuGetPackageNames;

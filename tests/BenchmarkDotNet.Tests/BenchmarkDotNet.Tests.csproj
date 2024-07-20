@@ -35,8 +35,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
+    <ProjectReference Include="..\..\src\JetBrains\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
+    <ProjectReference Include="..\..\src\JetBrains\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
