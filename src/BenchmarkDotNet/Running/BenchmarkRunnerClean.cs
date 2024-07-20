@@ -37,8 +37,7 @@ namespace BenchmarkDotNet.Running
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
-            using var taskbarProgress = new TaskbarProgress();
-            taskbarProgress.SetState(TaskbarProgressState.Indeterminate);
+            using var taskbarProgress = new TaskbarProgress(TaskbarProgressState.Indeterminate);
 
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
