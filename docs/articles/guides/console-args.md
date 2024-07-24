@@ -243,6 +243,6 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--runOncePerIteration` run the benchmark exactly once per iteration.
 * `--buildTimeout` build timeout in seconds.
 * `--wasmEngine` full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
-* `--wasmMainJS` path to the test-main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"
+* `--wasmMainJS` path to the test-main.mjs file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"
 * `--expose_wasm` arguments for the JavaScript engine used by Wasm toolchain.
 * `--customRuntimePack` specify the path to a custom runtime pack. Only used for wasm currently.

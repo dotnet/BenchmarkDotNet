@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         private static Process CreateProcess(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
         {
             WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
-            string mainJs = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.js";
+            string mainJs = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.mjs";
 
             var start = new ProcessStartInfo
             {
