@@ -1,0 +1,24 @@
+﻿<Project>
+  <ItemGroup>
+    <UpToDateCheckInput Include="$(IntermediateOutputPath)BDNTA\build.stamp" Visible="false" />
+  </ItemGroup>
+  <Target Name="BenchmarkDotNet_TestAdapter_Validation"
+          Condition="'$(Configuration)'!='Release' AND '$(Optimize)'!='true'"
+          BeforeTargets="CoreCompile">
+    
+    <!--This is a workaround to ensure rebuild when running in VS and error is raised BDNTAE00001.-->
+
+    <!--Begin workaround -->
+    <ItemGroup>
+      <Files Include="$(IntermediateOutputPath)BDNTA\build.stamp"/> 
+    </ItemGroup>
+    <Touch AlwaysCreate="true" ForceTouch="true" Files="@(Files)"/>
+    <!--End workaround -->
+    
+    <Error Code="BDNTAE00001"
+           Text="You are compiling $(MSBuildProjectName) with in not Release mode and with Optimize set to false."
+           HelpLink="https://benchmarkdotnet.org/articles/features/vstest.html"
+           File="$(MSBuildProjectFullPath)"
+           />
+  </Target>
+</Project>
