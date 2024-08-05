@@ -45,7 +45,7 @@ jobs:
         shell: cmd
         run: ./build.cmd in-tests-full -e
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-windows-full-trx
@@ -77,7 +77,7 @@ jobs:
       - name: Run task 'in-tests-core'
         run: ./build.cmd in-tests-core -e
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-linux-trx
@@ -102,7 +102,7 @@ jobs:
       - name: Run task 'in-tests-core'
         run: ./build.cmd in-tests-core -e
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-macos-trx
