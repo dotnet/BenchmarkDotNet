@@ -17,7 +17,7 @@ jobs:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
@@ -37,7 +37,7 @@ jobs:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
@@ -54,7 +54,7 @@ jobs:
   test-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Clang
         uses: egor-tensin/setup-clang@v1
         with:
@@ -86,7 +86,7 @@ jobs:
   test-macos:
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up node
         uses: actions/setup-node@v4
         with:
@@ -111,7 +111,7 @@ jobs:
   test-pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Clang
         uses: egor-tensin/setup-clang@v1
         with:
@@ -125,8 +125,8 @@ jobs:
   spellcheck-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         name: Setup node
         with:
           node-version: "18"
