@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -54,9 +55,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static string? GetDotNetSdkVersion()
+        internal static bool DotNetSdkSupportsArtifactsPath(string? customDotNetCliPath)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
+            var version = string.IsNullOrEmpty(customDotNetCliPath)
+                ? HostEnvironmentInfo.GetCurrent().DotNetSdkVersion.Value
+                : GetDotNetSdkVersion(customDotNetCliPath);
+            return Version.TryParse(version, out var semVer) && semVer.Major >= 8;
+        }
+
+        internal static string? GetDotNetSdkVersion() => GetDotNetSdkVersion(null);
+
+        internal static string? GetDotNetSdkVersion(string? customDotNetCliPath)
+        {
+            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath, workingDirectory: string.Empty, arguments: "--version") })
             using (new ConsoleExitHandler(process, NullLogger.Instance))
             {
                 try
