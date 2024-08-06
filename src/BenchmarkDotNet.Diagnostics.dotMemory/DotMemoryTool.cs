@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             {
                 logger.WriteLineInfo("Ensuring that dotMemory prerequisite is installed...");
                 var progress = new Progress(logger, "Installing DotMemory");
-                DotMemory.EnsurePrerequisiteAsync(progress, nugetUrl, nugetApi, downloadTo).Wait();
+                DotMemory.InitAsync(progress, nugetUrl, nugetApi, downloadTo).Wait();
                 logger.WriteLineInfo("dotMemory prerequisite is installed");
                 logger.WriteLineInfo($"dotMemory runner path: {GetRunnerPath()}");
             }

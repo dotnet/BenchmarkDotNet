@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
             {
                 logger.WriteLineInfo("Ensuring that dotTrace prerequisite is installed...");
                 var progress = new Progress(logger, "Installing DotTrace");
-                DotTrace.EnsurePrerequisiteAsync(progress, nugetUrl, nugetApi, downloadTo).Wait();
+                DotTrace.InitAsync(progress, nugetUrl, nugetApi, downloadTo).Wait();
                 logger.WriteLineInfo("dotTrace prerequisite is installed");
                 logger.WriteLineInfo($"dotTrace runner path: {GetRunnerPath()}");
             }
