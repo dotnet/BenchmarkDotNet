@@ -69,6 +69,13 @@ namespace BenchmarkDotNet.Toolchains
             => string.Empty;
 
         /// <summary>
+        /// returns a path to the auto-generated .csproj file that is used to build the reference dlls
+        /// </summary>
+        [PublicAPI]
+        protected virtual string GetProjectFilePathForReferences(string buildArtifactsDirectoryPath)
+            => string.Empty;
+
+        /// <summary>
         /// returns a list of artifacts that should be removed after running the benchmarks
         /// </summary>
         [PublicAPI] protected abstract string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths);
@@ -142,6 +149,7 @@ namespace BenchmarkDotNet.Toolchains
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
+                buildForReferencesProjectFilePath: GetProjectFilePathForReferences(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,
                 programName: programName,
