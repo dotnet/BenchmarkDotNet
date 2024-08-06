@@ -76,7 +76,8 @@ namespace BenchmarkDotNet.Configs
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
                 source.BuildTimeout,
-                configAnalyse.AsReadOnly()
+                configAnalyse.AsReadOnly(),
+                source.AutomaticBaselineMode
             );
         }
 

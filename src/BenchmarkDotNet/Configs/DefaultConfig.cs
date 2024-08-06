@@ -112,5 +112,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<EventProcessor> GetEventProcessors() => Array.Empty<EventProcessor>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+
+        public AutomaticBaselineMode AutomaticBaselineMode { get; } = AutomaticBaselineMode.None;
     }
 }

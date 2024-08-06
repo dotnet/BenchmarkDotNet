@@ -56,7 +56,8 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle summaryStyle,
             ConfigOptions options,
             TimeSpan buildTimeout,
-            IReadOnlyList<Conclusion> configAnalysisConclusion)
+            IReadOnlyList<Conclusion> configAnalysisConclusion,
+            AutomaticBaselineMode automaticBaselineMode)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -79,6 +80,7 @@ namespace BenchmarkDotNet.Configs
             Options = options;
             BuildTimeout = buildTimeout;
             ConfigAnalysisConclusion = configAnalysisConclusion;
+            AutomaticBaselineMode = automaticBaselineMode;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -89,6 +91,7 @@ namespace BenchmarkDotNet.Configs
         public ICategoryDiscoverer CategoryDiscoverer { get; }
         public SummaryStyle SummaryStyle { get; }
         public TimeSpan BuildTimeout { get; }
+        public AutomaticBaselineMode AutomaticBaselineMode { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
