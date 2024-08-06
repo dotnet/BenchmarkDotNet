@@ -9,10 +9,10 @@
     <!--This is a workaround to ensure rebuild when running in VS and error is raised BDNTAE00001.-->
 
     <!--Begin workaround -->
-    <ItemGroup>
-      <Files Include="$(IntermediateOutputPath)BDNTA\build.stamp"/> 
-    </ItemGroup>
-    <Touch AlwaysCreate="true" ForceTouch="true" Files="@(Files)"/>
+    <MakeDir Directories="$(IntermediateOutputPath)BDNTA"/>
+    <WriteLinesToFile File="$(IntermediateOutputPath)BDNTA\build.stamp"
+        Lines="$([System.Guid]::NewGuid().ToString('d'))"
+        Overwrite="true" />
     <!--End workaround -->
     
     <Error Code="BDNTAE00001"
