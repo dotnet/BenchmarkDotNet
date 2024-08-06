@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Samples
                 .Run<Algo_Md5VsSha256>(
                     DefaultConfig.Instance
                         .AddJob(Job.Default.WithRuntime(ClrRuntime.Net462))
-                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
+                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
                         .AddValidator(ExecutionValidator.FailOnError));
         }
     }

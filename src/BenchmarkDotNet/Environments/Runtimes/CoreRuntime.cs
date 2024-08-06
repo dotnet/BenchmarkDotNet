@@ -11,9 +11,13 @@ namespace BenchmarkDotNet.Environments
 {
     public class CoreRuntime : Runtime
     {
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         public static readonly CoreRuntime Core20 = new (RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         public static readonly CoreRuntime Core21 = new (RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         public static readonly CoreRuntime Core22 = new (RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
+        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.13.X or older.", true)]
         public static readonly CoreRuntime Core30 = new (RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
         public static readonly CoreRuntime Core31 = new (RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
         public static readonly CoreRuntime Core50 = new (RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
@@ -64,10 +68,6 @@ namespace BenchmarkDotNet.Environments
         {
             switch (version)
             {
-                case Version v when v.Major == 2 && v.Minor == 0: return Core20;
-                case Version v when v.Major == 2 && v.Minor == 1: return Core21;
-                case Version v when v.Major == 2 && v.Minor == 2: return Core22;
-                case Version v when v.Major == 3 && v.Minor == 0: return Core30;
                 case Version v when v.Major == 3 && v.Minor == 1: return Core31;
                 case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50);
                 case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
@@ -75,7 +75,9 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80);
                 case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90);
                 default:
-                    return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
+                    return version >= new Version(3, 1)
+                        ? CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}")
+                        : throw new PlatformNotSupportedException($"netcoreapp{version.Major}.{version.Minor} is no longer supported. Use a newer runtime version or use BenchmarkDotNet v0.13.X or older.");
             }
         }
 

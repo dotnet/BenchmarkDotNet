@@ -19,7 +19,6 @@ public static class EnvRequirementChecker
         EnvRequirement.FullFrameworkOnly => BdnRuntimeInformation.IsFullFramework ? null : "Full .NET Framework-only test",
         EnvRequirement.NonFullFramework => !BdnRuntimeInformation.IsFullFramework ? null : "Non-Full .NET Framework test",
         EnvRequirement.DotNetCoreOnly => BdnRuntimeInformation.IsNetCore ? null : ".NET/.NET Core-only test",
-        EnvRequirement.DotNetCore30Only => IsRuntime(RuntimeMoniker.NetCoreApp30) ? null : ".NET Core 3.0-only test",
         _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, "Unknown value")
     };
 

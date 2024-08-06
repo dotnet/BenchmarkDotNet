@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
 
-                if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp31)
                 {
-                    yield return new ValidationError(true, $"{nameof(ThreadingDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                    yield return new ValidationError(true, $"{nameof(ThreadingDiagnoser)} supports only .NET Core 3.1+", benchmark);
                 }
             }
         }
