@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI]
         public BuildResult ToBuildResult(GenerateResult generateResult)
-            => IsSuccess || File.Exists(generateResult.ArtifactsPaths.ExecutablePath) // dotnet cli could have successfully built the program, but returned 1 as exit code because it had some warnings
+            => IsSuccess
                 ? BuildResult.Success(generateResult)
                 : BuildResult.Failure(generateResult, AllInformation);
     }
