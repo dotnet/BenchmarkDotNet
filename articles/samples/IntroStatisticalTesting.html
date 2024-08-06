@@ -6,6 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content=" | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../../logo/icon-32.png">
       <link rel="stylesheet" href="../../public/docfx.min.css">
       <link rel="stylesheet" href="../../public/main.css">
@@ -89,15 +90,11 @@
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroStatisticalTesting.cs">using System.Threading;
 using BenchmarkDotNet.Attributes;
-using Perfolizer.Mathematics.SignificanceTesting;
-using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Samples
 {
-    [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Microseconds, 1, true)]
-    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 1, true)]
-    [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.03, true)]
-    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.03, true)]
+    [StatisticalTestColumn(&quot;500us&quot;)]
+    [StatisticalTestColumn(&quot;3%&quot;)]
     [SimpleJob(warmupCount: 0, iterationCount: 5)]
     public class IntroStatisticalTesting
     {
@@ -155,7 +152,7 @@ namespace BenchmarkDotNet.Samples
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

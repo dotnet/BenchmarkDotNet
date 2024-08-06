@@ -8,6 +8,7 @@
       <meta name="title" content="Class ArtifactsPaths
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -137,8 +138,8 @@
 
   <a id="BenchmarkDotNet_Toolchains_ArtifactsPaths__ctor_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
-  ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string)
+  <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+  ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string, string)
   
   </h3>
 
@@ -146,7 +147,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ArtifactsPaths(string rootArtifactsFolderPath, string buildArtifactsDirectoryPath, string binariesDirectoryPath, string programCodePath, string appConfigPath, string nuGetConfigPath, string projectFilePath, string buildScriptFilePath, string executablePath, string programName, string packagesDirectoryName)</code></pre>
+    <pre><code class="lang-csharp hljs">public ArtifactsPaths(string rootArtifactsFolderPath, string buildArtifactsDirectoryPath, string binariesDirectoryPath, string intermediateDirectoryPath, string programCodePath, string appConfigPath, string nuGetConfigPath, string projectFilePath, string buildScriptFilePath, string executablePath, string programName, string packagesDirectoryName)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -156,6 +157,8 @@
     <dt><code>buildArtifactsDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
     <dt><code>binariesDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>intermediateDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
     <dt><code>programCodePath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
@@ -379,6 +382,37 @@
 
 
 
+  <a id="BenchmarkDotNet_Toolchains_ArtifactsPaths_IntermediateDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths_IntermediateDirectoryPath" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath">
+  IntermediateDirectoryPath
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string IntermediateDirectoryPath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Toolchains_ArtifactsPaths_NuGetConfigPath_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.NuGetConfigPath*"></a>
 
   <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths_NuGetConfigPath" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.NuGetConfigPath">
@@ -582,7 +616,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

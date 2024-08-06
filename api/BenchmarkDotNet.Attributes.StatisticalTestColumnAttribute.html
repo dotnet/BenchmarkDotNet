@@ -8,6 +8,7 @@
       <meta name="title" content="Class StatisticalTestColumnAttribute
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -127,12 +128,6 @@ public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute, IConfig
     </dd>
   </dl>
 
-  <dl class="typelist derived">
-    <dt>Derived</dt>
-    <dd>
-      <div><a class="xref" href="BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html">WelchTTestPValueColumnAttribute</a></div>
-    </dd>
-  </dl>
 
   <dl class="typelist derived">
     <dt>Inherited Members</dt>
@@ -264,8 +259,8 @@ public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute, IConfig
 
   <a id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_Perfolizer_Mathematics_Thresholds_ThresholdUnit_System_Double_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.ThresholdUnit,System.Double,System.Boolean)">
-  StatisticalTestColumnAttribute(StatisticalTestKind, ThresholdUnit, double, bool)
+  <h3 id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor">
+  StatisticalTestColumnAttribute()
   
   </h3>
 
@@ -273,18 +268,38 @@ public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute, IConfig
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StatisticalTestColumnAttribute(StatisticalTestKind testKind, ThresholdUnit thresholdUnit, double value, bool showPValues = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public StatisticalTestColumnAttribute()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_System_String_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.String)">
+  StatisticalTestColumnAttribute(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StatisticalTestColumnAttribute(string threshold)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>testKind</code> <span class="xref">StatisticalTestKind</span></dt>
-    <dd></dd>
-    <dt><code>thresholdUnit</code> <span class="xref">ThresholdUnit</span></dt>
-    <dd></dd>
-    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></dt>
-    <dd></dd>
-    <dt><code>showPValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dt><code>threshold</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
   </dl>
 
@@ -301,8 +316,8 @@ public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute, IConfig
 
   <a id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,System.Boolean)">
-  StatisticalTestColumnAttribute(StatisticalTestKind, bool)
+  <h3 id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_System_String_Perfolizer_Mathematics_Common_SignificanceLevel_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.String,Perfolizer.Mathematics.Common.SignificanceLevel)">
+  StatisticalTestColumnAttribute(string, SignificanceLevel)
   
   </h3>
 
@@ -310,45 +325,14 @@ public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute, IConfig
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StatisticalTestColumnAttribute(StatisticalTestKind testKind, bool showPValues = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public StatisticalTestColumnAttribute(string threshold, SignificanceLevel significanceLevel)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>testKind</code> <span class="xref">StatisticalTestKind</span></dt>
+    <dt><code>threshold</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
-    <dt><code>showPValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
-
-  <a id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor*"></a>
-
-  <h3 id="BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.Boolean)">
-  StatisticalTestColumnAttribute(bool)
-  
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StatisticalTestColumnAttribute(bool showPValues = false)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>showPValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dt><code>significanceLevel</code> <span class="xref">SignificanceLevel</span></dt>
     <dd></dd>
   </dl>
 
@@ -380,7 +364,7 @@ public class StatisticalTestColumnAttribute : ColumnConfigBaseAttribute, IConfig
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

@@ -8,6 +8,7 @@
       <meta name="title" content="Class StatisticalTestColumn
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -170,8 +171,8 @@
 
   <a id="BenchmarkDotNet_Columns_StatisticalTestColumn__ctor_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn__ctor_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_Perfolizer_Mathematics_Thresholds_Threshold_System_Boolean_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.Threshold,System.Boolean)">
-  StatisticalTestColumn(StatisticalTestKind, Threshold, bool)
+  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn__ctor_Perfolizer_Metrology_Threshold_System_Nullable_Perfolizer_Mathematics_Common_SignificanceLevel__" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor(Perfolizer.Metrology.Threshold,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})">
+  StatisticalTestColumn(Threshold, SignificanceLevel?)
   
   </h3>
 
@@ -179,16 +180,14 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StatisticalTestColumn(StatisticalTestKind kind, Threshold threshold, bool showPValues = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public StatisticalTestColumn(Threshold threshold, SignificanceLevel? significanceLevel = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>kind</code> <span class="xref">StatisticalTestKind</span></dt>
-    <dd></dd>
     <dt><code>threshold</code> <span class="xref">Threshold</span></dt>
     <dd></dd>
-    <dt><code>showPValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dt><code>significanceLevel</code> <span class="xref">SignificanceLevel</span>?</dt>
     <dd></dd>
   </dl>
 
@@ -304,37 +303,6 @@
 
 
 
-  <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_Kind_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Kind*"></a>
-
-  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_Kind" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Kind">
-  Kind
-  
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StatisticalTestKind Kind { get; }</code></pre>
-  </div>
-
-
-
-
-
-  <h4 class="section">Property Value</h4>
-  <dl class="parameters">
-    <dt><span class="xref">StatisticalTestKind</span></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
   <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_Legend_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Legend*"></a>
 
   <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_Legend" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Legend">
@@ -399,10 +367,10 @@
 
 
 
-  <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_ShowPValues_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues*"></a>
+  <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_SignificanceLevel_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel*"></a>
 
-  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_ShowPValues" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues">
-  ShowPValues
+  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_SignificanceLevel" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel">
+  SignificanceLevel
   
   </h3>
 
@@ -410,7 +378,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ShowPValues { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public SignificanceLevel SignificanceLevel { get; }</code></pre>
   </div>
 
 
@@ -419,7 +387,7 @@
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dt><span class="xref">SignificanceLevel</span></dt>
     <dd></dd>
   </dl>
 
@@ -499,8 +467,8 @@
 
   <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_Create_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Create*"></a>
 
-  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_Create_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_Perfolizer_Mathematics_Thresholds_Threshold_System_Boolean_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.Threshold,System.Boolean)">
-  Create(StatisticalTestKind, Threshold, bool)
+  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_Create_Perfolizer_Metrology_Threshold_System_Nullable_Perfolizer_Mathematics_Common_SignificanceLevel__" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Metrology.Threshold,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})">
+  Create(Threshold, SignificanceLevel?)
   
   </h3>
 
@@ -508,18 +476,85 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static StatisticalTestColumn Create(StatisticalTestKind kind, Threshold threshold, bool showPValues = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public static StatisticalTestColumn Create(Threshold threshold, SignificanceLevel? significanceLevel = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>kind</code> <span class="xref">StatisticalTestKind</span></dt>
-    <dd></dd>
     <dt><code>threshold</code> <span class="xref">Threshold</span></dt>
     <dd></dd>
-    <dt><code>showPValues</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dt><code>significanceLevel</code> <span class="xref">SignificanceLevel</span>?</dt>
     <dd></dd>
   </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Columns.StatisticalTestColumn.html">StatisticalTestColumn</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_Create_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Create*"></a>
+
+  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_Create_System_String_System_Nullable_Perfolizer_Mathematics_Common_SignificanceLevel__" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.Create(System.String,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})">
+  Create(string, SignificanceLevel?)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static StatisticalTestColumn Create(string threshold, SignificanceLevel? significanceLevel = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>threshold</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>significanceLevel</code> <span class="xref">SignificanceLevel</span>?</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Columns.StatisticalTestColumn.html">StatisticalTestColumn</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Columns_StatisticalTestColumn_CreateDefault_" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault*"></a>
+
+  <h3 id="BenchmarkDotNet_Columns_StatisticalTestColumn_CreateDefault" data-uid="BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault">
+  CreateDefault()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static StatisticalTestColumn CreateDefault()</code></pre>
+  </div>
+
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
@@ -602,7 +637,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

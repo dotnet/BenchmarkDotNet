@@ -8,6 +8,7 @@
       <meta name="title" content="Class CsProjGenerator
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -387,7 +388,7 @@
   
   </h3>
 
-  <div class="markdown level1 summary"><p>returns a path where executable should be found after the build</p>
+  <div class="markdown level1 summary"><p>returns a path where executable should be found after the build (usually \bin)</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -478,6 +479,45 @@ and also by NuGet internal implementation like looking for global.json file in p
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetIntermediateDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetIntermediateDirectoryPath_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath(System.String,System.String)">
+  GetIntermediateDirectoryPath(string, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>returns a path where intermediate files should be found after the build (usually \obj)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override string GetIntermediateDirectoryPath(string buildArtifactsDirectoryPath, string configuration)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buildArtifactsDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>configuration</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
   </dl>
 
@@ -623,7 +663,7 @@ and also by NuGet internal implementation like looking for global.json file in p
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

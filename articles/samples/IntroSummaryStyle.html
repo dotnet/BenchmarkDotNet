@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title> | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content=" | BenchmarkDotNet ">
+      
+      
+      <link rel="icon" href="../../logo/icon-32.png">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/articles/samples/IntroSummaryStyle.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.SummaryStyle">
+
+<h2 id="summarystyle-in-benchmarkdotnet">SummaryStyle in BenchmarkDotNet</h2>
+<p><code>SummaryStyle</code> is a class in BenchmarkDotNet that allows customization of the summary reports of benchmark results. It offers several properties to fine-tune how the results are displayed.</p>
+<h3 id="usage">Usage</h3>
+<p>You can customize the summary report by specifying various properties of <code>SummaryStyle</code>. These properties include formatting options like whether to print units in the header or content, setting the maximum width for parameter columns, and choosing units for size and time measurements.</p>
+<h3 id="source-code">Source Code</h3>
+<pre><code class="lang-csharp" name="IntroSummaryStyle.cs">using System.Globalization;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Reports;
+using Perfolizer.Horology;
+using Perfolizer.Metrology;
+
+namespace BenchmarkDotNet.Samples
+{
+    [Config(typeof(Config))]
+    public class IntroSummaryStyle
+    {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                // Configure the summary style here
+                var summaryStyle = new SummaryStyle
+                (
+                    cultureInfo: CultureInfo.InvariantCulture,
+                    printUnitsInHeader: true,
+                    printUnitsInContent: false,
+                    sizeUnit: SizeUnit.KB,
+                    timeUnit: TimeUnit.Nanosecond,
+                    maxParameterColumnWidth: 20
+
+                );
+
+                WithSummaryStyle(summaryStyle);
+            }
+        }
+
+        [Params(10, 100)]
+        public int N;
+
+        [Benchmark]
+        public void Sleep() =&gt; System.Threading.Thread.Sleep(N);
+    }
+}
+</code></pre><h3 id="properties">Properties</h3>
+<ul>
+<li><code>PrintUnitsInHeader</code>: Boolean to indicate if units should be printed in the header.</li>
+<li><code>PrintUnitsInContent</code>: Boolean to control unit printing in the content.</li>
+<li><code>PrintZeroValuesInContent</code>: Determines if zero values should be printed.</li>
+<li><code>MaxParameterColumnWidth</code>: Integer defining the max width for parameter columns.</li>
+<li><code>SizeUnit</code>: Optional <code>SizeUnit</code> to specify the unit for size measurements.</li>
+<li><code>TimeUnit</code>: Optional <code>TimeUnit</code> for time measurement units.</li>
+<li><code>CultureInfo</code>: <code>CultureInfo</code> to define culture-specific formatting.</li>
+</ul>
+<h3 id="example-output">Example Output</h3>
+<p>Using SummaryStyle options:</p>
+<pre><code class="lang-markdown">| Method | N   | Mean [ns]     | Error [ns] | StdDev [ns] |
+|------- |---- |--------------:|-----------:|------------:|
+| Sleep  | 10  |  15,644,973.1 |   32,808.7 |    30,689.3 |
+| Sleep  | 100 | 109,440,686.7 |  236,673.8 |   221,384.8 |
+</code></pre>
+<p>Default:</p>
+<pre><code class="lang-markdown">| Method | N   | Mean      | Error    | StdDev   |
+|------- |---- |----------:|---------:|---------:|
+| Sleep  | 10  |  15.65 ms | 0.039 ms | 0.034 ms |
+| Sleep  | 100 | 109.20 ms | 0.442 ms | 0.392 ms |
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li>@docs.SummaryStyle</li>
+<li>The permanent link to this sample: @BenchmarkDotNet.Samples.IntroSummaryStyle</li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -8,6 +8,7 @@
       <meta name="title" content="Class StatisticsExtensions
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -172,7 +173,7 @@
   <a id="BenchmarkDotNet_Extensions_StatisticsExtensions_ToString_" data-uid="BenchmarkDotNet.Extensions.StatisticsExtensions.ToString*"></a>
 
   <h3 id="BenchmarkDotNet_Extensions_StatisticsExtensions_ToString_BenchmarkDotNet_Mathematics_Statistics_System_Globalization_CultureInfo_System_Func_System_Double_System_String__System_Boolean_" data-uid="BenchmarkDotNet.Extensions.StatisticsExtensions.ToString(BenchmarkDotNet.Mathematics.Statistics,System.Globalization.CultureInfo,System.Func{System.Double,System.String},System.Boolean)">
-  ToString(Statistics, CultureInfo, Func&lt;double, string&gt;, bool)
+  ToString(Statistics?, CultureInfo, Func&lt;double, string&gt;, bool)
   
   </h3>
 
@@ -180,7 +181,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static string ToString(this Statistics s, CultureInfo cultureInfo, Func&lt;double, string&gt; formatter, bool calcHistogram = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public static string ToString(this Statistics? s, CultureInfo cultureInfo, Func&lt;double, string&gt; formatter, bool calcHistogram = false)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -228,7 +229,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

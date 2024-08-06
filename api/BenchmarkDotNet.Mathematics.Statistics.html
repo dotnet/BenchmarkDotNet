@@ -8,6 +8,7 @@
       <meta name="title" content="Class Statistics
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -127,7 +128,7 @@
       <a class="xref" href="BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_CreateNanosecondFormatter_BenchmarkDotNet_Mathematics_Statistics_System_Globalization_CultureInfo_System_String_">StatisticsExtensions.CreateNanosecondFormatter(Statistics, CultureInfo, string)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_ToString_BenchmarkDotNet_Mathematics_Statistics_System_Globalization_CultureInfo_System_Func_System_Double_System_String__System_Boolean_">StatisticsExtensions.ToString(Statistics, CultureInfo, Func&lt;double, string&gt;, bool)</a>
+      <a class="xref" href="BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_ToString_BenchmarkDotNet_Mathematics_Statistics_System_Globalization_CultureInfo_System_Func_System_Double_System_String__System_Boolean_">StatisticsExtensions.ToString(Statistics?, CultureInfo, Func&lt;double, string&gt;, bool)</a>
   </div>
   </dd></dl>
 
@@ -137,6 +138,37 @@
 
   <h2 class="section" id="constructors">Constructors
 </h2>
+
+
+  <a id="BenchmarkDotNet_Mathematics_Statistics__ctor_" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Mathematics_Statistics__ctor_Perfolizer_Sample_" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor(Perfolizer.Sample)">
+  Statistics(Sample)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Statistics(Sample sample)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>sample</code> <span class="xref">Sample</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
 
 
   <a id="BenchmarkDotNet_Mathematics_Statistics__ctor_" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor*"></a>
@@ -278,7 +310,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConfidenceInterval ConfidenceInterval { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public LegacyConfidenceInterval ConfidenceInterval { get; }</code></pre>
   </div>
 
 
@@ -287,7 +319,7 @@
 
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
-    <dt><span class="xref">ConfidenceInterval</span></dt>
+    <dt><a class="xref" href="BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html">LegacyConfidenceInterval</a></dt>
     <dd></dd>
   </dl>
 
@@ -1074,8 +1106,8 @@
 
   <a id="BenchmarkDotNet_Mathematics_Statistics_GetConfidenceInterval_" data-uid="BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval*"></a>
 
-  <h3 id="BenchmarkDotNet_Mathematics_Statistics_GetConfidenceInterval_Perfolizer_Mathematics_Common_ConfidenceLevel_System_Int32_" data-uid="BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel,System.Int32)">
-  GetConfidenceInterval(ConfidenceLevel, int)
+  <h3 id="BenchmarkDotNet_Mathematics_Statistics_GetConfidenceInterval_Perfolizer_Mathematics_Common_ConfidenceLevel_" data-uid="BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel)">
+  GetConfidenceInterval(ConfidenceLevel)
   
   </h3>
 
@@ -1083,14 +1115,12 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n)</code></pre>
+    <pre><code class="lang-csharp hljs">public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>level</code> <span class="xref">ConfidenceLevel</span></dt>
-    <dd></dd>
-    <dt><code>n</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
     <dd></dd>
   </dl>
 
@@ -1406,7 +1436,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

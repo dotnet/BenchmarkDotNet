@@ -8,6 +8,7 @@
       <meta name="title" content="Class DotNetCliCommand
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -131,8 +132,8 @@
 
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean,System.Boolean)">
-  DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList&lt;EnvironmentVariable&gt;, TimeSpan, bool, bool)
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean)">
+  DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList&lt;EnvironmentVariable&gt;, TimeSpan, bool)
   
   </h3>
 
@@ -140,7 +141,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, BuildPartition buildPartition, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables, TimeSpan timeout, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, BuildPartition buildPartition, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables, TimeSpan timeout, bool logOutput = false)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -160,8 +161,6 @@
     <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
     <dd></dd>
     <dt><code>logOutput</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
-    <dd></dd>
-    <dt><code>retryFailedBuildWithNoDeps</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
     <dd></dd>
   </dl>
 
@@ -397,37 +396,6 @@
 
 
 
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps*"></a>
-
-  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps">
-  RetryFailedBuildWithNoDeps
-  
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool RetryFailedBuildWithNoDeps { get; }</code></pre>
-  </div>
-
-
-
-
-
-  <h4 class="section">Property Value</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout*"></a>
 
   <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout">
@@ -556,37 +524,6 @@
 
 
 
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies*"></a>
-
-  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies">
-  BuildNoRestoreNoDependencies()
-  
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult BuildNoRestoreNoDependencies()</code></pre>
-  </div>
-
-
-  <h4 class="section">Returns</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Publish_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish*"></a>
 
   <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Publish" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish">
@@ -618,10 +555,10 @@
 
 
 
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore*"></a>
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoRestore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore*"></a>
 
-  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore">
-  PublishNoBuildAndNoRestore()
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoRestore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore">
+  PublishNoRestore()
   
   </h3>
 
@@ -629,7 +566,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult PublishNoBuildAndNoRestore()</code></pre>
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult PublishNoRestore()</code></pre>
   </div>
 
 
@@ -831,7 +768,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

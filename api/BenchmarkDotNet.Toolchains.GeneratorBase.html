@@ -8,6 +8,7 @@
       <meta name="title" content="Class GeneratorBase
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -459,7 +460,7 @@
   
   </h3>
 
-  <div class="markdown level1 summary"><p>returns a path where executable should be found after the build</p>
+  <div class="markdown level1 summary"><p>returns a path where executable should be found after the build (usually \bin)</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -600,6 +601,45 @@
 
 
 
+  <a id="BenchmarkDotNet_Toolchains_GeneratorBase_GetIntermediateDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_GeneratorBase_GetIntermediateDirectoryPath_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath(System.String,System.String)">
+  GetIntermediateDirectoryPath(string, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>returns a path where intermediate files should be found after the build (usually \obj)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual string GetIntermediateDirectoryPath(string buildArtifactsDirectoryPath, string configuration)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buildArtifactsDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>configuration</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Toolchains_GeneratorBase_GetPackagesDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.GeneratorBase.GetPackagesDirectoryPath*"></a>
 
   <h3 id="BenchmarkDotNet_Toolchains_GeneratorBase_GetPackagesDirectoryPath_System_String_" data-uid="BenchmarkDotNet.Toolchains.GeneratorBase.GetPackagesDirectoryPath(System.String)">
@@ -691,7 +731,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

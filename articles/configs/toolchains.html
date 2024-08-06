@@ -6,6 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="Toolchains | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../../logo/icon-32.png">
       <link rel="stylesheet" href="../../public/docfx.min.css">
       <link rel="stylesheet" href="../../public/main.css">
@@ -195,8 +196,8 @@ namespace BenchmarkDotNet.Samples
             .NetCoreApp20
             .WithCustomDotNetCliPath(@&quot;C:\Program Files\dotnet\dotnet.exe&quot;, &quot;64 bit cli&quot;);
 
-        Add(Job.RyuJitX86.With(CsProjCoreToolchain.From(dotnetCli32bit)).WithId(&quot;32 bit cli&quot;));
-        Add(Job.RyuJitX64.With(CsProjCoreToolchain.From(dotnetCli64bit)).WithId(&quot;64 bit cli&quot;));
+        AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(dotnetCli32bit)).WithId(&quot;32 bit cli&quot;));
+        AddJob(Job.RyuJitX64.WithToolchain(CsProjCoreToolchain.From(dotnetCli64bit)).WithId(&quot;64 bit cli&quot;));
     }
 }
 </code></pre>
@@ -611,7 +612,7 @@ namespace BenchmarkDotNet.Samples
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

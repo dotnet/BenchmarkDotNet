@@ -745,42 +745,6 @@ references:
   commentId: Overload:BenchmarkDotNet.Analysers.ZeroMeasurementAnalyser.Id
   fullName: BenchmarkDotNet.Analysers.ZeroMeasurementAnalyser.Id
   nameWithType: ZeroMeasurementAnalyser.Id
-- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper
-  name: ZeroMeasurementHelper
-  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html
-  commentId: T:BenchmarkDotNet.Analysers.ZeroMeasurementHelper
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper
-  nameWithType: ZeroMeasurementHelper
-- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample(System.Double[],System.Double)
-  name: CheckZeroMeasurementOneSample(double[], double)
-  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementOneSample_System_Double___System_Double_
-  commentId: M:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample(System.Double[],System.Double)
-  name.vb: CheckZeroMeasurementOneSample(Double(), Double)
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample(double[], double)
-  fullName.vb: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample(Double(), Double)
-  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementOneSample(double[], double)
-  nameWithType.vb: ZeroMeasurementHelper.CheckZeroMeasurementOneSample(Double(), Double)
-- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample*
-  name: CheckZeroMeasurementOneSample
-  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementOneSample_
-  commentId: Overload:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample
-  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementOneSample
-- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[],Perfolizer.Mathematics.Thresholds.Threshold)
-  name: CheckZeroMeasurementTwoSamples(double[], double[], Threshold?)
-  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementTwoSamples_System_Double___System_Double___Perfolizer_Mathematics_Thresholds_Threshold_
-  commentId: M:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[],Perfolizer.Mathematics.Thresholds.Threshold)
-  name.vb: CheckZeroMeasurementTwoSamples(Double(), Double(), Threshold)
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Perfolizer.Mathematics.Thresholds.Threshold?)
-  fullName.vb: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double(), Perfolizer.Mathematics.Thresholds.Threshold)
-  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Threshold?)
-  nameWithType.vb: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double(), Threshold)
-- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples*
-  name: CheckZeroMeasurementTwoSamples
-  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementTwoSamples_
-  commentId: Overload:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples
-  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples
 - uid: BenchmarkDotNet.Attributes
   name: BenchmarkDotNet.Attributes
   href: api/BenchmarkDotNet.Attributes.html
@@ -1318,6 +1282,15 @@ references:
   commentId: T:BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute
   fullName: BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute
   nameWithType: ConfidenceIntervalErrorColumnAttribute
+- uid: BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.#ctor
+  name: ConfidenceIntervalErrorColumnAttribute()
+  href: api/BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.html#BenchmarkDotNet_Attributes_ConfidenceIntervalErrorColumnAttribute__ctor
+  commentId: M:BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.ConfidenceIntervalErrorColumnAttribute()
+  fullName.vb: BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.New()
+  nameWithType: ConfidenceIntervalErrorColumnAttribute.ConfidenceIntervalErrorColumnAttribute()
+  nameWithType.vb: ConfidenceIntervalErrorColumnAttribute.New()
 - uid: BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.#ctor(Perfolizer.Mathematics.Common.ConfidenceLevel)
   name: ConfidenceIntervalErrorColumnAttribute(ConfidenceLevel)
   href: api/BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.html#BenchmarkDotNet_Attributes_ConfidenceIntervalErrorColumnAttribute__ctor_Perfolizer_Mathematics_Common_ConfidenceLevel_
@@ -4168,33 +4141,33 @@ references:
   commentId: T:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute
   fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute
   nameWithType: StatisticalTestColumnAttribute
-- uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.ThresholdUnit,System.Double,System.Boolean)
-  name: StatisticalTestColumnAttribute(StatisticalTestKind, ThresholdUnit, double, bool)
-  href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_Perfolizer_Mathematics_Thresholds_ThresholdUnit_System_Double_System_Boolean_
-  commentId: M:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.ThresholdUnit,System.Double,System.Boolean)
-  name.vb: New(StatisticalTestKind, ThresholdUnit, Double, Boolean)
-  fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Perfolizer.Mathematics.Thresholds.ThresholdUnit, double, bool)
-  fullName.vb: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.New(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Perfolizer.Mathematics.Thresholds.ThresholdUnit, Double, Boolean)
-  nameWithType: StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(StatisticalTestKind, ThresholdUnit, double, bool)
-  nameWithType.vb: StatisticalTestColumnAttribute.New(StatisticalTestKind, ThresholdUnit, Double, Boolean)
-- uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,System.Boolean)
-  name: StatisticalTestColumnAttribute(StatisticalTestKind, bool)
-  href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_System_Boolean_
-  commentId: M:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,System.Boolean)
-  name.vb: New(StatisticalTestKind, Boolean)
-  fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, bool)
-  fullName.vb: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.New(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Boolean)
-  nameWithType: StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(StatisticalTestKind, bool)
-  nameWithType.vb: StatisticalTestColumnAttribute.New(StatisticalTestKind, Boolean)
-- uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.Boolean)
-  name: StatisticalTestColumnAttribute(bool)
-  href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_System_Boolean_
-  commentId: M:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.Boolean)
-  name.vb: New(Boolean)
-  fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(bool)
-  fullName.vb: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.New(Boolean)
-  nameWithType: StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(bool)
-  nameWithType.vb: StatisticalTestColumnAttribute.New(Boolean)
+- uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor
+  name: StatisticalTestColumnAttribute()
+  href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor
+  commentId: M:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.StatisticalTestColumnAttribute()
+  fullName.vb: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.New()
+  nameWithType: StatisticalTestColumnAttribute.StatisticalTestColumnAttribute()
+  nameWithType.vb: StatisticalTestColumnAttribute.New()
+- uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.String,Perfolizer.Mathematics.Common.SignificanceLevel)
+  name: StatisticalTestColumnAttribute(string, SignificanceLevel)
+  href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_System_String_Perfolizer_Mathematics_Common_SignificanceLevel_
+  commentId: M:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.String,Perfolizer.Mathematics.Common.SignificanceLevel)
+  name.vb: New(String, SignificanceLevel)
+  fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(string, Perfolizer.Mathematics.Common.SignificanceLevel)
+  fullName.vb: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.New(String, Perfolizer.Mathematics.Common.SignificanceLevel)
+  nameWithType: StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(string, SignificanceLevel)
+  nameWithType.vb: StatisticalTestColumnAttribute.New(String, SignificanceLevel)
+- uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.String)
+  name: StatisticalTestColumnAttribute(string)
+  href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_System_String_
+  commentId: M:BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor(System.String)
+  name.vb: New(String)
+  fullName: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(string)
+  fullName.vb: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.New(String)
+  nameWithType: StatisticalTestColumnAttribute.StatisticalTestColumnAttribute(string)
+  nameWithType.vb: StatisticalTestColumnAttribute.New(String)
 - uid: BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.#ctor*
   name: StatisticalTestColumnAttribute
   href: api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html#BenchmarkDotNet_Attributes_StatisticalTestColumnAttribute__ctor_
@@ -4531,30 +4504,6 @@ references:
   fullName.vb: BenchmarkDotNet.Attributes.WarmupCountAttribute.New
   nameWithType: WarmupCountAttribute.WarmupCountAttribute
   nameWithType.vb: WarmupCountAttribute.New
-- uid: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute
-  name: WelchTTestPValueColumnAttribute
-  href: api/BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html
-  commentId: T:BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute
-  fullName: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute
-  nameWithType: WelchTTestPValueColumnAttribute
-- uid: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.#ctor
-  name: WelchTTestPValueColumnAttribute()
-  href: api/BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html#BenchmarkDotNet_Attributes_WelchTTestPValueColumnAttribute__ctor
-  commentId: M:BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.#ctor
-  name.vb: New()
-  fullName: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.WelchTTestPValueColumnAttribute()
-  fullName.vb: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.New()
-  nameWithType: WelchTTestPValueColumnAttribute.WelchTTestPValueColumnAttribute()
-  nameWithType.vb: WelchTTestPValueColumnAttribute.New()
-- uid: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.#ctor*
-  name: WelchTTestPValueColumnAttribute
-  href: api/BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html#BenchmarkDotNet_Attributes_WelchTTestPValueColumnAttribute__ctor_
-  commentId: Overload:BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.#ctor
-  name.vb: New
-  fullName: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.WelchTTestPValueColumnAttribute
-  fullName.vb: BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.New
-  nameWithType: WelchTTestPValueColumnAttribute.WelchTTestPValueColumnAttribute
-  nameWithType.vb: WelchTTestPValueColumnAttribute.New
 - uid: BenchmarkDotNet.Attributes.XmlExporterAttribute
   name: XmlExporterAttribute
   href: api/BenchmarkDotNet.Attributes.XmlExporterAttribute.html
@@ -8920,432 +8869,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Columns.SimpleColumnProvider.GetColumns
   fullName: BenchmarkDotNet.Columns.SimpleColumnProvider.GetColumns
   nameWithType: SimpleColumnProvider.GetColumns
-- uid: BenchmarkDotNet.Columns.SizeUnit
-  name: SizeUnit
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html
-  commentId: T:BenchmarkDotNet.Columns.SizeUnit
-  fullName: BenchmarkDotNet.Columns.SizeUnit
-  nameWithType: SizeUnit
-- uid: BenchmarkDotNet.Columns.SizeUnit.#ctor(System.String,System.String,System.Int64)
-  name: SizeUnit(string, string, long)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit__ctor_System_String_System_String_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.#ctor(System.String,System.String,System.Int64)
-  name.vb: New(String, String, Long)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.SizeUnit(string, string, long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.New(String, String, Long)
-  nameWithType: SizeUnit.SizeUnit(string, string, long)
-  nameWithType.vb: SizeUnit.New(String, String, Long)
-- uid: BenchmarkDotNet.Columns.SizeUnit.#ctor*
-  name: SizeUnit
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit__ctor_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.#ctor
-  name.vb: New
-  fullName: BenchmarkDotNet.Columns.SizeUnit.SizeUnit
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.New
-  nameWithType: SizeUnit.SizeUnit
-  nameWithType.vb: SizeUnit.New
-- uid: BenchmarkDotNet.Columns.SizeUnit.All
-  name: All
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_All
-  commentId: F:BenchmarkDotNet.Columns.SizeUnit.All
-  fullName: BenchmarkDotNet.Columns.SizeUnit.All
-  nameWithType: SizeUnit.All
-- uid: BenchmarkDotNet.Columns.SizeUnit.B
-  name: B
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_B
-  commentId: F:BenchmarkDotNet.Columns.SizeUnit.B
-  fullName: BenchmarkDotNet.Columns.SizeUnit.B
-  nameWithType: SizeUnit.B
-- uid: BenchmarkDotNet.Columns.SizeUnit.ByteAmount
-  name: ByteAmount
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_ByteAmount
-  commentId: P:BenchmarkDotNet.Columns.SizeUnit.ByteAmount
-  fullName: BenchmarkDotNet.Columns.SizeUnit.ByteAmount
-  nameWithType: SizeUnit.ByteAmount
-- uid: BenchmarkDotNet.Columns.SizeUnit.ByteAmount*
-  name: ByteAmount
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_ByteAmount_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.ByteAmount
-  fullName: BenchmarkDotNet.Columns.SizeUnit.ByteAmount
-  nameWithType: SizeUnit.ByteAmount
-- uid: BenchmarkDotNet.Columns.SizeUnit.Convert(System.Int64,BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)
-  name: Convert(long, SizeUnit, SizeUnit)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Convert_System_Int64_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Columns_SizeUnit_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.Convert(System.Int64,BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)
-  name.vb: Convert(Long, SizeUnit, SizeUnit)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Convert(long, BenchmarkDotNet.Columns.SizeUnit, BenchmarkDotNet.Columns.SizeUnit)
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.Convert(Long, BenchmarkDotNet.Columns.SizeUnit, BenchmarkDotNet.Columns.SizeUnit)
-  nameWithType: SizeUnit.Convert(long, SizeUnit, SizeUnit)
-  nameWithType.vb: SizeUnit.Convert(Long, SizeUnit, SizeUnit)
-- uid: BenchmarkDotNet.Columns.SizeUnit.Convert*
-  name: Convert
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Convert_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.Convert
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Convert
-  nameWithType: SizeUnit.Convert
-- uid: BenchmarkDotNet.Columns.SizeUnit.Description
-  name: Description
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Description
-  commentId: P:BenchmarkDotNet.Columns.SizeUnit.Description
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Description
-  nameWithType: SizeUnit.Description
-- uid: BenchmarkDotNet.Columns.SizeUnit.Description*
-  name: Description
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Description_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.Description
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Description
-  nameWithType: SizeUnit.Description
-- uid: BenchmarkDotNet.Columns.SizeUnit.Equals(BenchmarkDotNet.Columns.SizeUnit)
-  name: Equals(SizeUnit)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Equals_BenchmarkDotNet_Columns_SizeUnit_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.Equals(BenchmarkDotNet.Columns.SizeUnit)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Equals(BenchmarkDotNet.Columns.SizeUnit)
-  nameWithType: SizeUnit.Equals(SizeUnit)
-- uid: BenchmarkDotNet.Columns.SizeUnit.Equals(System.Object)
-  name: Equals(object)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Equals_System_Object_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.Equals(System.Object)
-  name.vb: Equals(Object)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Equals(object)
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.Equals(Object)
-  nameWithType: SizeUnit.Equals(object)
-  nameWithType.vb: SizeUnit.Equals(Object)
-- uid: BenchmarkDotNet.Columns.SizeUnit.Equals*
-  name: Equals
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Equals_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.Equals
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Equals
-  nameWithType: SizeUnit.Equals
-- uid: BenchmarkDotNet.Columns.SizeUnit.GB
-  name: GB
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_GB
-  commentId: F:BenchmarkDotNet.Columns.SizeUnit.GB
-  fullName: BenchmarkDotNet.Columns.SizeUnit.GB
-  nameWithType: SizeUnit.GB
-- uid: BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit(System.Int64[])
-  name: GetBestSizeUnit(params long[])
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_GetBestSizeUnit_System_Int64___
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit(System.Int64[])
-  name.vb: GetBestSizeUnit(ParamArray Long())
-  fullName: BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit(params long[])
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit(ParamArray Long())
-  nameWithType: SizeUnit.GetBestSizeUnit(params long[])
-  nameWithType.vb: SizeUnit.GetBestSizeUnit(ParamArray Long())
-- uid: BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit*
-  name: GetBestSizeUnit
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_GetBestSizeUnit_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit
-  fullName: BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit
-  nameWithType: SizeUnit.GetBestSizeUnit
-- uid: BenchmarkDotNet.Columns.SizeUnit.GetHashCode
-  name: GetHashCode()
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_GetHashCode
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.GetHashCode
-  fullName: BenchmarkDotNet.Columns.SizeUnit.GetHashCode()
-  nameWithType: SizeUnit.GetHashCode()
-- uid: BenchmarkDotNet.Columns.SizeUnit.GetHashCode*
-  name: GetHashCode
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_GetHashCode_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.GetHashCode
-  fullName: BenchmarkDotNet.Columns.SizeUnit.GetHashCode
-  nameWithType: SizeUnit.GetHashCode
-- uid: BenchmarkDotNet.Columns.SizeUnit.KB
-  name: KB
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_KB
-  commentId: F:BenchmarkDotNet.Columns.SizeUnit.KB
-  fullName: BenchmarkDotNet.Columns.SizeUnit.KB
-  nameWithType: SizeUnit.KB
-- uid: BenchmarkDotNet.Columns.SizeUnit.MB
-  name: MB
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_MB
-  commentId: F:BenchmarkDotNet.Columns.SizeUnit.MB
-  fullName: BenchmarkDotNet.Columns.SizeUnit.MB
-  nameWithType: SizeUnit.MB
-- uid: BenchmarkDotNet.Columns.SizeUnit.Name
-  name: Name
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Name
-  commentId: P:BenchmarkDotNet.Columns.SizeUnit.Name
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Name
-  nameWithType: SizeUnit.Name
-- uid: BenchmarkDotNet.Columns.SizeUnit.Name*
-  name: Name
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_Name_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.Name
-  fullName: BenchmarkDotNet.Columns.SizeUnit.Name
-  nameWithType: SizeUnit.Name
-- uid: BenchmarkDotNet.Columns.SizeUnit.op_Equality(BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)
-  name: operator ==(SizeUnit, SizeUnit)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_op_Equality_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Columns_SizeUnit_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.op_Equality(BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)
-  name.vb: =(SizeUnit, SizeUnit)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.operator ==(BenchmarkDotNet.Columns.SizeUnit, BenchmarkDotNet.Columns.SizeUnit)
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.=(BenchmarkDotNet.Columns.SizeUnit, BenchmarkDotNet.Columns.SizeUnit)
-  nameWithType: SizeUnit.operator ==(SizeUnit, SizeUnit)
-  nameWithType.vb: SizeUnit.=(SizeUnit, SizeUnit)
-- uid: BenchmarkDotNet.Columns.SizeUnit.op_Equality*
-  name: operator ==
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_op_Equality_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.op_Equality
-  name.vb: =
-  fullName: BenchmarkDotNet.Columns.SizeUnit.operator ==
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.=
-  nameWithType: SizeUnit.operator ==
-  nameWithType.vb: SizeUnit.=
-- uid: BenchmarkDotNet.Columns.SizeUnit.op_Inequality(BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)
-  name: operator !=(SizeUnit, SizeUnit)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_op_Inequality_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Columns_SizeUnit_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.op_Inequality(BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)
-  name.vb: <>(SizeUnit, SizeUnit)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.operator !=(BenchmarkDotNet.Columns.SizeUnit, BenchmarkDotNet.Columns.SizeUnit)
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.<>(BenchmarkDotNet.Columns.SizeUnit, BenchmarkDotNet.Columns.SizeUnit)
-  nameWithType: SizeUnit.operator !=(SizeUnit, SizeUnit)
-  nameWithType.vb: SizeUnit.<>(SizeUnit, SizeUnit)
-- uid: BenchmarkDotNet.Columns.SizeUnit.op_Inequality*
-  name: operator !=
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_op_Inequality_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.op_Inequality
-  name.vb: <>
-  fullName: BenchmarkDotNet.Columns.SizeUnit.operator !=
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.<>
-  nameWithType: SizeUnit.operator !=
-  nameWithType.vb: SizeUnit.<>
-- uid: BenchmarkDotNet.Columns.SizeUnit.TB
-  name: TB
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_TB
-  commentId: F:BenchmarkDotNet.Columns.SizeUnit.TB
-  fullName: BenchmarkDotNet.Columns.SizeUnit.TB
-  nameWithType: SizeUnit.TB
-- uid: BenchmarkDotNet.Columns.SizeUnit.ToValue(System.Int64)
-  name: ToValue(long)
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_ToValue_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeUnit.ToValue(System.Int64)
-  name.vb: ToValue(Long)
-  fullName: BenchmarkDotNet.Columns.SizeUnit.ToValue(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeUnit.ToValue(Long)
-  nameWithType: SizeUnit.ToValue(long)
-  nameWithType.vb: SizeUnit.ToValue(Long)
-- uid: BenchmarkDotNet.Columns.SizeUnit.ToValue*
-  name: ToValue
-  href: api/BenchmarkDotNet.Columns.SizeUnit.html#BenchmarkDotNet_Columns_SizeUnit_ToValue_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeUnit.ToValue
-  fullName: BenchmarkDotNet.Columns.SizeUnit.ToValue
-  nameWithType: SizeUnit.ToValue
-- uid: BenchmarkDotNet.Columns.SizeValue
-  name: SizeValue
-  href: api/BenchmarkDotNet.Columns.SizeValue.html
-  commentId: T:BenchmarkDotNet.Columns.SizeValue
-  fullName: BenchmarkDotNet.Columns.SizeValue
-  nameWithType: SizeValue
-- uid: BenchmarkDotNet.Columns.SizeValue.#ctor(System.Int64,BenchmarkDotNet.Columns.SizeUnit)
-  name: SizeValue(long, SizeUnit)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue__ctor_System_Int64_BenchmarkDotNet_Columns_SizeUnit_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.#ctor(System.Int64,BenchmarkDotNet.Columns.SizeUnit)
-  name.vb: New(Long, SizeUnit)
-  fullName: BenchmarkDotNet.Columns.SizeValue.SizeValue(long, BenchmarkDotNet.Columns.SizeUnit)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.New(Long, BenchmarkDotNet.Columns.SizeUnit)
-  nameWithType: SizeValue.SizeValue(long, SizeUnit)
-  nameWithType.vb: SizeValue.New(Long, SizeUnit)
-- uid: BenchmarkDotNet.Columns.SizeValue.#ctor(System.Int64)
-  name: SizeValue(long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue__ctor_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.#ctor(System.Int64)
-  name.vb: New(Long)
-  fullName: BenchmarkDotNet.Columns.SizeValue.SizeValue(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.New(Long)
-  nameWithType: SizeValue.SizeValue(long)
-  nameWithType.vb: SizeValue.New(Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.#ctor*
-  name: SizeValue
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue__ctor_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.#ctor
-  name.vb: New
-  fullName: BenchmarkDotNet.Columns.SizeValue.SizeValue
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.New
-  nameWithType: SizeValue.SizeValue
-  nameWithType.vb: SizeValue.New
-- uid: BenchmarkDotNet.Columns.SizeValue.B
-  name: B
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_B
-  commentId: F:BenchmarkDotNet.Columns.SizeValue.B
-  fullName: BenchmarkDotNet.Columns.SizeValue.B
-  nameWithType: SizeValue.B
-- uid: BenchmarkDotNet.Columns.SizeValue.Bytes
-  name: Bytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_Bytes
-  commentId: P:BenchmarkDotNet.Columns.SizeValue.Bytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.Bytes
-  nameWithType: SizeValue.Bytes
-- uid: BenchmarkDotNet.Columns.SizeValue.Bytes*
-  name: Bytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_Bytes_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.Bytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.Bytes
-  nameWithType: SizeValue.Bytes
-- uid: BenchmarkDotNet.Columns.SizeValue.FromBytes(System.Int64)
-  name: FromBytes(long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromBytes_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.FromBytes(System.Int64)
-  name.vb: FromBytes(Long)
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromBytes(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.FromBytes(Long)
-  nameWithType: SizeValue.FromBytes(long)
-  nameWithType.vb: SizeValue.FromBytes(Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.FromBytes*
-  name: FromBytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromBytes_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.FromBytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromBytes
-  nameWithType: SizeValue.FromBytes
-- uid: BenchmarkDotNet.Columns.SizeValue.FromGigabytes(System.Int64)
-  name: FromGigabytes(long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromGigabytes_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.FromGigabytes(System.Int64)
-  name.vb: FromGigabytes(Long)
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromGigabytes(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.FromGigabytes(Long)
-  nameWithType: SizeValue.FromGigabytes(long)
-  nameWithType.vb: SizeValue.FromGigabytes(Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.FromGigabytes*
-  name: FromGigabytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromGigabytes_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.FromGigabytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromGigabytes
-  nameWithType: SizeValue.FromGigabytes
-- uid: BenchmarkDotNet.Columns.SizeValue.FromKilobytes(System.Int64)
-  name: FromKilobytes(long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromKilobytes_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.FromKilobytes(System.Int64)
-  name.vb: FromKilobytes(Long)
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromKilobytes(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.FromKilobytes(Long)
-  nameWithType: SizeValue.FromKilobytes(long)
-  nameWithType.vb: SizeValue.FromKilobytes(Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.FromKilobytes*
-  name: FromKilobytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromKilobytes_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.FromKilobytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromKilobytes
-  nameWithType: SizeValue.FromKilobytes
-- uid: BenchmarkDotNet.Columns.SizeValue.FromMegabytes(System.Int64)
-  name: FromMegabytes(long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromMegabytes_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.FromMegabytes(System.Int64)
-  name.vb: FromMegabytes(Long)
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromMegabytes(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.FromMegabytes(Long)
-  nameWithType: SizeValue.FromMegabytes(long)
-  nameWithType.vb: SizeValue.FromMegabytes(Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.FromMegabytes*
-  name: FromMegabytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromMegabytes_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.FromMegabytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromMegabytes
-  nameWithType: SizeValue.FromMegabytes
-- uid: BenchmarkDotNet.Columns.SizeValue.FromTerabytes(System.Int64)
-  name: FromTerabytes(long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromTerabytes_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.FromTerabytes(System.Int64)
-  name.vb: FromTerabytes(Long)
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromTerabytes(long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.FromTerabytes(Long)
-  nameWithType: SizeValue.FromTerabytes(long)
-  nameWithType.vb: SizeValue.FromTerabytes(Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.FromTerabytes*
-  name: FromTerabytes
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_FromTerabytes_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.FromTerabytes
-  fullName: BenchmarkDotNet.Columns.SizeValue.FromTerabytes
-  nameWithType: SizeValue.FromTerabytes
-- uid: BenchmarkDotNet.Columns.SizeValue.GB
-  name: GB
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_GB
-  commentId: F:BenchmarkDotNet.Columns.SizeValue.GB
-  fullName: BenchmarkDotNet.Columns.SizeValue.GB
-  nameWithType: SizeValue.GB
-- uid: BenchmarkDotNet.Columns.SizeValue.KB
-  name: KB
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_KB
-  commentId: F:BenchmarkDotNet.Columns.SizeValue.KB
-  fullName: BenchmarkDotNet.Columns.SizeValue.KB
-  nameWithType: SizeValue.KB
-- uid: BenchmarkDotNet.Columns.SizeValue.MB
-  name: MB
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_MB
-  commentId: F:BenchmarkDotNet.Columns.SizeValue.MB
-  fullName: BenchmarkDotNet.Columns.SizeValue.MB
-  nameWithType: SizeValue.MB
-- uid: BenchmarkDotNet.Columns.SizeValue.op_Multiply(BenchmarkDotNet.Columns.SizeValue,System.Int64)
-  name: operator *(SizeValue, long)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_op_Multiply_BenchmarkDotNet_Columns_SizeValue_System_Int64_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.op_Multiply(BenchmarkDotNet.Columns.SizeValue,System.Int64)
-  name.vb: '*(SizeValue, Long)'
-  fullName: BenchmarkDotNet.Columns.SizeValue.operator *(BenchmarkDotNet.Columns.SizeValue, long)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.*(BenchmarkDotNet.Columns.SizeValue, Long)
-  nameWithType: SizeValue.operator *(SizeValue, long)
-  nameWithType.vb: SizeValue.*(SizeValue, Long)
-- uid: BenchmarkDotNet.Columns.SizeValue.op_Multiply(System.Int64,BenchmarkDotNet.Columns.SizeValue)
-  name: operator *(long, SizeValue)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_op_Multiply_System_Int64_BenchmarkDotNet_Columns_SizeValue_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.op_Multiply(System.Int64,BenchmarkDotNet.Columns.SizeValue)
-  name.vb: '*(Long, SizeValue)'
-  fullName: BenchmarkDotNet.Columns.SizeValue.operator *(long, BenchmarkDotNet.Columns.SizeValue)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.*(Long, BenchmarkDotNet.Columns.SizeValue)
-  nameWithType: SizeValue.operator *(long, SizeValue)
-  nameWithType.vb: SizeValue.*(Long, SizeValue)
-- uid: BenchmarkDotNet.Columns.SizeValue.op_Multiply*
-  name: operator *
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_op_Multiply_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.op_Multiply
-  name.vb: '*'
-  fullName: BenchmarkDotNet.Columns.SizeValue.operator *
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.*
-  nameWithType: SizeValue.operator *
-  nameWithType.vb: SizeValue.*
-- uid: BenchmarkDotNet.Columns.SizeValue.TB
-  name: TB
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_TB
-  commentId: F:BenchmarkDotNet.Columns.SizeValue.TB
-  fullName: BenchmarkDotNet.Columns.SizeValue.TB
-  nameWithType: SizeValue.TB
-- uid: BenchmarkDotNet.Columns.SizeValue.ToString(BenchmarkDotNet.Columns.SizeUnit,System.Globalization.CultureInfo,System.String,Perfolizer.Common.UnitPresentation)
-  name: ToString(SizeUnit?, CultureInfo?, string?, UnitPresentation?)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_ToString_BenchmarkDotNet_Columns_SizeUnit_System_Globalization_CultureInfo_System_String_Perfolizer_Common_UnitPresentation_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.ToString(BenchmarkDotNet.Columns.SizeUnit,System.Globalization.CultureInfo,System.String,Perfolizer.Common.UnitPresentation)
-  name.vb: ToString(SizeUnit, CultureInfo, String, UnitPresentation)
-  fullName: BenchmarkDotNet.Columns.SizeValue.ToString(BenchmarkDotNet.Columns.SizeUnit?, System.Globalization.CultureInfo?, string?, Perfolizer.Common.UnitPresentation?)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.ToString(BenchmarkDotNet.Columns.SizeUnit, System.Globalization.CultureInfo, String, Perfolizer.Common.UnitPresentation)
-  nameWithType: SizeValue.ToString(SizeUnit?, CultureInfo?, string?, UnitPresentation?)
-  nameWithType.vb: SizeValue.ToString(SizeUnit, CultureInfo, String, UnitPresentation)
-- uid: BenchmarkDotNet.Columns.SizeValue.ToString(System.Globalization.CultureInfo,System.String,Perfolizer.Common.UnitPresentation)
-  name: ToString(CultureInfo?, string?, UnitPresentation?)
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_ToString_System_Globalization_CultureInfo_System_String_Perfolizer_Common_UnitPresentation_
-  commentId: M:BenchmarkDotNet.Columns.SizeValue.ToString(System.Globalization.CultureInfo,System.String,Perfolizer.Common.UnitPresentation)
-  name.vb: ToString(CultureInfo, String, UnitPresentation)
-  fullName: BenchmarkDotNet.Columns.SizeValue.ToString(System.Globalization.CultureInfo?, string?, Perfolizer.Common.UnitPresentation?)
-  fullName.vb: BenchmarkDotNet.Columns.SizeValue.ToString(System.Globalization.CultureInfo, String, Perfolizer.Common.UnitPresentation)
-  nameWithType: SizeValue.ToString(CultureInfo?, string?, UnitPresentation?)
-  nameWithType.vb: SizeValue.ToString(CultureInfo, String, UnitPresentation)
-- uid: BenchmarkDotNet.Columns.SizeValue.ToString*
-  name: ToString
-  href: api/BenchmarkDotNet.Columns.SizeValue.html#BenchmarkDotNet_Columns_SizeValue_ToString_
-  commentId: Overload:BenchmarkDotNet.Columns.SizeValue.ToString
-  fullName: BenchmarkDotNet.Columns.SizeValue.ToString
-  nameWithType: SizeValue.ToString
 - uid: BenchmarkDotNet.Columns.StatisticalTestColumn
   name: StatisticalTestColumn
   href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html
   commentId: T:BenchmarkDotNet.Columns.StatisticalTestColumn
   fullName: BenchmarkDotNet.Columns.StatisticalTestColumn
   nameWithType: StatisticalTestColumn
-- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.Threshold,System.Boolean)
-  name: StatisticalTestColumn(StatisticalTestKind, Threshold, bool)
-  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn__ctor_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_Perfolizer_Mathematics_Thresholds_Threshold_System_Boolean_
-  commentId: M:BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.Threshold,System.Boolean)
-  name.vb: New(StatisticalTestKind, Threshold, Boolean)
-  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.StatisticalTestColumn(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Perfolizer.Mathematics.Thresholds.Threshold, bool)
-  fullName.vb: BenchmarkDotNet.Columns.StatisticalTestColumn.New(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Perfolizer.Mathematics.Thresholds.Threshold, Boolean)
-  nameWithType: StatisticalTestColumn.StatisticalTestColumn(StatisticalTestKind, Threshold, bool)
-  nameWithType.vb: StatisticalTestColumn.New(StatisticalTestKind, Threshold, Boolean)
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor(Perfolizer.Metrology.Threshold,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})
+  name: StatisticalTestColumn(Threshold, SignificanceLevel?)
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn__ctor_Perfolizer_Metrology_Threshold_System_Nullable_Perfolizer_Mathematics_Common_SignificanceLevel__
+  commentId: M:BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor(Perfolizer.Metrology.Threshold,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})
+  name.vb: New(Threshold, SignificanceLevel?)
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.StatisticalTestColumn(Perfolizer.Metrology.Threshold, Perfolizer.Mathematics.Common.SignificanceLevel?)
+  fullName.vb: BenchmarkDotNet.Columns.StatisticalTestColumn.New(Perfolizer.Metrology.Threshold, Perfolizer.Mathematics.Common.SignificanceLevel?)
+  nameWithType: StatisticalTestColumn.StatisticalTestColumn(Threshold, SignificanceLevel?)
+  nameWithType.vb: StatisticalTestColumn.New(Threshold, SignificanceLevel?)
 - uid: BenchmarkDotNet.Columns.StatisticalTestColumn.#ctor*
   name: StatisticalTestColumn
   href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn__ctor_
@@ -9367,21 +8905,39 @@ references:
   commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.ColumnName
   fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.ColumnName
   nameWithType: StatisticalTestColumn.ColumnName
-- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.Threshold,System.Boolean)
-  name: Create(StatisticalTestKind, Threshold, bool)
-  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Create_Perfolizer_Mathematics_SignificanceTesting_StatisticalTestKind_Perfolizer_Mathematics_Thresholds_Threshold_System_Boolean_
-  commentId: M:BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind,Perfolizer.Mathematics.Thresholds.Threshold,System.Boolean)
-  name.vb: Create(StatisticalTestKind, Threshold, Boolean)
-  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Perfolizer.Mathematics.Thresholds.Threshold, bool)
-  fullName.vb: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Mathematics.SignificanceTesting.StatisticalTestKind, Perfolizer.Mathematics.Thresholds.Threshold, Boolean)
-  nameWithType: StatisticalTestColumn.Create(StatisticalTestKind, Threshold, bool)
-  nameWithType.vb: StatisticalTestColumn.Create(StatisticalTestKind, Threshold, Boolean)
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Metrology.Threshold,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})
+  name: Create(Threshold, SignificanceLevel?)
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Create_Perfolizer_Metrology_Threshold_System_Nullable_Perfolizer_Mathematics_Common_SignificanceLevel__
+  commentId: M:BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Metrology.Threshold,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(Perfolizer.Metrology.Threshold, Perfolizer.Mathematics.Common.SignificanceLevel?)
+  nameWithType: StatisticalTestColumn.Create(Threshold, SignificanceLevel?)
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(System.String,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})
+  name: Create(string, SignificanceLevel?)
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Create_System_String_System_Nullable_Perfolizer_Mathematics_Common_SignificanceLevel__
+  commentId: M:BenchmarkDotNet.Columns.StatisticalTestColumn.Create(System.String,System.Nullable{Perfolizer.Mathematics.Common.SignificanceLevel})
+  name.vb: Create(String, SignificanceLevel?)
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(string, Perfolizer.Mathematics.Common.SignificanceLevel?)
+  fullName.vb: BenchmarkDotNet.Columns.StatisticalTestColumn.Create(String, Perfolizer.Mathematics.Common.SignificanceLevel?)
+  nameWithType: StatisticalTestColumn.Create(string, SignificanceLevel?)
+  nameWithType.vb: StatisticalTestColumn.Create(String, SignificanceLevel?)
 - uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Create*
   name: Create
   href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Create_
   commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.Create
   fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.Create
   nameWithType: StatisticalTestColumn.Create
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault
+  name: CreateDefault()
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_CreateDefault
+  commentId: M:BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault()
+  nameWithType: StatisticalTestColumn.CreateDefault()
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault*
+  name: CreateDefault
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_CreateDefault_
+  commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.CreateDefault
+  nameWithType: StatisticalTestColumn.CreateDefault
 - uid: BenchmarkDotNet.Columns.StatisticalTestColumn.GetValue(BenchmarkDotNet.Reports.Summary,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Mathematics.Statistics,System.Collections.Generic.IReadOnlyDictionary{System.String,BenchmarkDotNet.Reports.Metric},BenchmarkDotNet.Mathematics.Statistics,System.Collections.Generic.IReadOnlyDictionary{System.String,BenchmarkDotNet.Reports.Metric},System.Boolean)
   name: GetValue(Summary, BenchmarkCase, Statistics, IReadOnlyDictionary<string, Metric>, Statistics, IReadOnlyDictionary<string, Metric>, bool)
   href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_GetValue_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Mathematics_Statistics_System_Collections_Generic_IReadOnlyDictionary_System_String_BenchmarkDotNet_Reports_Metric__BenchmarkDotNet_Mathematics_Statistics_System_Collections_Generic_IReadOnlyDictionary_System_String_BenchmarkDotNet_Reports_Metric__System_Boolean_
@@ -9421,18 +8977,6 @@ references:
   commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.IsNumeric
   fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.IsNumeric
   nameWithType: StatisticalTestColumn.IsNumeric
-- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Kind
-  name: Kind
-  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Kind
-  commentId: P:BenchmarkDotNet.Columns.StatisticalTestColumn.Kind
-  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.Kind
-  nameWithType: StatisticalTestColumn.Kind
-- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Kind*
-  name: Kind
-  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Kind_
-  commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.Kind
-  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.Kind
-  nameWithType: StatisticalTestColumn.Kind
 - uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Legend
   name: Legend
   href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Legend
@@ -9457,18 +9001,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.PriorityInCategory
   fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.PriorityInCategory
   nameWithType: StatisticalTestColumn.PriorityInCategory
-- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues
-  name: ShowPValues
-  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_ShowPValues
-  commentId: P:BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues
-  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues
-  nameWithType: StatisticalTestColumn.ShowPValues
-- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues*
-  name: ShowPValues
-  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_ShowPValues_
-  commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues
-  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.ShowPValues
-  nameWithType: StatisticalTestColumn.ShowPValues
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel
+  name: SignificanceLevel
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_SignificanceLevel
+  commentId: P:BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel
+  nameWithType: StatisticalTestColumn.SignificanceLevel
+- uid: BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel*
+  name: SignificanceLevel
+  href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_SignificanceLevel_
+  commentId: Overload:BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel
+  fullName: BenchmarkDotNet.Columns.StatisticalTestColumn.SignificanceLevel
+  nameWithType: StatisticalTestColumn.SignificanceLevel
 - uid: BenchmarkDotNet.Columns.StatisticalTestColumn.Threshold
   name: Threshold
   href: api/BenchmarkDotNet.Columns.StatisticalTestColumn.html#BenchmarkDotNet_Columns_StatisticalTestColumn_Threshold
@@ -19925,15 +19469,15 @@ references:
   commentId: T:BenchmarkDotNet.Environments.MonoAotLLVMRuntime
   fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime
   nameWithType: MonoAotLLVMRuntime
-- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode,System.String,System.String)
-  name: MonoAotLLVMRuntime(FileInfo, MonoAotCompilerMode, string, string)
-  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_System_IO_FileInfo_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode,System.String,System.String)
-  name.vb: New(FileInfo, MonoAotCompilerMode, String, String)
-  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.MonoAotLLVMRuntime(System.IO.FileInfo, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode, string, string)
-  fullName.vb: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.New(System.IO.FileInfo, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode, String, String)
-  nameWithType: MonoAotLLVMRuntime.MonoAotLLVMRuntime(FileInfo, MonoAotCompilerMode, string, string)
-  nameWithType.vb: MonoAotLLVMRuntime.New(FileInfo, MonoAotCompilerMode, String, String)
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode,System.String,System.String,BenchmarkDotNet.Jobs.RuntimeMoniker)
+  name: MonoAotLLVMRuntime(FileInfo, MonoAotCompilerMode, string, string, RuntimeMoniker)
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_System_IO_FileInfo_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_System_String_System_String_BenchmarkDotNet_Jobs_RuntimeMoniker_
+  commentId: M:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode,System.String,System.String,BenchmarkDotNet.Jobs.RuntimeMoniker)
+  name.vb: New(FileInfo, MonoAotCompilerMode, String, String, RuntimeMoniker)
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.MonoAotLLVMRuntime(System.IO.FileInfo, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode, string, string, BenchmarkDotNet.Jobs.RuntimeMoniker)
+  fullName.vb: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.New(System.IO.FileInfo, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode, String, String, BenchmarkDotNet.Jobs.RuntimeMoniker)
+  nameWithType: MonoAotLLVMRuntime.MonoAotLLVMRuntime(FileInfo, MonoAotCompilerMode, string, string, RuntimeMoniker)
+  nameWithType.vb: MonoAotLLVMRuntime.New(FileInfo, MonoAotCompilerMode, String, String, RuntimeMoniker)
 - uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor*
   name: MonoAotLLVMRuntime
   href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_
@@ -22170,13 +21714,13 @@ references:
   fullName: BenchmarkDotNet.Extensions.StatisticsExtensions.CreateNanosecondFormatter
   nameWithType: StatisticsExtensions.CreateNanosecondFormatter
 - uid: BenchmarkDotNet.Extensions.StatisticsExtensions.ToString(BenchmarkDotNet.Mathematics.Statistics,System.Globalization.CultureInfo,System.Func{System.Double,System.String},System.Boolean)
-  name: ToString(Statistics, CultureInfo, Func<double, string>, bool)
+  name: ToString(Statistics?, CultureInfo, Func<double, string>, bool)
   href: api/BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_ToString_BenchmarkDotNet_Mathematics_Statistics_System_Globalization_CultureInfo_System_Func_System_Double_System_String__System_Boolean_
   commentId: M:BenchmarkDotNet.Extensions.StatisticsExtensions.ToString(BenchmarkDotNet.Mathematics.Statistics,System.Globalization.CultureInfo,System.Func{System.Double,System.String},System.Boolean)
   name.vb: ToString(Statistics, CultureInfo, Func(Of Double, String), Boolean)
-  fullName: BenchmarkDotNet.Extensions.StatisticsExtensions.ToString(BenchmarkDotNet.Mathematics.Statistics, System.Globalization.CultureInfo, System.Func<double, string>, bool)
+  fullName: BenchmarkDotNet.Extensions.StatisticsExtensions.ToString(BenchmarkDotNet.Mathematics.Statistics?, System.Globalization.CultureInfo, System.Func<double, string>, bool)
   fullName.vb: BenchmarkDotNet.Extensions.StatisticsExtensions.ToString(BenchmarkDotNet.Mathematics.Statistics, System.Globalization.CultureInfo, System.Func(Of Double, String), Boolean)
-  nameWithType: StatisticsExtensions.ToString(Statistics, CultureInfo, Func<double, string>, bool)
+  nameWithType: StatisticsExtensions.ToString(Statistics?, CultureInfo, Func<double, string>, bool)
   nameWithType.vb: StatisticsExtensions.ToString(Statistics, CultureInfo, Func(Of Double, String), Boolean)
 - uid: BenchmarkDotNet.Extensions.StatisticsExtensions.ToString*
   name: ToString
@@ -22184,12 +21728,6 @@ references:
   commentId: Overload:BenchmarkDotNet.Extensions.StatisticsExtensions.ToString
   fullName: BenchmarkDotNet.Extensions.StatisticsExtensions.ToString
   nameWithType: StatisticsExtensions.ToString
-- uid: BenchmarkDotNet.Extensions.StringAndTextExtensions
-  name: StringAndTextExtensions
-  href: api/BenchmarkDotNet.Extensions.StringAndTextExtensions.html
-  commentId: T:BenchmarkDotNet.Extensions.StringAndTextExtensions
-  fullName: BenchmarkDotNet.Extensions.StringAndTextExtensions
-  nameWithType: StringAndTextExtensions
 - uid: BenchmarkDotNet.Filters
   name: BenchmarkDotNet.Filters
   href: api/BenchmarkDotNet.Filters.html
@@ -22496,6 +22034,48 @@ references:
   commentId: N:BenchmarkDotNet.Helpers
   fullName: BenchmarkDotNet.Helpers
   nameWithType: BenchmarkDotNet.Helpers
+- uid: BenchmarkDotNet.Helpers.AwaitHelper
+  name: AwaitHelper
+  href: api/BenchmarkDotNet.Helpers.AwaitHelper.html
+  commentId: T:BenchmarkDotNet.Helpers.AwaitHelper
+  fullName: BenchmarkDotNet.Helpers.AwaitHelper
+  nameWithType: AwaitHelper
+- uid: BenchmarkDotNet.Helpers.AwaitHelper.GetResult(System.Threading.Tasks.Task)
+  name: GetResult(Task)
+  href: api/BenchmarkDotNet.Helpers.AwaitHelper.html#BenchmarkDotNet_Helpers_AwaitHelper_GetResult_System_Threading_Tasks_Task_
+  commentId: M:BenchmarkDotNet.Helpers.AwaitHelper.GetResult(System.Threading.Tasks.Task)
+  fullName: BenchmarkDotNet.Helpers.AwaitHelper.GetResult(System.Threading.Tasks.Task)
+  nameWithType: AwaitHelper.GetResult(Task)
+- uid: BenchmarkDotNet.Helpers.AwaitHelper.GetResult(System.Threading.Tasks.ValueTask)
+  name: GetResult(ValueTask)
+  href: api/BenchmarkDotNet.Helpers.AwaitHelper.html#BenchmarkDotNet_Helpers_AwaitHelper_GetResult_System_Threading_Tasks_ValueTask_
+  commentId: M:BenchmarkDotNet.Helpers.AwaitHelper.GetResult(System.Threading.Tasks.ValueTask)
+  fullName: BenchmarkDotNet.Helpers.AwaitHelper.GetResult(System.Threading.Tasks.ValueTask)
+  nameWithType: AwaitHelper.GetResult(ValueTask)
+- uid: BenchmarkDotNet.Helpers.AwaitHelper.GetResult*
+  name: GetResult
+  href: api/BenchmarkDotNet.Helpers.AwaitHelper.html#BenchmarkDotNet_Helpers_AwaitHelper_GetResult_
+  commentId: Overload:BenchmarkDotNet.Helpers.AwaitHelper.GetResult
+  fullName: BenchmarkDotNet.Helpers.AwaitHelper.GetResult
+  nameWithType: AwaitHelper.GetResult
+- uid: BenchmarkDotNet.Helpers.AwaitHelper.GetResult``1(System.Threading.Tasks.Task{``0})
+  name: GetResult<T>(Task<T>)
+  href: api/BenchmarkDotNet.Helpers.AwaitHelper.html#BenchmarkDotNet_Helpers_AwaitHelper_GetResult__1_System_Threading_Tasks_Task___0__
+  commentId: M:BenchmarkDotNet.Helpers.AwaitHelper.GetResult``1(System.Threading.Tasks.Task{``0})
+  name.vb: GetResult(Of T)(Task(Of T))
+  fullName: BenchmarkDotNet.Helpers.AwaitHelper.GetResult<T>(System.Threading.Tasks.Task<T>)
+  fullName.vb: BenchmarkDotNet.Helpers.AwaitHelper.GetResult(Of T)(System.Threading.Tasks.Task(Of T))
+  nameWithType: AwaitHelper.GetResult<T>(Task<T>)
+  nameWithType.vb: AwaitHelper.GetResult(Of T)(Task(Of T))
+- uid: BenchmarkDotNet.Helpers.AwaitHelper.GetResult``1(System.Threading.Tasks.ValueTask{``0})
+  name: GetResult<T>(ValueTask<T>)
+  href: api/BenchmarkDotNet.Helpers.AwaitHelper.html#BenchmarkDotNet_Helpers_AwaitHelper_GetResult__1_System_Threading_Tasks_ValueTask___0__
+  commentId: M:BenchmarkDotNet.Helpers.AwaitHelper.GetResult``1(System.Threading.Tasks.ValueTask{``0})
+  name.vb: GetResult(Of T)(ValueTask(Of T))
+  fullName: BenchmarkDotNet.Helpers.AwaitHelper.GetResult<T>(System.Threading.Tasks.ValueTask<T>)
+  fullName.vb: BenchmarkDotNet.Helpers.AwaitHelper.GetResult(Of T)(System.Threading.Tasks.ValueTask(Of T))
+  nameWithType: AwaitHelper.GetResult<T>(ValueTask<T>)
+  nameWithType.vb: AwaitHelper.GetResult(Of T)(ValueTask(Of T))
 - uid: BenchmarkDotNet.Helpers.ExternalToolsHelper
   name: ExternalToolsHelper
   href: api/BenchmarkDotNet.Helpers.ExternalToolsHelper.html
@@ -22580,6 +22160,33 @@ references:
   commentId: Overload:BenchmarkDotNet.Helpers.SourceCodeHelper.ToSourceCode
   fullName: BenchmarkDotNet.Helpers.SourceCodeHelper.ToSourceCode
   nameWithType: SourceCodeHelper.ToSourceCode
+- uid: BenchmarkDotNet.Helpers.UnitHelper
+  name: UnitHelper
+  href: api/BenchmarkDotNet.Helpers.UnitHelper.html
+  commentId: T:BenchmarkDotNet.Helpers.UnitHelper
+  fullName: BenchmarkDotNet.Helpers.UnitHelper
+  nameWithType: UnitHelper
+- uid: BenchmarkDotNet.Helpers.UnitHelper.DefaultPresentation
+  name: DefaultPresentation
+  href: api/BenchmarkDotNet.Helpers.UnitHelper.html#BenchmarkDotNet_Helpers_UnitHelper_DefaultPresentation
+  commentId: F:BenchmarkDotNet.Helpers.UnitHelper.DefaultPresentation
+  fullName: BenchmarkDotNet.Helpers.UnitHelper.DefaultPresentation
+  nameWithType: UnitHelper.DefaultPresentation
+- uid: BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString(Perfolizer.Horology.TimeInterval,System.String)
+  name: ToDefaultString(TimeInterval, string?)
+  href: api/BenchmarkDotNet.Helpers.UnitHelper.html#BenchmarkDotNet_Helpers_UnitHelper_ToDefaultString_Perfolizer_Horology_TimeInterval_System_String_
+  commentId: M:BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString(Perfolizer.Horology.TimeInterval,System.String)
+  name.vb: ToDefaultString(TimeInterval, String)
+  fullName: BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString(Perfolizer.Horology.TimeInterval, string?)
+  fullName.vb: BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString(Perfolizer.Horology.TimeInterval, String)
+  nameWithType: UnitHelper.ToDefaultString(TimeInterval, string?)
+  nameWithType.vb: UnitHelper.ToDefaultString(TimeInterval, String)
+- uid: BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString*
+  name: ToDefaultString
+  href: api/BenchmarkDotNet.Helpers.UnitHelper.html#BenchmarkDotNet_Helpers_UnitHelper_ToDefaultString_
+  commentId: Overload:BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString
+  fullName: BenchmarkDotNet.Helpers.UnitHelper.ToDefaultString
+  nameWithType: UnitHelper.ToDefaultString
 - uid: BenchmarkDotNet.Jobs
   name: BenchmarkDotNet.Jobs
   href: api/BenchmarkDotNet.Jobs.html
@@ -26360,6 +25967,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineStatistic
   fullName: BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineStatistic
   nameWithType: LoggerExtensions.WriteLineStatistic
+- uid: BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning(BenchmarkDotNet.Loggers.ILogger,System.String)
+  name: WriteLineWarning(ILogger, string)
+  href: api/BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineWarning_BenchmarkDotNet_Loggers_ILogger_System_String_
+  commentId: M:BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning(BenchmarkDotNet.Loggers.ILogger,System.String)
+  name.vb: WriteLineWarning(ILogger, String)
+  fullName: BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning(BenchmarkDotNet.Loggers.ILogger, string)
+  fullName.vb: BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning(BenchmarkDotNet.Loggers.ILogger, String)
+  nameWithType: LoggerExtensions.WriteLineWarning(ILogger, string)
+  nameWithType.vb: LoggerExtensions.WriteLineWarning(ILogger, String)
+- uid: BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning*
+  name: WriteLineWarning
+  href: api/BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineWarning_
+  commentId: Overload:BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning
+  fullName: BenchmarkDotNet.Loggers.LoggerExtensions.WriteLineWarning
+  nameWithType: LoggerExtensions.WriteLineWarning
 - uid: BenchmarkDotNet.Loggers.LoggerExtensions.WriteResult(BenchmarkDotNet.Loggers.ILogger,System.String)
   name: WriteResult(ILogger, string)
   href: api/BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteResult_BenchmarkDotNet_Loggers_ILogger_System_String_
@@ -26390,6 +26012,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Loggers.LoggerExtensions.WriteStatistic
   fullName: BenchmarkDotNet.Loggers.LoggerExtensions.WriteStatistic
   nameWithType: LoggerExtensions.WriteStatistic
+- uid: BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning(BenchmarkDotNet.Loggers.ILogger,System.String)
+  name: WriteWarning(ILogger, string)
+  href: api/BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteWarning_BenchmarkDotNet_Loggers_ILogger_System_String_
+  commentId: M:BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning(BenchmarkDotNet.Loggers.ILogger,System.String)
+  name.vb: WriteWarning(ILogger, String)
+  fullName: BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning(BenchmarkDotNet.Loggers.ILogger, string)
+  fullName.vb: BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning(BenchmarkDotNet.Loggers.ILogger, String)
+  nameWithType: LoggerExtensions.WriteWarning(ILogger, string)
+  nameWithType.vb: LoggerExtensions.WriteWarning(ILogger, String)
+- uid: BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning*
+  name: WriteWarning
+  href: api/BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteWarning_
+  commentId: Overload:BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning
+  fullName: BenchmarkDotNet.Loggers.LoggerExtensions.WriteWarning
+  nameWithType: LoggerExtensions.WriteWarning
 - uid: BenchmarkDotNet.Loggers.LoggerWithPrefix
   name: LoggerWithPrefix
   href: api/BenchmarkDotNet.Loggers.LoggerWithPrefix.html
@@ -26540,6 +26177,12 @@ references:
   commentId: F:BenchmarkDotNet.Loggers.LogKind.Statistic
   fullName: BenchmarkDotNet.Loggers.LogKind.Statistic
   nameWithType: LogKind.Statistic
+- uid: BenchmarkDotNet.Loggers.LogKind.Warning
+  name: Warning
+  href: api/BenchmarkDotNet.Loggers.LogKind.html#BenchmarkDotNet_Loggers_LogKind_Warning
+  commentId: F:BenchmarkDotNet.Loggers.LogKind.Warning
+  fullName: BenchmarkDotNet.Loggers.LogKind.Warning
+  nameWithType: LogKind.Warning
 - uid: BenchmarkDotNet.Loggers.NullLogger
   name: NullLogger
   href: api/BenchmarkDotNet.Loggers.NullLogger.html
@@ -26813,27 +26456,288 @@ references:
   commentId: N:BenchmarkDotNet.Mathematics
   fullName: BenchmarkDotNet.Mathematics
   nameWithType: BenchmarkDotNet.Mathematics
-- uid: BenchmarkDotNet.Mathematics.MathHelper
-  name: MathHelper
-  href: api/BenchmarkDotNet.Mathematics.MathHelper.html
-  commentId: T:BenchmarkDotNet.Mathematics.MathHelper
-  fullName: BenchmarkDotNet.Mathematics.MathHelper
-  nameWithType: MathHelper
-- uid: BenchmarkDotNet.Mathematics.MathHelper.Clamp(System.Int32,System.Int32,System.Int32)
-  name: Clamp(int, int, int)
-  href: api/BenchmarkDotNet.Mathematics.MathHelper.html#BenchmarkDotNet_Mathematics_MathHelper_Clamp_System_Int32_System_Int32_System_Int32_
-  commentId: M:BenchmarkDotNet.Mathematics.MathHelper.Clamp(System.Int32,System.Int32,System.Int32)
-  name.vb: Clamp(Integer, Integer, Integer)
-  fullName: BenchmarkDotNet.Mathematics.MathHelper.Clamp(int, int, int)
-  fullName.vb: BenchmarkDotNet.Mathematics.MathHelper.Clamp(Integer, Integer, Integer)
-  nameWithType: MathHelper.Clamp(int, int, int)
-  nameWithType.vb: MathHelper.Clamp(Integer, Integer, Integer)
-- uid: BenchmarkDotNet.Mathematics.MathHelper.Clamp*
-  name: Clamp
-  href: api/BenchmarkDotNet.Mathematics.MathHelper.html#BenchmarkDotNet_Mathematics_MathHelper_Clamp_
-  commentId: Overload:BenchmarkDotNet.Mathematics.MathHelper.Clamp
-  fullName: BenchmarkDotNet.Mathematics.MathHelper.Clamp
-  nameWithType: MathHelper.Clamp
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions
+  name: ConfidenceLevelExtensions
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html
+  commentId: T:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions
+  nameWithType: ConfidenceLevelExtensions
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel,System.Int32)
+  name: GetZValue(LegacyConfidenceLevel, int)
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html#BenchmarkDotNet_Mathematics_ConfidenceLevelExtensions_GetZValue_BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_System_Int32_
+  commentId: M:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel,System.Int32)
+  name.vb: GetZValue(LegacyConfidenceLevel, Integer)
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel, int)
+  fullName.vb: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel, Integer)
+  nameWithType: ConfidenceLevelExtensions.GetZValue(LegacyConfidenceLevel, int)
+  nameWithType.vb: ConfidenceLevelExtensions.GetZValue(LegacyConfidenceLevel, Integer)
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue*
+  name: GetZValue
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html#BenchmarkDotNet_Mathematics_ConfidenceLevelExtensions_GetZValue_
+  commentId: Overload:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.GetZValue
+  nameWithType: ConfidenceLevelExtensions.GetZValue
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercent(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  name: ToPercent(LegacyConfidenceLevel)
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html#BenchmarkDotNet_Mathematics_ConfidenceLevelExtensions_ToPercent_BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_
+  commentId: M:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercent(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercent(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  nameWithType: ConfidenceLevelExtensions.ToPercent(LegacyConfidenceLevel)
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercent*
+  name: ToPercent
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html#BenchmarkDotNet_Mathematics_ConfidenceLevelExtensions_ToPercent_
+  commentId: Overload:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercent
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercent
+  nameWithType: ConfidenceLevelExtensions.ToPercent
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercentStr(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  name: ToPercentStr(LegacyConfidenceLevel)
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html#BenchmarkDotNet_Mathematics_ConfidenceLevelExtensions_ToPercentStr_BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_
+  commentId: M:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercentStr(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercentStr(BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  nameWithType: ConfidenceLevelExtensions.ToPercentStr(LegacyConfidenceLevel)
+- uid: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercentStr*
+  name: ToPercentStr
+  href: api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html#BenchmarkDotNet_Mathematics_ConfidenceLevelExtensions_ToPercentStr_
+  commentId: Overload:BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercentStr
+  fullName: BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.ToPercentStr
+  nameWithType: ConfidenceLevelExtensions.ToPercentStr
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval
+  name: LegacyConfidenceInterval
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html
+  commentId: T:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval
+  nameWithType: LegacyConfidenceInterval
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.#ctor(System.Double,System.Double,System.Int32,BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  name: LegacyConfidenceInterval(double, double, int, LegacyConfidenceLevel)
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval__ctor_System_Double_System_Double_System_Int32_BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_
+  commentId: M:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.#ctor(System.Double,System.Double,System.Int32,BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  name.vb: New(Double, Double, Integer, LegacyConfidenceLevel)
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.LegacyConfidenceInterval(double, double, int, BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  fullName.vb: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.New(Double, Double, Integer, BenchmarkDotNet.Mathematics.LegacyConfidenceLevel)
+  nameWithType: LegacyConfidenceInterval.LegacyConfidenceInterval(double, double, int, LegacyConfidenceLevel)
+  nameWithType.vb: LegacyConfidenceInterval.New(Double, Double, Integer, LegacyConfidenceLevel)
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.#ctor*
+  name: LegacyConfidenceInterval
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval__ctor_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.LegacyConfidenceInterval
+  fullName.vb: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.New
+  nameWithType: LegacyConfidenceInterval.LegacyConfidenceInterval
+  nameWithType.vb: LegacyConfidenceInterval.New
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains(System.Double)
+  name: Contains(double)
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Contains_System_Double_
+  commentId: M:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains(System.Double)
+  name.vb: Contains(Double)
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains(double)
+  fullName.vb: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains(Double)
+  nameWithType: LegacyConfidenceInterval.Contains(double)
+  nameWithType.vb: LegacyConfidenceInterval.Contains(Double)
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains*
+  name: Contains
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Contains_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Contains
+  nameWithType: LegacyConfidenceInterval.Contains
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Level
+  name: Level
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Level
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Level
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Level
+  nameWithType: LegacyConfidenceInterval.Level
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Level*
+  name: Level
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Level_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Level
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Level
+  nameWithType: LegacyConfidenceInterval.Level
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Lower
+  name: Lower
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Lower
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Lower
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Lower
+  nameWithType: LegacyConfidenceInterval.Lower
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Lower*
+  name: Lower
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Lower_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Lower
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Lower
+  nameWithType: LegacyConfidenceInterval.Lower
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Margin
+  name: Margin
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Margin
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Margin
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Margin
+  nameWithType: LegacyConfidenceInterval.Margin
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Margin*
+  name: Margin
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Margin_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Margin
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Margin
+  nameWithType: LegacyConfidenceInterval.Margin
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Mean
+  name: Mean
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Mean
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Mean
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Mean
+  nameWithType: LegacyConfidenceInterval.Mean
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Mean*
+  name: Mean
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Mean_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Mean
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Mean
+  nameWithType: LegacyConfidenceInterval.Mean
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.N
+  name: N
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_N
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.N
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.N
+  nameWithType: LegacyConfidenceInterval.N
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.N*
+  name: N
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_N_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.N
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.N
+  nameWithType: LegacyConfidenceInterval.N
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.StandardError
+  name: StandardError
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_StandardError
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.StandardError
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.StandardError
+  nameWithType: LegacyConfidenceInterval.StandardError
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.StandardError*
+  name: StandardError
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_StandardError_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.StandardError
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.StandardError
+  nameWithType: LegacyConfidenceInterval.StandardError
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString
+  name: ToString()
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_ToString
+  commentId: M:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString()
+  nameWithType: LegacyConfidenceInterval.ToString()
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Func{System.Double,System.String},System.Boolean)
+  name: ToString(Func<double, string>, bool)
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_ToString_System_Func_System_Double_System_String__System_Boolean_
+  commentId: M:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Func{System.Double,System.String},System.Boolean)
+  name.vb: ToString(Func(Of Double, String), Boolean)
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Func<double, string>, bool)
+  fullName.vb: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Func(Of Double, String), Boolean)
+  nameWithType: LegacyConfidenceInterval.ToString(Func<double, string>, bool)
+  nameWithType.vb: LegacyConfidenceInterval.ToString(Func(Of Double, String), Boolean)
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Globalization.CultureInfo,System.String,System.Boolean)
+  name: ToString(CultureInfo, string, bool)
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_ToString_System_Globalization_CultureInfo_System_String_System_Boolean_
+  commentId: M:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Globalization.CultureInfo,System.String,System.Boolean)
+  name.vb: ToString(CultureInfo, String, Boolean)
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Globalization.CultureInfo, string, bool)
+  fullName.vb: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString(System.Globalization.CultureInfo, String, Boolean)
+  nameWithType: LegacyConfidenceInterval.ToString(CultureInfo, string, bool)
+  nameWithType.vb: LegacyConfidenceInterval.ToString(CultureInfo, String, Boolean)
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString*
+  name: ToString
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_ToString_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.ToString
+  nameWithType: LegacyConfidenceInterval.ToString
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Upper
+  name: Upper
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Upper
+  commentId: P:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Upper
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Upper
+  nameWithType: LegacyConfidenceInterval.Upper
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Upper*
+  name: Upper
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html#BenchmarkDotNet_Mathematics_LegacyConfidenceInterval_Upper_
+  commentId: Overload:BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Upper
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.Upper
+  nameWithType: LegacyConfidenceInterval.Upper
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel
+  name: LegacyConfidenceLevel
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html
+  commentId: T:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel
+  nameWithType: LegacyConfidenceLevel
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L50
+  name: L50
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L50
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L50
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L50
+  nameWithType: LegacyConfidenceLevel.L50
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L70
+  name: L70
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L70
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L70
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L70
+  nameWithType: LegacyConfidenceLevel.L70
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L75
+  name: L75
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L75
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L75
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L75
+  nameWithType: LegacyConfidenceLevel.L75
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L80
+  name: L80
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L80
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L80
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L80
+  nameWithType: LegacyConfidenceLevel.L80
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L85
+  name: L85
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L85
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L85
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L85
+  nameWithType: LegacyConfidenceLevel.L85
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L90
+  name: L90
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L90
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L90
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L90
+  nameWithType: LegacyConfidenceLevel.L90
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L92
+  name: L92
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L92
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L92
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L92
+  nameWithType: LegacyConfidenceLevel.L92
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L95
+  name: L95
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L95
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L95
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L95
+  nameWithType: LegacyConfidenceLevel.L95
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L96
+  name: L96
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L96
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L96
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L96
+  nameWithType: LegacyConfidenceLevel.L96
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L97
+  name: L97
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L97
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L97
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L97
+  nameWithType: LegacyConfidenceLevel.L97
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L98
+  name: L98
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L98
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L98
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L98
+  nameWithType: LegacyConfidenceLevel.L98
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L99
+  name: L99
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L99
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L99
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L99
+  nameWithType: LegacyConfidenceLevel.L99
+- uid: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L999
+  name: L999
+  href: api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html#BenchmarkDotNet_Mathematics_LegacyConfidenceLevel_L999
+  commentId: F:BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L999
+  fullName: BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.L999
+  nameWithType: LegacyConfidenceLevel.L999
 - uid: BenchmarkDotNet.Mathematics.NumeralSystem
   name: NumeralSystem
   href: api/BenchmarkDotNet.Mathematics.NumeralSystem.html
@@ -27044,6 +26948,15 @@ references:
   commentId: T:BenchmarkDotNet.Mathematics.Statistics
   fullName: BenchmarkDotNet.Mathematics.Statistics
   nameWithType: Statistics
+- uid: BenchmarkDotNet.Mathematics.Statistics.#ctor(Perfolizer.Sample)
+  name: Statistics(Sample)
+  href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics__ctor_Perfolizer_Sample_
+  commentId: M:BenchmarkDotNet.Mathematics.Statistics.#ctor(Perfolizer.Sample)
+  name.vb: New(Sample)
+  fullName: BenchmarkDotNet.Mathematics.Statistics.Statistics(Perfolizer.Sample)
+  fullName.vb: BenchmarkDotNet.Mathematics.Statistics.New(Perfolizer.Sample)
+  nameWithType: Statistics.Statistics(Sample)
+  nameWithType.vb: Statistics.New(Sample)
 - uid: BenchmarkDotNet.Mathematics.Statistics.#ctor(System.Collections.Generic.IEnumerable{System.Double})
   name: Statistics(IEnumerable<double>)
   href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics__ctor_System_Collections_Generic_IEnumerable_System_Double__
@@ -27170,15 +27083,12 @@ references:
   commentId: Overload:BenchmarkDotNet.Mathematics.Statistics.GetActualOutliers
   fullName: BenchmarkDotNet.Mathematics.Statistics.GetActualOutliers
   nameWithType: Statistics.GetActualOutliers
-- uid: BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel,System.Int32)
-  name: GetConfidenceInterval(ConfidenceLevel, int)
-  href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics_GetConfidenceInterval_Perfolizer_Mathematics_Common_ConfidenceLevel_System_Int32_
-  commentId: M:BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel,System.Int32)
-  name.vb: GetConfidenceInterval(ConfidenceLevel, Integer)
-  fullName: BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel, int)
-  fullName.vb: BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel, Integer)
-  nameWithType: Statistics.GetConfidenceInterval(ConfidenceLevel, int)
-  nameWithType.vb: Statistics.GetConfidenceInterval(ConfidenceLevel, Integer)
+- uid: BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel)
+  name: GetConfidenceInterval(ConfidenceLevel)
+  href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics_GetConfidenceInterval_Perfolizer_Mathematics_Common_ConfidenceLevel_
+  commentId: M:BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel)
+  fullName: BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval(Perfolizer.Mathematics.Common.ConfidenceLevel)
+  nameWithType: Statistics.GetConfidenceInterval(ConfidenceLevel)
 - uid: BenchmarkDotNet.Mathematics.Statistics.GetConfidenceInterval*
   name: GetConfidenceInterval
   href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics_GetConfidenceInterval_
@@ -29846,13 +29756,13 @@ references:
   commentId: T:BenchmarkDotNet.Reports.SummaryStyle
   fullName: BenchmarkDotNet.Reports.SummaryStyle
   nameWithType: SummaryStyle
-- uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+- uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,Perfolizer.Metrology.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
   name: SummaryStyle(CultureInfo?, bool, SizeUnit?, TimeUnit?, bool, bool, int, RatioStyle, TextJustification, TextJustification)
-  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_
-  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_Perfolizer_Metrology_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_
+  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,Perfolizer.Metrology.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
   name.vb: New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle, TextJustification, TextJustification)
-  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo?, bool, BenchmarkDotNet.Columns.SizeUnit?, Perfolizer.Horology.TimeUnit?, bool, bool, int, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
-  fullName.vb: BenchmarkDotNet.Reports.SummaryStyle.New(System.Globalization.CultureInfo, Boolean, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, Boolean, Boolean, Integer, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo?, bool, Perfolizer.Metrology.SizeUnit?, Perfolizer.Horology.TimeUnit?, bool, bool, int, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  fullName.vb: BenchmarkDotNet.Reports.SummaryStyle.New(System.Globalization.CultureInfo, Boolean, Perfolizer.Metrology.SizeUnit, Perfolizer.Horology.TimeUnit, Boolean, Boolean, Integer, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
   nameWithType: SummaryStyle.SummaryStyle(CultureInfo?, bool, SizeUnit?, TimeUnit?, bool, bool, int, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
   nameWithType.vb: SummaryStyle.New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
 - uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor*
@@ -30098,11 +30008,11 @@ references:
   commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle
   fullName: BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle
   nameWithType: SummaryStyle.WithRatioStyle
-- uid: BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(BenchmarkDotNet.Columns.SizeUnit)
+- uid: BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(Perfolizer.Metrology.SizeUnit)
   name: WithSizeUnit(SizeUnit)
-  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_BenchmarkDotNet_Columns_SizeUnit_
-  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(BenchmarkDotNet.Columns.SizeUnit)
-  fullName: BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(BenchmarkDotNet.Columns.SizeUnit)
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_Perfolizer_Metrology_SizeUnit_
+  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(Perfolizer.Metrology.SizeUnit)
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(Perfolizer.Metrology.SizeUnit)
   nameWithType: SummaryStyle.WithSizeUnit(SizeUnit)
 - uid: BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit*
   name: WithSizeUnit
@@ -31835,6 +31745,9 @@ references:
 - uid: BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
   name: BenchmarkDotNet.Samples.IntroDisassemblyRyuJit
   href: articles/samples/IntroDisassemblyRyuJit.html
+- uid: BenchmarkDotNet.Samples.IntroDotMemoryDiagnoser
+  name: BenchmarkDotNet.Samples.IntroDotMemoryDiagnoser
+  href: articles/samples/IntroDotMemoryDiagnoser.html
 - uid: BenchmarkDotNet.Samples.IntroDotTraceDiagnoser
   name: BenchmarkDotNet.Samples.IntroDotTraceDiagnoser
   href: articles/samples/IntroDotTraceDiagnoser.html
@@ -31982,6 +31895,9 @@ references:
 - uid: BenchmarkDotNet.Samples.Xamarin
   name: BenchmarkDotNet.Samples.Xamarin
   href: articles/samples/IntroXamarin.html
+- uid: BenchmarkDotNet.SummaryStyle
+  name: BenchmarkDotNet.SummaryStyle
+  href: articles/samples/IntroSummaryStyle.html
 - uid: BenchmarkDotNet.Toolchains
   name: BenchmarkDotNet.Toolchains
   href: api/BenchmarkDotNet.Toolchains.html
@@ -31994,15 +31910,15 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.ArtifactsPaths
   fullName: BenchmarkDotNet.Toolchains.ArtifactsPaths
   nameWithType: ArtifactsPaths
-- uid: BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)
-  name: ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string)
-  href: api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html#BenchmarkDotNet_Toolchains_ArtifactsPaths__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)
-  name.vb: New(String, String, String, String, String, String, String, String, String, String, String)
-  fullName: BenchmarkDotNet.Toolchains.ArtifactsPaths.ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string)
-  fullName.vb: BenchmarkDotNet.Toolchains.ArtifactsPaths.New(String, String, String, String, String, String, String, String, String, String, String)
-  nameWithType: ArtifactsPaths.ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string)
-  nameWithType.vb: ArtifactsPaths.New(String, String, String, String, String, String, String, String, String, String, String)
+- uid: BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)
+  name: ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string, string)
+  href: api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html#BenchmarkDotNet_Toolchains_ArtifactsPaths__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)
+  name.vb: New(String, String, String, String, String, String, String, String, String, String, String, String)
+  fullName: BenchmarkDotNet.Toolchains.ArtifactsPaths.ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string, string)
+  fullName.vb: BenchmarkDotNet.Toolchains.ArtifactsPaths.New(String, String, String, String, String, String, String, String, String, String, String, String)
+  nameWithType: ArtifactsPaths.ArtifactsPaths(string, string, string, string, string, string, string, string, string, string, string, string)
+  nameWithType.vb: ArtifactsPaths.New(String, String, String, String, String, String, String, String, String, String, String, String)
 - uid: BenchmarkDotNet.Toolchains.ArtifactsPaths.#ctor*
   name: ArtifactsPaths
   href: api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html#BenchmarkDotNet_Toolchains_ArtifactsPaths__ctor_
@@ -32078,6 +31994,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.ArtifactsPaths.ExecutablePath
   fullName: BenchmarkDotNet.Toolchains.ArtifactsPaths.ExecutablePath
   nameWithType: ArtifactsPaths.ExecutablePath
+- uid: BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath
+  name: IntermediateDirectoryPath
+  href: api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html#BenchmarkDotNet_Toolchains_ArtifactsPaths_IntermediateDirectoryPath
+  commentId: P:BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath
+  fullName: BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath
+  nameWithType: ArtifactsPaths.IntermediateDirectoryPath
+- uid: BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath*
+  name: IntermediateDirectoryPath
+  href: api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html#BenchmarkDotNet_Toolchains_ArtifactsPaths_IntermediateDirectoryPath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath
+  fullName: BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath
+  nameWithType: ArtifactsPaths.IntermediateDirectoryPath
 - uid: BenchmarkDotNet.Toolchains.ArtifactsPaths.NuGetConfigPath
   name: NuGetConfigPath
   href: api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html#BenchmarkDotNet_Toolchains_ArtifactsPaths_NuGetConfigPath
@@ -32783,6 +32711,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode
   nameWithType: CsProjGenerator.GetHashCode
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath(System.String,System.String)
+  name: GetIntermediateDirectoryPath(string, string)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetIntermediateDirectoryPath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath(System.String,System.String)
+  name.vb: GetIntermediateDirectoryPath(String, String)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath(string, string)
+  fullName.vb: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath(String, String)
+  nameWithType: CsProjGenerator.GetIntermediateDirectoryPath(string, string)
+  nameWithType.vb: CsProjGenerator.GetIntermediateDirectoryPath(String, String)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath*
+  name: GetIntermediateDirectoryPath
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetIntermediateDirectoryPath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetIntermediateDirectoryPath
+  nameWithType: CsProjGenerator.GetIntermediateDirectoryPath
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetProjectFilePath(System.String)
   name: GetProjectFilePath(string)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_System_String_
@@ -33050,15 +32993,15 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder
   nameWithType: DotNetCliBuilder
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean,System.Boolean)
-  name: DotNetCliBuilder(string, string?, bool, bool)
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliBuilder__ctor_System_String_System_String_System_Boolean_System_Boolean_
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean,System.Boolean)
-  name.vb: New(String, String, Boolean, Boolean)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.DotNetCliBuilder(string, string?, bool, bool)
-  fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.New(String, String, Boolean, Boolean)
-  nameWithType: DotNetCliBuilder.DotNetCliBuilder(string, string?, bool, bool)
-  nameWithType.vb: DotNetCliBuilder.New(String, String, Boolean, Boolean)
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean)
+  name: DotNetCliBuilder(string, string?, bool)
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliBuilder__ctor_System_String_System_String_System_Boolean_
+  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean)
+  name.vb: New(String, String, Boolean)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.DotNetCliBuilder(string, string?, bool)
+  fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.New(String, String, Boolean)
+  nameWithType: DotNetCliBuilder.DotNetCliBuilder(string, string?, bool)
+  nameWithType.vb: DotNetCliBuilder.New(String, String, Boolean)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor*
   name: DotNetCliBuilder
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliBuilder__ctor_
@@ -33086,15 +33029,15 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand
   nameWithType: DotNetCliCommand
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean,System.Boolean)
-  name: DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList<EnvironmentVariable>, TimeSpan, bool, bool)
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_System_Boolean_
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean,System.Boolean)
-  name.vb: New(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList(Of EnvironmentVariable), TimeSpan, Boolean, Boolean)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.DotNetCliCommand(string, string, BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Running.BuildPartition, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Jobs.EnvironmentVariable>, System.TimeSpan, bool, bool)
-  fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.New(String, String, BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Running.BuildPartition, System.Collections.Generic.IReadOnlyList(Of BenchmarkDotNet.Jobs.EnvironmentVariable), System.TimeSpan, Boolean, Boolean)
-  nameWithType: DotNetCliCommand.DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList<EnvironmentVariable>, TimeSpan, bool, bool)
-  nameWithType.vb: DotNetCliCommand.New(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList(Of EnvironmentVariable), TimeSpan, Boolean, Boolean)
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean)
+  name: DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList<EnvironmentVariable>, TimeSpan, bool)
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_
+  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean)
+  name.vb: New(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList(Of EnvironmentVariable), TimeSpan, Boolean)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.DotNetCliCommand(string, string, BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Running.BuildPartition, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Jobs.EnvironmentVariable>, System.TimeSpan, bool)
+  fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.New(String, String, BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Running.BuildPartition, System.Collections.Generic.IReadOnlyList(Of BenchmarkDotNet.Jobs.EnvironmentVariable), System.TimeSpan, Boolean)
+  nameWithType: DotNetCliCommand.DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList<EnvironmentVariable>, TimeSpan, bool)
+  nameWithType.vb: DotNetCliCommand.New(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList(Of EnvironmentVariable), TimeSpan, Boolean)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor*
   name: DotNetCliCommand
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_
@@ -33152,18 +33095,6 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestore
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestore
   nameWithType: DotNetCliCommand.BuildNoRestore
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies
-  name: BuildNoRestoreNoDependencies()
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies()
-  nameWithType: DotNetCliCommand.BuildNoRestoreNoDependencies()
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies*
-  name: BuildNoRestoreNoDependencies
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies_
-  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies
-  nameWithType: DotNetCliCommand.BuildNoRestoreNoDependencies
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildPartition
   name: BuildPartition
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildPartition
@@ -33248,18 +33179,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish
   nameWithType: DotNetCliCommand.Publish
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore
-  name: PublishNoBuildAndNoRestore()
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore()
-  nameWithType: DotNetCliCommand.PublishNoBuildAndNoRestore()
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore*
-  name: PublishNoBuildAndNoRestore
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore_
-  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore
-  nameWithType: DotNetCliCommand.PublishNoBuildAndNoRestore
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore
+  name: PublishNoRestore()
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoRestore
+  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore()
+  nameWithType: DotNetCliCommand.PublishNoRestore()
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore*
+  name: PublishNoRestore
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoRestore_
+  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoRestore
+  nameWithType: DotNetCliCommand.PublishNoRestore
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Restore
   name: Restore()
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Restore
@@ -33296,18 +33227,6 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuildThenPublish
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuildThenPublish
   nameWithType: DotNetCliCommand.RestoreThenBuildThenPublish
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps
-  name: RetryFailedBuildWithNoDeps
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps
-  commentId: P:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps
-  nameWithType: DotNetCliCommand.RetryFailedBuildWithNoDeps
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps*
-  name: RetryFailedBuildWithNoDeps
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps_
-  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps
-  nameWithType: DotNetCliCommand.RetryFailedBuildWithNoDeps
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout
   name: Timeout
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout
@@ -34130,6 +34049,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath
   fullName: BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath
   nameWithType: GeneratorBase.GetExecutablePath
+- uid: BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath(System.String,System.String)
+  name: GetIntermediateDirectoryPath(string, string)
+  href: api/BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetIntermediateDirectoryPath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath(System.String,System.String)
+  name.vb: GetIntermediateDirectoryPath(String, String)
+  fullName: BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath(string, string)
+  fullName.vb: BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath(String, String)
+  nameWithType: GeneratorBase.GetIntermediateDirectoryPath(string, string)
+  nameWithType.vb: GeneratorBase.GetIntermediateDirectoryPath(String, String)
+- uid: BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath*
+  name: GetIntermediateDirectoryPath
+  href: api/BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetIntermediateDirectoryPath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath
+  fullName: BenchmarkDotNet.Toolchains.GeneratorBase.GetIntermediateDirectoryPath
+  nameWithType: GeneratorBase.GetIntermediateDirectoryPath
 - uid: BenchmarkDotNet.Toolchains.GeneratorBase.GetPackagesDirectoryPath(System.String)
   name: GetPackagesDirectoryPath(string)
   href: api/BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetPackagesDirectoryPath_System_String_
@@ -34259,18 +34193,6 @@ references:
   fullName.vb: BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.New
   nameWithType: ConsumableTypeInfo.ConsumableTypeInfo
   nameWithType.vb: ConsumableTypeInfo.New
-- uid: BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetAwaiterMethod
-  name: GetAwaiterMethod
-  href: api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.html#BenchmarkDotNet_Toolchains_InProcess_Emit_Implementation_ConsumableTypeInfo_GetAwaiterMethod
-  commentId: P:BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetAwaiterMethod
-  fullName: BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetAwaiterMethod
-  nameWithType: ConsumableTypeInfo.GetAwaiterMethod
-- uid: BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetAwaiterMethod*
-  name: GetAwaiterMethod
-  href: api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.html#BenchmarkDotNet_Toolchains_InProcess_Emit_Implementation_ConsumableTypeInfo_GetAwaiterMethod_
-  commentId: Overload:BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetAwaiterMethod
-  fullName: BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetAwaiterMethod
-  nameWithType: ConsumableTypeInfo.GetAwaiterMethod
 - uid: BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.GetResultMethod
   name: GetResultMethod
   href: api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.html#BenchmarkDotNet_Toolchains_InProcess_Emit_Implementation_ConsumableTypeInfo_GetResultMethod
@@ -36017,15 +35939,15 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain
   fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain
   nameWithType: MonoAotLLVMToolChain
-- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor)
-  name: MonoAotLLVMToolChain(string, IGenerator, IBuilder, IExecutor)
-  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_System_String_BenchmarkDotNet_Toolchains_IGenerator_BenchmarkDotNet_Toolchains_IBuilder_BenchmarkDotNet_Toolchains_IExecutor_
-  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor)
-  name.vb: New(String, IGenerator, IBuilder, IExecutor)
-  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.MonoAotLLVMToolChain(string, BenchmarkDotNet.Toolchains.IGenerator, BenchmarkDotNet.Toolchains.IBuilder, BenchmarkDotNet.Toolchains.IExecutor)
-  fullName.vb: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.New(String, BenchmarkDotNet.Toolchains.IGenerator, BenchmarkDotNet.Toolchains.IBuilder, BenchmarkDotNet.Toolchains.IExecutor)
-  nameWithType: MonoAotLLVMToolChain.MonoAotLLVMToolChain(string, IGenerator, IBuilder, IExecutor)
-  nameWithType.vb: MonoAotLLVMToolChain.New(String, IGenerator, IBuilder, IExecutor)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor,System.String)
+  name: MonoAotLLVMToolChain(string, IGenerator, IBuilder, IExecutor, string)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_System_String_BenchmarkDotNet_Toolchains_IGenerator_BenchmarkDotNet_Toolchains_IBuilder_BenchmarkDotNet_Toolchains_IExecutor_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor,System.String)
+  name.vb: New(String, IGenerator, IBuilder, IExecutor, String)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.MonoAotLLVMToolChain(string, BenchmarkDotNet.Toolchains.IGenerator, BenchmarkDotNet.Toolchains.IBuilder, BenchmarkDotNet.Toolchains.IExecutor, string)
+  fullName.vb: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.New(String, BenchmarkDotNet.Toolchains.IGenerator, BenchmarkDotNet.Toolchains.IBuilder, BenchmarkDotNet.Toolchains.IExecutor, String)
+  nameWithType: MonoAotLLVMToolChain.MonoAotLLVMToolChain(string, IGenerator, IBuilder, IExecutor, string)
+  nameWithType.vb: MonoAotLLVMToolChain.New(String, IGenerator, IBuilder, IExecutor, String)
 - uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor*
   name: MonoAotLLVMToolChain
   href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_
@@ -36047,6 +35969,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From
   fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From
   nameWithType: MonoAotLLVMToolChain.From
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)
+  name: Validate(BenchmarkCase, IResolver)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate(BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Characteristics.IResolver)
+  nameWithType: MonoAotLLVMToolChain.Validate(BenchmarkCase, IResolver)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate*
+  name: Validate
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain_Validate_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate
+  nameWithType: MonoAotLLVMToolChain.Validate
 - uid: BenchmarkDotNet.Toolchains.MonoWasm
   name: BenchmarkDotNet.Toolchains.MonoWasm
   href: api/BenchmarkDotNet.Toolchains.MonoWasm.html
@@ -36335,6 +36269,18 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net90
   fullName: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net90
   nameWithType: NativeAotToolchain.Net90
+- uid: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)
+  name: Validate(BenchmarkCase, IResolver)
+  href: api/BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.html#BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_
+  commentId: M:BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)
+  fullName: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Validate(BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Characteristics.IResolver)
+  nameWithType: NativeAotToolchain.Validate(BenchmarkCase, IResolver)
+- uid: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Validate*
+  name: Validate
+  href: api/BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.html#BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchain_Validate_
+  commentId: Overload:BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Validate
+  fullName: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Validate
+  nameWithType: NativeAotToolchain.Validate
 - uid: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder
   name: NativeAotToolchainBuilder
   href: api/BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html
@@ -38310,6 +38256,9 @@ references:
 - uid: changelog.v0.13.9
   name: BenchmarkDotNet v0.13.9
   href: changelog/v0.13.9.html
+- uid: changelog.v0.14.0
+  name: BenchmarkDotNet v0.14.0
+  href: changelog/v0.14.0.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html

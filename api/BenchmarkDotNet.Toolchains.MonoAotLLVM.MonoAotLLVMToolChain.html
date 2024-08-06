@@ -8,6 +8,7 @@
       <meta name="title" content="Class MonoAotLLVMToolChain
  | BenchmarkDotNet ">
       
+      
       <link rel="icon" href="../logo/icon-32.png">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -130,9 +131,6 @@
     <dt>Inherited Members</dt>
     <dd>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_">Toolchain.Validate(BenchmarkCase, IResolver)</a>
-    </div>
-    <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_ToString">Toolchain.ToString()</a>
     </div>
     <div>
@@ -163,8 +161,8 @@
 
   <a id="BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_" data-uid="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_System_String_BenchmarkDotNet_Toolchains_IGenerator_BenchmarkDotNet_Toolchains_IBuilder_BenchmarkDotNet_Toolchains_IExecutor_" data-uid="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor)">
-  MonoAotLLVMToolChain(string, IGenerator, IBuilder, IExecutor)
+  <h3 id="BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_System_String_BenchmarkDotNet_Toolchains_IGenerator_BenchmarkDotNet_Toolchains_IBuilder_BenchmarkDotNet_Toolchains_IExecutor_System_String_" data-uid="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor,System.String)">
+  MonoAotLLVMToolChain(string, IGenerator, IBuilder, IExecutor, string)
   
   </h3>
 
@@ -172,7 +170,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MonoAotLLVMToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor)</code></pre>
+    <pre><code class="lang-csharp hljs">public MonoAotLLVMToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -184,6 +182,8 @@
     <dt><code>builder</code> <a class="xref" href="BenchmarkDotNet.Toolchains.IBuilder.html">IBuilder</a></dt>
     <dd></dd>
     <dt><code>executor</code> <a class="xref" href="BenchmarkDotNet.Toolchains.IExecutor.html">IExecutor</a></dt>
+    <dd></dd>
+    <dt><code>customDotNetCliPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
   </dl>
 
@@ -238,6 +238,44 @@
 
 
 
+  <a id="BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain_Validate_" data-uid="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_" data-uid="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)">
+  Validate(BenchmarkCase, IResolver)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override IEnumerable&lt;ValidationError&gt; Validate(BenchmarkCase benchmarkCase, IResolver resolver)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+    <dt><code>resolver</code> <a class="xref" href="BenchmarkDotNet.Characteristics.IResolver.html">IResolver</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
 
 </article>
 
@@ -255,7 +293,7 @@
     <footer class="border-top text-secondary">
       <div class="container-xxl">
         <div class="flex-fill">
-          Copyright &copy; 2013–2023 .NET Foundation and contributors
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
         </div>
       </div>
     </footer>

@@ -184,16 +184,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Attributes.AllCategoriesFilterAttribute.yml",
       "output": {
         ".html": {
@@ -1424,16 +1414,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Attributes.XmlExporterAttribute.Brief.yml",
       "output": {
         ".html": {
@@ -1918,26 +1898,6 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.SimpleColumnProvider.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Columns.SizeUnit.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Columns.SizeUnit.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Columns.SizeValue.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Columns.SizeValue.html"
         }
       },
       "version": ""
@@ -3404,16 +3364,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Extensions.StringAndTextExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Extensions.StringAndTextExtensions.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Extensions.yml",
       "output": {
         ".html": {
@@ -3524,6 +3474,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Helpers.AwaitHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Helpers.AwaitHelper.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Helpers.ExternalToolsHelper.yml",
       "output": {
         ".html": {
@@ -3548,6 +3508,16 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Helpers.SourceCodeHelper.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Helpers.UnitHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Helpers.UnitHelper.html"
         }
       },
       "version": ""
@@ -3884,10 +3854,30 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Mathematics.MathHelper.yml",
+      "source_relative_path": "api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.yml",
       "output": {
         ".html": {
-          "relative_path": "api/BenchmarkDotNet.Mathematics.MathHelper.html"
+          "relative_path": "api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Mathematics.LegacyConfidenceInterval.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Mathematics.LegacyConfidenceLevel.html"
         }
       },
       "version": ""
@@ -6149,6 +6139,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/samples/IntroDotMemoryDiagnoser.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/samples/IntroDotMemoryDiagnoser.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/samples/IntroDotTraceDiagnoser.md",
       "output": {
         ".html": {
@@ -6573,6 +6573,16 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroStopOnFirstError.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/samples/IntroSummaryStyle.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/samples/IntroSummaryStyle.html"
         }
       },
       "version": ""
@@ -7062,6 +7072,16 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.9.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.14.0.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.14.0.html"
         }
       },
       "version": ""
