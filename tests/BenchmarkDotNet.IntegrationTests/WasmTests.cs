@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm");
-            var mainJsPath = Path.Combine(AppContext.BaseDirectory, "AppBundle", "test-main.js");
+            var mainJsPath = Path.Combine(AppContext.BaseDirectory, "AppBundle", "test-main.mjs");
 
             var config = ManualConfig.CreateEmpty()
                 .AddLogger(logger)
