@@ -72,6 +72,14 @@ namespace BenchmarkDotNet.Running
                     isInitialized = true;
                 }
 
+                Guid ultimatePerformanceGuid = PowerPlansDict[PowerPlan.UltimatePerformance];
+                Guid highPerformanceGuid = PowerPlansDict[PowerPlan.HighPerformance];
+                if (userCurrentPowerPlan == ultimatePerformanceGuid && guid == highPerformanceGuid)
+                {
+                    logger.WriteLineInfo($"Current power plan is already Ultimate Performance. Not changing to High Performance.");
+                    return;
+                }
+
                 if (PowerManagementHelper.Set(guid))
                 {
                     powerPlanChanged = true;
