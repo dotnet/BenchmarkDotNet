@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Disassemblers
         public Arm64RegisterId RegisterId {  get {  return _registerId; } }
     }
 
-    internal class Arm64Disassembler : ClrMdV2Disassembler
+    internal class Arm64Disassembler : ClrMdV3Disassembler
     {
         internal sealed class RuntimeSpecificData
         {
