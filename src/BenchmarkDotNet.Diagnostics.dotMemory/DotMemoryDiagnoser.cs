@@ -45,10 +45,11 @@ namespace BenchmarkDotNet.Diagnostics.dotMemory
             switch (signal)
             {
                 case HostSignal.BeforeAnythingElse:
-                    if (tool is not null)
-                        throw new InvalidOperationException("DotMemory tool is already initialized");
-                    tool = new DotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
-                    tool.Init();
+                    if (tool is null)
+                    {
+                        tool = new DotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
+                        tool.Init();
+                    }
                     break;
                 case HostSignal.BeforeActualRun:
                     if (tool is null)
