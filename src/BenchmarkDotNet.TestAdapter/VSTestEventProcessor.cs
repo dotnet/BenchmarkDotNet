@@ -130,6 +130,26 @@ namespace BenchmarkDotNet.TestAdapter
             var cultureInfo = CultureInfo.InvariantCulture;
             var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
 
+            if (testResult.ErrorMessage is null)
+            {
+                // Check thath WorkloadMethod has constraints
+                var constraints = benchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<Annotations.BenchmarkCaseConstraintAttribute>();
+                if (constraints.Any())
+                {
+                    var constraintsBuilder = new StringBuilder();
+                    // Validete all constraints
+                    foreach (var constraint in constraints)
+                    {
+                        constraint.Validate(report, constraintsBuilder);
+                    }
+                    if (constraintsBuilder.Length > 0)
+                    {
+                        testResult.Outcome = TestOutcome.Failed;
+                        testResult.ErrorMessage = $"// Constraint Errors: {constraintsBuilder}";
+                    }
+                }
+            }
+
             var builder = new StringBuilder();
             var histogram = HistogramBuilder.Adaptive.Build(statistics.Sample.Values);
             builder.AppendLine("-------------------- Histogram --------------------");
