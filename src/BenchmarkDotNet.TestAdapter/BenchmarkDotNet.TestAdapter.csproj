@@ -24,5 +24,6 @@
     <Compile Remove="entrypoints\EntryPoint.*" />
     <None Include="entrypoints\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
     <None Include="build\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
+    <None Include="build\BenchmarkDotNet.TestAdapter.targets" Pack="true" PackagePath="build\" />
   </ItemGroup>
 </Project>
