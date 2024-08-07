@@ -16,7 +16,7 @@
     <!--End workaround -->
     
     <Error Code="BDNTAE00001"
-           Text="You are compiling $(MSBuildProjectName) with in not Release mode and with Optimize set to false."
+           Text="You are compiling $(MSBuildProjectName) with in not Release mode and/or with Optimize set to false."
            HelpLink="https://benchmarkdotnet.org/articles/features/vstest.html"
            File="$(MSBuildProjectFullPath)"
            />
