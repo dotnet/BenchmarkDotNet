@@ -84,7 +84,8 @@ namespace BenchmarkDotNet.Exporters.Plotting
             var version = BenchmarkDotNetInfo.Instance.BrandTitle;
             var annotations = GetAnnotations(version);
 
-            var (timeUnit, timeScale) = GetTimeUnit(summary.Reports.SelectMany(m => m.AllMeasurements));
+            var (timeUnit, timeScale) = GetTimeUnit(summary.Reports
+                .SelectMany(m => m.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Result))));
 
             foreach (var benchmark in summary.Reports.GroupBy(r => r.BenchmarkCase.Descriptor.Type.Name))
             {
