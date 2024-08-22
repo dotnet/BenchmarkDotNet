@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string? GetDotNetSdkVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
+            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) })
             using (new ConsoleExitHandler(process, NullLogger.Instance))
             {
                 try
