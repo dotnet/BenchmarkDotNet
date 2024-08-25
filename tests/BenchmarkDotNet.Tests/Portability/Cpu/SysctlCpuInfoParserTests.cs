@@ -1,43 +1,40 @@
 ﻿using BenchmarkDotNet.Portability.Cpu;
-using Perfolizer.Horology;
+using BenchmarkDotNet.Portability.Cpu.macOS;
 using Xunit;
+using Xunit.Abstractions;
+using static Perfolizer.Horology.Frequency;
 
-namespace BenchmarkDotNet.Tests.Portability.Cpu
+namespace BenchmarkDotNet.Tests.Portability.Cpu;
+
+// ReSharper disable StringLiteralTypo
+public class SysctlCpuInfoParserTests(ITestOutputHelper output)
 {
-    public class SysctlCpuInfoParserTests
+    private ITestOutputHelper Output { get; } = output;
+
+    [Fact]
+    public void EmptyTest()
     {
-        [Fact]
-        public void EmptyTest()
-        {
-            var parser = SysctlCpuInfoParser.ParseOutput(string.Empty);
-            Assert.Null(parser.ProcessorName);
-            Assert.Null(parser.PhysicalProcessorCount);
-            Assert.Null(parser.PhysicalCoreCount);
-            Assert.Null(parser.LogicalCoreCount);
-            Assert.Null(parser.NominalFrequency);
-        }
+        var actual = SysctlCpuInfoParser.Parse(string.Empty);
+        var expected = CpuInfo.Empty;
+        Output.AssertEqual(expected, actual);
+    }
 
-        [Fact]
-        public void MalformedTest()
-        {
-            var parser = SysctlCpuInfoParser.ParseOutput("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
-            Assert.Null(parser.ProcessorName);
-            Assert.Null(parser.PhysicalProcessorCount);
-            Assert.Null(parser.PhysicalCoreCount);
-            Assert.Null(parser.LogicalCoreCount);
-            Assert.Null(parser.NominalFrequency);
-        }
+    [Fact]
+    public void MalformedTest()
+    {
+        var actual = SysctlCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
+        var expected = CpuInfo.Empty;
+        Output.AssertEqual(expected, actual);
+    }
 
-        [Fact]
-        public void RealOneProcessorFourCoresTest()
-        {
-            string cpuInfo = TestHelper.ReadTestFile("SysctlRealOneProcessorFourCores.txt");
-            var parser = SysctlCpuInfoParser.ParseOutput(cpuInfo);
-            Assert.Equal("Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz", parser.ProcessorName);
-            Assert.Equal(1, parser.PhysicalProcessorCount);
-            Assert.Equal(4, parser.PhysicalCoreCount);
-            Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2200 * Frequency.MHz, parser.NominalFrequency);
-        }
+    [Fact]
+    public void RealOneProcessorFourCoresTest()
+    {
+        string cpuInfo = TestHelper.ReadTestFile("SysctlRealOneProcessorFourCores.txt");
+        var actual = SysctlCpuInfoParser.Parse(cpuInfo);
+        var expected = new CpuInfo(
+            "Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz",
+            1, 4, 8, 2200 * MHz, 2200 * MHz);
+        Output.AssertEqual(expected, actual);
     }
 }

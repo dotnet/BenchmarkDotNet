@@ -19,8 +19,11 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz", "Intel Core i7-7700 CPU 3.60GHz (Kaby Lake)")]
         [InlineData("Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz ", "Intel Core i7-8650U CPU 1.90GHz (Kaby Lake R)")]
         [InlineData("Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz", "Intel Core i7-8700K CPU 3.70GHz (Coffee Lake)")]
-        public void IntelCoreIsPrettified(string originalName, string prettifiedName) =>
-            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(new CpuInfo(originalName, nominalFrequency: null)));
+        public void IntelCoreIsPrettified(string originalName, string prettifiedName)
+        {
+            var actual = CpuInfo.FromName(originalName);
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(actual));
+        }
 
         [Theory]
         [InlineData("Intel(R) Pentium(TM) G4560 CPU @ 3.50GHz", "Intel Pentium G4560 CPU 3.50GHz (Max: 3.70GHz)", 3.7)]
@@ -31,7 +34,8 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Intel(R) Core(TM) i7-5775R CPU @ 3.30GHz", "Intel Core i7-5775R CPU 3.30GHz (Max: 3.40GHz) (Broadwell)", 3.4)]
         public void CoreIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency)
         {
-            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(new CpuInfo(originalName, nominalFrequency: Frequency.FromGHz(actualFrequency)), includeMaxFrequency: true));
+            var actual = CpuInfo.FromNameAndFrequency(originalName, Frequency.FromGHz(actualFrequency));
+            Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(actual, includeMaxFrequency: true));
         }
 
         [Theory]
@@ -45,7 +49,6 @@ namespace BenchmarkDotNet.Tests.Environments
                 physicalCoreCount,
                 logicalCoreCount,
                 Frequency.FromGHz(actualFrequency),
-                minFrequency: null,
                 maxFrequency: null);
 
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
@@ -65,7 +68,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData(null, "Unknown processor")]
         public void UnknownProcessorDoesNotThrow(string? originalName, string prettifiedName)
         {
-            var cpuInfo = new CpuInfo(originalName, nominalFrequency: null);
+            var cpuInfo = new CpuInfo(originalName, null, null, null, null);
 
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
         }

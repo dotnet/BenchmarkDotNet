@@ -23,13 +23,13 @@ namespace BenchmarkDotNet.Tests.Builders
         private string osVersion = "Microsoft Windows NT 10.0.x.mock";
         private string runtimeVersion = "Clr 4.0.x.mock";
 
-        private CpuInfo cpuInfo = new CpuInfo("MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
-                                              physicalProcessorCount: 1,
-                                              physicalCoreCount: 4,
-                                              logicalCoreCount: 8,
-                                              nominalFrequency: Frequency.FromMHz(3100),
-                                              maxFrequency: Frequency.FromMHz(3100),
-                                              minFrequency: Frequency.FromMHz(3100));
+        private CpuInfo cpuInfo =
+            new ("MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+                physicalProcessorCount: 1,
+                physicalCoreCount: 4,
+                logicalCoreCount: 8,
+                nominalFrequency: Frequency.FromMHz(3100),
+                maxFrequency: Frequency.FromMHz(3100));
 
         private VirtualMachineHypervisor? virtualMachineHypervisor = HyperV.Default;
 

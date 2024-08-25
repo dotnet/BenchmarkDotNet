@@ -1,37 +1,36 @@
 ﻿using BenchmarkDotNet.Portability.Cpu;
-using Perfolizer.Horology;
+using BenchmarkDotNet.Portability.Cpu.Windows;
 using Xunit;
+using Xunit.Abstractions;
+using static Perfolizer.Horology.Frequency;
 
-namespace BenchmarkDotNet.Tests.Portability.Cpu
+namespace BenchmarkDotNet.Tests.Portability.Cpu;
+
+// ReSharper disable StringLiteralTypo
+public class WmicCpuInfoParserTests(ITestOutputHelper output)
 {
-    public class WmicCpuInfoParserTests
+    private ITestOutputHelper Output { get; } = output;
+
+    [Fact]
+    public void EmptyTest()
     {
-        [Fact]
-        public void EmptyTest()
-        {
-            var parser = WmicCpuInfoParser.ParseOutput(string.Empty);
-            Assert.Null(parser.ProcessorName);
-            Assert.Null(parser.PhysicalProcessorCount);
-            Assert.Null(parser.PhysicalCoreCount);
-            Assert.Null(parser.LogicalCoreCount);
-            Assert.Null(parser.NominalFrequency);
-        }
+        var actual = WmicCpuInfoParser.Parse(string.Empty);
+        var expected = CpuInfo.Empty;
+        Output.AssertEqual(expected, actual);
+    }
 
-        [Fact]
-        public void MalformedTest()
-        {
-            var parser = WmicCpuInfoParser.ParseOutput("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
-            Assert.Null(parser.ProcessorName);
-            Assert.Null(parser.PhysicalProcessorCount);
-            Assert.Null(parser.PhysicalCoreCount);
-            Assert.Null(parser.LogicalCoreCount);
-            Assert.Null(parser.NominalFrequency);
-        }
+    [Fact]
+    public void MalformedTest()
+    {
+        var actual = WmicCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
+        var expected = CpuInfo.Empty;
+        Output.AssertEqual(expected, actual);
+    }
 
-        [Fact]
-        public void RealTwoProcessorEightCoresTest()
-        {
-            const string cpuInfo = @"
+    [Fact]
+    public void RealTwoProcessorEightCoresTest()
+    {
+        const string cpuInfo = @"
 
 MaxClockSpeed=2400
 Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
@@ -45,45 +44,43 @@ NumberOfCores=8
 NumberOfLogicalProcessors=16
 
 ";
-            var parser = WmicCpuInfoParser.ParseOutput(cpuInfo);
-            Assert.Equal("Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz", parser.ProcessorName);
-            Assert.Equal(2, parser.PhysicalProcessorCount);
-            Assert.Equal(16, parser.PhysicalCoreCount);
-            Assert.Equal(32, parser.LogicalCoreCount);
-            Assert.Equal(2400 * Frequency.MHz, parser.MaxFrequency);
-        }
+        var actual = WmicCpuInfoParser.Parse(cpuInfo);
+        var expected = new CpuInfo(
+            "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
+            2, 16, 32, 2400 * MHz, 2400 * MHz);
+        Output.AssertEqual(expected, actual);
+    }
 
-        [Fact]
-        public void RealTwoProcessorEightCoresWithWmicBugTest()
-        {
-            const string cpuInfo =
-                "\r\r\n" +
-                "\r\r\n" +
-                "MaxClockSpeed=3111\r\r\n" +
-                "Name=Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz\r\r\n" +
-                "NumberOfCores=8\r\r\n" +
-                "NumberOfLogicalProcessors=16\r\r\n" +
-                "\r\r\n" +
-                "\r\r\n" +
-                "MaxClockSpeed=3111\r\r\n" +
-                "Name=Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz\r\r\n" +
-                "NumberOfCores=8\r\r\n" +
-                "NumberOfLogicalProcessors=16\r\r\n" +
-                "\r\r\n" +
-                "\r\r\n" +
-                "\r\r\n";
-            var parser = WmicCpuInfoParser.ParseOutput(cpuInfo);
-            Assert.Equal("Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz", parser.ProcessorName);
-            Assert.Equal(2, parser.PhysicalProcessorCount);
-            Assert.Equal(16, parser.PhysicalCoreCount);
-            Assert.Equal(32, parser.LogicalCoreCount);
-            Assert.Equal(3111 * Frequency.MHz, parser.MaxFrequency);
-        }
+    [Fact]
+    public void RealTwoProcessorEightCoresWithWmicBugTest()
+    {
+        const string cpuInfo =
+            "\r\r\n" +
+            "\r\r\n" +
+            "MaxClockSpeed=3111\r\r\n" +
+            "Name=Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz\r\r\n" +
+            "NumberOfCores=8\r\r\n" +
+            "NumberOfLogicalProcessors=16\r\r\n" +
+            "\r\r\n" +
+            "\r\r\n" +
+            "MaxClockSpeed=3111\r\r\n" +
+            "Name=Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz\r\r\n" +
+            "NumberOfCores=8\r\r\n" +
+            "NumberOfLogicalProcessors=16\r\r\n" +
+            "\r\r\n" +
+            "\r\r\n" +
+            "\r\r\n";
+        var actual = WmicCpuInfoParser.Parse(cpuInfo);
+        var expected = new CpuInfo(
+            "Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz",
+            2, 16, 32, 3111 * MHz, 3111 * MHz);
+        Output.AssertEqual(expected, actual);
+    }
 
-        [Fact]
-        public void RealOneProcessorFourCoresTest()
-        {
-            const string cpuInfo = @"
+    [Fact]
+    public void RealOneProcessorFourCoresTest()
+    {
+        const string cpuInfo = @"
 
 MaxClockSpeed=2500
 Name=Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
@@ -92,12 +89,10 @@ NumberOfLogicalProcessors=8
 
 ";
 
-            var parser = WmicCpuInfoParser.ParseOutput(cpuInfo);
-            Assert.Equal("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", parser.ProcessorName);
-            Assert.Equal(1, parser.PhysicalProcessorCount);
-            Assert.Equal(4, parser.PhysicalCoreCount);
-            Assert.Equal(8, parser.LogicalCoreCount);
-            Assert.Equal(2500 * Frequency.MHz, parser.MaxFrequency);
-        }
+        var actual = WmicCpuInfoParser.Parse(cpuInfo);
+        var expected = new CpuInfo(
+            "Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz",
+            1, 4, 8, 2500 * MHz, 2500 * MHz);
+        Output.AssertEqual(expected, actual);
     }
 }

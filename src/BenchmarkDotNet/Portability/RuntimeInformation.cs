@@ -12,6 +12,9 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Portability.Cpu.Linux;
+using BenchmarkDotNet.Portability.Cpu.macOS;
+using BenchmarkDotNet.Portability.Cpu.Windows;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using static System.Runtime.InteropServices.RuntimeInformation;
@@ -238,19 +241,8 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static CpuInfo GetCpuInfo()
-        {
-            if (IsWindows() && IsFullFramework && !IsMono)
-                return MosCpuInfoProvider.MosCpuInfo.Value;
-            if (IsWindows())
-                return WmicCpuInfoProvider.WmicCpuInfo.Value;
-            if (IsLinux())
-                return ProcCpuInfoProvider.ProcCpuInfo.Value;
-            if (IsMacOS())
-                return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
-
-            return null;
-        }
+        private static readonly Lazy<CpuInfo?> LazyCpuInfo = new (CpuInfo.DetectCurrent);
+        internal static CpuInfo? GetCpuInfo() => LazyCpuInfo.Value;
 
         internal static string GetRuntimeVersion()
         {

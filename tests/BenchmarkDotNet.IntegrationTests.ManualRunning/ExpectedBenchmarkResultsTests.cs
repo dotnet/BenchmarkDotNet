@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var cpuResolution = RuntimeInformation.GetCpuInfo()?.MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
             var threshold = new NumberValue(cpuResolution.Nanoseconds).ToThreshold();
 
             foreach (var report in summary.Reports)
