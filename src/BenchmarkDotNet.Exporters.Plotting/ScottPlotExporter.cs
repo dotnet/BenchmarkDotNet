@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
@@ -83,7 +84,8 @@ namespace BenchmarkDotNet.Exporters.Plotting
             var version = BenchmarkDotNetInfo.Instance.BrandTitle;
             var annotations = GetAnnotations(version);
 
-            var (timeUnit, timeScale) = GetTimeUnit(summary.Reports.SelectMany(m => m.AllMeasurements));
+            var (timeUnit, timeScale) = GetTimeUnit(summary.Reports
+                .SelectMany(m => m.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Result))));
 
             foreach (var benchmark in summary.Reports.GroupBy(r => r.BenchmarkCase.Descriptor.Type.Name))
             {
@@ -93,6 +95,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 var timeStats = from report in benchmark
                                 let jobId = report.BenchmarkCase.DisplayInfo.Replace(report.BenchmarkCase.Descriptor.DisplayInfo + ": ", string.Empty)
                                 from measurement in report.AllMeasurements
+                                where measurement.Is(IterationMode.Workload, IterationStage.Result)
                                 let measurementValue = measurement.Nanoseconds / measurement.Operations
                                 group measurementValue / timeScale by (Target: report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo, JobId: jobId) into g
                                 select (g.Key.Target, g.Key.JobId, Mean: g.Average(), StdError: StandardError(g.ToList()));
