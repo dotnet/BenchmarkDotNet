@@ -98,6 +98,42 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
         Output.AssertEqual(expected, actual);
     }
 
+    [Fact]
+    public void AmdRyzen9_7950X()
+    {
+        string cpuInfo = TestHelper.ReadTestFile("ryzen9-cpuinfo.txt");
+        const string lscpu =
+            """
+            Architecture:             x86_64
+              CPU op-mode(s):         32-bit, 64-bit
+              Address sizes:          48 bits physical, 48 bits virtual
+              Byte Order:             Little Endian
+            CPU(s):                   32
+              On-line CPU(s) list:    0-31
+            Vendor ID:                AuthenticAMD
+              Model name:             AMD Ryzen 9 7950X 16-Core Processor
+                CPU family:           25
+                Model:                97
+                Thread(s) per core:   2
+                Core(s) per socket:   16
+                Socket(s):            1
+                Stepping:             2
+                CPU(s) scaling MHz:   41%
+                CPU max MHz:          5881.0000
+                CPU min MHz:          400.0000
+                BogoMIPS:             8983.23
+                Flags:                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl 
+                                      pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb
+                                       bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512
+                                      cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean
+                                       flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succo
+                                      r smca fsrm flush_l1d
+            """;
+        var actual = LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
+        var expected = new CpuInfo("AMD Ryzen 9 7950X 16-Core Processor", 1, 16, 32, 5881 * MHz, 5881 * MHz);
+        Output.AssertEqual(expected, actual);
+    }
+
     [Theory]
     [InlineData("Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz", 2.50)]
     [InlineData("Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz", 2.30)]

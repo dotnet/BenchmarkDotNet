@@ -68,8 +68,8 @@ internal static class LinuxCpuInfoParser
                 string value = lscpuParts[i + 1].Trim();
 
                 if (name.EqualsWithIgnoreCase(Lscpu.MaxFrequency) &&
-                    Frequency.TryParseMHz(value.Replace(',', '.'), out var maxFrequencyMHz)) // Example: `CPU max MHz: 3200,0000`
-                    maxFrequency = Frequency.FromMHz(maxFrequencyMHz);
+                    Frequency.TryParseMHz(value.Replace(',', '.'), out var maxFrequencyParsed)) // Example: `CPU max MHz: 3200,0000`
+                    maxFrequency = maxFrequencyParsed;
 
                 if (name.EqualsWithIgnoreCase(Lscpu.ModelName))
                     processorModelNames.Add(value);
