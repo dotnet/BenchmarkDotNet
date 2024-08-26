@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Helpers;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Portability.Cpu.Linux;
 
@@ -14,8 +15,16 @@ internal class LinuxCpuInfoDetector : ICpuInfoDetector
     {
         if (!IsApplicable()) return null;
 
+        // lscpu output respects the system locale, so we should force language invariant environment for correct parsing
+        var languageInvariantEnvironment = new Dictionary<string, string>
+        {
+            ["LC_ALL"] = "C",
+            ["LANG"] = "C",
+            ["LANGUAGE"] = "C"
+        };
+
         string cpuInfo = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo") ?? "";
-        string lscpu = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu\"");
+        string lscpu = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu\"", environmentVariables: languageInvariantEnvironment);
         return LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
     }
 }
