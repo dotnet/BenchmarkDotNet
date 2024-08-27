@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -44,7 +45,7 @@ namespace BenchmarkDotNet.Environments
 
         internal static ClrRuntime GetCurrentVersion()
         {
-            if (!RuntimeInformation.IsWindows())
+            if (!OsDetector.IsWindows())
             {
                 throw new NotSupportedException(".NET Framework supports Windows OS only.");
             }

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Phd;
+using Perfolizer.Phd.Dto;
 
 namespace BenchmarkDotNet.Properties
 {
     public class BenchmarkDotNetInfo
     {
+        public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
+
         private static readonly Lazy<BenchmarkDotNetInfo> LazyInstance = new (() =>
         {
             var assembly = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly;
@@ -15,6 +19,12 @@ namespace BenchmarkDotNet.Properties
         });
 
         public static BenchmarkDotNetInfo Instance { get; } = LazyInstance.Value;
+
+        public PhdEngine GetBdnEngine() => new ()
+        {
+            Name = BenchmarkDotNetCaption,
+            Version = BrandVersion
+        };
 
         public Version AssemblyVersion { get; }
         public string FullVersion { get; }

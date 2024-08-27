@@ -1,0 +1,1276 @@
+﻿BenchmarkDotNet v0.1729.0-mock, Microsoft Windows NT 10.0.x.mock
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+
+Type = Bench, Jit = RyuJit
+
+@HostProcessAffinity0: Runtime = HostProcess, Affinity = 0
+@Squid:                Runtime = NotRecognized, Affinity = 1
+@MonoAffinity2:        Runtime = Mono, Affinity = 2
+@Net461Affinity3:      Runtime = Net461, Affinity = 3
+@Net462Affinity4:      Runtime = Net462, Affinity = 4
+@Net47Affinity5:       Runtime = Net47, Affinity = 5
+@Net471Affinity6:      Runtime = Net471, Affinity = 6
+@Net472Affinity7:      Runtime = Net472, Affinity = 7
+@Net48Affinity8:       Runtime = Net48, Affinity = 8
+@Net481Affinity9:      Runtime = Net481, Affinity = 9
+@Liger:                Runtime = NetCoreApp20, Affinity = 10
+@Rat:                  Runtime = NetCoreApp21, Affinity = 11
+@Skate:                Runtime = NetCoreApp22, Affinity = 12
+@Perch:                Runtime = NetCoreApp30, Affinity = 13
+@Roach:                Runtime = NetCoreApp31, Affinity = 14
+@Roe:                  Runtime = NetCoreApp50, Affinity = 15
+@Net50Affinity16:      Runtime = Net50, Affinity = 16
+@Net60Affinity17:      Runtime = Net60, Affinity = 17
+@Net70Affinity18:      Runtime = Net70, Affinity = 18
+@Net80Affinity19:      Runtime = Net80, Affinity = 19
+
+| Method | Job                  |    Center |  Spread |
+|:-------|:---------------------|----------:|--------:|
+| Foo    | HostProcessAffinity0 |   2.00 ns | 0.81 ns |
+| Bar    | HostProcessAffinity0 |   7.00 ns | 0.81 ns |
+| Foo    | Squid                |  12.00 ns | 0.81 ns |
+| Bar    | Squid                |  17.00 ns | 0.81 ns |
+| Foo    | MonoAffinity2        |  22.00 ns | 0.81 ns |
+| Bar    | MonoAffinity2        |  27.00 ns | 0.81 ns |
+| Foo    | Net461Affinity3      |  32.00 ns | 0.81 ns |
+| Bar    | Net461Affinity3      |  37.00 ns | 0.81 ns |
+| Foo    | Net462Affinity4      |  42.00 ns | 0.81 ns |
+| Bar    | Net462Affinity4      |  47.00 ns | 0.81 ns |
+| Foo    | Net47Affinity5       |  52.00 ns | 0.81 ns |
+| Bar    | Net47Affinity5       |  57.00 ns | 0.81 ns |
+| Foo    | Net471Affinity6      |  62.00 ns | 0.81 ns |
+| Bar    | Net471Affinity6      |  67.00 ns | 0.81 ns |
+| Foo    | Net472Affinity7      |  72.00 ns | 0.81 ns |
+| Bar    | Net472Affinity7      |  77.00 ns | 0.81 ns |
+| Foo    | Net48Affinity8       |  82.00 ns | 0.81 ns |
+| Bar    | Net48Affinity8       |  87.00 ns | 0.81 ns |
+| Foo    | Net481Affinity9      |  92.00 ns | 0.81 ns |
+| Bar    | Net481Affinity9      |  97.00 ns | 0.81 ns |
+| Foo    | Liger                | 102.00 ns | 0.81 ns |
+| Bar    | Liger                | 107.00 ns | 0.81 ns |
+| Foo    | Rat                  | 112.00 ns | 0.81 ns |
+| Bar    | Rat                  | 117.00 ns | 0.81 ns |
+| Foo    | Skate                | 122.00 ns | 0.81 ns |
+| Bar    | Skate                | 127.00 ns | 0.81 ns |
+| Foo    | Perch                | 132.00 ns | 0.81 ns |
+| Bar    | Perch                | 137.00 ns | 0.81 ns |
+| Foo    | Roach                | 142.00 ns | 0.81 ns |
+| Bar    | Roach                | 147.00 ns | 0.81 ns |
+| Foo    | Roe                  | 152.00 ns | 0.81 ns |
+| Bar    | Roe                  | 157.00 ns | 0.81 ns |
+| Foo    | Net50Affinity16      | 162.00 ns | 0.81 ns |
+| Bar    | Net50Affinity16      | 167.00 ns | 0.81 ns |
+| Foo    | Net60Affinity17      | 172.00 ns | 0.81 ns |
+| Bar    | Net60Affinity17      | 177.00 ns | 0.81 ns |
+| Foo    | Net70Affinity18      | 182.00 ns | 0.81 ns |
+| Bar    | Net70Affinity18      | 187.00 ns | 0.81 ns |
+| Foo    | Net80Affinity19      | 192.00 ns | 0.81 ns |
+| Bar    | Net80Affinity19      | 197.00 ns | 0.81 ns |
+
+{
+  "engine": {
+    "name": "BenchmarkDotNet",
+    "version": "0.1729.0-mock"
+  },
+  "host": {
+    "runtimeVersion": "Clr 4.0.x.mock",
+    "hasAttachedDebugger": false,
+    "hasRyuJit": true,
+    "configuration": "CONFIGURATION",
+    "dotNetSdkVersion": "1.0.x.mock",
+    "chronometerFrequency": 2531248,
+    "hardwareTimerKind": "Tsc",
+    "os": {
+      "display": "Microsoft Windows NT 10.0.x.mock"
+    },
+    "cpu": {
+      "processorName": "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+      "physicalProcessorCount": 1,
+      "physicalCoreCount": 4,
+      "logicalCoreCount": 8,
+      "nominalFrequencyHz": 3100000000,
+      "maxFrequencyHz": 3100000000
+    }
+  },
+  "nested": [
+    {
+      "job": {
+        "environment": {
+          "runtime": "hostProcess",
+          "jit": "ryuJit",
+          "affinity": 0
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 1,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 2,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 3,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 6,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 7,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 8,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "notRecognized",
+          "jit": "ryuJit",
+          "affinity": 1
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 11,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 12,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 13,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 16,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 17,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 18,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "mono",
+          "jit": "ryuJit",
+          "affinity": 2
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 21,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 22,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 23,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 26,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 27,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 28,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net461",
+          "jit": "ryuJit",
+          "affinity": 3
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 31,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 32,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 33,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 36,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 37,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 38,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net462",
+          "jit": "ryuJit",
+          "affinity": 4
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 41,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 42,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 43,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 46,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 47,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 48,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net47",
+          "jit": "ryuJit",
+          "affinity": 5
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 51,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 52,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 53,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 56,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 57,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 58,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net471",
+          "jit": "ryuJit",
+          "affinity": 6
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 61,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 62,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 63,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 66,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 67,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 68,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net472",
+          "jit": "ryuJit",
+          "affinity": 7
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 71,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 72,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 73,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 76,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 77,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 78,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net48",
+          "jit": "ryuJit",
+          "affinity": 8
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 81,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 82,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 83,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 86,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 87,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 88,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net481",
+          "jit": "ryuJit",
+          "affinity": 9
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 91,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 92,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 93,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 96,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 97,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 98,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "netCoreApp20",
+          "jit": "ryuJit",
+          "affinity": 10
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 101,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 102,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 103,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 106,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 107,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 108,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "netCoreApp21",
+          "jit": "ryuJit",
+          "affinity": 11
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 111,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 112,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 113,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 116,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 117,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 118,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "netCoreApp22",
+          "jit": "ryuJit",
+          "affinity": 12
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 121,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 122,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 123,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 126,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 127,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 128,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "netCoreApp30",
+          "jit": "ryuJit",
+          "affinity": 13
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 131,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 132,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 133,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 136,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 137,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 138,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "netCoreApp31",
+          "jit": "ryuJit",
+          "affinity": 14
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 141,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 142,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 143,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 146,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 147,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 148,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "netCoreApp50",
+          "jit": "ryuJit",
+          "affinity": 15
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 151,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 152,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 153,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 156,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 157,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 158,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net50",
+          "jit": "ryuJit",
+          "affinity": 16
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 161,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 162,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 163,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 166,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 167,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 168,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net60",
+          "jit": "ryuJit",
+          "affinity": 17
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 171,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 172,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 173,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 176,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 177,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 178,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net70",
+          "jit": "ryuJit",
+          "affinity": 18
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 181,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 182,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 183,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 186,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 187,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 188,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net80",
+          "jit": "ryuJit",
+          "affinity": 19
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 191,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 192,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 193,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 196,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 197,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 198,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "table": {
+      "columnDefinitions": [
+        {
+          "selector": ".engine",
+          "cloud": "primary",
+          "isSelfExplanatory": true,
+          "isAtomic": true
+        },
+        {
+          "selector": ".host.os",
+          "cloud": "primary",
+          "isSelfExplanatory": true,
+          "isAtomic": true
+        },
+        {
+          "selector": ".host.cpu",
+          "cloud": "primary",
+          "isSelfExplanatory": true,
+          "isAtomic": true
+        },
+        {
+          "selector": ".benchmark",
+          "cloud": "secondary"
+        },
+        {
+          "selector": ".job",
+          "cloud": "secondary",
+          "compressed": true
+        },
+        {
+          "selector": "=center"
+        },
+        {
+          "selector": "=spread"
+        }
+      ]
+    }
+  }
+}

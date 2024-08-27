@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnostics.dotMemory;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void DotMemorySmokeTest()
         {
-            if (!RuntimeInformation.IsWindows() && RuntimeInformation.IsMono)
+            if (!OsDetector.IsWindows() && RuntimeInformation.IsMono)
             {
                 Output.WriteLine("Skip Mono on non-Windows");
                 return;

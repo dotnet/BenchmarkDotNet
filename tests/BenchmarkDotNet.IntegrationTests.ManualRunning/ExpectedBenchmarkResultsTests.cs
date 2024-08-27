@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuResolution = RuntimeInformation.GetCpuInfo()?.MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var cpuResolution = CpuDetector.Cpu?.MaxFrequency()?.ToResolution() ?? FallbackCpuResolutionValue;
             var threshold = new NumberValue(cpuResolution.Nanoseconds).ToThreshold();
 
             foreach (var report in summary.Reports)
@@ -163,7 +164,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var cpuResolution = CpuDetector.Cpu?.MaxFrequency()?.ToResolution() ?? FallbackCpuResolutionValue;
             var threshold = (cpuResolution / 2).ToThreshold();
 
             foreach (var report in summary.Reports)

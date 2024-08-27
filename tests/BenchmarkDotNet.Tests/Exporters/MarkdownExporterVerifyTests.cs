@@ -10,12 +10,11 @@ using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Tests.Builders;
+using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
-using BenchmarkDotNet.Columns;
-using System.Reflection;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
@@ -42,8 +41,9 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
             logger.WriteLine("=== " + benchmarkType.Name + " ===");
+
             var exporter = MarkdownExporter.Mock;
-            var summary = MockFactory.CreateSummary(benchmarkType, benchmarkType.GetCustomAttribute<HideColumnsAttribute>()?.Config.GetColumnHidingRules().ToArray() ?? []);
+            var summary = MockFactory.CreateSummary(benchmarkType);
             exporter.ExportToLog(summary, logger);
 
             var validator = BaselineValidator.FailOnError;
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var error in errors)
                 logger.WriteLineError("* " + error.Message);
 
-            var settings = VerifySettingsFactory.Create();
+            var settings = VerifyHelper.Create();
             settings.UseTextForParameters(benchmarkType.Name);
             return Verifier.Verify(logger.GetLog(), settings);
         }
@@ -220,8 +220,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
             public class MethodJobBaseline_MethodsJobs
             {
-                [Benchmark(Baseline = true)] public void Foo() { }
-                [Benchmark] public void Bar() { }
+                [Benchmark(Baseline = true)] public void Foo() {}
+                [Benchmark] public void Bar() {}
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
@@ -230,8 +230,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
-                [Benchmark(Baseline = true)] public void Foo() { }
-                [Benchmark] public void Bar() { }
+                [Benchmark(Baseline = true)] public void Foo() {}
+                [Benchmark] public void Bar() {}
             }
 
             /* Invalid */
@@ -239,16 +239,16 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             public class Invalid_TwoMethodBaselines
             {
-                [Benchmark(Baseline = true)] public void Foo() { }
-                [Benchmark(Baseline = true)] public void Bar() { }
+                [Benchmark(Baseline = true)] public void Foo() {}
+                [Benchmark(Baseline = true)] public void Bar() {}
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2", baseline: true)]
             public class Invalid_TwoJobBaselines
             {
-                [Benchmark] public void Foo() { }
-                [Benchmark] public void Bar() { }
+                [Benchmark] public void Foo() {}
+                [Benchmark] public void Bar() {}
             }
 
             /* Escape Params */
@@ -260,13 +260,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                 [Arguments('\t')] [Arguments('\n')]
                 [Benchmark] public void Foo(char charArg) {}
                 [Benchmark] public void Bar() {}
-            }
-
-            /* Hide Column */
-            [HideColumns(Column.StdDev)]
-            public class HideColumns_TableMarkDown
-            {
-                [Benchmark] public void Foo() { }
             }
         }
     }

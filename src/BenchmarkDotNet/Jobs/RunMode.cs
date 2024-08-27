@@ -2,6 +2,8 @@
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Phd;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Jobs
@@ -9,7 +11,8 @@ namespace BenchmarkDotNet.Jobs
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public sealed class RunMode : JobMode<RunMode>
     {
-        public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic = Characteristic.Create<RunMode, RunStrategy>(nameof(RunStrategy), RunStrategy.Throughput);
+        public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic =
+            Characteristic.Create<RunMode, RunStrategy>(nameof(RunStrategy), RunStrategy.Throughput);
 
         public static readonly Characteristic<int> LaunchCountCharacteristic = CreateCharacteristic<int>(nameof(LaunchCount));
         public static readonly Characteristic<long> InvocationCountCharacteristic = CreateCharacteristic<long>(nameof(InvocationCount));
@@ -61,13 +64,9 @@ namespace BenchmarkDotNet.Jobs
         }.Freeze();
 
 
-        public RunMode() : this(null)
-        {
-        }
+        public RunMode() : this(null) { }
 
-        private RunMode(string id) : base(id)
-        {
-        }
+        private RunMode(string id) : base(id) { }
 
         /// <summary>
         /// Available values: Throughput and ColdStart.
@@ -191,5 +190,21 @@ namespace BenchmarkDotNet.Jobs
             get => MemoryRandomizationCharacteristic[this];
             set => MemoryRandomizationCharacteristic[this] = value;
         }
+
+        public BdnExecution ToPhd() => new ()
+        {
+            LaunchCount = HasValue(LaunchCountCharacteristic) ? LaunchCount : null,
+            WarmupCount = HasValue(WarmupCountCharacteristic) ? WarmupCount : null,
+            IterationCount = HasValue(IterationCountCharacteristic) ? IterationCount : null,
+            IterationTimeMs = HasValue(IterationTimeCharacteristic) ? IterationTime.ToMilliseconds().RoundToLong() : null,
+            InvocationCount = HasValue(InvocationCountCharacteristic) ? InvocationCount : null,
+            UnrollFactor = HasValue(UnrollFactorCharacteristic) ? UnrollFactor : null,
+            MinIterationCount = HasValue(MinIterationCountCharacteristic) ? MinIterationCount : null,
+            MaxIterationCount = HasValue(MaxIterationCountCharacteristic) ? MaxIterationCount : null,
+            MinWarmupIterationCount = HasValue(MinWarmupIterationCountCharacteristic) ? MinWarmupIterationCount : null,
+            MaxWarmupIterationCount = HasValue(MaxWarmupIterationCountCharacteristic) ? MaxWarmupIterationCount : null,
+            MemoryRandomization = HasValue(MemoryRandomizationCharacteristic) ? MemoryRandomization : null,
+            RunStrategy = HasValue(RunStrategyCharacteristic) ? RunStrategy : null,
+        };
     }
 }
