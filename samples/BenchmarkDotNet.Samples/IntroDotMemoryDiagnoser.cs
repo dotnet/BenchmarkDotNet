@@ -4,16 +4,10 @@ using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Samples
 {
-    // Enables dotMemory profiling for all jobs
+    // Profile benchmarks via dotMemory SelfApi profiling for all jobs
     [DotMemoryDiagnoser]
-    // Adds the default "external-process" job
-    // Profiling is performed using dotMemory Command-Line Profiler
-    // See: https://www.jetbrains.com/help/dotmemory/Working_with_dotMemory_Command-Line_Profiler.html
-    [SimpleJob]
-    // Adds an "in-process" job
-    // Profiling is performed using dotMemory SelfApi
-    // NuGet reference: https://www.nuget.org/packages/JetBrains.Profiler.SelfApi
-    [InProcess]
+    [SimpleJob] // external-process execution
+    [InProcess] // in-process execution
     public class IntroDotMemoryDiagnoser
     {
         [Params(1024)]

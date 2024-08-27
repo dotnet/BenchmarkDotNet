@@ -1,22 +1,22 @@
 using System;
 using BenchmarkDotNet.Configs;
 
-namespace BenchmarkDotNet.Diagnostics.dotMemory
+namespace BenchmarkDotNet.Diagnostics.dotMemory;
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DotMemoryDiagnoserAttribute : Attribute, IConfigSource
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public class DotMemoryDiagnoserAttribute : Attribute, IConfigSource
+    public IConfig Config { get; }
+
+    public DotMemoryDiagnoserAttribute()
     {
-        public IConfig Config { get; }
+        var diagnoser = new DotMemoryDiagnoser();
+        Config = ManualConfig.CreateEmpty().AddDiagnoser(diagnoser);
+    }
 
-        public DotMemoryDiagnoserAttribute()
-        {
-            Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotMemoryDiagnoser());
-        }
-
-        public DotMemoryDiagnoserAttribute(string? nugetUrl = null, string? toolsDownloadFolder = null)
-        {
-            var nugetUri = nugetUrl == null ? null : new Uri(nugetUrl);
-            Config = ManualConfig.CreateEmpty().AddDiagnoser(new DotMemoryDiagnoser(nugetUri, toolsDownloadFolder));
-        }
+    public DotMemoryDiagnoserAttribute(Uri? nugetUrl, string? downloadTo = null)
+    {
+        var diagnoser = new DotMemoryDiagnoser(nugetUrl, downloadTo);
+        Config = ManualConfig.CreateEmpty().AddDiagnoser(diagnoser);
     }
 }

@@ -3,16 +3,11 @@ using BenchmarkDotNet.Diagnostics.dotTrace;
 
 namespace BenchmarkDotNet.Samples
 {
-    // Enables dotTrace profiling for all jobs
+    // Profile benchmarks via dotTrace SelfApi profiling for all jobs
+    // See: https://www.nuget.org/packages/JetBrains.Profiler.SelfApi
     [DotTraceDiagnoser]
-    // Adds the default "external-process" job
-    // Profiling is performed using dotTrace command-line Tools
-    // See: https://www.jetbrains.com/help/profiler/Performance_Profiling__Profiling_Using_the_Command_Line.html
-    [SimpleJob]
-    // Adds an "in-process" job
-    // Profiling is performed using dotTrace SelfApi
-    // NuGet reference: https://www.nuget.org/packages/JetBrains.Profiler.SelfApi
-    [InProcess]
+    [SimpleJob] // external-process execution
+    [InProcess] // in-process execution
     public class IntroDotTraceDiagnoser
     {
         [Benchmark]

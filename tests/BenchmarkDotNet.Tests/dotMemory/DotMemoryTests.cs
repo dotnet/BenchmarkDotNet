@@ -3,15 +3,15 @@ using BenchmarkDotNet.Diagnostics.dotMemory;
 using BenchmarkDotNet.Jobs;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests.dotMemory
+namespace BenchmarkDotNet.Tests.dotMemory;
+
+public class DotMemoryTests
 {
-    public class DotMemoryTests
+    [Fact]
+    public void AllRuntimeMonikerAreKnown()
     {
-        [Fact]
-        public void AllRuntimeMonikerAreKnown()
-        {
-            foreach (RuntimeMoniker moniker in Enum.GetValues(typeof(RuntimeMoniker)))
-                DotMemoryDiagnoser.IsSupported(moniker); // Just check that it doesn't throw exceptions
-        }
+        var diagnoser = new DotMemoryDiagnoser();
+        foreach (RuntimeMoniker moniker in Enum.GetValues(typeof(RuntimeMoniker)))
+            diagnoser.IsSupported(moniker); // Just check that it doesn't throw exceptions
     }
 }
