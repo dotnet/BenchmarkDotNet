@@ -353,17 +353,6 @@ namespace BenchmarkDotNet.Running
         {
             var validationErrors = new List<ValidationError>();
 
-            if (benchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
-            {
-                var joinedCases = benchmarks.SelectMany(b => b.BenchmarksCases).ToArray();
-
-                validationErrors.AddRange(
-                    ConfigCompatibilityValidator
-                        .FailOnError
-                        .Validate(new ValidationParameters(joinedCases, null))
-                    );
-            }
-
             foreach (var benchmarkRunInfo in benchmarks)
                 validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
 

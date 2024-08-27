@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Reports
                    .Where(config => config.Orderer != DefaultOrderer.Instance)
                    .Select(config => config.Orderer)
                    .Distinct()
-                   .SingleOrDefault()
+                   .FirstOrDefault()
                ?? DefaultOrderer.Instance;
 
         private static SummaryStyle GetConfiguredSummaryStyleOrDefaultOne(ImmutableArray<BenchmarkCase> benchmarkCases)
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Reports
 #nullable enable
                    .Select(benchmark => benchmark.Config.SummaryStyle)
                    .Distinct()
-                   .SingleOrDefault()
+                   .FirstOrDefault()
                ?? SummaryStyle.Default;
 
         // TODO: GcStats
