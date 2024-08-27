@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using Perfolizer.Phd.Tables;
 
 namespace BenchmarkDotNet.Columns
 {

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Disassemblers
@@ -19,11 +20,11 @@ namespace BenchmarkDotNet.Disassemblers
         private static ulong GetMinValidAddress()
         {
             // https://github.com/dotnet/BenchmarkDotNet/pull/2413#issuecomment-1688100117
-            if (RuntimeInformation.IsWindows())
+            if (OsDetector.IsWindows())
                 return ushort.MaxValue + 1;
-            if (RuntimeInformation.IsLinux())
+            if (OsDetector.IsLinux())
                 return (ulong) Environment.SystemPageSize;
-            if (RuntimeInformation.IsMacOS())
+            if (OsDetector.IsMacOS())
                 return RuntimeInformation.GetCurrentPlatform() switch
                 {
                     Environments.Platform.X86 or Environments.Platform.X64 => 4096,
@@ -335,7 +336,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         protected void FlushCachedDataIfNeeded(IDataReader dataTargetDataReader, ulong address, byte[] buffer)
         {
-            if (!RuntimeInformation.IsWindows())
+            if (!OsDetector.IsWindows())
             {
                 if (dataTargetDataReader.Read(address, buffer) <= 0)
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Helpers
 
     internal class TaskbarProgress : IDisposable
     {
-        private static readonly bool OsVersionIsSupported = Portability.RuntimeInformation.IsWindows()
+        private static readonly bool OsVersionIsSupported = OsDetector.IsWindows()
             // Must be windows 7 or greater
             && Environment.OSVersion.Version >= new Version(6, 1);
 

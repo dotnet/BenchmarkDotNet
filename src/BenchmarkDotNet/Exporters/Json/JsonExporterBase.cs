@@ -3,8 +3,9 @@ using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Helpers;
 using Perfolizer.Horology;
-using JsonSerializer = SimpleJson.SimpleJson;
+using SimpleJson;
 
 namespace BenchmarkDotNet.Exporters.Json
 {
@@ -23,8 +24,8 @@ namespace BenchmarkDotNet.Exporters.Json
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            JsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
-            logger.WriteLine(JsonSerializer.SerializeObject(GetDataToSerialize(summary)));
+            SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
+            logger.WriteLine(SimpleJsonSerializer.SerializeObject(GetDataToSerialize(summary)));
         }
 
         protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(Summary summary)
@@ -47,11 +48,11 @@ namespace BenchmarkDotNet.Exporters.Json
             {
                 { nameof(HostEnvironmentInfo.BenchmarkDotNetCaption), HostEnvironmentInfo.BenchmarkDotNetCaption },
                 { nameof(environmentInfo.BenchmarkDotNetVersion), environmentInfo.BenchmarkDotNetVersion },
-                { "OsVersion", environmentInfo.OsVersion.Value },
-                { "ProcessorName", ProcessorBrandStringHelper.Prettify(environmentInfo.CpuInfo.Value) },
-                { "PhysicalProcessorCount", environmentInfo.CpuInfo.Value?.PhysicalProcessorCount },
-                { "PhysicalCoreCount", environmentInfo.CpuInfo.Value?.PhysicalCoreCount },
-                { "LogicalCoreCount", environmentInfo.CpuInfo.Value?.LogicalCoreCount },
+                { "OsVersion", environmentInfo.Os.Value.ToBrandString() },
+                { "ProcessorName", environmentInfo.Cpu.Value.ToShortBrandName() },
+                { "PhysicalProcessorCount", environmentInfo.Cpu.Value?.PhysicalProcessorCount },
+                { "PhysicalCoreCount", environmentInfo.Cpu.Value?.PhysicalCoreCount },
+                { "LogicalCoreCount", environmentInfo.Cpu.Value?.LogicalCoreCount },
                 { nameof(environmentInfo.RuntimeVersion), environmentInfo.RuntimeVersion },
                 { nameof(environmentInfo.Architecture), environmentInfo.Architecture },
                 { nameof(environmentInfo.HasAttachedDebugger), environmentInfo.HasAttachedDebugger },
@@ -83,40 +84,40 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Statistics", report.ResultStatistics }
             };
 
-                // We show MemoryDiagnoser's results only if it is being used
-                if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
+            // We show MemoryDiagnoser's results only if it is being used
+            if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
+            {
+                benchmark.Add("Memory", new
                 {
-                    benchmark.Add("Memory", new
-                    {
-                        report.GcStats.Gen0Collections,
-                        report.GcStats.Gen1Collections,
-                        report.GcStats.Gen2Collections,
-                        report.GcStats.TotalOperations,
-                        BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
-                    });
-                }
+                    report.GcStats.Gen0Collections,
+                    report.GcStats.Gen1Collections,
+                    report.GcStats.Gen2Collections,
+                    report.GcStats.TotalOperations,
+                    BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
+                });
+            }
 
-                if (ExcludeMeasurements == false)
+            if (ExcludeMeasurements == false)
+            {
+                // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
+                benchmark.Add("Measurements",
+                    report.AllMeasurements.Select(m => new
+                    {
+                        IterationMode = m.IterationMode.ToString(),
+                        IterationStage = m.IterationStage.ToString(),
+                        m.LaunchIndex,
+                        m.IterationIndex,
+                        m.Operations,
+                        m.Nanoseconds
+                    }));
+
+                if (report.Metrics.Any())
                 {
-                    // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
-                    benchmark.Add("Measurements",
-                        report.AllMeasurements.Select(m => new
-                        {
-                            IterationMode = m.IterationMode.ToString(),
-                            IterationStage = m.IterationStage.ToString(),
-                            m.LaunchIndex,
-                            m.IterationIndex,
-                            m.Operations,
-                            m.Nanoseconds
-                        }));
-
-                    if (report.Metrics.Any())
-                    {
-                        benchmark.Add("Metrics", report.Metrics.Values);
-                    }
+                    benchmark.Add("Metrics", report.Metrics.Values);
                 }
+            }
 
-                return benchmark;
+            return benchmark;
         }
     }
 }

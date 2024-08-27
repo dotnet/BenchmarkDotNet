@@ -12,6 +12,7 @@ using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Builders;
+using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;
 using JetBrains.Annotations;
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                     logger);
             }
 
-            var settings = VerifySettingsFactory.Create();
+            var settings = VerifyHelper.Create();
             settings.UseTextForParameters(GetName(cultureInfo));
             return Verifier.Verify(logger.GetLog(), settings);
         }

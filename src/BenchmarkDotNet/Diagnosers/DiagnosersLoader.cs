@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
@@ -40,11 +41,11 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 yield return EventPipeProfiler.Default;
 
-                if (RuntimeInformation.IsLinux())
+                if (OsDetector.IsLinux())
                     yield return PerfCollectProfiler.Default;
             }
 
-            if (!RuntimeInformation.IsWindows())
+            if (!OsDetector.IsWindows())
                 yield break;
 
             foreach (var windowsDiagnoser in LoadWindowsDiagnosers())

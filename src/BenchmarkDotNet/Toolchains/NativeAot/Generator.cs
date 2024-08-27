@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly string ilcOptimizationPreference;
         private readonly string ilcInstructionSet;
 
-        protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
+        protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
             => useTempFolderForRestore

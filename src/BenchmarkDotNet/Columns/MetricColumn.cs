@@ -4,6 +4,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
+using Perfolizer.Phd.Tables;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -18,6 +19,7 @@ namespace BenchmarkDotNet.Columns
         public string Id => descriptor.Id;
         public string ColumnName => descriptor.DisplayName;
         public string Legend => descriptor.Legend;
+
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Metric;
         public int PriorityInCategory => descriptor.PriorityInCategory;

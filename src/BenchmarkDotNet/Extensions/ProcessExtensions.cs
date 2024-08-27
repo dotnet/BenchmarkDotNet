@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -86,7 +87,7 @@ namespace BenchmarkDotNet.Extensions
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
-            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+            if (!OsDetector.IsWindows() && !OsDetector.IsLinux())
                 return false;
 
             try
@@ -108,7 +109,7 @@ namespace BenchmarkDotNet.Extensions
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
 
-            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+            if (!OsDetector.IsWindows() && !OsDetector.IsLinux())
                 return null;
 
             try
@@ -163,7 +164,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static void KillTree(this Process process, TimeSpan timeout)
         {
-            if (RuntimeInformation.IsWindows())
+            if (OsDetector.IsWindows())
             {
                 RunProcessAndIgnoreOutput("taskkill", $"/T /F /PID {process.Id}", timeout);
             }

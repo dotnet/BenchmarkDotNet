@@ -8,6 +8,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -43,7 +44,7 @@ namespace BenchmarkDotNet.Running
             var artifactsToCleanup = new List<string>();
 
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
-            var maxTitleLength = RuntimeInformation.IsWindows()
+            var maxTitleLength = OsDetector.IsWindows()
                 ? 254 - rootArtifactsFolderPath.Length
                 : int.MaxValue;
             var title = GetTitle(benchmarkRunInfos, maxTitleLength);

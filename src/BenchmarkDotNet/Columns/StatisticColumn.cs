@@ -10,6 +10,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.Multimodality;
 using Perfolizer.Metrology;
+using Perfolizer.Phd.Tables;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -28,48 +29,48 @@ namespace BenchmarkDotNet.Columns
             Additional
         }
 
-        public static readonly IStatisticColumn Mean = new StatisticColumn(Column.Mean, "Arithmetic mean of all measurements",
+        public static readonly IStatisticColumn Mean = new StatisticColumn(Column.Mean, "=mean", "Arithmetic mean of all measurements",
             s => s.Mean, Priority.Main);
 
-        public static readonly IColumn StdErr = new StatisticColumn(Column.StdErr, "Standard error of all measurements",
+        public static readonly IColumn StdErr = new StatisticColumn(Column.StdErr, null, "Standard error of all measurements",
             s => s.StandardError, Priority.Main, parentColumn: Mean);
 
-        public static readonly IColumn StdDev = new StatisticColumn(Column.StdDev, "Standard deviation of all measurements",
+        public static readonly IColumn StdDev = new StatisticColumn(Column.StdDev, "=stddev", "Standard deviation of all measurements",
             s => s.StandardDeviation, Priority.Main, parentColumn: Mean);
 
-        public static readonly IColumn Error = new StatisticColumn(Column.Error, "Half of 99.9% confidence interval",
+        public static readonly IColumn Error = new StatisticColumn(Column.Error, null, "Half of 99.9% confidence interval",
             s => s.GetConfidenceInterval(ConfidenceLevel.L999).Margin, Priority.Main, parentColumn: Mean);
 
-        public static readonly IColumn OperationsPerSecond = new StatisticColumn(Column.OperationPerSecond, "Operation per second",
+        public static readonly IColumn OperationsPerSecond = new StatisticColumn(Column.OperationPerSecond, null, "Operation per second",
             s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn Min = new StatisticColumn(Column.Min, "Minimum",
+        public static readonly IColumn Min = new StatisticColumn(Column.Min, "=min", "Minimum",
             s => s.Min, Priority.Quartile);
 
-        public static readonly IColumn Q1 = new StatisticColumn(Column.Q1, "Quartile 1 (25th percentile)",
+        public static readonly IColumn Q1 = new StatisticColumn(Column.Q1, "=q1", "Quartile 1 (25th percentile)",
             s => s.Q1, Priority.Quartile);
 
-        public static readonly IColumn Median = new StatisticColumn(Column.Median, "Value separating the higher half of all measurements (50th percentile)",
+        public static readonly IColumn Median = new StatisticColumn(Column.Median, "=median", "Value separating the higher half of all measurements (50th percentile)",
             s => s.Median, Priority.Quartile);
 
-        public static readonly IColumn Q3 = new StatisticColumn(Column.Q3, "Quartile 3 (75th percentile)",
+        public static readonly IColumn Q3 = new StatisticColumn(Column.Q3, "=q3", "Quartile 3 (75th percentile)",
             s => s.Q3, Priority.Quartile);
 
-        public static readonly IColumn Max = new StatisticColumn(Column.Max, "Maximum", s => s.Max, Priority.Quartile);
+        public static readonly IColumn Max = new StatisticColumn(Column.Max, "=max", "Maximum", s => s.Max, Priority.Quartile);
 
-        public static readonly IColumn Skewness = new StatisticColumn(Column.Skewness, "Measure of the asymmetry (third standardized moment)",
+        public static readonly IColumn Skewness = new StatisticColumn(Column.Skewness, null, "Measure of the asymmetry (third standardized moment)",
             s => s.Skewness, Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn Kurtosis = new StatisticColumn(Column.Kurtosis, "Measure of the tailedness ( fourth standardized moment)",
+        public static readonly IColumn Kurtosis = new StatisticColumn(Column.Kurtosis, null, "Measure of the tailedness ( fourth standardized moment)",
             s => s.Kurtosis, Priority.Additional, UnitType.Dimensionless);
 
         /// <summary>
         /// See http://www.brendangregg.com/FrequencyTrails/modes.html
         /// </summary>
-        public static readonly IColumn MValue = new StatisticColumn(Column.MValue, "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
+        public static readonly IColumn MValue = new StatisticColumn(Column.MValue, null, "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
             s => MValueCalculator.Calculate(s.Sample.Values), Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn Iterations = new StatisticColumn(Column.Iterations, "Number of target iterations",
+        public static readonly IColumn Iterations = new StatisticColumn(Column.Iterations, null, "Number of target iterations",
             s => s.N, Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn P0 = CreatePercentileColumn(0, Column.P0, s => s.Percentiles.P0);
@@ -84,17 +85,17 @@ namespace BenchmarkDotNet.Columns
 
         [PublicAPI]
         public static IColumn CiLower(ConfidenceLevel level) => new StatisticColumn(
-            $"CI{level} Lower", $"Lower bound of {level} confidence interval",
+            $"CI{level} Lower", null, $"Lower bound of {level} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Lower, Priority.Additional);
 
         [PublicAPI]
         public static IColumn CiUpper(ConfidenceLevel level) => new StatisticColumn(
-            $"CI{level} Upper", $"Upper bound of {level} confidence interval",
+            $"CI{level} Upper", null, $"Upper bound of {level} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Upper, Priority.Additional);
 
         [PublicAPI]
         public static IColumn CiError(ConfidenceLevel level) => new StatisticColumn(
-            $"CI{level} Margin", $"Half of {level} confidence interval",
+            $"CI{level} Margin", null, $"Half of {level} confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Margin, Priority.Additional);
 
 
@@ -104,14 +105,16 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
-        private readonly IStatisticColumn parentColumn;
+        private readonly IStatisticColumn? parentColumn;
+        private readonly string? phdSelector;
 
-        private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time,
+        private StatisticColumn(string columnName, string? phdSelector, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time,
             IStatisticColumn? parentColumn = null)
         {
             this.calc = calc;
             this.priority = priority;
             this.parentColumn = parentColumn;
+            this.phdSelector = phdSelector;
             UnitType = type;
             ColumnName = columnName;
             Legend = legend;
@@ -167,6 +170,6 @@ namespace BenchmarkDotNet.Columns
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
         private static IColumn CreatePercentileColumn(int percentiles, string columnName, Func<Statistics, double> calc) => new StatisticColumn(
-            columnName, "Percentile " + percentiles, calc, Priority.Percentiles);
+            columnName, "=p" + percentiles, "Percentile " + percentiles, calc, Priority.Percentiles);
     }
 }
