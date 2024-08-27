@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Helpers
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Helpers
         /// </remarks>
         public static string EscapeCommandExample(string input)
         {
-            return !RuntimeInformation.IsWindows() && input.IndexOf('*') >= 0 ? $"'{input}'" : input;
+            return !OsDetector.IsWindows() && input.IndexOf('*') >= 0 ? $"'{input}'" : input;
         }
     }
 }

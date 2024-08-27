@@ -1,0 +1,66 @@
+﻿| Method |  A |  B |  Center |
+|:-------|---:|---:|--------:|
+| Foo    |  1 |  2 | 10.0 ms |
+| Bar    | 10 | 20 | 20.0 ms |
+
+{
+  "nested": [
+    {
+      "parameters": {
+        "a": 1,
+        "b": 2
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 10,
+              "unit": "ms",
+              "iterationIndex": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "parameters": {
+        "a": 10,
+        "b": 20
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 20,
+              "unit": "ms",
+              "iterationIndex": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "table": {
+      "columnDefinitions": [
+        {
+          "selector": ".benchmark.method"
+        },
+        {
+          "selector": ".parameters"
+        },
+        {
+          "selector": "=center"
+        }
+      ]
+    }
+  }
+}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -82,7 +83,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static bool TryFindRScript(ILogger consoleLogger, out string? rscriptPath)
         {
-            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
+            string rscriptExecutable = OsDetector.IsWindows() ? "Rscript.exe" : "Rscript";
             rscriptPath = null;
 
             string rHome = Environment.GetEnvironmentVariable("R_HOME");
@@ -101,7 +102,7 @@ namespace BenchmarkDotNet.Exporters
             if (rscriptPath != null)
                 return true;
 
-            if (RuntimeInformation.IsWindows())
+            if (OsDetector.IsWindows())
             {
                 string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
                 string programFilesR = Path.Combine(programFiles, "R");

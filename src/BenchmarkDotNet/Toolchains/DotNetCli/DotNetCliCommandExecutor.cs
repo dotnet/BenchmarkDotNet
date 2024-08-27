@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -137,7 +138,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static string GetDefaultDotNetCliPath()
         {
-            if (!Portability.RuntimeInformation.IsLinux())
+            if (!OsDetector.IsLinux())
                 return "dotnet";
 
             using (var parentProcess = Process.GetProcessById(libc.getppid()))

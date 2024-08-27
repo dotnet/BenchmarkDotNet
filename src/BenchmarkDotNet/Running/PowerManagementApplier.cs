@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Running
 
         internal void ApplyPerformancePlan(Guid id)
         {
-            if (!RuntimeInformation.IsWindows() || id == Guid.Empty)
+            if (!OsDetector.IsWindows() || id == Guid.Empty)
                 return;
 
             if (id != UserPowerPlan)
@@ -44,7 +45,7 @@ namespace BenchmarkDotNet.Running
 
         private void ApplyUserPowerPlan()
         {
-            if (powerPlanChanged && RuntimeInformation.IsWindows())
+            if (powerPlanChanged && OsDetector.IsWindows())
             {
                 try
                 {

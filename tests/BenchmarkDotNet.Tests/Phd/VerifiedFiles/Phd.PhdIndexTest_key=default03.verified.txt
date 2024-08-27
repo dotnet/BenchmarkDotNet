@@ -1,0 +1,218 @@
+﻿[Keys]
+  .benchmark
+  .benchmark.method
+  .benchmark.type
+  .engine
+  .engine.name
+  .engine.version
+  .host
+  .host.chronometerFrequency
+  .host.configuration
+  .host.cpu
+  .host.cpu.logicalCoreCount
+  .host.cpu.maxFrequencyHz
+  .host.cpu.nominalFrequencyHz
+  .host.cpu.physicalCoreCount
+  .host.cpu.physicalProcessorCount
+  .host.cpu.processorName
+  .host.dotNetSdkVersion
+  .host.hardwareTimerKind
+  .host.hasAttachedDebugger
+  .host.hasRyuJit
+  .host.os
+  .host.os.display
+  .host.runtimeVersion
+  .iterationIndex
+  .job
+  .job.environment
+  .job.environment.jit
+  .job.environment.runtime
+  .unit
+  .value
+
+[Entry0]
+  .benchmark = Bench.Foo
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = <object>
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .iterationIndex = 0
+  .job = <object>
+  .job.environment = <object>
+  .job.environment.jit = RyuJit
+  .job.environment.runtime = Net70
+  .unit = ns
+  .value = 30
+[Entry1]
+  .benchmark = Bench.Foo
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = <object>
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .iterationIndex = 1
+  .job = <object>
+  .job.environment = <object>
+  .job.environment.jit = RyuJit
+  .job.environment.runtime = Net70
+  .unit = ns
+  .value = 31
+[Entry2]
+  .benchmark = Bench.Foo
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = <object>
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .iterationIndex = 2
+  .job = <object>
+  .job.environment = <object>
+  .job.environment.jit = RyuJit
+  .job.environment.runtime = Net70
+  .unit = ns
+  .value = 32
+[Entry3]
+  .benchmark = Bench.Bar
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = <object>
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .iterationIndex = 0
+  .job = <object>
+  .job.environment = <object>
+  .job.environment.jit = RyuJit
+  .job.environment.runtime = Net70
+  .unit = ns
+  .value = 40
+[Entry4]
+  .benchmark = Bench.Bar
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = <object>
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .iterationIndex = 1
+  .job = <object>
+  .job.environment = <object>
+  .job.environment.jit = RyuJit
+  .job.environment.runtime = Net70
+  .unit = ns
+  .value = 41
+[Entry5]
+  .benchmark = Bench.Bar
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .engine = BenchmarkDotNet v0.1729.0-mock
+  .engine.name = BenchmarkDotNet
+  .engine.version = 0.1729.0-mock
+  .host = <object>
+  .host.chronometerFrequency = 2531248
+  .host.configuration = CONFIGURATION
+  .host.cpu = MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+  .host.cpu.logicalCoreCount = 8
+  .host.cpu.maxFrequencyHz = 3100000000
+  .host.cpu.nominalFrequencyHz = 3100000000
+  .host.cpu.physicalCoreCount = 4
+  .host.cpu.physicalProcessorCount = 1
+  .host.cpu.processorName = MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz
+  .host.dotNetSdkVersion = 1.0.x.mock
+  .host.hardwareTimerKind = Tsc
+  .host.hasAttachedDebugger = False
+  .host.hasRyuJit = True
+  .host.os = Microsoft Windows NT 10.0.x.mock
+  .host.os.display = Microsoft Windows NT 10.0.x.mock
+  .host.runtimeVersion = Clr 4.0.x.mock
+  .iterationIndex = 2
+  .job = <object>
+  .job.environment = <object>
+  .job.environment.jit = RyuJit
+  .job.environment.runtime = Net70
+  .unit = ns
+  .value = 42
