@@ -23,6 +23,6 @@
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.6.0" />
     <PackageReference Update="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
   </ItemGroup>
 </Project>
