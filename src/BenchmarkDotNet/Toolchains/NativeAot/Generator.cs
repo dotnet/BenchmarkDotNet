@@ -133,11 +133,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
-    <PublishAot Condition="" '$(TargetFramework)' != 'net6.0' "">true</PublishAot>
+    <PublishAot Condition=""$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))"">true</PublishAot>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
+    <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
     {GetTrimmingSettings()}
-    <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+    <StackTraceSupport>{ilcGenerateStackTraceData}</StackTraceSupport>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
