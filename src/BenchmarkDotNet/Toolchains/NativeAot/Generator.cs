@@ -132,7 +132,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
-    <PublishAot Condition="" '$(TargetFramework)' != 'net6.0' "">true</PublishAot>
+    <PublishAot Condition=""$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))"">true</PublishAot>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
     {GetTrimmingSettings()}
