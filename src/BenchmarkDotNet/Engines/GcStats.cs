@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Engines
 
         public long? GetBytesAllocatedPerOperation(BenchmarkCase benchmarkCase)
         {
-            bool excludeAllocationQuantumSideEffects = benchmarkCase.GetRuntime().RuntimeMoniker <= RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+            bool excludeAllocationQuantumSideEffects = benchmarkCase.GetRuntime().RuntimeMoniker <= (RuntimeMoniker) 10; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
 
             long? allocatedBytes = GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects);
             return allocatedBytes == null ? null

@@ -107,11 +107,6 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
             case RuntimeMoniker.NetCoreApp50:
 #pragma warning restore CS0618 // Type or member is obsolete
                 return false;
-            case RuntimeMoniker.NetCoreApp20:
-            case RuntimeMoniker.NetCoreApp21:
-            case RuntimeMoniker.NetCoreApp22:
-                return OsDetector.IsWindows();
-            case RuntimeMoniker.NetCoreApp30:
             case RuntimeMoniker.NetCoreApp31:
                 return OsDetector.IsWindows() || OsDetector.IsLinux();
             default:

@@ -117,11 +117,6 @@ namespace BenchmarkDotNet.Diagnosers
                     {
                         var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
 
-                        if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
-                        {
-                            yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
-                        }
-
                         if (ptrace_scope.Value == "2")
                         {
                             yield return new ValidationError(false, $"ptrace_scope is set to 2, {nameof(DisassemblyDiagnoser)} is going to work only if you run as sudo");
