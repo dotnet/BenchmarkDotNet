@@ -18,16 +18,11 @@ namespace BenchmarkDotNet.Validators
 
         public static IEnumerable<ValidationError> ValidateCoreSdks(string? customDotNetCliPath, BenchmarkCase benchmark)
         {
-            if (benchmark.Config.Options.IsSet(ConfigOptions.DisableDotnetSdkVersionValidator))
-            {
-                yield break;
-            }
-
             if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
             {
                 yield return cliPathError;
             }
-            else if (TryGetSdkVersion(benchmark, out string requiredSdkVersion))
+            else if (!benchmark.Config.Options.IsSet(ConfigOptions.DisableDotnetSdkVersionValidator) && TryGetSdkVersion(benchmark, out string requiredSdkVersion))
             {
                 var installedSdks = GetInstalledDotNetSdks(customDotNetCliPath);
                 if (!installedSdks.Any(sdk => sdk.StartsWith(requiredSdkVersion)))
