@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using System;
@@ -17,6 +18,11 @@ namespace BenchmarkDotNet.Validators
 
         public static IEnumerable<ValidationError> ValidateCoreSdks(string? customDotNetCliPath, BenchmarkCase benchmark)
         {
+            if (benchmark.Config.Options.IsSet(ConfigOptions.DisableDotnetSdkVersionValidator))
+            {
+                yield break;
+            }
+
             if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
             {
                 yield return cliPathError;
@@ -33,6 +39,11 @@ namespace BenchmarkDotNet.Validators
 
         public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
         {
+            if (benchmark.Config.Options.IsSet(ConfigOptions.DisableDotnetSdkVersionValidator))
+            {
+                yield break;
+            }
+
             if (!TryGetSdkVersion(benchmark, out string requiredSdkVersionString))
             {
                 yield break;

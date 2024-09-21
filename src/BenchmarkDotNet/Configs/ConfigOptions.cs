@@ -48,7 +48,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Continue the execution if the last run was stopped.
         /// </summary>
-        Resume = 1 << 9
+        Resume = 1 << 9,
+        /// <summary>
+        /// Determines if the .NET SDK Version validator should be entirely turned off
+        /// </summary>
+        DisableDotnetSdkVersionValidator = 1 << 10,
     }
 
     internal static class ConfigOptionsExtensions
