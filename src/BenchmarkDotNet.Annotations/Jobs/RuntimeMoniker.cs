@@ -116,6 +116,11 @@ namespace BenchmarkDotNet.Jobs
         Net90,
 
         /// <summary>
+        /// .NET 10.0
+        /// </summary>
+        Net100,
+
+        /// <summary>
         /// NativeAOT compiled as net6.0
         /// </summary>
         NativeAot60,
@@ -134,6 +139,11 @@ namespace BenchmarkDotNet.Jobs
         /// NativeAOT compiled as net9.0
         /// </summary>
         NativeAot90,
+
+        /// <summary>
+        /// NativeAOT compiled as net10.0
+        /// </summary>
+        NativeAot100,
 
         /// <summary>
         /// WebAssembly with default .Net version
@@ -166,6 +176,11 @@ namespace BenchmarkDotNet.Jobs
         WasmNet90,
 
         /// <summary>
+        /// WebAssembly with net10.0
+        /// </summary>
+        WasmNet100,
+
+        /// <summary>
         /// Mono with the Ahead of Time LLVM Compiler backend
         /// </summary>
         MonoAOTLLVM,
@@ -191,6 +206,11 @@ namespace BenchmarkDotNet.Jobs
         MonoAOTLLVMNet90,
 
         /// <summary>
+        /// Mono with the Ahead of Time LLVM Compiler backend and net10.0
+        /// </summary>
+        MonoAOTLLVMNet100,
+
+        /// <summary>
         /// .NET 6 using MonoVM (not CLR which is the default)
         /// </summary>
         Mono60,
@@ -209,5 +229,10 @@ namespace BenchmarkDotNet.Jobs
         /// .NET 9 using MonoVM (not CLR which is the default)
         /// </summary>
         Mono90,
+
+        /// <summary>
+        /// .NET 10 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono100,
     }
 }
