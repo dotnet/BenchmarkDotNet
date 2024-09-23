@@ -528,7 +528,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net70:
                 case RuntimeMoniker.Net80:
                 case RuntimeMoniker.Net90:
-                case RuntimeMoniker.Net100:
+                case RuntimeMoniker.Net10_0:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
@@ -548,7 +548,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NativeAot90:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json");
 
-                case RuntimeMoniker.NativeAot100:
+                case RuntimeMoniker.NativeAot10_0:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json");
 
                 case RuntimeMoniker.Wasm:
@@ -569,7 +569,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.WasmNet90:
                     return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
 
-                case RuntimeMoniker.WasmNet100:
+                case RuntimeMoniker.WasmNet10_0:
                     return MakeWasmJob(baseJob, options, "net10.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVM:
@@ -587,7 +587,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.MonoAOTLLVMNet90:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net9.0", runtimeMoniker);
 
-                case RuntimeMoniker.MonoAOTLLVMNet100:
+                case RuntimeMoniker.MonoAOTLLVMNet10_0:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net10.0", runtimeMoniker);
 
                 case RuntimeMoniker.Mono60:
@@ -602,8 +602,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Mono90:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono90);
 
-                case RuntimeMoniker.Mono100:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono100);
+                case RuntimeMoniker.Mono10_0:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono10_0);
 
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");

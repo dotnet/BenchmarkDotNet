@@ -81,7 +81,7 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
             case RuntimeMoniker.Net70:
             case RuntimeMoniker.Net80:
             case RuntimeMoniker.Net90:
-            case RuntimeMoniker.Net100:
+            case RuntimeMoniker.Net10_0:
                 return true;
             case RuntimeMoniker.NotRecognized:
             case RuntimeMoniker.Mono:
@@ -89,24 +89,24 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
             case RuntimeMoniker.NativeAot70:
             case RuntimeMoniker.NativeAot80:
             case RuntimeMoniker.NativeAot90:
-            case RuntimeMoniker.NativeAot100:
+            case RuntimeMoniker.NativeAot10_0:
             case RuntimeMoniker.Wasm:
             case RuntimeMoniker.WasmNet50:
             case RuntimeMoniker.WasmNet60:
             case RuntimeMoniker.WasmNet70:
             case RuntimeMoniker.WasmNet80:
             case RuntimeMoniker.WasmNet90:
-            case RuntimeMoniker.WasmNet100:
+            case RuntimeMoniker.WasmNet10_0:
             case RuntimeMoniker.MonoAOTLLVM:
             case RuntimeMoniker.MonoAOTLLVMNet60:
             case RuntimeMoniker.MonoAOTLLVMNet70:
             case RuntimeMoniker.MonoAOTLLVMNet80:
             case RuntimeMoniker.MonoAOTLLVMNet90:
-            case RuntimeMoniker.MonoAOTLLVMNet100:
+            case RuntimeMoniker.MonoAOTLLVMNet10_0:
             case RuntimeMoniker.Mono60:
             case RuntimeMoniker.Mono70:
             case RuntimeMoniker.Mono80:
-            case RuntimeMoniker.Mono100:
+            case RuntimeMoniker.Mono10_0:
             case RuntimeMoniker.Mono90:
 #pragma warning disable CS0618 // Type or member is obsolete
             case RuntimeMoniker.NetCoreApp50:

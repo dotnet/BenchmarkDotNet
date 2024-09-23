@@ -39,8 +39,8 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core80;
                 case RuntimeMoniker.Net90:
                     return CoreRuntime.Core90;
-                case RuntimeMoniker.Net100:
-                    return CoreRuntime.Core100;
+                case RuntimeMoniker.Net10_0:
+                    return CoreRuntime.Core10_0;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
                 case RuntimeMoniker.NativeAot60:
@@ -49,16 +49,16 @@ namespace BenchmarkDotNet.Extensions
                     return NativeAotRuntime.Net70;
                 case RuntimeMoniker.NativeAot80:
                     return NativeAotRuntime.Net80;
-                case RuntimeMoniker.NativeAot100:
-                    return NativeAotRuntime.Net100;
+                case RuntimeMoniker.NativeAot10_0:
+                    return NativeAotRuntime.Net10_0;
                 case RuntimeMoniker.Mono60:
                     return MonoRuntime.Mono60;
                 case RuntimeMoniker.Mono70:
                     return MonoRuntime.Mono70;
                 case RuntimeMoniker.Mono80:
                     return MonoRuntime.Mono80;
-                case RuntimeMoniker.Mono100:
-                    return MonoRuntime.Mono100;
+                case RuntimeMoniker.Mono10_0:
+                    return MonoRuntime.Mono10_0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }

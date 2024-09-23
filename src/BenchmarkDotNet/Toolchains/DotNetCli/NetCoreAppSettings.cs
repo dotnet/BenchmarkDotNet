@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp70 = new ("net7.0", null, ".NET 7.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp80 = new ("net8.0", null, ".NET 8.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp90 = new ("net9.0", null, ".NET 9.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp100 = new ("net10.0", null, ".NET 10.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp10_0 = new ("net10.0", null, ".NET 10.0");
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">

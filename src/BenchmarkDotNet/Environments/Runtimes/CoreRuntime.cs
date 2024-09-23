@@ -25,9 +25,9 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core70 = new (RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
         public static readonly CoreRuntime Core80 = new (RuntimeMoniker.Net80, "net8.0", ".NET 8.0");
         public static readonly CoreRuntime Core90 = new (RuntimeMoniker.Net90, "net9.0", ".NET 9.0");
-        public static readonly CoreRuntime Core100 = new (RuntimeMoniker.Net100, "net10.0", ".NET 10.0");
+        public static readonly CoreRuntime Core10_0 = new (RuntimeMoniker.Net10_0, "net10.0", ".NET 10.0");
 
-        public static CoreRuntime Latest => Core100; // when dotnet/runtime branches for 11.0, this will need to get updated
+        public static CoreRuntime Latest => Core10_0; // when dotnet/runtime branches for 11.0, this will need to get updated
 
         private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
                 case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80);
                 case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90);
-                case Version v when v.Major == 10 && v.Minor == 0: return GetPlatformSpecific(Core100);
+                case Version v when v.Major == 10 && v.Minor == 0: return GetPlatformSpecific(Core10_0);
                 default:
                     return version >= new Version(3, 1)
                         ? CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}")

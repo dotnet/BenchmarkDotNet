@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         /// <summary>
         /// compiled as net10.0, targets latest NativeAOT build from the .NET 9 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json
         /// </summary>
-        public static readonly IToolchain Net100 = CreateBuilder()
+        public static readonly IToolchain Net10_0 = CreateBuilder()
             .UseNuGet("", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json")
             .TargetFrameworkMoniker("net10.0")
             .ToToolchain();

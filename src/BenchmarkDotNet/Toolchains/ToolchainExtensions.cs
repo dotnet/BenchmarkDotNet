@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains
                                 RuntimeMoniker.Mono70 => GetToolchain(RuntimeMoniker.Net70),
                                 RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
                                 RuntimeMoniker.Mono90 => GetToolchain(RuntimeMoniker.Net90),
-                                RuntimeMoniker.Mono100 => GetToolchain(RuntimeMoniker.Net100),
+                                RuntimeMoniker.Mono10_0 => GetToolchain(RuntimeMoniker.Net10_0),
                                 _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
                             };
                         }
@@ -144,8 +144,8 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net90:
                     return CsProjCoreToolchain.NetCoreApp90;
 
-                case RuntimeMoniker.Net100:
-                    return CsProjCoreToolchain.NetCoreApp100;
+                case RuntimeMoniker.Net10_0:
+                    return CsProjCoreToolchain.NetCoreApp10_0;
 
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
@@ -159,8 +159,8 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.NativeAot90:
                     return NativeAotToolchain.Net90;
 
-                case RuntimeMoniker.NativeAot100:
-                    return NativeAotToolchain.Net100;
+                case RuntimeMoniker.NativeAot10_0:
+                    return NativeAotToolchain.Net10_0;
 
                 case RuntimeMoniker.Mono60:
                     return MonoToolchain.Mono60;
@@ -174,8 +174,8 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Mono90:
                     return MonoToolchain.Mono90;
 
-                case RuntimeMoniker.Mono100:
-                    return MonoToolchain.Mono100;
+                case RuntimeMoniker.Mono10_0:
+                    return MonoToolchain.Mono10_0;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
