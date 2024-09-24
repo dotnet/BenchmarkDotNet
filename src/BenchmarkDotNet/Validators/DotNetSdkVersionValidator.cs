@@ -111,18 +111,9 @@ namespace BenchmarkDotNet.Validators
                         var versions = new List<Version>(lines.Count());
                         foreach (var line in lines)
                         {
-                            // Each line will start with the SDK version followed by the SDK path. Since we only support
-                            // targeting SDK versions by the major version, we'll just look at extracting the major and
-                            // minor versions. This is done by looking for the first two dots in the line.
-                            var firstDot = line.IndexOf('.');
-                            if (firstDot < 0)
-                                continue;
-
-                            var secondDot = line.IndexOf('.', firstDot + 1);
-                            if (secondDot < 0)
-                                continue;
-
-                            if (Version.TryParse(line.Substring(0, secondDot), out var version))
+                            // Version.TryParse does not handle things like 3.0.0-WORD, so this will get just the 3.0.0 part
+                            var parsableVersionPart = CoreRuntime.GetParsableVersionPart(line);
+                            if (Version.TryParse(parsableVersionPart, out var version))
                             {
                                 versions.Add(version);
                             }
