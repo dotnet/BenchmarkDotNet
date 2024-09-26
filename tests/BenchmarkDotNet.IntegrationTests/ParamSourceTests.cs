@@ -57,12 +57,13 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!toolchain.IsInProcess)
             {
                 // Show the relevant codegen excerpt in test results (the *.notcs is not part of the logs)
-                Output.WriteLine("// Benchmarks and CodeGenerator.GetParamsContent()");
+                Output.WriteLine("// Benchmarks and CodeGenerator.GetInstanceParamsContent() & GetStaticParamsContent()");
                 BenchmarkRunInfo runInfo = BenchmarkConverter.TypeToBenchmarks(type, config);
                 foreach (BenchmarkCase benchmarkCase in runInfo.BenchmarksCases)
                 {
                     Output.WriteLine("//   " + benchmarkCase.DisplayInfo);
-                    Output.WriteLine(CodeGenerator.GetParamsContent(benchmarkCase));
+                    Output.WriteLine(CodeGenerator.GetInstanceParamsContent(benchmarkCase));
+                    Output.WriteLine(CodeGenerator.GetStaticParamsContent(benchmarkCase));
                 }
             }
             return CanExecute(type, config);
