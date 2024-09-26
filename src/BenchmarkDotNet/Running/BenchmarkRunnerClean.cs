@@ -361,42 +361,68 @@ namespace BenchmarkDotNet.Running
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
-            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
+            var parallelPartitions = new List<(BuildPartition buildPartition, IToolchain toolchain, bool isSequential)[]>();
+            var sequentialPartitions = new List<(BuildPartition, IToolchain, bool)>();
+            foreach (var partition in buildPartitions)
+            {
+                // It's guaranteed that all the benchmarks in single partition have same toolchain.
+                var toolchain = partition.RepresentativeBenchmarkCase.GetToolchain();
+                // #2425
+                if (toolchain.IsSafeToBuildInParallel())
+                    parallelPartitions.Add([(partition, toolchain, false)]);
+                else
+                    sequentialPartitions.Add((partition, toolchain, true));
+            }
+            if (sequentialPartitions.Count > 0)
+            {
+                // We build the sequential partitions in parallel with the other partitions to complete as fast as possible.
+                // Place them first to make sure they are started first.
+                parallelPartitions.Insert(0, [.. sequentialPartitions]);
+            }
 
-            var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
+            logger.WriteLineHeader($"// ***** Building {parallelPartitions.Count} exe(s) in Parallel{(sequentialPartitions.Count <= 1 ? "" : $", {sequentialPartitions.Count} sequentially")}   *****");
+
+            var buildLogger = parallelPartitions.Count == 1 ? logger : NullLogger.Instance; // when we have just one parallel partition we can print to std out
 
             var beforeParallelBuild = globalChronometer.GetElapsed();
 
-            var buildResults = buildPartitions
+            var parallelBuildResults = parallelPartitions
                 .AsParallel()
-                .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
+                .SelectMany(partitions => partitions
+                    .Select(build => (Partition: build.buildPartition,
+                        Result: Build(build.buildPartition, build.toolchain, rootArtifactsFolderPath, buildLogger),
+                        WasSequential: build.isSequential)
+                    )
+                )
                 .AsSequential() // Ensure that build completion events are processed sequentially
                 .Select(build =>
                 {
                     // If the generation was successful, but the build was not, we will try building sequentially
                     // so don't send the OnBuildComplete event yet.
-                    if (buildPartitions.Length <= 1 || !build.Result.IsGenerateSuccess || build.Result.IsBuildSuccess)
+                    if (build.WasSequential || buildPartitions.Length <= 1 || !build.Result.IsGenerateSuccess || build.Result.IsBuildSuccess)
                         eventProcessor.OnBuildComplete(build.Partition, build.Result);
 
                     return build;
                 })
-                .ToDictionary(build => build.Partition, build => build.Result);
+                .ToArray();
 
             var afterParallelBuild = globalChronometer.GetElapsed();
 
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeParallelBuild, afterParallelBuild)}   *****");
 
-            if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
+            var buildResults = parallelBuildResults.ToDictionary(build => build.Partition, build => build.Result);
+
+            if (parallelPartitions.Count <= 1 || !parallelBuildResults.Any(build => !build.WasSequential && build.Result.IsGenerateSuccess && !build.Result.IsBuildSuccess))
                 return buildResults;
 
             logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
 
-            foreach (var buildPartition in buildPartitions)
+            foreach (var (buildPartition, toolchain, _) in parallelPartitions.Skip(1).Select(arr => arr[0]))
             {
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
                 {
                     if (!buildResults[buildPartition].TryToExplainFailureReason(out string _))
-                        buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+                        buildResults[buildPartition] = Build(buildPartition, toolchain, rootArtifactsFolderPath, buildLogger);
 
                     eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
                 }
@@ -412,10 +438,8 @@ namespace BenchmarkDotNet.Running
                 => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
         }
 
-        private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
+        private static BuildResult Build(BuildPartition buildPartition, IToolchain toolchain, string rootArtifactsFolderPath, ILogger buildLogger)
         {
-            var toolchain = buildPartition.RepresentativeBenchmarkCase.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
-
             var generateResult = toolchain.Generator.GenerateProject(buildPartition, buildLogger, rootArtifactsFolderPath);
 
             try
