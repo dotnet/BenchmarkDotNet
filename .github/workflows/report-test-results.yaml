@@ -21,7 +21,6 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
-          #workflow: ${{ github.event.workflow_run.workflow_id }}
       
       # Display the Structure of Downloaded Files
       - name: Display structure of downloaded files
