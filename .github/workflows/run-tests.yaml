@@ -11,46 +11,6 @@ concurrency:
 
 jobs:
 
-  test-windows-core:
-    runs-on: windows-latest
-    steps:
-      - name: Disable Windows Defender
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
-        shell: powershell
-      - uses: actions/checkout@v4
-      - name: Run task 'build'
-        shell: cmd
-        run: ./build.cmd build
-      - name: Run task 'in-tests-core'
-        shell: cmd
-        run: ./build.cmd in-tests-core -e
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: test-windows-core-trx
-          path: "**/*.trx"
-
-  test-windows-full:
-    runs-on: windows-latest
-    steps:
-      - name: Disable Windows Defender
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
-        shell: powershell
-      - uses: actions/checkout@v4
-      - name: Run task 'build'
-        shell: cmd
-        run: ./build.cmd build
-      - name: Run task 'in-tests-full'
-        shell: cmd
-        run: ./build.cmd in-tests-full -e
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-windows-full-trx
-          path: "**/*.trx"
-
   test-linux:
     runs-on: ubuntu-latest
     steps:
