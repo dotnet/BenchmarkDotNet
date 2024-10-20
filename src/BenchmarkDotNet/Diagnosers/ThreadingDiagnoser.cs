@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => true;
+            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => true;
+            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
         }
     }
 }
