@@ -12,12 +12,24 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
+      # Cleanup Old Files
+      - name: Cleanup Old Files
+        run: rm -rf $GITHUB_WORKSPACE/*.trx
+
+      # Download the Latest Artifacts with Unique Name
       - name: Download Artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
-          workflow: ${{ github.event.workflow_run.workflow_id }}
+          run_id: ${{ github.event.workflow_run.id }}
+      
+      # Display the Structure of Downloaded Files
       - name: Display structure of downloaded files
         run: ls -R
+      
+      # Display the Contents of .trx Files
+      - name: Display .trx file contents
+        run: cat **/*.trx || echo "No .trx files found"
+
       - name: Report tests results
         uses: AndreyAkinshin/test-reporter@0e2c48ebec2007001dd77dd4bcbcd450b96d5a38
         with:

@@ -321,7 +321,11 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithGcForce(false)
                     .WithGcServer(false)
                     .WithGcConcurrent(false)
-                    .WithEnvironmentVariable("COMPlus_TieredCompilation", "0") // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
+                    .WithEnvironmentVariables([
+                        // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
+                        new EnvironmentVariable("DOTNET_TieredCompilation", "0"),
+                        new EnvironmentVariable("COMPlus_TieredCompilation", "0")
+                    ])
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)

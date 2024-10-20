@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Environments
         }
 
         // Version.TryParse does not handle thing like 3.0.0-WORD
-        private static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
+        internal static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
 
         private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback)
         {
