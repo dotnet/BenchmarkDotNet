@@ -121,7 +121,7 @@ The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runt
 * Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`.
 * net46, net461, net462, net47, net471, net472, net48, net481 - to build and run benchmarks against specific .NET Framework version.
 * netcoreapp3.1, net5.0, net6.0, net7.0, net8.0 - to build and run benchmarks against specific .NET (Core) version.
-* nativeaot5.0, nativeaot6.0, nativeaot7.0, nativeaot8.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: `--ilcPath`, `--ilCompilerVersion`.
+* nativeaot5.0, nativeaot6.0, nativeaot7.0, nativeaot8.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: `--ilcPackages`, `--ilCompilerVersion`.
 * mono6.0, mono7.0, mono8.0 - to build and run benchmarks with .Net 6+ using MonoVM.
 
 Example: run the benchmarks for .NET 4.7.2 and .NET 8.0:
@@ -229,7 +229,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--cli` path to dotnet cli (optional).
 * `--packages` the directory to restore packages to (optional).
 * `--coreRun` path(s) to CoreRun (optional).
-* `--ilcPath` path to ILCompiler for NativeAOT.
+* `--ilcPackages` path to ILCompiler for NativeAOT.
 * `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
 * `--stopOnFirstError` stop on first error.
 * `--help` display this help screen.
