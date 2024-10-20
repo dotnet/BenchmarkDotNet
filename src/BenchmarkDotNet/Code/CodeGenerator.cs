@@ -56,7 +56,8 @@ namespace BenchmarkDotNet.Code
                     .Replace("$OverheadImplementation$", provider.OverheadImplementation)
                     .Replace("$ConsumeField$", provider.ConsumeField)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
-                    .Replace("$ParamsContent$", GetParamsContent(benchmark))
+                    .Replace("$InstanceParamsContent$", GetInstanceParamsContent(benchmark))
+                    .Replace("$StaticParamsContent$", GetStaticParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
@@ -187,12 +188,16 @@ namespace BenchmarkDotNet.Code
         }
 
         // internal for tests
-        internal static string GetParamsContent(BenchmarkCase benchmarkCase)
+        internal static string GetInstanceParamsContent(BenchmarkCase benchmarkCase) => GetParamsContent(benchmarkCase, isStatic: false, separator: ", ");
+
+        internal static string GetStaticParamsContent(BenchmarkCase benchmarkCase) => GetParamsContent(benchmarkCase, isStatic: true, separator: "; ");
+
+        private static string GetParamsContent(BenchmarkCase benchmarkCase, bool isStatic, string separator)
             => string.Join(
                 string.Empty,
                 benchmarkCase.Parameters.Items
-                    .Where(parameter => !parameter.IsArgument)
-                    .Select(parameter => $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.ToSourceCode()};"));
+                    .Where(parameter => !parameter.IsArgument && parameter.IsStatic == isStatic)
+                    .Select(parameter => $"{parameter.Name} = {parameter.ToSourceCode()}{separator}"));
 
         private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
