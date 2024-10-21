@@ -233,8 +233,8 @@ namespace BenchmarkDotNet.Tests
 
             var jobs = config.GetJobs().ToArray();
             Assert.Equal(2, jobs.Length);
-            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1));
-            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2));
+            Assert.Single(jobs, job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1);
+            Assert.Single(jobs, job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2);
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(new[] { "-r", "mono", "--monoPath", fakeMonoPath }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath));
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath);
         }
 
         [FactEnvSpecific("Testing local builds of Full .NET Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
@@ -254,7 +254,7 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(new[] { "--clrVersion", clrVersion }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clr && clr.Version == clrVersion));
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is ClrRuntime clr && clr.Version == clrVersion);
         }
 
         [Fact]
@@ -418,20 +418,20 @@ namespace BenchmarkDotNet.Tests
                 new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
-            Assert.Single(config.GetJobs().Where(job =>
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462");
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is MonoRuntime);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.1" &&
-                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31));
-            Assert.Single(config.GetJobs().Where(job =>
+                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
-            Assert.Single(config.GetJobs().Where(job =>
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
-            Assert.Single(config.GetJobs().Where(job =>
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80));
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80);
         }
 
         [Theory]
@@ -469,8 +469,8 @@ namespace BenchmarkDotNet.Tests
                 new OutputLogger(Output)).config;
 
             Assert.Equal(2, config.GetHardwareCounters().Count());
-            Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
-            Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
+            Assert.Single(config.GetHardwareCounters(), counter => counter == HardwareCounter.CacheMisses);
+            Assert.Single(config.GetHardwareCounters(), counter => counter == HardwareCounter.InstructionRetired);
         }
 
         [Fact]
