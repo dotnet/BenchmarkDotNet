@@ -155,10 +155,10 @@ namespace BenchmarkDotNet.Extensions
         {
             var typeInfo = type.GetTypeInfo();
 
-            if (typeInfo.IsAbstract
-                || typeInfo.IsSealed
-                || typeInfo.IsNotPublic
-                || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
+            if (typeInfo.IsAbstract)
+                // || typeInfo.IsSealed
+                //|| typeInfo.IsNotPublic
+                //|| typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
@@ -215,10 +215,10 @@ namespace BenchmarkDotNet.Extensions
             return false;
         }
 
-        private static bool IsRunnableGenericType(TypeInfo typeInfo)
-            => // if it is an open generic - there must be GenericBenchmark attributes
-                (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
-                    && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
+        //private static bool IsRunnableGenericType(TypeInfo typeInfo)
+        //    => // if it is an open generic - there must be GenericBenchmark attributes
+        //        (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
+        //            && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
 
         internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
     }

@@ -7,6 +7,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Validators;
 using Xunit;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Tests.Validators
 {
@@ -57,6 +58,18 @@ namespace BenchmarkDotNet.Tests.Validators
             Assert.Contains(errors,
                 s => s.Equals(
                     "Benchmarked method `typeof` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+        }
+
+        [Theory]
+        [InlineData(typeof(MySealedClass), true)]               // IsSealed
+        //[InlineData(typeof(MyPrivateClass), true)]            // IsNotPublic
+        [InlineData(typeof(BenchmarkClass<PublicClass>), true)] // IsGenericType
+        /* how to handle IsRunnableGenericType */               // IsRunnableGenericType
+        public void Benchmark_Class_Modifers(Type type, bool hasErrors)
+        {
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+
+            Assert.Equal(hasErrors, validationErrors.Any());
         }
 
         [Theory]
@@ -115,6 +128,13 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             protected internal class ProtectedInternalNestedClass { }
         }
+
+        private class MyPrivateClass
+        {
+            [Benchmark]
+            public static void StaticMethod() { }
+        }
+
     }
 
     public class BenchmarkClassWithStaticMethod
@@ -138,4 +158,11 @@ namespace BenchmarkDotNet.Tests.Validators
     {
         internal class InternalNestedClass { }
     }
+
+    public sealed class MySealedClass
+    {
+        [Benchmark]
+        public void StaticMethod() { }
+    }
+
 }

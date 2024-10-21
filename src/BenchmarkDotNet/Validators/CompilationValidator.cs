@@ -7,6 +7,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -25,8 +26,21 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
                     .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
+                    .Union(ValidateClassModifiers((validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
-                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks));
+                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
+                );
+
+        private static IEnumerable<ValidationError> ValidateClassModifiers(IEnumerable<BenchmarkCase> benchmarks)
+            => benchmarks
+                .Where(benchmark => benchmark.Descriptor.Type.IsSealed || benchmark.Descriptor.Type.IsGenericType || benchmark.Descriptor.Type.IsNotPublic || IsRunnableGenericType(benchmark.Descriptor.Type))
+                .Distinct(BenchmarkMethodEqualityComparer.Instance)
+                .Select(benchmark
+                    => new ValidationError(
+                        true,
+                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` contains unsupported class modifiers.",
+                        benchmark
+                    ));
 
         private static IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
@@ -101,5 +115,18 @@ namespace BenchmarkDotNet.Validators
 
             public int GetHashCode(BenchmarkCase obj) => obj.Descriptor.WorkloadMethod.GetHashCode();
         }
+
+        private static bool IsRunnableGenericType(Type type)
+        {
+
+            var typeInfo = type.GetTypeInfo();
+
+
+            return (!typeInfo.IsGenericTypeDefinition
+                    || typeInfo.GenericTypeArguments.Any()
+                    || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
+                   && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // We need public parameterless ctor to create it
+        }
+
     }
 }
