@@ -24,6 +24,5 @@
     <PackageReference Update="FSharp.Core" Version="4.6.0" />
     <PackageReference Update="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
   </ItemGroup>
 </Project>
