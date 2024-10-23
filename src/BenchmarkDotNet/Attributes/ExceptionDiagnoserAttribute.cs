@@ -9,6 +9,10 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public ExceptionDiagnoserAttribute() => Config = ManualConfig.CreateEmpty().AddDiagnoser(ExceptionDiagnoser.Default);
+        /// <param name="displayExceptions">Display Exceptions column. True by default.</param>
+        public ExceptionDiagnoserAttribute(bool displayExceptions = true)
+        {
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptions)));
+        }
     }
 }

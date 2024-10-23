@@ -9,6 +9,11 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public ThreadingDiagnoserAttribute() => Config = ManualConfig.CreateEmpty().AddDiagnoser(ThreadingDiagnoser.Default);
+        /// <param name="displayWorkItemsColumn">Display Work Items column. True by default.</param>
+        /// <param name="displayLockContentionsColumn">Display Lock Contentions column. True by default.</param>
+        public ThreadingDiagnoserAttribute(bool displayWorkItemsColumn = true, bool displayLockContentionsColumn = true)
+        {
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayWorkItemsColumn, displayLockContentionsColumn)));
+        }
     }
 }

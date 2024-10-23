@@ -15,7 +15,11 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class ThreadingDiagnoser : IDiagnoser
     {
-        public static readonly ThreadingDiagnoser Default = new ThreadingDiagnoser();
+        public static readonly ThreadingDiagnoser Default = new ThreadingDiagnoser(new ThreadingDiagnoserConfig(true, true));
+
+        public ThreadingDiagnoser(ThreadingDiagnoserConfig config) => Config = config;
+
+        public ThreadingDiagnoserConfig Config { get; }
 
         private ThreadingDiagnoser() { }
 
@@ -33,8 +37,15 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
-            yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
+            if (!Config.DisplayWorkItemsColumnIfZeroValue && results.ThreadingStats.CompletedWorkItemCount == 0)
+            {
+                yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
+            }
+
+            if (!Config.DisplayLockContentionsColumnIfZeroValue && results.ThreadingStats.LockContentionCount == 0)
+            {
+                yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
+            }
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
