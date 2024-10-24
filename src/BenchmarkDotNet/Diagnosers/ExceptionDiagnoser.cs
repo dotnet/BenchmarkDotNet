@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public ExceptionDiagnoserConfig Config { get; }
 
-        private ExceptionDiagnoser() { }
-
         public IEnumerable<string> Ids => new[] { nameof(ExceptionDiagnoser) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
@@ -36,7 +34,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            if (!Config.DisplayExceptionsIfZeroValue && results.ExceptionFrequency == 0)
+            if (Config.DisplayExceptionsIfZeroValue || results.ExceptionFrequency != 0)
             {
                 yield return new Metric(ExceptionsFrequencyMetricDescriptor.Instance, results.ExceptionFrequency);
             }

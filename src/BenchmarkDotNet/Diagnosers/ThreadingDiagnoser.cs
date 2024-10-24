@@ -21,8 +21,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public ThreadingDiagnoserConfig Config { get; }
 
-        private ThreadingDiagnoser() { }
-
         public IEnumerable<string> Ids => new[] { nameof(ThreadingDiagnoser) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
@@ -37,12 +35,12 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            if (!Config.DisplayWorkItemsColumnIfZeroValue && results.ThreadingStats.CompletedWorkItemCount == 0)
+            if (Config.DisplayWorkItemsColumnIfZeroValue || results.ThreadingStats.CompletedWorkItemCount != 0)
             {
                 yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
             }
 
-            if (!Config.DisplayLockContentionsColumnIfZeroValue && results.ThreadingStats.LockContentionCount == 0)
+            if (Config.DisplayLockContentionsColumnIfZeroValue || results.ThreadingStats.LockContentionCount != 0)
             {
                 yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
             }
