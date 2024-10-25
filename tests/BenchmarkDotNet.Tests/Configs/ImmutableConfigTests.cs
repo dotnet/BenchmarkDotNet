@@ -376,6 +376,40 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(TimeSpan.FromSeconds(2), final.BuildTimeout);
         }
 
+        [Fact]
+        public void WhenWakeLockIsNotSpecifiedTheDefaultValueIsUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(DefaultConfig.Instance.WakeLock, final.WakeLock);
+        }
+
+        [Fact]
+        public void CustomWakeLockHasPrecedenceOverDefaultWakeLock()
+        {
+            WakeLockType customTimeout = WakeLockType.RequireDisplay;
+            var mutable = ManualConfig.CreateEmpty().WithWakeLock(customTimeout);
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(customTimeout, final.WakeLock);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void WhenTwoCustomWakeLocksAreProvidedTheLongerOneIsUsed(bool direction)
+        {
+            var system = ManualConfig.CreateEmpty().WithWakeLock(WakeLockType.RequireSystem);
+            var display = ManualConfig.CreateEmpty().WithWakeLock(WakeLockType.RequireDisplay);
+
+            if (direction)
+                system.Add(display);
+            else
+                display.Add(system);
+
+            var final = ImmutableConfigBuilder.Create(direction ? system : display);
+            Assert.Equal(WakeLockType.RequireDisplay, final.WakeLock);
+        }
+
         private static ManualConfig CreateConfigFromJobs(params Job[] jobs)
         {
             var config = ManualConfig.CreateEmpty();

@@ -364,6 +364,22 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(DefaultConfig.Instance.BuildTimeout, config.BuildTimeout);
         }
 
+        [Fact]
+        public void UserCanSpecifyWakeLock()
+        {
+            var config = ConfigParser.Parse(["--preventSleep", "RequireSystem"], new OutputLogger(Output)).config;
+
+            Assert.Equal(WakeLockType.RequireSystem, config.WakeLock);
+        }
+
+        [Fact]
+        public void WhenUserDoesNotSpecifyWakeLockTheDefaultValueIsUsed()
+        {
+            var config = ConfigParser.Parse([], new OutputLogger(Output)).config;
+
+            Assert.Equal(WakeLockType.No, config.WakeLock);
+        }
+
         [Theory]
         [InlineData("net461")]
         [InlineData("net462")]

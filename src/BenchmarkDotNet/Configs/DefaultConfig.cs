@@ -87,6 +87,8 @@ namespace BenchmarkDotNet.Configs
 
         public TimeSpan BuildTimeout => TimeSpan.FromSeconds(120);
 
+        public WakeLockType WakeLock => WakeLockType.No;
+
         public string ArtifactsPath
         {
             get
