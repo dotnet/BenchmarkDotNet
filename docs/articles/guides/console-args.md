@@ -243,6 +243,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--platform` the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.
 * `--runOncePerIteration` run the benchmark exactly once per iteration.
 * `--buildTimeout` build timeout in seconds.
+* `--preventSleep` prevents the system from entering sleep or turning off the display. No/RequireSystem/RequireDisplay.
 * `--wasmEngine` full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
 * `--wasmMainJS` path to the test-main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"
 * `--expose_wasm` arguments for the JavaScript engine used by Wasm toolchain.
