@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Validators
                     {
                         errors.Add(new ValidationError(
                            true,
-                           $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within `{message}`,\nDeclaring type must be public..",
+                           $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within `{message}`,\nDeclaring type must be public.",
                            benchmark));
 
                         return errors;
