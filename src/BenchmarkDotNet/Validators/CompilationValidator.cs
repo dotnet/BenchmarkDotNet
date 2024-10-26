@@ -32,15 +32,32 @@ namespace BenchmarkDotNet.Validators
                 );
 
         private static IEnumerable<ValidationError> ValidateClassModifiers(IEnumerable<BenchmarkCase> benchmarks)
-            => benchmarks
-                .Where(benchmark => benchmark.Descriptor.Type.IsSealed || benchmark.Descriptor.Type.IsGenericType || benchmark.Descriptor.Type.IsNotPublic || IsRunnableGenericType(benchmark.Descriptor.Type))
+        {
+            return benchmarks
                 .Distinct(BenchmarkMethodEqualityComparer.Instance)
-                .Select(benchmark
-                    => new ValidationError(
-                        true,
-                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` contains unsupported class modifiers.",
-                        benchmark
-                    ));
+                .SelectMany(benchmark =>
+                {
+                    var errors = new List<ValidationError>();
+                    string message = string.Empty;
+                    if (benchmark.Descriptor.Type.IsSealed){ message = "a sealed class"; }
+                    if (!benchmark.Descriptor.Type.IsPublic && !benchmark.Descriptor.Type.IsNestedPublic) { message = "a private class"; }
+                    /* Validation for Generics Remaining */
+
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        errors.Add(new ValidationError(
+                           true,
+                           $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within `{message}`,\nDeclaring type must be public..",
+                           benchmark));
+
+                        return errors;
+                    }
+                    else
+                    {
+                        return Enumerable.Empty<ValidationError>();
+                    }
+                });
+        }
 
         private static IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks

@@ -61,11 +61,12 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Theory]
-        [InlineData(typeof(MySealedClass), true)]               // IsSealed
-        //[InlineData(typeof(MyPrivateClass), true)]            // IsNotPublic
-        [InlineData(typeof(BenchmarkClass<PublicClass>), true)] // IsGenericType
-        /* how to handle IsRunnableGenericType */               // IsRunnableGenericType
-        public void Benchmark_Class_Modifers(Type type, bool hasErrors)
+        /* BenchmarkDotNet can only benchmark public methods */
+        [InlineData(typeof(SealedClass), true)]
+        [InlineData(typeof(MyPrivateClass), true)]
+        [InlineData(typeof(BenchMarkPublicClass), false)]
+        /* Generics Remaining */
+        public void Benchmark_Class_Modifers_Must_Be_Public(Type type, bool hasErrors)
         {
             var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
 
@@ -132,9 +133,8 @@ namespace BenchmarkDotNet.Tests.Validators
         private class MyPrivateClass
         {
             [Benchmark]
-            public static void StaticMethod() { }
+            public void NonStaticMethod() { }
         }
-
     }
 
     public class BenchmarkClassWithStaticMethod
@@ -159,10 +159,15 @@ namespace BenchmarkDotNet.Tests.Validators
         internal class InternalNestedClass { }
     }
 
-    public sealed class MySealedClass
+    public sealed class SealedClass
     {
         [Benchmark]
-        public void StaticMethod() { }
+        public void NonStaticMethod() { }
     }
 
+    public class BenchMarkPublicClass()
+    {
+        [Benchmark]
+        public void NonStaticMethod() { }
+    }
 }
