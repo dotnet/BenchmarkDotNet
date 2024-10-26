@@ -149,8 +149,7 @@ namespace BenchmarkDotNet.Tests.Validators
         internal class MyInternalClass{ [Benchmark] public void PublicMethod(){} }
 
         protected internal class MyProtectedInternalClass{ [Benchmark] public void PublicMethod() { } }
-
-    }
+        }
 
     public class BenchmarkClassWithStaticMethod
     {
