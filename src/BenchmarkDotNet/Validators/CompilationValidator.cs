@@ -37,25 +37,25 @@ namespace BenchmarkDotNet.Validators
                 .Distinct(BenchmarkMethodEqualityComparer.Instance)
                 .SelectMany(benchmark =>
                 {
+                    var type = benchmark.Descriptor.Type;
                     var errors = new List<ValidationError>();
-                    string message = string.Empty;
-                    if (benchmark.Descriptor.Type.IsSealed){ message = "a sealed class"; }
-                    if (!benchmark.Descriptor.Type.IsPublic && !benchmark.Descriptor.Type.IsNestedPublic) { message = "a private class"; }
-                    /* Validation for Generics Remaining */
 
-                    if (!string.IsNullOrEmpty(message))
+                    if (type.IsSealed)
                     {
                         errors.Add(new ValidationError(
                            true,
-                           $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within `{message}`,\nDeclaring type must be public.",
+                           $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a sealed class,\nDeclaring type must be public.",
                            benchmark));
-
-                        return errors;
                     }
-                    else
+                    if (!type.IsPublic && !type.IsNestedPublic)
                     {
-                        return Enumerable.Empty<ValidationError>();
+                        errors.Add(new ValidationError(
+                            true,
+                            $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a private class,\nDeclaring type must be public.",
+                            benchmark));
                     }
+                    // TODO: Generics validation
+                    return errors;
                 });
         }
 
@@ -132,18 +132,5 @@ namespace BenchmarkDotNet.Validators
 
             public int GetHashCode(BenchmarkCase obj) => obj.Descriptor.WorkloadMethod.GetHashCode();
         }
-
-        private static bool IsRunnableGenericType(Type type)
-        {
-
-            var typeInfo = type.GetTypeInfo();
-
-
-            return (!typeInfo.IsGenericTypeDefinition
-                    || typeInfo.GenericTypeArguments.Any()
-                    || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
-                   && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // We need public parameterless ctor to create it
-        }
-
     }
 }

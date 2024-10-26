@@ -61,10 +61,13 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Theory]
-        /* BenchmarkDotNet can only benchmark public methods */
+        /* BenchmarkDotNet can only benchmark public unsealed classes*/
+        [InlineData(typeof(BenchMarkPublicClass), false)]
         [InlineData(typeof(SealedClass), true)]
         [InlineData(typeof(MyPrivateClass), true)]
-        [InlineData(typeof(BenchMarkPublicClass), false)]
+        [InlineData(typeof(MyPublicProtectedClass), true)]
+        [InlineData(typeof(MyPrivateProtectedClass), true)]
+        [InlineData(typeof(MyInternalClass), true)]
         /* Generics Remaining */
         public void Benchmark_Class_Modifers_Must_Be_Public(Type type, bool hasErrors)
         {
@@ -130,11 +133,16 @@ namespace BenchmarkDotNet.Tests.Validators
             protected internal class ProtectedInternalNestedClass { }
         }
 
-        private class MyPrivateClass
-        {
-            [Benchmark]
-            public void NonStaticMethod() { }
-        }
+        private class MyPrivateClass{ [Benchmark] public void NonStaticMethod(){} }
+
+        protected class MyPublicProtectedClass(){ [Benchmark] public void PublicMethod(){} }
+
+        private protected class MyPrivateProtectedClass(){ [Benchmark] public void PublicMethod(){} }
+
+        internal class MyInternalClass(){ [Benchmark] public void PublicMethod(){} }
+
+        protected internal class MyProtectedInternalClass() { [Benchmark] public void PublicMethod() { } }
+
     }
 
     public class BenchmarkClassWithStaticMethod
