@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Validators
                            $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a sealed class, Declaring type must be unsealed.",
                            benchmark));
                     }
-                    if (!type.IsPublic && !type.IsNestedPublic)
+                    if (!type.IsVisible)
                     {
                         errors.Add(new ValidationError(
                             true,

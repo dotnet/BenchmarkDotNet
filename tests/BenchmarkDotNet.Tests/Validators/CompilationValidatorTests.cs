@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(BenchMarkPublicClass), false)]
         [InlineData(typeof(BenchMarkPublicClass.PublicNestedClass), false)]
         [InlineData(typeof(SealedClass.PublicNestedClass), false)]
-        [InlineData(typeof(OuterClass.PublicNestedClass), false)]
+        [InlineData(typeof(OuterClass.PublicNestedClass), true)]
         [InlineData(typeof(SealedClass), true)]
         [InlineData(typeof(MyPrivateClass), true)]
         [InlineData(typeof(MyPublicProtectedClass), true)]
