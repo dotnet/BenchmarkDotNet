@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Validators
                     {
                         errors.Add(new ValidationError(
                             true,
-                            $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a private class, Declaring type must be public.",
+                            $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a non-visible class, all declaring types must be public.",
                             benchmark));
                     }
                     // TODO: Generics validation
