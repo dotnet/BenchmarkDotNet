@@ -7,6 +7,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Validators;
 using Xunit;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Tests.Validators
 {
@@ -57,6 +58,29 @@ namespace BenchmarkDotNet.Tests.Validators
             Assert.Contains(errors,
                 s => s.Equals(
                     "Benchmarked method `typeof` contains illegal character(s) or uses C# keyword. Please use `[<Benchmark(Description = \"Custom name\")>]` to set custom display name."));
+        }
+
+        [Theory]
+        /* BenchmarkDotNet can only benchmark public unsealed classes*/
+        [InlineData(typeof(BenchMarkPublicClass), false)]
+        [InlineData(typeof(BenchMarkPublicClass.PublicNestedClass), false)]
+        [InlineData(typeof(SealedClass.PublicNestedClass), false)]
+        [InlineData(typeof(OuterClass.PublicNestedClass), true)]
+        [InlineData(typeof(SealedClass), true)]
+        [InlineData(typeof(MyPrivateClass), true)]
+        [InlineData(typeof(MyPublicProtectedClass), true)]
+        [InlineData(typeof(MyPrivateProtectedClass), true)]
+        [InlineData(typeof(MyProtectedInternalClass), true)]
+        [InlineData(typeof(MyInternalClass), true)]
+        [InlineData(typeof(OuterClass), true)]
+        [InlineData(typeof(OuterClass.InternalNestedClass), true)]
+        [InlineData(typeof(BenchMarkPublicClass.InternalNestedClass), true)]
+        /* Generics Remaining */
+        public void Benchmark_Class_Modifers_Must_Be_Public(Type type, bool hasErrors)
+        {
+            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+
+            Assert.Equal(hasErrors, validationErrors.Any());
         }
 
         [Theory]
@@ -115,7 +139,17 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             protected internal class ProtectedInternalNestedClass { }
         }
-    }
+
+        private class MyPrivateClass{ [Benchmark] public void PublicMethod(){} }
+
+        protected class MyPublicProtectedClass{ [Benchmark] public void PublicMethod(){} }
+
+        private protected class MyPrivateProtectedClass{ [Benchmark] public void PublicMethod(){} }
+
+        internal class MyInternalClass{ [Benchmark] public void PublicMethod(){} }
+
+        protected internal class MyProtectedInternalClass{ [Benchmark] public void PublicMethod() { } }
+        }
 
     public class BenchmarkClassWithStaticMethod
     {
@@ -137,5 +171,30 @@ namespace BenchmarkDotNet.Tests.Validators
     internal class InternalClass
     {
         internal class InternalNestedClass { }
+    }
+
+    public sealed class SealedClass
+    {
+        [Benchmark] public void PublicMethod() { }
+
+        public class PublicNestedClass { [Benchmark] public void PublicMethod() { } }
+    }
+
+    internal class OuterClass
+    {
+        [Benchmark] public void PublicMethod(){}
+
+        internal class InternalNestedClass { [Benchmark] public void PublicMethod() { } }
+
+        public class PublicNestedClass { [Benchmark] public void PublicMethod() { } }
+    }
+
+    public class BenchMarkPublicClass
+    {
+        [Benchmark] public void PublicMethod(){}
+
+        public class PublicNestedClass { [Benchmark] public void PublicMethod() { } }
+
+        internal class InternalNestedClass { [Benchmark] public void PublicMethod() { } }
     }
 }

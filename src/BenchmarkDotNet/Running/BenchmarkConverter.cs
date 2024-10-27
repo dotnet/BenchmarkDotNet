@@ -263,16 +263,7 @@ namespace BenchmarkDotNet.Running
         {
             if (!methodInfo.IsPublic)
                 throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
-
-            var declaringType = methodInfo.DeclaringType;
-
-            while (declaringType != null)
-            {
-                if (!declaringType.GetTypeInfo().IsPublic && !declaringType.GetTypeInfo().IsNestedPublic)
-                    throw new InvalidBenchmarkDeclarationException($"{declaringType.FullName} containing {methodType} method {methodInfo.Name} has incorrect access modifiers.\nDeclaring type must be public.");
-
-                declaringType = declaringType.DeclaringType;
-            }
+            /* Moved the code that verifies if DeclaringType of a given MethodInfo (a method) is publicly accessible to CompilationValidator */
         }
 
         private static void AssertMethodIsNotGeneric(string methodType, MethodInfo methodInfo)

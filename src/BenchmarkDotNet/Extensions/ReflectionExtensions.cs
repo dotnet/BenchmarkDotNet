@@ -155,10 +155,7 @@ namespace BenchmarkDotNet.Extensions
         {
             var typeInfo = type.GetTypeInfo();
 
-            if (typeInfo.IsAbstract
-                || typeInfo.IsSealed
-                || typeInfo.IsNotPublic
-                || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
+            if (typeInfo.IsAbstract || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
                 return false;
 
             return typeInfo.GetBenchmarks().Any();
