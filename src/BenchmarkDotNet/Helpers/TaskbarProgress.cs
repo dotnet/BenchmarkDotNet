@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Helpers
         Warning = Paused
     }
 
-    internal class TaskbarProgress : IDisposable
+    internal class TaskbarProgress : DisposeAtProcessTermination
     {
         private static readonly bool OsVersionIsSupported = OsDetector.IsWindows()
             // Must be windows 7 or greater
@@ -31,10 +31,6 @@ namespace BenchmarkDotNet.Helpers
             {
                 com = Com.MaybeCreateInstanceAndSetInitialState(initialTaskbarState);
                 terminal = Terminal.MaybeCreateInstanceAndSetInitialState(initialTaskbarState);
-                if (IsEnabled)
-                {
-                    Console.CancelKeyPress += OnConsoleCancelEvent;
-                }
             }
         }
 
@@ -51,23 +47,20 @@ namespace BenchmarkDotNet.Helpers
             {
                 throw new ArgumentOutOfRangeException(nameof(progressValue), "progressValue must be between 0 and 1 inclusive.");
             }
-            uint value = (uint) (progressValue * 100);
+            uint value = (uint)(progressValue * 100);
             com?.SetValue(value);
             terminal?.SetValue(value);
         }
 
-        private void OnConsoleCancelEvent(object sender, ConsoleCancelEventArgs e)
-            => Dispose();
-
-        public void Dispose()
+        public override void Dispose()
         {
             if (IsEnabled)
             {
                 SetState(TaskbarProgressState.NoProgress);
                 com = null;
                 terminal = null;
-                Console.CancelKeyPress -= OnConsoleCancelEvent;
             }
+            base.Dispose();
         }
 
         private sealed class Com
