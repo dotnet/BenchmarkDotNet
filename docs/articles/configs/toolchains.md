@@ -87,8 +87,7 @@ namespace BenchmarkDotNet.Samples
         static void Main(string[] args)
         {
             var config = DefaultConfig.Instance
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
-                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core30))
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
                 .AddJob(Job.Default.WithRuntime(ClrRuntime.Net48))
                 .AddJob(Job.Default.WithRuntime(MonoRuntime.Default));
 
