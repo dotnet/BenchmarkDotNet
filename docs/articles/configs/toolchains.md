@@ -87,10 +87,9 @@ namespace BenchmarkDotNet.Samples
         static void Main(string[] args)
         {
             var config = DefaultConfig.Instance
-                .With(Job.Default.With(CoreRuntime.Core21))
-                .With(Job.Default.With(CoreRuntime.Core30))
-                .With(Job.Default.With(ClrRuntime.Net48))
-                .With(Job.Default.With(MonoRuntime.Default));
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.Net48))
+                .AddJob(Job.Default.WithRuntime(MonoRuntime.Default));
 
             BenchmarkSwitcher
                 .FromAssembly(typeof(Program).Assembly)
@@ -130,8 +129,8 @@ It's possible to benchmark a private build of .NET Runtime. All you need to do i
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, 
-        DefaultConfig.Instance.With(
-            Job.ShortRun.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0"))));
+        DefaultConfig.Instance.AddJob(
+            Job.ShortRun.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0"))));
 ```
 
 This sends the provided version as a `COMPLUS_Version` env var to the benchmarked process.
@@ -208,7 +207,7 @@ or:
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.Default.With(NativeAotRuntime.Net70)); // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
+    .AddJob(Job.Default.WithRuntime(NativeAotRuntime.Net70)); // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
@@ -231,8 +230,8 @@ If you want to benchmark some particular version of NativeAOT (or from a differe
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.ShortRun
-        .With(NativeAotToolchain.CreateBuilder()
+    .AddJob(Job.ShortRun
+        .WithToolchain(NativeAotToolchain.CreateBuilder()
             .UseNuGet(
                 microsoftDotNetILCompilerVersion: "7.0.0-*", // the version goes here
                 nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json") // this address might change over time
@@ -338,8 +337,8 @@ or explicitly in the code:
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.ShortRun
-        .With(NativeAotToolchain.CreateBuilder()
+    .AddJob(Job.ShortRun
+        .WithToolchain(NativeAotToolchain.CreateBuilder()
             .UseLocalBuild(@"C:\Projects\runtime\artifacts\packages\Release\Shipping\")
             .DisplayName("NativeAOT local build")
             .TargetFrameworkMoniker("net7.0")

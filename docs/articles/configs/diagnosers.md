@@ -59,11 +59,11 @@ private class Config : ManualConfig
 {
     public Config()
     {
-        Add(MemoryDiagnoser.Default);
-        Add(new InliningDiagnoser());
-        Add(new EtwProfiler());
-        Add(ThreadingDiagnoser.Default);
-        Add(ExceptionDiagnoser.Default);
+        AddDiagnoser(MemoryDiagnoser.Default);
+        AddDiagnoser(new InliningDiagnoser());
+        AddDiagnoser(new EtwProfiler());
+        AddDiagnoser(ThreadingDiagnoser.Default);
+        AddDiagnoser(ExceptionDiagnoser.Default);
     }
 }
 ```
