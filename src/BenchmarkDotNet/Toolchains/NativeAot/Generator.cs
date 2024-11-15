@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Detectors.Cpu;
@@ -155,7 +156,19 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
+{GetCustomProperties(buildPartition, logger)}
 </Project>";
+
+        private string GetCustomProperties(BuildPartition buildPartition, ILogger logger)
+        {
+            var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(projectFile.FullName);
+
+            (string customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+            return customProperties;
+        }
+
 
         private string GetILCompilerPackageReference()
             => string.IsNullOrEmpty(ilCompilerVersion) ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
