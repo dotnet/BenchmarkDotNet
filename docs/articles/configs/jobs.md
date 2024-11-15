@@ -98,20 +98,20 @@ public class MyBenchmarks
     {
         public Config()
         {
-            Add(
-                new Job("MySuperJob", RunMode.Dry, EnvMode.RyuJitX64)
+            AddJob(
+                new Job("MySuperJob", RunMode.Dry, EnvironmentMode.RyuJitX64)
                 {
-                    Env = { Runtime = Runtime.Core },
+                    Environment = { Runtime = CoreRuntime.Core90 },
                     Run = { LaunchCount = 5, IterationTime = TimeInterval.Millisecond * 200 },
-                    Accuracy = { MaxStdErrRelative = 0.01 }
+                    Accuracy = { MaxRelativeError = 0.01 }
                 });
 
             // The same, using the .With() factory methods:
-            Add(
+            AddJob(
                 Job.Dry
                 .WithPlatform(Platform.X64)
                 .WithJit(Jit.RyuJit)
-                .WithRuntime(Runtime.Core)
+                .WithRuntime(CoreRuntime.Core90)
                 .WithLaunchCount(5)
                 .WithIterationTime(TimeInterval.Millisecond * 200)
                 .WithMaxRelativeError(0.01)
@@ -122,26 +122,26 @@ public class MyBenchmarks
 }
 ```
 
-Basically, it's a good idea to start with predefined values (e.g. `EnvMode.RyuJitX64` and `RunMode.Dry` passed as constructor args) and modify rest of the properties using property setters or with help of object initializer syntax.
+Basically, it's a good idea to start with predefined values (e.g. `EnvironmentMode.RyuJitX64` and `RunMode.Dry` passed as constructor args) and modify rest of the properties using property setters or with help of object initializer syntax.
 
 Note that the job cannot be modified after it's added into config. Trying to set a value on property of the frozen job will throw an `InvalidOperationException`. Use the `Job.Frozen` property to determine if the code properties can be altered.
 
 If you do want to create a new job based on frozen one (all predefined job values are frozen) you can use the `.With()` extension method
 
 ```cs
-            var newJob = Job.Dry.With(Platform.X64);
+            var newJob = Job.Dry.WithPlatform(Platform.X64);
 ```
 
 or pass the frozen value as a constructor argument
 
 ```c#
-            var newJob = new Job(Job.Dry) { Env = { Platform = Platform.X64 } };
+            var newJob = new Job(Job.Dry) { Environment = { Platform = Platform.X64 } };
 ```
 
 or use the `.Apply()` method on unfrozen job
 
 ```c#
-            var newJob = new Job() { Env = { Platform = Platform.X64 } }.Apply(Job.Dry);
+            var newJob = new Job() { Environment = { Platform = Platform.X64 } }.Apply(Job.Dry);
 ```
 
 in any case the Id property will not be transfered and you must pass it explicitly (using the .ctor id argument or the `.WithId()` extension method).
@@ -152,7 +152,9 @@ You can also add new jobs via attributes. Examples:
 
 ```cs
 [DryJob]
-[ClrJob, CoreJob, MonoJob]
+[MonoJob]
+[SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.NetCoreApp31)]
 [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
 [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, iterationCount: 5, id: "FastAndDirtyJob")]
 public class MyBenchmarkClass
@@ -212,7 +214,7 @@ public class MySuperJobAttribute : Attribute, IConfigSource
     {
         var job = new Job("MySuperJob", RunMode.Core);
         job.Env.Platform = Platform.X64;
-        Config = ManualConfig.CreateEmpty().With(job);
+        Config = ManualConfig.CreateEmpty().AddJob(job);
     }
 
     public IConfig Config { get; }
