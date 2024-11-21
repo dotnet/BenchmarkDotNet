@@ -343,8 +343,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
-            if (options.UseMemoryDiagnoser)
+            if (options.UseSurvivedMemoryDiagnoser)
+                config.AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(includeSurvived: true)));
+            else if (options.UseMemoryDiagnoser)
                 config.AddDiagnoser(MemoryDiagnoser.Default);
+
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
             if (options.UseExceptionDiagnoser)
