@@ -239,35 +239,125 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void InProcessEmitToolchainSupportsIterationSetupAndCleanup()
+        [Theory]
+        [InlineData(typeof(IterationSetupCleanup))]
+        [InlineData(typeof(GlobalSetupCleanupTask))]
+        [InlineData(typeof(GlobalSetupCleanupValueTask))]
+        [InlineData(typeof(GlobalSetupCleanupValueTaskSource))]
+        public void InProcessEmitToolchainSupportsSetupAndCleanup(Type benchmarkType)
         {
             var logger = new OutputLogger(Output);
             var config = CreateInProcessConfig(logger);
 
-            WithIterationSetupAndCleanup.SetupCounter = 0;
-            WithIterationSetupAndCleanup.BenchmarkCounter = 0;
-            WithIterationSetupAndCleanup.CleanupCounter = 0;
+            Counters.SetupCounter = 0;
+            Counters.BenchmarkCounter = 0;
+            Counters.CleanupCounter = 0;
 
-            var summary = CanExecute<WithIterationSetupAndCleanup>(config);
+            var summary = CanExecute(benchmarkType, config);
 
-            Assert.Equal(1, WithIterationSetupAndCleanup.SetupCounter);
-            Assert.Equal(16, WithIterationSetupAndCleanup.BenchmarkCounter);
-            Assert.Equal(1, WithIterationSetupAndCleanup.CleanupCounter);
+            Assert.Equal(1, Counters.SetupCounter);
+            Assert.Equal(16, Counters.BenchmarkCounter);
+            Assert.Equal(1, Counters.CleanupCounter);
         }
 
-        public class WithIterationSetupAndCleanup
+        private static class Counters
         {
             public static int SetupCounter, BenchmarkCounter, CleanupCounter;
+        }
 
+        public class IterationSetupCleanup
+        {
             [IterationSetup]
-            public void Setup() => Interlocked.Increment(ref SetupCounter);
+            public void Setup() => Interlocked.Increment(ref Counters.SetupCounter);
 
             [Benchmark]
-            public void Benchmark() => Interlocked.Increment(ref BenchmarkCounter);
+            public void Benchmark() => Interlocked.Increment(ref Counters.BenchmarkCounter);
 
             [IterationCleanup]
-            public void Cleanup() => Interlocked.Increment(ref CleanupCounter);
+            public void Cleanup() => Interlocked.Increment(ref Counters.CleanupCounter);
+        }
+
+        public class GlobalSetupCleanupTask
+        {
+            [GlobalSetup]
+            public static async Task GlobalSetup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counters.SetupCounter);
+            }
+
+            [GlobalCleanup]
+            public async Task<int> GlobalCleanup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counters.CleanupCounter);
+                return 42;
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counters.BenchmarkCounter);
+            }
+        }
+
+        public class GlobalSetupCleanupValueTask
+        {
+            [GlobalSetup]
+            public static async ValueTask GlobalSetup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counters.SetupCounter);
+            }
+
+            [GlobalCleanup]
+            public async ValueTask<int> GlobalCleanup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counters.CleanupCounter);
+                return 42;
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counters.BenchmarkCounter);
+            }
+        }
+
+        public class GlobalSetupCleanupValueTaskSource
+        {
+            private readonly static ValueTaskSource<int> valueTaskSource = new ();
+
+            [GlobalSetup]
+            public static ValueTask GlobalSetup()
+            {
+                valueTaskSource.Reset();
+                Task.Delay(1).ContinueWith(_ =>
+                {
+                    Interlocked.Increment(ref Counters.SetupCounter);
+                    valueTaskSource.SetResult(42);
+                });
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [GlobalCleanup]
+            public ValueTask<int> GlobalCleanup()
+            {
+                valueTaskSource.Reset();
+                Task.Delay(1).ContinueWith(_ =>
+                {
+                    Interlocked.Increment(ref Counters.CleanupCounter);
+                    valueTaskSource.SetResult(42);
+                });
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counters.BenchmarkCounter);
+            }
         }
     }
 }
