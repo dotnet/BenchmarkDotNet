@@ -18,7 +18,8 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
         private readonly MonoAotCompilerMode AotCompilerMode;
 
         public MonoAotLLVMGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string aotCompilerPath, MonoAotCompilerMode aotCompilerMode)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+            // We have no tests for this toolchain, so not including ArtifactsPath in case it fails the same as wasm.
+            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null, useArtifactsPathIfSupported: false)
         {
             CustomRuntimePack = customRuntimePack;
             AotCompilerPath = aotCompilerPath;

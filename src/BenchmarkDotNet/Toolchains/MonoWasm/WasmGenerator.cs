@@ -17,7 +17,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         private readonly string MainJS;
 
         public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+            // Building wasm with ArtifactsPath set fails for some reason (haven't figured out why yet).
+            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null, useArtifactsPathIfSupported: false)
         {
             Aot = aot;
             CustomRuntimePack = customRuntimePack;
