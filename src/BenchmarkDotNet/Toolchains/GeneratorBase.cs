@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns a path to the folder where auto-generated project and code are going to be placed
         /// </summary>
-        [PublicAPI] protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programName);
+        [PublicAPI] protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programDirectory);
 
         /// <summary>
         /// returns a path where executable should be found after the build (usually \bin)
@@ -128,10 +128,10 @@ namespace BenchmarkDotNet.Toolchains
             // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs/csprojs that include all *.cs by default
             const string codeFileExtension = ".notcs";
 
-            string programName = buildPartition.ProgramName;
-            string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
+            string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, buildPartition.ProgramDirectory);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
 
+            string programName = buildPartition.ProgramName;
             string executablePath = GetExecutablePath(binariesDirectoryPath, programName);
 
             return new ArtifactsPaths(

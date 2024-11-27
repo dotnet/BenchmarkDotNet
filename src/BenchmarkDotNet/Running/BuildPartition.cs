@@ -23,7 +23,10 @@ namespace BenchmarkDotNet.Running
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
+            var keepBenchmarkFiles = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
+            var guid = Guid.NewGuid().ToString();
+            ProgramName = keepBenchmarkFiles ? RepresentativeBenchmarkCase.Job.FolderInfo : guid;
+            ProgramDirectory = keepBenchmarkFiles ? Path.Combine(RepresentativeBenchmarkCase.Job.FolderInfo, guid) : guid;
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }
@@ -31,6 +34,8 @@ namespace BenchmarkDotNet.Running
         public BenchmarkBuildInfo[] Benchmarks { get; }
 
         public string ProgramName { get; }
+
+        public string ProgramDirectory { get; }
 
         /// <summary>
         /// the benchmarks are grouped by the build settings
