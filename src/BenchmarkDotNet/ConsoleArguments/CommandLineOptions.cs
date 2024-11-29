@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
 
-        [Option("preventSleep", Required = false, HelpText = "Prevents the system from entering sleep or turning off the display. No/RequireSystem/RequireDisplay.")]
+        [Option("wakeLock", Required = false, HelpText = "Prevents the system from entering sleep or turning off the display. None/System/Display.")]
         public WakeLockType? WakeLock { get; set; }
 
         [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]

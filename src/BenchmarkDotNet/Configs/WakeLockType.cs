@@ -5,16 +5,16 @@
         /// <summary>
         /// Allows the system to enter sleep and/or turn off the display while benchmarks are running.
         /// </summary>
-        No,
+        None,
 
         /// <summary>
         /// Forces the system to be in the working state while benchmarks are running.
         /// </summary>
-        RequireSystem,
+        System,
 
         /// <summary>
         /// Forces the display to be on while benchmarks are running.
         /// </summary>
-        RequireDisplay
+        Display
     }
 }

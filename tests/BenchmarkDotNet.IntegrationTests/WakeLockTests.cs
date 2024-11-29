@@ -25,15 +25,15 @@ public class WakeLockTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
     [Fact]
     public void ConfigurationDefaultValue()
     {
-        Assert.Equal(WakeLockType.No, DefaultConfig.Instance.WakeLock);
-        Assert.Equal(WakeLockType.No, new DebugBuildConfig().WakeLock);
-        Assert.Equal(WakeLockType.No, new DebugInProcessConfig().WakeLock);
+        Assert.Equal(WakeLockType.System, DefaultConfig.Instance.WakeLock);
+        Assert.Equal(WakeLockType.System, new DebugBuildConfig().WakeLock);
+        Assert.Equal(WakeLockType.System, new DebugInProcessConfig().WakeLock);
     }
 
     [TheoryEnvSpecific(EnvRequirement.NonWindows)]
-    [InlineData(WakeLockType.No)]
-    [InlineData(WakeLockType.RequireSystem)]
-    [InlineData(WakeLockType.RequireDisplay)]
+    [InlineData(WakeLockType.None)]
+    [InlineData(WakeLockType.System)]
+    [InlineData(WakeLockType.Display)]
     public void WakeLockIsWindowsOnly(WakeLockType wakeLockType)
     {
         using IDisposable wakeLock = WakeLock.Request(wakeLockType, "dummy");
@@ -43,14 +43,14 @@ public class WakeLockTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
     [FactEnvSpecific(EnvRequirement.WindowsOnly)]
     public void WakeLockSleepOrDisplayIsAllowed()
     {
-        using IDisposable wakeLock = WakeLock.Request(WakeLockType.No, "dummy");
+        using IDisposable wakeLock = WakeLock.Request(WakeLockType.None, "dummy");
         Assert.Null(wakeLock);
     }
 
     [FactEnvSpecific(EnvRequirement.WindowsOnly)]
     public void WakeLockRequireSystem()
     {
-        using (IDisposable wakeLock = WakeLock.Request(WakeLockType.RequireSystem, "WakeLockTests"))
+        using (IDisposable wakeLock = WakeLock.Request(WakeLockType.System, "WakeLockTests"))
         {
             Assert.NotNull(wakeLock);
             Assert.Equal("SYSTEM", GetPowerRequests("WakeLockTests"));
@@ -61,7 +61,7 @@ public class WakeLockTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
     [FactEnvSpecific(EnvRequirement.WindowsOnly)]
     public void WakeLockRequireDisplay()
     {
-        using (IDisposable wakeLock = WakeLock.Request(WakeLockType.RequireDisplay, "WakeLockTests"))
+        using (IDisposable wakeLock = WakeLock.Request(WakeLockType.Display, "WakeLockTests"))
         {
             Assert.NotNull(wakeLock);
             Assert.Equal("DISPLAY, SYSTEM", GetPowerRequests("WakeLockTests"));
@@ -73,7 +73,7 @@ public class WakeLockTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
     public void BenchmarkRunnerIgnoresWakeLock() =>
         _ = CanExecute<IgnoreWakeLock>(fullValidation: false);
 
-    [WakeLock(WakeLockType.RequireDisplay)]
+    [WakeLock(WakeLockType.Display)]
     public class IgnoreWakeLock
     {
         [Benchmark] public void Sleep() { }
@@ -83,7 +83,8 @@ public class WakeLockTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
     [SupportedOSPlatform("windows")]
 #endif
     [TheoryEnvSpecific(EnvRequirement.WindowsOnly)]
-    [InlineData(typeof(Sleepy), "")]
+    [InlineData(typeof(Default), "SYSTEM")]
+    [InlineData(typeof(None), "")]
     [InlineData(typeof(RequireSystem), "SYSTEM")]
     [InlineData(typeof(RequireDisplay), "DISPLAY, SYSTEM")]
     public async Task BenchmarkRunnerAcquiresWakeLock(Type type, string expected)
@@ -106,11 +107,13 @@ public class WakeLockTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
         }
     }
 
-    public class Sleepy : Base { }
+    public class Default : Base { }
 
-    [WakeLock(WakeLockType.RequireSystem)] public class RequireSystem : Base { }
+    [WakeLock(WakeLockType.None)] public class None : Base { }
 
-    [WakeLock(WakeLockType.RequireDisplay)] public class RequireDisplay : Base { }
+    [WakeLock(WakeLockType.System)] public class RequireSystem : Base { }
+
+    [WakeLock(WakeLockType.Display)] public class RequireDisplay : Base { }
 
     public class Base
     {

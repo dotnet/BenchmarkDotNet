@@ -336,7 +336,11 @@ namespace BenchmarkDotNet.Configs
                 ? other
                 : TimeSpan.FromMilliseconds(Math.Max(current.TotalMilliseconds, other.TotalMilliseconds));
 
-        private static WakeLockType GetWakeLock(WakeLockType current, WakeLockType other) =>
-            current.CompareTo(other) > 0 ? current : other;
+        private static WakeLockType GetWakeLock(WakeLockType current, WakeLockType other)
+        {
+            if (current == DefaultConfig.Instance.WakeLock) { return other; }
+            if (other == DefaultConfig.Instance.WakeLock) { return current; }
+            return current.CompareTo(other) > 0 ? current : other;
+        }
     }
 }
