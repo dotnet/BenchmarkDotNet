@@ -4,7 +4,7 @@ uid: BenchmarkDotNet.Samples.IntroWakeLock
 
 ## Sample: IntroWakeLock
 
-Running Benchmarks usually takes enough time such that the system enters sleep or turns of the display.
+Running benchmarks may sometimes take enough time such that the system enters sleep or turns off the display.
 
 Using a WakeLock prevents the system doing so.
 
@@ -15,13 +15,13 @@ Using a WakeLock prevents the system doing so.
 ### Command line
 
 ```
---preventSleep No
+--wakeLock None
 ```
 ```
---preventSleep RequireSystem
+--wakeLock System
 ```
 ```
---preventSleep RequireDisplay
+--wakeLock Display
 ```
 
 ### Links
