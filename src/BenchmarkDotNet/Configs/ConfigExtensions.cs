@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Configs
         internal static ILogger GetNonNullCompositeLogger(this IConfig config)
         {
             // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
-            if (config == null || !config.GetLoggers().Any())
+            if (config == null || !config.GetLoggers().Any() || config.GetLoggers().All(x => x is NullLogger))
                 return new CompositeLogger(ImmutableHashSet.Create(ConsoleLogger.Default));
 
             return new CompositeLogger(config.GetLoggers().ToImmutableHashSet());
