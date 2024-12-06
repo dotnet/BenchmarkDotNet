@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    [ThreadingDiagnoser]
-    public class IntroThreadingDiagnoserAutoHideColumns
+    [ExceptionDiagnoser]
+    public class IntroExceptionDiagnoserAfterHideColumns
     {
         [Benchmark]
         public void Benchmark()
