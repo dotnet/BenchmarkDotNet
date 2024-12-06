@@ -36,6 +36,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
         private readonly List<EventProcessor> eventProcessors = new List<EventProcessor>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
+        private readonly List<IColumnHidingRule> autoHidingRules = new List<IColumnHidingRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -234,6 +235,14 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig HideColumns(params string[] columnNames)
         {
             columnHidingRules.AddRange(columnNames.Select(c => new ColumnHidingByNameRule(c)));
+            return this;
+        }
+
+
+        [PublicAPI]
+        public ManualConfig AutoHideColumns(params string[] autoHideRules)
+        {
+            autoHidingRules.AddRange(autoHideRules.Select(c => new ColumnHidingByAutoRule(c)));
             return this;
         }
 
