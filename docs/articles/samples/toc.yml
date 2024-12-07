@@ -124,6 +124,8 @@
   href: IntroTagColumn.md
 - name: IntroTailcall
   href: IntroTailcall.md
+- name: IntroVisualStudioProfiler
+  href: IntroVisualStudioProfiler.md
 - name: IntroWasm
   href: IntroWasm.md
 - name: IntroUnicode
