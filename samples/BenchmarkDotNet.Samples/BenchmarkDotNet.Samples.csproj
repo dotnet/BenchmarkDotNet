@@ -24,7 +24,7 @@
     <!-- The Test SDK is required only for the VSTest Adapter to work -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <!-- This package enables the Visual Studio Profiler integration IntroVisualStudioProfiler.cs -->
-    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="17.13.35603.1" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="17.13.35606.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
