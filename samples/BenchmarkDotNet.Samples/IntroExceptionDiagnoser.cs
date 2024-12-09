@@ -6,20 +6,10 @@ namespace BenchmarkDotNet.Samples
     [ExceptionDiagnoser]
     public class IntroExceptionDiagnoser
     {
-        [Benchmark]
-        public void ThrowExceptionRandomly()
+        [Benchmark] public void NoThrow() { }
+        [Benchmark] public void Throw()
         {
-            try
-            {
-                if (new Random().Next(0, 5) > 1)
-                {
-                    throw new Exception();
-                }
-            }
-            catch
-            {
-                // ignored
-            }
+            try { throw new Exception(); } catch { }
         }
     }
 }

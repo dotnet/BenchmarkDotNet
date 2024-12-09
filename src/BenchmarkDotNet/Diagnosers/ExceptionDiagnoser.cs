@@ -14,9 +14,11 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class ExceptionDiagnoser : IDiagnoser
     {
-        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser();
+        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser(new ExceptionDiagnoserConfig(true));
 
-        private ExceptionDiagnoser() { }
+        public ExceptionDiagnoser(ExceptionDiagnoserConfig config) => Config = config;
+
+        public ExceptionDiagnoserConfig Config { get; }
 
         public IEnumerable<string> Ids => new[] { nameof(ExceptionDiagnoser) };
 
@@ -32,7 +34,10 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(ExceptionsFrequencyMetricDescriptor.Instance, results.ExceptionFrequency);
+            if (Config.DisplayExceptionsIfZeroValue || results.ExceptionFrequency != 0)
+            {
+                yield return new Metric(ExceptionsFrequencyMetricDescriptor.Instance, results.ExceptionFrequency);
+            }
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
