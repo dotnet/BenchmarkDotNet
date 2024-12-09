@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -14,9 +15,11 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class ExceptionDiagnoser : IDiagnoser
     {
-        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser();
+        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: true));
 
-        private ExceptionDiagnoser() { }
+        public ExceptionDiagnoser(ExceptionDiagnoserConfig config) => Config = config;
+
+        public ExceptionDiagnoserConfig Config { get; }
 
         public IEnumerable<string> Ids => new[] { nameof(ExceptionDiagnoser) };
 
@@ -32,15 +35,23 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(ExceptionsFrequencyMetricDescriptor.Instance, results.ExceptionFrequency);
+            var descriptor = ExceptionsFrequencyMetricDescriptor.Instance;
+
+            if (descriptor is ExceptionsFrequencyMetricDescriptor concreteDescriptor)
+            {
+                concreteDescriptor.SetConfiguration(Config);
+            }
+
+            yield return new Metric(descriptor, results.ExceptionFrequency);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
-
-        private class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
+        private class ExceptionsFrequencyMetricDescriptor: MetricDescriptorConfigurationHandler<ExceptionDiagnoserConfig>, IMetricDescriptor
         {
-            internal static readonly IMetricDescriptor Instance = new ExceptionsFrequencyMetricDescriptor();
+            public static IMetricDescriptor Instance
+                => MetricDescriptorSingletonBase<ExceptionsFrequencyMetricDescriptor>.Instance;
 
+            // IMetricDescriptor properties
             public string Id => "ExceptionFrequency";
             public string DisplayName => Column.Exceptions;
             public string Legend => "Exceptions thrown per single operation";
@@ -49,7 +60,8 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
+
+            public bool GetIsAvailable(Metric metric) => Config.DisplayExceptionsIfZeroValue || metric.Value > 0;
         }
     }
 }

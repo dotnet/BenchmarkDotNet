@@ -38,6 +38,42 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] bool GetIsAvailable(Metric metric);
     }
 
+    public interface IMetricDescriptorConfigurationHandler<TConfig>
+    {
+        void SetConfiguration(TConfig config);
+    }
+
+    public class MetricDescriptorConfigurationHandler<TConfig> : IMetricDescriptorConfigurationHandler<TConfig>
+    {
+        private TConfig _config;
+
+        protected TConfig Config => _config;
+
+        public virtual void SetConfiguration(TConfig config)
+        {
+            _config = config;
+        }
+    }
+
+    public abstract class MetricDescriptorSingletonBase<T> where T : class, new()
+    {
+        private static T _instance;
+
+        protected MetricDescriptorSingletonBase() { }
+
+        public static T Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new T();
+                }
+                return _instance;
+            }
+        }
+    }
+
     public class MetricDescriptorEqualityComparer : EqualityComparer<IMetricDescriptor>
     {
         public static readonly EqualityComparer<IMetricDescriptor> Instance = new MetricDescriptorEqualityComparer();

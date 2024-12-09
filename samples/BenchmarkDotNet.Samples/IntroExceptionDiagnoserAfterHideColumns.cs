@@ -16,5 +16,12 @@ namespace BenchmarkDotNet.Samples
         {
             Thread.Sleep(1);
         }
+
+        [Benchmark] public void NoThrow() { }
+        [Benchmark]
+        public void Throw()
+        {
+            //try { throw new Exception(); } catch { }
+        }
     }
 }
