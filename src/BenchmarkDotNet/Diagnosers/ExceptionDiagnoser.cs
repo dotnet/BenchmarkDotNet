@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -14,9 +15,11 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class ExceptionDiagnoser : IDiagnoser
     {
-        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser();
+        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: true));
 
-        private ExceptionDiagnoser() { }
+        public ExceptionDiagnoser(ExceptionDiagnoserConfig config) => Config = config;
+
+        public ExceptionDiagnoserConfig Config { get; }
 
         public IEnumerable<string> Ids => new[] { nameof(ExceptionDiagnoser) };
 

@@ -15,9 +15,10 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class ThreadingDiagnoser : IDiagnoser
     {
-        public static readonly ThreadingDiagnoser Default = new ThreadingDiagnoser();
+        public static readonly ThreadingDiagnoser Default = new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: true, displayLockContentionWhenZero: true));
 
-        private ThreadingDiagnoser() { }
+        public ThreadingDiagnoser(ThreadingDiagnoserConfig config) => Config = config;
+        public ThreadingDiagnoserConfig Config { get; }
 
         public IEnumerable<string> Ids => new[] { nameof(ThreadingDiagnoser) };
 
