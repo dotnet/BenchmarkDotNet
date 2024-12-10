@@ -34,8 +34,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
-            yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
+
+            yield return new Metric(new CompletedWorkItemCountMetricDescriptor(Config), results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
+            yield return new Metric(new LockContentionCountMetricDescriptor(Config), results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
@@ -53,8 +54,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         private class CompletedWorkItemCountMetricDescriptor : IMetricDescriptor
         {
-            internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
-
+            private readonly ThreadingDiagnoserConfig? _config;
+            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
+            {
+                _config = config;
+            }
             public string Id => "CompletedWorkItemCount";
             public string DisplayName => Column.CompletedWorkItems;
             public string Legend => "The number of work items that have been processed in ThreadPool (per single operation)";
@@ -63,12 +67,22 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
+            public bool GetIsAvailable(Metric metric)
+            {
+                if (_config == null)
+                    return metric.Value > 0;
+                else
+                    return _config.DisplayCompletedWorkItemCountWhenZero || metric.Value > 0;
+            }
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
         {
-            internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
+            private readonly ThreadingDiagnoserConfig? _config;
+            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
+            {
+                _config = config;
+            }
 
             public string Id => "LockContentionCount";
             public string DisplayName => Column.LockContentions;
@@ -78,7 +92,13 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
+            public bool GetIsAvailable(Metric metric)
+            {
+                if (_config == null)
+                    return metric.Value > 0;
+                else
+                    return _config.DisplayLockContentionWhenZero || metric.Value > 0;
+            }
         }
     }
 }

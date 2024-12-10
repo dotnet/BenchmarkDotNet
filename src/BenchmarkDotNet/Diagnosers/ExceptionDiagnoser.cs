@@ -35,14 +35,18 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(ExceptionsFrequencyMetricDescriptor.Instance, results.ExceptionFrequency);
+            yield return new Metric(new ExceptionsFrequencyMetricDescriptor(Config), results.ExceptionFrequency);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
         private class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
         {
-            internal static readonly IMetricDescriptor Instance = new ExceptionsFrequencyMetricDescriptor();
+            private readonly ExceptionDiagnoserConfig? _config;
+            public ExceptionsFrequencyMetricDescriptor(ExceptionDiagnoserConfig config = null)
+            {
+                _config = config;
+            }
 
             public string Id => "ExceptionFrequency";
             public string DisplayName => Column.Exceptions;
@@ -52,7 +56,13 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
+            public bool GetIsAvailable(Metric metric)
+            {
+                if (_config == null)
+                    return metric.Value > 0;
+                else
+                    return _config.DisplayExceptionsIfZeroValue || metric.Value > 0;
+            }
         }
     }
 }
