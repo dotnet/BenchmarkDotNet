@@ -35,23 +35,19 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            var descriptor = ExceptionsFrequencyMetricDescriptor.Instance;
-
-            if (descriptor is ExceptionsFrequencyMetricDescriptor concreteDescriptor)
-            {
-                concreteDescriptor.SetConfiguration(Config);
-            }
-
-            yield return new Metric(descriptor, results.ExceptionFrequency);
+            yield return new Metric(new ExceptionsFrequencyMetricDescriptor(Config), results.ExceptionFrequency);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
-        private class ExceptionsFrequencyMetricDescriptor: MetricDescriptorConfigurationHandler<ExceptionDiagnoserConfig>, IMetricDescriptor
-        {
-            public static IMetricDescriptor Instance
-                => MetricDescriptorSingletonBase<ExceptionsFrequencyMetricDescriptor>.Instance;
 
-            // IMetricDescriptor properties
+        private class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
+        {
+            private readonly ExceptionDiagnoserConfig? _config;
+            public ExceptionsFrequencyMetricDescriptor(ExceptionDiagnoserConfig config = null)
+            {
+                _config = config;
+            }
+
             public string Id => "ExceptionFrequency";
             public string DisplayName => Column.Exceptions;
             public string Legend => "Exceptions thrown per single operation";
@@ -60,8 +56,13 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-
-            public bool GetIsAvailable(Metric metric) => Config.DisplayExceptionsIfZeroValue || metric.Value > 0;
+            public bool GetIsAvailable(Metric metric)
+            {
+                if (_config == null)
+                    return metric.Value > 0;
+                else
+                    return _config.DisplayExceptionsIfZeroValue || metric.Value > 0;
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -165,6 +167,23 @@ namespace BenchmarkDotNet.Tests.Reports
                 }
                 return System.Array.Empty<Metric>();
             });
+            var table = new SummaryTable(summary);
+            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+
+            // assert
+            Assert.Equal(new[] { "-", "NA" }, actual);
+        }
+
+        [Fact] // Issue #2673
+        public void ThereNoConfigurationToExceptionDiagnoser()
+        {
+            // arrange
+            var config = ManualConfig.CreateEmpty().AddDiagnoser(ExceptionDiagnoser.Default);
+            var fakeMetricDescriptor = new FakeMetricDescriptor("ExceptionFrequency", "Exceptions thrown per single operation", "#0.0000");
+            var metrics = new[] { new Metric(fakeMetricDescriptor, 0) };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
             var table = new SummaryTable(summary);
             var actual = table.Columns.First(c => c.Header == "metric1").Content;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    [ThreadingDiagnoser(false, false)]
+    [ThreadingDiagnoser(false, true)]
     public class IntroThreadingDiagnoserAfterHideColumns
     {
         [Benchmark]
