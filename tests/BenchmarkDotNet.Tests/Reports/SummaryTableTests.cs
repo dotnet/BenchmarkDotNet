@@ -174,21 +174,267 @@ namespace BenchmarkDotNet.Tests.Reports
             Assert.Equal(new[] { "-", "NA" }, actual);
         }
 
-        [Fact] // Issue #2673
-        public void ThereNoConfigurationToExceptionDiagnoser()
+        #region Issue #2673
+        [Fact]
+        public void DefaultExceptionDiagnoserConfig_WhenExceptionsIsNotZero()
         {
+
             // arrange
-            var config = ManualConfig.CreateEmpty().AddDiagnoser(ExceptionDiagnoser.Default);
-            var fakeMetricDescriptor = new FakeMetricDescriptor("ExceptionFrequency", "Exceptions thrown per single operation", "#0.0000");
-            var metrics = new[] { new Metric(fakeMetricDescriptor, 0) };
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var exceptionConfig = new ExceptionDiagnoserConfig();
+            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 5);
+            var metrics = new[] { metric };
 
             // act
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
             var table = new SummaryTable(summary);
-            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+            var actual = table.Columns.First(c => c.Header == "Exceptions").Content;
 
             // assert
-            Assert.Equal(new[] { "-", "NA" }, actual);
+            Assert.Equal(new[] { "5.0000", "5.0000" }, actual);
         }
+
+        [Fact]
+        public void DefaultExceptionDiagnoserConfig_WhenExceptionsIsZero()
+        {
+
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var exceptionConfig = new ExceptionDiagnoserConfig();
+            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 0);
+            var metrics = new[] { metric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+            var actual = table.Columns.First(c => c.Header == "Exceptions").Content;
+
+            // assert
+            Assert.Equal(new[] { "-", "-" }, actual);
+        }
+
+        [Fact]
+        public void HideExceptionDiagnoserConfig_WhenExceptionsIsNotZero()
+        {
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var exceptionConfig = new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false);
+            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 5);
+            var metrics = new[] { metric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+            var actual = table.Columns.First(c => c.Header == "Exceptions").Content;
+
+            // assert
+            Assert.Equal(new[] { "5.0000", "5.0000" }, actual);
+        }
+
+        [Fact]
+        public void HideExceptionDiagnoserConfig_WhenExceptionsIsZero()
+        {
+
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var exceptionConfig = new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false);
+            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 0);
+            var metrics = new[] { metric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+            var isExist = table.Columns.Any(c => c.Header == "Exceptions");
+
+            // assert
+            Assert.False(isExist);
+        }
+
+        [Fact]
+        public void DefaultThreadingDiagnoserConfig_WhenDescriptorValuesAreNotZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig();
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 5);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 5);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            var lockContentionCount = table.Columns.FirstOrDefault(c => c.Header == "Lock Contentions").Content;
+            var completedWorkItemCount = table.Columns.FirstOrDefault(c => c.Header == "Completed Work Items").Content;
+
+            // assert
+            Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
+            Assert.Equal(new[] { "5.0000", "5.0000" }, completedWorkItemCount);
+        }
+
+        [Fact]
+        public void DefaultThreadingDiagnoserConfig_WhenDescriptorValuesAreZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig();
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            var lockContentionCount = table.Columns.FirstOrDefault(c => c.Header == "Lock Contentions").Content;
+            var completedWorkItemCount = table.Columns.FirstOrDefault(c => c.Header == "Completed Work Items").Content;
+
+            // assert
+            Assert.Equal(new[] { "-", "-" }, lockContentionCount);
+            Assert.Equal(new[] { "-", "-" }, completedWorkItemCount);
+        }
+
+        [Fact]
+        public void HideLockContentionCountThreadingDiagnoserConfig_WhenDescriptorValuesAreZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig(displayLockContentionWhenZero: false);
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            string[]? lockContentionCount = table.Columns?.FirstOrDefault(c => c.Header == "Lock Contentions")?.Content ?? null;
+            string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
+
+            // assert
+            Assert.Null(lockContentionCount);
+            Assert.Equal(new[] { "-", "-" }, completedWorkItemCount);
+        }
+
+        [Fact]
+        public void HideLockContentionCountThreadingDiagnoserConfig_WhenDescriptorValuesAreNotZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig(displayLockContentionWhenZero: false);
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 5);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 5);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            string[]? lockContentionCount = table.Columns?.FirstOrDefault(c => c.Header == "Lock Contentions")?.Content ?? null;
+            string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
+
+            // assert
+            Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
+            Assert.Equal(new[] { "5.0000", "5.0000" }, completedWorkItemCount);
+        }
+
+        [Fact]
+        public void HideCompletedWorkItemCountThreadingDiagnoserConfig_WhenDescriptorValuesAreZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false);
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            string[]? lockContentionCount = table.Columns?.FirstOrDefault(c => c.Header == "Lock Contentions")?.Content ?? null;
+            string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
+
+            // assert
+            Assert.Null(completedWorkItemCount);
+            Assert.Equal(new[] { "-", "-" }, lockContentionCount);
+        }
+
+        [Fact]
+        public void HideCompletedWorkItemCountThreadingDiagnoserConfig_WhenDescriptorValuesAreNotZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false);
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 5);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 5);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            string[]? lockContentionCount = table.Columns?.FirstOrDefault(c => c.Header == "Lock Contentions")?.Content ?? null;
+            string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
+
+            // assert
+            Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
+            Assert.Equal(new[] { "5.0000", "5.0000" }, completedWorkItemCount);
+        }
+
+        [Fact]
+        public void HideThreadingDiagnoserConfigs_WhenDescriptorValuesAreZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false);
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            string[]? lockContentionCount = table.Columns?.FirstOrDefault(c => c.Header == "Lock Contentions")?.Content ?? null;
+            string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
+
+            // assert
+            Assert.Null(lockContentionCount);
+            Assert.Null(completedWorkItemCount);
+        }
+
+        [Fact]
+        public void DisplayThreadingDiagnoserConfigs_WhenDescriptorValuesAreZero()
+        {
+
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: true, displayLockContentionWhenZero: true);
+            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
+            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+            var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+
+            string[]? lockContentionCount = table.Columns?.FirstOrDefault(c => c.Header == "Lock Contentions")?.Content ?? null;
+            string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
+
+            // assert
+            Assert.Equal(new[] { "-", "-" }, lockContentionCount);
+            Assert.Equal(new[] { "-", "-" }, completedWorkItemCount);
+        }
+        #endregion
     }
 }

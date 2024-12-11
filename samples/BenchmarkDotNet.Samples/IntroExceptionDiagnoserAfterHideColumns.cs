@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         public void Throw()
         {
-            //try { throw new Exception(); } catch { }
+            try { throw new Exception(); } catch { }
         }
     }
 }
