@@ -52,14 +52,12 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private class CompletedWorkItemCountMetricDescriptor : IMetricDescriptor
+        internal class CompletedWorkItemCountMetricDescriptor : DescriptorConfigInjector<ThreadingDiagnoserConfig>, IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
 
-            private readonly ThreadingDiagnoserConfig? _config;
-            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
+            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null) : base(config)
             {
-                _config = config;
             }
             public string Id => "CompletedWorkItemCount";
             public string DisplayName => Column.CompletedWorkItems;
@@ -71,21 +69,19 @@ namespace BenchmarkDotNet.Diagnosers
             public int PriorityInCategory => 0;
             public bool GetIsAvailable(Metric metric)
             {
-                if (_config == null)
+                if (Config == null)
                     return metric.Value > 0;
                 else
-                    return _config.DisplayCompletedWorkItemCountWhenZero || metric.Value > 0;
+                    return Config.DisplayCompletedWorkItemCountWhenZero || metric.Value > 0;
             }
         }
 
-        private class LockContentionCountMetricDescriptor : IMetricDescriptor
+        internal class LockContentionCountMetricDescriptor : DescriptorConfigInjector<ThreadingDiagnoserConfig>, IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
 
-            private readonly ThreadingDiagnoserConfig? _config;
-            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
+            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null) : base(config)
             {
-                _config = config;
             }
 
             public string Id => "LockContentionCount";
@@ -98,10 +94,10 @@ namespace BenchmarkDotNet.Diagnosers
             public int PriorityInCategory => 0;
             public bool GetIsAvailable(Metric metric)
             {
-                if (_config == null)
+                if (Config == null)
                     return metric.Value > 0;
                 else
-                    return _config.DisplayLockContentionWhenZero || metric.Value > 0;
+                    return Config.DisplayLockContentionWhenZero || metric.Value > 0;
             }
         }
     }

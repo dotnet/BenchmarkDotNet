@@ -182,7 +182,10 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var exceptionConfig = new ExceptionDiagnoserConfig();
-            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 5);
+
+            var exceptionsFrequencyMetricDescriptor = new ExceptionDiagnoser.ExceptionsFrequencyMetricDescriptor(exceptionConfig);
+
+            var metric = new Metric(exceptionsFrequencyMetricDescriptor, 5);
             var metrics = new[] { metric };
 
             // act
@@ -202,7 +205,10 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var exceptionConfig = new ExceptionDiagnoserConfig();
-            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 0);
+
+            var exceptionsFrequencyMetricDescriptor = new ExceptionDiagnoser.ExceptionsFrequencyMetricDescriptor(exceptionConfig);
+
+            var metric = new Metric(exceptionsFrequencyMetricDescriptor, 0);
             var metrics = new[] { metric };
 
             // act
@@ -220,7 +226,10 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var exceptionConfig = new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false);
-            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 5);
+
+            var exceptionsFrequencyMetricDescriptor = new ExceptionDiagnoser.ExceptionsFrequencyMetricDescriptor(exceptionConfig);
+
+            var metric = new Metric(exceptionsFrequencyMetricDescriptor, 5);
             var metrics = new[] { metric };
 
             // act
@@ -240,7 +249,10 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var exceptionConfig = new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false);
-            var metric = new Metric(new DescriptorWithConfigurations.ExceptionsFrequencyMetricDescriptor(exceptionConfig), 0);
+
+            var exceptionsFrequencyMetricDescriptor = new ExceptionDiagnoser.ExceptionsFrequencyMetricDescriptor(exceptionConfig);
+
+            var metric = new Metric(exceptionsFrequencyMetricDescriptor, 0);
             var metrics = new[] { metric };
 
             // act
@@ -259,8 +271,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig();
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 5);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 5);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 5);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 5);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -282,8 +298,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig();
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 0);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 0);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -305,8 +325,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig(displayLockContentionWhenZero: false);
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 0);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 0);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -328,8 +352,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig(displayLockContentionWhenZero: false);
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 5);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 5);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 5);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 5);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -351,8 +379,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false);
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 0);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 0);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -374,8 +406,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false);
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 5);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 5);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 5);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 5);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -397,8 +433,12 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false);
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 0);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 0);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
@@ -420,8 +460,11 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var threadingConfig = new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: true, displayLockContentionWhenZero: true);
-            var lockContentionCountMetric = new Metric(new DescriptorWithConfigurations.LockContentionCountMetricDescriptor(threadingConfig), 0);
-            var completedWorkItemMetric = new Metric(new DescriptorWithConfigurations.CompletedWorkItemCountMetricDescriptor(threadingConfig), 0);
+            var lockContentionCountMetricDescriptor = new ThreadingDiagnoser.LockContentionCountMetricDescriptor(threadingConfig);
+            var completedWorkItemCountMetricDescriptor = new ThreadingDiagnoser.CompletedWorkItemCountMetricDescriptor(threadingConfig);
+
+            var lockContentionCountMetric = new Metric(lockContentionCountMetricDescriptor, 0);
+            var completedWorkItemMetric = new Metric(completedWorkItemCountMetricDescriptor, 0);
             var metrics = new[] { lockContentionCountMetric, completedWorkItemMetric };
 
             // act
