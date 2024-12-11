@@ -54,6 +54,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private class CompletedWorkItemCountMetricDescriptor : IMetricDescriptor
         {
+            internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
+
             private readonly ThreadingDiagnoserConfig? _config;
             public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
             {
@@ -78,6 +80,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
         {
+            internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
+
             private readonly ThreadingDiagnoserConfig? _config;
             public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
             {
