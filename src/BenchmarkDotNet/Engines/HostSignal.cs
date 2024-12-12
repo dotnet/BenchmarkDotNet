@@ -8,6 +8,11 @@
         BeforeProcessStart,
 
         /// <summary>
+        /// right after we start the benchmarking process
+        /// </summary>
+        AfterProcessStart,
+
+        /// <summary>
         /// before jitting, warmup
         /// </summary>
         BeforeAnythingElse,

@@ -79,6 +79,8 @@ namespace BenchmarkDotNet.Toolchains
                 return new ExecuteResult(true, null, null, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), launchIndex);
             }
 
+            broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+
             processOutputReader.BeginRead();
 
             process.EnsureHighPriority(logger);
