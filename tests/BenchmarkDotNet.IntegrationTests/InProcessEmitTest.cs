@@ -71,6 +71,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var benchmarkCase = summary.BenchmarksCases.First();
             var caseName = $"{benchmarkCase.Descriptor.Type.Assembly.GetName().Name}-{benchmarkCase.Job.FolderInfo}";
+            // The benchmark config built jobs with 2 toolchains, 1 InProcessEmit and 1 Roslyn,
+            // so we need to subtract 1 from the partition counter to obtain the emit output.
             NaiveRunnableEmitDiff.RunDiff(
                 $@"{caseName}-{BuildPartition.s_partitionCounter}.exe",
                 $@"{caseName}-{BuildPartition.s_partitionCounter - 1}Emitted.dll",
