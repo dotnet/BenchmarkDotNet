@@ -10,6 +10,7 @@ using BenchmarkDotNet.IntegrationTests.InProcess.EmitTests;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -68,10 +69,13 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!Portability.RuntimeInformation.IsFullFramework)
                 return;
 
-            var caseName = summary.BenchmarksCases.First().Job.ToString();
+            var benchmarkCase = summary.BenchmarksCases.First();
+            var caseName = $"{benchmarkCase.Descriptor.Type.Assembly.GetName().Name}-{benchmarkCase.Job.FolderInfo}";
+            // The benchmark config built jobs with 2 toolchains, 1 InProcessEmit and 1 Roslyn,
+            // so we need to subtract 1 from the partition counter to obtain the emit output.
             NaiveRunnableEmitDiff.RunDiff(
-                $@"{caseName}.exe",
-                $@"{caseName}Emitted.dll",
+                $@"{caseName}-{BuildPartition.s_partitionCounter}.exe",
+                $@"{caseName}-{BuildPartition.s_partitionCounter - 1}Emitted.dll",
                 ConsoleLogger.Default);
         }
 
