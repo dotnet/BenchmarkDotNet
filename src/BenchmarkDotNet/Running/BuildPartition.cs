@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Running
     {
         // We use an auto-increment global counter instead of Guid to guarantee uniqueness per benchmark run (Guid has a small chance to collide),
         // assuming there are fewer than 4 billion build partitions (a safe assumption).
-        private static int s_partitionCounter;
+        internal static int s_partitionCounter;
 
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
