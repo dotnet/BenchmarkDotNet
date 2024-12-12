@@ -24,8 +24,8 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                     netCoreAppSettings.CustomRuntimePack,
                     netCoreAppSettings.AOTCompilerPath,
                     netCoreAppSettings.AOTCompilerMode),
-                new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
-                    netCoreAppSettings.CustomDotNetCliPath),
+                // We have no tests for this toolchain, so not including ArtifactsPath in case it fails the same as wasm.
+                new DotNetCliBuilder(netCoreAppSettings.CustomDotNetCliPath, logOutput: false, useArtifactsPathIfSupported: false),
                 new Executor(),
                 netCoreAppSettings.CustomDotNetCliPath);
 
