@@ -52,12 +52,14 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        internal class CompletedWorkItemCountMetricDescriptor : DescriptorConfigInjector<ThreadingDiagnoserConfig>, IMetricDescriptor
+        internal class CompletedWorkItemCountMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
 
-            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null) : base(config)
+            private ThreadingDiagnoserConfig Config { get; }
+            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
             {
+                Config = config;
             }
             public string Id => "CompletedWorkItemCount";
             public string DisplayName => Column.CompletedWorkItems;
@@ -76,12 +78,15 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        internal class LockContentionCountMetricDescriptor : DescriptorConfigInjector<ThreadingDiagnoserConfig>, IMetricDescriptor
+        internal class LockContentionCountMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
 
-            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null) : base(config)
+            private ThreadingDiagnoserConfig Config { get; }
+
+            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
             {
+                Config = config;
             }
 
             public string Id => "LockContentionCount";

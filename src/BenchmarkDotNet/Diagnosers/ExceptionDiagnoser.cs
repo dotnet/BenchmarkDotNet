@@ -40,10 +40,12 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
-        internal class ExceptionsFrequencyMetricDescriptor : DescriptorConfigInjector<ExceptionDiagnoserConfig>, IMetricDescriptor
+        internal class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
         {
-            public ExceptionsFrequencyMetricDescriptor(ExceptionDiagnoserConfig config = null) : base(config)
+            public ExceptionDiagnoserConfig Config { get; }
+            public ExceptionsFrequencyMetricDescriptor(ExceptionDiagnoserConfig config = null)
             {
+                Config = config;
             }
 
             public string Id => "ExceptionFrequency";
