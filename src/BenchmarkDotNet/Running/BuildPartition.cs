@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -18,15 +19,20 @@ namespace BenchmarkDotNet.Running
 {
     public class BuildPartition
     {
+        // We use an auto-increment global counter instead of Guid to guarantee uniqueness per benchmark run (Guid has a small chance to collide),
+        // assuming there are fewer than 4 billion build partitions (a safe assumption).
+        private static int s_partitionCounter;
+
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            var keepBenchmarkFiles = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
-            var guid = Guid.NewGuid().ToString();
-            ProgramName = keepBenchmarkFiles ? RepresentativeBenchmarkCase.Job.FolderInfo : guid;
-            ProgramDirectory = keepBenchmarkFiles ? Path.Combine(RepresentativeBenchmarkCase.Job.FolderInfo, guid) : guid;
+            // Combine the benchmark's assembly name, folder info, and build partition id.
+            string benchmarkAssemblyName = RepresentativeBenchmarkCase.Descriptor.Type.Assembly.GetName().Name;
+            string folderInfo = RepresentativeBenchmarkCase.Job.FolderInfo;
+            int id = Interlocked.Increment(ref s_partitionCounter);
+            ProgramName = $"{benchmarkAssemblyName}-{folderInfo}-{id}";
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }
@@ -34,8 +40,6 @@ namespace BenchmarkDotNet.Running
         public BenchmarkBuildInfo[] Benchmarks { get; }
 
         public string ProgramName { get; }
-
-        public string ProgramDirectory { get; }
 
         /// <summary>
         /// the benchmarks are grouped by the build settings

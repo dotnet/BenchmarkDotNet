@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     [PublicAPI]
     public class Generator : GeneratorBase
     {
-        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programDirectory)
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
             => Path.GetDirectoryName(buildPartition.AssemblyLocation);
 
         [PublicAPI]

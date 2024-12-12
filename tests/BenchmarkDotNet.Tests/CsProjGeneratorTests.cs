@@ -220,9 +220,9 @@ namespace BenchmarkDotNet.Tests
 
         private class SteamLoadedBuildPartition : CsProjGenerator
         {
-            internal string ResolvePathForBinaries(BuildPartition buildPartition, string programDirectory)
+            internal string ResolvePathForBinaries(BuildPartition buildPartition, string programName)
             {
-                return base.GetBuildArtifactsDirectoryPath(buildPartition, programDirectory);
+                return base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
             }
 
             public SteamLoadedBuildPartition(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion, bool isNetCore)
