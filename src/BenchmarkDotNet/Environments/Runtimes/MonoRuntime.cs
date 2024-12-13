@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Environments
         public static readonly MonoRuntime Mono70 = new ("Mono with .NET 7.0", RuntimeMoniker.Mono70, "net7.0", isDotNetBuiltIn: true);
         public static readonly MonoRuntime Mono80 = new ("Mono with .NET 8.0", RuntimeMoniker.Mono80, "net8.0", isDotNetBuiltIn: true);
         public static readonly MonoRuntime Mono90 = new ("Mono with .NET 9.0", RuntimeMoniker.Mono90, "net9.0", isDotNetBuiltIn: true);
+        public static readonly MonoRuntime Mono10_0 = new ("Mono with .NET 10.0", RuntimeMoniker.Mono10_0, "net10.0", isDotNetBuiltIn: true);
 
         public string CustomPath { get; }
 
