@@ -30,6 +30,14 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
+        [Fact]
+        public void ExceptionTest()
+        {
+            var config = CreateConfig();
+
+            var summary = BenchmarkRunner.Run<ExceptionCount>(config);
+        }
+
         public class ExceptionCount
         {
             [Benchmark]
@@ -44,6 +52,19 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public void DoNothing() { }
+
+            [Benchmark]
+            public void NoThrow() { }
+
+            [Benchmark]
+            public void Throw()
+            {
+                try
+                {
+                    throw new Exception();
+                }
+                catch { }
+            }
 
             [Benchmark]
             public async Task ThrowFromMultipleThreads()
