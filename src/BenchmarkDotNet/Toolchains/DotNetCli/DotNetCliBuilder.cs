@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
             var cliCommand = new DotNetCliCommand(
-                generateResult.ArtifactsPaths.BuildForReferencesProjectFilePath,
+                generateResult.ArtifactsPaths.BuildTraversalProjectFilePath,
                 CustomDotNetCliPath,
                 string.Empty,
                 generateResult,
@@ -75,11 +75,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             foreach (var assemblyFile in Directory.GetFiles(artifactsPaths.BinariesDirectoryPath, "*.dll"))
             {
                 var assemblyName = Path.GetFileNameWithoutExtension(assemblyFile);
-                // The dummy csproj was used to build the original project, but it also outputs a dll for itself which we need to ignore because it's not valid.
-                if (assemblyName == artifactsPaths.ProgramName)
-                {
-                    continue;
-                }
                 var referenceElement = xmlDoc.CreateElement("Reference");
                 itemGroup.AppendChild(referenceElement);
                 referenceElement.SetAttribute("Include", assemblyName);

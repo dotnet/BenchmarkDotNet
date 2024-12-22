@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             baseArtifacts.AppConfigPath,
             baseArtifacts.NuGetConfigPath,
             baseArtifacts.ProjectFilePath,
-            baseArtifacts.BuildForReferencesProjectFilePath,
+            baseArtifacts.BuildTraversalProjectFilePath,
             baseArtifacts.BuildScriptFilePath,
             baseArtifacts.ExecutablePath,
             baseArtifacts.ProgramName,
