@@ -85,7 +85,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
                 .Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver))
                 .Replace("$COPIEDSETTINGS$", customProperties)
-                .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                 .Replace("$SDKNAME$", sdkName)
                 .ToString();
 
