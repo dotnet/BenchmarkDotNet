@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
             var cliCommand = new DotNetCliCommand(
-                generateResult.ArtifactsPaths.BuildForReferencesProjectFilePath,
+                generateResult.ArtifactsPaths.BuildTraversalProjectFilePath,
                 CustomDotNetCliPath,
                 string.Empty,
                 generateResult,
