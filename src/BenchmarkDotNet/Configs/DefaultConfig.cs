@@ -11,6 +11,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
@@ -38,6 +39,11 @@ namespace BenchmarkDotNet.Configs
             yield return CsvExporter.Default;
             yield return MarkdownExporter.GitHub;
             yield return HtmlExporter.Default;
+        }
+
+        public IEnumerable<ILocator> GetLocators()
+        {
+            yield return ProjectLocator.Default;
         }
 
         public IEnumerable<ILogger> GetLoggers()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -11,6 +11,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -71,7 +72,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
+            var projectFile = GetProjectFilePath(benchmark, logger);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(projectFile.FullName);
@@ -246,8 +247,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         /// returns a path to the project file which defines the benchmarks
         /// </summary>
         [PublicAPI]
-        protected virtual FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
+        protected virtual FileInfo GetProjectFilePath(BenchmarkCase benchmark, ILogger logger)
         {
+            var benchmarkTarget = benchmark.Descriptor.Type;
+
             if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(
@@ -255,27 +258,21 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             }
 
-            // important assumption! project's file name === output dll name
-            string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
-
-            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
-            var projectFiles = rootDirectory
-                .EnumerateFiles("*proj", SearchOption.AllDirectories)
-                .Where(file => possibleNames.Contains(file.Name))
-                .ToArray();
-
-            if (projectFiles.Length == 0)
+            List<string> notFound = new List<string>();
+            foreach (ILocator locator in benchmark.Config.GetLocators())
             {
-                throw new NotSupportedException(
-                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
-            }
-            else if (projectFiles.Length > 1)
-            {
-                throw new NotSupportedException(
-                    $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: {string.Join(",", projectFiles.Select(pf => $"'{pf.FullName}'"))}. Benchmark project names needs to be unique.");
+                if (locator.LocatorType != LocatorType.ProjectFile)
+                    continue;
+
+                var path = locator.Locate(rootDirectory, benchmarkTarget);
+
+                if (path.Exists)
+                    return path;
+
+                notFound.Add(path.FullName);
             }
 
-            return projectFiles[0];
+            throw new NotSupportedException($"Unable to find project file in {rootDirectory}. Attempted location(s): " + string.Join(", ", notFound));
         }
 
         public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);

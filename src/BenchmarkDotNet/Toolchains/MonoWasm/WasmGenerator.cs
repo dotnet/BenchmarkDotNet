@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         protected void GenerateProjectFile(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, bool aot, ILogger logger)
         {
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
+            var projectFile = GetProjectFilePath(benchmark, logger);
 
             WasmRuntime runtime = (WasmRuntime) buildPartition.Runtime;
 

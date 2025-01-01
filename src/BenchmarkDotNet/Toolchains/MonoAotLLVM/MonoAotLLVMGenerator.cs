@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
+            var projectFile = GetProjectFilePath(benchmark, logger);
 
             string useLLVM = AotCompilerMode == MonoAotCompilerMode.llvm ? "true" : "false";
 

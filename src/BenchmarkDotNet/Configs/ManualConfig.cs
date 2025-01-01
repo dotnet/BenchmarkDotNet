@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -11,6 +11,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -26,6 +27,7 @@ namespace BenchmarkDotNet.Configs
 
         private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
         private readonly List<IExporter> exporters = new List<IExporter>();
+        private readonly List<ILocator> locators = new List<ILocator>();
         private readonly List<ILogger> loggers = new List<ILogger>();
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
@@ -39,6 +41,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
+        public IEnumerable<ILocator> GetLocators() => locators;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
@@ -136,6 +139,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig AddExporter(params IExporter[] newExporters)
         {
             exporters.AddRange(newExporters);
+            return this;
+        }
+
+        public ManualConfig AddLocator(params ILocator[] newLocators)
+        {
+            locators.AddRange(newLocators);
             return this;
         }
 
@@ -256,6 +265,7 @@ namespace BenchmarkDotNet.Configs
         {
             columnProviders.AddRange(config.GetColumnProviders());
             exporters.AddRange(config.GetExporters());
+            locators.AddRange(config.GetLocators());
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
@@ -287,6 +297,7 @@ namespace BenchmarkDotNet.Configs
         public static ManualConfig CreateMinimumViable()
             => CreateEmpty()
                 .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddLocator(ProjectLocator.Default)
                 .AddLogger(ConsoleLogger.Default);
 
         public static ManualConfig Create(IConfig config)

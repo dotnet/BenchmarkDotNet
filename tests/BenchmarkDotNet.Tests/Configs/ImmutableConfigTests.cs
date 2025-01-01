@@ -8,6 +8,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -451,6 +452,44 @@ namespace BenchmarkDotNet.Tests.Configs
 
             }
 
+        }
+
+        [Fact]
+        public void LocatorsAreAddedCorrectly()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddLocator(ProjectLocator.Default);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            var locator = Assert.Single(final.GetLocators());
+            Assert.Same(ProjectLocator.Default, locator);
+        }
+
+        [Fact]
+        public void DuplicateLocatorsAreAllowed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddLocator(ProjectLocator.Default);
+            mutable.AddLocator(ProjectLocator.Default);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Equal(2, final.GetLocators().Count());
+        }
+
+        [Fact]
+        public void VerifyConfigsHaveLocators()
+        {
+            var minVar = ManualConfig.CreateMinimumViable();
+            var build1 = ImmutableConfigBuilder.Create(minVar);
+            Assert.Single(build1.GetLocators());
+
+            var def = DefaultConfig.Instance;
+            var build2 = ImmutableConfigBuilder.Create(def);
+            Assert.Single(build2.GetLocators());
         }
     }
 }
