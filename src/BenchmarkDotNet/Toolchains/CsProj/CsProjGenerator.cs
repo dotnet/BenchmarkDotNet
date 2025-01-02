@@ -266,6 +266,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 var path = locator.Locate(rootDirectory, benchmarkTarget);
 
+                if (path == null)
+                    continue;
+
                 if (path.Exists)
                     return path;
 

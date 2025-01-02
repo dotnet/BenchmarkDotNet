@@ -26,10 +26,10 @@ public class ProjectLocator : ILocator
 
         if (projectFiles.Length == 0)
         {
-            throw new NotSupportedException(
-                $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
+            return null;
         }
-        else if (projectFiles.Length > 1)
+
+        if (projectFiles.Length > 1)
         {
             throw new NotSupportedException(
                 $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: {string.Join(",", projectFiles.Select(pf => $"'{pf.FullName}'"))}. Benchmark project names needs to be unique.");
