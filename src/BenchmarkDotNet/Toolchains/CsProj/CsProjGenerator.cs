@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using BenchmarkDotNet.Characteristics;
@@ -249,33 +247,26 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(BenchmarkCase benchmark, ILogger logger)
         {
-            var benchmarkTarget = benchmark.Descriptor.Type;
+            var notFound = new List<string>();
+            var args = new LocatorArgs(benchmark, logger);
 
-            if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
+            foreach (var locator in benchmark.Config.GetFileLocators())
             {
-                logger.WriteLineError(
-                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
-                rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+                if (locator.LocatorType != FileLocatorType.Project)
+                {
+                    continue;
+                }
+
+                if (locator.TryLocate(args, out var fileInfo))
+                {
+                    if (fileInfo.Exists)
+                        return fileInfo;
+
+                    notFound.Add(fileInfo.FullName);
+                }
             }
 
-            List<string> notFound = new List<string>();
-            foreach (ILocator locator in benchmark.Config.GetLocators())
-            {
-                if (locator.LocatorType != LocatorType.ProjectFile)
-                    continue;
-
-                var path = locator.Locate(rootDirectory, benchmarkTarget);
-
-                if (path == null)
-                    continue;
-
-                if (path.Exists)
-                    return path;
-
-                notFound.Add(path.FullName);
-            }
-
-            throw new NotSupportedException($"Unable to find project file in {rootDirectory}. Attempted location(s): " + string.Join(", ", notFound));
+            throw new FileNotFoundException("Unable to find project file. Attempted location(s): " + string.Join(", ", notFound));
         }
 
         public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);

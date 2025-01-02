@@ -459,12 +459,12 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddLocator(ProjectLocator.Default);
+            mutable.AddLocator(ProjectFileLocator.Default);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
-            var locator = Assert.Single(final.GetLocators());
-            Assert.Same(ProjectLocator.Default, locator);
+            var locator = Assert.Single(final.GetFileLocators());
+            Assert.Same(ProjectFileLocator.Default, locator);
         }
 
         [Fact]
@@ -472,12 +472,12 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddLocator(ProjectLocator.Default);
-            mutable.AddLocator(ProjectLocator.Default);
+            mutable.AddLocator(ProjectFileLocator.Default);
+            mutable.AddLocator(ProjectFileLocator.Default);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
-            Assert.Equal(2, final.GetLocators().Count());
+            Assert.Equal(2, final.GetFileLocators().Count());
         }
 
         [Fact]
@@ -485,11 +485,11 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var minVar = ManualConfig.CreateMinimumViable();
             var build1 = ImmutableConfigBuilder.Create(minVar);
-            Assert.Single(build1.GetLocators());
+            Assert.Single(build1.GetFileLocators());
 
             var def = DefaultConfig.Instance;
             var build2 = ImmutableConfigBuilder.Create(def);
-            Assert.Single(build2.GetLocators());
+            Assert.Single(build2.GetFileLocators());
         }
     }
 }

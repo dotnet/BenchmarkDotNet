@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Configs
     {
         IEnumerable<IColumnProvider> GetColumnProviders();
         IEnumerable<IExporter> GetExporters();
-        IEnumerable<ILocator> GetLocators();
+        IEnumerable<IFileLocator> GetFileLocators();
         IEnumerable<ILogger> GetLoggers();
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();

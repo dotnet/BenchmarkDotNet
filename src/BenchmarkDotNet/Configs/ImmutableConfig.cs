@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Configs
         // if something is an array here instead of hashset it means it must have a guaranteed order of elements
         private readonly ImmutableArray<IColumnProvider> columnProviders;
         private readonly ImmutableArray<IExporter> exporters;
-        private readonly ImmutableArray<ILocator> locators;
+        private readonly ImmutableArray<IFileLocator> fileLocators;
         private readonly ImmutableHashSet<ILogger> loggers;
         private readonly ImmutableHashSet<IDiagnoser> diagnosers;
         private readonly ImmutableHashSet<IAnalyser> analysers;
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<HardwareCounter> uniqueHardwareCounters,
             ImmutableHashSet<IDiagnoser> uniqueDiagnosers,
             ImmutableArray<IExporter> uniqueExporters,
-            ImmutableArray<ILocator> uniqueLocators,
+            ImmutableArray<IFileLocator> uniqueFileLocators,
             ImmutableHashSet<IAnalyser> uniqueAnalyzers,
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters = uniqueHardwareCounters;
             diagnosers = uniqueDiagnosers;
             exporters = uniqueExporters;
-            locators = uniqueLocators;
+            fileLocators = uniqueFileLocators;
             analysers = uniqueAnalyzers;
             validators = uniqueValidators;
             filters = uniqueFilters;
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
-        public IEnumerable<ILocator> GetLocators() => locators;
+        public IEnumerable<IFileLocator> GetFileLocators() => fileLocators;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;

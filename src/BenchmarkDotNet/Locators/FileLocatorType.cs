@@ -1,6 +1,6 @@
 namespace BenchmarkDotNet.Locators;
 
-public enum LocatorType
+public enum FileLocatorType
 {
-    ProjectFile
+    Project
 }

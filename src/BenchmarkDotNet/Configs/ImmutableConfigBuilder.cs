@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
-            var uniqueLocators = source.GetLocators().ToImmutableArray();
+            var uniqueFileLocators = source.GetFileLocators().ToImmutableArray();
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
-                uniqueLocators,
+                uniqueFileLocators,
                 uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
