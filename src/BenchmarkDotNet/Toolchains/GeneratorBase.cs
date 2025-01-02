@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Toolchains
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
-                buildTraversalProjectFilePath: GetProjectFilePathForReferences(buildArtifactsDirectoryPath),
+                buildForReferencesProjectFilePath: GetProjectFilePathForReferences(buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{OsDetector.ScriptFileExtension}"),
                 executablePath: executablePath,
                 programName: programName,

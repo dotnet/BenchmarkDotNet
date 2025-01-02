@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.Build.Traversal/4.1">
-
-  <ItemGroup>
-    <ProjectReference Include="$CSPROJPATH$">
-        <Properties>TargetFramework=$TFM$</Properties>
-    </ProjectReference>
-  </ItemGroup>
-
-</Project>
