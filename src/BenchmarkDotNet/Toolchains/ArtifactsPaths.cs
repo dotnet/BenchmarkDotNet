@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] public string ProgramCodePath { get; }
         [PublicAPI] public string AppConfigPath { get; }
         [PublicAPI] public string NuGetConfigPath { get; }
-        [PublicAPI] public string BuildTraversalProjectFilePath { get; }
+        [PublicAPI] public string BuildForReferencesProjectFilePath { get; }
         [PublicAPI] public string ProjectFilePath { get; }
         [PublicAPI] public string BuildScriptFilePath { get; }
         [PublicAPI] public string ExecutablePath { get; }
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains
             string programCodePath,
             string appConfigPath,
             string nuGetConfigPath,
-            string buildTraversalProjectFilePath,
+            string buildForReferencesProjectFilePath,
             string projectFilePath,
             string buildScriptFilePath,
             string executablePath,
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains
             ProgramCodePath = programCodePath;
             AppConfigPath = appConfigPath;
             NuGetConfigPath = nuGetConfigPath;
-            BuildTraversalProjectFilePath = buildTraversalProjectFilePath;
+            BuildForReferencesProjectFilePath = buildForReferencesProjectFilePath;
             ProjectFilePath = projectFilePath;
             BuildScriptFilePath = buildScriptFilePath;
             ExecutablePath = executablePath;

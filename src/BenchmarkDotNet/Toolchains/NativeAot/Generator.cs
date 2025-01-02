@@ -74,8 +74,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.BuildTraversalProjectFilePath, extraArguments)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.BuildTraversalProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.BuildForReferencesProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.BuildForReferencesProjectFilePath, extraArguments)}")
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
                 .ToString();
@@ -116,7 +116,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         {
             var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
 
-            GenerateBuildTraversalProject(artifactsPaths, projectFile.FullName);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(projectFile.FullName);
+            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+
+            GenerateBuildForReferencesProject(buildPartition, artifactsPaths, projectFile.FullName, customProperties, sdkName);
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger));
             GenerateReflectionFile(artifactsPaths);
