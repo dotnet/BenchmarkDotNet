@@ -151,17 +151,17 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     {GetILCompilerPackageReference()}
-    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
+    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 {GetCustomProperties(buildPartition, logger)}
 </Project>";
 
         private string GetCustomProperties(BuildPartition buildPartition, ILogger logger)
         {
-            var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
+            var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase, logger);
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(projectFile.FullName);
 
@@ -186,11 +186,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             return !string.IsNullOrEmpty(instructionSet) ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>" : "";
         }
 
-        public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
+        public IEnumerable<string> GetRdXmlFiles(BenchmarkCase benchmark, ILogger logger)
         {
             yield return GeneratedRdXmlFileName;
 
-            var projectFile = GetProjectFilePath(benchmarkTarget, logger);
+            var projectFile = GetProjectFilePath(benchmark, logger);
             var projectFileFolder = projectFile.DirectoryName;
             var rdXml = Path.Combine(projectFileFolder, "rd.xml");
             if (File.Exists(rdXml))

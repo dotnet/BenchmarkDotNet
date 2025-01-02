@@ -10,8 +10,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
-        private static readonly string[] ProjectExtensions = { ".csproj", ".fsproj", ".vbroj" };
-
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
         [PublicAPI] public string CliPath { get; }
@@ -38,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            if (GetSolutionRootDirectory(out var directoryInfo))
+            if (!GetRootDirectory(IsRootSolutionFolder, out var directoryInfo))
             {
                 return Path.Combine(directoryInfo.FullName, programName);
             }
@@ -49,16 +47,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (parent == null)
                 throw new DirectoryNotFoundException("Parent directory for current directory");
             return Path.Combine(parent.FullName, programName);
-        }
-
-        internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
-        {
-            return GetRootDirectory(IsRootSolutionFolder, out directoryInfo);
-        }
-
-        internal static bool GetProjectRootDirectory(out DirectoryInfo directoryInfo)
-        {
-            return GetRootDirectory(IsRootProjectFolder, out directoryInfo);
         }
 
         internal static bool GetRootDirectory(Func<DirectoryInfo, bool> condition, out DirectoryInfo? directoryInfo)
@@ -112,10 +100,5 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => directoryInfo
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
-
-        private static bool IsRootProjectFolder(DirectoryInfo directoryInfo)
-            => directoryInfo
-                .GetFileSystemInfos()
-                .Any(fileInfo => ProjectExtensions.Contains(fileInfo.Extension));
     }
 }
