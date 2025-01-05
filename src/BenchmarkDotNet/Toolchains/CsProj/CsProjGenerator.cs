@@ -251,6 +251,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             var args = new LocatorArgs(benchmark, logger);
 
+            // Try locators first. Logic is provided by the user for uses-cases such as they have set AssemblyName to a custom value.
             foreach (var locator in benchmark.Config.GetFileLocators())
             {
                 if (locator.LocatorType != FileLocatorType.Project)
@@ -265,6 +266,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 }
             }
 
+            // Fall back to default project detection logic
             if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(

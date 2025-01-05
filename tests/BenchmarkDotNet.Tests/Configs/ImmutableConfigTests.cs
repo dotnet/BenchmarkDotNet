@@ -460,7 +460,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            TestFileLocator expected = new TestFileLocator();
+            var expected = new TestFileLocator();
             mutable.AddFileLocator(expected);
 
             var final = ImmutableConfigBuilder.Create(mutable);
@@ -474,8 +474,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            TestFileLocator locator = new TestFileLocator();
-
+            var locator = new TestFileLocator();
             mutable.AddFileLocator(locator);
             mutable.AddFileLocator(locator);
 
