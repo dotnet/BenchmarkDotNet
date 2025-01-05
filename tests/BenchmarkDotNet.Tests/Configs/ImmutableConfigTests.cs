@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -459,12 +460,13 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddLocator(ProjectFileLocator.Default);
+            TestFileLocator expected = new TestFileLocator();
+            mutable.AddFileLocator(expected);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
-            var locator = Assert.Single(final.GetFileLocators());
-            Assert.Same(ProjectFileLocator.Default, locator);
+            var actual = Assert.Single(final.GetFileLocators());
+            Assert.Same(expected, actual);
         }
 
         [Fact]
@@ -472,24 +474,24 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddLocator(ProjectFileLocator.Default);
-            mutable.AddLocator(ProjectFileLocator.Default);
+            TestFileLocator locator = new TestFileLocator();
+
+            mutable.AddFileLocator(locator);
+            mutable.AddFileLocator(locator);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Equal(2, final.GetFileLocators().Count());
         }
 
-        [Fact]
-        public void VerifyConfigsHaveLocators()
+        private class TestFileLocator : IFileLocator
         {
-            var minVar = ManualConfig.CreateMinimumViable();
-            var build1 = ImmutableConfigBuilder.Create(minVar);
-            Assert.Single(build1.GetFileLocators());
-
-            var def = DefaultConfig.Instance;
-            var build2 = ImmutableConfigBuilder.Create(def);
-            Assert.Single(build2.GetFileLocators());
+            public FileLocatorType LocatorType => FileLocatorType.Project;
+            public bool TryLocate(LocatorArgs locatorArgs, out FileInfo fileInfo)
+            {
+                fileInfo = new FileInfo("");
+                return true;
+            }
         }
     }
 }

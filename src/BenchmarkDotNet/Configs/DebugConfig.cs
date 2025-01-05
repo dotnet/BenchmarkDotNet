@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
         public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
         public IEnumerable<IExporter> GetExporters() => Array.Empty<IExporter>();
-        public IEnumerable<IFileLocator> GetFileLocators() => new[] { ProjectFileLocator.Default };
+        public IEnumerable<IFileLocator> GetFileLocators() => Array.Empty<IFileLocator>();
         public IEnumerable<ILogger> GetLoggers() => new[] { ConsoleLogger.Default };
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();

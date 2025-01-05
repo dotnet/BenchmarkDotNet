@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using BenchmarkDotNet.Characteristics;
@@ -247,7 +249,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(BenchmarkCase benchmark, ILogger logger)
         {
-            var notFound = new List<string>();
             var args = new LocatorArgs(benchmark, logger);
 
             foreach (var locator in benchmark.Config.GetFileLocators())
@@ -261,12 +262,37 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 {
                     if (fileInfo.Exists)
                         return fileInfo;
-
-                    notFound.Add(fileInfo.FullName);
                 }
             }
 
-            throw new FileNotFoundException("Unable to find project file. Attempted location(s): " + string.Join(", ", notFound));
+            if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
+            {
+                logger.WriteLineError(
+                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
+                rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+            }
+
+            // important assumption! project's file name === output dll name
+            string projectName = benchmark.Descriptor.Type.GetTypeInfo().Assembly.GetName().Name;
+
+            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
+            var projectFiles = rootDirectory
+                .EnumerateFiles("*proj", SearchOption.AllDirectories)
+                .Where(file => possibleNames.Contains(file.Name))
+                .ToArray();
+
+            if (projectFiles.Length == 0)
+            {
+                throw new FileNotFoundException(
+                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
+            }
+            else if (projectFiles.Length > 1)
+            {
+                throw new InvalidOperationException(
+                    $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: {string.Join(",", projectFiles.Select(pf => $"'{pf.FullName}'"))}. Benchmark project names needs to be unique.");
+            }
+
+            return projectFiles[0];
         }
 
         public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);

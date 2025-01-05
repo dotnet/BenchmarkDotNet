@@ -297,7 +297,6 @@ namespace BenchmarkDotNet.Configs
         public static ManualConfig CreateMinimumViable()
             => CreateEmpty()
                 .AddColumnProvider(DefaultColumnProviders.Instance)
-                .AddFileLocator(ProjectFileLocator.Default)
                 .AddLogger(ConsoleLogger.Default);
 
         public static ManualConfig Create(IConfig config)

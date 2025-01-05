@@ -41,10 +41,7 @@ namespace BenchmarkDotNet.Configs
             yield return HtmlExporter.Default;
         }
 
-        public IEnumerable<IFileLocator> GetFileLocators()
-        {
-            yield return ProjectFileLocator.Default;
-        }
+        public IEnumerable<IFileLocator> GetFileLocators() => Array.Empty<IFileLocator>();
 
         public IEnumerable<ILogger> GetLoggers()
         {
