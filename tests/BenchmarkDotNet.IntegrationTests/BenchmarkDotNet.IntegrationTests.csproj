@@ -26,15 +26,11 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FileLocators\BenchmarkDotNet.IntegrationTests.FileLocators.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <!-- This test project is only relevant for .NET 5+ projects -->
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FileLocators\BenchmarkDotNet.IntegrationTests.FileLocators.csproj" />
   </ItemGroup>
   
   <ItemGroup>

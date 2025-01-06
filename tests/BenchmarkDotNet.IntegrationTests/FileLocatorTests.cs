@@ -5,6 +5,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.IntegrationTests.FileLocators;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Locators;
+using BenchmarkDotNet.Toolchains.CsProj;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -18,7 +19,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void ExecutionWithoutFileLocatorShouldFail()
         {
             var config = ManualConfig.CreateMinimumViable()
-                                     .AddJob(Job.Dry);
+                                     .AddJob(Job.Dry
+                                         .WithToolchain(CsProjClassicNetToolchain.Net462)
+                                         .WithToolchain(CsProjCoreToolchain.NetCoreApp80));
 
             var summary = CanExecute<AssemblyNameIsSetBenchmarks>(config, false);
             Assert.True(summary.Reports.All(r => !r.BuildResult.IsBuildSuccess));
@@ -28,7 +31,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void ExecutionWithFileLocatorShouldSucceed()
         {
             var config = ManualConfig.CreateMinimumViable()
-                                     .AddJob(Job.Dry)
+                                     .AddJob(Job.Dry
+                                         .WithToolchain(CsProjClassicNetToolchain.Net462)
+                                         .WithToolchain(CsProjCoreToolchain.NetCoreApp80))
                                      .AddFileLocator(new CustomFileLocator());
 
             CanExecute<AssemblyNameIsSetBenchmarks>(config);
