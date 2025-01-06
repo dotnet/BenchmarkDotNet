@@ -249,9 +249,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(BenchmarkCase benchmark, ILogger logger)
         {
-            var args = new LocatorArgs(benchmark, logger);
+            var args = new FileLocatorArgs(benchmark, logger);
 
             // Try locators first. Logic is provided by the user for uses-cases such as they have set AssemblyName to a custom value.
+            var notFound = new List<string>();
             foreach (var locator in benchmark.Config.GetFileLocators())
             {
                 if (locator.LocatorType != FileLocatorType.Project)
@@ -263,6 +264,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 {
                     if (fileInfo.Exists)
                         return fileInfo;
+
+                    notFound.Add(fileInfo.FullName);
                 }
             }
 
@@ -285,8 +288,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (projectFiles.Length == 0)
             {
-                throw new FileNotFoundException(
-                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
+                string message;
+
+                if (notFound.Count > 0)
+                    message = $"Unable to find {projectName} in any of the paths: {string.Join(", ", notFound)} or in {rootDirectory.FullName} and its subfolders";
+                else
+                    message = $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj";
+
+                throw new FileNotFoundException(message);
             }
             else if (projectFiles.Length > 1)
             {

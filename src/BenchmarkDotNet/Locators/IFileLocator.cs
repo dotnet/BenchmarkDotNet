@@ -15,8 +15,8 @@ public interface IFileLocator
     /// <summary>
     /// Tries to locate a file
     /// </summary>
-    /// <param name="locatorArgs">The arguments such as benchmark and logger</param>
+    /// <param name="fileLocatorArgs">The arguments such as benchmark and logger</param>
     /// <param name="fileInfo">The file is provided by the implementation</param>
     /// <returns>True when a file was successfully found, False otherwise.</returns>
-    bool TryLocate(LocatorArgs locatorArgs, out FileInfo fileInfo);
+    bool TryLocate(FileLocatorArgs fileLocatorArgs, out FileInfo fileInfo);
 }

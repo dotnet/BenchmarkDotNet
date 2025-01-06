@@ -3,9 +3,9 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Locators;
 
-public class LocatorArgs
+public class FileLocatorArgs
 {
-    public LocatorArgs(BenchmarkCase benchmarkCase, ILogger logger)
+    public FileLocatorArgs(BenchmarkCase benchmarkCase, ILogger logger)
     {
         BenchmarkCase = benchmarkCase;
         Logger = logger;

@@ -486,7 +486,7 @@ namespace BenchmarkDotNet.Tests.Configs
         private class TestFileLocator : IFileLocator
         {
             public FileLocatorType LocatorType => FileLocatorType.Project;
-            public bool TryLocate(LocatorArgs locatorArgs, out FileInfo fileInfo)
+            public bool TryLocate(FileLocatorArgs fileLocatorArgs, out FileInfo fileInfo)
             {
                 fileInfo = new FileInfo("");
                 return true;
