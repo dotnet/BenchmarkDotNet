@@ -293,7 +293,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 if (notFound.Count > 0)
                     message = $"Unable to find {projectName} in any of the paths: {string.Join(", ", notFound)} or in {rootDirectory.FullName} and its subfolders";
                 else
-                    message = $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj";
+                    message = $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj. You can add an IFileLocator to the config if this is on purpose.";
 
                 throw new FileNotFoundException(message);
             }
