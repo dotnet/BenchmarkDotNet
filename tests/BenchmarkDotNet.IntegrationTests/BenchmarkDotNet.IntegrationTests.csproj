@@ -31,6 +31,12 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
   </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <!-- This test project is only relevant for .NET 5+ projects -->
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FileLocators\BenchmarkDotNet.IntegrationTests.FileLocators.csproj" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <!-- We implicitly need v13.0.1 of Newtonsoft.Json for BenchmarkDotNet.IntegrationTests.NuGetReferenceTests -->

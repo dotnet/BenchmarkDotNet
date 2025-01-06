@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    
+    <!-- It is important that AssemblyName is different from the project name. This is part of the test. -->
+    <AssemblyName>MyCustomName</AssemblyName>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+</Project>
