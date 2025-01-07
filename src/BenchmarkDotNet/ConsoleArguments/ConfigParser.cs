@@ -774,10 +774,17 @@ namespace BenchmarkDotNet.ConsoleArguments
         internal static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
         {
             int index = runtime.IndexOf('-');
+            if (index >= 0)
+            {
+                runtime = runtime.Substring(0, index);
+            }
 
-            return index < 0
-                ? Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker)
-                : Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
+            // Monikers older than Net 10 don't use any version delimiter, newer monikers use _ delimiter.
+            if (Enum.TryParse(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker))
+            {
+                return true;
+            }
+            return Enum.TryParse(runtime.Replace('.', '_'), ignoreCase: true, out runtimeMoniker);
         }
     }
 }
