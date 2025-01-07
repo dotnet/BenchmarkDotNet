@@ -106,8 +106,8 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
             case RuntimeMoniker.Mono60:
             case RuntimeMoniker.Mono70:
             case RuntimeMoniker.Mono80:
-            case RuntimeMoniker.Mono10_0:
             case RuntimeMoniker.Mono90:
+            case RuntimeMoniker.Mono10_0:
 #pragma warning disable CS0618 // Type or member is obsolete
             case RuntimeMoniker.NetCoreApp50:
 #pragma warning restore CS0618 // Type or member is obsolete
