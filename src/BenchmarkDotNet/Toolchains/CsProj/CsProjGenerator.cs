@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +11,6 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -72,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark, logger);
+            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(projectFile.FullName);
@@ -247,29 +246,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         /// returns a path to the project file which defines the benchmarks
         /// </summary>
         [PublicAPI]
-        protected virtual FileInfo GetProjectFilePath(BenchmarkCase benchmark, ILogger logger)
+        protected virtual FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
-            var args = new FileLocatorArgs(benchmark, logger);
-
-            // Try locators first. Logic is provided by the user for uses-cases such as they have set AssemblyName to a custom value.
-            var notFound = new List<string>();
-            foreach (var locator in benchmark.Config.GetFileLocators())
-            {
-                if (locator.LocatorType != FileLocatorType.Project)
-                {
-                    continue;
-                }
-
-                if (locator.TryLocate(args, out var fileInfo))
-                {
-                    if (fileInfo.Exists)
-                        return fileInfo;
-
-                    notFound.Add(fileInfo.FullName);
-                }
-            }
-
-            // Fall back to default project detection logic
             if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(
@@ -278,7 +256,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             // important assumption! project's file name === output dll name
-            string projectName = benchmark.Descriptor.Type.GetTypeInfo().Assembly.GetName().Name;
+            string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
 
             var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
             var projectFiles = rootDirectory
@@ -288,18 +266,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (projectFiles.Length == 0)
             {
-                string message;
-
-                if (notFound.Count > 0)
-                    message = $"Unable to find {projectName} in any of the paths: {string.Join(", ", notFound)} or in {rootDirectory.FullName} and its subfolders";
-                else
-                    message = $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj. You can add an IFileLocator to the config if this is on purpose.";
-
-                throw new FileNotFoundException(message);
+                throw new NotSupportedException(
+                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
             }
             else if (projectFiles.Length > 1)
             {
-                throw new InvalidOperationException(
+                throw new NotSupportedException(
                     $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: {string.Join(",", projectFiles.Select(pf => $"'{pf.FullName}'"))}. Benchmark project names needs to be unique.");
             }
 
