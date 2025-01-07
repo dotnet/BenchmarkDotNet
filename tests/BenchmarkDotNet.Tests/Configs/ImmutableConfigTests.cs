@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -9,7 +8,6 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -453,44 +451,6 @@ namespace BenchmarkDotNet.Tests.Configs
 
             }
 
-        }
-
-        [Fact]
-        public void LocatorsAreAddedCorrectly()
-        {
-            var mutable = ManualConfig.CreateEmpty();
-
-            var expected = new TestFileLocator();
-            mutable.AddFileLocator(expected);
-
-            var final = ImmutableConfigBuilder.Create(mutable);
-
-            var actual = Assert.Single(final.GetFileLocators());
-            Assert.Same(expected, actual);
-        }
-
-        [Fact]
-        public void DuplicateLocatorsAreAllowed()
-        {
-            var mutable = ManualConfig.CreateEmpty();
-
-            var locator = new TestFileLocator();
-            mutable.AddFileLocator(locator);
-            mutable.AddFileLocator(locator);
-
-            var final = ImmutableConfigBuilder.Create(mutable);
-
-            Assert.Equal(2, final.GetFileLocators().Count());
-        }
-
-        private class TestFileLocator : IFileLocator
-        {
-            public FileLocatorType LocatorType => FileLocatorType.Project;
-            public bool TryLocate(FileLocatorArgs fileLocatorArgs, out FileInfo fileInfo)
-            {
-                fileInfo = new FileInfo("");
-                return true;
-            }
         }
     }
 }

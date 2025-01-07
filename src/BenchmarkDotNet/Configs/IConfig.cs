@@ -8,7 +8,6 @@ using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -21,7 +20,6 @@ namespace BenchmarkDotNet.Configs
     {
         IEnumerable<IColumnProvider> GetColumnProviders();
         IEnumerable<IExporter> GetExporters();
-        IEnumerable<IFileLocator> GetFileLocators();
         IEnumerable<ILogger> GetLoggers();
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();

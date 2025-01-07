@@ -8,7 +8,6 @@ using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Locators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -59,7 +58,6 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
         public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
         public IEnumerable<IExporter> GetExporters() => Array.Empty<IExporter>();
-        public IEnumerable<IFileLocator> GetFileLocators() => Array.Empty<IFileLocator>();
         public IEnumerable<ILogger> GetLoggers() => new[] { ConsoleLogger.Default };
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();

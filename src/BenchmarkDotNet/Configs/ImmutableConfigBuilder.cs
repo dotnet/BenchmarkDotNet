@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -44,7 +44,6 @@ namespace BenchmarkDotNet.Configs
             var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
-            var uniqueFileLocators = source.GetFileLocators().ToImmutableArray();
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
@@ -62,7 +61,6 @@ namespace BenchmarkDotNet.Configs
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
-                uniqueFileLocators,
                 uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
