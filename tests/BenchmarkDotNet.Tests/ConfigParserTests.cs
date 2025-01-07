@@ -383,11 +383,17 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
+        [InlineData("net50")]
         [InlineData("net5.0")]
+        [InlineData("net60")]
         [InlineData("net6.0")]
+        [InlineData("net70")]
         [InlineData("net7.0")]
+        [InlineData("net80")]
         [InlineData("net8.0")]
+        [InlineData("net90")]
         [InlineData("net9.0")]
+        [InlineData("net10_0")]
         [InlineData("net10.0")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
