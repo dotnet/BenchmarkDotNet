@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Configs
         public IOrderer Orderer => null;
         public ICategoryDiscoverer? CategoryDiscoverer => null;
 
-        public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
+        public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
         public CultureInfo CultureInfo => null;
 

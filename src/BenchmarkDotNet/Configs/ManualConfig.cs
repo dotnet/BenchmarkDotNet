@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -25,7 +26,6 @@ namespace BenchmarkDotNet.Configs
         private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
-        private readonly List<IExporter> exporters = new List<IExporter>();
         private readonly List<ILogger> loggers = new List<ILogger>();
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
@@ -37,8 +37,12 @@ namespace BenchmarkDotNet.Configs
         private readonly List<EventProcessor> eventProcessors = new List<EventProcessor>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
+        private List<IExporter> exporters = new List<IExporter>();
+        private List<IntegratedExport> integratedExporters = new List<IntegratedExport>();
+
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
+        public IEnumerable<IntegratedExport> GetIntegratedExporters() => integratedExporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
@@ -108,6 +112,21 @@ namespace BenchmarkDotNet.Configs
             BuildTimeout = buildTimeout;
             return this;
         }
+
+        public ManualConfig WithSetExporters(List<IExporter> updatedExporters)
+        {
+            exporters.Clear();
+            exporters = updatedExporters;
+            return this;
+        }
+
+        public ManualConfig WithSetIntegratedExporters(List<IntegratedExport> updatedExporters)
+        {
+            integratedExporters.Clear();
+            integratedExporters.AddRange(updatedExporters);
+            return this;
+        }
+
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .AddColumn() instead.")]
@@ -318,6 +337,8 @@ namespace BenchmarkDotNet.Configs
             }
             return manualConfig;
         }
+
+
 
         internal void RemoveAllJobs() => jobs.Clear();
 

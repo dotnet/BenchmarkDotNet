@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Globalization;
@@ -75,6 +76,9 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
         [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
+
+        [PublicAPI] public static ManualConfig WithSetExporters(this IConfig config, List<IExporter> exporters) => config.With(m => m.WithSetExporters(exporters));
+        [PublicAPI] public static ManualConfig WithSetIntegratedExporters(this IConfig config, List<IntegratedExport> exporters) => config.With(m => m.WithSetIntegratedExporters(exporters));
 
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks

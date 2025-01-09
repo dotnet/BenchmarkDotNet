@@ -12,19 +12,25 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class RPlotExporter : IExporter, IExporterDependencies
+    public class RPlotExporter : IExporter, IExporterDependencies, IIntegratedExports
     {
+        public RPlotExporter(IntegratedExportEnum[] IntegratedExportEnums = null)
+        {
+            this.IntegratedExportEnums = IntegratedExportEnums;
+        }
+
         public static readonly IExporter Default = new RPlotExporter();
         public string Name => nameof(RPlotExporter);
 
         private const string ImageExtension = ".png";
         private static readonly object BuildScriptLock = new object();
-
         public IEnumerable<IExporter> Dependencies
         {
             // R Plots depends on having the full measurements available
             get { yield return CsvMeasurementsExporter.Default; }
         }
+
+        public IEnumerable<IntegratedExportEnum> IntegratedExportEnums { get; set; }
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {

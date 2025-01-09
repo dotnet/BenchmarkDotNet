@@ -43,7 +43,10 @@ namespace BenchmarkDotNet.Configs
 
             var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
-            var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
+            var allExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
+
+            // Check for integrated exporters
+            var (uniqueExporters, integratedExports) = ProcessIntegratedConfiguration(allExporters);
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
@@ -61,6 +64,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
+                integratedExports,
                 uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
@@ -253,6 +257,42 @@ namespace BenchmarkDotNet.Configs
             public bool Equals(TInterface x, TInterface y) => x.GetType() == y.GetType();
 
             public int GetHashCode(TInterface obj) => obj.GetType().GetHashCode();
+        }
+
+        private static IReadOnlyCollection<IntegratedExportEnum> ExtractIntegrationExportEnums(IEnumerable<IExporter> exporters)
+        {
+            return exporters
+                    .OfType<IIntegratedExports>()
+                    .Where(export => export.IntegratedExportEnums.Any())
+                    .SelectMany(export => export.IntegratedExportEnums)
+                    .ToList();
+        }
+
+        private static (ImmutableArray<IExporter> UniqueExporters, ImmutableArray<IntegratedExport> IntegratedExports) ProcessIntegratedConfiguration(ImmutableArray<IExporter> allExporters)
+        {
+            var integratedExportEnums = ExtractIntegrationExportEnums(allExporters);
+            var integratedExports = integratedExportEnums.Select(exportEnum =>
+            {
+                var exporterTypesStr = IntegratedExportersMap.SplitEnumByWith(exportEnum);
+                return new IntegratedExport
+                {
+                    ExportEnum = exportEnum,
+                    Exporter = allExporters.FirstOrDefault(e => exporterTypesStr[0] == e.Name),
+                    WithExporter = allExporters.FirstOrDefault(e => exporterTypesStr[1] == e.Name),
+                    Dependencies = allExporters
+                                    .Where(exporter => exporter is IExporterDependencies)
+                                    .SelectMany(exporter => (exporter as IExporterDependencies).Dependencies)
+                                    .ToList()
+                };
+            }).ToList();
+
+            var distinctExporters = allExporters
+                .Where(exporter => !integratedExports
+                 .Any(integrated => integrated.Exporter?.Name == exporter.Name ||
+                                    integrated.WithExporter?.Name == exporter.Name || !integrated.Dependencies.Any(d => d.Name == exporter.Name)))
+                .ToList();
+
+            return (distinctExporters.ToImmutableArray(), integratedExports.ToImmutableArray());
         }
     }
 }
