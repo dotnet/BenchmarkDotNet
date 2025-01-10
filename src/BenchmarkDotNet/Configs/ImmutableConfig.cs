@@ -95,7 +95,6 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
-
         public IEnumerable<IntegratedExport> GetIntegratedExports() => integratedExports;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
@@ -110,6 +109,7 @@ namespace BenchmarkDotNet.Configs
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);
+        public IExporter GetCompositeIntegratedExporter() => new CompositeExporter(integratedExports);
         public IValidator GetCompositeValidator() => new CompositeValidator(validators);
         public IAnalyser GetCompositeAnalyser() => new CompositeAnalyser(analysers);
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);

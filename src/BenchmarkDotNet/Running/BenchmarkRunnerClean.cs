@@ -292,11 +292,19 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Export *");
             string currentDirectory = Directory.GetCurrentDirectory();
-            List<dynamic> additionalData = new List<dynamic>();
             foreach (string file in config.GetCompositeExporter().ExportToFiles(summary, logger))
             {
                 logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
             }
+
+            //if (config.GetIntegratedExports().Any())
+            //{
+            //    foreach (string file in config.GetCompositeIntegratedExporter().ExportToFiles(summary, logger))
+            //    {
+            //        logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
+            //    }
+            //}
+
 
             logger.WriteLine();
 

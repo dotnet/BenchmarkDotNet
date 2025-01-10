@@ -263,7 +263,7 @@ namespace BenchmarkDotNet.Configs
         {
             return exporters
                     .OfType<IIntegratedExports>()
-                    .Where(export => export.IntegratedExportEnums.Any())
+                    .Where(export => export?.IntegratedExportEnums?.Any() ?? false)
                     .SelectMany(export => export.IntegratedExportEnums)
                     .ToList();
         }
