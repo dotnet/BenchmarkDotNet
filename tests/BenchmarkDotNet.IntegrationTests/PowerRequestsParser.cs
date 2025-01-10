@@ -106,7 +106,11 @@ internal class PowerRequestsParser
     /// <param name="input">Output of 'powercfg /requests'.</param>
     private static IEnumerable<Token> Tokens(string input)
     {
-        foreach (string line in input.EnumerateLines())
+        // Contrary to calling input.Split('\r', '\n'), StringReader's ReadLine method does not
+        // return an empty string when CR is followed by LF.
+        StringReader reader = new StringReader(input);
+        string? line;
+        while ((line = reader.ReadLine()) != null)
         {
             if (line.Length == 0)
             {
@@ -128,7 +132,7 @@ internal class PowerRequestsParser
             }
             else
             {
-                yield return new Token(TokenType.Reason, line.ToString());
+                yield return new Token(TokenType.Reason, line);
             }
         }
     }
