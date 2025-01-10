@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Running;
 
 internal partial class WakeLock
 {
-    private class SafePowerHandle : SafeHandleZeroOrMinusOneIsInvalid
+    private sealed class SafePowerHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         private SafePowerHandle() : base(true) { }
 

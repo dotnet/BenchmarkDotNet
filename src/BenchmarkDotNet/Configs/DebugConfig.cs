@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Configs
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
-        public WakeLockType WakeLock => DefaultConfig.Instance.WakeLock;
+        public WakeLockType WakeLock => WakeLockType.None;
 
         public string ArtifactsPath => null; // DefaultConfig.ArtifactsPath will be used if the user does not specify it in explicit way
 

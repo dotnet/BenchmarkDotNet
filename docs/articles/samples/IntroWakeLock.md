@@ -6,7 +6,7 @@ uid: BenchmarkDotNet.Samples.IntroWakeLock
 
 Running benchmarks may sometimes take enough time such that the system enters sleep or turns off the display.
 
-Using a WakeLock prevents the system doing so.
+Using a WakeLock prevents the Windows system doing so.
 
 ### Source code
 

@@ -15,7 +15,7 @@ internal partial class WakeLock
         // Must be windows 7 or greater
         OsDetector.IsWindows() && Environment.OSVersion.Version >= new Version(6, 1);
 
-    public static IDisposable Request(WakeLockType wakeLockType, string reason) =>
+    public static IDisposable? Request(WakeLockType wakeLockType, string reason) =>
         wakeLockType == WakeLockType.None || !OsVersionIsSupported ? null : new WakeLockSentinel(wakeLockType, reason);
 
     private class WakeLockSentinel : DisposeAtProcessTermination
