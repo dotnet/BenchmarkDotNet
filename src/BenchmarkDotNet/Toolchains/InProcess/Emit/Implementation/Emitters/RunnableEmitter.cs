@@ -244,7 +244,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private TypeBuilder runnableBuilder;
         private ConsumableTypeInfo consumableInfo;
-        private ConsumeEmitter consumeEmitter;
         private ConsumableTypeInfo globalSetupReturnInfo;
         private ConsumableTypeInfo globalCleanupReturnInfo;
         private ConsumableTypeInfo iterationSetupReturnInfo;
@@ -356,7 +355,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             dummyUnrollFactor = DummyUnrollFactor;
 
             consumableInfo = new ConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType);
-            consumeEmitter = ConsumeEmitter.GetConsumeEmitter(consumableInfo);
             globalSetupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalSetupMethod?.ReturnType);
             globalCleanupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalCleanupMethod?.ReturnType);
             iterationSetupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.IterationSetupMethod?.ReturnType);
@@ -428,7 +426,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             notElevenField = runnableBuilder.DefineField(NotElevenFieldName, typeof(int), FieldAttributes.Public);
             dummyVarField = runnableBuilder.DefineField(DummyVarFieldName, typeof(int), FieldAttributes.Private);
-            consumeEmitter.OnDefineFields(runnableBuilder);
         }
 
         private ConstructorBuilder DefineCtor()
@@ -585,7 +582,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
                 methodName,
                 MethodAttributes.Private,
-                EmitParameterInfo.CreateReturnParameter(consumableInfo.WorkloadMethodReturnType),
+                EmitParameterInfo.CreateReturnParameter(typeof(void)),
                 parameters)
                 .SetNoInliningImplementationFlag()
                 .SetNoOptimizationImplementationFlag();
@@ -615,6 +612,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
             }
 
+            if (consumableInfo.WorkloadMethodReturnType != typeof(void))
+            {
+                ilBuilder.Emit(OpCodes.Pop);
+            }
             /*
                 IL_0014: ret
              */
@@ -661,7 +662,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             // Emit impl
             var ilBuilder = actionMethodBuilder.GetILGenerator();
-            consumeEmitter.BeginEmitAction(actionMethodBuilder, ilBuilder, invokeMethod, actionKind);
 
             // init locals
             var argLocals = EmitDeclareArgLocals(ilBuilder);
@@ -684,16 +684,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 {
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.EmitInstanceCallThisValueOnStack(null, invokeMethod, argLocals, forceDirectCall: true);
-
-                    if (actionKind == RunnableActionKind.Workload)
-                    {
-                        consumeEmitter.EmitActionAfterCall(ilBuilder);
-                    }
                 }
             }
             ilBuilder.EmitLoopEndFromLocToArg(loopStartLabel, loopHeadLabel, indexLocal, toArg);
-
-            consumeEmitter.CompleteEmitAction(ilBuilder);
 
             // IL_003a: ret
             ilBuilder.EmitVoidReturn(actionMethodBuilder);
@@ -791,9 +784,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder EmitForDisassemblyDiagnoser(string methodName)
         {
             // .method public hidebysig
-            //    instance int32 __ForDisassemblyDiagnoser__() cil managed noinlining nooptimization
+            //    instance void __ForDisassemblyDiagnoser__() cil managed noinlining nooptimization
             var workloadMethod = Descriptor.WorkloadMethod;
-            var workloadReturnParameter = EmitParameterInfo.CreateReturnParameter(consumableInfo.WorkloadMethodReturnType);
+            var workloadReturnParameter = EmitParameterInfo.CreateReturnParameter(typeof(void));
             var methodBuilder = runnableBuilder
                 .DefineNonVirtualInstanceMethod(
                     methodName,
@@ -812,8 +805,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // NB: c# compiler does not store first arg in locals for static calls
             var skipFirstArg = workloadMethod.IsStatic;
             var argLocals = EmitDeclareArgLocals(ilBuilder, skipFirstArg);
-
-            consumeEmitter.DeclareDisassemblyDiagnoserLocals(ilBuilder);
 
             var notElevenLabel = ilBuilder.DefineLabel();
             /*
@@ -860,22 +851,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
                 }
 
-                /*
-                    IL_0018: ret
-                */
                 if (consumableInfo.WorkloadMethodReturnType != typeof(void))
                 {
-                    ilBuilder.Emit(OpCodes.Ret);
+                    ilBuilder.Emit(OpCodes.Pop);
                 }
-
-                // IL_0019: ret
-                // -or-
-                // return default;
-                // IL_0019: ldc.i4.0
-                // IL_001a: ret
             }
             ilBuilder.MarkLabel(notElevenLabel);
-            consumeEmitter.EmitDisassemblyDiagnoserReturnDefault(ilBuilder);
+            /*
+                IL_0018: ret
+            */
+            ilBuilder.Emit(OpCodes.Ret);
 
             return methodBuilder;
         }
