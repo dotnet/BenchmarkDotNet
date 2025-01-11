@@ -37,16 +37,12 @@ namespace BenchmarkDotNet.Code
 
                 string passArguments = GetPassArguments(benchmark);
 
-                string compilationId = $"{provider.ReturnsDefinition}_{buildInfo.Id}";
-
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
-                    .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
@@ -62,7 +58,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
-                    .RemoveRedundantIfDefines(compilationId);
+                    .ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
@@ -308,31 +304,6 @@ namespace BenchmarkDotNet.Code
                 else
                     builder.Append($"\n// '{oldValue}' not found");
                 return this;
-            }
-
-            public string RemoveRedundantIfDefines(string id)
-            {
-                var oldLines = builder.ToString().Split('\n');
-                var newLines = new List<string>();
-                bool keepAdding = true;
-
-                foreach (string line in oldLines)
-                {
-                    if (line.StartsWith("#if RETURNS") || line.StartsWith("#elif RETURNS"))
-                    {
-                        keepAdding = line.Contains(id);
-                    }
-                    else if (line.StartsWith("#endif // RETURNS"))
-                    {
-                        keepAdding = true;
-                    }
-                    else if (keepAdding)
-                    {
-                        newLines.Add(line);
-                    }
-                }
-
-                return string.Join("\n", newLines);
             }
 
             public override string ToString() => builder.ToString();

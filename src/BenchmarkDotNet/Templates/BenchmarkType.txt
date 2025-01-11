@@ -127,6 +127,13 @@
             }
         }
 
+        // Prevent inlining the method invoke.
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
+        private void __WorkloadWrapper($ArgumentsDefinition$)
+        {
+            $WorkloadMethodCall$;
+        }
+
         [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
@@ -147,59 +154,6 @@
             }
         }
 
-#if RETURNS_NON_VOID_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            return $WorkloadMethodCall$;
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
-        {
-            if (NotEleven == 11)
-            {
-                $LoadArguments$
-                return $WorkloadMethodCall$;
-            }
-            
-            return default($WorkloadMethodReturnType$);
-        }
-
-#elif RETURNS_BYREF_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            return ref $WorkloadMethodCall$;
-        }
-
-        private $WorkloadMethodReturnType$ __disassemblerDefaultValueHolder = default($WorkloadMethodReturnType$);
-        
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
-        {
-            if (NotEleven == 11)
-            {
-                $LoadArguments$
-                return ref $WorkloadMethodCall$;
-            }
-            
-            return ref __disassemblerDefaultValueHolder;
-        }
-
-#elif RETURNS_VOID_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private void __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            $WorkloadMethodCall$;
-        }
-
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public void $DisassemblerEntryMethodName$()
         {
@@ -209,5 +163,4 @@
                 $WorkloadMethodCall$;
             }
         }
-#endif // RETURNS
     }
