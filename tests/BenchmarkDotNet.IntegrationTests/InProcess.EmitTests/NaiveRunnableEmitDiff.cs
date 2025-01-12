@@ -31,7 +31,8 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             { OpCodes.Br_S, OpCodes.Br },
             { OpCodes.Blt_S, OpCodes.Blt },
-            { OpCodes.Bne_Un_S, OpCodes.Bne_Un }
+            { OpCodes.Bne_Un_S, OpCodes.Bne_Un },
+            { OpCodes.Bge_S, OpCodes.Bge }
         };
 
         public static void RunDiff(string roslynAssemblyPath, string emittedAssemblyPath, ILogger logger)

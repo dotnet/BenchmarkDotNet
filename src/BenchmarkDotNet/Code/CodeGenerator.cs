@@ -147,36 +147,21 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
-                return new TaskDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(descriptor);
             }
             if (method.ReturnType.GetTypeInfo().IsGenericType
                 && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
-                return new GenericTaskDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(descriptor);
             }
 
-            if (method.ReturnType == typeof(void))
+            if (method.ReturnType == typeof(void) && method.HasAttribute<AsyncStateMachineAttribute>())
             {
-                bool isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
-                if (isUsingAsyncKeyword)
-                {
-                    throw new NotSupportedException("async void is not supported by design");
-                }
-
-                return new VoidDeclarationsProvider(descriptor);
+                throw new NotSupportedException("async void is not supported by design");
             }
 
-            if (method.ReturnType.IsByRef)
-            {
-                // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
-                if (method.ReturnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
-                    return new ByReadOnlyRefDeclarationsProvider(descriptor);
-                else
-                    return new ByRefDeclarationsProvider(descriptor);
-            }
-
-            return new NonVoidDeclarationsProvider(descriptor);
+            return new SyncDeclarationsProvider(descriptor);
         }
 
         private static string GetParamsInitializer(BenchmarkCase benchmarkCase)
