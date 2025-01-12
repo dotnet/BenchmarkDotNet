@@ -116,6 +116,22 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             }
         }
 
+        public static void EmitStarg(this ILGenerator ilBuilder, ParameterInfo argument)
+        {
+            var position = argument.Position;
+            if (!((MethodBase) argument.Member).IsStatic)
+                position++;
+
+            if (position < 255)
+            {
+                ilBuilder.Emit(OpCodes.Starg_S, (byte) position);
+            }
+            else
+            {
+                ilBuilder.Emit(OpCodes.Starg, checked((short) position));
+            }
+        }
+
         public static void EmitLdindStind(this ILGenerator ilBuilder, Type resultType)
         {
             if (!resultType.IsByRef)

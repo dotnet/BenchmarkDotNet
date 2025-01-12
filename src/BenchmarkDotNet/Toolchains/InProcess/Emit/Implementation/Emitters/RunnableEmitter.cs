@@ -263,9 +263,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder dummy1Method;
         private MethodBuilder dummy2Method;
         private MethodBuilder dummy3Method;
-        private MethodBuilder workloadWrapperMethod;
         private MethodBuilder overheadImplementationMethod;
-        private MethodBuilder overheadWrapperMethod;
         private MethodBuilder overheadActionUnrollMethod;
         private MethodBuilder overheadActionNoUnrollMethod;
         private MethodBuilder workloadActionUnrollMethod;
@@ -318,12 +316,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             // Overhead impl
             overheadImplementationMethod = EmitOverheadImplementation(OverheadImplementationMethodName);
-            overheadWrapperMethod = EmitOverheadWrapperImplementation(OverheadWrapperImplementationMethodName);
             overheadActionUnrollMethod = EmitOverheadAction(OverheadActionUnrollMethodName, jobUnrollFactor);
             overheadActionNoUnrollMethod = EmitOverheadAction(OverheadActionNoUnrollMethodName, 1);
 
             // Workload impl
-            workloadWrapperMethod = EmitWorkloadWrapperImplementation(WorkloadWrapperImplementationMethodName);
             workloadActionUnrollMethod = EmitWorkloadAction(WorkloadActionUnrollMethodName, jobUnrollFactor);
             workloadActionNoUnrollMethod = EmitWorkloadAction(WorkloadActionNoUnrollMethodName, 1);
 
@@ -534,103 +530,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return methodBuilder;
         }
 
-        private MethodBuilder EmitOverheadWrapperImplementation(string methodName)
-        {
-            //.method private hidebysig
-            //    instance int32 __OverheadWrapper(int64 arg0) cil managed noinlining nooptimization
-
-            // Replace arg names
-            var parameters = Descriptor.WorkloadMethod.GetParameters()
-                .Select(p =>
-                    (ParameterInfo) new EmitParameterInfo(
-                        p.Position,
-                        ArgParamPrefix + p.Position,
-                        p.ParameterType,
-                        p.Attributes,
-                        null))
-                .ToArray();
-
-            var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
-                methodName,
-                MethodAttributes.Private,
-                EmitParameterInfo.CreateReturnParameter(consumableInfo.OverheadMethodReturnType),
-                parameters)
-                .SetNoInliningImplementationFlag()
-                .SetNoOptimizationImplementationFlag();
-
-            var ilBuilder = methodBuilder.GetILGenerator();
-            /*
-                IL_0000: ldarg.0
-                IL_0001: ldarg.1
-                IL_0002: call instance int32 [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::__Overhead(int64)
-                IL_0007: ret
-             */
-            if (!overheadImplementationMethod.IsStatic)
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            parameters = methodBuilder.GetEmitParameters(parameters);
-            ilBuilder.EmitLdargs(parameters);
-            ilBuilder.Emit(OpCodes.Call, overheadImplementationMethod);
-            ilBuilder.Emit(OpCodes.Ret);
-            return methodBuilder;
-        }
-
-        private MethodBuilder EmitWorkloadWrapperImplementation(string methodName)
-        {
-            //.method private hidebysig
-            //    instance string __WorkloadWrapper(int32 arg0) cil managed noinlining nooptimization
-
-            // Replace arg names
-            var parameters = Descriptor.WorkloadMethod.GetParameters()
-                .Select(p =>
-                    (ParameterInfo) new EmitParameterInfo(
-                        p.Position,
-                        ArgParamPrefix + p.Position,
-                        p.ParameterType,
-                        p.Attributes,
-                        null))
-                .ToArray();
-
-            var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
-                methodName,
-                MethodAttributes.Private,
-                EmitParameterInfo.CreateReturnParameter(consumableInfo.WorkloadMethodReturnType),
-                parameters)
-                .SetNoInliningImplementationFlag()
-                .SetNoOptimizationImplementationFlag();
-
-            var ilBuilder = methodBuilder.GetILGenerator();
-
-            /*
-                IL_0000: ldarg.0
-                IL_0001: ldarg.1
-                IL_0002: call instance string [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::ReturnSingleArgCase(int32)
-             */
-            if (!Descriptor.WorkloadMethod.IsStatic)
-            {
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            }
-            parameters = methodBuilder.GetEmitParameters(parameters);
-            ilBuilder.EmitLdargs(parameters);
-            ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
-
-            if (consumableInfo.IsAwaitable)
-            {
-                /*
-                    // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
-                    IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
-                */
-
-                ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
-            }
-
-            /*
-                IL_0014: ret
-             */
-            ilBuilder.Emit(OpCodes.Ret);
-
-            return methodBuilder;
-        }
-
         private MethodBuilder EmitOverheadAction(string methodName, int unrollFactor)
         {
             return EmitActionImpl(methodName, RunnableActionKind.Overhead, unrollFactor);
@@ -641,31 +540,62 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return EmitActionImpl(methodName, RunnableActionKind.Workload, unrollFactor);
         }
 
+        private void EmitCallOverhead(ILGenerator ilBuilder, IReadOnlyList<LocalBuilder> argLocals)
+        {
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.EmitLdLocals(argLocals);
+            ilBuilder.Emit(OpCodes.Call, overheadImplementationMethod);
+        }
+
+        private void EmitCallWorkload(ILGenerator ilBuilder, IReadOnlyList<LocalBuilder> argLocals)
+        {
+            MethodInfo invokeMethod = Descriptor.WorkloadMethod;
+            if (!invokeMethod.IsStatic)
+            {
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+            }
+            ilBuilder.EmitLdLocals(argLocals);
+            ilBuilder.Emit(OpCodes.Call, invokeMethod);
+
+            if (consumableInfo.IsAwaitable)
+            {
+                /*
+                    // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
+                    IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
+                */
+                ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
+            }
+        }
+
         private MethodBuilder EmitActionImpl(string methodName, RunnableActionKind actionKind, int unrollFactor)
         {
+            Action<ILGenerator, IReadOnlyList<LocalBuilder>> callMethodEmitter;
             MethodInfo invokeMethod;
             switch (actionKind)
             {
                 case RunnableActionKind.Overhead:
-                    invokeMethod = overheadWrapperMethod;
+                    callMethodEmitter = EmitCallOverhead;
+                    invokeMethod = overheadImplementationMethod;
                     break;
                 case RunnableActionKind.Workload:
-                    invokeMethod = workloadWrapperMethod;
+                    callMethodEmitter = EmitCallWorkload;
+                    invokeMethod = Descriptor.WorkloadMethod;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(actionKind), actionKind, null);
             }
 
             // .method private hidebysig
-            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed aggressiveoptimization
-            var toArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
+            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed noinlining nooptimization
+            var invokeCountArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
             var actionMethodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
                 methodName,
                 MethodAttributes.Private,
                 EmitParameterInfo.CreateReturnVoidParameter(),
-                toArg)
-                .SetAggressiveOptimizationImplementationFlag();
-            toArg.SetMember(actionMethodBuilder);
+                invokeCountArg)
+                .SetNoOptimizationImplementationFlag()
+                .SetNoInliningImplementationFlag();
+            invokeCountArg.SetMember(actionMethodBuilder);
 
             // Emit impl
             var ilBuilder = actionMethodBuilder.GetILGenerator();
@@ -674,7 +604,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // init locals
             var argLocals = EmitDeclareArgLocals(ilBuilder);
             consumeEmitter.DeclareActionLocals(ilBuilder);
-            var indexLocal = ilBuilder.DeclareLocal(typeof(long));
 
             // load fields
             EmitLoadArgFieldsToLocals(ilBuilder, argLocals);
@@ -683,7 +612,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // loop
             var loopStartLabel = ilBuilder.DefineLabel();
             var loopHeadLabel = ilBuilder.DefineLabel();
-            ilBuilder.EmitLoopBeginFromLocToArg(loopStartLabel, loopHeadLabel, indexLocal, toArg);
+            ilBuilder.EmitLoopBeginFromArgToZero(loopStartLabel, loopHeadLabel);
             {
                 /*
                     // overheadDelegate();
@@ -704,13 +633,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 {
                     consumeEmitter.EmitActionBeforeCall(ilBuilder);
 
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.EmitInstanceCallThisValueOnStack(null, invokeMethod, argLocals, forceDirectCall: true);
+                    callMethodEmitter(ilBuilder, argLocals);
 
                     consumeEmitter.EmitActionAfterCall(ilBuilder);
                 }
             }
-            ilBuilder.EmitLoopEndFromLocToArg(loopStartLabel, loopHeadLabel, indexLocal, toArg);
+            ilBuilder.EmitLoopEndFromArgToZero(loopStartLabel, loopHeadLabel, invokeCountArg);
 
             consumeEmitter.EmitActionAfterLoop(ilBuilder);
             consumeEmitter.CompleteEmitAction(ilBuilder);

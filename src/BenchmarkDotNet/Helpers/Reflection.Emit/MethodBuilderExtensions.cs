@@ -38,13 +38,5 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
             return methodBuilder;
         }
-
-        public static MethodBuilder SetAggressiveOptimizationImplementationFlag(this MethodBuilder methodBuilder)
-        {
-            methodBuilder.SetImplementationFlags(
-                methodBuilder.GetMethodImplementationFlags() | CodeGenHelper.AggressiveOptimizationOptionForEmit);
-
-            return methodBuilder;
-        }
     }
 }

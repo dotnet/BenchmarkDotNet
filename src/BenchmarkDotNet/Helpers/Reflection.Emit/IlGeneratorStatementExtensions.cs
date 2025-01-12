@@ -84,64 +84,55 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             }
         }
 
-        public static void EmitLoopBeginFromLocToArg(
+        public static void EmitLoopBeginFromArgToZero(
             this ILGenerator ilBuilder,
             Label loopStartLabel,
-            Label loopHeadLabel,
-            LocalBuilder indexLocal,
-            ParameterInfo toArg)
+            Label loopHeadLabel)
         {
-            // loop counter stored as loc0, loop max passed as arg1
+            // invokeCount passed as arg
             /*
-                // for (long i = 0L; i < invokeCount; i++)
-                IL_0000: ldc.i4.0
-                IL_0001: conv.i8
-                IL_0002: stloc.0
+                // while (--invokeCount >= 0)
             */
-            ilBuilder.Emit(OpCodes.Ldc_I4_0);
-            ilBuilder.Emit(OpCodes.Conv_I8);
-            ilBuilder.EmitStloc(indexLocal);
 
-            // IL_0003: br.s IL_0036 // loop head: IL_0036 // we use long jump
+            // IL_0000: br.s IL_000e // loop head: IL_000e // we use long jump
             ilBuilder.Emit(OpCodes.Br, loopHeadLabel);
 
-            // loop start (head: IL_0036)
+            // loop start (head: IL_000e)
             ilBuilder.MarkLabel(loopStartLabel);
         }
 
-        public static void EmitLoopEndFromLocToArg(
+        public static void EmitLoopEndFromArgToZero(
             this ILGenerator ilBuilder,
             Label loopStartLabel,
             Label loopHeadLabel,
-            LocalBuilder indexLocal,
-            ParameterInfo toArg)
+            ParameterInfo arg)
         {
-            // loop counter stored as loc0, loop max passed as arg1
+            // invokeCount passed as arg
             /*
-                // for (long i = 0L; i < invokeCount; i++)
-                IL_0031: ldloc.0
-                IL_0032: ldc.i4.1
-                IL_0033: conv.i8
-                IL_0034: add
-                IL_0035: stloc.0
-             */
-            ilBuilder.EmitLdloc(indexLocal);
-            ilBuilder.Emit(OpCodes.Ldc_I4_1);
-            ilBuilder.Emit(OpCodes.Conv_I8);
-            ilBuilder.Emit(OpCodes.Add);
-            ilBuilder.EmitStloc(indexLocal);
-
-            /*
-                // for (long i = 0L; i < invokeCount; i++)
-                IL_0036: ldloc.0 // loop head: IL_0036
-                IL_0037: ldarg.1
-                IL_0038: blt.s IL_0005 // we use long jump
+                // while (--invokeCount >= 0)
+                IL_0008: ldarg.1
+                IL_0009: ldc.i4.1
+                IL_000a: conv.i8
+                IL_000b: sub
+                IL_000c: dup
+                IL_000d: starg.s invokeCount
+                IL_000f: ldc.i4.0
+                IL_0010: conv.i8
+                IL_0011: bge.s IL_0002
                 // end loop
              */
+
+            // loop head
             ilBuilder.MarkLabel(loopHeadLabel);
-            ilBuilder.EmitLdloc(indexLocal);
-            ilBuilder.EmitLdarg(toArg);
-            ilBuilder.Emit(OpCodes.Blt, loopStartLabel);
+            ilBuilder.EmitLdarg(arg);
+            ilBuilder.Emit(OpCodes.Ldc_I4_1);
+            ilBuilder.Emit(OpCodes.Conv_I8);
+            ilBuilder.Emit(OpCodes.Sub);
+            ilBuilder.Emit(OpCodes.Dup);
+            ilBuilder.EmitStarg(arg);
+            ilBuilder.Emit(OpCodes.Ldc_I4_0);
+            ilBuilder.Emit(OpCodes.Conv_I8);
+            ilBuilder.Emit(OpCodes.Bge, loopStartLabel);
         }
     }
 }

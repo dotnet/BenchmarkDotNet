@@ -28,9 +28,7 @@
         public const string Dummy2MethodName = "Dummy2";
         public const string Dummy3MethodName = "Dummy3";
         public const string WorkloadImplementationMethodName = "__Workload";
-        public const string WorkloadWrapperImplementationMethodName = "__WorkloadWrapper";
         public const string OverheadImplementationMethodName = "__Overhead";
-        public const string OverheadWrapperImplementationMethodName = "__OverheadWrapper";
         public const string OverheadActionUnrollMethodName = "OverheadActionUnroll";
         public const string OverheadActionNoUnrollMethodName = "OverheadActionNoUnroll";
         public const string WorkloadActionUnrollMethodName = "WorkloadActionUnroll";
