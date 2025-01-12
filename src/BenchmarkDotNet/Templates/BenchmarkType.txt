@@ -76,6 +76,16 @@
             $DisassemblerEntryMethodName$();
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public void $DisassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                $WorkloadMethodCall$;
+            }
+        }
+
         private System.Int32 dummyVar;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -101,65 +111,42 @@
         }
 
         // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private void __OverheadWrapper($ArgumentsDefinition$)
-        {
-            __Overhead($PassArguments$);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
+            while (--invokeCount >= 0)
             {
-                __OverheadWrapper($PassArguments$);@Unroll@
-            }
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                __OverheadWrapper($PassArguments$);
-            }
-        }
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private void __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            $WorkloadMethodCall$;
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                __WorkloadWrapper($PassArguments$);@Unroll@
-            }
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                __WorkloadWrapper($PassArguments$);
+                __Overhead($PassArguments$);@Unroll@
             }
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public void $DisassemblerEntryMethodName$()
+        private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
-            if (NotEleven == 11)
+            $LoadArguments$
+            while (--invokeCount >= 0)
             {
-                $LoadArguments$
+                __Overhead($PassArguments$);
+            }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private void WorkloadActionUnroll(System.Int64 invokeCount)
+        {
+            $LoadArguments$
+            while (--invokeCount >= 0)
+            {
+                $WorkloadMethodCall$;@Unroll@
+            }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
+        {
+            $LoadArguments$
+            while (--invokeCount >= 0)
+            {
                 $WorkloadMethodCall$;
             }
         }

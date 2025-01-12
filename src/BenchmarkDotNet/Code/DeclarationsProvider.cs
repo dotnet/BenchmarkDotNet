@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Code
@@ -30,14 +26,6 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public abstract string ReturnsDefinition { get; }
-
-        protected virtual Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType;
-
-        public virtual string WorkloadMethodReturnTypeName => WorkloadMethodReturnType.GetCorrectCSharpTypeName();
-
-        public virtual string WorkloadMethodReturnTypeModifiers => null;
-
         public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
 
         private string GetMethodName(MethodInfo method)
@@ -60,55 +48,14 @@ namespace BenchmarkDotNet.Code
         }
     }
 
-    internal class VoidDeclarationsProvider : DeclarationsProvider
+    internal class SyncDeclarationsProvider : DeclarationsProvider
     {
-        public VoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string ReturnsDefinition => "RETURNS_VOID";
+        public SyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
     }
 
-    internal class NonVoidDeclarationsProvider : DeclarationsProvider
+    internal class AsyncDeclarationsProvider : DeclarationsProvider
     {
-        public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string ReturnsDefinition => "RETURNS_NON_VOID";
-    }
-
-    internal class ByRefDeclarationsProvider : NonVoidDeclarationsProvider
-    {
-        public ByRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string WorkloadMethodReturnTypeName => base.WorkloadMethodReturnTypeName.Replace("&", string.Empty);
-
-        public override string ReturnsDefinition => "RETURNS_BYREF";
-
-        public override string WorkloadMethodReturnTypeModifiers => "ref";
-    }
-
-    internal class ByReadOnlyRefDeclarationsProvider : ByRefDeclarationsProvider
-    {
-        public ByReadOnlyRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
-    }
-
-    internal class TaskDeclarationsProvider : VoidDeclarationsProvider
-    {
-        public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
-
-        protected override Type WorkloadMethodReturnType => typeof(void);
-    }
-
-    /// <summary>
-    /// declarations provider for <see cref="Task{TResult}" /> and <see cref="ValueTask{TResult}" />
-    /// </summary>
-    internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
-    {
-        public GenericTaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
+        public AsyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
     }

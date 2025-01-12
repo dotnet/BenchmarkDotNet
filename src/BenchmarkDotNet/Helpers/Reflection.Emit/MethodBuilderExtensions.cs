@@ -1,6 +1,4 @@
-﻿using BenchmarkDotNet.Portability;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -9,9 +7,6 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal static class MethodBuilderExtensions
     {
-        public static Type[] GetParameterTypes(this MethodBase method) =>
-            method.GetParameters().Select(p => p.ParameterType).ToArray();
-
         public static ParameterInfo[] GetEmitParameters(this MethodBuilder method, IEnumerable<ParameterInfo> signatureParameters) =>
             signatureParameters
                 .Select(p =>
@@ -35,14 +30,6 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
         {
             methodBuilder.SetImplementationFlags(
                 methodBuilder.GetMethodImplementationFlags() | MethodImplAttributes.NoOptimization);
-
-            return methodBuilder;
-        }
-
-        public static MethodBuilder SetAggressiveOptimizationImplementationFlag(this MethodBuilder methodBuilder)
-        {
-            methodBuilder.SetImplementationFlags(
-                methodBuilder.GetMethodImplementationFlags() | CodeGenHelper.AggressiveOptimizationOptionForEmit);
 
             return methodBuilder;
         }
