@@ -30,13 +30,13 @@ namespace BenchmarkDotNet.Engines
 
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
 
-        private readonly int unrollFactor;
-        private readonly TimeInterval minIterationTime;
-        private readonly int minInvokeCount;
-        private readonly double maxRelativeError;
-        private readonly TimeInterval? maxAbsoluteError;
-        private readonly double targetIterationTime;
-        private readonly double resolution;
+        internal readonly int unrollFactor;
+        internal readonly TimeInterval minIterationTime;
+        internal readonly int minInvokeCount;
+        internal readonly double maxRelativeError;
+        internal readonly TimeInterval? maxAbsoluteError;
+        internal readonly double targetIterationTime;
+        internal readonly double resolution;
 
         public EnginePilotStage(IEngine engine) : base(engine)
         {
@@ -132,6 +132,6 @@ namespace BenchmarkDotNet.Engines
             return new PilotStageResult(invokeCount, measurements);
         }
 
-        private long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
+        internal long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
     }
 }
