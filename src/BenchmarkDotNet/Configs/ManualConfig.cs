@@ -9,6 +9,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -24,7 +25,6 @@ namespace BenchmarkDotNet.Configs
     public class ManualConfig : IConfig
     {
         private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
-
         private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
         private readonly List<ILogger> loggers = new List<ILogger>();
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
@@ -38,11 +38,14 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
         private List<IExporter> exporters = new List<IExporter>();
-        private List<IntegratedExport> integratedExporters = new List<IntegratedExport>();
+        private List<IntegratedExporterData> integratedExporters = new List<IntegratedExporterData>();
+
+        private IntegratedExportType integratedExporterType;
+        public IntegratedExportType IntegratedExportType => integratedExporterType;
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
-        public IEnumerable<IntegratedExport> GetIntegratedExporters() => integratedExporters;
+        public IEnumerable<IntegratedExporterData> GetIntegratedExporters() => integratedExporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
@@ -113,21 +116,6 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        public ManualConfig WithSetExporters(List<IExporter> updatedExporters)
-        {
-            exporters.Clear();
-            exporters = updatedExporters;
-            return this;
-        }
-
-        public ManualConfig WithSetIntegratedExporters(List<IntegratedExport> updatedExporters)
-        {
-            integratedExporters.Clear();
-            integratedExporters.AddRange(updatedExporters);
-            return this;
-        }
-
-
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .AddColumn() instead.")]
         public void Add(params IColumn[] newColumns) => AddColumn(newColumns);
@@ -157,6 +145,19 @@ namespace BenchmarkDotNet.Configs
             exporters.AddRange(newExporters);
             return this;
         }
+
+        public ManualConfig AddIntegratedExporter(List<IExporter>? dependencies, IExporter withExporter, IExporter exporter)
+        {
+            integratedExporters.Add(new IntegratedExporterData() { Exporter = exporter, WithExporter = withExporter, Dependencies = dependencies });
+            return this;
+        }
+
+        public ManualConfig SetIntegratedExporterType(IntegratedExportType type)
+        {
+            integratedExporterType = type;
+            return this;
+        }
+
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .AddLogger() instead.")]
@@ -275,6 +276,7 @@ namespace BenchmarkDotNet.Configs
         {
             columnProviders.AddRange(config.GetColumnProviders());
             exporters.AddRange(config.GetExporters());
+            integratedExporters.AddRange(config.GetIntegratedExporters());
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
@@ -348,5 +350,6 @@ namespace BenchmarkDotNet.Configs
             => current == DefaultConfig.Instance.BuildTimeout
                 ? other
                 : TimeSpan.FromMilliseconds(Math.Max(current.TotalMilliseconds, other.TotalMilliseconds));
+
     }
 }

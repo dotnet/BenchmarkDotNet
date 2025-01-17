@@ -1,14 +1,16 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
-
+using BenchmarkDotNet.Attributes.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    //[MemoryDiagnoser]
-    //[Config(typeof(Config))]
-    [RPlotExporter]
-    public class IntroRPlot
+    [IntegratedExporter(IntegratedExportType.HtmlExporterWithRPlotExporter)]
+    public class IntroIntegratedExporter
     {
         [Benchmark]
         public void Benchmark()
@@ -26,14 +28,4 @@ namespace BenchmarkDotNet.Samples
             return sum;
         }
     }
-
-    public class Config : ManualConfig
-    {
-        public Config()
-        {
-            //AddExporter(CsvMeasurementsExporter.Default);
-            //AddExporter(RPlotExporter.Default);
-        }
-    }
-
 }

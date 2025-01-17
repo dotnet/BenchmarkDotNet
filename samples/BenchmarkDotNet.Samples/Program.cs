@@ -5,6 +5,6 @@ namespace BenchmarkDotNet.Samples
     public class Program
     {
         //public static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
-        public static void Main(string[] args) => BenchmarkRunner.Run<IntroRPlot>();
+        public static void Main(string[] args) => BenchmarkRunner.Run<IntroIntegratedExporter>();
     }
 }

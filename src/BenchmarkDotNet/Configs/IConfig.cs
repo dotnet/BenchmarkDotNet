@@ -6,6 +6,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -20,6 +21,7 @@ namespace BenchmarkDotNet.Configs
     {
         IEnumerable<IColumnProvider> GetColumnProviders();
         IEnumerable<IExporter> GetExporters();
+        IEnumerable<IntegratedExporterData> GetIntegratedExporters();
         IEnumerable<ILogger> GetLoggers();
         IEnumerable<IDiagnoser> GetDiagnosers();
         IEnumerable<IAnalyser> GetAnalysers();

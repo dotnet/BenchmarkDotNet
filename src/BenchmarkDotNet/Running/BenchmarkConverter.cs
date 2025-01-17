@@ -8,6 +8,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Order;
@@ -89,18 +90,44 @@ namespace BenchmarkDotNet.Running
         {
             config = config ?? DefaultConfig.Instance;
 
+
             var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
             var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
 
             foreach (var configFromAttribute in assemblyAttributes.Concat(typeAttributes))
-                config = ManualConfig.Union(config, configFromAttribute.Config);
+            {
+                if (configFromAttribute.GetType().Name == "IntegratedExporterAttribute" && configFromAttribute.Config is ManualConfig manualConfig)
+                {
+                    IntegratedExportType integratedExportType = manualConfig.IntegratedExportType;
+                    bool isExported = TryGetIntegratedExportersByType(integratedExportType, out List<IExporter>? dependencies, out IExporter exporter, out IExporter withExporter);
+                    if (!isExported) continue;
+                    config = ManualConfig.Union(config, ManualConfig.CreateEmpty().AddIntegratedExporter(dependencies: dependencies, withExporter: withExporter, exporter: exporter));
+                }
+                else
+                {
+                    config = ManualConfig.Union(config, configFromAttribute.Config);
+                }
+            }
 
-            // Check for integrated exporters
-            //IReadOnlyCollection<IntegratedExportEnum> integrationExportEnums = ExtractIntegrationExportEnums(config.GetExporters());
-            //if (integrationExportEnums.Any())
-            //    config = ProcessIntegratedConfiguration(config, integrationExportEnums);
 
             return ImmutableConfigBuilder.Create(config);
+        }
+
+        private static bool TryGetIntegratedExportersByType(IntegratedExportType type, out List<IExporter>? dependencies, out IExporter exporter, out IExporter withExporter)
+        {
+            switch (type)
+            {
+                case IntegratedExportType.HtmlExporterWithRPlotExporter:
+                    exporter = HtmlExporter.Default;
+                    withExporter = RPlotExporter.Default;
+                    dependencies = (withExporter is IExporterDependencies exporterDependencies) ? exporterDependencies.Dependencies.ToList() : null;
+                    return true;
+                default:
+                    exporter = null;
+                    withExporter = null;
+                    dependencies = null;
+                    return false;
+            }
         }
 
         private static ImmutableConfig GetFullMethodConfig(MethodInfo method, ImmutableConfig typeConfig)
@@ -357,40 +384,6 @@ namespace BenchmarkDotNet.Running
                 return new object[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
 
             return new object[] { Activator.CreateInstance(parameterType) };
-        }
-
-        private static IReadOnlyCollection<IntegratedExportEnum> ExtractIntegrationExportEnums(IEnumerable<IExporter> exporters)
-        {
-            return exporters
-                    .OfType<IIntegratedExports>()
-                    .Where(export => export.IntegratedExportEnums.Any())
-                    .SelectMany(export => export.IntegratedExportEnums)
-                    .ToList();
-        }
-
-        private static IConfig ProcessIntegratedConfiguration(IConfig config, IEnumerable<IntegratedExportEnum> integrationExportEnums)
-        {
-            var allExporters = config.GetExporters().ToList();
-            var integratedExports = integrationExportEnums.Select(exportEnum =>
-            {
-                var exporterTypesStr = IntegratedExportersMap.SplitEnumByWith(exportEnum);
-                return new IntegratedExport
-                {
-                    ExportEnum = exportEnum,
-                    Exporter = allExporters.FirstOrDefault(e => exporterTypesStr[0] == e.Name),
-                    WithExporter = allExporters.FirstOrDefault(e => exporterTypesStr[1] == e.Name)
-                };
-            }).ToList();
-
-            var distinctExporters = allExporters
-                    .Where(exporter => !integratedExports
-                    .Any(integrated => integrated.Exporter.Name == exporter.Name ||
-                                     integrated.WithExporter.Name == exporter.Name))
-                .ToList();
-
-            return config
-                .WithSetExporters(distinctExporters)
-                .WithSetIntegratedExporters(integratedExports);
         }
     }
 }

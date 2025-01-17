@@ -1,18 +1,19 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
+using System.Text;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Exporters.IntegratedExporter
 {
-    public class CompositeExporter : IExporter
+    internal class CompositeIntegratedExporter : IExporter
     {
-        private readonly ImmutableArray<IExporter> exporters;
+        private readonly ImmutableArray<IntegratedExporterData> exporters;
 
-        public CompositeExporter(ImmutableArray<IExporter> exporters) => this.exporters = exporters;
+        public CompositeIntegratedExporter(ImmutableArray<IntegratedExporterData> integratedExporters) => this.exporters = integratedExporters;
 
         public string Name => nameof(CompositeExporter);
 
@@ -20,38 +21,10 @@ namespace BenchmarkDotNet.Exporters
         {
             if (summary.GetColumns().IsNullOrEmpty())
                 logger.WriteLineHint("You haven't configured any columns, your results will be empty");
-
-            foreach (var exporter in exporters)
-            {
-                try
-                {
-                    exporter.ExportToLog(summary, logger);
-                }
-                catch (Exception e)
-                {
-                    logger.WriteLineError(e.ToString());
-                }
-            }
         }
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
-            if (exporters != null && exporters.Any())
-            {
-                return exporters.SelectMany(exporter =>
-                {
-                    var files = new List<string>();
-                    try
-                    {
-                        files.AddRange(exporter.ExportToFiles(summary, consoleLogger));
-                    }
-                    catch (Exception e)
-                    {
-                        consoleLogger.WriteLineError(e.ToString());
-                    }
-                    return files;
-                });
-            }
             //else if (integratedExports != null && integratedExports.Any())
             //{
             //    return integratedExports.SelectMany(exporter =>
@@ -93,10 +66,7 @@ namespace BenchmarkDotNet.Exporters
             //        return files;
             //    });
             //}
-            else
-            {
-                return Array.Empty<string>();
-            }
+            return Array.Empty<string>();
         }
     }
 }

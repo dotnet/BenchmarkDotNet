@@ -37,6 +37,7 @@ namespace BenchmarkDotNet.Configs
         [Obsolete("This method will soon be removed, please start using .AddExporter() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IExporter[] exporters) => config.AddExporter(exporters);
         [PublicAPI] public static ManualConfig AddExporter(this IConfig config, params IExporter[] exporters) => config.With(m => m.AddExporter(exporters));
+        [PublicAPI] public static ManualConfig AddIntegratedExporter(this IConfig config, List<IExporter>? dependencies, IExporter withExporter, IExporter exporter) => config.With(m => m.AddIntegratedExporter(dependencies, withExporter, exporter));
 
         [Obsolete("This method will soon be removed, please start using .AddDiagnoser() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.AddDiagnoser(diagnosers);
@@ -76,9 +77,6 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
         [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
-
-        [PublicAPI] public static ManualConfig WithSetExporters(this IConfig config, List<IExporter> exporters) => config.With(m => m.WithSetExporters(exporters));
-        [PublicAPI] public static ManualConfig WithSetIntegratedExporters(this IConfig config, List<IntegratedExport> exporters) => config.With(m => m.WithSetIntegratedExporters(exporters));
 
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks

@@ -6,10 +6,8 @@ namespace BenchmarkDotNet.Attributes
 {
     public class RPlotExporterAttribute : ExporterConfigBaseAttribute
     {
-        protected RPlotExporterAttribute()
-        {}
 
-        public RPlotExporterAttribute(params IntegratedExportEnum[] integratedExportEnums) : base(new RPlotExporter(integratedExportEnums))
+        public RPlotExporterAttribute() : base(new RPlotExporter())
         {
         }
     }
