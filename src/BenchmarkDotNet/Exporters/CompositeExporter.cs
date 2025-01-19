@@ -36,67 +36,19 @@ namespace BenchmarkDotNet.Exporters
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
         {
-            if (exporters != null && exporters.Any())
+            return exporters.SelectMany(exporter =>
             {
-                return exporters.SelectMany(exporter =>
+                var files = new List<string>();
+                try
                 {
-                    var files = new List<string>();
-                    try
-                    {
-                        files.AddRange(exporter.ExportToFiles(summary, consoleLogger));
-                    }
-                    catch (Exception e)
-                    {
-                        consoleLogger.WriteLineError(e.ToString());
-                    }
-                    return files;
-                });
-            }
-            //else if (integratedExports != null && integratedExports.Any())
-            //{
-            //    return integratedExports.SelectMany(exporter =>
-            //    {
-            //        var files = new List<string>();
-            //        IEnumerable<string> dependencyFilePaths = new List<string>();
-            //        try
-            //        {
-            //            if (exporter.Dependencies.Any())
-            //            {
-            //                exporter.Dependencies.ForEach(d =>
-            //                {
-            //                    files.AddRange(d.ExportToFiles(summary, consoleLogger));
-            //                });
-            //            }
-            //            if (exporter.WithExporter != null)
-            //            {
-            //                files.AddRange(exporter.WithExporter.ExportToFiles(summary, consoleLogger));
-            //            }
-            //            if (exporter.Exporter != null && exporter.Exporter is IntegratedExporterExtension exporterBase)
-            //            {
-            //                object? payload = null;
-            //                switch (exporter.ExportEnum)
-            //                {
-            //                    case IntegratedExporterType.HtmlExporterWithRPlotExporter:
-            //                        if (exporter.WithExporter is RPlotExporter rPlotExporter)
-            //                        {
-            //                            payload = rPlotExporter.GetExpectedPngPaths(summary, consoleLogger);
-            //                        }
-            //                        break;
-            //                }
-            //                files.AddRange(exporterBase.IntegratedExportToFiles(summary, consoleLogger, payload));
-            //            }
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            consoleLogger.WriteLineError(e.ToString());
-            //        }
-            //        return files;
-            //    });
-            //}
-            else
-            {
-                return Array.Empty<string>();
-            }
+                    files.AddRange(exporter.ExportToFiles(summary, consoleLogger));
+                }
+                catch (Exception e)
+                {
+                    consoleLogger.WriteLineError(e.ToString());
+                }
+                return files;
+            });
         }
     }
 }

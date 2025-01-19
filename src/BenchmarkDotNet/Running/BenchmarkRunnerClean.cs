@@ -297,13 +297,13 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
             }
 
-            //if (config.GetIntegratedExports().Any())
-            //{
-            //    foreach (string file in config.GetCompositeIntegratedExporter().ExportToFiles(summary, logger))
-            //    {
-            //        logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
-            //    }
-            //}
+            if (config.GetIntegratedExporters().Any())
+            {
+                foreach (string file in config.GetCompositeIntegratedExporter().ExportToFiles(summary, logger))
+                {
+                    logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
+                }
+            }
 
 
             logger.WriteLine();

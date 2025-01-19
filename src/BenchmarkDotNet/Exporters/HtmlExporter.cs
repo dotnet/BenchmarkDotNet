@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Exporters.IntegratedExporter;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using System;

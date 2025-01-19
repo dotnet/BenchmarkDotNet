@@ -9,5 +9,6 @@ namespace BenchmarkDotNet.Exporters.IntegratedExporter
         public IExporter Exporter { get; set; }
         public IExporter WithExporter { get; set; }
         public List<IExporter>? Dependencies { get; set; }
+        public IntegratedExportType ExporterType { get; set; }
     }
 }

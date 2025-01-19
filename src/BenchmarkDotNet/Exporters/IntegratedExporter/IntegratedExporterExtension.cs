@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Exporters.IntegratedExporter
 {
     public abstract class IntegratedExporterExtension : ExporterBase
     {

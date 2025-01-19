@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
@@ -46,15 +47,37 @@ namespace BenchmarkDotNet.Configs
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
 
             var integratedExporters = source?.GetIntegratedExporters();
+            IEnumerable<IExporter>? distinctExporters = null;
             if (integratedExporters is not null && integratedExporters.Count() > 0)
             {
-                var distinctExporters = source.GetExporters().DistinctBy(e =>
+                var exporters = source.GetExporters();
+                foreach (var e in exporters)
                 {
-                    bool hasIntegratedExporter = source
-                })
+                    if (integratedExporters.Any(ie => ie.Exporter.GetType() == e.GetType()))
+                    {
+                        continue;
+                    }
+                    if (integratedExporters.Any(ie => ie.WithExporter.GetType() == e.GetType()))
+                    {
+                        continue;
+                    }
+                    if (integratedExporters.Any(ie => ie?.Dependencies?.Any(d => d.GetType() == e.GetType()) ?? false))
+                    {
+                        continue;
+                    }
+
+                    if (distinctExporters is null)
+                    {
+                        distinctExporters = new List<IExporter> { e };
+                    }
+                    else
+                    {
+                        ((List<IExporter>)distinctExporters).Add(e);
+                    }
+                }
             }
 
-            var allExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
+            var allUniqueExporters = GetExporters(distinctExporters, uniqueDiagnosers, configAnalyse);
 
             // Check for integrated exporters
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
@@ -73,8 +96,8 @@ namespace BenchmarkDotNet.Configs
                 uniqueLoggers,
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
-                allExporters,
-                new ImmutableArray<IntegratedExporterData>(),
+                allUniqueExporters,
+                integratedExporters?.ToImmutableArray() ?? new ImmutableArray<IntegratedExporterData>(),
                 uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
