@@ -3,14 +3,10 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
-    // Note: To properly test this locally, modify
-    // BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.csproj,
-    // following the comments in that file.
     public class MultipleFrameworksTest : BenchmarkTestExecutor
     {
         private const string TfmEnvVarName = "TfmEnvVarName";
@@ -60,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             {
                 if (Environment.GetEnvironmentVariable(TfmEnvVarName) != moniker.ToString())
                 {
-                    throw new InvalidOperationException($"Has not been recompiled, the value was {Environment.GetEnvironmentVariable(TfmEnvVarName)}");
+                    throw new InvalidOperationException($"Has not been recompiled, the value was {moniker}, expected {Environment.GetEnvironmentVariable(TfmEnvVarName)}");
                 }
             }
         }

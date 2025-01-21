@@ -3,17 +3,10 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
     <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
+    <TargetFrameworks>net461;net48;netcoreapp2.0;net8.0</TargetFrameworks>
+    <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
+    <NoWarn>$(NoWarn);NETSDK1138;NU1901;NU1902;NU1903;NU1904</NoWarn>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <!-- Using netcoreapp2.0 and net461 as one of the target frameworks leads to the following problems:-->
-    <!-- * NU1903: Package 'Microsoft.NETCore.App' 2.0.0 has a known high severity vulnerability -->
-    <!-- * Incompability with xunit.runner.visualstudio 2.4.2+ -->
-    <!-- Therefore, we don't use it explicitly in the source code base to avoid persistent warnings -->
-    <!-- If you need it for local backward compatibility experiments, do the following: -->
-    <!-- 1. Add 'netcoreapp2.0;net461' in the list of TargetFrameworks -->
-    <!-- 2. Add '<NoWarn>$(NoWarn);NU1903</NoWarn>' -->
-    <!-- 3. Downgrade the xunit.runner.visualstudio NuGet package to v2.4.1 -->
-    <!-- Please, do not commit these changes to the repository -->
-    <TargetFrameworks>net462;net48;net8.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</PackageId>
