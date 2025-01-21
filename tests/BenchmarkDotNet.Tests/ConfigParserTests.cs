@@ -421,7 +421,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0" },
+            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
                 new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
