@@ -249,10 +249,10 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
-            var configWithClrJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net462));
-            var configWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(CoreRuntime.Core80));
+            var configWithClrJob = CreateConfigFromJobs(Job.Default.WithRuntime(CoreRuntime.Core21));
+            var configWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net462));
 
-            foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithCoreJob, configWithClrJob))
+            foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, configWithCoreJob))
             {
                 var runnableJobs = added.GetJobs();
 
@@ -269,7 +269,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var configWithMutatorJob = CreateConfigFromJobs(Job.Default.WithWarmupCount(warmupCount).AsMutator());
             var configWithTwoStandardJobs = CreateConfigFromJobs(
                 Job.Default.WithRuntime(ClrRuntime.Net462),
-                Job.Default.WithRuntime(CoreRuntime.Core80));
+                Job.Default.WithRuntime(CoreRuntime.Core21));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithTwoStandardJobs, configWithMutatorJob))
             {

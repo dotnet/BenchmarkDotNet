@@ -18,14 +18,14 @@ When you run your benchmarks without specifying the toolchain in an explicit way
 If you want to test multiple frameworks, your project file **MUST target all of them** and you **MUST install the corresponding SDKs**:
 
 ```xml
-<TargetFrameworks>netcoreapp3.1;net8.0;net48</TargetFrameworks>
+<TargetFrameworks>netcoreapp3.0;netcoreapp2.1;net48</TargetFrameworks>
 ```
 
 If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks **using the same framework as the host process**:
 
 ```cmd
-dotnet run -c Release -f netcoreapp3.1 # is going to run the benchmarks using .NET Core 3.1
-dotnet run -c Release -f net8.0 # is going to run the benchmarks using .NET 8.0
+dotnet run -c Release -f netcoreapp2.1 # is going to run the benchmarks using .NET Core 2.1
+dotnet run -c Release -f netcoreapp3.0 # is going to run the benchmarks using .NET Core 3.0
 dotnet run -c Release -f net48         # is going to run the benchmarks using .NET 4.8
 mono $pathToExe                        # is going to run the benchmarks using Mono from your PATH
 ```
@@ -33,8 +33,8 @@ mono $pathToExe                        # is going to run the benchmarks using Mo
 To run the benchmarks for multiple runtimes with a single command, you need to specify the target framework moniker names via `--runtimes|-r` console argument:
 
 ```cmd
-dotnet run -c Release -f net8.0 --runtimes net8.0 netcoreapp3.1 # is going to run the benchmarks using .NET 8.0 and .NET Core 3.1
-dotnet run -c Release -f net8.0 --runtimes net8.0 net48         # is going to run the benchmarks using .NET 8.0 and .NET 4.8
+dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 netcoreapp3.0 # is going to run the benchmarks using .NET Core 2.1 and .NET Core 3.0
+dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # is going to run the benchmarks using .NET Core 2.1 and .NET 4.8
 ```
 
 What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:
@@ -67,8 +67,8 @@ namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RuntimeMoniker.Net48)]
     [SimpleJob(RuntimeMoniker.Mono)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-    [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
     public class TheClassWithBenchmarks
 ```
 
@@ -114,9 +114,9 @@ public class MyConfig : ManualConfig
         Add(Job.Default.With(
             CsProjCoreToolchain.From(
                 new NetCoreAppSettings(
-                    targetFrameworkMoniker: "net8.0-windows",
-                    runtimeFrameworkVersion: "8.0.101",
-                    name: ".NET 8.0 Windows"))));
+                    targetFrameworkMoniker: "netcoreapp2.1", 
+                    runtimeFrameworkVersion: "2.1.0-preview2-25628-01", 
+                    name: ".NET Core 2.1"))));
     }
 }
 ```
@@ -145,11 +145,11 @@ public class CustomPathsConfig : ManualConfig
     public CustomPathsConfig() 
     {
         var dotnetCli32bit = NetCoreAppSettings
-            .NetCoreApp31
+            .NetCoreApp20
             .WithCustomDotNetCliPath(@"C:\Program Files (x86)\dotnet\dotnet.exe", "32 bit cli");
 
         var dotnetCli64bit = NetCoreAppSettings
-            .NetCoreApp31
+            .NetCoreApp20
             .WithCustomDotNetCliPath(@"C:\Program Files\dotnet\dotnet.exe", "64 bit cli");
 
         AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(dotnetCli32bit)).WithId("32 bit cli"));

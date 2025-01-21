@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Environments
         public RuntimeMoniker RuntimeMoniker { get; }
 
         /// <summary>
-        /// MsBuild Target Framework Moniker, example: net462, net8.0
+        /// MsBuild Target Framework Moniker, example: net462, netcoreapp2.1
         /// </summary>
         public string MsBuildMoniker { get; }
 

@@ -57,27 +57,22 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// .NET Core 2.0
         /// </summary>
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
-        // Assigning explicit values so we can check for them without the compiler erroring.
-        NetCoreApp20 = 10,
+        NetCoreApp20,
 
         /// <summary>
         /// .NET Core 2.1
         /// </summary>
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
-        NetCoreApp21 = 11,
+        NetCoreApp21,
 
         /// <summary>
         /// .NET Core 2.2
         /// </summary>
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
-        NetCoreApp22 = 12,
+        NetCoreApp22,
 
         /// <summary>
         /// .NET Core 3.0
         /// </summary>
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
-        NetCoreApp30 = 13,
+        NetCoreApp30,
 
         /// <summary>
         /// .NET Core 3.1

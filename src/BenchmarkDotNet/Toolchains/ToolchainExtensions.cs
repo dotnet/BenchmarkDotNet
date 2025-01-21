@@ -124,6 +124,18 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net481:
                     return CsProjClassicNetToolchain.Net481;
 
+                case RuntimeMoniker.NetCoreApp20:
+                    return CsProjCoreToolchain.NetCoreApp20;
+
+                case RuntimeMoniker.NetCoreApp21:
+                    return CsProjCoreToolchain.NetCoreApp21;
+
+                case RuntimeMoniker.NetCoreApp22:
+                    return CsProjCoreToolchain.NetCoreApp22;
+
+                case RuntimeMoniker.NetCoreApp30:
+                    return CsProjCoreToolchain.NetCoreApp30;
+
                 case RuntimeMoniker.NetCoreApp31:
                     return CsProjCoreToolchain.NetCoreApp31;
 #pragma warning disable CS0618 // Type or member is obsolete

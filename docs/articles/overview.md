@@ -10,7 +10,7 @@ name: Overview
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
 * *Projects:* classic and modern with PackageReferences
-* *Runtimes:* Full .NET Framework (4.6+), .NET Core (3.1+), Mono, NativeAOT
+* *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, NativeAOT
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
 
