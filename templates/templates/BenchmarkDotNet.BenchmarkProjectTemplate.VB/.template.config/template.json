@@ -35,6 +35,14 @@
       "datatype": "choice",
       "choices": [
         {
+          "choice": "net10.0",
+          "description": ".NET 10"
+        },
+        {
+          "choice": "net9.0",
+          "description": ".NET 9"
+        },
+        {
           "choice": "net8.0",
           "description": ".NET 8"
         },
