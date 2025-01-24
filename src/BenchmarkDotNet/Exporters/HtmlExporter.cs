@@ -1,10 +1,13 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Exporters.IntegratedExporter;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using System;
+using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class HtmlExporter : ExporterBase
+    public class HtmlExporter : IntegratedExporterExtension
     {
         private const string CssDefinition = @"
 <style type=""text/css"">
@@ -23,7 +26,7 @@ namespace BenchmarkDotNet.Exporters
             PrintAll(summary, new HtmlLoggerWrapper(logger));
         }
 
-        private static void PrintAll(Summary summary, ILogger logger)
+        private static void PrintAll(Summary summary, ILogger logger, List<string>? moreData = null)
         {
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");
@@ -45,6 +48,14 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine();
 
             PrintTable(summary.Table, logger);
+
+            if (moreData != null)
+            {
+                foreach (var item in moreData)
+                {
+                    logger.WriteLine($"<img src='{item}'/>");
+                }
+            }
 
             logger.WriteLine("</body>");
             logger.WriteLine("</html>");
@@ -94,6 +105,11 @@ namespace BenchmarkDotNet.Exporters
             }
 
             logger.WriteLine();
+        }
+
+        public override void IntegratedExportToLog(Summary summary, ILogger logger, object moreData)
+        {
+            PrintAll(summary, logger, moreData as List<string>);
         }
 
         private class HtmlLoggerWrapper : ILogger

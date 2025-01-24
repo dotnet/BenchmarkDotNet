@@ -6,6 +6,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -58,6 +59,8 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
         public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
         public IEnumerable<IExporter> GetExporters() => Array.Empty<IExporter>();
+        public IEnumerable<IntegratedExporterData> GetIntegratedExporters() => Array.Empty<IntegratedExporterData>();
+        public IIntegratedExporter GetIntegratedExporter() => null;
         public IEnumerable<ILogger> GetLoggers() => new[] { ConsoleLogger.Default };
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();

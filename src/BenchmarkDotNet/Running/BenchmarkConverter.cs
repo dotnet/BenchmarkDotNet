@@ -7,8 +7,11 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 
@@ -16,7 +19,7 @@ namespace BenchmarkDotNet.Running
 {
     public static partial class BenchmarkConverter
     {
-        private const BindingFlags AllMethodsFlags =  BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags AllMethodsFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig? config = null)
         {
@@ -87,13 +90,44 @@ namespace BenchmarkDotNet.Running
         {
             config = config ?? DefaultConfig.Instance;
 
+
             var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
             var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
 
             foreach (var configFromAttribute in assemblyAttributes.Concat(typeAttributes))
-                config = ManualConfig.Union(config, configFromAttribute.Config);
+            {
+                if (configFromAttribute.GetType().Name == "IntegratedExporterAttribute" && configFromAttribute.Config is ManualConfig manualConfig)
+                {
+                    IntegratedExportType integratedExportType = manualConfig.IntegratedExportType;
+                    bool success = TryGetIntegratedExportersByType(integratedExportType, out List<IExporter>? dependencies, out IExporter exporter, out IExporter withExporter);
+                    if (!success || withExporter == null || exporter == null) continue;
+                    config = ManualConfig.Union(config, ManualConfig.CreateEmpty().AddIntegratedExporter(dependencies, withExporter, exporter));
+                }
+                else
+                {
+                    config = ManualConfig.Union(config, configFromAttribute.Config);
+                }
+            }
+
 
             return ImmutableConfigBuilder.Create(config);
+        }
+
+        private static bool TryGetIntegratedExportersByType(IntegratedExportType type, out List<IExporter>? dependencies, out IExporter exporter, out IExporter withExporter)
+        {
+            switch (type)
+            {
+                case IntegratedExportType.HtmlExporterWithRPlotExporter:
+                    exporter = HtmlExporter.Default;
+                    withExporter = RPlotExporter.Default;
+                    dependencies = (withExporter is IExporterDependencies exporterDependencies) ? exporterDependencies.Dependencies.ToList() : null;
+                    return true;
+                default:
+                    exporter = null;
+                    withExporter = null;
+                    dependencies = null;
+                    return false;
+            }
         }
 
         private static ImmutableConfig GetFullMethodConfig(MethodInfo method, ImmutableConfig typeConfig)

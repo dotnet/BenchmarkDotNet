@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Exporters
             return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
         }
 
-        private static string GetFileName(Summary summary)
+        protected static string GetFileName(Summary summary)
         {
             // we can't use simple name here, because user might be running benchmarks for a library,  which defines few types with the same name
             // and reports the results per type, so every summary is going to contain just single benchmark

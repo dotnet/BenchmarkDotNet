@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Globalization;
@@ -36,6 +37,7 @@ namespace BenchmarkDotNet.Configs
         [Obsolete("This method will soon be removed, please start using .AddExporter() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IExporter[] exporters) => config.AddExporter(exporters);
         [PublicAPI] public static ManualConfig AddExporter(this IConfig config, params IExporter[] exporters) => config.With(m => m.AddExporter(exporters));
+        [PublicAPI] public static ManualConfig AddIntegratedExporter(this IConfig config, List<IExporter>? dependencies, IExporter withExporter, IExporter exporter) => config.With(m => m.AddIntegratedExporter(dependencies, withExporter, exporter));
 
         [Obsolete("This method will soon be removed, please start using .AddDiagnoser() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.AddDiagnoser(diagnosers);

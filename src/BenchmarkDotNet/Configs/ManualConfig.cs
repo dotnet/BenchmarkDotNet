@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -23,9 +25,7 @@ namespace BenchmarkDotNet.Configs
     public class ManualConfig : IConfig
     {
         private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
-
         private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
-        private readonly List<IExporter> exporters = new List<IExporter>();
         private readonly List<ILogger> loggers = new List<ILogger>();
         private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
@@ -37,8 +37,15 @@ namespace BenchmarkDotNet.Configs
         private readonly List<EventProcessor> eventProcessors = new List<EventProcessor>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
+        private List<IExporter> exporters = new List<IExporter>();
+        private List<IntegratedExporterData> integratedExporters = new List<IntegratedExporterData>();
+
+        private IntegratedExportType integratedExporterType;
+        public IntegratedExportType IntegratedExportType => integratedExporterType;
+
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
+        public IEnumerable<IntegratedExporterData> GetIntegratedExporters() => integratedExporters;
         public IEnumerable<ILogger> GetLoggers() => loggers;
         public IEnumerable<IDiagnoser> GetDiagnosers() => diagnosers;
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
@@ -138,6 +145,19 @@ namespace BenchmarkDotNet.Configs
             exporters.AddRange(newExporters);
             return this;
         }
+
+        public ManualConfig AddIntegratedExporter(List<IExporter>? dependencies, IExporter withExporter, IExporter exporter)
+        {
+            integratedExporters.Add(new IntegratedExporterData() { Exporter = exporter, WithExporter = withExporter, Dependencies = dependencies });
+            return this;
+        }
+
+        public ManualConfig SetIntegratedExporterType(IntegratedExportType type)
+        {
+            integratedExporterType = type;
+            return this;
+        }
+
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .AddLogger() instead.")]
@@ -256,6 +276,7 @@ namespace BenchmarkDotNet.Configs
         {
             columnProviders.AddRange(config.GetColumnProviders());
             exporters.AddRange(config.GetExporters());
+            integratedExporters.AddRange(config.GetIntegratedExporters());
             loggers.AddRange(config.GetLoggers());
             diagnosers.AddRange(config.GetDiagnosers());
             analysers.AddRange(config.GetAnalysers());
@@ -319,6 +340,8 @@ namespace BenchmarkDotNet.Configs
             return manualConfig;
         }
 
+
+
         internal void RemoveAllJobs() => jobs.Clear();
 
         internal void RemoveAllDiagnosers() => diagnosers.Clear();
@@ -327,5 +350,6 @@ namespace BenchmarkDotNet.Configs
             => current == DefaultConfig.Instance.BuildTimeout
                 ? other
                 : TimeSpan.FromMilliseconds(Math.Max(current.TotalMilliseconds, other.TotalMilliseconds));
+
     }
 }

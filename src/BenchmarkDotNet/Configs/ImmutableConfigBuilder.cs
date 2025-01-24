@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -43,7 +45,28 @@ namespace BenchmarkDotNet.Configs
 
             var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
-            var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
+
+            var integratedExporters = source?.GetIntegratedExporters();
+            IEnumerable<IExporter>? distinctExporters = null;
+
+            if (integratedExporters?.Any() == true)
+            {
+                distinctExporters = source.GetExporters()
+                    .Where(e =>
+                        !integratedExporters.Any(ie =>
+                            ie.Exporter.GetType() == e.GetType() ||
+                            ie.WithExporter.GetType() == e.GetType() ||
+                            ie.Dependencies?.Any(d => d.GetType() == e.GetType()) == true))
+                    .ToList();
+            }
+            else
+            {
+                distinctExporters = source.GetExporters();
+            }
+
+            var allUniqueExporters = GetExporters(distinctExporters, uniqueDiagnosers, configAnalyse);
+
+            // Check for integrated exporters
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
@@ -60,7 +83,8 @@ namespace BenchmarkDotNet.Configs
                 uniqueLoggers,
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
-                uniqueExporters,
+                allUniqueExporters,
+                integratedExporters?.ToImmutableArray() ?? new ImmutableArray<IntegratedExporterData>(),
                 uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,

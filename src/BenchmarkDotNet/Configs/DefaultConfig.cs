@@ -9,6 +9,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -39,6 +40,10 @@ namespace BenchmarkDotNet.Configs
             yield return MarkdownExporter.GitHub;
             yield return HtmlExporter.Default;
         }
+
+        public IEnumerable<IntegratedExporterData> GetIntegratedExporters() => Array.Empty<IntegratedExporterData>();
+
+        public IIntegratedExporter GetIntegratedExporter() => null;
 
         public IEnumerable<ILogger> GetLoggers()
         {
@@ -77,7 +82,7 @@ namespace BenchmarkDotNet.Configs
         public IOrderer Orderer => null;
         public ICategoryDiscoverer? CategoryDiscoverer => null;
 
-        public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
+        public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
 
         public CultureInfo CultureInfo => null;
 
@@ -113,5 +118,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<EventProcessor> GetEventProcessors() => Array.Empty<EventProcessor>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+
+
     }
 }

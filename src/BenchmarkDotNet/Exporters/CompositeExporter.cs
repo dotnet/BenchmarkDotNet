@@ -35,7 +35,8 @@ namespace BenchmarkDotNet.Exporters
         }
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
-            => exporters.SelectMany(exporter =>
+        {
+            return exporters.SelectMany(exporter =>
             {
                 var files = new List<string>();
                 try
@@ -48,5 +49,6 @@ namespace BenchmarkDotNet.Exporters
                 }
                 return files;
             });
+        }
     }
 }
