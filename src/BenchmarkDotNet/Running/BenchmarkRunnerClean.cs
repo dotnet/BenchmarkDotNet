@@ -14,6 +14,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.IntegratedExporter;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -297,7 +298,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
             }
 
-            if (config.GetIntegratedExporters().Any())
+            if ((config?.GetIntegratedExporters() ?? new List<IntegratedExporterData>()).Any())
             {
                 foreach (string file in config.GetCompositeIntegratedExporter().ExportToFiles(summary, logger))
                 {

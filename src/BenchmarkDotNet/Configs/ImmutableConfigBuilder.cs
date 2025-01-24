@@ -48,33 +48,20 @@ namespace BenchmarkDotNet.Configs
 
             var integratedExporters = source?.GetIntegratedExporters();
             IEnumerable<IExporter>? distinctExporters = null;
-            if (integratedExporters is not null && integratedExporters.Count() > 0)
-            {
-                var exporters = source.GetExporters();
-                foreach (var e in exporters)
-                {
-                    if (integratedExporters.Any(ie => ie.Exporter.GetType() == e.GetType()))
-                    {
-                        continue;
-                    }
-                    if (integratedExporters.Any(ie => ie.WithExporter.GetType() == e.GetType()))
-                    {
-                        continue;
-                    }
-                    if (integratedExporters.Any(ie => ie?.Dependencies?.Any(d => d.GetType() == e.GetType()) ?? false))
-                    {
-                        continue;
-                    }
 
-                    if (distinctExporters is null)
-                    {
-                        distinctExporters = new List<IExporter> { e };
-                    }
-                    else
-                    {
-                        ((List<IExporter>)distinctExporters).Add(e);
-                    }
-                }
+            if (integratedExporters?.Any() == true)
+            {
+                distinctExporters = source.GetExporters()
+                    .Where(e =>
+                        !integratedExporters.Any(ie =>
+                            ie.Exporter.GetType() == e.GetType() ||
+                            ie.WithExporter.GetType() == e.GetType() ||
+                            ie.Dependencies?.Any(d => d.GetType() == e.GetType()) == true))
+                    .ToList();
+            }
+            else
+            {
+                distinctExporters = source.GetExporters();
             }
 
             var allUniqueExporters = GetExporters(distinctExporters, uniqueDiagnosers, configAnalyse);

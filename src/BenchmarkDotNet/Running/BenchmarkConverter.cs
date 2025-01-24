@@ -99,9 +99,9 @@ namespace BenchmarkDotNet.Running
                 if (configFromAttribute.GetType().Name == "IntegratedExporterAttribute" && configFromAttribute.Config is ManualConfig manualConfig)
                 {
                     IntegratedExportType integratedExportType = manualConfig.IntegratedExportType;
-                    bool isExported = TryGetIntegratedExportersByType(integratedExportType, out List<IExporter>? dependencies, out IExporter exporter, out IExporter withExporter);
-                    if (!isExported) continue;
-                    config = ManualConfig.Union(config, ManualConfig.CreateEmpty().AddIntegratedExporter(dependencies: dependencies, withExporter: withExporter, exporter: exporter));
+                    bool success = TryGetIntegratedExportersByType(integratedExportType, out List<IExporter>? dependencies, out IExporter exporter, out IExporter withExporter);
+                    if (!success || withExporter == null || exporter == null) continue;
+                    config = ManualConfig.Union(config, ManualConfig.CreateEmpty().AddIntegratedExporter(dependencies, withExporter, exporter));
                 }
                 else
                 {
