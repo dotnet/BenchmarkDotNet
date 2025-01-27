@@ -1,0 +1,15 @@
+﻿=== HideColumns_TableMarkDown ===
+
+BenchmarkDotNet v0.10.x-mock, Microsoft Windows NT 10.0.x.mock (Hyper-V)
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
+  [Host]     : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
+  DefaultJob : extra output line
+
+StdDev=8.80 ns  
+
+ Method | Mean     | Error   | 
+------- |---------:|--------:|
+ Foo    | 114.5 ns | 5.88 ns | 
+
+Errors: 0

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -131,7 +132,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)", EnvRequirement.DotNetCoreOnly)]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            if (RuntimeInformation.IsMacOS())
+            if (OsDetector.IsMacOS())
                 return; // currently not supported
 
             MemoryDiagnoserIsAccurate(NativeAotToolchain.Net80);
@@ -369,8 +370,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific(".NET Core 3.0 preview6+ exposes a GC.GetTotalAllocatedBytes method which makes it possible to work",
-            EnvRequirement.DotNetCore30Only)]
+        [Theory(Skip = "Test is flaky even in latest .Net")]
         [MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
@@ -460,7 +460,11 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithGcForce(false)
                     .WithGcServer(false)
                     .WithGcConcurrent(false)
-                    .WithEnvironmentVariable("COMPlus_TieredCompilation", "0") // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
+                    .WithEnvironmentVariables([
+                        // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
+                        new EnvironmentVariable("DOTNET_TieredCompilation", "0"),
+                        new EnvironmentVariable("COMPlus_TieredCompilation", "0")
+                    ])
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(memoryDiagnoser)

@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Phd;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
+using Perfolizer.Phd;
+using Perfolizer.Phd.Base;
+using Perfolizer.Phd.Dto;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -51,5 +59,54 @@ namespace BenchmarkDotNet.Reports
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";
 
         public IReadOnlyList<Measurement> GetResultRuns() => AllMeasurements.Where(r => r.Is(IterationMode.Workload, IterationStage.Result)).ToList();
+
+        public PhdEntry ToPhd()
+        {
+            var entry = new PhdEntry
+            {
+                Benchmark = new BdnBenchmark
+                {
+                    Display = BenchmarkCase.DisplayInfo,
+                    Namespace = BenchmarkCase.Descriptor.Type.Namespace ?? "",
+                    Type = FullNameProvider.GetTypeName(BenchmarkCase.Descriptor.Type),
+                    Method = BenchmarkCase.Descriptor.WorkloadMethod.Name,
+                    Parameters = BenchmarkCase.Parameters.PrintInfo,
+                    HardwareIntrinsics = this.GetHardwareIntrinsicsInfo()
+                },
+                Job = new BdnJob
+                {
+                    Environment = BenchmarkCase.Job.Environment.ToPhd(),
+                    Execution = BenchmarkCase.Job.Run.ToPhd()
+                }
+            };
+
+            var lifecycles = AllMeasurements.GroupBy(m => new BdnLifecycle
+            {
+                LaunchIndex = m.LaunchIndex,
+                IterationMode = m.IterationMode,
+                IterationStage = m.IterationStage
+            }).OrderBy(x => x.Key).ToList();
+            foreach (var lifecycleGroup in lifecycles)
+            {
+                var measurementsEntry = new PhdEntry
+                {
+                    Lifecycle = lifecycleGroup.Key
+                };
+
+                foreach (var measurement in lifecycleGroup.ToList())
+                {
+                    measurementsEntry.Add(new PhdEntry
+                    {
+                        IterationIndex = measurement.IterationIndex,
+                        InvocationCount = measurement.Operations,
+                        Value = measurement.Nanoseconds / measurement.Operations,
+                        Unit = TimeUnit.Nanosecond
+                    });
+                }
+                entry.Add(measurementsEntry);
+            }
+
+            return entry;
+        }
     }
 }

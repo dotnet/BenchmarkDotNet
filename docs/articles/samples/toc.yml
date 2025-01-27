@@ -38,6 +38,8 @@
   href: IntroDisassemblyRyuJit.md
 - name: IntroDotTraceDiagnoser
   href: IntroDotTraceDiagnoser.md
+- name: IntroDotMemoryDiagnoser
+  href: IntroDotMemoryDiagnoser.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
 - name: IntroEventPipeProfiler
@@ -122,6 +124,8 @@
   href: IntroTagColumn.md
 - name: IntroTailcall
   href: IntroTailcall.md
+- name: IntroVisualStudioProfiler
+  href: IntroVisualStudioProfiler.md
 - name: IntroWasm
   href: IntroWasm.md
 - name: IntroUnicode

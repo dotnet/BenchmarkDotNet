@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.TestAdapter
                 foreach (var benchmarkCase in benchmark.BenchmarksCases)
                 {
                     var testId = benchmarkCase.GetTestCaseId();
-                    if (benchmarkIds != null && benchmarkIds.Contains(testId))
+                    if (benchmarkIds == null || benchmarkIds.Contains(testId))
                     {
                         filteredCases.Add(benchmarkCase);
                         testCases.Add(benchmarkCase.ToVsTestCase(assemblyPath, needsJobInfo));

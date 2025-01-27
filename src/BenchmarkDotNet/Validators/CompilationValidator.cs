@@ -7,6 +7,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -25,8 +26,38 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
                     .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
+                    .Union(ValidateClassModifiers((validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
-                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks));
+                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
+                );
+
+        private static IEnumerable<ValidationError> ValidateClassModifiers(IEnumerable<BenchmarkCase> benchmarks)
+        {
+            return benchmarks
+                .Distinct(BenchmarkMethodEqualityComparer.Instance)
+                .SelectMany(benchmark =>
+                {
+                    var type = benchmark.Descriptor.Type;
+                    var errors = new List<ValidationError>();
+
+                    if (type.IsSealed)
+                    {
+                        errors.Add(new ValidationError(
+                           true,
+                           $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a sealed class, Declaring type must be unsealed.",
+                           benchmark));
+                    }
+                    if (!type.IsVisible)
+                    {
+                        errors.Add(new ValidationError(
+                            true,
+                            $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is within a non-visible class, all declaring types must be public.",
+                            benchmark));
+                    }
+                    // TODO: Generics validation
+                    return errors;
+                });
+        }
 
         private static IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks

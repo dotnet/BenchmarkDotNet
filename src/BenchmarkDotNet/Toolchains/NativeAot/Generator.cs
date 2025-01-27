@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -57,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly string ilcOptimizationPreference;
         private readonly string ilcInstructionSet;
 
-        protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
+        protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
             => useTempFolderForRestore
@@ -132,11 +134,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
-    <PublishAot Condition="" '$(TargetFramework)' != 'net6.0' "">true</PublishAot>
+    <PublishAot Condition=""$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))"">true</PublishAot>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
+    <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
     {GetTrimmingSettings()}
-    <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+    <StackTraceSupport>{ilcGenerateStackTraceData}</StackTraceSupport>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
@@ -153,7 +156,19 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
+{GetCustomProperties(buildPartition, logger)}
 </Project>";
+
+        private string GetCustomProperties(BuildPartition buildPartition, ILogger logger)
+        {
+            var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(projectFile.FullName);
+
+            (string customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+            return customProperties;
+        }
+
 
         private string GetILCompilerPackageReference()
             => string.IsNullOrEmpty(ilCompilerVersion) ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
@@ -248,11 +263,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
                     if (HardwareIntrinsics.IsX86Avx2Supported) yield return "avx2";
-                    if (HardwareIntrinsics.IsX86Avx512FSupported) yield return "avx-512f";
-                    if (HardwareIntrinsics.IsX86Avx512BWSupported) yield return "avx-512bw";
-                    if (HardwareIntrinsics.IsX86Avx512CDSupported) yield return "avx-512cd";
-                    if (HardwareIntrinsics.IsX86Avx512DQSupported) yield return "avx-512dq";
-                    if (HardwareIntrinsics.IsX86Avx512VbmiSupported) yield return "avx-512vbmi";
+                    if (HardwareIntrinsics.IsX86Avx512FSupported) yield return "avx512f";
+                    if (HardwareIntrinsics.IsX86Avx512BWSupported) yield return "avx512bw";
+                    if (HardwareIntrinsics.IsX86Avx512CDSupported) yield return "avx512cd";
+                    if (HardwareIntrinsics.IsX86Avx512DQSupported) yield return "avx512dq";
+                    if (HardwareIntrinsics.IsX86Avx512VbmiSupported) yield return "avx512vbmi";
                     if (HardwareIntrinsics.IsX86AesSupported) yield return "aes";
                     if (HardwareIntrinsics.IsX86Bmi1Supported) yield return "bmi";
                     if (HardwareIntrinsics.IsX86Bmi2Supported) yield return "bmi2";

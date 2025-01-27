@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -18,12 +19,20 @@ namespace BenchmarkDotNet.Running
 {
     public class BuildPartition
     {
+        // We use an auto-increment global counter instead of Guid to guarantee uniqueness per benchmark run (Guid has a small chance to collide),
+        // assuming there are fewer than 4 billion build partitions (a safe assumption).
+        internal static int s_partitionCounter;
+
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
+            // Combine the benchmark's assembly name, folder info, and build partition id.
+            string benchmarkAssemblyName = RepresentativeBenchmarkCase.Descriptor.Type.Assembly.GetName().Name;
+            string folderInfo = RepresentativeBenchmarkCase.Job.FolderInfo;
+            int id = Interlocked.Increment(ref s_partitionCounter);
+            ProgramName = $"{benchmarkAssemblyName}-{folderInfo}-{id}";
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }

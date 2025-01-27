@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Helpers
 
             // long paths can be enabled on Windows but it does not mean that everything is going to work fine..
             // so we always use 260 as limit on Windows
-            int limit =  RuntimeInformation.IsWindows()
+            int limit =  OsDetector.IsWindows()
                 ? WindowsOldPathLimit - reserve
                 : CommonSenseLimit;
 
@@ -68,7 +69,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetFilePath(string fileName, DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension)
         {
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net462 vs netcoreapp2.1 etc
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net462 vs net8.0 etc
             if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
                 fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 

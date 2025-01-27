@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Phd;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
+using Perfolizer.Helpers;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
+using Perfolizer.Phd;
+using Perfolizer.Phd.Dto;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -33,14 +37,11 @@ namespace BenchmarkDotNet.Environments
         public string BenchmarkDotNetVersion { get; protected set; }
 
         /// <summary>
-        /// Could be expensive
-        /// </summary>
-        public Lazy<string> OsVersion { get; protected set; }
-
-        /// <summary>
         /// is expensive to call (1s)
         /// </summary>
-        public Lazy<CpuInfo> CpuInfo { get; protected set; }
+        public Lazy<PhdCpu> Cpu { get; protected set; }
+
+        public Lazy<PhdOs> Os { get; protected set; }
 
         /// <summary>
         /// .NET Core SDK version
@@ -65,35 +66,36 @@ namespace BenchmarkDotNet.Environments
 
         public Lazy<ICollection<Antivirus>> AntivirusProducts { get; }
 
-        public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
+        // TODO: Join with PhdOs
+        public Lazy<VirtualMachineHypervisor?> VirtualMachineHypervisor { get; protected set; }
 
         protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = BenchmarkDotNetInfo.Instance.BrandVersion;
-            OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
-            CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
             IsMonoInstalled = new Lazy<bool>(() => !string.IsNullOrEmpty(ProcessHelper.RunAndReadOutput("mono", "--version")));
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
+            Os = new Lazy<PhdOs>(OsDetector.GetOs);
+            Cpu = new Lazy<PhdCpu>(CpuDetector.CrossPlatform.Detect);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => current ??= new HostEnvironmentInfo();
 
         public override IEnumerable<string> ToFormattedString()
         {
-            string vmName = VirtualMachineHypervisor.Value?.Name;
+            string? vmName = VirtualMachineHypervisor.Value?.Name;
 
             if (!string.IsNullOrEmpty(vmName))
-                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value} ({vmName})";
+                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()} ({vmName})";
             else if (RuntimeInformation.IsRunningInContainer)
-                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value} (container)";
+                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()} (container)";
             else
-                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value}";
+                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()}";
 
-            yield return CpuInfoFormatter.Format(CpuInfo.Value);
+            yield return Cpu.Value.ToFullBrandName();
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
             {
                 string frequency = ChronometerFrequency.ToString(FrequencyUnit.Hz, unitPresentation: UnitHelper.DefaultPresentation);
@@ -104,7 +106,7 @@ namespace BenchmarkDotNet.Environments
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
             {
-                // this wonderful version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
+                // this wonderful version number contains words like "preview" and ... 5 segments, so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
                 if (int.TryParse(new string(DotNetSdkVersion.Value.TrimStart().TakeWhile(char.IsDigit).ToArray()), out int major) && major >= 5)
                     yield return $".NET SDK {DotNetSdkVersion.Value}";
                 else
@@ -131,5 +133,18 @@ namespace BenchmarkDotNet.Environments
             sb.AppendLine(Summary.BuildAllRuntimes(hostEnvironmentInfo, Array.Empty<BenchmarkReport>()));
             return sb.ToString();
         }
+
+        public BdnHost ToPhd() => new ()
+        {
+            Cpu = Cpu.Value,
+            Os = Os.Value,
+            RuntimeVersion = RuntimeVersion,
+            HasAttachedDebugger = HasAttachedDebugger,
+            HasRyuJit = HasRyuJit,
+            Configuration = Configuration,
+            DotNetSdkVersion = DotNetSdkVersion.Value,
+            ChronometerFrequency = ChronometerFrequency.Hertz,
+            HardwareTimerKind = HardwareTimerKind.ToString()
+        };
     }
 }

@@ -5,13 +5,13 @@ using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
     }
 
-    internal abstract class Session : IDisposable
+    internal abstract class Session : DisposeAtProcessTermination
     {
         private const int MaxSessionNameLength = 128;
 
@@ -114,26 +114,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 BufferSizeMB = config.BufferSizeInMb,
                 CpuSampleIntervalMSec = config.CpuSampleIntervalInMilliseconds,
             };
-
-            Console.CancelKeyPress += OnConsoleCancelKeyPress;
-            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
         }
 
-        public void Dispose() => TraceEventSession.Dispose();
-
-        internal void Stop()
+        public override void Dispose()
         {
-            TraceEventSession.Stop();
-
-            Console.CancelKeyPress -= OnConsoleCancelKeyPress;
-            AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
+            TraceEventSession.Dispose();
+            base.Dispose();
         }
 
         internal abstract Session EnableProviders();
-
-        private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
-
-        private void OnProcessExit(object sender, EventArgs e) => Stop();
 
         protected static string GetSessionName(BenchmarkCase benchmarkCase)
         {

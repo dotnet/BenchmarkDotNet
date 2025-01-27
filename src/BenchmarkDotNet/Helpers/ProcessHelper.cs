@@ -12,7 +12,8 @@ namespace BenchmarkDotNet.Helpers
         /// Run external process and return the console output.
         /// In the case of any exception, null will be returned.
         /// </summary>
-        internal static string? RunAndReadOutput(string fileName, string arguments = "", ILogger? logger = null)
+        internal static string? RunAndReadOutput(string fileName, string arguments = "", ILogger? logger = null,
+            Dictionary<string, string>? environmentVariables = null)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -24,6 +25,9 @@ namespace BenchmarkDotNet.Helpers
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
+            if (environmentVariables != null)
+                foreach (var variable in environmentVariables)
+                    processStartInfo.Environment[variable.Key] = variable.Value;
             using (var process = new Process { StartInfo = processStartInfo })
             using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
             {

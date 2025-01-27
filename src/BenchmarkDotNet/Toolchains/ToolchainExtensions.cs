@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -46,9 +47,9 @@ namespace BenchmarkDotNet.Toolchains
                         : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
 
                 case MonoRuntime mono:
-                    if (RuntimeInformation.IsAndroid())
+                    if (OsDetector.IsAndroid())
                         return InProcessEmitToolchain.Instance;
-                    if (RuntimeInformation.IsIOS())
+                    if (OsDetector.IsIOS())
                         return InProcessNoEmitToolchain.Instance;
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
@@ -65,6 +66,7 @@ namespace BenchmarkDotNet.Toolchains
                                 RuntimeMoniker.Mono70 => GetToolchain(RuntimeMoniker.Net70),
                                 RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
                                 RuntimeMoniker.Mono90 => GetToolchain(RuntimeMoniker.Net90),
+                                RuntimeMoniker.Mono10_0 => GetToolchain(RuntimeMoniker.Net10_0),
                                 _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
                             };
                         }
@@ -122,18 +124,6 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net481:
                     return CsProjClassicNetToolchain.Net481;
 
-                case RuntimeMoniker.NetCoreApp20:
-                    return CsProjCoreToolchain.NetCoreApp20;
-
-                case RuntimeMoniker.NetCoreApp21:
-                    return CsProjCoreToolchain.NetCoreApp21;
-
-                case RuntimeMoniker.NetCoreApp22:
-                    return CsProjCoreToolchain.NetCoreApp22;
-
-                case RuntimeMoniker.NetCoreApp30:
-                    return CsProjCoreToolchain.NetCoreApp30;
-
                 case RuntimeMoniker.NetCoreApp31:
                     return CsProjCoreToolchain.NetCoreApp31;
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -154,6 +144,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net90:
                     return CsProjCoreToolchain.NetCoreApp90;
 
+                case RuntimeMoniker.Net10_0:
+                    return CsProjCoreToolchain.NetCoreApp10_0;
+
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
 
@@ -166,6 +159,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.NativeAot90:
                     return NativeAotToolchain.Net90;
 
+                case RuntimeMoniker.NativeAot10_0:
+                    return NativeAotToolchain.Net10_0;
+
                 case RuntimeMoniker.Mono60:
                     return MonoToolchain.Mono60;
 
@@ -177,6 +173,9 @@ namespace BenchmarkDotNet.Toolchains
 
                 case RuntimeMoniker.Mono90:
                     return MonoToolchain.Mono90;
+
+                case RuntimeMoniker.Mono10_0:
+                    return MonoToolchain.Mono10_0;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");

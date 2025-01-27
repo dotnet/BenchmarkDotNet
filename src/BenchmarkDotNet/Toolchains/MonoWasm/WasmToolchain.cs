@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 yield return validationError;
             }
 
-            if (RuntimeInformation.IsWindows())
+            if (OsDetector.IsWindows())
             {
                 yield return new ValidationError(true,
                     $"{nameof(WasmToolchain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly",

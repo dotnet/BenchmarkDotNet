@@ -522,10 +522,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
 
-                case RuntimeMoniker.NetCoreApp20:
-                case RuntimeMoniker.NetCoreApp21:
-                case RuntimeMoniker.NetCoreApp22:
-                case RuntimeMoniker.NetCoreApp30:
                 case RuntimeMoniker.NetCoreApp31:
 #pragma warning disable CS0618 // Type or member is obsolete
                 case RuntimeMoniker.NetCoreApp50:
@@ -535,6 +531,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net70:
                 case RuntimeMoniker.Net80:
                 case RuntimeMoniker.Net90:
+                case RuntimeMoniker.Net10_0:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
@@ -554,6 +551,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NativeAot90:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json");
 
+                case RuntimeMoniker.NativeAot10_0:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json");
+
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
 
@@ -572,6 +572,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.WasmNet90:
                     return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
 
+                case RuntimeMoniker.WasmNet10_0:
+                    return MakeWasmJob(baseJob, options, "net10.0", runtimeMoniker);
+
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0", runtimeMoniker);
 
@@ -587,6 +590,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.MonoAOTLLVMNet90:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net9.0", runtimeMoniker);
 
+                case RuntimeMoniker.MonoAOTLLVMNet10_0:
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net10.0", runtimeMoniker);
+
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
 
@@ -598,6 +604,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.Mono90:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono90);
+
+                case RuntimeMoniker.Mono10_0:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono10_0);
 
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
@@ -768,10 +777,17 @@ namespace BenchmarkDotNet.ConsoleArguments
         internal static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
         {
             int index = runtime.IndexOf('-');
+            if (index >= 0)
+            {
+                runtime = runtime.Substring(0, index);
+            }
 
-            return index < 0
-                ? Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker)
-                : Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
+            // Monikers older than Net 10 don't use any version delimiter, newer monikers use _ delimiter.
+            if (Enum.TryParse(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker))
+            {
+                return true;
+            }
+            return Enum.TryParse(runtime.Replace('.', '_'), ignoreCase: true, out runtimeMoniker);
         }
     }
 }

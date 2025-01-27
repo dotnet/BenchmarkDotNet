@@ -15,11 +15,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
     <!-- We use Verify.Xunit v20.8.2 because it's the latest version with net461 support -->
     <PackageReference Include="Verify.Xunit" Version="[20.8.2]" />
-    <PackageReference Include="xunit" Version="2.6.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -36,12 +36,23 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
+    <EmbeddedResource Include="Detectors\Cpu\TestFiles\*.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Detectors\Cpu\VerifiedFiles\CpuInfoFormatterTests.FormatTest.verified.txt">
+      <ParentFile>CpuInfoFormatterTests</ParentFile>
+      <DependentUpon>CpuInfoFormatterTests.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Detectors\" />
+    <Folder Include="Phd\VerifiedFiles\" />
   </ItemGroup>
 </Project>

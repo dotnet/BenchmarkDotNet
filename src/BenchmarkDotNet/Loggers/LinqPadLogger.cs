@@ -82,6 +82,7 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Statistic, "#00FFFF" },
                 { LogKind.Info, "#808000" },
                 { LogKind.Error, "#FF0000" },
+                { LogKind.Warning, "#FFFF00" },
                 { LogKind.Hint, "#008080" }
             };
 
@@ -95,6 +96,7 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Statistic, "#008080" },
                 { LogKind.Info, "#808000" },
                 { LogKind.Error, "#FF0000" },
+                { LogKind.Warning, "#FFFF00" },
                 { LogKind.Hint, "#008080" }
             };
     }

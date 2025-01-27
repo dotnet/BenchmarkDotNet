@@ -8,6 +8,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -37,14 +38,13 @@ namespace BenchmarkDotNet.Running
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
-            using var taskbarProgress = new TaskbarProgress();
-            taskbarProgress.SetState(TaskbarProgressState.Indeterminate);
+            using var taskbarProgress = new TaskbarProgress(TaskbarProgressState.Indeterminate);
 
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
 
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
-            var maxTitleLength = RuntimeInformation.IsWindows()
+            var maxTitleLength = OsDetector.IsWindows()
                 ? 254 - rootArtifactsFolderPath.Length
                 : int.MaxValue;
             var title = GetTitle(benchmarkRunInfos, maxTitleLength);
@@ -352,17 +352,6 @@ namespace BenchmarkDotNet.Running
         private static ImmutableArray<ValidationError> Validate(params BenchmarkRunInfo[] benchmarks)
         {
             var validationErrors = new List<ValidationError>();
-
-            if (benchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
-            {
-                var joinedCases = benchmarks.SelectMany(b => b.BenchmarksCases).ToArray();
-
-                validationErrors.AddRange(
-                    ConfigCompatibilityValidator
-                        .FailOnError
-                        .Validate(new ValidationParameters(joinedCases, null))
-                    );
-            }
 
             foreach (var benchmarkRunInfo in benchmarks)
                 validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));

@@ -1,0 +1,194 @@
+﻿BenchmarkDotNet v0.1729.0-mock, Microsoft Windows NT 10.0.x.mock
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+
+Type = Bench
+
+@Net481LegacyJit: Runtime = Net481, Jit = LegacyJit
+@Net70RyuJit:     Runtime = Net70, Jit = RyuJit
+
+| Method | Job             |  Center |  Spread |
+|:-------|:----------------|--------:|--------:|
+| Foo    | Net481LegacyJit | 11.0 ns | 0.81 ns |
+| Bar    | Net481LegacyJit | 21.0 ns | 0.81 ns |
+| Foo    | Net70RyuJit     | 31.0 ns | 0.81 ns |
+| Bar    | Net70RyuJit     | 41.0 ns | 0.81 ns |
+
+{
+  "engine": {
+    "name": "BenchmarkDotNet",
+    "version": "0.1729.0-mock"
+  },
+  "host": {
+    "runtimeVersion": "Clr 4.0.x.mock",
+    "hasAttachedDebugger": false,
+    "hasRyuJit": true,
+    "configuration": "CONFIGURATION",
+    "dotNetSdkVersion": "1.0.x.mock",
+    "chronometerFrequency": 2531248,
+    "hardwareTimerKind": "Tsc",
+    "os": {
+      "display": "Microsoft Windows NT 10.0.x.mock"
+    },
+    "cpu": {
+      "processorName": "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
+      "physicalProcessorCount": 1,
+      "physicalCoreCount": 4,
+      "logicalCoreCount": 8,
+      "nominalFrequencyHz": 3100000000,
+      "maxFrequencyHz": 3100000000
+    }
+  },
+  "nested": [
+    {
+      "job": {
+        "environment": {
+          "runtime": "net481",
+          "jit": "legacyJit"
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 10,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 11,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 12,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 20,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 21,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 22,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net70",
+          "jit": "ryuJit"
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 30,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 31,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 32,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 40,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 41,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 42,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "table": {
+      "columnDefinitions": [
+        {
+          "selector": ".engine",
+          "cloud": "primary",
+          "isSelfExplanatory": true,
+          "isAtomic": true
+        },
+        {
+          "selector": ".host.os",
+          "cloud": "primary",
+          "isSelfExplanatory": true,
+          "isAtomic": true
+        },
+        {
+          "selector": ".host.cpu",
+          "cloud": "primary",
+          "isSelfExplanatory": true,
+          "isAtomic": true
+        },
+        {
+          "selector": ".benchmark",
+          "cloud": "secondary"
+        },
+        {
+          "selector": ".job",
+          "cloud": "secondary",
+          "compressed": true
+        },
+        {
+          "selector": "=center"
+        },
+        {
+          "selector": "=spread"
+        }
+      ]
+    }
+  }
+}

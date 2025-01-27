@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\..\build\common.props" />
+    <PropertyGroup>
+        <TargetFrameworks>net6.0;net462;netcoreapp3.1</TargetFrameworks>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <AssemblyTitle>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyTitle>
+        <AssemblyName>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyName>
+        <PackageId>BenchmarkDotNet.Diagnostics.dotMemory</PackageId>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Profiler.SelfApi" Version="2.5.11" />
+    </ItemGroup>
+
+</Project>

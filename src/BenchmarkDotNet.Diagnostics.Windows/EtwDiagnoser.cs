@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
@@ -15,7 +16,7 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public abstract class EtwDiagnoser<TStats> where TStats : new()
+    public abstract class EtwDiagnoser<TStats> : DisposeAtProcessTermination where TStats : new()
     {
         internal readonly LogCapture Logger = new LogCapture();
         protected readonly Dictionary<BenchmarkCase, int> BenchmarkToProcess = new Dictionary<BenchmarkCase, int>();
@@ -38,11 +39,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             BenchmarkToProcess.Add(parameters.BenchmarkCase, parameters.Process.Id);
             StatsPerProcess.TryAdd(parameters.Process.Id, GetInitializedStats(parameters));
-
-            // Important: Must wire-up clean-up events prior to acquiring IDisposable instance (Session property)
-            // This is in effect the inverted sequence of actions in the Stop() method.
-            Console.CancelKeyPress += OnConsoleCancelKeyPress;
-            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
             Session = CreateSession(parameters.BenchmarkCase);
 
@@ -80,11 +76,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected void Stop()
         {
             WaitForDelayedEvents();
+            Dispose();
+        }
 
-            Session.Dispose();
-
-            Console.CancelKeyPress -= OnConsoleCancelKeyPress;
-            AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
+        public override void Dispose()
+        {
+            Session?.Dispose();
+            base.Dispose();
         }
 
         private void Clear()
@@ -92,10 +90,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             BenchmarkToProcess.Clear();
             StatsPerProcess.Clear();
         }
-
-        private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Session?.Dispose();
-
-        private void OnProcessExit(object sender, EventArgs e) => Session?.Dispose();
 
         private static string GetSessionName(string prefix, BenchmarkCase benchmarkCase, ParameterInstances? parameters = null)
         {

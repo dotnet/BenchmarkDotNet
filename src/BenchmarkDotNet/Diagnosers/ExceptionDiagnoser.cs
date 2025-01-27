@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -14,9 +15,11 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class ExceptionDiagnoser : IDiagnoser
     {
-        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser();
+        public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: true));
 
-        private ExceptionDiagnoser() { }
+        public ExceptionDiagnoser(ExceptionDiagnoserConfig config) => Config = config;
+
+        public ExceptionDiagnoserConfig Config { get; }
 
         public IEnumerable<string> Ids => new[] { nameof(ExceptionDiagnoser) };
 
@@ -32,14 +35,18 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(ExceptionsFrequencyMetricDescriptor.Instance, results.ExceptionFrequency);
+            yield return new Metric(new ExceptionsFrequencyMetricDescriptor(Config), results.ExceptionFrequency);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
-        private class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
+        internal class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
         {
-            internal static readonly IMetricDescriptor Instance = new ExceptionsFrequencyMetricDescriptor();
+            public ExceptionDiagnoserConfig Config { get; }
+            public ExceptionsFrequencyMetricDescriptor(ExceptionDiagnoserConfig config = null)
+            {
+                Config = config;
+            }
 
             public string Id => "ExceptionFrequency";
             public string DisplayName => Column.Exceptions;
@@ -49,7 +56,13 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => true;
+            public bool GetIsAvailable(Metric metric)
+            {
+                if (Config == null)
+                    return metric.Value > 0;
+                else
+                    return Config.DisplayExceptionsIfZeroValue || metric.Value > 0;
+            }
         }
     }
 }

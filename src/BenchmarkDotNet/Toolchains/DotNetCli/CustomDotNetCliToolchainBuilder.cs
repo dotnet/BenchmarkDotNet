@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        /// <param name="targetFrameworkMoniker">TFM, example: netcoreapp2.1</param>
+        /// <param name="targetFrameworkMoniker">TFM, example: net8.0</param>
         [PublicAPI]
         [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker)
@@ -127,7 +128,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
             // returns win10-x64, we want the simpler form win-x64
             // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
-            string osPart = RuntimeInformation.IsWindows() ? "win" : (RuntimeInformation.IsMacOS() ? "osx" : "linux");
+            string osPart = OsDetector.IsWindows() ? "win" : (OsDetector.IsMacOS() ? "osx" : "linux");
 
             string architecture =
 #if NETSTANDARD

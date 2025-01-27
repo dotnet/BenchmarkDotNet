@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    internal class PowerManagementApplier : IDisposable
+    internal class PowerManagementApplier : DisposeAtProcessTermination
     {
         private static readonly Guid UserPowerPlan = new Guid("67b4a053-3646-4532-affd-0535c9ea82a7");
 
@@ -27,13 +27,17 @@ namespace BenchmarkDotNet.Running
 
         internal PowerManagementApplier(ILogger logger) => this.logger = logger;
 
-        public void Dispose() => ApplyUserPowerPlan();
+        public override void Dispose()
+        {
+            ApplyUserPowerPlan();
+            base.Dispose();
+        }
 
         internal static Guid Map(PowerPlan value) => PowerPlansDict[value];
 
         internal void ApplyPerformancePlan(Guid id)
         {
-            if (!RuntimeInformation.IsWindows() || id == Guid.Empty)
+            if (!OsDetector.IsWindows() || id == Guid.Empty)
                 return;
 
             if (id != UserPowerPlan)
@@ -44,7 +48,7 @@ namespace BenchmarkDotNet.Running
 
         private void ApplyUserPowerPlan()
         {
-            if (powerPlanChanged && RuntimeInformation.IsWindows())
+            if (powerPlanChanged && OsDetector.IsWindows())
             {
                 try
                 {

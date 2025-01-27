@@ -1,0 +1,31 @@
+﻿[Keys]
+  .benchmark
+  .benchmark.method
+  .benchmark.type
+  .iterationIndex
+  .parameters
+  .parameters.a
+  .parameters.b
+  .unit
+  .value
+
+[Entry0]
+  .benchmark = Bench.Foo
+  .benchmark.method = Foo
+  .benchmark.type = Bench
+  .iterationIndex = 0
+  .parameters = <dictionary>
+  .parameters.a = 1
+  .parameters.b = 2
+  .unit = ms
+  .value = 10
+[Entry1]
+  .benchmark = Bench.Bar
+  .benchmark.method = Bar
+  .benchmark.type = Bench
+  .iterationIndex = 0
+  .parameters = <dictionary>
+  .parameters.a = 10
+  .parameters.b = 20
+  .unit = ms
+  .value = 20

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -86,7 +87,7 @@ namespace BenchmarkDotNet.Extensions
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
-            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+            if (!OsDetector.IsWindows() && !OsDetector.IsLinux())
                 return false;
 
             try
@@ -108,7 +109,7 @@ namespace BenchmarkDotNet.Extensions
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
 
-            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+            if (!OsDetector.IsWindows() && !OsDetector.IsLinux())
                 return null;
 
             try
@@ -124,7 +125,7 @@ namespace BenchmarkDotNet.Extensions
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase, IResolver resolver)
         {
             if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
-                start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
+                SetClrEnvironmentVariables(start, "Version", clrRuntime.Version);
 
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
@@ -132,10 +133,10 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Config.HasPerfCollectProfiler())
             {
                 // enable tracing configuration inside of CoreCLR (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#collecting-a-trace)
-                start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
-                start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
+                SetClrEnvironmentVariables(start, "PerfMapEnabled", "1");
+                SetClrEnvironmentVariables(start, "EnableEventLog", "1");
                 // enable BDN Event Source (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#filtering)
-                start.EnvironmentVariables["COMPlus_EventSourceFilter"] = EngineEventSource.SourceName;
+                SetClrEnvironmentVariables(start, "EventSourceFilter", EngineEventSource.SourceName);
                 // workaround for https://github.com/dotnet/runtime/issues/71786, will be solved by next perf version
                 start.EnvironmentVariables["DOTNET_EnableWriteXorExecute"] = "0";
             }
@@ -163,7 +164,7 @@ namespace BenchmarkDotNet.Extensions
 
         public static void KillTree(this Process process, TimeSpan timeout)
         {
-            if (RuntimeInformation.IsWindows())
+            if (OsDetector.IsWindows())
             {
                 RunProcessAndIgnoreOutput("taskkill", $"/T /F /PID {process.Id}", timeout);
             }
@@ -257,21 +258,27 @@ namespace BenchmarkDotNet.Extensions
         {
             var gcMode = benchmarkCase.Job.Environment.Gc;
 
-            start.EnvironmentVariables["COMPlus_gcServer"] = gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver) ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_gcConcurrent"] = gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver) ? "1" : "0";
+            SetClrEnvironmentVariables(start, "gcServer", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver) ? "1" : "0");
+            SetClrEnvironmentVariables(start, "gcConcurrent", gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver) ? "1" : "0");
 
             if (gcMode.HasValue(GcMode.CpuGroupsCharacteristic))
-                start.EnvironmentVariables["COMPlus_GCCpuGroup"] = gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver) ? "1" : "0";
+                SetClrEnvironmentVariables(start, "GCCpuGroup", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver) ? "1" : "0");
             if (gcMode.HasValue(GcMode.AllowVeryLargeObjectsCharacteristic))
-                start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver) ? "1" : "0";
+                SetClrEnvironmentVariables(start, "gcAllowVeryLargeObjects", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver) ? "1" : "0");
             if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
-                start.EnvironmentVariables["COMPlus_GCRetainVM"] = gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver) ? "1" : "0";
+                SetClrEnvironmentVariables(start, "GCRetainVM", gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver) ? "1" : "0");
             if (gcMode.HasValue(GcMode.NoAffinitizeCharacteristic))
-                start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver) ? "1" : "0";
+                SetClrEnvironmentVariables(start, "GCNoAffinitize", gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver) ? "1" : "0");
             if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
-                start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = gcMode.HeapAffinitizeMask.ToString("X");
+                SetClrEnvironmentVariables(start, "GCHeapAffinitizeMask", gcMode.HeapAffinitizeMask.ToString("X"));
             if (gcMode.HasValue(GcMode.HeapCountCharacteristic))
-                start.EnvironmentVariables["COMPlus_GCHeapCount"] = gcMode.HeapCount.ToString("X");
+                SetClrEnvironmentVariables(start, "GCHeapCount", gcMode.HeapCount.ToString("X"));
+        }
+
+        private static void SetClrEnvironmentVariables(ProcessStartInfo start, string suffix, string value)
+        {
+            start.EnvironmentVariables[$"DOTNET_{suffix}"] = value;
+            start.EnvironmentVariables[$"COMPlus_{suffix}"] = value;
         }
     }
 }

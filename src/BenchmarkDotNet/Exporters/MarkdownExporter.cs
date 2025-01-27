@@ -164,9 +164,9 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart().TrimEnd() + "-" : "-");
 
                 logger.WriteLineStatistic(string.Join("",
-                    table.Columns.Where(c => c.NeedToShow).Select(column =>
+                    table.Columns.Where(c => c.NeedToShow).Select((column, index) =>
                         new string('-', column.Width - 1) + GetHeaderSeparatorIndicator(column.OriginalColumn.IsNumeric) +
-                        GetHeaderSeparatorColumnDivider(column.Index, table.ColumnCount))));
+                        GetHeaderSeparatorColumnDivider(index, table.Columns.Where(c => c.NeedToShow).Count()))));
             }
 
             int rowCounter = 0;

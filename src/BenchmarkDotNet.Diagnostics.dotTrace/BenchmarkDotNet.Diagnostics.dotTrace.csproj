@@ -14,7 +14,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="JetBrains.Profiler.SelfApi" Version="2.5.0" />
+        <PackageReference Include="JetBrains.Profiler.SelfApi" Version="2.5.11" />
     </ItemGroup>
 
 </Project>

@@ -18,14 +18,14 @@ When you run your benchmarks without specifying the toolchain in an explicit way
 If you want to test multiple frameworks, your project file **MUST target all of them** and you **MUST install the corresponding SDKs**:
 
 ```xml
-<TargetFrameworks>netcoreapp3.0;netcoreapp2.1;net48</TargetFrameworks>
+<TargetFrameworks>netcoreapp3.1;net8.0;net48</TargetFrameworks>
 ```
 
 If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks **using the same framework as the host process**:
 
 ```cmd
-dotnet run -c Release -f netcoreapp2.1 # is going to run the benchmarks using .NET Core 2.1
-dotnet run -c Release -f netcoreapp3.0 # is going to run the benchmarks using .NET Core 3.0
+dotnet run -c Release -f netcoreapp3.1 # is going to run the benchmarks using .NET Core 3.1
+dotnet run -c Release -f net8.0 # is going to run the benchmarks using .NET 8.0
 dotnet run -c Release -f net48         # is going to run the benchmarks using .NET 4.8
 mono $pathToExe                        # is going to run the benchmarks using Mono from your PATH
 ```
@@ -33,8 +33,8 @@ mono $pathToExe                        # is going to run the benchmarks using Mo
 To run the benchmarks for multiple runtimes with a single command, you need to specify the target framework moniker names via `--runtimes|-r` console argument:
 
 ```cmd
-dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 netcoreapp3.0 # is going to run the benchmarks using .NET Core 2.1 and .NET Core 3.0
-dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # is going to run the benchmarks using .NET Core 2.1 and .NET 4.8
+dotnet run -c Release -f net8.0 --runtimes net8.0 netcoreapp3.1 # is going to run the benchmarks using .NET 8.0 and .NET Core 3.1
+dotnet run -c Release -f net8.0 --runtimes net8.0 net48         # is going to run the benchmarks using .NET 8.0 and .NET 4.8
 ```
 
 What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:
@@ -67,8 +67,8 @@ namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RuntimeMoniker.Net48)]
     [SimpleJob(RuntimeMoniker.Mono)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net80)]
     public class TheClassWithBenchmarks
 ```
 
@@ -87,10 +87,9 @@ namespace BenchmarkDotNet.Samples
         static void Main(string[] args)
         {
             var config = DefaultConfig.Instance
-                .With(Job.Default.With(CoreRuntime.Core21))
-                .With(Job.Default.With(CoreRuntime.Core30))
-                .With(Job.Default.With(ClrRuntime.Net48))
-                .With(Job.Default.With(MonoRuntime.Default));
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.Net48))
+                .AddJob(Job.Default.WithRuntime(MonoRuntime.Default));
 
             BenchmarkSwitcher
                 .FromAssembly(typeof(Program).Assembly)
@@ -115,9 +114,9 @@ public class MyConfig : ManualConfig
         Add(Job.Default.With(
             CsProjCoreToolchain.From(
                 new NetCoreAppSettings(
-                    targetFrameworkMoniker: "netcoreapp2.1", 
-                    runtimeFrameworkVersion: "2.1.0-preview2-25628-01", 
-                    name: ".NET Core 2.1"))));
+                    targetFrameworkMoniker: "net8.0-windows",
+                    runtimeFrameworkVersion: "8.0.101",
+                    name: ".NET 8.0 Windows"))));
     }
 }
 ```
@@ -130,8 +129,8 @@ It's possible to benchmark a private build of .NET Runtime. All you need to do i
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, 
-        DefaultConfig.Instance.With(
-            Job.ShortRun.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0"))));
+        DefaultConfig.Instance.AddJob(
+            Job.ShortRun.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0"))));
 ```
 
 This sends the provided version as a `COMPLUS_Version` env var to the benchmarked process.
@@ -146,11 +145,11 @@ public class CustomPathsConfig : ManualConfig
     public CustomPathsConfig() 
     {
         var dotnetCli32bit = NetCoreAppSettings
-            .NetCoreApp20
+            .NetCoreApp31
             .WithCustomDotNetCliPath(@"C:\Program Files (x86)\dotnet\dotnet.exe", "32 bit cli");
 
         var dotnetCli64bit = NetCoreAppSettings
-            .NetCoreApp20
+            .NetCoreApp31
             .WithCustomDotNetCliPath(@"C:\Program Files\dotnet\dotnet.exe", "64 bit cli");
 
         AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(dotnetCli32bit)).WithId("32 bit cli"));
@@ -208,7 +207,7 @@ or:
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.Default.With(NativeAotRuntime.Net70)); // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
+    .AddJob(Job.Default.WithRuntime(NativeAotRuntime.Net70)); // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
@@ -231,8 +230,8 @@ If you want to benchmark some particular version of NativeAOT (or from a differe
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.ShortRun
-        .With(NativeAotToolchain.CreateBuilder()
+    .AddJob(Job.ShortRun
+        .WithToolchain(NativeAotToolchain.CreateBuilder()
             .UseNuGet(
                 microsoftDotNetILCompilerVersion: "7.0.0-*", // the version goes here
                 nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json") // this address might change over time
@@ -338,8 +337,8 @@ or explicitly in the code:
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.ShortRun
-        .With(NativeAotToolchain.CreateBuilder()
+    .AddJob(Job.ShortRun
+        .WithToolchain(NativeAotToolchain.CreateBuilder()
             .UseLocalBuild(@"C:\Projects\runtime\artifacts\packages\Release\Shipping\")
             .DisplayName("NativeAOT local build")
             .TargetFrameworkMoniker("net7.0")

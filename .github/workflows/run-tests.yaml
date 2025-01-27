@@ -17,18 +17,20 @@ jobs:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      # Build and Test
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
       - name: Run task 'in-tests-core'
         shell: cmd
         run: ./build.cmd in-tests-core -e
+      # Upload Artifacts with Unique Name
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: test-windows-core-trx
+          name: test-windows-core-trx-${{ github.run_id }}
           path: "**/*.trx"
 
   test-windows-full:
@@ -37,24 +39,27 @@ jobs:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      # Build and Test
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
       - name: Run task 'in-tests-full'
         shell: cmd
         run: ./build.cmd in-tests-full -e
+      # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-windows-full-trx
+          name: test-windows-full-trx-${{ github.run_id }}
           path: "**/*.trx"
 
   test-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      # Set up the environment
       - name: Set up Clang
         uses: egor-tensin/setup-clang@v1
         with:
@@ -70,23 +75,25 @@ jobs:
         run: npm install jsvu -g && jsvu --os=linux64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
+      # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Run task 'unit-tests'
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
         run: ./build.cmd in-tests-core -e
+      # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-linux-trx
+          name: test-linux-trx-${{ github.run_id }}
           path: "**/*.trx"
 
   test-macos:
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up node
         uses: actions/setup-node@v4
         with:
@@ -95,23 +102,25 @@ jobs:
         run: npm install jsvu -g && jsvu --os=mac64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
+      # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
       - name: Run task 'unit-tests'
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
         run: ./build.cmd in-tests-core -e
+      # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-macos-trx
+          name: test-macos-trx-${{ github.run_id }}
           path: "**/*.trx"
 
   test-pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Clang
         uses: egor-tensin/setup-clang@v1
         with:
@@ -125,8 +134,8 @@ jobs:
   spellcheck-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         name: Setup node
         with:
           node-version: "18"

@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Tests
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net9.0", generator.TargetFrameworkMoniker);
+            Assert.Equal("net10.0", generator.TargetFrameworkMoniker);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -233,8 +233,8 @@ namespace BenchmarkDotNet.Tests
 
             var jobs = config.GetJobs().ToArray();
             Assert.Equal(2, jobs.Length);
-            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1));
-            Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2));
+            Assert.Single(jobs, job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_1);
+            Assert.Single(jobs, job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2);
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(new[] { "-r", "mono", "--monoPath", fakeMonoPath }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath));
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath);
         }
 
         [FactEnvSpecific("Testing local builds of Full .NET Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
@@ -254,7 +254,7 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(new[] { "--clrVersion", clrVersion }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clr && clr.Version == clrVersion));
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is ClrRuntime clr && clr.Version == clrVersion);
         }
 
         [Fact]
@@ -271,10 +271,10 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("netcoreapp2.0", true)]
-        [InlineData("netcoreapp2.1", true)]
-        [InlineData("netcoreapp2.2", true)]
-        [InlineData("netcoreapp3.0", true)]
+        [InlineData("netcoreapp3.1", true)]
+        [InlineData("net5.0", true)]
+        [InlineData("net6.0", true)]
+        [InlineData("net8.0", true)]
         [InlineData("net462", false)]
         [InlineData("net48", false)]
         public void DotNetCliParsedCorrectly(string tfm, bool isCore)
@@ -333,7 +333,7 @@ namespace BenchmarkDotNet.Tests
         public void PackagesPathParsedCorrectly()
         {
             var fakeRestoreDirectory = new FileInfo(typeof(object).Assembly.Location).Directory.FullName;
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0", "--packages", fakeRestoreDirectory }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1", "--packages", fakeRestoreDirectory }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
@@ -345,7 +345,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyBuildTimeout()
         {
             const int timeoutInSeconds = 10;
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0", "--buildTimeout", timeoutInSeconds.ToString() }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1", "--buildTimeout", timeoutInSeconds.ToString() }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
@@ -356,7 +356,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WhenUserDoesNotSpecifyTimeoutTheDefaultValueIsUsed()
         {
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0" }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1" }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
@@ -384,10 +384,17 @@ namespace BenchmarkDotNet.Tests
 
         [Theory]
         [InlineData("net50")]
+        [InlineData("net5.0")]
         [InlineData("net60")]
+        [InlineData("net6.0")]
         [InlineData("net70")]
+        [InlineData("net7.0")]
         [InlineData("net80")]
+        [InlineData("net8.0")]
         [InlineData("net90")]
+        [InlineData("net9.0")]
+        [InlineData("net10_0")]
+        [InlineData("net10.0")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
@@ -414,24 +421,24 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0" },
+            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp3.1", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
                 new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
-            Assert.Single(config.GetJobs().Where(job =>
-                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" &&
-                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
-            Assert.Single(config.GetJobs().Where(job =>
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462");
+            Assert.Single(config.GetJobs(), job => job.Environment.Runtime is MonoRuntime);
+            Assert.Single(config.GetJobs(), job =>
+                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.1" &&
+                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
-            Assert.Single(config.GetJobs().Where(job =>
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
-            Assert.Single(config.GetJobs().Where(job =>
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70);
+            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80));
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80);
         }
 
         [Theory]
@@ -439,7 +446,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("10ms")]
         public void CanUseStatisticalTestsToCompareFewDifferentRuntimes(string threshold)
         {
-            string[] arguments = ["--runtimes", "netcoreapp2.1", "netcoreapp2.2", "--statisticalTest", threshold];
+            string[] arguments = ["--runtimes", "net6.0", "net8.0", "--statisticalTest", threshold];
             var config = ConfigParser.Parse(arguments, new OutputLogger(Output)).config;
 
             var mockSummary = MockFactory.CreateSummary(config);
@@ -469,8 +476,8 @@ namespace BenchmarkDotNet.Tests
                 new OutputLogger(Output)).config;
 
             Assert.Equal(2, config.GetHardwareCounters().Count());
-            Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
-            Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.InstructionRetired));
+            Assert.Single(config.GetHardwareCounters(), counter => counter == HardwareCounter.CacheMisses);
+            Assert.Single(config.GetHardwareCounters(), counter => counter == HardwareCounter.InstructionRetired);
         }
 
         [Fact]

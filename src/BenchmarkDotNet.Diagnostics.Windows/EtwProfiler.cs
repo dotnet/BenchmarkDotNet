@@ -120,21 +120,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private void Stop(DiagnoserActionParameters parameters)
         {
             WaitForDelayedEvents();
-            string userSessionFile;
-            try
-            {
-                kernelSession.Stop();
-                heapSession?.Stop();
-                userSession.Stop();
-
-                userSessionFile = userSession.FilePath;
-            }
-            finally
-            {
-                kernelSession.Dispose();
-                heapSession?.Dispose();
-                userSession.Dispose();
-            }
+            string userSessionFile = userSession.FilePath;
+            kernelSession.Dispose();
+            heapSession?.Dispose();
+            userSession.Dispose();
 
             // Merge the 'primary' etl file X.etl (userSession) with any files that match .clr*.etl .user*.etl. and .kernel.etl.
             TraceEventSession.MergeInPlace(userSessionFile, TextWriter.Null);

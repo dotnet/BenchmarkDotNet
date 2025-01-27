@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using JsonSerializer = SimpleJson.SimpleJson;
+using JsonSerializer = SimpleJson.SimpleJsonSerializer;
 
 namespace BenchmarkDotNet.Tests
 {

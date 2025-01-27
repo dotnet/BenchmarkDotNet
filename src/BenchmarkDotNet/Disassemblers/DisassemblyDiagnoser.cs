@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Disassemblers.Exporters;
 using BenchmarkDotNet.Engines;
@@ -75,7 +76,7 @@ namespace BenchmarkDotNet.Diagnosers
                 case HostSignal.AfterAll when ShouldUseSameArchitectureDisassembler(benchmark, parameters):
                     results.Add(benchmark, sameArchitectureDisassembler.Disassemble(parameters));
                     break;
-                case HostSignal.AfterAll when RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark):
+                case HostSignal.AfterAll when OsDetector.IsWindows() && !ShouldUseMonoDisassembler(benchmark):
                     results.Add(benchmark, windowsDifferentArchitectureDisassembler.Disassemble(parameters));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
@@ -112,14 +113,9 @@ namespace BenchmarkDotNet.Diagnosers
 
                 if (ShouldUseClrMdDisassembler(benchmark))
                 {
-                    if (RuntimeInformation.IsLinux())
+                    if (OsDetector.IsLinux())
                     {
                         var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
-
-                        if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
-                        {
-                            yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
-                        }
 
                         if (ptrace_scope.Value == "2")
                         {
@@ -143,13 +139,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         // when we add  macOS support, RuntimeInformation.IsMacOS() needs to be added here
         private static bool ShouldUseClrMdDisassembler(BenchmarkCase benchmarkCase)
-            => !ShouldUseMonoDisassembler(benchmarkCase) && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux());
+            => !ShouldUseMonoDisassembler(benchmarkCase) && (OsDetector.IsWindows() || OsDetector.IsLinux());
 
         private static bool ShouldUseSameArchitectureDisassembler(BenchmarkCase benchmarkCase, DiagnoserActionParameters parameters)
         {
             if (ShouldUseClrMdDisassembler(benchmarkCase))
             {
-                if (RuntimeInformation.IsWindows())
+                if (OsDetector.IsWindows())
                 {
                     return WindowsDisassembler.GetDisassemblerArchitecture(parameters.Process, benchmarkCase.Job.Environment.Platform)
                         == RuntimeInformation.GetCurrentPlatform();

@@ -18,18 +18,40 @@ using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
 using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
+using Measurement = BenchmarkDotNet.Reports.Measurement;
 using MethodInfo = System.Reflection.MethodInfo;
 
 namespace BenchmarkDotNet.Tests.Mocks
 {
     public static class MockFactory
     {
-        public static Summary CreateSummary(Type benchmarkType)
+        public static Summary CreateSummary(Type benchmarkType, params IColumnHidingRule[] columHidingRules)
         {
             var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
             return new Summary(
                 "MockSummary",
                 runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 30, (index + 1) * 100)).ToImmutableArray(),
+                new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
+                string.Empty,
+                string.Empty,
+                TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray.Create<IColumnHidingRule>(columHidingRules));
+        }
+
+        public static Summary CreateSummaryWithBiasedDistribution(Type benchmarkType, int min, int median, int max, int n)
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
+            return new Summary(
+                $"MockSummary-N{n}",
+                runInfo.BenchmarksCases.Select((benchmark, index) => CreateReportWithBiasedDistribution(
+                    benchmark,
+                    (index + 1) * min,
+                    (index + 1) * median,
+                    (index + 1) * max,
+                    n,
+                    Array.Empty<Metric>())).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
                 string.Empty,
                 string.Empty,
@@ -117,6 +139,40 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
             var executeResult = new ExecuteResult(measurements, default, default, 0);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
+        }
+
+        private static BenchmarkReport CreateReportWithBiasedDistribution(BenchmarkCase benchmarkCase, int min, int median, int max, int n, Metric[] metrics)
+        {
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
+            bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
+            bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
+            var measurements = from i in Enumerable.Range(0, Math.Max(1, n / 9))
+                               from m in isFoo ? new[]
+                               {
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, min), // 1
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, min + ((median - min) / 2) + 1), // 3
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, median), // 4
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, median), // 4
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, median), // 4
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 7, 1, median + ((max - median) / 2)), // 7
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 8, 1, median + ((max - median) / 2)), // 7
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 9, 1, max),    // 10
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 9, 1, max),    // 10
+                               } : new[]
+                               {
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, min), // 1
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, min), // 1
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, min + ((median - min) / 2) + 1), // 3
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, min + ((median - min) / 2) + 1), // 3
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, median), // 4
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, median), // 4
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, median), // 4
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 7, 1, median + ((max - median) / 2)), // 7
+                                    new Measurement(1, IterationMode.Workload, IterationStage.Result, 9, 1, max),    // 10
+                               }
+                               select m;
+            var executeResult = new ExecuteResult(measurements.Take(n).ToList(), default, default, 0);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
         }
 

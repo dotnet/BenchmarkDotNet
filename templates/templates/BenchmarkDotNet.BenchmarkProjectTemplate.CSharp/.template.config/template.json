@@ -35,6 +35,14 @@
       "datatype": "choice",
       "choices": [
         {
+          "choice": "net10.0",
+          "description": ".NET 10"
+        },
+        {
+          "choice": "net9.0",
+          "description": ".NET 9"
+        },
+        {
           "choice": "net8.0",
           "description": ".NET 8"
         },
@@ -131,7 +139,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Version of BenchmarkDotNet that will be referenced.",
-      "defaultValue": "0.13.13",
+      "defaultValue": "0.14.1",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
   },

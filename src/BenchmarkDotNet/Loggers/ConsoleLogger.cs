@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Loggers
         public static readonly ILogger Ascii = new ConsoleLogger(false);
         public static readonly ILogger Unicode = new ConsoleLogger(true);
         private static readonly bool ConsoleSupportsColors
-            = !(RuntimeInformation.IsAndroid() || RuntimeInformation.IsIOS() || RuntimeInformation.IsWasm || RuntimeInformation.IsTvOS());
+            = !(OsDetector.IsAndroid() || OsDetector.IsIOS() || RuntimeInformation.IsWasm || OsDetector.IsTvOS());
 
         private readonly bool unicodeSupport;
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
@@ -79,6 +80,7 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Statistic, ConsoleColor.Cyan },
                 { LogKind.Info, ConsoleColor.DarkYellow },
                 { LogKind.Error, ConsoleColor.Red },
+                { LogKind.Warning, ConsoleColor.Yellow },
                 { LogKind.Hint, ConsoleColor.DarkCyan }
             };
 

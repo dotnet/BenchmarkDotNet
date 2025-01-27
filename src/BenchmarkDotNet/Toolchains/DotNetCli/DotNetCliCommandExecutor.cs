@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -56,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string? GetDotNetSdkVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
+            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) })
             using (new ConsoleExitHandler(process, NullLogger.Instance))
             {
                 try
@@ -137,7 +138,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static string GetDefaultDotNetCliPath()
         {
-            if (!Portability.RuntimeInformation.IsLinux())
+            if (!OsDetector.IsLinux())
                 return "dotnet";
 
             using (var parentProcess = Process.GetProcessById(libc.getppid()))

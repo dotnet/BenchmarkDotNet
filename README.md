@@ -30,7 +30,7 @@ It's no harder than writing unit tests!
 Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
 The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
-BenchmarkDotNet is already adopted by [19100+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
+BenchmarkDotNet is already adopted by [22000+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
   [.NET Runtime](https://github.com/dotnet/runtime),
   [.NET Compiler](https://github.com/dotnet/roslyn),
   [.NET Performance](https://github.com/dotnet/performance),
@@ -112,7 +112,7 @@ The measured data can be exported to different formats (md, html, csv, xml, json
 
 ![](https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/ec962b0bd6854c991d7a3ebd77037579165acb36/docs/images/v0.12.0/rplot.png)
 
-*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, NativeAOT  
+*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 3.1+, Mono, NativeAOT  
 *Supported languages:* C#, F#, Visual Basic  
 *Supported OS:* Windows, Linux, macOS  
 *Supported architectures:* x86, x64, ARM, ARM64, Wasm and LoongArch64
@@ -125,7 +125,7 @@ Four aspects define the design of these features:
 
 ### Simplicity
 
-You shouldn't be an experienced performance engineer if you want to write benchmarks.
+You shouldn't have to be an experienced performance engineer if you want to write benchmarks.
 You can design very complicated performance experiments in the declarative style using simple APIs.
 
 For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/features/parameterization.html) your benchmark,
@@ -135,8 +135,8 @@ If you want to compare benchmarks with each other,
   mark one of the benchmarks as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
   via `[Benchmark(Baseline = true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
-For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
-  `[SimpleJob(RuntimeMoniker.NetCoreApp30)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
+For example, you can run all the benchmarks on .NET Core 3.1 and Mono via
+  `[SimpleJob(RuntimeMoniker.NetCoreApp31)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
 
 If you don't like attributes, you can call most of the APIs via the fluent style and write code like this:
 

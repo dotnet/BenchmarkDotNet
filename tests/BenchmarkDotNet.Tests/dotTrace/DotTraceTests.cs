@@ -1,17 +1,24 @@
 using System;
+using System.Reflection;
 using BenchmarkDotNet.Diagnostics.dotTrace;
 using BenchmarkDotNet.Jobs;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests.dotTrace
+namespace BenchmarkDotNet.Tests.dotTrace;
+
+public class DotTraceTests
 {
-    public class DotTraceTests
+    [Fact]
+    public void AllRuntimeMonikerAreKnown()
     {
-        [Fact]
-        public void AllRuntimeMonikerAreKnown()
+        var diagnoser = new DotTraceDiagnoser();
+        foreach (RuntimeMoniker moniker in Enum.GetValues(typeof(RuntimeMoniker)))
         {
-            foreach (RuntimeMoniker moniker in Enum.GetValues(typeof(RuntimeMoniker)))
-                DotTraceDiagnoser.IsSupported(moniker); // Just check that it doesn't throw exceptions
+            // Just check that it doesn't throw exceptions, ignoring deprecated values.
+            if (typeof(RuntimeMoniker).GetMember(moniker.ToString())[0].GetCustomAttribute<ObsoleteAttribute>() == null)
+            {
+                diagnoser.IsSupported(moniker);
+            }
         }
     }
 }

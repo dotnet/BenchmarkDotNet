@@ -15,9 +15,7 @@ namespace BenchmarkDotNet.Loggers
     {
         private readonly ILogger logger;
         private readonly Process process;
-        private readonly IDiagnoser diagnoser;
         private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
-        private readonly DiagnoserActionParameters diagnoserActionParameters;
         private readonly ManualResetEvent finished;
 
         public Broker(ILogger logger, Process process, IDiagnoser diagnoser,
@@ -25,10 +23,10 @@ namespace BenchmarkDotNet.Loggers
         {
             this.logger = logger;
             this.process = process;
-            this.diagnoser = diagnoser;
+            this.Diagnoser = diagnoser;
             this.inputFromBenchmark = inputFromBenchmark;
             this.acknowledgments = acknowledgments;
-            diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
+            DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
             finished = new ManualResetEvent(false);
 
             Results = new List<string>();
@@ -37,6 +35,10 @@ namespace BenchmarkDotNet.Loggers
             process.EnableRaisingEvents = true;
             process.Exited += OnProcessExited;
         }
+
+        internal IDiagnoser Diagnoser { get; }
+
+        internal DiagnoserActionParameters DiagnoserActionParameters { get; }
 
         internal List<string> Results { get; }
 
@@ -90,7 +92,7 @@ namespace BenchmarkDotNet.Loggers
                 }
                 else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
-                    diagnoser?.Handle(signal, diagnoserActionParameters);
+                    Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
                     writer.WriteLine(Engine.Signals.Acknowledgment);
 
