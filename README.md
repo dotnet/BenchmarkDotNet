@@ -135,8 +135,8 @@ If you want to compare benchmarks with each other,
   mark one of the benchmarks as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
   via `[Benchmark(Baseline = true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
-For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
-  `[SimpleJob(RuntimeMoniker.NetCoreApp30)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
+For example, you can run all the benchmarks on .NET 8.0 and Mono via
+  `[SimpleJob(RuntimeMoniker.Net80)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
 
 If you don't like attributes, you can call most of the APIs via the fluent style and write code like this:
 

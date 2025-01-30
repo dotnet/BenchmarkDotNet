@@ -143,7 +143,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- fix System.Runtime.CompilerServices.Unsafe doesn't support netcoreapp2.0 -->
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     {GetInstructionSetSettings(buildPartition)}
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}

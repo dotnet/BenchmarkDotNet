@@ -18,6 +18,10 @@ namespace BenchmarkDotNet.Tests
         [InlineData(".NETCoreApp,Version=v3.0", RuntimeMoniker.NetCoreApp30, "netcoreapp3.0")]
         [InlineData(".NETCoreApp,Version=v3.1", RuntimeMoniker.NetCoreApp31, "netcoreapp3.1")]
         [InlineData(".NETCoreApp,Version=v5.0", RuntimeMoniker.Net50, "net5.0")]
+        [InlineData(".NETCoreApp,Version=v6.0", RuntimeMoniker.Net60, "net6.0")]
+        [InlineData(".NETCoreApp,Version=v7.0", RuntimeMoniker.Net70, "net7.0")]
+        [InlineData(".NETCoreApp,Version=v8.0", RuntimeMoniker.Net80, "net8.0")]
+        [InlineData(".NETCoreApp,Version=v9.0", RuntimeMoniker.Net90, "net9.0")]
         [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "net123.0")]
         public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
         {
@@ -125,6 +129,8 @@ namespace BenchmarkDotNet.Tests
             Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
 #elif NETCOREAPP5_0
             Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp50);
+#elif NET8_0
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net80);
 #endif
         }
     }

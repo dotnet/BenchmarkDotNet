@@ -23,7 +23,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
     <Nullable>annotations</Nullable>
-    <!-- Suppress "System.Collections.Immutable 8.0.0 doesn't support netcoreapp3.1" warning -->
+    <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 

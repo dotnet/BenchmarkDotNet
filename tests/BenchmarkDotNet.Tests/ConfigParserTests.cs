@@ -275,6 +275,12 @@ namespace BenchmarkDotNet.Tests
         [InlineData("netcoreapp2.1", true)]
         [InlineData("netcoreapp2.2", true)]
         [InlineData("netcoreapp3.0", true)]
+        [InlineData("netcoreapp3.1", true)]
+        [InlineData("net5.0", true)]
+        [InlineData("net6.0", true)]
+        [InlineData("net7.0", true)]
+        [InlineData("net8.0", true)]
+        [InlineData("net9.0", true)]
         [InlineData("net462", false)]
         [InlineData("net48", false)]
         public void DotNetCliParsedCorrectly(string tfm, bool isCore)
