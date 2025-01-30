@@ -56,6 +56,7 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle summaryStyle,
             ConfigOptions options,
             TimeSpan buildTimeout,
+            WakeLockType wakeLock,
             IReadOnlyList<Conclusion> configAnalysisConclusion)
         {
             columnProviders = uniqueColumnProviders;
@@ -78,6 +79,7 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle = summaryStyle;
             Options = options;
             BuildTimeout = buildTimeout;
+            WakeLock = wakeLock;
             ConfigAnalysisConclusion = configAnalysisConclusion;
         }
 
@@ -89,6 +91,7 @@ namespace BenchmarkDotNet.Configs
         public ICategoryDiscoverer CategoryDiscoverer { get; }
         public SummaryStyle SummaryStyle { get; }
         public TimeSpan BuildTimeout { get; }
+        public WakeLockType WakeLock { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;

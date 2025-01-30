@@ -7,5 +7,6 @@ public enum EnvRequirement
     NonLinux,
     FullFrameworkOnly,
     NonFullFramework,
-    DotNetCoreOnly
+    DotNetCoreOnly,
+    NeedsPrivilegedProcess
 }

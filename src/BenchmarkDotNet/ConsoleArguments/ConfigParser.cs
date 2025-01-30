@@ -392,6 +392,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.TimeOutInSeconds.HasValue)
                 config.WithBuildTimeout(TimeSpan.FromSeconds(options.TimeOutInSeconds.Value));
 
+            if (options.WakeLock.HasValue)
+                config.WithWakeLock(options.WakeLock.Value);
+
             return config;
         }
 
