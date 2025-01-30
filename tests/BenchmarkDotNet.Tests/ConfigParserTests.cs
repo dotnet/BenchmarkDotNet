@@ -339,7 +339,7 @@ namespace BenchmarkDotNet.Tests
         public void PackagesPathParsedCorrectly()
         {
             var fakeRestoreDirectory = new FileInfo(typeof(object).Assembly.Location).Directory.FullName;
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0", "--packages", fakeRestoreDirectory }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1", "--packages", fakeRestoreDirectory }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
@@ -351,7 +351,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyBuildTimeout()
         {
             const int timeoutInSeconds = 10;
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0", "--buildTimeout", timeoutInSeconds.ToString() }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1", "--buildTimeout", timeoutInSeconds.ToString() }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
@@ -362,7 +362,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WhenUserDoesNotSpecifyTimeoutTheDefaultValueIsUsed()
         {
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.0" }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1" }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
@@ -452,7 +452,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("10ms")]
         public void CanUseStatisticalTestsToCompareFewDifferentRuntimes(string threshold)
         {
-            string[] arguments = ["--runtimes", "netcoreapp2.1", "netcoreapp2.2", "--statisticalTest", threshold];
+            string[] arguments = ["--runtimes", "net6.0", "net8.0", "--statisticalTest", threshold];
             var config = ConfigParser.Parse(arguments, new OutputLogger(Output)).config;
 
             var mockSummary = MockFactory.CreateSummary(config);

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
-        /// sample values: netcoreapp2.0, netcoreapp2.1
+        /// sample values: net6.0, net8.0
         /// </param>
         /// <param name="runtimeFrameworkVersion">
         /// used in the auto-generated .csproj file
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         /// <summary>
-        /// sample values: netcoreapp2.0, netcoreapp2.1
+        /// sample values: net6.0, net8.0
         /// </summary>
         public string TargetFrameworkMoniker { get; }
 
