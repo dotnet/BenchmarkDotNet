@@ -112,7 +112,7 @@ The measured data can be exported to different formats (md, html, csv, xml, json
 
 ![](https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/ec962b0bd6854c991d7a3ebd77037579165acb36/docs/images/v0.12.0/rplot.png)
 
-*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 3.1+, Mono, NativeAOT  
+*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, NativeAOT  
 *Supported languages:* C#, F#, Visual Basic  
 *Supported OS:* Windows, Linux, macOS  
 *Supported architectures:* x86, x64, ARM, ARM64, Wasm and LoongArch64
@@ -135,8 +135,8 @@ If you want to compare benchmarks with each other,
   mark one of the benchmarks as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
   via `[Benchmark(Baseline = true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
-For example, you can run all the benchmarks on .NET Core 3.1 and Mono via
-  `[SimpleJob(RuntimeMoniker.NetCoreApp31)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
+For example, you can run all the benchmarks on .NET 8.0 and Mono via
+  `[SimpleJob(RuntimeMoniker.Net80)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
 
 If you don't like attributes, you can call most of the APIs via the fluent style and write code like this:
 

@@ -3,7 +3,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
@@ -13,13 +12,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         private const string TfmEnvVarName = "TfmEnvVarName";
 
         [Theory]
-        [InlineData(RuntimeMoniker.Net462)]
+        [InlineData(RuntimeMoniker.Net461)]
         [InlineData(RuntimeMoniker.Net48)]
-        [InlineData(RuntimeMoniker.NetCoreApp31)]
+        [InlineData(RuntimeMoniker.NetCoreApp20)]
         [InlineData(RuntimeMoniker.Net80)]
         public void EachFrameworkIsRebuilt(RuntimeMoniker runtime)
         {
-#if NET462
+#if NET461
             // We cannot detect what target framework version the host was compiled for on full Framework,
             // which causes the RoslynToolchain to be used instead of CsProjClassicNetToolchain when the host is full Framework
             // (because full Framework always uses the version that's installed on the machine, unlike Core),
@@ -40,12 +39,12 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public class ValuePerTfm
         {
             private const RuntimeMoniker moniker =
-#if NET462
-                RuntimeMoniker.Net462;
+#if NET461
+                RuntimeMoniker.Net461;
 #elif NET48
                 RuntimeMoniker.Net48;
-#elif NETCOREAPP3_1
-                RuntimeMoniker.NetCoreApp31;
+#elif NETCOREAPP2_0
+                RuntimeMoniker.NetCoreApp20;
 #elif NET8_0
                 RuntimeMoniker.Net80;
 #else
@@ -57,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             {
                 if (Environment.GetEnvironmentVariable(TfmEnvVarName) != moniker.ToString())
                 {
-                    throw new InvalidOperationException($"Has not been recompiled, the value was {Environment.GetEnvironmentVariable(TfmEnvVarName)}");
+                    throw new InvalidOperationException($"Has not been recompiled, the value was {moniker}, expected {Environment.GetEnvironmentVariable(TfmEnvVarName)}");
                 }
             }
         }

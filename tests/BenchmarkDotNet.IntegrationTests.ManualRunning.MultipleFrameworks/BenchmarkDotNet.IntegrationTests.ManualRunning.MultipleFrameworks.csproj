@@ -2,8 +2,8 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
-    <!-- We test older frameworks supported by BDN (net462 and netcoreapp3.1), as well as newer versions of those frameworks. -->
-    <TargetFrameworks>net462;net48;netcoreapp3.1;net8.0</TargetFrameworks>
+    <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
+    <TargetFrameworks>net461;net48;netcoreapp2.0;net8.0</TargetFrameworks>
     <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
     <NoWarn>$(NoWarn);NETSDK1138;NU1901;NU1902;NU1903;NU1904</NoWarn>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -38,9 +38,10 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.9.2" />
-    <!-- We use older version 2.4.1 for combatibility with netcoreapp3.1. -->
+    <!-- Microsoft.NET.Test.Sdk breaks netcoreapp2.0 -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" Condition=" '$(TargetFramework)' != 'netcoreapp2.0' " />
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <!-- We use older version 2.4.1 for combatibility with netcoreapp2.0. -->
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -522,6 +522,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
 
+                case RuntimeMoniker.NetCoreApp20:
+                case RuntimeMoniker.NetCoreApp21:
+                case RuntimeMoniker.NetCoreApp22:
+                case RuntimeMoniker.NetCoreApp30:
                 case RuntimeMoniker.NetCoreApp31:
 #pragma warning disable CS0618 // Type or member is obsolete
                 case RuntimeMoniker.NetCoreApp50:

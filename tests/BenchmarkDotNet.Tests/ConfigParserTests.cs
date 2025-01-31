@@ -271,10 +271,16 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
+        [InlineData("netcoreapp2.0", true)]
+        [InlineData("netcoreapp2.1", true)]
+        [InlineData("netcoreapp2.2", true)]
+        [InlineData("netcoreapp3.0", true)]
         [InlineData("netcoreapp3.1", true)]
         [InlineData("net5.0", true)]
         [InlineData("net6.0", true)]
+        [InlineData("net7.0", true)]
         [InlineData("net8.0", true)]
+        [InlineData("net9.0", true)]
         [InlineData("net462", false)]
         [InlineData("net48", false)]
         public void DotNetCliParsedCorrectly(string tfm, bool isCore)
@@ -437,15 +443,15 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp3.1", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
+            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
                 new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs(), job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462");
             Assert.Single(config.GetJobs(), job => job.Environment.Runtime is MonoRuntime);
             Assert.Single(config.GetJobs(), job =>
-                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.1" &&
-                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
+                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp2.0" &&
+                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp20);
             Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
                 nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60);
