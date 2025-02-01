@@ -69,10 +69,12 @@ namespace BenchmarkDotNet.Engines
                     .WithMinInvokeCount(2) // the minimum is 2 (not the default 4 which can be too much and not 1 which we already know is not enough)
                     .WithEvaluateOverhead(false); // it's something very time consuming, it overhead is too small compared to total time
 
-                return CreateEngine(engineParameters, needsPilot, engineParameters.OverheadActionNoUnroll, engineParameters.WorkloadActionNoUnroll);
+                return CreateEngine(engineParameters, needsPilot, engineParameters.OverheadActionNoUnroll, engineParameters.WorkloadActionNoUnroll)
+                    .WithInitialData(singleActionEngine);
             }
 
-            var multiActionEngine = CreateMultiActionEngine(engineParameters);
+            var multiActionEngine = CreateMultiActionEngine(engineParameters)
+                .WithInitialData(singleActionEngine);
 
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Jit(multiActionEngine, ++jitIndex, invokeCount: defaultUnrollFactor, unrollFactor: defaultUnrollFactor));
 
@@ -118,6 +120,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.Dummy3Action,
                 idle,
                 main,
+                engineParameters.WorkloadActionNoUnroll,
                 job,
                 engineParameters.GlobalSetupAction,
                 engineParameters.GlobalCleanupAction,
@@ -125,6 +128,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
                 engineParameters.MeasureExtraStats,
+                engineParameters.MeasureSurvivedMemory,
                 engineParameters.BenchmarkName);
     }
 }

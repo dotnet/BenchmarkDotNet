@@ -114,6 +114,8 @@ namespace BenchmarkDotNet.Configs
 
         public bool HasMemoryDiagnoser() => diagnosers.OfType<MemoryDiagnoser>().Any();
 
+        public bool HasSurvivedMemoryDiagnoser() => diagnosers.Any(diagnoser => diagnoser is MemoryDiagnoser md && md.Config.IncludeSurvived);
+
         public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
 
         public bool HasExceptionDiagnoser() => diagnosers.Contains(ExceptionDiagnoser.Default);
