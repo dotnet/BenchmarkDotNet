@@ -326,7 +326,7 @@ namespace BenchmarkDotNet.Engines
             long invokeCount = data.InvokeCount;
             int unrollFactor = data.UnrollFactor;
             if (invokeCount % unrollFactor != 0)
-                throw new ArgumentOutOfRangeException($"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
+                throw new ArgumentOutOfRangeException(nameof(data), $"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
 
             long totalOperations = invokeCount * OperationsPerInvoke;
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
