@@ -35,7 +35,6 @@
         public const string InvokeCountParamName = "invokeCount";
 
         public const string DummyParamName = "_";
-        public const string DisassemblerDefaultValueHolderName = "__disassemblerDefaultValueHolder";
 
         public const string GlobalSetupMethodName = "GlobalSetup";
         public const string GlobalCleanupMethodName = "GlobalCleanup";
