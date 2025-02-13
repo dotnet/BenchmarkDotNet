@@ -11,7 +11,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Perfolizer;
 using Perfolizer.Horology;
@@ -26,10 +26,22 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
     public class ExpectedBenchmarkResultsTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        // NativeAot takes a long time to build, so not including it in these tests.
-        // We also don't test InProcessNoEmitToolchain because it is known to be less accurate than code-gen toolchains.
-
         private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
+
+        // Visual Studio Test Explorer doesn't like to display IToolchain params separately, so use an enum instead.
+        public enum ToolchainType
+        {
+            Default,
+            InProcess
+        }
+
+        private IToolchain GetToolchain(ToolchainType toolchain)
+            => toolchain switch
+            {
+                ToolchainType.Default => Job.Default.GetToolchain(),
+                ToolchainType.InProcess => InProcessEmitToolchain.Instance,
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
         private static IEnumerable<Type> EmptyBenchmarkTypes() =>
             [
@@ -49,73 +61,32 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 typeof(EmptyClass)
             ];
 
-        public static IEnumerable<object[]> InProcessData()
+        public static IEnumerable<object[]> GetEmptyArgs()
         {
             foreach (var type in EmptyBenchmarkTypes())
             {
-                yield return new object[] { type };
-            }
-        }
-
-        public static IEnumerable<object[]> CoreData()
-        {
-            foreach (var type in EmptyBenchmarkTypes())
-            {
-                yield return new object[] { type, RuntimeMoniker.Net80 };
-                yield return new object[] { type, RuntimeMoniker.Mono80 };
-            }
-        }
-
-        public static IEnumerable<object[]> FrameworkData()
-        {
-            foreach (var type in EmptyBenchmarkTypes())
-            {
-                yield return new object[] { type, RuntimeMoniker.Net462 };
-                yield return new object[] { type, RuntimeMoniker.Mono };
+                yield return new object[] { ToolchainType.Default, type };
+                // InProcess overhead measurements are incorrect in Core. https://github.com/dotnet/runtime/issues/89685
+                if (!RuntimeInformation.IsNetCore)
+                {
+                    yield return new object[] { ToolchainType.InProcess, type };
+                }
             }
         }
 
         [Theory]
-        [MemberData(nameof(InProcessData))]
-        public void EmptyBenchmarkReportsZeroTimeAndAllocated_InProcess(Type benchmarkType)
+        [MemberData(nameof(GetEmptyArgs))]
+        public void EmptyBenchmarkReportsZeroTimeAndAllocated(ToolchainType toolchain, Type benchmarkType)
         {
-            AssertZeroResults(benchmarkType, ManualConfig.CreateEmpty()
-                .AddJob(Job.Default
-                    .WithToolchain(InProcessEmitToolchain.Instance)
-                // IL Emit has incorrect overhead measurement. https://github.com/dotnet/runtime/issues/89685
-                // We multiply the threshold to account for it.
-                ), multiplyThresholdBy: RuntimeInformation.IsNetCore ? 3 : 1);
-        }
-
-        [TheoryEnvSpecific("To not repeat tests in both Full .NET Framework and Core", EnvRequirement.DotNetCoreOnly)]
-        [MemberData(nameof(CoreData))]
-        public void EmptyBenchmarkReportsZeroTimeAndAllocated_Core(Type benchmarkType, RuntimeMoniker runtimeMoniker)
-        {
-            AssertZeroResults(benchmarkType, ManualConfig.CreateEmpty()
-                .AddJob(Job.Default
-                    .WithRuntime(runtimeMoniker.GetRuntime())
-                ));
-        }
-
-        [TheoryEnvSpecific("Can only run Full .NET Framework and Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
-        [MemberData(nameof(FrameworkData))]
-        public void EmptyBenchmarkReportsZeroTimeAndAllocated_Framework(Type benchmarkType, RuntimeMoniker runtimeMoniker)
-        {
-            AssertZeroResults(benchmarkType, ManualConfig.CreateEmpty()
-                .AddJob(Job.Default
-                    .WithRuntime(runtimeMoniker.GetRuntime())
-                ));
-        }
-
-        private void AssertZeroResults(Type benchmarkType, IConfig config, int multiplyThresholdBy = 1)
-        {
-            var summary = CanExecute(benchmarkType, config
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Default.WithToolchain(GetToolchain(toolchain)))
                 .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Nanosecond))
-                .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
-            );
+                .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)));
+
+            var summary = CanExecute(benchmarkType, config);
 
             var cpuResolution = CpuDetector.Cpu?.MaxFrequency()?.ToResolution() ?? FallbackCpuResolutionValue;
-            var threshold = new NumberValue(cpuResolution.Nanoseconds * multiplyThresholdBy).ToThreshold();
+            var threshold = new NumberValue(cpuResolution.Nanoseconds).ToThreshold();
 
             foreach (var report in summary.Reports)
             {
@@ -131,80 +102,41 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 
         private static IEnumerable<Type> NonEmptyBenchmarkTypes() =>
             [
-                typeof(DifferentSizedStructs),
+                // Structs even as large as Struct128 results in zero measurements on Zen 5, so the test will only pass on older or different CPU architectures.
+                //typeof(DifferentSizedStructs),
                 typeof(ActualWork)
             ];
 
-        public static IEnumerable<object[]> NonEmptyInProcessData()
+        public static IEnumerable<object[]> GetNonEmptyArgs()
         {
             foreach (var type in NonEmptyBenchmarkTypes())
             {
-                yield return new object[] { type };
-            }
-        }
-
-        public static IEnumerable<object[]> NonEmptyCoreData()
-        {
-            foreach (var type in NonEmptyBenchmarkTypes())
-            {
-                yield return new object[] { type, RuntimeMoniker.Net80 };
-                yield return new object[] { type, RuntimeMoniker.Mono80 };
-            }
-        }
-
-        public static IEnumerable<object[]> NonEmptyFrameworkData()
-        {
-            foreach (var type in NonEmptyBenchmarkTypes())
-            {
-                yield return new object[] { type, RuntimeMoniker.Net462 };
-                yield return new object[] { type, RuntimeMoniker.Mono };
+                // Framework is slightly less accurate than Core.
+                yield return new object[] { ToolchainType.Default, type, RuntimeInformation.IsNetCore ? 0 : 1 };
+                // InProcess overhead measurements are incorrect in Core. https://github.com/dotnet/runtime/issues/89685
+                if (!RuntimeInformation.IsNetCore)
+                {
+                    yield return new object[] { ToolchainType.InProcess, type, 1 };
+                }
             }
         }
 
         [Theory]
-        [MemberData(nameof(NonEmptyInProcessData))]
-        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated_InProcess(Type benchmarkType)
+        [MemberData(nameof(GetNonEmptyArgs))]
+        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated(ToolchainType toolchain, Type benchmarkType, int subtractOverheadByClocks)
         {
-            AssertNonZeroResults(benchmarkType, ManualConfig.CreateEmpty()
-                .AddJob(Job.Default
-                    .WithToolchain(InProcessEmitToolchain.Instance)
-                // InProcess overhead measurements are incorrect, so we adjust the results to account for it. https://github.com/dotnet/runtime/issues/89685
-                ), subtractOverheadByClocks: RuntimeInformation.IsNetCore ? 3 : 1);
-        }
-
-        [TheoryEnvSpecific("To not repeat tests in both Full .NET Framework and Core", EnvRequirement.DotNetCoreOnly)]
-        [MemberData(nameof(NonEmptyCoreData))]
-        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated_Core(Type benchmarkType, RuntimeMoniker runtimeMoniker)
-        {
-            AssertNonZeroResults(benchmarkType, ManualConfig.CreateEmpty()
-                .AddJob(Job.Default
-                    .WithRuntime(runtimeMoniker.GetRuntime())
-                ));
-        }
-
-        [TheoryEnvSpecific("Can only run Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
-        [MemberData(nameof(NonEmptyFrameworkData))]
-        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated_Framework(Type benchmarkType, RuntimeMoniker runtimeMoniker)
-        {
-            AssertNonZeroResults(benchmarkType, ManualConfig.CreateEmpty()
-                .AddJob(Job.Default
-                    .WithRuntime(runtimeMoniker.GetRuntime())
-                ));
-        }
-
-        private void AssertNonZeroResults(Type benchmarkType, IConfig config, int subtractOverheadByClocks = 0)
-        {
-            var summary = CanExecute(benchmarkType, config
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Default.WithToolchain(GetToolchain(toolchain)))
                 .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Nanosecond))
-                .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
-            );
+                .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)));
+
+            var summary = CanExecute(benchmarkType, config);
 
             var cpuResolution = CpuDetector.Cpu?.MaxFrequency()?.ToResolution() ?? FallbackCpuResolutionValue;
             // Modern cpus can execute multiple instructions per clock cycle,
             // resulting in measurements greater than 0 but less than 1 clock cycle.
             // (example: Intel Core i9-9880H CPU 2.30GHz reports 0.2852 ns for `_field++;`)
             var threshold = new NumberValue(cpuResolution.Nanoseconds / 4).ToThreshold();
-            // InProcess overhead measurements are incorrect, so we adjust the results to account for it. https://github.com/dotnet/runtime/issues/89685
             var overheadSubtraction = cpuResolution.Nanoseconds * subtractOverheadByClocks;
 
             foreach (var report in summary.Reports)

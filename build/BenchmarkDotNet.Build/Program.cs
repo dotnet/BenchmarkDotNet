@@ -17,7 +17,28 @@ public static class Program
 }
 
 [TaskName(Name)]
+[TaskDescription("Pack Weaver")]
+public class PackWeaverTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "pack-weaver";
+
+    public override void Run(BuildContext context) => context.BuildRunner.PackWeaver();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples = new[]
+            {
+                new Example(Name)
+            }
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Restore NuGet packages")]
+[IsDependentOn(typeof(PackWeaverTask))]
 public class RestoreTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "restore";

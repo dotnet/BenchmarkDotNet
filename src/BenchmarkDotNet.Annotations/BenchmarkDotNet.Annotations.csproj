@@ -14,4 +14,19 @@
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="Attributes\CodeAnnotations.cs" />
   </ItemGroup>
+
+  <Choose>
+	<When Condition="'$(IsFullPack)' == 'true'">
+	  <!-- ProjectReference to ensure the nuget package has a dependency on BenchmarkDotNet.Weaver using the proper version. -->
+	  <ItemGroup>
+		<ProjectReference Include="..\BenchmarkDotNet.Weaver\BenchmarkDotNet.Weaver.csproj" />
+	  </ItemGroup>
+	</When>
+	<Otherwise>
+	  <!-- PackageReference for transitive weaver dependency for ProjectReferences to this. -->
+	  <ItemGroup>
+		<PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" />
+	  </ItemGroup>
+	</Otherwise>
+  </Choose>
 </Project>

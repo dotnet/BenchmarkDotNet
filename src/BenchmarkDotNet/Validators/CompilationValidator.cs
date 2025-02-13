@@ -29,6 +29,7 @@ namespace BenchmarkDotNet.Validators
                     .Union(ValidateClassModifiers((validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
                     .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
+                    .Union(ValidateMethodImpl(validationParameters.Benchmarks))
                 );
 
         private static IEnumerable<ValidationError> ValidateClassModifiers(IEnumerable<BenchmarkCase> benchmarks)
@@ -94,6 +95,18 @@ namespace BenchmarkDotNet.Validators
                                   $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Benchmarks MUST be instance methods, static methods are not supported.",
                                   benchmark
                               ));
+
+        private static IEnumerable<ValidationError> ValidateMethodImpl(IEnumerable<BenchmarkCase> benchmarks)
+            // Only InProcess toolchains need this validation. Build toolchains run the assembly weaver to automatically apply the MethodImpl flag.
+            => benchmarks.Where(x => !x.Descriptor.WorkloadMethod.MethodImplementationFlags.HasFlag(MethodImplAttributes.NoInlining) && x.GetToolchain().IsInProcess)
+                .Distinct(BenchmarkMethodEqualityComparer.Instance)
+                .Select(benchmark
+                    => new ValidationError(
+                        true,
+                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` does not have MethodImplOptions.NoInlining flag set." +
+                        $" You may need to rebuild your project, or apply it manually if you are not using MSBuild to build your project.",
+                        benchmark
+                    ));
 
         private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)

@@ -1,0 +1,25 @@
+﻿<!-- When any changes are made to this project, increment the WeaverVersionSuffix in the common.props file,
+     then re-pack with output to \packages, and delete the old nupkg. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+	<TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
+	<VersionSuffix Condition="'$(IsFullPack)' != 'true'">$(VersionSuffix)$(WeaverVersionSuffix)</VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
+	<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<!-- Include .targets file and all DLLs in the output directory in the NuGet package -->
+	<Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
+	<Content Include="$(OutputPath)**\*.dll" Exclude="$(OutputPath)**\$(AssemblyName).dll" Pack="true" PackagePath="lib/$(TargetFramework)" />
+	<None Remove="packages\**" />
+  </ItemGroup>
+</Project>

@@ -106,12 +106,12 @@
             @DummyUnroll@
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void __Overhead($ArgumentsDefinition$) // __ is to avoid possible name conflict
         {
         }
 
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -121,7 +121,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -131,7 +131,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -141,7 +141,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$

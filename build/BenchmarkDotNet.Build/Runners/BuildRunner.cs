@@ -8,6 +8,7 @@ using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Workload.Install;
 using Cake.Core;
 using Cake.Core.IO;
+using System.Linq;
 
 namespace BenchmarkDotNet.Build.Runners;
 
@@ -18,6 +19,34 @@ public class BuildRunner
     public BuildRunner(BuildContext context)
     {
         this.context = context;
+    }
+
+    public void PackWeaver()
+    {
+        var weaverPath = context.AllPackableSrcProjects.Single(p => p.GetFilename() == "BenchmarkDotNet.Weaver.csproj");
+
+        context.DotNetRestore(weaverPath.GetDirectory().FullPath,
+            new DotNetRestoreSettings
+            {
+                MSBuildSettings = context.MsBuildSettingsRestore
+            });
+
+        context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
+        context.DotNetBuild(weaverPath.FullPath, new DotNetBuildSettings
+        {
+            NoRestore = true,
+            DiagnosticOutput = true,
+            MSBuildSettings = context.MsBuildSettingsBuild,
+            Configuration = context.BuildConfiguration,
+            Verbosity = context.BuildVerbosity
+        });
+
+        context.DotNetPack(weaverPath.FullPath, new DotNetPackSettings
+        {
+            OutputDirectory = weaverPath.GetDirectory().Combine("packages"),
+            MSBuildSettings = context.MsBuildSettingsPack,
+            Configuration = context.BuildConfiguration
+        });
     }
 
     public void Restore()
@@ -71,7 +100,7 @@ public class BuildRunner
         var settingsSrc = new DotNetPackSettings
         {
             OutputDirectory = context.ArtifactsDirectory,
-            ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
+            ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg").Append("-p:IsFullPack=true"),
             MSBuildSettings = context.MsBuildSettingsPack,
             Configuration = context.BuildConfiguration
         };

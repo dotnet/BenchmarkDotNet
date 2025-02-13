@@ -144,6 +144,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
+    <BenchmarkDotNetWrapperProj>true</BenchmarkDotNetWrapperProj>
     {GetInstructionSetSettings(buildPartition)}
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
