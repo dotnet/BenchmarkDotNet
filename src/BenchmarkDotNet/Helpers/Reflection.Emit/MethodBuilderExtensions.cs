@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BenchmarkDotNet.Portability;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -30,6 +31,14 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
         {
             methodBuilder.SetImplementationFlags(
                 methodBuilder.GetMethodImplementationFlags() | MethodImplAttributes.NoOptimization);
+
+            return methodBuilder;
+        }
+
+        public static MethodBuilder SetAggressiveOptimizationImplementationFlag(this MethodBuilder methodBuilder)
+        {
+            methodBuilder.SetImplementationFlags(
+                methodBuilder.GetMethodImplementationFlags() | CodeGenHelper.AggressiveOptimizationOptionForEmit);
 
             return methodBuilder;
         }
