@@ -3,6 +3,7 @@
     <!-- MSBuild was complaing about InformationalVersion from common.props file, so I excluded them in conditional way -->
     <IsFsharp>true</IsFsharp>
   </PropertyGroup>
+  <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>

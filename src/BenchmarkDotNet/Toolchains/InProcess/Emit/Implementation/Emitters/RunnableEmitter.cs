@@ -507,7 +507,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 methodName,
                 MethodAttributes.Private,
                 EmitParameterInfo.CreateReturnVoidParameter(),
-                parameters);
+                parameters)
+                .SetNoInliningImplementationFlag();
 
             var ilBuilder = methodBuilder.GetILGenerator();
             /*
@@ -578,8 +579,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 MethodAttributes.Private,
                 EmitParameterInfo.CreateReturnVoidParameter(),
                 invokeCountArg)
-                .SetNoOptimizationImplementationFlag()
-                .SetNoInliningImplementationFlag();
+                .SetAggressiveOptimizationImplementationFlag();
             invokeCountArg.SetMember(actionMethodBuilder);
 
             // Emit impl

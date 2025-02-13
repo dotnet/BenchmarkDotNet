@@ -21,6 +21,7 @@
     <SelfContained>true</SelfContained>
     <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <BenchmarkDotNetWrapperProj>true</BenchmarkDotNetWrapperProj>
   </PropertyGroup>
 
   <ItemGroup>

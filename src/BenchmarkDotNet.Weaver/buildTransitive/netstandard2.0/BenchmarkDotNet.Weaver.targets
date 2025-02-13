@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssembliesTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\lib\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
+
+  <!-- .Net Framework causes "warning MSB3026: Could not copy ... The file is locked by: .NET Host" when the weaver task is ran on the user's project
+	   when the wrapper project is built. So DotNetCliCommand disables it globally, and the wrapper project enables it only for itself. -->
+  <Target Name="WeaveAssemblies" AfterTargets="AfterBuild" Condition="'$(BenchmarkDotNetSkipWeaver)' != 'true' Or '$(BenchmarkDotNetWrapperProj)' == 'true'">
+	<WeaveAssembliesTask TargetDir="$(TargetDir)" TargetAssembly="$(TargetDir)$(TargetFileName)" />
+  </Target>
+</Project>
