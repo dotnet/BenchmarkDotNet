@@ -105,14 +105,41 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private IEnumerable<(IterationStage stage, IterationMode mode, IEngineStageEvaluator evaluator)> EnumerateStages()
+        {
+            if (Strategy != RunStrategy.ColdStart)
+            {
+                if (Strategy != RunStrategy.Monitoring)
+                {
+                    var pilotEvaluator = pilotStage.GetEvaluator();
+                    if (pilotEvaluator != null)
+                    {
+                        yield return (IterationStage.Pilot, IterationMode.Workload, pilotEvaluator);
+                    }
+
+                    if (EvaluateOverhead)
+                    {
+                        yield return (IterationStage.Warmup, IterationMode.Overhead, warmupStage.GetOverheadEvaluator());
+                        yield return (IterationStage.Actual, IterationMode.Overhead, actualStage.GetOverheadEvaluator());
+                    }
+                }
+
+                yield return (IterationStage.Warmup, IterationMode.Workload, warmupStage.GetWorkloadEvaluator(Strategy));
+            }
+
+            Host.BeforeMainRun();
+
+            yield return (IterationStage.Actual, IterationMode.Workload, actualStage.GetWorkloadEvaluator(Strategy == RunStrategy.Monitoring));
+
+            Host.AfterMainRun();
+        }
+
         // AggressiveOptimization forces the method to go straight to tier1 JIT, and will never be re-jitted,
         // eliminating tiered JIT as a potential variable in measurements.
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public RunResults Run()
         {
-            // This method is huge, because all stages are inlined. This ensures the stack size
-            // remains constant for each benchmark invocation, eliminating stack sizes as a potential variable in measurements.
-            // #1120
             var measurements = new List<Measurement>();
             measurements.AddRange(jittingMeasurements);
 
@@ -121,191 +148,23 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
-            if (Strategy != RunStrategy.ColdStart)
+            // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size.
+            // #1120
+            foreach (var (stage, mode, evaluator) in EnumerateStages())
             {
-                if (Strategy != RunStrategy.Monitoring)
+                var stageMeasurements = new List<Measurement>(evaluator.MaxIterationCount);
+                int iterationCounter = 0;
+                while (!evaluator.EvaluateShouldStop(stageMeasurements, ref invokeCount))
                 {
-                    // Pilot Stage
-                    {
-                        // If InvocationCount is specified, pilot stage should be skipped
-                        if (TargetJob.HasValue(RunMode.InvocationCountCharacteristic))
-                        {
-                        }
-                        // Here we want to guess "perfect" amount of invocation
-                        else if (TargetJob.HasValue(RunMode.IterationTimeCharacteristic))
-                        {
-                            // Perfect invocation count
-                            invokeCount = pilotStage.Autocorrect(MinInvokeCount);
-
-                            int iterationCounter = 0;
-
-                            int downCount = 0; // Amount of iterations where newInvokeCount < invokeCount
-                            while (true)
-                            {
-                                iterationCounter++;
-                                var measurement = RunIteration(new IterationData(IterationMode.Workload, IterationStage.Pilot, iterationCounter, invokeCount, UnrollFactor));
-                                measurements.Add(measurement);
-                                double actualIterationTime = measurement.Nanoseconds;
-                                long newInvokeCount = pilotStage.Autocorrect(Math.Max(pilotStage.minInvokeCount, (long) Math.Round(invokeCount * pilotStage.targetIterationTime / actualIterationTime)));
-
-                                if (newInvokeCount < invokeCount)
-                                    downCount++;
-
-                                if (Math.Abs(newInvokeCount - invokeCount) <= 1 || downCount >= 3)
-                                    break;
-
-                                invokeCount = newInvokeCount;
-                            }
-                            WriteLine();
-                        }
-                        else
-                        {
-                            // A case where we don't have specific iteration time.
-                            invokeCount = pilotStage.Autocorrect(pilotStage.minInvokeCount);
-
-                            int iterationCounter = 0;
-                            while (true)
-                            {
-                                iterationCounter++;
-                                var measurement = RunIteration(new IterationData(IterationMode.Workload, IterationStage.Pilot, iterationCounter, invokeCount, UnrollFactor));
-                                measurements.Add(measurement);
-                                double iterationTime = measurement.Nanoseconds;
-                                double operationError = 2.0 * pilotStage.resolution / invokeCount; // An operation error which has arisen due to the Chronometer precision
-
-                                // Max acceptable operation error
-                                double operationMaxError1 = iterationTime / invokeCount * pilotStage.maxRelativeError;
-                                double operationMaxError2 = pilotStage.maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
-                                double operationMaxError = Math.Min(operationMaxError1, operationMaxError2);
-
-                                bool isFinished = operationError < operationMaxError && iterationTime >= pilotStage.minIterationTime.Nanoseconds;
-                                if (isFinished)
-                                    break;
-                                if (invokeCount >= EnginePilotStage.MaxInvokeCount)
-                                    break;
-
-                                if (UnrollFactor == 1 && invokeCount < EnvironmentResolver.DefaultUnrollFactorForThroughput)
-                                    invokeCount += 1;
-                                else
-                                    invokeCount *= 2;
-                            }
-                            WriteLine();
-                        }
-                    }
-                    // End Pilot Stage
-
-                    if (EvaluateOverhead)
-                    {
-                        // Warmup Overhead
-                        {
-                            var warmupMeasurements = new List<Measurement>();
-
-                            var criteria = DefaultStoppingCriteriaFactory.Instance.CreateWarmup(TargetJob, Resolver, IterationMode.Overhead, RunStrategy.Throughput);
-                            int iterationCounter = 0;
-                            while (!criteria.Evaluate(warmupMeasurements).IsFinished)
-                            {
-                                iterationCounter++;
-                                warmupMeasurements.Add(RunIteration(new IterationData(IterationMode.Overhead, IterationStage.Warmup, iterationCounter, invokeCount, UnrollFactor)));
-                            }
-                            WriteLine();
-
-                            measurements.AddRange(warmupMeasurements);
-                        }
-                        // End Warmup Overhead
-
-                        // Actual Overhead
-                        {
-                            var measurementsForStatistics = new List<Measurement>(actualStage.maxIterationCount);
-
-                            int iterationCounter = 0;
-                            double effectiveMaxRelativeError = EngineActualStage.MaxOverheadRelativeError;
-                            while (true)
-                            {
-                                iterationCounter++;
-                                var measurement = RunIteration(new IterationData(IterationMode.Overhead, IterationStage.Actual, iterationCounter, invokeCount, UnrollFactor));
-                                measurements.Add(measurement);
-                                measurementsForStatistics.Add(measurement);
-
-                                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, actualStage.outlierMode);
-                                double actualError = statistics.LegacyConfidenceInterval.Margin;
-
-                                double maxError1 = effectiveMaxRelativeError * statistics.Mean;
-                                double maxError2 = actualStage.maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
-                                double maxError = Math.Min(maxError1, maxError2);
-
-                                if (iterationCounter >= actualStage.minIterationCount && actualError < maxError)
-                                    break;
-
-                                if (iterationCounter >= actualStage.maxIterationCount || iterationCounter >= EngineActualStage.MaxOverheadIterationCount)
-                                    break;
-                            }
-                            WriteLine();
-                        }
-                        // End Actual Overhead
-                    }
+                    // TODO: Not sure why index is 1-based? 0-based is standard.
+                    ++iterationCounter;
+                    var measurement = RunIteration(new IterationData(mode, stage, iterationCounter, invokeCount, UnrollFactor));
+                    stageMeasurements.Add(measurement);
                 }
+                measurements.AddRange(stageMeasurements);
 
-                // Warmup Workload
-                {
-                    var workloadMeasurements = new List<Measurement>();
-
-                    var criteria = DefaultStoppingCriteriaFactory.Instance.CreateWarmup(TargetJob, Resolver, IterationMode.Workload, Strategy);
-                    int iterationCounter = 0;
-                    while (!criteria.Evaluate(workloadMeasurements).IsFinished)
-                    {
-                        iterationCounter++;
-                        workloadMeasurements.Add(RunIteration(new IterationData(IterationMode.Workload, IterationStage.Warmup, iterationCounter, invokeCount, UnrollFactor)));
-                    }
-                    WriteLine();
-
-                    measurements.AddRange(workloadMeasurements);
-                }
-                // End Warmup Workload
-            }
-
-            Host.BeforeMainRun();
-
-            // Actual Workload
-            {
-                if (actualStage.iterationCount == null && Strategy != RunStrategy.Monitoring)
-                {
-                    // RunAuto
-                    var measurementsForStatistics = new List<Measurement>(actualStage.maxIterationCount);
-
-                    int iterationCounter = 0;
-                    double effectiveMaxRelativeError = actualStage.maxRelativeError;
-                    while (true)
-                    {
-                        iterationCounter++;
-                        var measurement = RunIteration(new IterationData(IterationMode.Workload, IterationStage.Actual, iterationCounter, invokeCount, UnrollFactor));
-                        measurements.Add(measurement);
-                        measurementsForStatistics.Add(measurement);
-
-                        var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, actualStage.outlierMode);
-                        double actualError = statistics.LegacyConfidenceInterval.Margin;
-
-                        double maxError1 = effectiveMaxRelativeError * statistics.Mean;
-                        double maxError2 = actualStage.maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
-                        double maxError = Math.Min(maxError1, maxError2);
-
-                        if (iterationCounter >= actualStage.minIterationCount && actualError < maxError)
-                            break;
-
-                        if (iterationCounter >= actualStage.maxIterationCount)
-                            break;
-                    }
-                }
-                else
-                {
-                    // RunSpecific
-                    var iterationCount = actualStage.iterationCount ?? EngineActualStage.DefaultWorkloadCount;
-                    for (int i = 0; i < iterationCount; i++)
-                        measurements.Add(RunIteration(new IterationData(IterationMode.Workload, IterationStage.Actual, i + 1, invokeCount, UnrollFactor)));
-                }
                 WriteLine();
             }
-            // End Actual Workload
-
-            Host.AfterMainRun();
 
             (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = includeExtraStats
                 ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))

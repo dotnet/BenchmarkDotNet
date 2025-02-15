@@ -30,13 +30,13 @@ namespace BenchmarkDotNet.Engines
 
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
 
-        internal readonly int unrollFactor;
-        internal readonly TimeInterval minIterationTime;
-        internal readonly int minInvokeCount;
-        internal readonly double maxRelativeError;
-        internal readonly TimeInterval? maxAbsoluteError;
-        internal readonly double targetIterationTime;
-        internal readonly double resolution;
+        private readonly int unrollFactor;
+        private readonly TimeInterval minIterationTime;
+        private readonly int minInvokeCount;
+        private readonly double maxRelativeError;
+        private readonly TimeInterval? maxAbsoluteError;
+        private readonly double targetIterationTime;
+        private readonly double resolution;
 
         public EnginePilotStage(IEngine engine) : base(engine)
         {
@@ -132,6 +132,88 @@ namespace BenchmarkDotNet.Engines
             return new PilotStageResult(invokeCount, measurements);
         }
 
-        internal long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
+        private long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;
+
+        internal IEngineStageEvaluator GetEvaluator()
+        {
+            // If InvocationCount is specified, pilot stage should be skipped
+            return TargetJob.HasValue(RunMode.InvocationCountCharacteristic) ? null
+                // Here we want to guess "perfect" amount of invocation
+                : TargetJob.HasValue(RunMode.IterationTimeCharacteristic) ? new SpecificEvaluator(this)
+                : new AutoEvaluator(this);
+        }
+
+        private sealed class AutoEvaluator(EnginePilotStage stage) : IEngineStageEvaluator
+        {
+            public int MaxIterationCount => 0;
+
+            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
+            {
+                if (measurements.Count == 0)
+                {
+                    invokeCount = stage.Autocorrect(stage.minInvokeCount);
+                    return false;
+                }
+
+                var measurement = measurements[measurements.Count - 1];
+                double iterationTime = measurement.Nanoseconds;
+                double operationError = 2.0 * stage.resolution / invokeCount; // An operation error which has arisen due to the Chronometer precision
+
+                // Max acceptable operation error
+                double operationMaxError1 = iterationTime / invokeCount * stage.maxRelativeError;
+                double operationMaxError2 = stage.maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
+                double operationMaxError = Math.Min(operationMaxError1, operationMaxError2);
+
+                bool isFinished = operationError < operationMaxError && iterationTime >= stage.minIterationTime.Nanoseconds;
+                if (isFinished || invokeCount >= MaxInvokeCount)
+                {
+                    return true;
+                }
+
+                if (stage.unrollFactor == 1 && invokeCount < EnvironmentResolver.DefaultUnrollFactorForThroughput)
+                {
+                    ++invokeCount;
+                }
+                else
+                {
+                    invokeCount *= 2;
+                }
+
+                return false;
+            }
+        }
+
+        private sealed class SpecificEvaluator(EnginePilotStage stage) : IEngineStageEvaluator
+        {
+            public int MaxIterationCount => 0;
+
+            private int _downCount = 0; // Amount of iterations where newInvokeCount < invokeCount
+
+            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
+            {
+                if (measurements.Count == 0)
+                {
+                    invokeCount = stage.Autocorrect(Engine.MinInvokeCount);
+                    return false;
+                }
+
+                var measurement = measurements[measurements.Count - 1];
+                double actualIterationTime = measurement.Nanoseconds;
+                long newInvokeCount = stage.Autocorrect(Math.Max(stage.minInvokeCount, (long) Math.Round(invokeCount * stage.targetIterationTime / actualIterationTime)));
+
+                if (newInvokeCount < invokeCount)
+                {
+                    _downCount++;
+                }
+
+                if (Math.Abs(newInvokeCount - invokeCount) <= 1 || _downCount >= 3)
+                {
+                    return true;
+                }
+
+                invokeCount = newInvokeCount;
+                return false;
+            }
+        }
     }
 }
