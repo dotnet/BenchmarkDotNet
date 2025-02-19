@@ -56,6 +56,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$OverheadImplementation$", provider.OverheadImplementation)
                     .Replace("$ConsumeField$", provider.ConsumeField)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
+                    .Replace("$ParamsInitializer$", GetParamsInitializer(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
@@ -186,7 +187,15 @@ namespace BenchmarkDotNet.Code
             return new NonVoidDeclarationsProvider(descriptor);
         }
 
+        private static string GetParamsInitializer(BenchmarkCase benchmarkCase)
+            => string.Join(
+                ", ",
+                benchmarkCase.Parameters.Items
+                    .Where(parameter => !parameter.IsArgument && !parameter.IsStatic)
+                    .Select(parameter => $"{parameter.Name} = default!"));
+
         // internal for tests
+
         internal static string GetParamsContent(BenchmarkCase benchmarkCase)
             => string.Join(
                 string.Empty,
