@@ -192,7 +192,7 @@ namespace BenchmarkDotNet.Code
                 ", ",
                 benchmarkCase.Parameters.Items
                     .Where(parameter => !parameter.IsArgument && !parameter.IsStatic)
-                    .Select(parameter => $"{parameter.Name} = default!"));
+                    .Select(parameter => $"{parameter.Name} = default"));
 
         // internal for tests
 
