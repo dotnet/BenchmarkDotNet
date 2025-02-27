@@ -219,17 +219,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
             // we want to avoid "file in use" and "zombie processes" issues
             const string NoMsBuildZombieProcesses = "/p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
-            // .Net Framework causes "warning MSB3026: Could not copy ... The file is locked by: .NET Host" when the weaver task is ran
-            // on the user's project when the wrapper project is built. So we disable it globally, and enable it only for the wrapper project.
-            const string SkipWeaver = "/p:BenchmarkDotNetSkipWeaver=true";
             const string EnforceOptimizations = "/p:Optimize=true";
 
             if (string.Equals(buildConfiguration, RuntimeInformation.DebugConfigurationName, StringComparison.OrdinalIgnoreCase))
             {
-                return $"{NoMsBuildZombieProcesses} {SkipWeaver}";
+                return NoMsBuildZombieProcesses;
             }
 
-            return $"{NoMsBuildZombieProcesses} {EnforceOptimizations} {SkipWeaver}";
+            return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
         }
 
         private static string BuildAddPackageCommand(NuGetReference reference)
