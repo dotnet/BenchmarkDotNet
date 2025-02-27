@@ -97,8 +97,7 @@ namespace BenchmarkDotNet.Validators
                               ));
 
         private static IEnumerable<ValidationError> ValidateMethodImpl(IEnumerable<BenchmarkCase> benchmarks)
-            // Only InProcess toolchains need this validation. Build toolchains run the assembly weaver to automatically apply the MethodImpl flag.
-            => benchmarks.Where(x => !x.Descriptor.WorkloadMethod.MethodImplementationFlags.HasFlag(MethodImplAttributes.NoInlining) && x.GetToolchain().IsInProcess)
+            => benchmarks.Where(x => !x.Descriptor.WorkloadMethod.MethodImplementationFlags.HasFlag(MethodImplAttributes.NoInlining))
                 .Distinct(BenchmarkMethodEqualityComparer.Instance)
                 .Select(benchmark
                     => new ValidationError(
