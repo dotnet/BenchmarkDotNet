@@ -4,10 +4,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-	<TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	<OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
+	<TargetFrameworks>netstandard2.0</TargetFrameworks>
 	<VersionSuffix Condition="'$(IsFullPack)' != 'true'">$(VersionSuffix)$(WeaverVersionSuffix)</VersionSuffix>
+	<OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<IncludeBuildOutput>false</IncludeBuildOutput>
+	<NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +21,7 @@
   <ItemGroup>
 	<!-- Include .targets file and all DLLs in the output directory in the NuGet package -->
 	<Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
-	<Content Include="$(OutputPath)**\*.dll" Exclude="$(OutputPath)**\$(AssemblyName).dll" Pack="true" PackagePath="lib/$(TargetFramework)" />
+	<Content Include="$(OutputPath)**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
 	<None Remove="packages\**" />
   </ItemGroup>
 </Project>
