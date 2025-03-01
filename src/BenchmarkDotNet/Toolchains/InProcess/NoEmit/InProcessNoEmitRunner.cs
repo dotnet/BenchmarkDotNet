@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     /// </summary>
     internal class InProcessNoEmitRunner
     {
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Runnable))]
         public static int Run(IHost host, BenchmarkCase benchmarkCase)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
