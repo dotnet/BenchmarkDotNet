@@ -67,6 +67,8 @@ namespace BenchmarkDotNet.Extensions
                     return MonoRuntime.Mono70;
                 case RuntimeMoniker.Mono80:
                     return MonoRuntime.Mono80;
+                case RuntimeMoniker.Mono90:
+                    return MonoRuntime.Mono90;
                 case RuntimeMoniker.Mono10_0:
                     return MonoRuntime.Mono10_0;
                 default:
