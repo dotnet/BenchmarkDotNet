@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
