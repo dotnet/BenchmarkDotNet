@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -15,6 +16,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     /// </summary>
     internal class InProcessNoEmitRunner
     {
+#if NET6_0_OR_GREATER
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Runnable))]
+#endif
         public static int Run(IHost host, BenchmarkCase benchmarkCase)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
