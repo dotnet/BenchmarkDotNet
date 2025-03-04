@@ -136,7 +136,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             // Modern cpus can execute multiple instructions per clock cycle,
             // resulting in measurements greater than 0 but less than 1 clock cycle.
             // (example: Intel Core i9-9880H CPU 2.30GHz reports 0.2852 ns for `_field++;`)
-            var threshold = new NumberValue(cpuResolution.Nanoseconds / 4).ToThreshold();
+            var threshold = Threshold.Zero;
             var overheadSubtraction = cpuResolution.Nanoseconds * subtractOverheadByClocks;
 
             foreach (var report in summary.Reports)
