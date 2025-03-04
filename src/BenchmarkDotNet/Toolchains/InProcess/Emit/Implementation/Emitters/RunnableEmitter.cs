@@ -572,7 +572,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder EmitActionImpl(string methodName, MethodInfo invokeMethod, Action<ILGenerator, IReadOnlyList<LocalBuilder>> callMethodEmitter, int unrollFactor)
         {
             // .method private hidebysig
-            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed noinlining nooptimization
+            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed aggressiveoptimization
             var invokeCountArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
             var actionMethodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
                 methodName,
