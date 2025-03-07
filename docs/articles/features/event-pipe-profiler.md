@@ -7,7 +7,7 @@ name: EventPipeProfiler
 
 `EventPipeProfiler` is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS. Collected data are exported to trace files (`.speedscope.json` and `.nettrace`) which can be analyzed using [SpeedScope](https://www.speedscope.app/), [PerfView](https://github.com/Microsoft/perfview), and [Visual Studio Profiler](https://learn.microsoft.com/visualstudio/profiling/profiling-feature-tour). This new profiler is available from the 0.12.1 version.
 
-![](https://wojciechnagorski.com/images/EventPipeProfiler/SpeedScopeAdvance.png)
+![](https://wojciechnagorski.github.io/images/EventPipeProfiler/SpeedScopeAdvance.png)
 
 # Configuration
 
