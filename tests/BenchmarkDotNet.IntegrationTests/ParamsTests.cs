@@ -217,5 +217,28 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException($"{nameof(StaticParamProperty)} has wrong value: {StaticParamProperty}!");
             }
         }
+
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void ParamsSupportRequiredProperty()
+        {
+            var summary = CanExecute<ParamsTestRequiredProperty>();
+            var standardOutput = GetCombinedStandardOutput(summary);
+
+            foreach (var param in new[] { "a", "b" })
+            {
+                Assert.Contains($"// ### New Parameter {param} ###", standardOutput);
+            }
+        }
+
+        public class ParamsTestRequiredProperty
+        {
+            [Params("a", "b")]
+            public required string ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
+        }
+#endif
     }
 }
