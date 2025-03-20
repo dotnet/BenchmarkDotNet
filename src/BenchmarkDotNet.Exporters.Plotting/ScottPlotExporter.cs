@@ -204,13 +204,13 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 .ToDictionary(t => t.jobId, t => palette.GetColor(t.index));
 
             plt.Legend.IsVisible = true;
-            plt.Legend.Location = Alignment.UpperRight;
-            plt.Legend.Font.Size = this.FontSize;
+            plt.Legend.Alignment = Alignment.UpperRight;
+            plt.Legend.FontSize = this.FontSize;
             var legend = data.Select(d => d.JobId)
                 .Distinct()
                 .Select((label, index) => new LegendItem()
                 {
-                    Label = label,
+                    LabelText = label,
                     FillColor = legendPalette[label]
                 })
                 .ToList();
@@ -236,7 +236,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 float largestLabelWidth = 0;
                 foreach (Tick tick in ticks)
                 {
-                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label);
+                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label).Size;
                     largestLabelWidth = Math.Max(largestLabelWidth, size.Width);
                 }
 
@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
                     Error = d.StdError,
                     FillColor = legendPalette[d.JobId]
                 });
-            plt.Add.Bars(bars);
+            plt.Add.Bars(bars.ToList());
 
             // Tell the plot to autoscale with no padding beneath the bars
             plt.Axes.Margins(bottom: 0, right: .2);
@@ -279,13 +279,13 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 .ToDictionary(t => t.jobId, t => palette.GetColor(t.index));
 
             plt.Legend.IsVisible = true;
-            plt.Legend.Location = Alignment.UpperRight;
-            plt.Legend.Font.Size = this.FontSize;
+            plt.Legend.Alignment = Alignment.UpperRight;
+            plt.Legend.FontSize = this.FontSize;
             var legend = data.Select(d => d.JobId)
                 .Distinct()
                 .Select((label, index) => new LegendItem()
                 {
-                    Label = label,
+                    LabelText = label,
                     FillColor = legendPalette[label]
                 })
                 .ToList();
@@ -311,7 +311,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 float largestLabelWidth = 0;
                 foreach (Tick tick in ticks)
                 {
-                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label);
+                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label).Size;
                     largestLabelWidth = Math.Max(largestLabelWidth, size.Width);
                 }
 
@@ -326,8 +326,8 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 var boxes = targetGroup.Select(job => (job.JobId, Stats: job.CalculateBoxPlotStatistics())).Select((j, jobIndex) => new Box()
                     {
                         Position = ticks[globalIndex++].Position,
-                        Fill = new FillStyle() { Color = legendPalette[j.JobId] },
-                        Stroke = new LineStyle() { Color = Colors.Black },
+                        FillStyle = new FillStyle() { Color = legendPalette[j.JobId] },
+                        LineStyle = new LineStyle() { Color = Colors.Black },
                         BoxMin = j.Stats.Q1,
                         BoxMax = j.Stats.Q3,
                         WhiskerMin = j.Stats.Min,
@@ -356,7 +356,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
         {
             var versionAnnotation = new Annotation()
             {
-                Label =
+                LabelStyle =
                 {
                     Text = version,
                     FontSize = 14,
