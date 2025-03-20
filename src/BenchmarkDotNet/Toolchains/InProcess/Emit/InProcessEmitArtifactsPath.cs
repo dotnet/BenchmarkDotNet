@@ -11,6 +11,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             ArtifactsPaths baseArtifacts) : base(
             baseArtifacts.RootArtifactsFolderPath,
             baseArtifacts.BuildArtifactsDirectoryPath,
+            baseArtifacts.PublishDirectoryPath,
             baseArtifacts.BinariesDirectoryPath,
             baseArtifacts.IntermediateDirectoryPath,
             baseArtifacts.ProgramCodePath,

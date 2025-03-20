@@ -46,6 +46,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
+                publishDirectoryPath: null,
                 binariesDirectoryPath: binariesDirectoryPath,
                 intermediateDirectoryPath: null,
                 programCodePath: null,

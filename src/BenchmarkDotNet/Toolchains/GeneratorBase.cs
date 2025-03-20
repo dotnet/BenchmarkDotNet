@@ -45,6 +45,13 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected abstract string GetBuildArtifactsDirectoryPath(BuildPartition assemblyLocation, string programName);
 
         /// <summary>
+        /// returns a path where the publish directory should be found after the build (usually \publish)
+        /// </summary>
+        [PublicAPI]
+        protected virtual string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+            => Path.Combine(buildArtifactsDirectoryPath, "publish");
+
+        /// <summary>
         /// returns a path where executable should be found after the build (usually \bin)
         /// </summary>
         [PublicAPI] protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
@@ -137,6 +144,7 @@ namespace BenchmarkDotNet.Toolchains
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
+                publishDirectoryPath: GetPublishDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration),
                 binariesDirectoryPath: binariesDirectoryPath,
                 intermediateDirectoryPath: GetIntermediateDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration),
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
