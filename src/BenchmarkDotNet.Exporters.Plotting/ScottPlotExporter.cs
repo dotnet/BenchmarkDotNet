@@ -415,9 +415,6 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 }
             }
 
-            // Tell the plot to autoscale with a small padding below the boxes.
-            plt.Axes.Margins(bottom: 0.05, right: .2);
-
             plt.PlottableList.AddRange(annotations);
 
             plt.SavePng(fileName, this.Width, this.Height);
