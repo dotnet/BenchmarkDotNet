@@ -8,6 +8,7 @@ using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using ScottPlot;
 using ScottPlot.Plottables;
+using ScottPlot.Statistics;
 
 namespace BenchmarkDotNet.Exporters.Plotting
 {
@@ -37,6 +38,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
             this.Height = height;
             this.IncludeBarPlot = true;
             this.IncludeBoxPlot = true;
+            this.IncludeHistogramPlot = true;
             this.RotateLabels = true;
         }
 
@@ -77,6 +79,12 @@ namespace BenchmarkDotNet.Exporters.Plotting
         /// measurement values should be exported.
         /// </summary>
         public bool IncludeBoxPlot { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a histogram plot for time-per-op
+        /// measurement values should be exported.
+        /// </summary>
+        public bool IncludeHistogramPlot { get; set; }
 
         /// <summary>
         /// Not supported.
@@ -137,6 +145,18 @@ namespace BenchmarkDotNet.Exporters.Plotting
                         Path.Combine(summary.ResultsDirectoryPath, $"{title}-{benchmarkName}-boxplot.png"),
                         $"Time ({timeUnit})",
                         "Target",
+                        timeStats,
+                        annotations);
+                }
+
+                if (this.IncludeHistogramPlot)
+                {
+                    // <BenchmarkName>-histogramplot.png
+                    yield return CreateHistogramPlot(
+                        $"{title} - {benchmarkName}",
+                        Path.Combine(summary.ResultsDirectoryPath, $"{title}-{benchmarkName}-histogramplot.png"),
+                        "Count",
+                        $"Time ({timeUnit})",
                         timeStats,
                         annotations);
                 }
@@ -336,6 +356,63 @@ namespace BenchmarkDotNet.Exporters.Plotting
                     })
                     .ToList();
                 plt.Add.Boxes(boxes);
+            }
+
+            // Tell the plot to autoscale with a small padding below the boxes.
+            plt.Axes.Margins(bottom: 0.05, right: .2);
+
+            plt.PlottableList.AddRange(annotations);
+
+            plt.SavePng(fileName, this.Width, this.Height);
+            return Path.GetFullPath(fileName);
+        }
+
+        // This doesn't support RotateTicks. I figure it's not necessary, since they're not category labels and thus shouldn't be very long
+        private string CreateHistogramPlot(string title, string fileName, string yLabel, string xLabel, IEnumerable<ChartStats> data, IReadOnlyList<Annotation> annotations)
+        {
+            Plot plt = new Plot();
+            plt.Title(title, this.TitleFontSize);
+            plt.YLabel(yLabel, this.FontSize);
+            plt.XLabel(xLabel, this.FontSize);
+
+            var palette = new ScottPlot.Palettes.Category10();
+
+            var legendPalette = data.Select(d => d.JobId)
+                .Distinct()
+                .Select((jobId, index) => (jobId, index))
+                .ToDictionary(t => t.jobId, t => palette.GetColor(t.index).WithAlpha(0.5));
+
+            plt.Legend.IsVisible = true;
+            plt.Legend.Alignment = Alignment.UpperRight;
+            plt.Legend.FontSize = this.FontSize;
+            var legend = data.Select(d => d.JobId)
+                .Distinct()
+                .Select((label, index) => new LegendItem()
+                {
+                    LabelText = label,
+                    FillColor = legendPalette[label]
+                })
+                .ToList();
+
+            plt.Legend.ManualItems.AddRange(legend);
+
+            var jobCount = plt.Legend.ManualItems.Count;
+
+            plt.Axes.Left.TickLabelStyle.FontSize = this.FontSize;
+            plt.Axes.Bottom.MajorTickStyle.Length = 0;
+            plt.Axes.Bottom.TickLabelStyle.FontSize = this.FontSize;
+
+            // 5 is an arbitrary multiplier, this may need to be responsive to the number of points
+            // There are theoretically optimzal binsizes (e.g. the 2 * IQR * N^(-1/3) rule), but they tend to make significant assumptions about the data
+            var binWidth = data.GroupBy(s => s.Target).SelectMany(tg => tg.Select(stats => 5 * (stats.Max - stats.Min) / stats.Values.Count)).Min();
+
+            foreach (var (targetGroup, targetGroupIndex) in data.GroupBy(s => s.Target).Select((targetGroup, index) => (targetGroup, index)))
+            {
+                var hists = targetGroup.Select((job) => (job, hist: Histogram.WithBinSize(binWidth, job.Values)));
+
+                foreach (var (job, hist) in hists) {
+                    plt.Add.Histogram(hist, legendPalette[job.JobId]);
+                }
             }
 
             // Tell the plot to autoscale with a small padding below the boxes.
