@@ -133,13 +133,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class BenchmarkAllCases
         {
-            [Params("a", "b")]
-#if NET8_0_OR_GREATER
-            public required string ParamProperty { get; set; }
-#else
-            public string ParamProperty { get; set; }
-#endif
-
             public static int Counter;
 
             [GlobalSetup]
@@ -204,13 +197,6 @@ namespace BenchmarkDotNet.IntegrationTests
             public static void InvokeOnceStaticVoid()
             {
                 Interlocked.Increment(ref Counter);
-            }
-
-            [Benchmark]
-            public string InvokeOnceReturnParamValue()
-            {
-                Interlocked.Increment(ref Counter);
-                return ParamProperty;
             }
 
             [Benchmark]

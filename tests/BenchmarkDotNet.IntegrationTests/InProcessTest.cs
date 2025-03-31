@@ -82,24 +82,24 @@ namespace BenchmarkDotNet.IntegrationTests
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, CreateBenchmarkAllCases(), unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, false, null);
 
             // Idle mode
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, CreateBenchmarkAllCases(), unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, true, null);
 
             // GlobalSetup/GlobalCleanup
-            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, CreateBenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, 1, false, null);
-            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, CreateBenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, 1, false, null);
 
             // GlobalSetup/GlobalCleanup (empty)
             descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
-            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, CreateBenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, CreateBenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
 
             // Dummy (just in case something may broke)
@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, CreateBenchmarkAllCases(), unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, false, expectedResult);
 
             // Idle mode
@@ -133,14 +133,9 @@ namespace BenchmarkDotNet.IntegrationTests
             else
                 idleExpected = GetDefault(expectedResult.GetType());
 
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, CreateBenchmarkAllCases(), unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, true, idleExpected);
         }
-
-        private static BenchmarkAllCases CreateBenchmarkAllCases() => new BenchmarkAllCases()
-        {
-            ParamProperty = null
-        };
 
         private static object GetDefault(Type type)
         {
@@ -222,16 +217,35 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void ParamsSupportRequiredProperty()
+        {
+            var logger = new OutputLogger(Output);
+            var config = CreateInProcessConfig(logger);
+            var summary = CanExecute<ParamsTestRequiredProperty>(config);
+            var log = logger.GetLog();
+
+            foreach (var param in new[] { "a", "b" })
+            {
+                Assert.Contains($"| Benchmark | {param}             |", log);
+            }
+        }
+
+        public class ParamsTestRequiredProperty
+        {
+            [Params("a", "b")]
+            public required string ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
+        }
+#endif
+
         [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class BenchmarkAllCases
         {
-            [Params("a", "b")]
-#if NET8_0_OR_GREATER
-            public required string ParamProperty { get; set; }
-#else
-            public string ParamProperty { get; set; }
-#endif
-
             public static int Counter;
 
             [GlobalSetup]
@@ -268,13 +282,6 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 Interlocked.Increment(ref Counter);
                 return DecimalResult;
-            }
-
-            [Benchmark]
-            public string InvokeOnceReturnParamValue()
-            {
-                Interlocked.Increment(ref Counter);
-                return ParamProperty;
             }
 
             [Benchmark]
