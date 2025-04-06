@@ -273,5 +273,26 @@ namespace BenchmarkDotNet.IntegrationTests
                 return new ValueTask<decimal>(DecimalResult);
             }
         }
+
+
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void ParamsSupportRequiredProperty()
+        {
+            var config = CreateInProcessConfig();
+            CanExecute<ParamsTestRequiredProperty>(config);
+        }
+
+        public class ParamsTestRequiredProperty
+        {
+            private const string Expected = "a";
+
+            [Params(Expected)]
+            public required string ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Assert.Equal(Expected, ParamProperty);
+        }
+#endif
     }
 }
