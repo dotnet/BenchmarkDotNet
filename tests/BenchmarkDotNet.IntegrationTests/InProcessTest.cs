@@ -217,32 +217,6 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-
-#if NET8_0_OR_GREATER
-        [Fact]
-        public void ParamsSupportRequiredProperty()
-        {
-            var logger = new OutputLogger(Output);
-            var config = CreateInProcessConfig(logger);
-            var summary = CanExecute<ParamsTestRequiredProperty>(config);
-            var log = logger.GetLog();
-
-            foreach (var param in new[] { "a", "b" })
-            {
-                Assert.Contains($"| Benchmark | {param}             |", log);
-            }
-        }
-
-        public class ParamsTestRequiredProperty
-        {
-            [Params("a", "b")]
-            public required string ParamProperty { get; set; }
-
-            [Benchmark]
-            public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
-        }
-#endif
-
         [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class BenchmarkAllCases
         {
@@ -299,5 +273,26 @@ namespace BenchmarkDotNet.IntegrationTests
                 return new ValueTask<decimal>(DecimalResult);
             }
         }
+
+
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void ParamsSupportRequiredProperty()
+        {
+            var config = CreateInProcessConfig();
+            CanExecute<ParamsTestRequiredProperty>(config);
+        }
+
+        public class ParamsTestRequiredProperty
+        {
+            private const string Expected = "a";
+
+            [Params(Expected)]
+            public required string ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Assert.Equal(Expected, ParamProperty);
+        }
+#endif
     }
 }
