@@ -342,26 +342,32 @@ namespace BenchmarkDotNet.Engines
         // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
         private readonly struct FinalizerBlocker : IDisposable
         {
-            private readonly ManualResetEventSlim hangEvent;
+            private readonly object hangLock;
 
-            private FinalizerBlocker(ManualResetEventSlim hangEvent) => this.hangEvent = hangEvent;
+            private FinalizerBlocker(object hangLock) => this.hangLock = hangLock;
 
             private sealed class Impl
             {
-                private readonly ManualResetEventSlim hangEvent = new (false);
+                // ManualResetEvent(Slim) allocates when it is waited and yields the thread,
+                // so we use Monitor.Wait instead which does not allocate managed memory.
+                // This behavior is not documented, but was observed with the VS Profiler.
+                private readonly object hangLock = new ();
                 private readonly ManualResetEventSlim enteredFinalizerEvent = new (false);
 
                 ~Impl()
                 {
-                    enteredFinalizerEvent.Set();
-                    hangEvent.Wait();
+                    lock (hangLock)
+                    {
+                        enteredFinalizerEvent.Set();
+                        Monitor.Wait(hangLock);
+                    }
                 }
 
                 [MethodImpl(MethodImplOptions.NoInlining)]
-                internal static (ManualResetEventSlim hangEvent, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
+                internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
                 {
                     var impl = new Impl();
-                    return (impl.hangEvent, impl.enteredFinalizerEvent);
+                    return (impl.hangLock, impl.enteredFinalizerEvent);
                 }
             }
 
@@ -371,17 +377,26 @@ namespace BenchmarkDotNet.Engines
                 {
                     return default;
                 }
-                var (hangEvent, enteredFinalizerEvent) = Impl.CreateWeakly();
+                var (hangLock, enteredFinalizerEvent) = Impl.CreateWeakly();
                 do
                 {
                     GC.Collect();
                     // Do NOT call GC.WaitForPendingFinalizers.
                 }
                 while (!enteredFinalizerEvent.IsSet);
-                return new FinalizerBlocker(hangEvent);
+                return new FinalizerBlocker(hangLock);
             }
 
-            public void Dispose() => hangEvent?.Set();
+            public void Dispose()
+            {
+                if (hangLock is not null)
+                {
+                    lock (hangLock)
+                    {
+                        Monitor.Pulse(hangLock);
+                    }
+                }
+            }
         }
     }
 }
