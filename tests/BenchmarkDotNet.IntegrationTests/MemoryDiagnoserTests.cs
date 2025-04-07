@@ -234,9 +234,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly), MemberData(nameof(GetToolchains),
-            Skip = "Some random background allocations are occurring that we haven't been able to figure out, causing this test in particular to be flaky." +
-            " Other tests likely also suffer from it, but their high invocation counts successfully drown it out. #2562")]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly)]
+        [MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
