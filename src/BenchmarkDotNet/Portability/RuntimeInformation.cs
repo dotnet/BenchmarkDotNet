@@ -54,17 +54,17 @@ namespace BenchmarkDotNet.Portability
             ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                 && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
-        public static readonly bool IsNativeAOT =
-            Environment.Version.Major >= 5
-                && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
-                && !IsWasm; // Wasm also returns "" for assembly locations
-
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
         public static readonly bool IsWasm = OperatingSystem.IsBrowser();
 #else
         public static readonly bool IsWasm = IsOSPlatform(OSPlatform.Create("BROWSER"));
 #endif
+
+        public static readonly bool IsNativeAOT =
+            Environment.Version.Major >= 5
+                && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
+                && !IsWasm; // Wasm also returns "" for assembly locations
 
 #if NETSTANDARD2_0
         public static readonly bool IsAot = IsAotMethod();
