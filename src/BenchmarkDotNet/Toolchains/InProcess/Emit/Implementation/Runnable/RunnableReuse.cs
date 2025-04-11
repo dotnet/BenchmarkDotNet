@@ -102,6 +102,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 TargetJob = benchmarkCase.Job,
                 OperationsPerInvoke = benchmarkCase.Descriptor.OperationsPerInvoke,
                 MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
+                MeasureSurvivedMemory = benchmarkCase.Config.HasSurvivedMemoryDiagnoser(),
                 BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
             };
             return engineParameters;
