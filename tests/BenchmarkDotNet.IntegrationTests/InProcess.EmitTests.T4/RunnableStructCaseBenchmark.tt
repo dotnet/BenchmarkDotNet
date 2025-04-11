@@ -62,6 +62,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private <#=type#> _refResultHolder<#=counter#>;
 
         [Benchmark]
+        public ref readonly <#=type#> RefReadonlyReturnStructCase<#=counter#>() => ref _refResultHolder<#=counter#>;
+
+        [Benchmark]
         public ref <#=type#> RefReturnStructCase<#=counter#>() => ref _refResultHolder<#=counter#>;
 
 <#+
