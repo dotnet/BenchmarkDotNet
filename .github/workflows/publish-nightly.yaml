@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'dotnet/BenchmarkDotNet' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set date
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: Pack
         run: ./build.cmd pack /p:VersionSuffix=nightly.$DATE.$GITHUB_RUN_NUMBER
       - name: Upload nupkg to artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nupkgs
           path: "**/*.*nupkg"
