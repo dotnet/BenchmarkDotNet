@@ -74,7 +74,10 @@ namespace BenchmarkDotNet.Running
                     return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors.ToImmutableArray()) };
 
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
+                {
+                    compositeLogger.WriteLineError("// No benchmarks have been found");
                     return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath) };
+                }
 
                 eventProcessor.OnEndValidationStage();
 
