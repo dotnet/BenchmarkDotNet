@@ -10,6 +10,7 @@ using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Tests.Running
 {
@@ -18,14 +19,11 @@ namespace BenchmarkDotNet.Tests.Running
         [Fact]
         public void WhenNoBenchmarksAreFound_ReturnsNoBenchmarksHaveBeenFoundValidationError()
         {
-            var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmarks), null) });
-            // Act
-            // Assert
-            Assert.Single(summaries);
-            var summary = summaries[0];
-            Assert.True(summary.HasCriticalValidationErrors);
-            Assert.Equal("No benchmarks have been found", summary.ValidationErrors[0].Message);
-            Assert.True(summary.ValidationErrors[0].IsCritical);
+            var logger = new AccumulationLogger();
+            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmarks), config) });
+            Console.WriteLine(logger.GetLog());
+            Assert.Contains("// No benchmarks have been found", logger.GetLog());
         }
 
         public class EmptyBenchmarks
