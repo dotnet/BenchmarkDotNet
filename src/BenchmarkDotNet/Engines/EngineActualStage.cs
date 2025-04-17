@@ -86,5 +86,63 @@ namespace BenchmarkDotNet.Engines
 
             return measurements;
         }
+
+        internal IEngineStageEvaluator GetOverheadEvaluator()
+            => new AutoEvaluator(this, true);
+
+        internal IEngineStageEvaluator GetWorkloadEvaluator(bool forceSpecific)
+            => iterationCount == null && !forceSpecific
+                ? new AutoEvaluator(this, false)
+                : new SpecificEvaluator(this);
+
+        private sealed class AutoEvaluator(EngineActualStage stage, bool isOverhead) : IEngineStageEvaluator
+        {
+            public int MaxIterationCount => stage.maxIterationCount;
+
+            private readonly List<Measurement> _measurementsForStatistics = new (stage.maxIterationCount);
+            private int _iterationCounter = 0;
+
+            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
+            {
+                if (measurements.Count == 0)
+                {
+                    return false;
+                }
+
+                double effectiveMaxRelativeError = isOverhead ? MaxOverheadRelativeError : stage.maxRelativeError;
+                _iterationCounter++;
+                var measurement = measurements[measurements.Count - 1];
+                _measurementsForStatistics.Add(measurement);
+
+                var statistics = MeasurementsStatistics.Calculate(_measurementsForStatistics, stage.outlierMode);
+                double actualError = statistics.LegacyConfidenceInterval.Margin;
+
+                double maxError1 = effectiveMaxRelativeError * statistics.Mean;
+                double maxError2 = stage.maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
+                double maxError = Math.Min(maxError1, maxError2);
+
+                if (_iterationCounter >= stage.minIterationCount && actualError < maxError)
+                {
+                    return true;
+                }
+
+                if (_iterationCounter >= stage.maxIterationCount || isOverhead && _iterationCounter >= MaxOverheadIterationCount)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        private sealed class SpecificEvaluator(EngineActualStage stage) : IEngineStageEvaluator
+        {
+            public int MaxIterationCount => stage.iterationCount ?? DefaultWorkloadCount;
+
+            private int _iterationCount = 0;
+
+            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
+                => ++_iterationCount > MaxIterationCount;
+        }
     }
 }
