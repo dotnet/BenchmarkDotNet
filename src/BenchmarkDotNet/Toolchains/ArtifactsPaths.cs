@@ -4,10 +4,11 @@ namespace BenchmarkDotNet.Toolchains
 {
     public class ArtifactsPaths
     {
-        public static readonly ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "", "", "");
+        public static readonly ArtifactsPaths Empty = new ArtifactsPaths("", "", "", "", "", "", "", "", "", "", "", "", "");
 
         [PublicAPI] public string RootArtifactsFolderPath { get; }
         [PublicAPI] public string BuildArtifactsDirectoryPath { get; }
+        [PublicAPI] public string PublishDirectoryPath { get; }
         [PublicAPI] public string BinariesDirectoryPath { get; }
         [PublicAPI] public string IntermediateDirectoryPath { get; }
         [PublicAPI] public string ProgramCodePath { get; }
@@ -22,6 +23,7 @@ namespace BenchmarkDotNet.Toolchains
         public ArtifactsPaths(
             string rootArtifactsFolderPath,
             string buildArtifactsDirectoryPath,
+            string publishDirectoryPath,
             string binariesDirectoryPath,
             string intermediateDirectoryPath,
             string programCodePath,
@@ -35,6 +37,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             RootArtifactsFolderPath = rootArtifactsFolderPath;
             BuildArtifactsDirectoryPath = buildArtifactsDirectoryPath;
+            PublishDirectoryPath = publishDirectoryPath;
             BinariesDirectoryPath = binariesDirectoryPath;
             IntermediateDirectoryPath = intermediateDirectoryPath;
             ProgramCodePath = programCodePath;
