@@ -19,7 +19,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -72,12 +71,6 @@ namespace BenchmarkDotNet.Running
 
                 if (validationErrors.Any(validationError => validationError.IsCritical))
                     return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors.ToImmutableArray()) };
-
-                if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
-                {
-                    compositeLogger.WriteLineError("// No benchmarks have been found");
-                    return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath) };
-                }
 
                 eventProcessor.OnEndValidationStage();
 
@@ -581,20 +574,41 @@ namespace BenchmarkDotNet.Running
         private static (BenchmarkRunInfo[], List<ValidationError>) GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, IResolver resolver)
         {
             List<ValidationError> validationErrors = new ();
+            List<BenchmarkRunInfo> runInfos = new (benchmarkRunInfos.Length);
 
-            var runInfos = benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
-                    info.BenchmarksCases.Where(benchmark =>
+            foreach (var benchmarkRunInfo in benchmarkRunInfos)
+            {
+                if (benchmarkRunInfo.BenchmarksCases.Length == 0)
+                {
+                    validationErrors.Add(new ValidationError(true, $"No [Benchmark] attribute found on '{benchmarkRunInfo.Type.Name}' benchmark case."));
+                    continue;
+                }
+
+                var validBenchmarks = benchmarkRunInfo.BenchmarksCases
+                    .Where(benchmark =>
                     {
-                        var errors = benchmark.GetToolchain().Validate(benchmark, resolver).ToArray();
-                        validationErrors.AddRange(errors);
-                        return !errors.Any();
-                    }).ToArray(),
-                    info.Type,
-                    info.Config))
-                .Where(infos => infos.BenchmarksCases.Any())
-                .ToArray();
 
-            return (runInfos, validationErrors);
+                        var errors = benchmark.GetToolchain()
+                            .Validate(benchmark, resolver)
+                            .ToArray();
+
+                        validationErrors.AddRange(errors);
+
+                        return errors.Length == 0;
+                    })
+                    .ToArray();
+
+                runInfos.Add(
+                    new BenchmarkRunInfo(
+                        validBenchmarks,
+                        benchmarkRunInfo.Type,
+                        benchmarkRunInfo.Config
+
+                    ));
+
+
+            }
+            return (runInfos.ToArray(), validationErrors);
         }
 
         private static string GetRootArtifactsFolderPath(BenchmarkRunInfo[] benchmarkRunInfos)
