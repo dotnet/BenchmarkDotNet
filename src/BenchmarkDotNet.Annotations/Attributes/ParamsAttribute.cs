@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ParamsAttribute : PriorityAttribute
     {
-        public object?[] Values { get; }
+        public object?[] Values { get; protected set; }
 
         // CLS-Compliant Code requires a constructor without an array in the argument list
         public ParamsAttribute() => Values = new object[0];

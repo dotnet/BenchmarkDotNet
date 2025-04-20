@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Tests
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net9.0", generator.TargetFrameworkMoniker);
+            Assert.Equal("net10.0", generator.TargetFrameworkMoniker);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -271,10 +271,16 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
+        [InlineData("netcoreapp2.0", true)]
+        [InlineData("netcoreapp2.1", true)]
+        [InlineData("netcoreapp2.2", true)]
+        [InlineData("netcoreapp3.0", true)]
         [InlineData("netcoreapp3.1", true)]
         [InlineData("net5.0", true)]
         [InlineData("net6.0", true)]
+        [InlineData("net7.0", true)]
         [InlineData("net8.0", true)]
+        [InlineData("net9.0", true)]
         [InlineData("net462", false)]
         [InlineData("net48", false)]
         public void DotNetCliParsedCorrectly(string tfm, bool isCore)
@@ -364,6 +370,22 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(DefaultConfig.Instance.BuildTimeout, config.BuildTimeout);
         }
 
+        [Fact]
+        public void UserCanSpecifyWakeLock()
+        {
+            var config = ConfigParser.Parse(["--wakeLock", "Display"], new OutputLogger(Output)).config;
+
+            Assert.Equal(WakeLockType.Display, config.WakeLock);
+        }
+
+        [Fact]
+        public void WhenUserDoesNotSpecifyWakeLockTheDefaultValueIsUsed()
+        {
+            var config = ConfigParser.Parse([], new OutputLogger(Output)).config;
+
+            Assert.Equal(DefaultConfig.Instance.WakeLock, config.WakeLock);
+        }
+
         [Theory]
         [InlineData("net461")]
         [InlineData("net462")]
@@ -384,10 +406,17 @@ namespace BenchmarkDotNet.Tests
 
         [Theory]
         [InlineData("net50")]
+        [InlineData("net5.0")]
         [InlineData("net60")]
+        [InlineData("net6.0")]
         [InlineData("net70")]
+        [InlineData("net7.0")]
         [InlineData("net80")]
+        [InlineData("net8.0")]
         [InlineData("net90")]
+        [InlineData("net9.0")]
+        [InlineData("net10_0")]
+        [InlineData("net10.0")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
@@ -414,15 +443,15 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp3.1", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
+            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
                 new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs(), job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462");
             Assert.Single(config.GetJobs(), job => job.Environment.Runtime is MonoRuntime);
             Assert.Single(config.GetJobs(), job =>
-                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.1" &&
-                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
+                job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp2.0" &&
+                coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp20);
             Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
                 nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60);

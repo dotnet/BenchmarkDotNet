@@ -15,13 +15,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjCoreToolchain : Toolchain, IEquatable<CsProjCoreToolchain>
     {
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp22 = From(NetCoreAppSettings.NetCoreApp22);
-        [Obsolete("This runtime is no longer supported. Use a newer runtime or use BenchmarkDotNet v0.14.X or older.", true)]
         [PublicAPI] public static readonly IToolchain NetCoreApp30 = From(NetCoreAppSettings.NetCoreApp30);
         [PublicAPI] public static readonly IToolchain NetCoreApp31 = From(NetCoreAppSettings.NetCoreApp31);
         [PublicAPI] public static readonly IToolchain NetCoreApp50 = From(NetCoreAppSettings.NetCoreApp50);
@@ -29,6 +25,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain NetCoreApp70 = From(NetCoreAppSettings.NetCoreApp70);
         [PublicAPI] public static readonly IToolchain NetCoreApp80 = From(NetCoreAppSettings.NetCoreApp80);
         [PublicAPI] public static readonly IToolchain NetCoreApp90 = From(NetCoreAppSettings.NetCoreApp90);
+        [PublicAPI] public static readonly IToolchain NetCoreApp10_0 = From(NetCoreAppSettings.NetCoreApp10_0);
 
         internal CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor)

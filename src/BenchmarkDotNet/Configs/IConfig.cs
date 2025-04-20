@@ -55,6 +55,8 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         TimeSpan BuildTimeout { get; }
 
+        public WakeLockType WakeLock { get; }
+
         /// <summary>
         /// Collect any errors or warnings when composing the configuration
         /// </summary>

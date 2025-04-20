@@ -24,6 +24,14 @@ namespace BenchmarkDotNet.Extensions
                     return ClrRuntime.Net48;
                 case RuntimeMoniker.Net481:
                     return ClrRuntime.Net481;
+                case RuntimeMoniker.NetCoreApp20:
+                    return CoreRuntime.Core20;
+                case RuntimeMoniker.NetCoreApp21:
+                    return CoreRuntime.Core21;
+                case RuntimeMoniker.NetCoreApp22:
+                    return CoreRuntime.Core22;
+                case RuntimeMoniker.NetCoreApp30:
+                    return CoreRuntime.Core30;
                 case RuntimeMoniker.NetCoreApp31:
                     return CoreRuntime.Core31;
                 case RuntimeMoniker.Net50:
@@ -39,6 +47,8 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core80;
                 case RuntimeMoniker.Net90:
                     return CoreRuntime.Core90;
+                case RuntimeMoniker.Net10_0:
+                    return CoreRuntime.Core10_0;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
                 case RuntimeMoniker.NativeAot60:
@@ -49,6 +59,8 @@ namespace BenchmarkDotNet.Extensions
                     return NativeAotRuntime.Net80;
                 case RuntimeMoniker.NativeAot90:
                     return NativeAotRuntime.Net90;
+                case RuntimeMoniker.NativeAot10_0:
+                    return NativeAotRuntime.Net10_0;
                 case RuntimeMoniker.Mono60:
                     return MonoRuntime.Mono60;
                 case RuntimeMoniker.Mono70:
@@ -57,6 +69,8 @@ namespace BenchmarkDotNet.Extensions
                     return MonoRuntime.Mono80;
                 case RuntimeMoniker.Mono90:
                     return MonoRuntime.Mono90;
+                case RuntimeMoniker.Mono10_0:
+                    return MonoRuntime.Mono10_0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }

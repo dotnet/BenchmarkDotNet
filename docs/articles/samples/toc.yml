@@ -126,6 +126,8 @@
   href: IntroTailcall.md
 - name: IntroVisualStudioProfiler
   href: IntroVisualStudioProfiler.md
+- name: IntroWakeLock
+  href: IntroWakeLock.md
 - name: IntroWasm
   href: IntroWasm.md
 - name: IntroUnicode

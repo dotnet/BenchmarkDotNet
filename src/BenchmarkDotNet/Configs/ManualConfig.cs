@@ -58,6 +58,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public ICategoryDiscoverer CategoryDiscoverer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
+        [PublicAPI] public WakeLockType WakeLock { get; set; } = DefaultConfig.Instance.WakeLock;
 
         public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
@@ -106,6 +107,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)
         {
             BuildTimeout = buildTimeout;
+            return this;
+        }
+
+        public ManualConfig WithWakeLock(WakeLockType wakeLockType)
+        {
+            WakeLock = wakeLockType;
             return this;
         }
 
@@ -273,6 +280,7 @@ namespace BenchmarkDotNet.Configs
             columnHidingRules.AddRange(config.GetColumnHidingRules());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
+            WakeLock = GetWakeLock(WakeLock, config.WakeLock);
         }
 
         /// <summary>
@@ -327,5 +335,12 @@ namespace BenchmarkDotNet.Configs
             => current == DefaultConfig.Instance.BuildTimeout
                 ? other
                 : TimeSpan.FromMilliseconds(Math.Max(current.TotalMilliseconds, other.TotalMilliseconds));
+
+        private static WakeLockType GetWakeLock(WakeLockType current, WakeLockType other)
+        {
+            if (current == DefaultConfig.Instance.WakeLock) { return other; }
+            if (other == DefaultConfig.Instance.WakeLock) { return current; }
+            return current.CompareTo(other) > 0 ? current : other;
+        }
     }
 }

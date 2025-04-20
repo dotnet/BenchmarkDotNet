@@ -66,6 +66,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // .Net Core does not support assembly saving so far
             // SEE https://github.com/dotnet/corefx/issues/4491
+            // TODO: Use new PersistedAssemblyBuilder when BDN and tests are updated to net9.0 or newer.
             if (!Portability.RuntimeInformation.IsFullFramework)
                 return;
 
@@ -363,5 +364,26 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counters.BenchmarkCounter);
             }
         }
+
+
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void ParamsSupportRequiredProperty()
+        {
+            var config = CreateInProcessConfig(null);
+            CanExecute<ParamsTestRequiredProperty>(config);
+        }
+
+        public class ParamsTestRequiredProperty
+        {
+            private const string Expected = "a";
+
+            [Params(Expected)]
+            public required string ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Assert.Equal(Expected, ParamProperty);
+        }
+#endif
     }
 }

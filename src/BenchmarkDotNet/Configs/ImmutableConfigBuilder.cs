@@ -76,6 +76,7 @@ namespace BenchmarkDotNet.Configs
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
                 source.BuildTimeout,
+                source.WakeLock,
                 configAnalyse.AsReadOnly()
             );
         }
