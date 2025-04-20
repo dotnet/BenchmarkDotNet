@@ -1,16 +1,7 @@
 using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Parameters;
-using System.Reflection;
 using Xunit;
-using Xunit.Abstractions;
-using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Loggers;
 using System.Linq;
 
 namespace BenchmarkDotNet.Tests.Running
