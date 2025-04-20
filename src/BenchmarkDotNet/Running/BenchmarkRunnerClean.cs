@@ -576,6 +576,12 @@ namespace BenchmarkDotNet.Running
             List<ValidationError> validationErrors = new ();
             List<BenchmarkRunInfo> runInfos = new (benchmarkRunInfos.Length);
 
+            if (benchmarkRunInfos.Length == 0)
+            {
+                validationErrors.Add(new ValidationError(true, $"No benchmarks were found."));
+                return (Array.Empty<BenchmarkRunInfo>(), validationErrors);
+            }
+
             foreach (var benchmarkRunInfo in benchmarkRunInfos)
             {
                 if (benchmarkRunInfo.BenchmarksCases.Length == 0)

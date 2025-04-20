@@ -50,6 +50,17 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == $"No [Benchmark] attribute found on '{typeof(EmptyBenchmark).Name}' benchmark case.");
         }
 
+        [Fact]
+        public void WhenRunningEmptyArrayOfBenchmarks_ValidationErrorIsThrown()
+        {
+            var summaries = BenchmarkRunnerClean.Run(Array.Empty<BenchmarkRunInfo>());
+            Assert.Single(summaries);
+            var summary = summaries[0];
+            Assert.True(summary.HasCriticalValidationErrors);
+            Assert.Single(summary.ValidationErrors);
+            Assert.Equal("No benchmarks were found.", summary.ValidationErrors[0].Message);
+        }
+
         public class EmptyBenchmark
         {
         }
