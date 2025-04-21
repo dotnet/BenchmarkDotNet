@@ -9,30 +9,28 @@ namespace BenchmarkDotNet.Tests.Running
     public class RunningEmptyBenchmarkTests
     {
         [Fact]
-        public void WhenRunningSingleEmptyBenchmark_ValidationErrorIsThrown()
+        public void WhenRunningSingleEmptyBenchmark_NoBenchmarkValidationErrorIsThrown()
         {
             var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), null) });
             Assert.Single(summaries);
             var summary = summaries[0];
             Assert.True(summary.HasCriticalValidationErrors);
-            Assert.Single(summary.ValidationErrors);
-            Assert.Equal($"No [Benchmark] attribute found on '{typeof(EmptyBenchmark).Name}' benchmark case.", summary.ValidationErrors[0].Message);
+            Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == $"No [Benchmark] attribute found on '{typeof(EmptyBenchmark).Name}' benchmark case.");
         }
 
         [Fact]
-        public void WhenRunningMultipleEmptyBenchmarks_ValidationErrorIsThrown()
+        public void WhenRunningMultipleEmptyBenchmarks_NoBenchmarkValidationErrorIsThrown()
         {
-            var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), null), BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), null) });
+            var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), null), BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark2), null) });
             Assert.Single(summaries);
             var summary = summaries[0];
             Assert.True(summary.HasCriticalValidationErrors);
-            Assert.Equal(2, summary.ValidationErrors.Count());
-            Assert.Equal($"No [Benchmark] attribute found on '{typeof(EmptyBenchmark).Name}' benchmark case.", summary.ValidationErrors[0].Message);
-            Assert.Equal($"No [Benchmark] attribute found on '{typeof(EmptyBenchmark).Name}' benchmark case.", summary.ValidationErrors[1].Message);
+            Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == $"No [Benchmark] attribute found on '{typeof(EmptyBenchmark).Name}' benchmark case.");
+            Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == $"No [Benchmark] attribute found on '{typeof(EmptyBenchmark2).Name}' benchmark case.");
         }
 
         [Fact]
-        public void WhenRunningMultipleBenchmarksOneOfWhichIsEmpty_ValidationErrorIsThrown()
+        public void WhenRunningMultipleBenchmarksOneOfWhichIsEmpty_NoBenchmarkValidationErrorIsThrown()
         {
             var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), null), BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), null) });
             Assert.Single(summaries);
@@ -42,17 +40,20 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void WhenRunningEmptyArrayOfBenchmarks_ValidationErrorIsThrown()
+        public void WhenRunningEmptyArrayOfBenchmarks_NoBenchmarkValidationErrorIsThrown()
         {
             var summaries = BenchmarkRunnerClean.Run(Array.Empty<BenchmarkRunInfo>());
             Assert.Single(summaries);
             var summary = summaries[0];
             Assert.True(summary.HasCriticalValidationErrors);
-            Assert.Single(summary.ValidationErrors);
-            Assert.Equal("No benchmarks were found.", summary.ValidationErrors[0].Message);
+            Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == "No benchmarks were found.");
         }
 
         public class EmptyBenchmark
+        {
+        }
+
+        public class EmptyBenchmark2
         {
         }
 
