@@ -88,7 +88,11 @@ namespace BenchmarkDotNet.Running
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
                 eventProcessor.OnStartBuildStage(buildPartitions);
-                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor);
+
+                bool useParallelBuild = !supportedBenchmarks.Any(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild));
+                var buildResults = useParallelBuild
+                    ? BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor)
+                    : BuildSequential(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor);
 
                 var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
 
@@ -406,6 +410,31 @@ namespace BenchmarkDotNet.Running
             var afterSequentialBuild = globalChronometer.GetElapsed();
 
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)}   *****");
+
+            return buildResults;
+
+            static string GetFormattedDifference(ClockSpan before, ClockSpan after)
+                => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
+        }
+
+        private static Dictionary<BuildPartition, BuildResult> BuildSequential(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
+        {
+            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s): Start   *****");
+
+            var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
+
+            var beforeBuild = globalChronometer.GetElapsed();
+
+            var buildResults = new Dictionary<BuildPartition, BuildResult>();
+            foreach (var buildPartition in buildPartitions)
+            {
+                buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+                eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
+            }
+
+            var afterBuild = globalChronometer.GetElapsed();
+
+            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeBuild, afterBuild)}   *****");
 
             return buildResults;
 
