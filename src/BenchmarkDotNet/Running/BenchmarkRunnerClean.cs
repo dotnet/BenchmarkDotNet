@@ -688,6 +688,9 @@ namespace BenchmarkDotNet.Running
                 foreach (var logger in benchmarkRunInfo.Config.GetLoggers())
                     AddLogger(logger);
 
+            if (benchmarkRunInfos.Length == 0)
+                AddLogger(new ConsoleLogger());
+
             AddLogger(streamLogger);
 
             return new CompositeLogger(loggers.Values.ToImmutableHashSet());
