@@ -57,7 +57,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 .Replace("$TFM$", TargetFrameworkMoniker)
                 .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
                 .Replace("$COPIEDSETTINGS$", customProperties)
-                .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                 .Replace("$SDKNAME$", sdkName)
                 .Replace("$WASMDATADIR$", runtime.WasmDataDir)
                 .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")

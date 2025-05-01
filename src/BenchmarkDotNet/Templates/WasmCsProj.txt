@@ -11,7 +11,6 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <OutputPath>bin</OutputPath>
     <RuntimeConfig>Release</RuntimeConfig>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFramework>$TFM$</TargetFramework>

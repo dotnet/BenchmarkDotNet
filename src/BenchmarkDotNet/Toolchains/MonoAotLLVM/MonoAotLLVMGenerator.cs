@@ -43,7 +43,6 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 .Replace("$TFM$", TargetFrameworkMoniker)
                 .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
                 .Replace("$COPIEDSETTINGS$", customProperties)
-                .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                 .Replace("$SDKNAME$", sdkName)
                 .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
                 .Replace("$COMPILERBINARYPATH$", AotCompilerPath)
