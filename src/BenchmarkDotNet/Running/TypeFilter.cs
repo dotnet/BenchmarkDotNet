@@ -26,7 +26,6 @@ namespace BenchmarkDotNet.Running
                     {
                         logger.WriteLineError($"No [Benchmark] attribute found on '{type.Name}' benchmark case.");
                     }
-                    return (false, Array.Empty<Type>());
                 }
                 else if (assemblies.Any())
                 {
@@ -34,11 +33,12 @@ namespace BenchmarkDotNet.Running
                     {
                         logger.WriteLineError($"No [Benchmark] attribute found on '{assembly.GetName().Name}' assembly.");
                     }
-                    return (false, Array.Empty<Type>());
                 }
-                logger.WriteLineError("No benchmarks were found.");
+                else
+                {
+                    logger.WriteLineError("No benchmarks were found.");
+                }
                 return (false, Array.Empty<Type>());
-
             }
 
             foreach (var type in types)

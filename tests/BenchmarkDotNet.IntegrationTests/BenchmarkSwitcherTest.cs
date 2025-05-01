@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Run(new[] { "--filter", "*" }, config);
 
             Assert.Empty(summaries);
-            Assert.Contains("Type BenchmarkDotNet.IntegrationTests.ClassC is invalid.", logger.GetLog());
+            Assert.Contains(GetValidationErrorForType(typeof(ClassC)), logger.GetLog());
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Run(new[] { "--filter", "*" }, config);
 
             Assert.Empty(summaries);
-            Assert.Contains("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.", logger.GetLog());
+            Assert.Contains("No benchmarks were found.", logger.GetLog());
         }
 
         [Fact]
@@ -369,6 +369,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 return returnValue;
             }
         }
+
+        private string GetValidationErrorForType(Type type)
+        {
+            return $"No [Benchmark] attribute found on '{type.Name}' benchmark case.";
+        }
     }
 }
 
@@ -424,6 +429,8 @@ namespace BenchmarkDotNet.IntegrationTests
             exported = true;
         }
     }
+
+
 }
 
 namespace BenchmarkDotNet.NOTIntegrationTests
