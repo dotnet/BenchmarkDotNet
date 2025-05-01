@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Detectors.Cpu.macOS;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,7 +14,7 @@ public class SysctlCpuInfoParserTests(ITestOutputHelper output)
     public void EmptyTest()
     {
         var actual = SysctlCpuInfoParser.Parse(string.Empty);
-        var expected = new PhdCpu();
+        var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
 
@@ -22,7 +22,7 @@ public class SysctlCpuInfoParserTests(ITestOutputHelper output)
     public void MalformedTest()
     {
         var actual = SysctlCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
-        var expected = new PhdCpu();
+        var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
 
@@ -31,7 +31,7 @@ public class SysctlCpuInfoParserTests(ITestOutputHelper output)
     {
         string cpuInfo = TestHelper.ReadTestFile("SysctlRealOneProcessorFourCores.txt");
         var actual = SysctlCpuInfoParser.Parse(cpuInfo);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz",
             PhysicalProcessorCount = 1,

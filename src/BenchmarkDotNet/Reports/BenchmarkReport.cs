@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Phd;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
-using Perfolizer.Phd;
-using Perfolizer.Phd.Base;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -60,9 +56,9 @@ namespace BenchmarkDotNet.Reports
 
         public IReadOnlyList<Measurement> GetResultRuns() => AllMeasurements.Where(r => r.Is(IterationMode.Workload, IterationStage.Result)).ToList();
 
-        public PhdEntry ToPhd()
+        internal EntryInfo ToPerfonar()
         {
-            var entry = new PhdEntry
+            var entry = new EntryInfo
             {
                 Benchmark = new BdnBenchmark
                 {
@@ -73,10 +69,10 @@ namespace BenchmarkDotNet.Reports
                     Parameters = BenchmarkCase.Parameters.PrintInfo,
                     HardwareIntrinsics = this.GetHardwareIntrinsicsInfo()
                 },
-                Job = new BdnJob
+                Job = new JobInfo
                 {
-                    Environment = BenchmarkCase.Job.Environment.ToPhd(),
-                    Execution = BenchmarkCase.Job.Run.ToPhd()
+                    Environment = BenchmarkCase.Job.Environment.ToPerfonar(),
+                    Execution = BenchmarkCase.Job.Run.ToPerfonar()
                 }
             };
 
@@ -88,14 +84,14 @@ namespace BenchmarkDotNet.Reports
             }).OrderBy(x => x.Key).ToList();
             foreach (var lifecycleGroup in lifecycles)
             {
-                var measurementsEntry = new PhdEntry
+                var measurementsEntry = new EntryInfo
                 {
                     Lifecycle = lifecycleGroup.Key
                 };
 
                 foreach (var measurement in lifecycleGroup.ToList())
                 {
-                    measurementsEntry.Add(new PhdEntry
+                    measurementsEntry.Add(new EntryInfo
                     {
                         IterationIndex = measurement.IterationIndex,
                         InvocationCount = measurement.Operations,

@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Detectors.Cpu.Linux;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 using Xunit;
 using Xunit.Abstractions;
 using static Perfolizer.Horology.Frequency;
@@ -15,7 +15,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     public void EmptyTest()
     {
         var actual = LinuxCpuInfoParser.Parse("", "");
-        var expected = new PhdCpu();
+        var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
 
@@ -23,7 +23,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     public void MalformedTest()
     {
         var actual = LinuxCpuInfoParser.Parse("malformedkey: malformedvalue\n\nmalformedkey2: malformedvalue2", null);
-        var expected = new PhdCpu();
+        var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
 
@@ -32,7 +32,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     {
         string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoProcessorWithDifferentCoresCount.txt");
         var actual = LinuxCpuInfoParser.Parse(cpuInfo, null);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Unknown processor with 2 cores and hyper threading, Unknown processor with 4 cores",
             PhysicalProcessorCount = 2,
@@ -50,7 +50,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     {
         string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorTwoCores.txt");
         var actual = LinuxCpuInfoParser.Parse(cpuInfo, null);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz",
             PhysicalProcessorCount = 1,
@@ -67,7 +67,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     {
         string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorFourCores.txt");
         var actual = LinuxCpuInfoParser.Parse(cpuInfo, null);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz",
             PhysicalProcessorCount = 1,
@@ -112,7 +112,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
                 Flags:              fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
             """;
         var actual = LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
-        var expected = new PhdCpu { ProcessorName = "Neoverse-N1", PhysicalCoreCount = 16 };
+        var expected = new CpuInfo { ProcessorName = "Neoverse-N1", PhysicalCoreCount = 16 };
         Output.AssertEqual(expected, actual);
     }
 
@@ -148,7 +148,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
                                       r smca fsrm flush_l1d
             """;
         var actual = LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "AMD Ryzen 9 7950X 16-Core Processor",
             PhysicalProcessorCount = 1,

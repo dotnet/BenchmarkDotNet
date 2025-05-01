@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Phd;
+using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Jobs
 
         internal Runtime GetRuntime() => HasValue(RuntimeCharacteristic) ? Runtime : RuntimeInformation.GetCurrentRuntime();
 
-        public BdnEnvironment ToPhd() => new ()
+        internal BdnEnvironment ToPerfonar() => new ()
         {
             Jit = HasValue(JitCharacteristic) ? Jit : null,
             Runtime = HasValue(RuntimeCharacteristic) ? Runtime?.RuntimeMoniker : null,

@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.macOS;
 
@@ -20,7 +20,7 @@ internal static class SysctlCpuInfoParser
 
     /// <param name="sysctlOutput">Output of `sysctl -a`</param>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    internal static PhdCpu Parse(string? sysctlOutput)
+    internal static CpuInfo Parse(string? sysctlOutput)
     {
         var sysctl = SectionsHelper.ParseSection(sysctlOutput, ':');
         string processorName = sysctl.GetValueOrDefault(Sysctl.ProcessorName);
@@ -29,7 +29,7 @@ internal static class SysctlCpuInfoParser
         int? logicalCoreCount = PositiveIntValue(sysctl, Sysctl.LogicalCoreCount);
         long? nominalFrequency = PositiveLongValue(sysctl, Sysctl.NominalFrequency);
         long? maxFrequency = PositiveLongValue(sysctl, Sysctl.MaxFrequency);
-        return new PhdCpu
+        return new CpuInfo
         {
             ProcessorName = processorName,
             PhysicalProcessorCount = physicalProcessorCount,

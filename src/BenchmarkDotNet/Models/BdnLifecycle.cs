@@ -1,13 +1,11 @@
 using System;
 using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
-using Perfolizer.Phd;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
-namespace BenchmarkDotNet.Phd;
+namespace BenchmarkDotNet.Models;
 
-[PublicAPI]
-public class BdnLifecycle : PhdLifecycle, IEquatable<BdnLifecycle>, IComparable<BdnLifecycle>
+internal class BdnLifecycle : LifecycleInfo, IEquatable<BdnLifecycle>, IComparable<BdnLifecycle>
 {
     public int LaunchIndex { get; set; }
     public IterationStage IterationStage { get; set; } = IterationStage.Unknown;

@@ -2,17 +2,17 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 internal static class WmicCpuInfoParser
 {
     /// <summary>
-    /// Parses wmic output and returns <see cref="PhdCpu"/>
+    /// Parses wmic output and returns <see cref="CpuInfo"/>
     /// </summary>
     /// <param name="wmicOutput">Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`</param>
-    internal static PhdCpu Parse(string? wmicOutput)
+    internal static CpuInfo Parse(string? wmicOutput)
     {
         var processorModelNames = new HashSet<string>();
         int physicalCoreCount = 0;
@@ -52,7 +52,7 @@ internal static class WmicCpuInfoParser
             ? Frequency.FromMHz(sumMaxFrequency / processorsCount)
             : null;
 
-        return new PhdCpu
+        return new CpuInfo
         {
             ProcessorName = processorName,
             PhysicalProcessorCount = processorsCount > 0 ? processorsCount : null,

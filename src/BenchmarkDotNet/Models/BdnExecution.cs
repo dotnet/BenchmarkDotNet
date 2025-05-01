@@ -1,11 +1,10 @@
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
-using Perfolizer.Horology;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
-namespace BenchmarkDotNet.Phd;
+namespace BenchmarkDotNet.Models;
 
-public class BdnExecution : PhdExecution
+internal class BdnExecution : ExecutionInfo
 {
     /// <summary>
     /// Available values: Throughput and ColdStart.

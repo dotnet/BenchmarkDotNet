@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Phd;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
@@ -13,9 +13,8 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using Perfolizer.Helpers;
 using Perfolizer.Horology;
+using Perfolizer.Models;
 using Perfolizer.Metrology;
-using Perfolizer.Phd;
-using Perfolizer.Phd.Dto;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -39,9 +38,9 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// is expensive to call (1s)
         /// </summary>
-        public Lazy<PhdCpu> Cpu { get; protected set; }
+        public Lazy<CpuInfo> Cpu { get; protected set; }
 
-        public Lazy<PhdOs> Os { get; protected set; }
+        public Lazy<OsInfo> Os { get; protected set; }
 
         /// <summary>
         /// .NET Core SDK version
@@ -66,7 +65,7 @@ namespace BenchmarkDotNet.Environments
 
         public Lazy<ICollection<Antivirus>> AntivirusProducts { get; }
 
-        // TODO: Join with PhdOs
+        // TODO: Join with OsInfo
         public Lazy<VirtualMachineHypervisor?> VirtualMachineHypervisor { get; protected set; }
 
         protected HostEnvironmentInfo()
@@ -78,8 +77,8 @@ namespace BenchmarkDotNet.Environments
             IsMonoInstalled = new Lazy<bool>(() => !string.IsNullOrEmpty(ProcessHelper.RunAndReadOutput("mono", "--version")));
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
-            Os = new Lazy<PhdOs>(OsDetector.GetOs);
-            Cpu = new Lazy<PhdCpu>(CpuDetector.CrossPlatform.Detect);
+            Os = new Lazy<OsInfo>(OsDetector.GetOs);
+            Cpu = new Lazy<CpuInfo>(CpuDetector.CrossPlatform.Detect);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => current ??= new HostEnvironmentInfo();
@@ -134,7 +133,7 @@ namespace BenchmarkDotNet.Environments
             return sb.ToString();
         }
 
-        public BdnHost ToPhd() => new ()
+        internal BdnHostInfo ToPerfonar() => new ()
         {
             Cpu = Cpu.Value,
             Os = Os.Value,
