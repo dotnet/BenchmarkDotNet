@@ -1,10 +1,10 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
-namespace BenchmarkDotNet.Phd;
+namespace BenchmarkDotNet.Models;
 
-public class BdnEnvironment : PhdEnvironment
+internal class BdnEnvironment : EnvironmentInfo
 {
     public RuntimeMoniker? Runtime { get; set; }
     public Jit? Jit { get; set; }

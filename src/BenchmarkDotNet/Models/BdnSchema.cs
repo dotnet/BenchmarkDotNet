@@ -1,18 +1,16 @@
-using Perfolizer.Phd.Base;
+using Perfolizer.Perfonar.Base;
 
-namespace BenchmarkDotNet.Phd;
+namespace BenchmarkDotNet.Models;
 
-public class BdnSchema : PhdSchema
+internal class BdnSchema : PerfonarSchema
 {
     public static readonly BdnSchema Instance = new ();
 
     private BdnSchema() : base("bdn")
     {
-        Add<BdnInfo>();
         Add<BdnLifecycle>();
-        Add<BdnHost>();
+        Add<BdnHostInfo>();
         Add<BdnBenchmark>();
-        Add<BdnJob>();
         Add<BdnEnvironment>();
         Add<BdnExecution>();
     }

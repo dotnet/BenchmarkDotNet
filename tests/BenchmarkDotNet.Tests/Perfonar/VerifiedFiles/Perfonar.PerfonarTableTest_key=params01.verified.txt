@@ -47,20 +47,5 @@
         }
       ]
     }
-  ],
-  "meta": {
-    "table": {
-      "columnDefinitions": [
-        {
-          "selector": ".benchmark.method"
-        },
-        {
-          "selector": ".parameters"
-        },
-        {
-          "selector": "=center"
-        }
-      ]
-    }
-  }
+  ]
 }

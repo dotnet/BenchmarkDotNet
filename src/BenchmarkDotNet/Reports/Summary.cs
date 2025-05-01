@@ -8,15 +8,14 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Phd;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
-using Perfolizer.Phd;
-using Perfolizer.Phd.Base;
-using Perfolizer.Phd.Dto;
-using Perfolizer.Phd.Tables;
+using Perfolizer.Models;
+using Perfolizer.Perfonar;
+using Perfolizer.Perfonar.Base;
+using Perfolizer.Perfonar.Tables;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -176,35 +175,37 @@ namespace BenchmarkDotNet.Reports
                    .FirstOrDefault()
                ?? SummaryStyle.Default;
 
-        // TODO: GcStats
-        public PhdEntry ToPhd()
+        internal PerfonarTableConfig GetDefaultTableConfig()
         {
-            var tableConfig = new PhdTableConfig
+            return new PerfonarTableConfig
             {
                 ColumnDefinitions =
                 [
-                    new PhdColumnDefinition(".engine") { Cloud = "primary", IsSelfExplanatory = true, IsAtomic = true },
-                    new PhdColumnDefinition(".host.os") { Cloud = "primary", IsSelfExplanatory = true, IsAtomic = true },
-                    new PhdColumnDefinition(".host.cpu") { Cloud = "primary", IsSelfExplanatory = true, IsAtomic = true },
-                    new PhdColumnDefinition(".benchmark") { Cloud = "secondary" },
-                    new PhdColumnDefinition(".job") { Cloud = "secondary", Compressed = true },
-                    new PhdColumnDefinition("=center"),
-                    new PhdColumnDefinition("=spread")
+                    new PerfonarColumnDefinition(".engine") { Cloud = "primary", IsSelfExplanatory = true, IsAtomic = true },
+                    new PerfonarColumnDefinition(".host.os") { Cloud = "primary", IsSelfExplanatory = true, IsAtomic = true },
+                    new PerfonarColumnDefinition(".host.cpu") { Cloud = "primary", IsSelfExplanatory = true, IsAtomic = true },
+                    new PerfonarColumnDefinition(".benchmark") { Cloud = "secondary" },
+                    new PerfonarColumnDefinition(".job") { Cloud = "secondary", Compressed = true },
+                    new PerfonarColumnDefinition("=center"),
+                    new PerfonarColumnDefinition("=spread")
                 ]
             };
+        }
 
-            var root = new PhdEntry
+        // TODO: GcStats
+        internal EntryInfo ToPerfonar()
+        {
+            var root = new EntryInfo
             {
-                Engine = new PhdEngine
+                Engine = new EngineInfo
                 {
                     Name = HostEnvironmentInfo.BenchmarkDotNetCaption,
                     Version = HostEnvironmentInfo.BenchmarkDotNetVersion,
                 },
-                Host = HostEnvironmentInfo.ToPhd(),
-                Meta = new PhdMeta { Table = tableConfig }
+                Host = HostEnvironmentInfo.ToPerfonar(),
             };
             foreach (var benchmarkReport in Reports)
-                root.Add(benchmarkReport.ToPhd());
+                root.Add(benchmarkReport.ToPerfonar());
             return root;
         }
     }

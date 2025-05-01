@@ -2,7 +2,7 @@
 using System.Reflection;
 using JetBrains.Annotations;
 using Perfolizer.Helpers;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,7 +24,7 @@ public static class TestHelper
     }
 
     [AssertionMethod]
-    public static void AssertEqual(this ITestOutputHelper output, PhdCpu expected, PhdCpu actual)
+    public static void AssertEqual(this ITestOutputHelper output, CpuInfo expected, CpuInfo actual)
     {
         output.WriteLine($"Expected : {expected.ToFullBrandName()}");
         output.WriteLine($"Actual   : {actual.ToFullBrandName()}");

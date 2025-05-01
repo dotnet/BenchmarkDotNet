@@ -1,16 +1,16 @@
+using Perfolizer.Models;
 using Perfolizer.Metrology;
-using Perfolizer.Phd.Base;
 
-namespace BenchmarkDotNet.Tests.Phd.Infra;
+namespace BenchmarkDotNet.Tests.Perfonar.Infra;
 
-public static class PhdTestExtensions
+public static class PerfonarTestExtensions
 {
-    public static PhdEntry AddMetrics(this PhdEntry entry, params string[] metrics)
+    public static EntryInfo AddMetrics(this EntryInfo entry, params string[] metrics)
     {
         for (int i = 0; i < metrics.Length; i++)
         {
             var measurement = Measurement.Parse(metrics[i]);
-            entry.Add(new PhdEntry
+            entry.Add(new EntryInfo
             {
                 IterationIndex = i,
                 Value = measurement.NominalValue,

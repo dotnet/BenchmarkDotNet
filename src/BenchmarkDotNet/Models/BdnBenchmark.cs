@@ -1,12 +1,10 @@
 using System.Text;
 using BenchmarkDotNet.Extensions;
-using JetBrains.Annotations;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
-namespace BenchmarkDotNet.Phd;
+namespace BenchmarkDotNet.Models;
 
-[PublicAPI]
-public class BdnBenchmark : PhdBenchmark
+internal class BdnBenchmark : BenchmarkInfo
 {
     public string Namespace { get; set; } = "";
     public string Type { get; set; } = "";

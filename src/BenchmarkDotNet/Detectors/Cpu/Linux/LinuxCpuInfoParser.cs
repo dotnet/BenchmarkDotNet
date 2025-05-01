@@ -5,7 +5,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;
 
@@ -28,7 +28,7 @@ internal static class LinuxCpuInfoParser
 
     /// <param name="cpuInfo">Output of `cat /proc/cpuinfo`</param>
     /// <param name="lscpu">Output of `lscpu`</param>
-    internal static PhdCpu Parse(string? cpuInfo, string? lscpu)
+    internal static CpuInfo Parse(string? cpuInfo, string? lscpu)
     {
         var processorModelNames = new HashSet<string>();
         var processorsToPhysicalCoreCount = new Dictionary<string, int>();
@@ -89,7 +89,7 @@ internal static class LinuxCpuInfoParser
         string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         int? physicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : null;
         int? physicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : coresPerSocket;
-        return new PhdCpu
+        return new CpuInfo
         {
             ProcessorName = processorName,
             PhysicalProcessorCount = physicalProcessorCount,

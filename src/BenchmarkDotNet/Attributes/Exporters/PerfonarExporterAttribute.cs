@@ -7,4 +7,4 @@ namespace BenchmarkDotNet.Attributes;
 /// IMPORTANT: Not fully implemented yet
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
-public class PhdExporterAttribute() : ExporterConfigBaseAttribute(new PhdJsonExporter(), new PhdMdExporter());
+internal class PerfonarExporterAttribute() : ExporterConfigBaseAttribute(new PerfonarJsonExporter(), new PerfonarMdExporter());

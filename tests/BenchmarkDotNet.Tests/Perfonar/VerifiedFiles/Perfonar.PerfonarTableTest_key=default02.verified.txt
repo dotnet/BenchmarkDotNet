@@ -1,12 +1,14 @@
 ﻿BenchmarkDotNet v0.1729.0-mock, Microsoft Windows NT 10.0.x.mock
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 
-Type = Bench, Runtime = Net70, Jit = RyuJit
+Type = Bench
 
-| Method |  Center |  Spread |
-|:-------|--------:|--------:|
-| Foo    | 31.0 ns | 0.81 ns |
-| Bar    | 41.0 ns | 0.81 ns |
+| Method | Runtime |  Center |  Spread |
+|:-------|:--------|--------:|--------:|
+| Foo    | Net481  | 11.0 ns | 0.81 ns |
+| Bar    | Net481  | 21.0 ns | 0.81 ns |
+| Foo    | Net70   | 31.0 ns | 0.81 ns |
+| Bar    | Net70   | 41.0 ns | 0.81 ns |
 
 {
   "engine": {
@@ -37,8 +39,62 @@ Type = Bench, Runtime = Net70, Jit = RyuJit
     {
       "job": {
         "environment": {
-          "runtime": "net70",
-          "jit": "ryuJit"
+          "runtime": "net481"
+        }
+      },
+      "nested": [
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Foo"
+          },
+          "nested": [
+            {
+              "value": 10,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 11,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 12,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        },
+        {
+          "benchmark": {
+            "type": "Bench",
+            "method": "Bar"
+          },
+          "nested": [
+            {
+              "value": 20,
+              "unit": "ns",
+              "iterationIndex": 0
+            },
+            {
+              "value": 21,
+              "unit": "ns",
+              "iterationIndex": 1
+            },
+            {
+              "value": 22,
+              "unit": "ns",
+              "iterationIndex": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "job": {
+        "environment": {
+          "runtime": "net70"
         }
       },
       "nested": [
@@ -90,44 +146,5 @@ Type = Bench, Runtime = Net70, Jit = RyuJit
         }
       ]
     }
-  ],
-  "meta": {
-    "table": {
-      "columnDefinitions": [
-        {
-          "selector": ".engine",
-          "cloud": "primary",
-          "isSelfExplanatory": true,
-          "isAtomic": true
-        },
-        {
-          "selector": ".host.os",
-          "cloud": "primary",
-          "isSelfExplanatory": true,
-          "isAtomic": true
-        },
-        {
-          "selector": ".host.cpu",
-          "cloud": "primary",
-          "isSelfExplanatory": true,
-          "isAtomic": true
-        },
-        {
-          "selector": ".benchmark",
-          "cloud": "secondary"
-        },
-        {
-          "selector": ".job",
-          "cloud": "secondary",
-          "compressed": true
-        },
-        {
-          "selector": "=center"
-        },
-        {
-          "selector": "=spread"
-        }
-      ]
-    }
-  }
+  ]
 }
