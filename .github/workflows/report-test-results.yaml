@@ -18,7 +18,7 @@ jobs:
 
       # Download the Latest Artifacts with Unique Name
       - name: Download Artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v6
         with:
           run_id: ${{ github.event.workflow_run.id }}
       
