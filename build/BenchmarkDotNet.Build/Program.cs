@@ -113,7 +113,7 @@ public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
-[TaskDescription("Run integration tests using .NET 7 (slow)")]
+[TaskDescription("Run integration tests using .NET 8 (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
 {
