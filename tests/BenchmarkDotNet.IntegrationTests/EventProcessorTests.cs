@@ -23,8 +23,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void WhenUsingEventProcessorAndNoBenchmarks()
         {
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassEmpty) });
-            Assert.Single(events);
+            Assert.Equal(2, events.Count);
             Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnValidationError), events[1].EventType);
         }
 
         [Fact]

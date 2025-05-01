@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Running;
 internal partial class WakeLock
 {
     public static WakeLockType GetWakeLockType(BenchmarkRunInfo[] benchmarkRunInfos) =>
-        benchmarkRunInfos.Select(static i => i.Config.WakeLock).Max();
+        benchmarkRunInfos.Length == 0 ? WakeLockType.None : benchmarkRunInfos.Select(static i => i.Config.WakeLock).Max();
 
     private static readonly bool OsVersionIsSupported =
         // Must be windows 7 or greater
