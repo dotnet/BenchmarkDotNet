@@ -52,12 +52,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     benchmarkCase);
                 yield break;
             }
-            else if (DotNetSdkValidator.IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
-            {
-                yield return invalidCliError;
-            }
 
-            foreach (var validationError in DotNetSdkValidator.ValidateFrameworkSdks(benchmarkCase))
+            foreach (var validationError in DotNetSdkValidator.ValidateFrameworkSdks(CustomDotNetCliPath, benchmarkCase))
             {
                 yield return validationError;
             }

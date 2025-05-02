@@ -20,29 +20,44 @@ namespace BenchmarkDotNet.Validators
             if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
             {
                 yield return cliPathError;
+                yield break;
             }
-            else if (TryGetSdkVersion(benchmark, out Version requiredSdkVersion))
+            if (!TryGetSdkVersion(benchmark, out Version requiredSdkVersion))
             {
-                var installedSdks = GetInstalledDotNetSdks(customDotNetCliPath);
-                if (!installedSdks.Any(sdk => sdk >= requiredSdkVersion))
-                {
-                    yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime.RuntimeMoniker} is not installed.", benchmark);
-                }
+                yield break;
+            }
+
+            var installedSdks = GetInstalledDotNetSdks(customDotNetCliPath);
+            if (!installedSdks.Any(sdk => sdk >= requiredSdkVersion))
+            {
+                yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime.RuntimeMoniker} is not installed.", benchmark);
+            }
+            else if (requiredSdkVersion.Major < 8)
+            {
+                yield return new ValidationError(false, ".Net SDK versions older than 8.0 may produce builds with incorrect bindings.", benchmark);
             }
         }
 
-        public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
+        public static IEnumerable<ValidationError> ValidateFrameworkSdks(string? customDotNetCliPath, BenchmarkCase benchmark)
         {
+            if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
+            {
+                yield return cliPathError;
+                yield break;
+            }
             if (!TryGetSdkVersion(benchmark, out Version requiredSdkVersion))
             {
                 yield break;
             }
 
             var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();
-
             if (installedVersionString == null || Version.TryParse(installedVersionString, out var installedVersion) && installedVersion < requiredSdkVersion)
             {
                 yield return new ValidationError(true, $"The required .NET Framework SDK version {requiredSdkVersion} or higher is not installed.", benchmark);
+            }
+            else if (requiredSdkVersion.Major < 8)
+            {
+                yield return new ValidationError(false, ".Net SDK versions older than 8.0 may produce builds with incorrect bindings.", benchmark);
             }
         }
 
