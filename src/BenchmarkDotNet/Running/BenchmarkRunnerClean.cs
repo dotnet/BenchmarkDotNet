@@ -644,7 +644,7 @@ namespace BenchmarkDotNet.Running
 
                         validationErrors.AddRange(errors);
 
-                        return errors.Length == 0;
+                        return !errors.Any(error => error.IsCritical);
                     })
                     .ToArray();
 
