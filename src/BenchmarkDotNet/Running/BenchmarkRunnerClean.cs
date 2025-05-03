@@ -82,9 +82,32 @@ namespace BenchmarkDotNet.Running
                 var globalChronometer = Chronometer.Start();
 
 
-                var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
-                eventProcessor.OnStartBuildStage(buildPartitions);
-                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor);
+                var parallelBuildBenchmarks = supportedBenchmarks.Where(x => !x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild)).ToArray();
+                var parallelBuildPartitions = BenchmarkPartitioner.CreateForBuild(parallelBuildBenchmarks, resolver);
+
+                var sequentialBuildBenchmarks = supportedBenchmarks.Where(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild)).ToArray();
+                var sequentialBuildPartitions = BenchmarkPartitioner.CreateForBuild(sequentialBuildBenchmarks, resolver);
+
+                eventProcessor.OnStartBuildStage([.. parallelBuildPartitions, .. sequentialBuildPartitions]);
+
+                var buildResults = new Dictionary<BuildPartition, BuildResult>();
+                if (parallelBuildBenchmarks.Length > 0)
+                {
+                    var results = BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, in globalChronometer, eventProcessor);
+                    foreach (var kvp in results)
+                    {
+                        buildResults.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+                if (sequentialBuildBenchmarks.Length > 0)
+                {
+                    var results = BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, in globalChronometer, eventProcessor);
+                    foreach (var kvp in results)
+                    {
+                        buildResults.Add(kvp.Key, kvp.Value);
+                    }
+                }
 
                 var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
 
@@ -404,10 +427,30 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)}   *****");
 
             return buildResults;
-
-            static string GetFormattedDifference(ClockSpan before, ClockSpan after)
-                => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
         }
+
+        private static Dictionary<BuildPartition, BuildResult> BuildSequential(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
+        {
+            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Sequential: Start   *****");
+
+            var beforeBuild = globalChronometer.GetElapsed();
+
+            var buildResults = new Dictionary<BuildPartition, BuildResult>();
+            foreach (var buildPartition in buildPartitions)
+            {
+                buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, logger);
+                eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
+            }
+
+            var afterBuild = globalChronometer.GetElapsed();
+
+            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeBuild, afterBuild)}   *****");
+
+            return buildResults;
+        }
+
+        private static string GetFormattedDifference(ClockSpan before, ClockSpan after)
+                => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
 
         private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
         {
