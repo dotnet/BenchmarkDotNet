@@ -412,23 +412,18 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)}   *****");
 
             return buildResults;
-
-            static string GetFormattedDifference(ClockSpan before, ClockSpan after)
-                => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
         }
 
         private static Dictionary<BuildPartition, BuildResult> BuildSequential(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
             logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s): Start   *****");
 
-            var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
-
             var beforeBuild = globalChronometer.GetElapsed();
 
             var buildResults = new Dictionary<BuildPartition, BuildResult>();
             foreach (var buildPartition in buildPartitions)
             {
-                buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+                buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, logger);
                 eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
             }
 
@@ -437,10 +432,10 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeBuild, afterBuild)}   *****");
 
             return buildResults;
-
-            static string GetFormattedDifference(ClockSpan before, ClockSpan after)
-                => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
         }
+
+        private static string GetFormattedDifference(ClockSpan before, ClockSpan after)
+                => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
 
         private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
         {
