@@ -199,7 +199,7 @@ namespace BenchmarkDotNet.Validators
             return "";
         }
 
-        private static Version GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)
+        internal static Version GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)
         {
             return runtimeMoniker switch
             {
