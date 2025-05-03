@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using System;
@@ -20,26 +21,19 @@ namespace BenchmarkDotNet.Validators
             if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
             {
                 yield return cliPathError;
+                yield break;
             }
-            else if (TryGetSdkVersion(benchmark, out Version requiredSdkVersion))
+            var requiredSdkVersion = benchmark.GetRuntime().RuntimeMoniker.GetRuntimeVersion();
+            if (!GetInstalledDotNetSdks(customDotNetCliPath).Any(sdk => sdk >= requiredSdkVersion))
             {
-                var installedSdks = GetInstalledDotNetSdks(customDotNetCliPath);
-                if (!installedSdks.Any(sdk => sdk >= requiredSdkVersion))
-                {
-                    yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime.RuntimeMoniker} is not installed.", benchmark);
-                }
+                yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime.RuntimeMoniker} is not installed.", benchmark);
             }
         }
 
         public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
         {
-            if (!TryGetSdkVersion(benchmark, out Version requiredSdkVersion))
-            {
-                yield break;
-            }
-
+            var requiredSdkVersion = benchmark.GetRuntime().RuntimeMoniker.GetRuntimeVersion();
             var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();
-
             if (installedVersionString == null || Version.TryParse(installedVersionString, out var installedVersion) && installedVersion < requiredSdkVersion)
             {
                 yield return new ValidationError(true, $"The required .NET Framework SDK version {requiredSdkVersion} or higher is not installed.", benchmark);
@@ -68,17 +62,6 @@ namespace BenchmarkDotNet.Validators
                 return true;
             }
 
-            return false;
-        }
-
-        private static bool TryGetSdkVersion(BenchmarkCase benchmark, out Version sdkVersion)
-        {
-            sdkVersion = default;
-            if (benchmark?.Job?.Environment?.Runtime?.RuntimeMoniker != null)
-            {
-                sdkVersion = GetSdkVersionFromMoniker(benchmark.Job.Environment.Runtime.RuntimeMoniker);
-                return true;
-            }
             return false;
         }
 
@@ -197,55 +180,6 @@ namespace BenchmarkDotNet.Validators
                 return "4.5";
 
             return "";
-        }
-
-        internal static Version GetSdkVersionFromMoniker(RuntimeMoniker runtimeMoniker)
-        {
-            return runtimeMoniker switch
-            {
-                RuntimeMoniker.Net461 => new Version(4, 6, 1),
-                RuntimeMoniker.Net462 => new Version(4, 6, 2),
-                RuntimeMoniker.Net47 => new Version(4, 7),
-                RuntimeMoniker.Net471 => new Version(4, 7, 1),
-                RuntimeMoniker.Net472 => new Version(4, 7, 2),
-                RuntimeMoniker.Net48 => new Version(4, 8),
-                RuntimeMoniker.Net481 => new Version(4, 8, 1),
-                RuntimeMoniker.NetCoreApp20 => new Version(2, 0),
-                RuntimeMoniker.NetCoreApp21 => new Version(2, 1),
-                RuntimeMoniker.NetCoreApp22 => new Version(2, 2),
-                RuntimeMoniker.NetCoreApp30 => new Version(3, 0),
-                RuntimeMoniker.NetCoreApp31 => new Version(3, 1),
-                RuntimeMoniker.Net50 => new Version(5, 0),
-                RuntimeMoniker.Net60 => new Version(6, 0),
-                RuntimeMoniker.Net70 => new Version(7, 0),
-                RuntimeMoniker.Net80 => new Version(8, 0),
-                RuntimeMoniker.Net90 => new Version(9, 0),
-                RuntimeMoniker.Net10_0 => new Version(10, 0),
-                RuntimeMoniker.NativeAot60 => new Version(6, 0),
-                RuntimeMoniker.NativeAot70 => new Version(7, 0),
-                RuntimeMoniker.NativeAot80 => new Version(8, 0),
-                RuntimeMoniker.NativeAot90 => new Version(9, 0),
-                RuntimeMoniker.NativeAot10_0 => new Version(10, 0),
-                RuntimeMoniker.Mono60 => new Version(6, 0),
-                RuntimeMoniker.Mono70 => new Version(7, 0),
-                RuntimeMoniker.Mono80 => new Version(8, 0),
-                RuntimeMoniker.Mono90 => new Version(9, 0),
-                RuntimeMoniker.Mono10_0 => new Version(10, 0),
-                RuntimeMoniker.Wasm => Portability.RuntimeInformation.IsNetCore && CoreRuntime.TryGetVersion(out var version) ? version : new Version(5, 0),
-                RuntimeMoniker.WasmNet50 => new Version(5, 0),
-                RuntimeMoniker.WasmNet60 => new Version(6, 0),
-                RuntimeMoniker.WasmNet70 => new Version(7, 0),
-                RuntimeMoniker.WasmNet80 => new Version(8, 0),
-                RuntimeMoniker.WasmNet90 => new Version(9, 0),
-                RuntimeMoniker.WasmNet10_0 => new Version(10, 0),
-                RuntimeMoniker.MonoAOTLLVM => Portability.RuntimeInformation.IsNetCore && CoreRuntime.TryGetVersion(out var version) ? version : new Version(6, 0),
-                RuntimeMoniker.MonoAOTLLVMNet60 => new Version(6, 0),
-                RuntimeMoniker.MonoAOTLLVMNet70 => new Version(7, 0),
-                RuntimeMoniker.MonoAOTLLVMNet80 => new Version(8, 0),
-                RuntimeMoniker.MonoAOTLLVMNet90 => new Version(9, 0),
-                RuntimeMoniker.MonoAOTLLVMNet10_0 => new Version(10, 0),
-                _ => throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}")
-            };
         }
     }
 }
