@@ -21,6 +21,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -81,17 +82,21 @@ namespace BenchmarkDotNet.Running
                 compositeLogger.WriteLineHeader($"// ***** Found {totalBenchmarkCount} benchmark(s) in total *****");
                 var globalChronometer = Chronometer.Start();
 
+                var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
 
-                var parallelBuildBenchmarks = supportedBenchmarks.Where(x => !x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild)).ToArray();
-                var parallelBuildPartitions = BenchmarkPartitioner.CreateForBuild(parallelBuildBenchmarks, resolver);
+                static bool ShouldBuildSequential(BuildPartition partition)
+                    => partition.RepresentativeBenchmarkCase.Config.Options.IsSet(ConfigOptions.DisableParallelBuild)
+                    // .Net SDK 8+ supports ArtifactsPath for proper parallel builds.
+                    // Older SDKs may produce builds with incorrect bindings if more than 1 partition is built in parallel.
+                    || (partition.RepresentativeBenchmarkCase.GetToolchain().Generator is DotNetCliGenerator && partition.RepresentativeBenchmarkCase.GetRuntime().RuntimeMoniker < RuntimeMoniker.Net80);
 
-                var sequentialBuildBenchmarks = supportedBenchmarks.Where(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild)).ToArray();
-                var sequentialBuildPartitions = BenchmarkPartitioner.CreateForBuild(sequentialBuildBenchmarks, resolver);
+                var parallelBuildPartitions = buildPartitions.Where(x => !ShouldBuildSequential(x)).ToArray();
+                var sequentialBuildPartitions = buildPartitions.Where(ShouldBuildSequential).ToArray();
 
                 eventProcessor.OnStartBuildStage([.. parallelBuildPartitions, .. sequentialBuildPartitions]);
 
                 var buildResults = new Dictionary<BuildPartition, BuildResult>();
-                if (parallelBuildBenchmarks.Length > 0)
+                if (parallelBuildPartitions.Length > 0)
                 {
                     var results = BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, in globalChronometer, eventProcessor);
                     foreach (var kvp in results)
@@ -100,7 +105,7 @@ namespace BenchmarkDotNet.Running
                     }
                 }
 
-                if (sequentialBuildBenchmarks.Length > 0)
+                if (sequentialBuildPartitions.Length > 0)
                 {
                     var results = BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, in globalChronometer, eventProcessor);
                     foreach (var kvp in results)
