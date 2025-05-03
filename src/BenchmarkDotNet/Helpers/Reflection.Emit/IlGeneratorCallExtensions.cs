@@ -7,25 +7,6 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal static class IlGeneratorCallExtensions
     {
-        public static LocalBuilder DeclareOptionalLocalForInstanceCall(
-            this ILGenerator ilBuilder,
-            Type localType,
-            MethodInfo methodToCall)
-        {
-            if (methodToCall.DeclaringType == null)
-                throw new ArgumentException($"The {nameof(methodToCall)} should have non-null {nameof(methodToCall.DeclaringType)}.");
-
-            if (methodToCall.IsStatic)
-                return null;
-
-            if (!methodToCall.DeclaringType.IsAssignableFrom(localType))
-                throw new ArgumentException($"{methodToCall.DeclaringType} is not assignable from {localType}.");
-
-            return localType.IsValueType && localType != typeof(void)
-                ? ilBuilder.DeclareLocal(localType)
-                : null;
-        }
-
         public static void EmitStaticCall(
             this ILGenerator ilBuilder,
             MethodInfo methodToCall,
