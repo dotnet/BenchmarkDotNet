@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -8,141 +9,75 @@ using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {
-    public class EngineActualStage : EngineStage
+    internal abstract class EngineActualStage(IterationMode iterationMode) : EngineStage(IterationStage.Actual, iterationMode)
     {
         internal const int MaxOverheadIterationCount = 20;
-        private const double MaxOverheadRelativeError = 0.05;
-        private const int DefaultWorkloadCount = 10;
 
-        private readonly int? iterationCount;
-        private readonly double maxRelativeError;
-        private readonly TimeInterval? maxAbsoluteError;
-        private readonly OutlierMode outlierMode;
-        private readonly int minIterationCount;
-        private readonly int maxIterationCount;
+        internal static EngineActualStage GetOverhead(IEngine engine)
+            => new EngineActualStageAuto(engine.TargetJob, engine.Resolver, IterationMode.Overhead);
 
-        public EngineActualStage(IEngine engine) : base(engine)
+        internal static EngineActualStage GetWorkload(IEngine engine, RunStrategy strategy)
         {
-            iterationCount = engine.TargetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
-            maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
-            maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
-            outlierMode = engine.TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, engine.Resolver);
-            minIterationCount = engine.TargetJob.ResolveValue(RunMode.MinIterationCountCharacteristic, engine.Resolver);
-            maxIterationCount = engine.TargetJob.ResolveValue(RunMode.MaxIterationCountCharacteristic, engine.Resolver);
+            var targetJob = engine.TargetJob;
+            int? iterationCount = targetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
+            const int DefaultWorkloadCount = 10;
+            return iterationCount == null && strategy != RunStrategy.Monitoring
+                ?  new EngineActualStageAuto(targetJob, engine.Resolver, IterationMode.Workload)
+                :  new EngineActualStageSpecific(iterationCount ?? DefaultWorkloadCount, IterationMode.Workload);
         }
+    }
 
-        public IReadOnlyList<Measurement> RunOverhead(long invokeCount, int unrollFactor)
-            => RunAuto(invokeCount, IterationMode.Overhead, unrollFactor);
+    internal sealed class EngineActualStageAuto(Job targetJob, IResolver resolver, IterationMode iterationMode) : EngineActualStage(iterationMode)
+    {
+        private readonly double maxRelativeError = targetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, resolver);
+        private readonly TimeInterval? maxAbsoluteError = targetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
+        private readonly OutlierMode outlierMode = targetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, resolver);
+        private readonly int minIterationCount = targetJob.ResolveValue(RunMode.MinIterationCountCharacteristic, resolver);
+        private readonly int maxIterationCount = targetJob.ResolveValue(RunMode.MaxIterationCountCharacteristic, resolver);
+        private int _iterationCounter = 0;
 
-        public IReadOnlyList<Measurement> RunWorkload(long invokeCount, int unrollFactor, bool forceSpecific = false)
-            => Run(invokeCount, IterationMode.Workload, false, unrollFactor, forceSpecific);
+        internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
 
-        internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
-            => (runAuto || iterationCount == null) && !forceSpecific
-                ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, iterationCount ?? DefaultWorkloadCount, unrollFactor);
-
-        private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
+        internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
         {
-            var measurements = new List<Measurement>(maxIterationCount);
-            var measurementsForStatistics = new List<Measurement>(maxIterationCount);
-
-            int iterationCounter = 0;
-            bool isOverhead = iterationMode == IterationMode.Overhead;
-            double effectiveMaxRelativeError = isOverhead ? MaxOverheadRelativeError : maxRelativeError;
-            while (true)
+            if (measurements.Count == 0)
             {
-                iterationCounter++;
-                var measurement = RunIteration(iterationMode, IterationStage.Actual, iterationCounter, invokeCount, unrollFactor);
-                measurements.Add(measurement);
-                measurementsForStatistics.Add(measurement);
-
-                var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, outlierMode);
-                double actualError = statistics.LegacyConfidenceInterval.Margin;
-
-                double maxError1 = effectiveMaxRelativeError * statistics.Mean;
-                double maxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
-                double maxError = Math.Min(maxError1, maxError2);
-
-                if (iterationCounter >= minIterationCount && actualError < maxError)
-                    break;
-
-                if (iterationCounter >= maxIterationCount || isOverhead && iterationCounter >= MaxOverheadIterationCount)
-                    break;
+                return true;
             }
-            WriteLine();
 
-            return measurements;
-        }
+            const double MaxOverheadRelativeError = 0.05;
+            bool isOverhead = Mode == IterationMode.Overhead;
+            double effectiveMaxRelativeError = isOverhead ? MaxOverheadRelativeError : maxRelativeError;
+            _iterationCounter++;
 
-        private List<Measurement> RunSpecific(long invokeCount, IterationMode iterationMode, int iterationCount, int unrollFactor)
-        {
-            var measurements = new List<Measurement>(iterationCount);
+            var statistics = MeasurementsStatistics.Calculate(measurements, outlierMode);
+            double actualError = statistics.LegacyConfidenceInterval.Margin;
 
-            for (int i = 0; i < iterationCount; i++)
-                measurements.Add(RunIteration(iterationMode, IterationStage.Actual, i + 1, invokeCount, unrollFactor));
+            double maxError1 = effectiveMaxRelativeError * statistics.Mean;
+            double maxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
+            double maxError = Math.Min(maxError1, maxError2);
 
-            WriteLine();
-
-            return measurements;
-        }
-
-        internal IEngineStageEvaluator GetOverheadEvaluator()
-            => new AutoEvaluator(this, true);
-
-        internal IEngineStageEvaluator GetWorkloadEvaluator(bool forceSpecific)
-            => iterationCount == null && !forceSpecific
-                ? new AutoEvaluator(this, false)
-                : new SpecificEvaluator(this);
-
-        private sealed class AutoEvaluator(EngineActualStage stage, bool isOverhead) : IEngineStageEvaluator
-        {
-            public int MaxIterationCount => stage.maxIterationCount;
-
-            private readonly List<Measurement> _measurementsForStatistics = new (stage.maxIterationCount);
-            private int _iterationCounter = 0;
-
-            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
+            if (_iterationCounter >= minIterationCount && actualError < maxError)
             {
-                if (measurements.Count == 0)
-                {
-                    return false;
-                }
-
-                double effectiveMaxRelativeError = isOverhead ? MaxOverheadRelativeError : stage.maxRelativeError;
-                _iterationCounter++;
-                var measurement = measurements[measurements.Count - 1];
-                _measurementsForStatistics.Add(measurement);
-
-                var statistics = MeasurementsStatistics.Calculate(_measurementsForStatistics, stage.outlierMode);
-                double actualError = statistics.LegacyConfidenceInterval.Margin;
-
-                double maxError1 = effectiveMaxRelativeError * statistics.Mean;
-                double maxError2 = stage.maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
-                double maxError = Math.Min(maxError1, maxError2);
-
-                if (_iterationCounter >= stage.minIterationCount && actualError < maxError)
-                {
-                    return true;
-                }
-
-                if (_iterationCounter >= stage.maxIterationCount || isOverhead && _iterationCounter >= MaxOverheadIterationCount)
-                {
-                    return true;
-                }
-
                 return false;
             }
+
+            if (_iterationCounter >= maxIterationCount || isOverhead && _iterationCounter >= MaxOverheadIterationCount)
+            {
+                return false;
+            }
+
+            return true;
         }
+    }
 
-        private sealed class SpecificEvaluator(EngineActualStage stage) : IEngineStageEvaluator
-        {
-            public int MaxIterationCount => stage.iterationCount ?? DefaultWorkloadCount;
+    internal sealed class EngineActualStageSpecific(int maxIterationCount, IterationMode iterationMode) : EngineActualStage(iterationMode)
+    {
+        private int iterationCount = 0;
 
-            private int _iterationCount = 0;
+        internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
 
-            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
-                => ++_iterationCount > MaxIterationCount;
-        }
+        internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
+            => ++iterationCount <= maxIterationCount;
     }
 }

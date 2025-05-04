@@ -18,8 +18,6 @@ namespace BenchmarkDotNet.Engines
     [UsedImplicitly]
     public class Engine : IEngine
     {
-        public const int MinInvokeCount = 4;
-
         [PublicAPI] public IHost Host { get; }
         [PublicAPI] public Action<long> WorkloadAction { get; }
         [PublicAPI] public Action Dummy1Action { get; }
@@ -44,9 +42,6 @@ namespace BenchmarkDotNet.Engines
         private bool MemoryRandomization { get; }
 
         private readonly List<Measurement> jittingMeasurements = new (10);
-        private readonly EnginePilotStage pilotStage;
-        private readonly EngineWarmupStage warmupStage;
-        private readonly EngineActualStage actualStage;
         private readonly bool includeExtraStats;
         private readonly Random random;
 
@@ -82,10 +77,6 @@ namespace BenchmarkDotNet.Engines
             EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
             MemoryRandomization = targetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
-            warmupStage = new EngineWarmupStage(this);
-            pilotStage = new EnginePilotStage(this);
-            actualStage = new EngineActualStage(this);
-
             random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
@@ -105,36 +96,6 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private IEnumerable<(IterationStage stage, IterationMode mode, IEngineStageEvaluator evaluator)> EnumerateStages()
-        {
-            if (Strategy != RunStrategy.ColdStart)
-            {
-                if (Strategy != RunStrategy.Monitoring)
-                {
-                    var pilotEvaluator = pilotStage.GetEvaluator();
-                    if (pilotEvaluator != null)
-                    {
-                        yield return (IterationStage.Pilot, IterationMode.Workload, pilotEvaluator);
-                    }
-
-                    if (EvaluateOverhead)
-                    {
-                        yield return (IterationStage.Warmup, IterationMode.Overhead, warmupStage.GetOverheadEvaluator());
-                        yield return (IterationStage.Actual, IterationMode.Overhead, actualStage.GetOverheadEvaluator());
-                    }
-                }
-
-                yield return (IterationStage.Warmup, IterationMode.Workload, warmupStage.GetWorkloadEvaluator(Strategy));
-            }
-
-            Host.BeforeMainRun();
-
-            yield return (IterationStage.Actual, IterationMode.Workload, actualStage.GetWorkloadEvaluator(Strategy == RunStrategy.Monitoring));
-
-            Host.AfterMainRun();
-        }
-
         // AggressiveOptimization forces the method to go straight to tier1 JIT, and will never be re-jitted,
         // eliminating tiered JIT as a potential variable in measurements.
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
@@ -150,20 +111,30 @@ namespace BenchmarkDotNet.Engines
 
             // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size.
             // #1120
-            foreach (var (stage, mode, evaluator) in EnumerateStages())
+            foreach (var stage in EngineStage.EnumerateStages(this, Strategy, EvaluateOverhead))
             {
-                var stageMeasurements = new List<Measurement>(evaluator.MaxIterationCount);
-                int iterationCounter = 0;
-                while (!evaluator.EvaluateShouldStop(stageMeasurements, ref invokeCount))
+                if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    // TODO: Not sure why index is 1-based? 0-based is standard.
-                    ++iterationCounter;
-                    var measurement = RunIteration(new IterationData(mode, stage, iterationCounter, invokeCount, UnrollFactor));
+                    Host.BeforeMainRun();
+                }
+
+                var stageMeasurements = stage.GetMeasurementList();
+                // 1-based iterationIndex
+                int iterationIndex = 1;
+                while (stage.GetShouldRunIteration(stageMeasurements, ref invokeCount))
+                {
+                    var measurement = RunIteration(new IterationData(stage.Mode, stage.Stage, iterationIndex, invokeCount, UnrollFactor));
                     stageMeasurements.Add(measurement);
+                    ++iterationIndex;
                 }
                 measurements.AddRange(stageMeasurements);
 
                 WriteLine();
+
+                if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
+                {
+                    Host.AfterMainRun();
+                }
             }
 
             (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = includeExtraStats

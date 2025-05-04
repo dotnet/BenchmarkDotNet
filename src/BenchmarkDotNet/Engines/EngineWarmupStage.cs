@@ -1,38 +1,78 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
 {
-    internal class EngineWarmupStage : EngineStage
+    internal abstract class EngineWarmupStage(IterationMode iterationMode) : EngineStage(IterationStage.Warmup, iterationMode)
     {
-        private readonly IEngine engine;
+        private const int MinOverheadIterationCount = 4;
+        internal const int MaxOverheadIterationCount = 10;
 
-        public EngineWarmupStage(IEngine engine) : base(engine) => this.engine = engine;
+        internal static EngineWarmupStage GetOverhead()
+            => new EngineWarmupStageAuto(IterationMode.Overhead, MinOverheadIterationCount, MaxOverheadIterationCount);
 
-        public IReadOnlyList<Measurement> RunOverhead(long invokeCount, int unrollFactor)
-            => Run(invokeCount, IterationMode.Overhead, unrollFactor, RunStrategy.Throughput);
-
-        public IReadOnlyList<Measurement> RunWorkload(long invokeCount, int unrollFactor, RunStrategy runStrategy)
-            => Run(invokeCount, IterationMode.Workload, unrollFactor, runStrategy);
-
-        internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, int unrollFactor, RunStrategy runStrategy)
+        internal static EngineWarmupStage GetWorkload(IEngine engine, RunStrategy runStrategy)
         {
-            var criteria = DefaultStoppingCriteriaFactory.Instance.CreateWarmup(engine.TargetJob, engine.Resolver, iterationMode, runStrategy);
-            return Run(criteria, invokeCount, iterationMode, IterationStage.Warmup, unrollFactor);
+            var job = engine.TargetJob;
+            var count = job.ResolveValueAsNullable(RunMode.WarmupCountCharacteristic);
+            if (count.HasValue && count.Value != EngineResolver.ForceAutoWarmup || runStrategy == RunStrategy.Monitoring)
+            {
+                return new EngineWarmupStageSpecific(count ?? 0, IterationMode.Workload);
+            }
+
+            int minIterationCount = job.ResolveValue(RunMode.MinWarmupIterationCountCharacteristic, engine.Resolver);
+            int maxIterationCount = job.ResolveValue(RunMode.MaxWarmupIterationCountCharacteristic, engine.Resolver);
+            return new EngineWarmupStageAuto(IterationMode.Overhead, minIterationCount, maxIterationCount);
         }
+    }
 
-        internal IEngineStageEvaluator GetOverheadEvaluator()
-            => new Evaluator(DefaultStoppingCriteriaFactory.Instance.CreateWarmup(engine.TargetJob, engine.Resolver, IterationMode.Overhead, RunStrategy.Throughput));
+    internal sealed class EngineWarmupStageAuto(IterationMode iterationMode, int minIterationCount, int maxIterationCount) : EngineWarmupStage(iterationMode)
+    {
+        private const int MinFluctuationCount = 4;
 
-        internal IEngineStageEvaluator GetWorkloadEvaluator(RunStrategy runStrategy)
-            => new Evaluator(DefaultStoppingCriteriaFactory.Instance.CreateWarmup(engine.TargetJob, engine.Resolver, IterationMode.Workload, runStrategy));
+        private readonly int minIterationCount = minIterationCount;
+        private readonly int maxIterationCount = maxIterationCount;
 
-        private sealed class Evaluator(IStoppingCriteria stoppingCriteria) : IEngineStageEvaluator
+        internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
+
+        internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
         {
-            public int MaxIterationCount => stoppingCriteria.MaxIterationCount;
+            int n = measurements.Count;
 
-            public bool EvaluateShouldStop(List<Measurement> measurements, ref long invokeCount)
-                => stoppingCriteria.Evaluate(measurements).IsFinished;
+            if (n >= maxIterationCount)
+            {
+                return false;
+            }
+            if (n < minIterationCount)
+            {
+                return true;
+            }
+
+            int direction = -1; // The default "pre-state" is "decrease mode"
+            int fluctuationCount = 0;
+            for (int i = 1; i < n; i++)
+            {
+                int nextDirection = Math.Sign(measurements[i].Nanoseconds - measurements[i - 1].Nanoseconds);
+                if (nextDirection != direction || nextDirection == 0)
+                {
+                    direction = nextDirection;
+                    fluctuationCount++;
+                }
+            }
+
+            return fluctuationCount < MinFluctuationCount;
         }
+    }
+
+    internal sealed class EngineWarmupStageSpecific(int maxIterationCount, IterationMode iterationMode) : EngineWarmupStage(iterationMode)
+    {
+        private int iterationCount = 0;
+
+        internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
+
+        internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
+            => ++iterationCount <= maxIterationCount;
     }
 }
