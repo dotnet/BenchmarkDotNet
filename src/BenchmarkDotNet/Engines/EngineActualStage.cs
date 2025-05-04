@@ -27,14 +27,25 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
-    internal sealed class EngineActualStageAuto(Job targetJob, IResolver resolver, IterationMode iterationMode) : EngineActualStage(iterationMode)
+    internal sealed class EngineActualStageAuto : EngineActualStage
     {
-        private readonly double maxRelativeError = targetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, resolver);
-        private readonly TimeInterval? maxAbsoluteError = targetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
-        private readonly OutlierMode outlierMode = targetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, resolver);
-        private readonly int minIterationCount = targetJob.ResolveValue(RunMode.MinIterationCountCharacteristic, resolver);
-        private readonly int maxIterationCount = targetJob.ResolveValue(RunMode.MaxIterationCountCharacteristic, resolver);
-        private int _iterationCounter = 0;
+        private readonly double maxRelativeError;
+        private readonly TimeInterval? maxAbsoluteError;
+        private readonly OutlierMode outlierMode;
+        private readonly int minIterationCount;
+        private readonly int maxIterationCount;
+        private readonly List<Measurement> measurementsForStatistics;
+        private int iterationCounter = 0;
+
+        public EngineActualStageAuto(Job targetJob, IResolver resolver, IterationMode iterationMode) : base(iterationMode)
+        {
+            maxRelativeError = targetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, resolver);
+            maxAbsoluteError = targetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
+            outlierMode = targetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, resolver);
+            minIterationCount = targetJob.ResolveValue(RunMode.MinIterationCountCharacteristic, resolver);
+            maxIterationCount = targetJob.ResolveValue(RunMode.MaxIterationCountCharacteristic, resolver);
+            measurementsForStatistics = GetMeasurementList();
+        }
 
         internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
 
@@ -48,21 +59,23 @@ namespace BenchmarkDotNet.Engines
             const double MaxOverheadRelativeError = 0.05;
             bool isOverhead = Mode == IterationMode.Overhead;
             double effectiveMaxRelativeError = isOverhead ? MaxOverheadRelativeError : maxRelativeError;
-            _iterationCounter++;
+            iterationCounter++;
+            var measurement = measurements[measurements.Count - 1];
+            measurementsForStatistics.Add(measurement);
 
-            var statistics = MeasurementsStatistics.Calculate(measurements, outlierMode);
+            var statistics = MeasurementsStatistics.Calculate(measurementsForStatistics, outlierMode);
             double actualError = statistics.LegacyConfidenceInterval.Margin;
 
             double maxError1 = effectiveMaxRelativeError * statistics.Mean;
             double maxError2 = maxAbsoluteError?.Nanoseconds ?? double.MaxValue;
             double maxError = Math.Min(maxError1, maxError2);
 
-            if (_iterationCounter >= minIterationCount && actualError < maxError)
+            if (iterationCounter >= minIterationCount && actualError < maxError)
             {
                 return false;
             }
 
-            if (_iterationCounter >= maxIterationCount || isOverhead && _iterationCounter >= MaxOverheadIterationCount)
+            if (iterationCounter >= maxIterationCount || isOverhead && iterationCounter >= MaxOverheadIterationCount)
             {
                 return false;
             }
