@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -55,6 +56,19 @@ namespace BenchmarkDotNet.Tests.Mocks
         }
 
         public RunResults Run() => default;
+
+        internal (long invokeCount, List<Measurement> measurements) Run(EngineStage stage, long invokeCount = 0)
+        {
+            var measurements = stage.GetMeasurementList();
+            int iterationIndex = 1;
+            while (stage.GetShouldRunIteration(measurements, ref invokeCount))
+            {
+                var measurement = RunIteration(new IterationData(stage.Mode, stage.Stage, iterationIndex, invokeCount, 1));
+                measurements.Add(measurement);
+                ++iterationIndex;
+            }
+            return (invokeCount, measurements);
+        }
 
         public void WriteLine() => output.WriteLine("");
         public void WriteLine(string line) => output.WriteLine(line);

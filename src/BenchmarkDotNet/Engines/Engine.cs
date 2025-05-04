@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -15,8 +18,6 @@ namespace BenchmarkDotNet.Engines
     [UsedImplicitly]
     public class Engine : IEngine
     {
-        public const int MinInvokeCount = 4;
-
         [PublicAPI] public IHost Host { get; }
         [PublicAPI] public Action<long> WorkloadAction { get; }
         [PublicAPI] public Action Dummy1Action { get; }
@@ -41,9 +42,6 @@ namespace BenchmarkDotNet.Engines
         private bool MemoryRandomization { get; }
 
         private readonly List<Measurement> jittingMeasurements = new (10);
-        private readonly EnginePilotStage pilotStage;
-        private readonly EngineWarmupStage warmupStage;
-        private readonly EngineActualStage actualStage;
         private readonly bool includeExtraStats;
         private readonly Random random;
 
@@ -79,10 +77,6 @@ namespace BenchmarkDotNet.Engines
             EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
             MemoryRandomization = targetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
-            warmupStage = new EngineWarmupStage(this);
-            pilotStage = new EnginePilotStage(this);
-            actualStage = new EngineActualStage(this);
-
             random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
@@ -102,6 +96,9 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
+        // AggressiveOptimization forces the method to go straight to tier1 JIT, and will never be re-jitted,
+        // eliminating tiered JIT as a potential variable in measurements.
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public RunResults Run()
         {
             var measurements = new List<Measurement>();
@@ -112,29 +109,33 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
-            if (Strategy != RunStrategy.ColdStart)
+            // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size.
+            // #1120
+            foreach (var stage in EngineStage.EnumerateStages(this, Strategy, EvaluateOverhead))
             {
-                if (Strategy != RunStrategy.Monitoring)
+                if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    var pilotStageResult = pilotStage.Run();
-                    invokeCount = pilotStageResult.PerfectInvocationCount;
-                    measurements.AddRange(pilotStageResult.Measurements);
-
-                    if (EvaluateOverhead)
-                    {
-                        measurements.AddRange(warmupStage.RunOverhead(invokeCount, UnrollFactor));
-                        measurements.AddRange(actualStage.RunOverhead(invokeCount, UnrollFactor));
-                    }
+                    Host.BeforeMainRun();
                 }
 
-                measurements.AddRange(warmupStage.RunWorkload(invokeCount, UnrollFactor, Strategy));
+                var stageMeasurements = stage.GetMeasurementList();
+                // 1-based iterationIndex
+                int iterationIndex = 1;
+                while (stage.GetShouldRunIteration(stageMeasurements, ref invokeCount))
+                {
+                    var measurement = RunIteration(new IterationData(stage.Mode, stage.Stage, iterationIndex, invokeCount, UnrollFactor));
+                    stageMeasurements.Add(measurement);
+                    ++iterationIndex;
+                }
+                measurements.AddRange(stageMeasurements);
+
+                WriteLine();
+
+                if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
+                {
+                    Host.AfterMainRun();
+                }
             }
-
-            Host.BeforeMainRun();
-
-            measurements.AddRange(actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring));
-
-            Host.AfterMainRun();
 
             (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = includeExtraStats
                 ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))
@@ -148,11 +149,15 @@ namespace BenchmarkDotNet.Engines
             return new RunResults(measurements, outlierMode, workGcHasDone, threadingStats, exceptionFrequency);
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public Measurement RunIteration(IterationData data)
         {
             // Initialization
             long invokeCount = data.InvokeCount;
             int unrollFactor = data.UnrollFactor;
+            if (invokeCount % unrollFactor != 0)
+                throw new ArgumentOutOfRangeException(nameof(data), $"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
+
             long totalOperations = invokeCount * OperationsPerInvoke;
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
             bool randomizeMemory = !isOverhead && MemoryRandomization;
@@ -167,7 +172,7 @@ namespace BenchmarkDotNet.Engines
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
             var clockSpan = randomizeMemory
-                ? MeasureWithRandomMemory(action, invokeCount / unrollFactor)
+                ? MeasureWithRandomStack(action, invokeCount / unrollFactor)
                 : Measure(action, invokeCount / unrollFactor);
 
             if (EngineEventSource.Log.IsEnabled())
@@ -193,8 +198,8 @@ namespace BenchmarkDotNet.Engines
         // This is in a separate method, because stackalloc can affect code alignment,
         // resulting in unexpected measurements on some AMD cpus,
         // even if the stackalloc branch isn't executed. (#2366)
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private unsafe ClockSpan MeasureWithRandomMemory(Action<long> action, long invokeCount)
+        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
+        private unsafe ClockSpan MeasureWithRandomStack(Action<long> action, long invokeCount)
         {
             byte* stackMemory = stackalloc byte[random.Next(32)];
             var clockSpan = Measure(action, invokeCount);
@@ -205,6 +210,7 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.NoInlining)]
         private unsafe void Consume(byte* _) { }
 
+        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
         private ClockSpan Measure(Action<long> action, long invokeCount)
         {
             var clock = Clock.Start();

@@ -1,48 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Jobs;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
 {
-    public class EngineStage
+    internal abstract class EngineStage(IterationStage stage, IterationMode mode)
     {
-        private readonly IEngine engine;
+        internal readonly IterationStage Stage = stage;
+        internal readonly IterationMode Mode = mode;
 
-        protected EngineStage(IEngine engine) => this.engine = engine;
+        internal abstract List<Measurement> GetMeasurementList();
+        internal abstract bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount);
 
-        protected Job TargetJob => engine.TargetJob;
-
-        protected Measurement RunIteration(IterationMode mode, IterationStage stage, int index, long invokeCount, int unrollFactor)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static IEnumerable<EngineStage> EnumerateStages(IEngine engine, RunStrategy strategy, bool evaluateOverhead)
         {
-            if (invokeCount % unrollFactor != 0)
-                throw new ArgumentOutOfRangeException($"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
-            return engine.RunIteration(new IterationData(mode, stage, index, invokeCount, unrollFactor));
-        }
+            // It might be possible to add the jitting stage to this, but it's done in EngineFactory.CreateReadyToRun for now.
 
-        internal List<Measurement> Run(IStoppingCriteria criteria, long invokeCount, IterationMode mode, IterationStage stage, int unrollFactor)
-        {
-            var measurements = new List<Measurement>(criteria.MaxIterationCount);
-            if (criteria.Evaluate(measurements).IsFinished)
+            if (strategy != RunStrategy.ColdStart)
             {
-                WriteLine();
-                return measurements;
+                if (strategy != RunStrategy.Monitoring)
+                {
+                    var pilotStage = EnginePilotStage.GetStage(engine);
+                    if (pilotStage != null)
+                    {
+                        yield return pilotStage;
+                    }
+
+                    if (evaluateOverhead)
+                    {
+                        yield return EngineWarmupStage.GetOverhead();
+                        yield return EngineActualStage.GetOverhead(engine);
+                    }
+                }
+
+                yield return EngineWarmupStage.GetWorkload(engine, strategy);
             }
 
-            int iterationCounter = 0;
-            while (true)
-            {
-                iterationCounter++;
-                measurements.Add(RunIteration(mode, stage, iterationCounter, invokeCount, unrollFactor));
-                if (criteria.Evaluate(measurements).IsFinished)
-                    break;
-            }
-
-            WriteLine();
-
-            return measurements;
+            yield return EngineActualStage.GetWorkload(engine, strategy);
         }
-
-        protected void WriteLine() => engine.WriteLine();
     }
 }
