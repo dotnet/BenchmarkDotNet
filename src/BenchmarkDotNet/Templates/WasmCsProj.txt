@@ -15,7 +15,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFramework>$TFM$</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
+    <AppDir>$(PublishDir)</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
@@ -50,8 +50,8 @@
 
   <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
     <ItemGroup>
-      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Condition="'$(RunAOTCompilation)' != 'true'" />
-      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Exclude="$(TargetDir)publish\KernelTraceControl.dll" Condition="'$(RunAOTCompilation)' == 'true'" />
+      <WasmAssembliesToBundle Include="$(PublishDir)*.dll" Condition="'$(RunAOTCompilation)' != 'true'" />
+      <WasmAssembliesToBundle Include="$(PublishDir)*.dll" Exclude="$(PublishDir)KernelTraceControl.dll" Condition="'$(RunAOTCompilation)' == 'true'" />
     </ItemGroup>
   </Target>
 

@@ -53,6 +53,9 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
+        protected override string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+            => Path.Combine(GetBinariesDirectoryPath(buildArtifactsDirectoryPath, configuration), "publish");
+
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
             => OsDetector.IsWindows()
                 ? Path.Combine(binariesDirectoryPath, "publish", $"{programName}.exe")

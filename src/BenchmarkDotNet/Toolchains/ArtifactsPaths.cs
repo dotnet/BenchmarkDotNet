@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] public string RootArtifactsFolderPath { get; }
         [PublicAPI] public string BuildArtifactsDirectoryPath { get; }
         [PublicAPI] public string BinariesDirectoryPath { get; }
-        [PublicAPI] public string IntermediateDirectoryPath { get; }
+        [PublicAPI] public string PublishDirectoryPath { get; }
         [PublicAPI] public string ProgramCodePath { get; }
         [PublicAPI] public string AppConfigPath { get; }
         [PublicAPI] public string NuGetConfigPath { get; }
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains
             string rootArtifactsFolderPath,
             string buildArtifactsDirectoryPath,
             string binariesDirectoryPath,
-            string intermediateDirectoryPath,
+            string publishDirectoryPath,
             string programCodePath,
             string appConfigPath,
             string nuGetConfigPath,
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains
             RootArtifactsFolderPath = rootArtifactsFolderPath;
             BuildArtifactsDirectoryPath = buildArtifactsDirectoryPath;
             BinariesDirectoryPath = binariesDirectoryPath;
-            IntermediateDirectoryPath = intermediateDirectoryPath;
+            PublishDirectoryPath = publishDirectoryPath;
             ProgramCodePath = programCodePath;
             AppConfigPath = appConfigPath;
             NuGetConfigPath = nuGetConfigPath;

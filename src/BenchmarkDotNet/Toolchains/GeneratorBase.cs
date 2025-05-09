@@ -51,11 +51,11 @@ namespace BenchmarkDotNet.Toolchains
             => buildArtifactsDirectoryPath;
 
         /// <summary>
-        /// returns a path where intermediate files should be found after the build (usually \obj)
+        /// returns a path where the publish directory should be found after the build (usually \publish)
         /// </summary>
         [PublicAPI]
-        protected virtual string GetIntermediateDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => string.Empty;
+        protected virtual string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+            => Path.Combine(buildArtifactsDirectoryPath, "publish");
 
         /// <summary>
         /// returns OS-specific executable extension
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Toolchains
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,
-                intermediateDirectoryPath: GetIntermediateDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration),
+                publishDirectoryPath: GetPublishDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration),
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
