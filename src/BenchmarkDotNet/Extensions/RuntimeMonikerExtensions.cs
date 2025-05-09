@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Extensions
             RuntimeMoniker.MonoAOTLLVMNet80 => new Version(8, 0),
             RuntimeMoniker.MonoAOTLLVMNet90 => new Version(9, 0),
             RuntimeMoniker.MonoAOTLLVMNet10_0 => new Version(10, 0),
-            _ => throw new NotImplementedException($"SDK version check not implemented for {runtimeMoniker}")
+            _ => throw new NotImplementedException($"{nameof(GetRuntimeVersion)} not implemented for {runtimeMoniker}")
         };
     }
 }
