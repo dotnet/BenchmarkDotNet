@@ -83,6 +83,7 @@ namespace BenchmarkDotNet.Running
                 var globalChronometer = Chronometer.Start();
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
+                eventProcessor.OnStartBuildStage(buildPartitions);
 
                 var sequentialBuildPartitions = buildPartitions.Where(partition =>
                         partition.Benchmarks.Any(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild))
@@ -93,8 +94,6 @@ namespace BenchmarkDotNet.Running
                     )
                     .ToArray();
                 var parallelBuildPartitions = buildPartitions.Except(sequentialBuildPartitions).ToArray();
-
-                eventProcessor.OnStartBuildStage([.. parallelBuildPartitions, .. sequentialBuildPartitions]);
 
                 var buildResults = new Dictionary<BuildPartition, BuildResult>();
                 if (parallelBuildPartitions.Length > 0)
