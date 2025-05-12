@@ -64,9 +64,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker);
 
-        protected override string GetIntermediateDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "obj", configuration, TargetFrameworkMoniker);
-
         [SuppressMessage("ReSharper", "StringLiteralTypo")] // R# complains about $variables$
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {

@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,
-                intermediateDirectoryPath: null,
+                publishDirectoryPath: null,
                 programCodePath: null,
                 appConfigPath: null,
                 nuGetConfigPath: null,
