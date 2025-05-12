@@ -36,17 +36,14 @@ namespace BenchmarkDotNet.Tests.Engine
             if (max == -1)
                 max = min;
             var job = Job.Default;
-            var stage = CreateStage(job, measure);
-            var measurements = stage.Run(1, iterationMode, true, 1);
+            var engine = new MockEngine(output, job, measure);
+            var stage = iterationMode == IterationMode.Overhead
+                ? EngineActualStage.GetOverhead(engine)
+                : EngineActualStage.GetWorkload(engine, RunStrategy.Throughput);
+            var (_, measurements) = engine.Run(stage);
             int count = measurements.Count;
             output.WriteLine($"MeasurementCount = {count} (Min= {min}, Max = {max})");
             Assert.InRange(count, min, max);
-        }
-
-        private EngineActualStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
-        {
-            var engine = new MockEngine(output, job, measure);
-            return new EngineActualStage(engine);
         }
     }
 }
