@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
             {
                 IncludeBarPlot = true,
                 IncludeBoxPlot = false,
+                IncludeHistogramPlot = false,
             };
             var summary = MockFactory.CreateSummary(benchmarkType);
             var filePaths = exporter.ExportToFiles(summary, logger).ToList();
@@ -57,6 +58,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
             {
                 IncludeBarPlot = false,
                 IncludeBoxPlot = true,
+                IncludeHistogramPlot = false,
             };
             var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 9);
             var filePaths = exporter.ExportToFiles(summary, logger).ToList();
@@ -79,8 +81,32 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
             {
                 IncludeBarPlot = false,
                 IncludeBoxPlot = true,
+                IncludeHistogramPlot = false,
             };
             var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 1);
+            var filePaths = exporter.ExportToFiles(summary, logger).ToList();
+            Assert.NotEmpty(filePaths);
+            Assert.All(filePaths, f => File.Exists(f));
+
+            foreach (string filePath in filePaths)
+                logger.WriteLine($"* {filePath}");
+            output.WriteLine(logger.GetLog());
+        }
+
+        [Theory]
+        [MemberData(nameof(GetGroupBenchmarkTypes))]
+        public void HistogramPlots(Type benchmarkType)
+        {
+            var logger = new AccumulationLogger();
+            logger.WriteLine("=== " + benchmarkType.Name + " ===");
+
+            var exporter = new ScottPlotExporter()
+            {
+                IncludeBarPlot = false,
+                IncludeBoxPlot = false,
+                IncludeHistogramPlot = true,
+            };
+            var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 9);
             var filePaths = exporter.ExportToFiles(summary, logger).ToList();
             Assert.NotEmpty(filePaths);
             Assert.All(filePaths, f => File.Exists(f));
