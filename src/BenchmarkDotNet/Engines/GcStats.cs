@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -106,9 +107,10 @@ namespace BenchmarkDotNet.Engines
             return AllocatedBytes <= AllocationQuantum ? 0L : AllocatedBytes;
         }
 
+        // Skip tier0 jit to make sure we don't get any unexpected allocations in this method.
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public static GcStats ReadInitial()
         {
-            // this will force GC.Collect, so we want to do this before collecting collections counts
             long? allocatedBytes = GetAllocatedBytes();
 
             return new GcStats(
@@ -119,15 +121,14 @@ namespace BenchmarkDotNet.Engines
                 0);
         }
 
+        // Skip tier0 jit to make sure we don't get any unexpected allocations in this method.
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public static GcStats ReadFinal()
         {
             return new GcStats(
                 GC.CollectionCount(0),
                 GC.CollectionCount(1),
                 GC.CollectionCount(2),
-
-                // this will force GC.Collect, so we want to do this after collecting collections counts
-                // to exclude this single full forced collection from results
                 GetAllocatedBytes(),
                 0);
         }
@@ -136,17 +137,16 @@ namespace BenchmarkDotNet.Engines
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
 
+        // Skip tier0 jit to make sure we don't get any unexpected allocations in this method.
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private static long? GetAllocatedBytes()
         {
             // we have no tests for WASM and don't want to risk introducing a new bug (https://github.com/dotnet/BenchmarkDotNet/issues/2226)
             if (RuntimeInformation.IsWasm)
                 return null;
 
-            // "This instance Int64 property returns the number of bytes that have been allocated by a specific
-            // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
-            // so we enforce GC.Collect here just to make sure we get accurate results
-            GC.Collect();
-
+            // Do NOT call GC.Collect() here, as it causes finalizers to run and possibly allocate. https://github.com/dotnet/runtime/issues/101536#issuecomment-2077533242
+            // Instead, we call it before we start the measurement in the Engine.
 #if NET6_0_OR_GREATER
             return GC.GetTotalAllocatedBytes(precise: true);
 #else
@@ -218,9 +218,7 @@ namespace BenchmarkDotNet.Engines
                     break;
                 }
 
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
+                Engine.ForceGcCollect();
 
                 result = GC.GetTotalMemory(false);
                 var tmp = new object();
