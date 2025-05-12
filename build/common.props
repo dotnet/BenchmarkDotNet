@@ -90,4 +90,9 @@
       </Code>
     </Task>
   </UsingTask>
+
+  <PropertyGroup>
+	<!-- Increment this when the BenchmarkDotNet.Weaver package needs to be re-packed. -->
+	<WeaverVersionSuffix>-1</WeaverVersionSuffix>
+  </PropertyGroup>
 </Project>
