@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public abstract class Argument: IEquatable<Argument>
+    public abstract class Argument : IEquatable<Argument>
     {
         [PublicAPI] public string TextRepresentation { get; }
 
@@ -47,6 +49,40 @@ namespace BenchmarkDotNet.Jobs
     [PublicAPI]
     public class MsBuildArgument : Argument
     {
-        public MsBuildArgument(string value) : base(value) { }
+        private static readonly Dictionary<char, string> MsBuildEscapes = new ()
+        {
+            { '%', "%25" },
+            { '$', "%24" },
+            { '@', "%40" },
+            { '\'', "%27" },
+            { '(', "%28" },
+            { ')', "%29" },
+            { ';', "%3B" },
+            { '?', "%3F" },
+            { '*', "%2A" }
+        };
+
+        private static string EscapeMsBuildSpecialChars(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+            var sb = new StringBuilder(value.Length);
+
+            foreach (char c in value)
+            {
+                if (MsBuildEscapes.TryGetValue(c, out string escaped))
+                {
+                    sb.Append(escaped);
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public MsBuildArgument(string value) : base(EscapeMsBuildSpecialChars(value)) { }
     }
 }

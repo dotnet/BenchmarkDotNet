@@ -43,6 +43,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             CanExecute<PropertyDefine>(config);
         }
 
+        [Fact]
+        public void EscapesSemicolonInDefineConstants()
+        {
+            var arg = new MsBuildArgument("/p:DefineConstants=TEST1;TEST2");
+            Assert.Equal("/p:DefineConstants=TEST1%3BTEST2", arg.ToString());
+        }
+
         public class PropertyDefine
         {
             private const bool customPropWasSet =
