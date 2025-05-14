@@ -62,50 +62,30 @@ namespace BenchmarkDotNet.Jobs
             { '*', "%2A" }
         };
 
-        // This lets us check if a %xx is a known escape
-        private static readonly HashSet<string> KnownEscapeValues = [.. MsBuildEscapes.Values];
-
         private static string EscapeMsBuildSpecialChars(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return value;
 
             var sb = new StringBuilder(value.Length);
-            int i = 0;
-
-            while (i < value.Length)
+            foreach (char c in value)
             {
-                char c = value[i];
-
-                // Check for a known %xx escape
-                if (c == '%' && i + 2 < value.Length)
-                {
-                    string candidate = value.Substring(i, 3); // e.g., "%3B"
-
-                    if (KnownEscapeValues.Contains(candidate))
-                    {
-                        sb.Append(candidate);
-                        i += 3;
-                        continue;
-                    }
-                }
-
-                // Escape only if it's a special MSBuild character
                 if (MsBuildEscapes.TryGetValue(c, out var escaped))
-                {
                     sb.Append(escaped);
-                }
                 else
-                {
                     sb.Append(c);
-                }
-
-                i++;
             }
 
             return sb.ToString();
         }
-
-        public MsBuildArgument(string value) : base(EscapeMsBuildSpecialChars(value)) { }
+        /// <summary>
+        /// Represents an MSBuild command-line argument.
+        /// <param name="value">The raw or escaped argument value (e.g., "/p:DefineConstants=TEST1;TEST2").</param>
+        /// <param name="escapeSpecialChars">
+        /// If true (default), special MSBuild characters like %, ;, *, etc. will be escaped.
+        /// If false, the value is used as-is — use this only if you're passing a fully pre-escaped string.
+        /// </param>
+        /// </summary>
+        public MsBuildArgument(string value, bool escapeSpecialChars = true) : base(escapeSpecialChars ? EscapeMsBuildSpecialChars(value) : value) { }
     }
 }

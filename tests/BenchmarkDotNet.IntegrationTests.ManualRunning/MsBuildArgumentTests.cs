@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         [Fact]
         public void DoesNotDoubleEscapeAlreadyEscapedPercent()
         {
-            var arg = new MsBuildArgument("/p:SomeValue=100%25");
+            var arg = new MsBuildArgument("/p:SomeValue=100%25", false);
             Assert.Equal("/p:SomeValue=100%25", arg.ToString());
         }
 
