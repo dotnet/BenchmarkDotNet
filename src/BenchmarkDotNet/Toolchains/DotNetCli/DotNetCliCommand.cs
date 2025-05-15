@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
 
-            return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
+            return string.Join(" ", msBuildArguments.Select(arg => arg.GetEscapedTextRepresentation()));
         }
 
         private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
