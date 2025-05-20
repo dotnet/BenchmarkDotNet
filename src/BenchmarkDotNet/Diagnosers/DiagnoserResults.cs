@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -16,6 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
             ThreadingStats = executeResult.ThreadingStats;
             BuildResult = buildResult;
             ExceptionFrequency = executeResult.ExceptionFrequency;
+            Measurements = executeResult.Measurements;
         }
 
         public BenchmarkCase BenchmarkCase { get; }
@@ -29,5 +31,7 @@ namespace BenchmarkDotNet.Diagnosers
         public double ExceptionFrequency { get; }
 
         public BuildResult BuildResult { get; }
+
+        public IReadOnlyList<Measurement> Measurements { get; }
     }
 }
