@@ -1,9 +1,9 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public abstract class Argument: IEquatable<Argument>
+    public abstract class Argument : IEquatable<Argument>
     {
         [PublicAPI] public string TextRepresentation { get; }
 
@@ -47,13 +47,17 @@ namespace BenchmarkDotNet.Jobs
     [PublicAPI]
     public class MsBuildArgument : Argument
     {
-        // Characters that need to be escaped.
-        // 1. Space
-        // 2. Comma (Special char that is used for separater for value of `-property:{name}={value}` and `-restoreProperty:{name}={value}`)
-        // 3. Other MSBuild special chars (https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-special-characters?view=vs-2022)
-        private static readonly char[] MSBuildCharsToEscape = [' ', ',', '%', '$', '@', '\'', '(', ')', ';', '?', '*'];
+        // Specisal chars that need to be wrapped with `\"`.
+        // 1. Comma char (It's used for separater char for `-property:{name}={value}` and `-restoreProperty:{name}={ value}`)
+        // 2. MSBuild special chars (https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-special-characters?view=vs-2022)
+        private static readonly char[] MSBuildSpecialChars = [',', '%', '$', '@', '\'', '(', ')', ';', '?', '*'];
 
-        public MsBuildArgument(string value) : base(value) { }
+        private readonly bool escapeArgument;
+
+        public MsBuildArgument(string value, bool escape = false) : base(value)
+        {
+            escapeArgument = escape;
+        }
 
         /// <summary>
         /// Gets the MSBuild argument that is used for build script.
@@ -61,6 +65,9 @@ namespace BenchmarkDotNet.Jobs
         internal string GetEscapedTextRepresentation()
         {
             var originalArgument = TextRepresentation;
+
+            if (!escapeArgument)
+                return originalArgument;
 
             // If entire argument surrounded with double quote, returns original argument.
             // In this case. MSBuild special chars must be escaped by user. https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-special-characters
@@ -76,41 +83,27 @@ namespace BenchmarkDotNet.Jobs
             var key = values[0];
             var value = values[1];
 
-            // If value starts with `\` char. It is expected that the escaped value is specified by the user.
-            if (value.StartsWith("\\"))
+            // If value starts with `\"`.
+            // It is expected that the escaped value is specified by the user.
+            if (value.StartsWith("\\\""))
                 return originalArgument;
 
-            // If value don't contains special chars. return original value.
-            if (value.IndexOfAny(MSBuildCharsToEscape) < 0)
-                return originalArgument;
-
-            return $"{key}={GetEscapedValue(value)}";
-        }
-
-        private static string GetEscapedValue(string value)
-        {
-            // If value starts with double quote. Trim leading/trailing double quote
-            if (value.StartsWith("\""))
+            // If value is wrapped with double quote. Trim leading/trailing double quote.
+            if (value.StartsWith("\"") && value.EndsWith("\""))
                 value = value.Trim(['"']);
 
-            bool isWindows = true;
-#if NET
-            isWindows = OperatingSystem.IsWindows();
-#endif
-            if (isWindows)
-            {
-                // On Windows environment.
-                // Returns double-quoted value. (Command line execution and `.bat` file requires escape double quote with `\`)
-                return $"""
-                        \"{value}\"
-                        """;
-            }
+            // Escape chars that need to escaped when wrapped with escaped double quote (`\"`)
+            value = value.Replace(" ", "%20")   // Space
+                         .Replace("\"", "%22")  // Double Quote
+                         .Replace("\\", "%5C"); // BackSlash
 
-            // On non-Windows environment.
-            // Returns value that surround with `'"` and `"'`. See: https://github.com/dotnet/sdk/issues/8792#issuecomment-393756980
-            // It requires escape with `\` when running command with `.sh` file. )
+            // If escaped value doesn't contains MSBuild special char, return original argument.
+            if (value.IndexOfAny(MSBuildSpecialChars) < 0)
+                return originalArgument;
+
+            // Return escaped value that is wrapped with escaped double quote (`\"`)
             return $"""
-                    \'\"{value}\"\'
+                    {key}=\"{value}\"
                     """;
         }
     }

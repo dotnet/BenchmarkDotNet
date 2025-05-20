@@ -15,7 +15,15 @@
   <PropertyGroup Condition="'$(CustomProp)'=='true'">
     <DefineConstants>$(DefineConstants);CUSTOM_PROP</DefineConstants>
   </PropertyGroup>
-  
+
+  <!-- Set AssemblyMetadataAttribute that is used by MsBuildArgumentTests-->
+  <ItemGroup Condition="'$(CustomProp)' != ''">
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>CustomProp</_Parameter1>
+      <_Parameter2>$(CustomProp)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\Xunit\MisconfiguredEnvironmentException.cs" Link="MisconfiguredEnvironmentException.cs" />
@@ -41,4 +49,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
 </Project>
