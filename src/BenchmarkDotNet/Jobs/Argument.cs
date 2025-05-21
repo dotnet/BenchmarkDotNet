@@ -48,5 +48,18 @@ namespace BenchmarkDotNet.Jobs
     public class MsBuildArgument : Argument
     {
         public MsBuildArgument(string value) : base(value) { }
+
+        public MsBuildArgument(string key, params string[] values)
+            : base($"/p:{key}={EscapeAndJoin(values)}") { }
+
+        private static string EscapeAndJoin(string[] values)
+        {
+            return string.Join("%3b", values.Select(EscapeSpecialChars));
+        }
+
+        private static string EscapeSpecialChars(string input)
+        {
+            return input.Replace(";", "%3B");
+        }
     }
 }

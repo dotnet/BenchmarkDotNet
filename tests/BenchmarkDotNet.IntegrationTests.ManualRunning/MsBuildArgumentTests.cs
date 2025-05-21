@@ -25,6 +25,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         }
 
         [Fact]
+
+        public void Constructor_WithKeyAndMultipleValues_ShouldEscapeSemicolons()
+        {
+            var arg = new MsBuildArgument("DefineConstants", "FOO", "BAR");
+            Assert.Equal("/p:DefineConstants=FOO%3BBAR", arg.TextRepresentation);
+        }
+        
         public void MultipleProcessesAreBuiltWithCorrectProperties()
         {
             var config = ManualConfig.CreateEmpty()
