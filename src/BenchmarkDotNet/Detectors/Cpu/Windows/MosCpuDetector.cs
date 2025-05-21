@@ -4,7 +4,7 @@ using System.Management;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
@@ -20,7 +20,7 @@ internal class MosCpuDetector : ICpuDetector
 #if NET6_0_OR_GREATER
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
-    public PhdCpu? Detect()
+    public CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
 
@@ -51,7 +51,7 @@ internal class MosCpuDetector : ICpuDetector
             ? Frequency.FromMHz(sumMaxFrequency * 1.0 / processorsCount)
             : null;
 
-        return new PhdCpu
+        return new CpuInfo
         {
             ProcessorName = processorName,
             PhysicalProcessorCount = processorsCount > 0 ? processorsCount : null,

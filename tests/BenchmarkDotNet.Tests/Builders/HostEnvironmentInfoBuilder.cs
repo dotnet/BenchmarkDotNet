@@ -4,7 +4,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -23,10 +23,10 @@ namespace BenchmarkDotNet.Tests.Builders
         private bool isServerGC = false;
         private string jitInfo = "RyuJIT-v4.6.x.mock";
         private string jitModules = "clrjit-v4.6.x.mock";
-        private PhdOs os = new () { Display = "Microsoft Windows NT 10.0.x.mock" };
+        private OsInfo os = new () { Display = "Microsoft Windows NT 10.0.x.mock" };
         private string runtimeVersion = "Clr 4.0.x.mock";
 
-        private readonly PhdCpu cpu = new ()
+        private readonly CpuInfo cpu = new ()
         {
             ProcessorName = "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
             PhysicalProcessorCount = 1,
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Tests.Builders
         public MockHostEnvironmentInfo(
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-            string jitInfo, string jitModules, PhdOs os, PhdCpu cpu,
+            string jitInfo, string jitModules, OsInfo os, CpuInfo cpu,
             string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
         {
             Architecture = architecture;
@@ -84,8 +84,8 @@ namespace BenchmarkDotNet.Tests.Builders
             IsServerGC = isServerGC;
             JitInfo = jitInfo;
             HardwareIntrinsicsShort = "";
-            Os = new Lazy<PhdOs>(() => os);
-            Cpu = new Lazy<PhdCpu>(() => cpu);
+            Os = new Lazy<OsInfo>(() => os);
+            Cpu = new Lazy<CpuInfo>(() => cpu);
             RuntimeVersion = runtimeVersion;
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
         }

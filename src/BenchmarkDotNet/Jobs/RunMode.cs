@@ -3,7 +3,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Phd;
+using BenchmarkDotNet.Models;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Jobs
@@ -191,7 +191,7 @@ namespace BenchmarkDotNet.Jobs
             set => MemoryRandomizationCharacteristic[this] = value;
         }
 
-        public BdnExecution ToPhd() => new ()
+        internal BdnExecution ToPerfonar() => new ()
         {
             LaunchCount = HasValue(LaunchCountCharacteristic) ? LaunchCount : null,
             WarmupCount = HasValue(WarmupCountCharacteristic) ? WarmupCount : null,

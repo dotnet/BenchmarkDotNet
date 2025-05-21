@@ -1,12 +1,12 @@
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu;
 
 /// <summary>
-/// Loads the <see cref="PhdCpu"/> for the current hardware
+/// Loads the <see cref="CpuInfo"/> for the current hardware
 /// </summary>
 public interface ICpuDetector
 {
     bool IsApplicable();
-    PhdCpu? Detect();
+    CpuInfo? Detect();
 }

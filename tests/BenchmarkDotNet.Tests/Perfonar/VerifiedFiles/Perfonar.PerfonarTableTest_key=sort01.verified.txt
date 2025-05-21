@@ -31,23 +31,5 @@
         }
       ]
     }
-  ],
-  "meta": {
-    "table": {
-      "columnDefinitions": [
-        {
-          "selector": ".benchmark.method"
-        },
-        {
-          "selector": "=center"
-        }
-      ],
-      "sortPolicies": [
-        {
-          "selector": "=center",
-          "direction": "descending"
-        }
-      ]
-    }
-  }
+  ]
 }

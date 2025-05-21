@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Phd;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Properties
 {
@@ -20,7 +19,7 @@ namespace BenchmarkDotNet.Properties
 
         public static BenchmarkDotNetInfo Instance { get; } = LazyInstance.Value;
 
-        public PhdEngine GetBdnEngine() => new ()
+        public EngineInfo GetBdnEngineInfo() => new ()
         {
             Name = BenchmarkDotNetCaption,
             Version = BrandVersion

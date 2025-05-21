@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using BenchmarkDotNet.Helpers;
 using Microsoft.Win32;
-using Perfolizer.Phd.Dto;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Extensions;
+using Perfolizer.Models;
 using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
@@ -19,16 +19,16 @@ public class OsDetector
     internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
     internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-    private readonly Lazy<PhdOs> os = new (ResolveOs);
-    public static PhdOs GetOs() => Instance.os.Value;
+    private readonly Lazy<OsInfo> os = new (ResolveOs);
+    public static OsInfo GetOs() => Instance.os.Value;
 
-    private static PhdOs ResolveOs()
+    private static OsInfo ResolveOs()
     {
         if (IsMacOS())
         {
             string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
             string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
-            return new PhdOs
+            return new OsInfo
             {
                 Name = "macOS",
                 Version = systemVersion,
@@ -42,7 +42,7 @@ public class OsDetector
             {
                 string version = LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
                 bool wsl = IsUnderWsl();
-                return new PhdOs
+                return new OsInfo
                 {
                     Name = "Linux",
                     Version = version,
@@ -63,7 +63,7 @@ public class OsDetector
             if (ubr != null)
                 operatingSystemVersion += $".{ubr}";
         }
-        return new PhdOs
+        return new OsInfo
         {
             Name = operatingSystem,
             Version = operatingSystemVersion

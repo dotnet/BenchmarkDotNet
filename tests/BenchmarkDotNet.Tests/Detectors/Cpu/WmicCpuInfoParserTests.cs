@@ -1,8 +1,7 @@
 ﻿using BenchmarkDotNet.Detectors.Cpu.Windows;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 using Xunit;
 using Xunit.Abstractions;
-using static Perfolizer.Horology.Frequency;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
@@ -15,7 +14,7 @@ public class WmicCpuInfoParserTests(ITestOutputHelper output)
     public void EmptyTest()
     {
         var actual = WmicCpuInfoParser.Parse(string.Empty);
-        var expected = new PhdCpu();
+        var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
 
@@ -23,7 +22,7 @@ public class WmicCpuInfoParserTests(ITestOutputHelper output)
     public void MalformedTest()
     {
         var actual = WmicCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
-        var expected = new PhdCpu();
+        var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
 
@@ -45,7 +44,7 @@ NumberOfLogicalProcessors=16
 
 ";
         var actual = WmicCpuInfoParser.Parse(cpuInfo);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
             PhysicalProcessorCount = 2,
@@ -77,7 +76,7 @@ NumberOfLogicalProcessors=16
             "\r\r\n" +
             "\r\r\n";
         var actual = WmicCpuInfoParser.Parse(cpuInfo);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz",
             PhysicalProcessorCount = 2,
@@ -102,7 +101,7 @@ NumberOfLogicalProcessors=8
 ";
 
         var actual = WmicCpuInfoParser.Parse(cpuInfo);
-        var expected = new PhdCpu
+        var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz",
             PhysicalProcessorCount = 1,

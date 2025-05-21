@@ -151,44 +151,5 @@ Type = Bench
         }
       ]
     }
-  ],
-  "meta": {
-    "table": {
-      "columnDefinitions": [
-        {
-          "selector": ".engine",
-          "cloud": "primary",
-          "isSelfExplanatory": true,
-          "isAtomic": true
-        },
-        {
-          "selector": ".host.os",
-          "cloud": "primary",
-          "isSelfExplanatory": true,
-          "isAtomic": true
-        },
-        {
-          "selector": ".host.cpu",
-          "cloud": "primary",
-          "isSelfExplanatory": true,
-          "isAtomic": true
-        },
-        {
-          "selector": ".benchmark",
-          "cloud": "secondary"
-        },
-        {
-          "selector": ".job",
-          "cloud": "secondary",
-          "compressed": true
-        },
-        {
-          "selector": "=center"
-        },
-        {
-          "selector": "=spread"
-        }
-      ]
-    }
-  }
+  ]
 }

@@ -16,8 +16,6 @@ using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using Perfolizer.Helpers;
-using Perfolizer.Phd;
-using Perfolizer.Phd.Dto;
 using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 

@@ -1,9 +1,8 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Infra;
 using Perfolizer.Helpers;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 using VerifyXunit;
 using Xunit;
 
@@ -22,7 +21,7 @@ public class CpuInfoFormatterTests
         foreach (var physicalCoreCount in new int?[] { null, 0, 1, 2 })
         foreach (var logicalCoreCount in new int?[] { null, 0, 1, 2 })
         {
-            var cpu = new PhdCpu
+            var cpu = new CpuInfo
             {
                 ProcessorName = processorName,
                 PhysicalProcessorCount = physicalProcessorCount,

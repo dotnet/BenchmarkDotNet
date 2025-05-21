@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
@@ -15,7 +15,7 @@ internal class WmicCpuDetector : ICpuDetector
 
     public bool IsApplicable() => OsDetector.IsWindows();
 
-    public PhdCpu? Detect()
+    public CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
 

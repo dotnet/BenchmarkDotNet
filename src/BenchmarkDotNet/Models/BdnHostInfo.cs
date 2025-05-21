@@ -1,11 +1,8 @@
-using JetBrains.Annotations;
-using Perfolizer.Phd;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
-namespace BenchmarkDotNet.Phd;
+namespace BenchmarkDotNet.Models;
 
-[PublicAPI]
-public class BdnHost : PhdHost
+internal class BdnHostInfo : HostInfo
 {
     public string RuntimeVersion { get; set; } = "";
     public bool HasAttachedDebugger { get; set; }

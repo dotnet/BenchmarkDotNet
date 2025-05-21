@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Portability;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.macOS;
 
@@ -12,7 +11,7 @@ internal class MacOsCpuDetector : ICpuDetector
 {
     public bool IsApplicable() => OsDetector.IsMacOS();
 
-    public PhdCpu? Detect()
+    public CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
 

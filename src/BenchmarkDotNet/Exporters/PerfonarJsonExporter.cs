@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Exporters;
 /// <summary>
 /// IMPORTANT: Not fully implemented yet
 /// </summary>
-public class PhdJsonExporter(LightJsonSettings? jsonSettings = null) : ExporterBase
+internal class PerfonarJsonExporter(LightJsonSettings? jsonSettings = null) : ExporterBase
 {
-    protected override string FileExtension => "phd.json";
+    protected override string FileExtension => "perfonar.json";
 
     public override void ExportToLog(Summary summary, ILogger logger)
     {
-        logger.WriteLine(LightJsonSerializer.Serialize(summary.ToPhd(), jsonSettings));
+        logger.WriteLine(LightJsonSerializer.Serialize(summary.ToPerfonar(), jsonSettings));
     }
 }

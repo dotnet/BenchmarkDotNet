@@ -53,6 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Detectors\" />
-    <Folder Include="Phd\VerifiedFiles\" />
+    <Folder Include="Perfonar\VerifiedFiles\" />
   </ItemGroup>
 </Project>

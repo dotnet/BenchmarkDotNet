@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Portability;
-using Perfolizer.Phd.Dto;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;
 
@@ -13,7 +12,7 @@ internal class LinuxCpuDetector : ICpuDetector
 {
     public bool IsApplicable() => OsDetector.IsLinux();
 
-    public PhdCpu? Detect()
+    public CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
 
