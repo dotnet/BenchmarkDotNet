@@ -45,6 +45,19 @@ namespace BenchmarkDotNet.Jobs
     /// example: new MsBuildArgument("/p:MyCustomSetting=123")
     /// </summary>
     [PublicAPI]
+
+    /// <summary>
+    /// A specialized MSBuild argument that sets a property using a quoted, semicolon-separated list of values.
+    /// </summary>
+    public class MsBuildProperty : MsBuildArgument
+    {
+        public MsBuildProperty(string key, params string[] values)
+            : base($"/p:{key}=\"{string.Join(";", values)}")
+        {
+        }
+
+
+    }
     public class MsBuildArgument : Argument
     {
         public MsBuildArgument(string value) : base(value) { }
