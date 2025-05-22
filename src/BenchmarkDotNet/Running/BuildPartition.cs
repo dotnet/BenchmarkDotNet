@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -28,11 +29,7 @@ namespace BenchmarkDotNet.Running
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            // Combine the benchmark's assembly name, folder info, and build partition id.
-            string benchmarkAssemblyName = RepresentativeBenchmarkCase.Descriptor.Type.Assembly.GetName().Name;
-            string folderInfo = RepresentativeBenchmarkCase.Job.FolderInfo;
-            int id = Interlocked.Increment(ref s_partitionCounter);
-            ProgramName = $"{benchmarkAssemblyName}-{folderInfo}-{id}";
+            ProgramName = GetProgramName(RepresentativeBenchmarkCase, Interlocked.Increment(ref s_partitionCounter));
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }
@@ -84,6 +81,33 @@ namespace BenchmarkDotNet.Running
             // in case of SingleFile, location.Length returns 0, so we use GetName() and
             // manually construct the path.
             assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
+
+        internal static string GetProgramName(BenchmarkCase representativeBenchmarkCase, int id)
+        {
+            // Combine the benchmark's assembly name, folder info, and build partition id.
+            string benchmarkAssemblyName = representativeBenchmarkCase.Descriptor.Type.Assembly.GetName().Name;
+            string folderInfo = representativeBenchmarkCase.Job.FolderInfo;
+            var programName = $"{benchmarkAssemblyName}-{folderInfo}-{id}";
+            // Very long program name can cause the path to exceed Windows' 260 character limit,
+            // for example BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.
+            // 36 is an arbitrary limit, but it's the length of Guid strings which is what was used previously.
+            const int MaxLength = 36;
+            if (!OsDetector.IsWindows() || programName.Length <= MaxLength)
+            {
+                return programName;
+            }
+            programName = $"{benchmarkAssemblyName}-{id}";
+            if (programName.Length <= MaxLength)
+            {
+                return programName;
+            }
+            programName = $"{folderInfo}-{id}";
+            if (programName.Length <= MaxLength)
+            {
+                return programName;
+            }
+            return id.ToString();
+        }
 
         internal bool ForcedNoDependenciesForIntegrationTests
         {
