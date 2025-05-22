@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -29,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
     <header class="bg-body border-bottom">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -77,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -431,7 +431,7 @@ IConfig after = ManualConfig.CreateMinimumViable();
 <li><code>LangVersion</code> set to a non-numeric value like <code>latest</code> was crashing the build. Fixed by <a href="https://github.com/martincostello">@martincostello</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1420">#1420</a>.</li>
 <li>Windows 10 November 201<strong>9</strong> was being recognized as 201<strong>8</strong>. Fixed by <a href="https://github.com/kapsiR">@kapsiR</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1437">#1437</a>.</li>
 <li>Assemblies loaded via streams were not supported. Fixed by <a href="https://github.com/jeremyosterhoudt">@jeremyosterhoudt</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1443">#1443</a>.</li>
-<li><a href="https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/">NativeMemoryProfiler</a> was detecting small leaks that were false positives. Fixed by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1451">#1451</a> and <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1600">#1600</a>.</li>
+<li><a href="https://wojciechnagorski.github.io/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/">NativeMemoryProfiler</a> was detecting small leaks that were false positives. Fixed by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1451">#1451</a> and <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1600">#1600</a>.</li>
 <li><a href="https://adamsitnik.com/Disassembly-Diagnoser/">DisassemblyDiagnoser</a> was crashing on Linux. Fixed by <a href="https://github.com/damageboy">@damageboy</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1459">#1459</a>.</li>
 <li>Target framework moniker was being printed as toolchain name for Full .NET Framework benchmarks. Fixed by <a href="https://github.com/svick">@svick</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1471">#1471</a>.</li>
 <li><code>[ParamsSource]</code> returning <code>IEnumerable&lt;object[]&gt;</code> was not working properly when combined with <code>[Arguments]</code>. Fixed by <a href="https://github.com/adamsitnik">@adamsitnik</a> in <a href="https://github.com/dotnet/BenchmarkDotNet/pull/1478">#1478</a>.</li>

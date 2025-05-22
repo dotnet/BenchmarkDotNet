@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Running with Visual Studio profiler | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Running with Visual Studio profiler | BenchmarkDotNet ">
+      
+      
+      <link rel="icon" href="../../logo/icon-32.png">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/articles/features/vsprofiler.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="docs.vsprofiler">
+<h1 id="running-with-visual-studio-profiler">Running with Visual Studio profiler</h1>
+
+<p>Visual Studio supports <a href="https://learn.microsoft.com/visualstudio/profiling/profiling-with-benchmark-dotnet">profiler integration with BenchmarkDotNet</a> on Windows through its <a href="https://www.nuget.org/packages/Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers">Microsoft.VisualStudio.BenchmarkDotNetDiagnosers</a> NuGet package. Once installed, Visual Studio specific diagnosers will capture performance data in runs and automatically open traces if launched through Visual Studio</p>
+<p><img src="../../images/vs-profiler-demo.png" alt=""></p>
+<h2 id="how-it-works">How it works</h2>
+<p>First, install the <a href="https://www.nuget.org/packages/Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers">Microsoft.VisualStudio.BenchmarkDotNetDiagnosers</a> NuGet package in your benchmarking project. Next add one or more of the Visual Studio diagnosers to your benchmark to capture the relevant profiling information while benchmarking. Lastly, run your benchmarks and a diagsession will be generated. If run from Visual Studio the diagsession will automatically be opened.</p>
+<h2 id="available-diagnosers">Available Diagnosers</h2>
+<ul>
+<li><code>[CPUUsageDiagnoser]</code> - Enables the <a href="https://learn.microsoft.com/visualstudio/profiling/cpu-usage">CPU Usage tool</a>.</li>
+<li><code>[DatabaseDiagnoser]</code> - Enables the <a href="https://learn.microsoft.com/visualstudio/profiling/analyze-database">Database tool</a></li>
+<li><code>[DotNetCountersDiagnoser]</code> - Enables the <a href="https://learn.microsoft.com/visualstudio/profiling/dotnet-counters-tool">.NET Counters tool</a></li>
+<li><code>[DotNetObjectAllocDiagnoser]</code> - Enables the <a href="https://learn.microsoft.com/visualstudio/profiling/dotnet-alloc-tool">.NET Object Allocation tool</a>. When using this tool, you must also specify <code>[DotNetObjectAllocJobConfiguration]</code> on the benchmark. If this is missing the run will fail and you will receive an error indicating you need to add it.</li>
+<li><code>[EventsDiagnoser]</code> - Enables the <a href="https://learn.microsoft.com/visualstudio/profiling/events-viewer">Events tool</a></li>
+<li><code>[FileIODiagnoser]</code> - Enables the <a href="https://learn.microsoft.com/visualstudio/profiling/use-file-io">File IO tool</a></li>
+</ul>
+<h2 id="how-to-use-it">How to use it?</h2>
+<p>After installing the <a href="https://www.nuget.org/packages/Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers">Microsoft.VisualStudio.BenchmarkDotNetDiagnosers</a> NuGet package add the following code as a benchmark:</p>
+<pre><code class="lang-cs">using System;
+using System.Security.Cryptography;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using Microsoft.VSDiagnostics;
+
+namespace MyBenchmarks
+{
+    [CPUUsageDiagnoser]
+    public class Md5VsSha256
+    {
+        private const int N = 10000;
+        private readonly byte[] data;
+
+        private readonly SHA256 sha256 = SHA256.Create();
+        private readonly MD5 md5 = MD5.Create();
+
+        public Md5VsSha256()
+        {
+            data = new byte[N];
+            new Random(42).NextBytes(data);
+        }
+
+        [Benchmark]
+        public byte[] Sha256() =&gt; sha256.ComputeHash(data);
+
+        [Benchmark]
+        public byte[] Md5() =&gt; md5.ComputeHash(data);
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+        }
+    }
+}
+</code></pre>
+<p>In this case we have added the <code>[CpuUsageDiagnoser]</code> to capture a CPU sampling trace. From here run the benchmark in Visual Studio (Ctrl+F5), and after the benchmark run the resulting diagsession will be displayed. Double clicking on one of the benchmark rows shown under the Benchmarks tab will filter the time selection to the specific benchmark allowing you to better isolate and investigate.</p>
+<p><img src="../../images/vs-profiler-demo.png" alt=""></p>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class SnapshotProfilerBase | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class SnapshotProfilerBase | BenchmarkDotNet ">
+      
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase">
+
+
+
+  <h1 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase" class="text-break">
+Class SnapshotProfilerBase  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Diagnosers.html">Diagnosers</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class SnapshotProfilerBase : IDiagnoser</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">SnapshotProfilerBase</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a></div>
+    </dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase__ctor_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase__ctor" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.#ctor">
+  SnapshotProfilerBase()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected SnapshotProfilerBase()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Analysers_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Analysers*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Analysers" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Analysers">
+  Analysers
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IAnalyser&gt; Analysers { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Exporters_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Exporters*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Exporters" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Exporters">
+  Exporters
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IExporter&gt; Exporters { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Ids_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Ids*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Ids" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Ids">
+  Ids
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;string&gt; Ids { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_ShortName_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.ShortName*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_ShortName" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.ShortName">
+  ShortName
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract string ShortName { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_AttachToCurrentProcess_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.AttachToCurrentProcess*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_AttachToCurrentProcess_System_String_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.AttachToCurrentProcess(System.String)">
+  AttachToCurrentProcess(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void AttachToCurrentProcess(string snapshotFile)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>snapshotFile</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_AttachToProcessByPid_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.AttachToProcessByPid*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_AttachToProcessByPid_System_Int32_System_String_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.AttachToProcessByPid(System.Int32,System.String)">
+  AttachToProcessByPid(int, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void AttachToProcessByPid(int pid, string snapshotFile)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>pid</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+    <dt><code>snapshotFile</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_CreateSnapshotFilePath_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.CreateSnapshotFilePath*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_CreateSnapshotFilePath_BenchmarkDotNet_Diagnosers_DiagnoserActionParameters_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.CreateSnapshotFilePath(BenchmarkDotNet.Diagnosers.DiagnoserActionParameters)">
+  CreateSnapshotFilePath(DiagnoserActionParameters)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract string CreateSnapshotFilePath(DiagnoserActionParameters parameters)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>parameters</code> <a class="xref" href="BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.html">DiagnoserActionParameters</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Detach_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Detach*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Detach" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Detach">
+  Detach()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void Detach()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_DisplayResults_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.DisplayResults*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_DisplayResults_BenchmarkDotNet_Loggers_ILogger_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.DisplayResults(BenchmarkDotNet.Loggers.ILogger)">
+  DisplayResults(ILogger)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void DisplayResults(ILogger logger)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>logger</code> <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_GetRunMode_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.GetRunMode*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_GetRunMode_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.GetRunMode(BenchmarkDotNet.Running.BenchmarkCase)">
+  GetRunMode(BenchmarkCase)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RunMode GetRunMode(BenchmarkCase benchmarkCase)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Diagnosers.RunMode.html">RunMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_GetRunnerPath_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.GetRunnerPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_GetRunnerPath" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.GetRunnerPath">
+  GetRunnerPath()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract string GetRunnerPath()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Handle_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Handle*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Handle_BenchmarkDotNet_Engines_HostSignal_BenchmarkDotNet_Diagnosers_DiagnoserActionParameters_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Handle(BenchmarkDotNet.Engines.HostSignal,BenchmarkDotNet.Diagnosers.DiagnoserActionParameters)">
+  Handle(HostSignal, DiagnoserActionParameters)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Handle(HostSignal signal, DiagnoserActionParameters parameters)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>signal</code> <a class="xref" href="BenchmarkDotNet.Engines.HostSignal.html">HostSignal</a></dt>
+    <dd></dd>
+    <dt><code>parameters</code> <a class="xref" href="BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.html">DiagnoserActionParameters</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_InitTool_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.InitTool*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_InitTool_BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Progress_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.InitTool(BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Progress)">
+  InitTool(Progress)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void InitTool(SnapshotProfilerBase.Progress progress)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>progress</code> <a class="xref" href="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.html">SnapshotProfilerBase</a>.<a class="xref" href="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Progress.html">Progress</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_ProcessResults_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.ProcessResults*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_ProcessResults_BenchmarkDotNet_Diagnosers_DiagnoserResults_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.ProcessResults(BenchmarkDotNet.Diagnosers.DiagnoserResults)">
+  ProcessResults(DiagnoserResults)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Metric&gt; ProcessResults(DiagnoserResults results)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>results</code> <a class="xref" href="BenchmarkDotNet.Diagnosers.DiagnoserResults.html">DiagnoserResults</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Metric.html">Metric</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_TakeSnapshot_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.TakeSnapshot*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_TakeSnapshot" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.TakeSnapshot">
+  TakeSnapshot()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void TakeSnapshot()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Validate_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Validate*"></a>
+
+  <h3 id="BenchmarkDotNet_Diagnosers_SnapshotProfilerBase_Validate_BenchmarkDotNet_Validators_ValidationParameters_" data-uid="BenchmarkDotNet.Diagnosers.SnapshotProfilerBase.Validate(BenchmarkDotNet.Validators.ValidationParameters)">
+  Validate(ValidationParameters)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;ValidationError&gt; Validate(ValidationParameters validationParameters)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>validationParameters</code> <a class="xref" href="BenchmarkDotNet.Validators.ValidationParameters.html">ValidationParameters</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

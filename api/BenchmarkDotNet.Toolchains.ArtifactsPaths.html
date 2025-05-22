@@ -1,12 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class ArtifactsPaths
- | BenchmarkDotNet </title>
+      <title>Class ArtifactsPaths | BenchmarkDotNet </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class ArtifactsPaths
- | BenchmarkDotNet ">
+      <meta name="title" content="Class ArtifactsPaths | BenchmarkDotNet ">
       
       
       <link rel="icon" href="../logo/icon-32.png">
@@ -31,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
     <header class="bg-body border-bottom">
@@ -56,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -79,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -91,8 +89,7 @@
 
 
   <h1 id="BenchmarkDotNet_Toolchains_ArtifactsPaths" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths" class="text-break">
-    Class ArtifactsPaths
-  
+Class ArtifactsPaths  
   </h1>
 
   <div class="facts text-secondary">
@@ -147,7 +144,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ArtifactsPaths(string rootArtifactsFolderPath, string buildArtifactsDirectoryPath, string binariesDirectoryPath, string intermediateDirectoryPath, string programCodePath, string appConfigPath, string nuGetConfigPath, string projectFilePath, string buildScriptFilePath, string executablePath, string programName, string packagesDirectoryName)</code></pre>
+    <pre><code class="lang-csharp hljs">public ArtifactsPaths(string rootArtifactsFolderPath, string buildArtifactsDirectoryPath, string binariesDirectoryPath, string publishDirectoryPath, string programCodePath, string appConfigPath, string nuGetConfigPath, string projectFilePath, string buildScriptFilePath, string executablePath, string programName, string packagesDirectoryName)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -158,7 +155,7 @@
     <dd></dd>
     <dt><code>binariesDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
-    <dt><code>intermediateDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dt><code>publishDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
     <dt><code>programCodePath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
@@ -382,37 +379,6 @@
 
 
 
-  <a id="BenchmarkDotNet_Toolchains_ArtifactsPaths_IntermediateDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath*"></a>
-
-  <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths_IntermediateDirectoryPath" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.IntermediateDirectoryPath">
-  IntermediateDirectoryPath
-  
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string IntermediateDirectoryPath { get; }</code></pre>
-  </div>
-
-
-
-
-
-  <h4 class="section">Property Value</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
   <a id="BenchmarkDotNet_Toolchains_ArtifactsPaths_NuGetConfigPath_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.NuGetConfigPath*"></a>
 
   <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths_NuGetConfigPath" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.NuGetConfigPath">
@@ -549,6 +515,37 @@
 
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public string ProjectFilePath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_ArtifactsPaths_PublishDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.PublishDirectoryPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_ArtifactsPaths_PublishDirectoryPath" data-uid="BenchmarkDotNet.Toolchains.ArtifactsPaths.PublishDirectoryPath">
+  PublishDirectoryPath
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string PublishDirectoryPath { get; }</code></pre>
   </div>
 
 

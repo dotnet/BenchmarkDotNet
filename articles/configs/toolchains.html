@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -29,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
     <header class="bg-body border-bottom">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -77,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -95,17 +95,17 @@
 </ul>
 <h2 id="multiple-frameworks-support">Multiple frameworks support</h2>
 <p>If you want to test multiple frameworks, your project file <strong>MUST target all of them</strong> and you <strong>MUST install the corresponding SDKs</strong>:</p>
-<pre><code class="lang-xml">&lt;TargetFrameworks&gt;netcoreapp3.0;netcoreapp2.1;net48&lt;/TargetFrameworks&gt;
+<pre><code class="lang-xml">&lt;TargetFrameworks&gt;netcoreapp3.1;net8.0;net48&lt;/TargetFrameworks&gt;
 </code></pre>
 <p>If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks <strong>using the same framework as the host process</strong>:</p>
-<pre><code class="lang-cmd">dotnet run -c Release -f netcoreapp2.1 # is going to run the benchmarks using .NET Core 2.1
-dotnet run -c Release -f netcoreapp3.0 # is going to run the benchmarks using .NET Core 3.0
+<pre><code class="lang-cmd">dotnet run -c Release -f netcoreapp3.1 # is going to run the benchmarks using .NET Core 3.1
+dotnet run -c Release -f net8.0 # is going to run the benchmarks using .NET 8.0
 dotnet run -c Release -f net48         # is going to run the benchmarks using .NET 4.8
 mono $pathToExe                        # is going to run the benchmarks using Mono from your PATH
 </code></pre>
 <p>To run the benchmarks for multiple runtimes with a single command, you need to specify the target framework moniker names via <code>--runtimes|-r</code> console argument:</p>
-<pre><code class="lang-cmd">dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 netcoreapp3.0 # is going to run the benchmarks using .NET Core 2.1 and .NET Core 3.0
-dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # is going to run the benchmarks using .NET Core 2.1 and .NET 4.8
+<pre><code class="lang-cmd">dotnet run -c Release -f net8.0 --runtimes net8.0 netcoreapp3.1 # is going to run the benchmarks using .NET 8.0 and .NET Core 3.1
+dotnet run -c Release -f net8.0 --runtimes net8.0 net48         # is going to run the benchmarks using .NET 8.0 and .NET 4.8
 </code></pre>
 <p>What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:</p>
 <pre><code class="lang-cmd">dotnet run -c Release -f net461 net472 net48
@@ -128,8 +128,8 @@ namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RuntimeMoniker.Net48)]
     [SimpleJob(RuntimeMoniker.Mono)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net80)]
     public class TheClassWithBenchmarks
 </code></pre>
 <p>Or using a custom config:</p>
@@ -145,10 +145,9 @@ namespace BenchmarkDotNet.Samples
         static void Main(string[] args)
         {
             var config = DefaultConfig.Instance
-                .With(Job.Default.With(CoreRuntime.Core21))
-                .With(Job.Default.With(CoreRuntime.Core30))
-                .With(Job.Default.With(ClrRuntime.Net48))
-                .With(Job.Default.With(MonoRuntime.Default));
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.Net48))
+                .AddJob(Job.Default.WithRuntime(MonoRuntime.Default));
 
             BenchmarkSwitcher
                 .FromAssembly(typeof(Program).Assembly)
@@ -167,9 +166,9 @@ namespace BenchmarkDotNet.Samples
         Add(Job.Default.With(
             CsProjCoreToolchain.From(
                 new NetCoreAppSettings(
-                    targetFrameworkMoniker: &quot;netcoreapp2.1&quot;, 
-                    runtimeFrameworkVersion: &quot;2.1.0-preview2-25628-01&quot;, 
-                    name: &quot;.NET Core 2.1&quot;))));
+                    targetFrameworkMoniker: &quot;net8.0-windows&quot;,
+                    runtimeFrameworkVersion: &quot;8.0.101&quot;,
+                    name: &quot;.NET 8.0 Windows&quot;))));
     }
 }
 </code></pre>
@@ -178,8 +177,8 @@ namespace BenchmarkDotNet.Samples
 <pre><code class="lang-cs">BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, 
-        DefaultConfig.Instance.With(
-            Job.ShortRun.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: &quot;4.0&quot;))));
+        DefaultConfig.Instance.AddJob(
+            Job.ShortRun.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: &quot;4.0&quot;))));
 </code></pre>
 <p>This sends the provided version as a <code>COMPLUS_Version</code> env var to the benchmarked process.</p>
 <h2 id="custom-dotnet-cli-path">Custom dotnet cli path</h2>
@@ -189,11 +188,11 @@ namespace BenchmarkDotNet.Samples
     public CustomPathsConfig() 
     {
         var dotnetCli32bit = NetCoreAppSettings
-            .NetCoreApp20
+            .NetCoreApp31
             .WithCustomDotNetCliPath(@&quot;C:\Program Files (x86)\dotnet\dotnet.exe&quot;, &quot;32 bit cli&quot;);
 
         var dotnetCli64bit = NetCoreAppSettings
-            .NetCoreApp20
+            .NetCoreApp31
             .WithCustomDotNetCliPath(@&quot;C:\Program Files\dotnet\dotnet.exe&quot;, &quot;64 bit cli&quot;);
 
         AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(dotnetCli32bit)).WithId(&quot;32 bit cli&quot;));
@@ -361,7 +360,7 @@ namespace BenchmarkDotNet.Samples
 </code></pre>
 <p>or:</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
-    .With(Job.Default.With(NativeAotRuntime.Net70)); // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
+    .AddJob(Job.Default.WithRuntime(NativeAotRuntime.Net70)); // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
@@ -377,8 +376,8 @@ public class TheTypeWithBenchmarks
 <h3 id="customization">Customization</h3>
 <p>If you want to benchmark some particular version of NativeAOT (or from a different NuGet feed) you have to specify it in an explicit way:</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
-    .With(Job.ShortRun
-        .With(NativeAotToolchain.CreateBuilder()
+    .AddJob(Job.ShortRun
+        .WithToolchain(NativeAotToolchain.CreateBuilder()
             .UseNuGet(
                 microsoftDotNetILCompilerVersion: &quot;7.0.0-*&quot;, // the version goes here
                 nuGetFeedUrl: &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json&quot;) // this address might change over time
@@ -463,8 +462,8 @@ cat .\BenchmarkDotNet.Autogenerated.csproj
 </code></pre>
 <p>or explicitly in the code:</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
-    .With(Job.ShortRun
-        .With(NativeAotToolchain.CreateBuilder()
+    .AddJob(Job.ShortRun
+        .WithToolchain(NativeAotToolchain.CreateBuilder()
             .UseLocalBuild(@&quot;C:\Projects\runtime\artifacts\packages\Release\Shipping\&quot;)
             .DisplayName(&quot;NativeAOT local build&quot;)
             .TargetFrameworkMoniker(&quot;net7.0&quot;)

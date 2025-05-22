@@ -1,12 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class Generator
- | BenchmarkDotNet </title>
+      <title>Class Generator | BenchmarkDotNet </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class Generator
- | BenchmarkDotNet ">
+      <meta name="title" content="Class Generator | BenchmarkDotNet ">
       
       <meta name="description" content="generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project">
       <link rel="icon" href="../logo/icon-32.png">
@@ -31,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
     <header class="bg-body border-bottom">
@@ -56,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -79,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -91,8 +89,7 @@
 
 
   <h1 id="BenchmarkDotNet_Toolchains_NativeAot_Generator" data-uid="BenchmarkDotNet.Toolchains.NativeAot.Generator" class="text-break">
-    Class Generator
-  
+Class Generator  
   </h1>
 
   <div class="facts text-secondary">
@@ -133,14 +130,11 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   </dl>
 
 
-  <dl class="typelist derived">
+  <dl class="typelist inheritedMembers">
     <dt>Inherited Members</dt>
     <dd>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_System_String_">CsProjGenerator.GetProjectFilePath(string)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetIntermediateDirectoryPath_System_String_System_String_">CsProjGenerator.GetIntermediateDirectoryPath(string, string)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetRuntimeSettings_BenchmarkDotNet_Jobs_GcMode_BenchmarkDotNet_Characteristics_IResolver_">CsProjGenerator.GetRuntimeSettings(GcMode, IResolver)</a>
@@ -182,6 +176,9 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Loggers_ILogger_System_String_">GeneratorBase.GenerateProject(BuildPartition, ILogger, string)</a>
     </div>
     <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetPublishDirectoryPath_System_String_System_String_">GeneratorBase.GetPublishDirectoryPath(string, string)</a>
+    </div>
+    <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateAppConfig_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_">GeneratorBase.GenerateAppConfig(BuildPartition, ArtifactsPaths)</a>
     </div>
     <div>
@@ -219,9 +216,9 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>buildPartition</code> <a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
     <dt><code>artifactsPaths</code> <a class="xref" href="BenchmarkDotNet.Toolchains.ArtifactsPaths.html">ArtifactsPaths</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -253,7 +250,7 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>artifactsPaths</code> <a class="xref" href="BenchmarkDotNet.Toolchains.ArtifactsPaths.html">ArtifactsPaths</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -285,11 +282,11 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>buildPartition</code> <a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
     <dt><code>artifactsPaths</code> <a class="xref" href="BenchmarkDotNet.Toolchains.ArtifactsPaths.html">ArtifactsPaths</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
     <dt><code>logger</code> <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -321,13 +318,13 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>artifactsPaths</code> <a class="xref" href="BenchmarkDotNet.Toolchains.ArtifactsPaths.html">ArtifactsPaths</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -358,15 +355,15 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>buildArtifactsDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
     <dt><code>configuration</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -399,15 +396,15 @@ and also by NuGet internal implementation like looking for global.json file in p
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>buildPartition</code> <a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
     <dt><code>programName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -439,7 +436,7 @@ and also by NuGet internal implementation like looking for global.json file in p
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 
@@ -469,15 +466,15 @@ and also by NuGet internal implementation like looking for global.json file in p
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>benchmarkTarget</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
     <dt><code>logger</code> <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
-    <dd>generates new csproj file for self-contained NativeAOT app based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project</dd>
+    <dd></dd>
   </dl>
 
 

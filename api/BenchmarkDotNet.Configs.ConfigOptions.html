@@ -1,12 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Enum ConfigOptions
- | BenchmarkDotNet </title>
+      <title>Enum ConfigOptions | BenchmarkDotNet </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Enum ConfigOptions
- | BenchmarkDotNet ">
+      <meta name="title" content="Enum ConfigOptions | BenchmarkDotNet ">
       
       
       <link rel="icon" href="../logo/icon-32.png">
@@ -31,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
     <header class="bg-body border-bottom">
@@ -56,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -79,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -92,8 +90,7 @@
 
 
   <h1 id="BenchmarkDotNet_Configs_ConfigOptions" data-uid="BenchmarkDotNet.Configs.ConfigOptions" class="text-break">
-    Enum ConfigOptions
-  
+Enum ConfigOptions  
   </h1>
 
   <div class="facts text-secondary">
@@ -121,37 +118,52 @@ public enum ConfigOptions</code></pre>
 </h2>
   <dl class="parameters">
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_ApplesToApples"><code>ApplesToApples = 256</code></dt>
-    <dd><p>Performs apples-to-apples comparison for provided benchmarks and jobs. Experimental, will change in the near future!</p>
+  
+  <dd><p>Performs apples-to-apples comparison for provided benchmarks and jobs. Experimental, will change in the near future!</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_Default"><code>Default = 0</code></dt>
-    <dd><p>no custom settings</p>
+  
+  <dd><p>no custom settings</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_DisableLogFile"><code>DisableLogFile = 32</code></dt>
-    <dd><p>Determines if the log file should be disabled.</p>
+  
+  <dd><p>Determines if the log file should be disabled.</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_DisableOptimizationsValidator"><code>DisableOptimizationsValidator = 8</code></dt>
-    <dd><p>determines if &quot;mandatory&quot; optimizations validator should be entirely turned off</p>
+  
+  <dd><p>determines if &quot;mandatory&quot; optimizations validator should be entirely turned off</p>
+</dd>
+    <dt id="BenchmarkDotNet_Configs_ConfigOptions_DisableParallelBuild"><code>DisableParallelBuild = 1024</code></dt>
+  
+  <dd><p>Determines whether parallel build of benchmark projects should be disabled.</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_DontOverwriteResults"><code>DontOverwriteResults = 16</code></dt>
-    <dd><p>determines if the exported result files should not be overwritten (be default they are overwritten)</p>
+  
+  <dd><p>determines if the exported result files should not be overwritten (be default they are overwritten)</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_GenerateMSBuildBinLog"><code>GenerateMSBuildBinLog = 128</code></dt>
-    <dd><p>Determines whether to generate msbuild binlogs</p>
+  
+  <dd><p>Determines whether to generate msbuild binlogs</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_JoinSummary"><code>JoinSummary = 2</code></dt>
-    <dd><p>determines if all benchmarks results should be joined into a single summary (by default we have a summary per type)</p>
+  
+  <dd><p>determines if all benchmarks results should be joined into a single summary (by default we have a summary per type)</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_KeepBenchmarkFiles"><code>KeepBenchmarkFiles = 1</code></dt>
-    <dd><p>determines if all auto-generated files should be kept after running the benchmarks (be default they are removed)</p>
+  
+  <dd><p>determines if all auto-generated files should be kept after running the benchmarks (be default they are removed)</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_LogBuildOutput"><code>LogBuildOutput = 64</code></dt>
-    <dd><p>Determines whether build output should be logged.</p>
+  
+  <dd><p>Determines whether build output should be logged.</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_Resume"><code>Resume = 512</code></dt>
-    <dd><p>Continue the execution if the last run was stopped.</p>
+  
+  <dd><p>Continue the execution if the last run was stopped.</p>
 </dd>
     <dt id="BenchmarkDotNet_Configs_ConfigOptions_StopOnFirstError"><code>StopOnFirstError = 4</code></dt>
-    <dd><p>determines if benchmarking should be stopped after the first error (by default it's not)</p>
+  
+  <dd><p>determines if benchmarking should be stopped after the first error (by default it's not)</p>
 </dd>
   </dl>
 

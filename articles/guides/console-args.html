@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -29,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
     <header class="bg-body border-bottom">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -77,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -186,20 +186,21 @@ BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
 <p>The <code>--runtimes</code> or just <code>-r</code> allows you to run the benchmarks for selected Runtimes. Available options are:</p>
 <ul>
 <li>Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app).</li>
-<li>Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1.</li>
+<li>Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use net8.0.</li>
 <li>Mono - it's going to use the Mono from <code>$Path</code>, you can override  it with <code>--monoPath</code>.</li>
-<li>net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version.</li>
-<li>netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0, netcoreapp3.1, net5.0, net6.0, net7.0 - to build and run benchmarks against specific .NET Core version.</li>
-<li>nativeaot5.0, nativeaot6.0, nativeaot7.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: <code>--ilcPath</code>, <code>--ilCompilerVersion</code>.</li>
+<li>net46, net461, net462, net47, net471, net472, net48, net481 - to build and run benchmarks against specific .NET Framework version.</li>
+<li>netcoreapp3.1, net5.0, net6.0, net7.0, net8.0 - to build and run benchmarks against specific .NET (Core) version.</li>
+<li>nativeaot5.0, nativeaot6.0, nativeaot7.0, nativeaot8.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: <code>--ilcPackages</code>, <code>--ilCompilerVersion</code>.</li>
+<li>mono6.0, mono7.0, mono8.0 - to build and run benchmarks with .Net 6+ using MonoVM.</li>
 </ul>
-<p>Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:</p>
-<pre><code class="lang-log">dotnet run -c Release -- --runtimes net472 netcoreapp2.1
+<p>Example: run the benchmarks for .NET 4.7.2 and .NET 8.0:</p>
+<pre><code class="lang-log">dotnet run -c Release -- --runtimes net472 net8.0
 </code></pre>
-<p>Example: run the benchmarks for .NET Core 3.0 and latest .NET SDK installed on your PC:</p>
-<pre><code class="lang-log">dotnet run -c Release -f netcoreapp3.0 -- --runtimes clr core
+<p>Example: run the benchmarks for .NET Core 3.1 and latest .NET SDK installed on your PC:</p>
+<pre><code class="lang-log">dotnet run -c Release -f netcoreapp3.1 -- --runtimes clr core
 </code></pre>
-<p>But same command executed with <code>-f netcoreapp2.0</code> is going to run the benchmarks for .NET Core 2.0:</p>
-<pre><code class="lang-log">dotnet run -c Release -f netcoreapp2.0 -- --runtimes clr core
+<p>But same command executed with <code>-f net6.0</code> is going to run the benchmarks for .NET 6.0:</p>
+<pre><code class="lang-log">dotnet run -c Release -f net6.0 -- --runtimes clr core
 </code></pre>
 <h2 id="number-of-invocations-and-iterations">Number of invocations and iterations</h2>
 <ul>
@@ -249,8 +250,8 @@ static IConfig GetGlobalConfig()
 <ul>
 <li><code>--statisticalTest</code>- Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s</li>
 </ul>
-<p>Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.</p>
-<pre><code class="lang-log">dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --statisticalTest 5%
+<p>Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET 6.0 will be baseline because it was first.</p>
+<pre><code class="lang-log">dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5%
 </code></pre>
 <h2 id="more">More</h2>
 <ul>
@@ -267,7 +268,7 @@ static IConfig GetGlobalConfig()
 <li><code>--cli</code> path to dotnet cli (optional).</li>
 <li><code>--packages</code> the directory to restore packages to (optional).</li>
 <li><code>--coreRun</code> path(s) to CoreRun (optional).</li>
-<li><code>--ilcPath</code> path to ILCompiler for NativeAOT.</li>
+<li><code>--ilcPackages</code> path to ILCompiler for NativeAOT.</li>
 <li><code>--info</code> prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version</li>
 <li><code>--stopOnFirstError</code> stop on first error.</li>
 <li><code>--help</code> display this help screen.</li>
@@ -281,6 +282,7 @@ static IConfig GetGlobalConfig()
 <li><code>--platform</code> the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.</li>
 <li><code>--runOncePerIteration</code> run the benchmark exactly once per iteration.</li>
 <li><code>--buildTimeout</code> build timeout in seconds.</li>
+<li><code>--wakeLock</code> prevents the system from entering sleep or turning off the display. None/System/Display.</li>
 <li><code>--wasmEngine</code> full path to a java script engine used to run the benchmarks, used by Wasm toolchain.</li>
 <li><code>--wasmMainJS</code> path to the test-main.js file used by Wasm toolchain. Mandatory when using &quot;--runtimes wasm&quot;</li>
 <li><code>--expose_wasm</code> arguments for the JavaScript engine used by Wasm toolchain.</li>

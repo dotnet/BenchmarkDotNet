@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -29,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
     <header class="bg-body border-bottom">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -77,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -179,20 +179,20 @@ public class MyBenchmarks
     {
         public Config()
         {
-            Add(
-                new Job(&quot;MySuperJob&quot;, RunMode.Dry, EnvMode.RyuJitX64)
+            AddJob(
+                new Job(&quot;MySuperJob&quot;, RunMode.Dry, EnvironmentMode.RyuJitX64)
                 {
-                    Env = { Runtime = Runtime.Core },
+                    Environment = { Runtime = CoreRuntime.Core90 },
                     Run = { LaunchCount = 5, IterationTime = TimeInterval.Millisecond * 200 },
-                    Accuracy = { MaxStdErrRelative = 0.01 }
+                    Accuracy = { MaxRelativeError = 0.01 }
                 });
 
             // The same, using the .With() factory methods:
-            Add(
+            AddJob(
                 Job.Dry
                 .WithPlatform(Platform.X64)
                 .WithJit(Jit.RyuJit)
-                .WithRuntime(Runtime.Core)
+                .WithRuntime(CoreRuntime.Core90)
                 .WithLaunchCount(5)
                 .WithIterationTime(TimeInterval.Millisecond * 200)
                 .WithMaxRelativeError(0.01)
@@ -202,22 +202,24 @@ public class MyBenchmarks
     // Benchmarks
 }
 </code></pre>
-<p>Basically, it's a good idea to start with predefined values (e.g. <code>EnvMode.RyuJitX64</code> and <code>RunMode.Dry</code> passed as constructor args) and modify rest of the properties using property setters or with help of object initializer syntax.</p>
+<p>Basically, it's a good idea to start with predefined values (e.g. <code>EnvironmentMode.RyuJitX64</code> and <code>RunMode.Dry</code> passed as constructor args) and modify rest of the properties using property setters or with help of object initializer syntax.</p>
 <p>Note that the job cannot be modified after it's added into config. Trying to set a value on property of the frozen job will throw an <code>InvalidOperationException</code>. Use the <code>Job.Frozen</code> property to determine if the code properties can be altered.</p>
 <p>If you do want to create a new job based on frozen one (all predefined job values are frozen) you can use the <code>.With()</code> extension method</p>
-<pre><code class="lang-cs">            var newJob = Job.Dry.With(Platform.X64);
+<pre><code class="lang-cs">            var newJob = Job.Dry.WithPlatform(Platform.X64);
 </code></pre>
 <p>or pass the frozen value as a constructor argument</p>
-<pre><code class="lang-c#">            var newJob = new Job(Job.Dry) { Env = { Platform = Platform.X64 } };
+<pre><code class="lang-c#">            var newJob = new Job(Job.Dry) { Environment = { Platform = Platform.X64 } };
 </code></pre>
 <p>or use the <code>.Apply()</code> method on unfrozen job</p>
-<pre><code class="lang-c#">            var newJob = new Job() { Env = { Platform = Platform.X64 } }.Apply(Job.Dry);
+<pre><code class="lang-c#">            var newJob = new Job() { Environment = { Platform = Platform.X64 } }.Apply(Job.Dry);
 </code></pre>
 <p>in any case the Id property will not be transfered and you must pass it explicitly (using the .ctor id argument or the <code>.WithId()</code> extension method).</p>
 <h3 id="attribute-style">Attribute style</h3>
 <p>You can also add new jobs via attributes. Examples:</p>
 <pre><code class="lang-cs">[DryJob]
-[ClrJob, CoreJob, MonoJob]
+[MonoJob]
+[SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.NetCoreApp31)]
 [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
 [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, iterationCount: 5, id: &quot;FastAndDirtyJob&quot;)]
 public class MyBenchmarkClass
@@ -267,7 +269,7 @@ public class MySuperJobAttribute : Attribute, IConfigSource
     {
         var job = new Job(&quot;MySuperJob&quot;, RunMode.Core);
         job.Env.Platform = Platform.X64;
-        Config = ManualConfig.CreateEmpty().With(job);
+        Config = ManualConfig.CreateEmpty().AddJob(job);
     }
 
     public IConfig Config { get; }

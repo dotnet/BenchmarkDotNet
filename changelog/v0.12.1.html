@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
@@ -29,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
     <header class="bg-body border-bottom">
@@ -54,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -77,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -305,7 +305,7 @@ public class IntroEventPipeProfiler
 }
 </code></pre>
 <p>Once the benchmark run is finished, you get a <code>.speedscope.json</code> file that can be opened in <a href="https://www.speedscope.app/">SpeedScope</a>:</p>
-<p><img src="https://wojciechnagorski.com/images/EventPipeProfiler/SpeedScope.png#mid" alt=""></p>
+<p><img src="https://wojciechnagorski.github.io/images/EventPipeProfiler/SpeedScope.png#mid" alt=""></p>
 <p>The new profiler supports several modes:</p>
 <ul>
 <li><code>CpuSampling</code> - Useful for tracking CPU usage and general .NET runtime information. This is the default option.</li>
@@ -313,7 +313,7 @@ public class IntroEventPipeProfiler
 <li><code>GcCollect</code> - Tracks GC collections only at very low overhead.</li>
 <li><code>Jit</code> - Logging when Just in time (JIT) compilation occurs. Logging of the internal workings of the Just In Time compiler. This is fairly verbose. It details decisions about interesting optimization (like inlining and tail call)</li>
 </ul>
-<p>Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/">blog post</a> for all the details.</p>
+<p>Please see Wojciech Nagórski's <a href="https://wojciechnagorski.github.io/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/">blog post</a> for all the details.</p>
 <p>Special thanks to <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a> for the implementation!</p>
 <h2 id="new-fluent-api">New fluent API</h2>
 <p>We continue to improve our API and make it easier for reading and writing.

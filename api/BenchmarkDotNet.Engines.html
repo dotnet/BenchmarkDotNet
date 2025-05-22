@@ -1,12 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Namespace BenchmarkDotNet.Engines
- | BenchmarkDotNet </title>
+      <title>Namespace BenchmarkDotNet.Engines | BenchmarkDotNet </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Namespace BenchmarkDotNet.Engines
- | BenchmarkDotNet ">
+      <meta name="title" content="Namespace BenchmarkDotNet.Engines | BenchmarkDotNet ">
       
       
       <link rel="icon" href="../logo/icon-32.png">
@@ -31,15 +29,15 @@
       <meta name="loc:changeTheme" content="Change theme">
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
   </head>
-
-  <script type="module" src="./../public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
 
   <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
     <header class="bg-body border-bottom">
@@ -56,7 +54,7 @@
             <div id="navbar">
               <form class="search" role="search" id="search">
                 <i class="bi bi-search"></i>
-                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
               </form>
             </div>
           </div>
@@ -79,7 +77,7 @@
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
 
@@ -88,8 +86,7 @@
 
         <article data-uid="BenchmarkDotNet.Engines">
 
-  <h1 id="BenchmarkDotNet_Engines" data-uid="BenchmarkDotNet.Engines" class="text-break">Namespace BenchmarkDotNet.Engines
-</h1>
+  <h1 id="BenchmarkDotNet_Engines" data-uid="BenchmarkDotNet.Engines" class="text-break">Namespace BenchmarkDotNet.Engines</h1>
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   <div class="markdown level0 remarks"></div>
@@ -100,11 +97,6 @@ Classes
     <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.AnonymousPipesHost.html">AnonymousPipesHost</a></dt>
       <dd></dd>
-    </dl>
-    <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.AutoWarmupStoppingCriteria.html">AutoWarmupStoppingCriteria</a></dt>
-      <dd><p>Automatically choose the best number of iterations during the warmup stage.</p>
-</dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.Consumer.html">Consumer</a></dt>
@@ -119,19 +111,11 @@ Classes
       <dd></dd>
     </dl>
     <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.DefaultStoppingCriteriaFactory.html">DefaultStoppingCriteriaFactory</a></dt>
-      <dd></dd>
-    </dl>
-    <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.Engine.html">Engine</a></dt>
       <dd></dd>
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.Engine.Signals.html">Engine.Signals</a></dt>
-      <dd></dd>
-    </dl>
-    <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.EngineActualStage.html">EngineActualStage</a></dt>
       <dd></dd>
     </dl>
     <dl class="jumplist">
@@ -155,15 +139,6 @@ Classes
       <dd></dd>
     </dl>
     <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.EngineStage.html">EngineStage</a></dt>
-      <dd></dd>
-    </dl>
-    <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.FixedStoppingCriteria.html">FixedStoppingCriteria</a></dt>
-      <dd><p>Stopping criteria which require a specific amount of iterations.</p>
-</dd>
-    </dl>
-    <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html">HostExtensions</a></dt>
       <dd></dd>
     </dl>
@@ -173,10 +148,6 @@ Classes
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.RunStrategyExtensions.html">RunStrategyExtensions</a></dt>
-      <dd></dd>
-    </dl>
-    <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.StoppingCriteriaBase.html">StoppingCriteriaBase</a></dt>
       <dd></dd>
     </dl>
     <h3 id="structs">
@@ -192,10 +163,6 @@ Structs
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.RunResults.html">RunResults</a></dt>
-      <dd></dd>
-    </dl>
-    <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.StoppingResult.html">StoppingResult</a></dt>
       <dd></dd>
     </dl>
     <dl class="jumplist">
@@ -216,11 +183,6 @@ Interfaces
     <dl class="jumplist">
       <dt><a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a></dt>
       <dd></dd>
-    </dl>
-    <dl class="jumplist">
-      <dt><a class="xref" href="BenchmarkDotNet.Engines.IStoppingCriteria.html">IStoppingCriteria</a></dt>
-      <dd><p>A stopping criteria checks when it's time to terminate iteration in the current stage.</p>
-</dd>
     </dl>
     <h3 id="enums">
 Enums
