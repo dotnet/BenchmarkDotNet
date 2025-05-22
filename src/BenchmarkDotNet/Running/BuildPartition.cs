@@ -91,17 +91,18 @@ namespace BenchmarkDotNet.Running
             // Very long program name can cause the path to exceed Windows' 260 character limit,
             // for example BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.
             // 36 is an arbitrary limit, but it's the length of Guid strings which is what was used previously.
-            if (!OsDetector.IsWindows() || programName.Length <= 36)
+            const int MaxLength = 36;
+            if (!OsDetector.IsWindows() || programName.Length <= MaxLength)
             {
                 return programName;
             }
             programName = $"{benchmarkAssemblyName}-{id}";
-            if (programName.Length <= 36)
+            if (programName.Length <= MaxLength)
             {
                 return programName;
             }
             programName = $"{folderInfo}-{id}";
-            if (programName.Length <= 36)
+            if (programName.Length <= MaxLength)
             {
                 return programName;
             }
