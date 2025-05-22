@@ -51,6 +51,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: site
+        path: site
+
+    - name: Print file tree
+      run: tree $GITHUB_WORKSPACE
 
     - name: Deploy documentation
       uses: JamesIves/github-pages-deploy-action@3.7.1
