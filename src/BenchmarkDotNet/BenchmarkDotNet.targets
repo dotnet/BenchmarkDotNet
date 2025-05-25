@@ -1,9 +1,12 @@
 ﻿<Project>
-  <PropertyGroup Condition="'$(BenchmarkDotNetTargetPlatform)' == ''">
-    <!-- If the RuntimeIdentifier is explicitly specified, use the specified target platform. -->
-    <BenchmarkDotNetTargetPlatform>$(RuntimeIdentifier)</BenchmarkDotNetTargetPlatform>
 
-    <!-- Otherwise, try to use current build platform -->
+  <PropertyGroup>
+    <!-- If the RuntimeIdentifier is explicitly specified. Use the specified target platform. -->
+    <BenchmarkDotNetTargetPlatform>$(RuntimeIdentifier)</BenchmarkDotNetTargetPlatform>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(BenchmarkDotNetTargetPlatform)' == ''">
+    <!-- If RuntimeIdentifier is not specified Use current build platform -->
     <!-- List of runtimes supported by Gee.External.Capstone: https://github.com/9ee1/Capstone.NET/tree/master/Gee.External.Capstone/runtimes -->
     <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux</BenchmarkDotNetTargetPlatform>
     <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('Windows'))">win</BenchmarkDotNetTargetPlatform>
