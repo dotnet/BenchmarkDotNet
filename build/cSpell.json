@@ -39,8 +39,10 @@
   "ignoreWords": [
     "Akinshin",
     "Andrey",
+    "Cassell",
     "Expecto",
     "Jint",
+    "JITted",
     "LoongArch64",
     "macrobenchmark",
     "MediatR",
@@ -49,6 +51,9 @@
     "NodaTime",
     "Npgsql",
     "Sitnik's",
+    "Sitnik",
+    "Stepanov",
+    "Yegor",
     "Wojciech",
     "Avalonia",
     "Gitter"
