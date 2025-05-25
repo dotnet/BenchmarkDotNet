@@ -1,18 +1,18 @@
 ﻿<Project>
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(BenchmarkDotNetTargetPlatform)' == ''">
     <!-- If the RuntimeIdentifier is explicitly specified, use the specified target platform. -->
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == ''">$(RuntimeIdentifier)</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform>$(RuntimeIdentifier)</BenchmarkDotNetTargetPlatform>
 
     <!-- Otherwise, try to use current build platform -->
-    <!-- See: List of runtimes supported by Gee.External.Capstone: https://github.com/9ee1/Capstone.NET/tree/master/Gee.External.Capstone/runtimes -->
-    <!-- linux-x86 is excluded. Because .NET SDK don't support x86. -->
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Linux'))   AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">linux-x64</BenchmarkDotNetTargetPlatform>
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Linux'))   AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">linux-arm64</BenchmarkDotNetTargetPlatform>
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Windows')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'">win-x86</BenchmarkDotNetTargetPlatform>
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Windows')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">win-x64</BenchmarkDotNetTargetPlatform>
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Windows')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">win-arm64</BenchmarkDotNetTargetPlatform>
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('OSX'))     AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">osx-x64</BenchmarkDotNetTargetPlatform>
-    <BenchmarkDotNetTargetPlatform Condition="'$(BenchmarkDotNetTargetPlatform)' == '' AND $([MSBuild]::IsOSPlatform('OSX'))     AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">osx-arm64</BenchmarkDotNetTargetPlatform>
+    <!-- List of runtimes supported by Gee.External.Capstone: https://github.com/9ee1/Capstone.NET/tree/master/Gee.External.Capstone/runtimes -->
+    <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('Windows'))">win</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx</BenchmarkDotNetTargetPlatform>
+
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">$(BenchmarkDotNetTargetPlatform)-x64</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'">$(BenchmarkDotNetTargetPlatform)-x86</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm'">$(BenchmarkDotNetTargetPlatform)-arm</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">$(BenchmarkDotNetTargetPlatform)-arm64</BenchmarkDotNetTargetPlatform>
   </PropertyGroup>
 
   <Target Name="FilterBenchmarkDotNetPackageAssets" AfterTargets="ResolvePackageAssets">
