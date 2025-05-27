@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Environments
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
             Os = new Lazy<OsInfo>(OsDetector.GetOs);
-            Cpu = new Lazy<CpuInfo>(CpuDetector.CrossPlatform.Detect);
+            Cpu = new Lazy<CpuInfo>(() => CpuDetector.CrossPlatform.Detect() ?? CpuInfo.Unknown);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => current ??= new HostEnvironmentInfo();
