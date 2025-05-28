@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Detectors;
+using System;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Helpers
@@ -27,10 +28,18 @@ namespace BenchmarkDotNet.Helpers
     /// </remarks>
     public abstract class DisposeAtProcessTermination : IDisposable
     {
-        public DisposeAtProcessTermination()
+        private static readonly bool ConsoleSupportsCancelKeyPress
+            = !(OsDetector.IsAndroid() || OsDetector.IsIOS() || OsDetector.IsTvOS() || Portability.RuntimeInformation.IsWasm);
+
+        protected DisposeAtProcessTermination()
         {
-            Console.CancelKeyPress += OnCancelKeyPress;
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+            if (ConsoleSupportsCancelKeyPress)
+            {
+                // Cancel key presses are not supported by .NET or do not exist for these
+                Console.CancelKeyPress += OnCancelKeyPress;
+            }
+
             // It does not make sense to include a Finalizer. We do not manage any native resource and:
             // as we are subscribed to static events, it would never be called.
         }
@@ -50,8 +59,12 @@ namespace BenchmarkDotNet.Helpers
 
         public virtual void Dispose()
         {
-            Console.CancelKeyPress -= OnCancelKeyPress;
             AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
+            if (ConsoleSupportsCancelKeyPress)
+            {
+                // Cancel key presses are not supported by .NET or do not exist for these
+                Console.CancelKeyPress -= OnCancelKeyPress;
+            }
         }
     }
 }
