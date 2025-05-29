@@ -1,0 +1,30 @@
+<Project>
+  <!-- 
+    This file provides an initial VersionPrefix to prevent MSBuild SDK from setting default "1.0.0".
+    The actual version will be determined dynamically by DetermineVersion.targets based on git tags.
+    
+    IMPORTANT: The version MUST always start with 0 to follow BenchmarkDotNet's 0.<major>.<minor> convention.
+  -->
+  
+  <!-- Detect if VersionPrefix was provided externally (e.g., command line) -->
+  <PropertyGroup>
+    <VersionPrefixOverride Condition="'$(VersionPrefix)' != ''">$(VersionPrefix)</VersionPrefixOverride>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(VersionPrefixOverride)' == ''">
+    <!-- Set a temporary version that will be overridden by the targets file -->
+    <!-- This MUST start with 0 to ensure we never get v1.x.y versions -->
+    <VersionPrefix>0.0.1</VersionPrefix>
+    
+    <!-- Failsafe: Force override any SDK defaults -->
+    <AssemblyVersion>0.0.1</AssemblyVersion>
+    <FileVersion>0.0.1</FileVersion>
+  </PropertyGroup>
+  
+  <!-- If version was provided externally, use it but validate it starts with 0 -->
+  <PropertyGroup Condition="'$(VersionPrefixOverride)' != ''">
+    <VersionPrefix>$(VersionPrefixOverride)</VersionPrefix>
+    <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+    <FileVersion>$(VersionPrefix)</FileVersion>
+  </PropertyGroup>
+</Project>

@@ -250,3 +250,20 @@ public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
         }
     };
 }
+
+[TaskName(Name)]
+[TaskDescription("Run self-tests for the build system")]
+public class SelfTestsTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "self-tests";
+    public override void Run(BuildContext context) => context.SelfTestRunner.Run();
+
+    public HelpInfo GetHelp() => new()
+    {
+        Description = "Tests the build system by running build.cmd with various arguments and validating the resulting package versions",
+        Examples = new[]
+        {
+            new Example(Name)
+        }
+    };
+}

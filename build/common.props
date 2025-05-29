@@ -41,16 +41,15 @@
     <LangVersion>12.0</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
-    <VersionPrefix>0.15.1</VersionPrefix>
-  </PropertyGroup>
+  <!-- Import dynamic version determination -->
+  <Import Project="$(MSBuildThisFileDirectory)DetermineVersion.props" />
+  <Import Project="$(MSBuildThisFileDirectory)DetermineVersion.targets" />
 
-  <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">
-    <VersionSuffix>develop</VersionSuffix>
-    <VersionSuffix Condition=" '$(BDN_CI_BUILD)' != '' ">ci</VersionSuffix>
-  </PropertyGroup>
 
   <PropertyGroup>
+    <!-- CRITICAL: Ensure versions always start with 0 -->
+    <VersionPrefix Condition="$(VersionPrefix.StartsWith('1.')) OR $(VersionPrefix.StartsWith('2.')) OR $(VersionPrefix.StartsWith('3.')) OR $(VersionPrefix.StartsWith('4.')) OR $(VersionPrefix.StartsWith('5.')) OR $(VersionPrefix.StartsWith('6.')) OR $(VersionPrefix.StartsWith('7.')) OR $(VersionPrefix.StartsWith('8.')) OR $(VersionPrefix.StartsWith('9.'))">0.0.1</VersionPrefix>
+    
     <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <AssemblyFileVersion>$(VersionPrefix)</AssemblyFileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>

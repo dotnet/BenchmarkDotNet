@@ -51,6 +51,7 @@ public class BuildContext : FrostingContext
     public DocumentationRunner DocumentationRunner { get; }
     public BuildRunner BuildRunner { get; }
     public ReleaseRunner ReleaseRunner { get; }
+    public SelfTestRunner SelfTestRunner { get; }
 
     public BuildContext(ICakeContext context)
         : base(context)
@@ -148,6 +149,7 @@ public class BuildContext : FrostingContext
         DocumentationRunner = new DocumentationRunner(this);
         BuildRunner = new BuildRunner(this);
         ReleaseRunner = new ReleaseRunner(this);
+        SelfTestRunner = new SelfTestRunner(this);
     }
 
     public void GenerateFile(FilePath filePath, StringBuilder content)

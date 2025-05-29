@@ -66,11 +66,20 @@ public class BuildRunner
 
     public void Pack()
     {
-        context.CleanDirectory(context.ArtifactsDirectory);
+        // Allow overriding artifacts directory via environment variable
+        var artifactsDir = context.ArtifactsDirectory;
+        var envArtifactsDir = System.Environment.GetEnvironmentVariable("BDN_ARTIFACTS_DIR");
+        if (!string.IsNullOrEmpty(envArtifactsDir))
+        {
+            artifactsDir = new DirectoryPath(envArtifactsDir);
+            context.EnsureDirectoryExists(artifactsDir);
+        }
+
+        context.CleanDirectory(artifactsDir);
 
         var settingsSrc = new DotNetPackSettings
         {
-            OutputDirectory = context.ArtifactsDirectory,
+            OutputDirectory = artifactsDir,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
             MSBuildSettings = context.MsBuildSettingsPack,
             Configuration = context.BuildConfiguration
@@ -81,7 +90,7 @@ public class BuildRunner
 
         var settingsTemplate = new DotNetPackSettings
         {
-            OutputDirectory = context.ArtifactsDirectory,
+            OutputDirectory = artifactsDir,
             MSBuildSettings = context.MsBuildSettingsPack,
             Configuration = context.BuildConfiguration
         };

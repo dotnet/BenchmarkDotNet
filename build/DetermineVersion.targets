@@ -1,0 +1,142 @@
+<Project>
+  <!--
+    DetermineVersion.targets
+    
+    This file automatically determines the next version based on git tags.
+    It follows the 0.<major>.<minor> versioning convention used by BenchmarkDotNet.
+    
+    Usage:
+    - By default, it increments the minor version (e.g., 0.15.0 -> 0.15.1)
+    - To bump the major version instead, set BumpMajorVersion=true (e.g., 0.15.0 -> 0.16.0)
+    
+    Examples:
+    - Normal build: dotnet build
+    - Major version bump: dotnet build -p:BumpMajorVersion=true
+  -->
+  
+  <!-- Properties to control version determination -->
+  <PropertyGroup>
+    <!-- Set to true to bump major version instead of minor -->
+    <BumpMajorVersion Condition="'$(BumpMajorVersion)' == ''">false</BumpMajorVersion>
+  </PropertyGroup>
+
+  <!-- Target to determine version from git tags -->
+  <!-- Only run if VersionPrefix wasn't explicitly provided (e.g., via command line) -->
+  <Target Name="DetermineVersionFromGitTags" 
+          BeforeTargets="BeforeBuild;GenerateNuspec;GenerateAssemblyInfo;GetAssemblyVersion;PrepareForBuild"
+          Condition="'$(SkipVersionDetermination)' != 'true' AND '$(VersionPrefixOverride)' == ''">
+    
+    <!-- Determine build type and set default version suffix if needed -->
+    <PropertyGroup>
+      <!-- Set default version suffix for non-stable builds -->
+      <VersionSuffix Condition="'$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == ''">develop</VersionSuffix>
+      <VersionSuffix Condition="'$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' AND '$(BDN_CI_BUILD)' != ''">ci</VersionSuffix>
+      
+      <!-- A develop build is when VersionSuffix is 'develop' -->
+      <IsDevelopBuild Condition="'$(VersionSuffix)' == 'develop'">true</IsDevelopBuild>
+      <IsDevelopBuild Condition="'$(IsDevelopBuild)' == ''">false</IsDevelopBuild>
+    </PropertyGroup>
+    
+    <!-- Always get the full git describe output -->
+    <Exec Command="git describe --tags 2&gt;/dev/null || echo 'v0.0.0'"
+          ConsoleToMSBuild="true"
+          StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitDescribe"/>
+    </Exec>
+
+    <!-- Parse git describe output to extract base version -->
+    <!-- git describe returns something like v0.15.0-6-g7da69ade or just v0.15.0 -->
+    <PropertyGroup>
+      <GitDescribeTag>$(GitDescribe.Split('-')[0])</GitDescribeTag>
+      <LatestVersion Condition="$(GitDescribeTag.StartsWith('v'))">$(GitDescribeTag.Substring(1))</LatestVersion>
+      <LatestVersion Condition="!$(GitDescribeTag.StartsWith('v'))">$(GitDescribeTag)</LatestVersion>
+      <LatestVersion Condition="'$(LatestVersion)' == ''">0.0.0</LatestVersion>
+      
+      <!-- For 0.major.minor: Major is always 0, Minor is the second component, Build is the third -->
+      <Major>$([System.Version]::Parse($(LatestVersion)).Major)</Major>
+      <CurrentMajor>$([System.Version]::Parse($(LatestVersion)).Minor)</CurrentMajor>
+      <CurrentMinor>$([System.Version]::Parse($(LatestVersion)).Build)</CurrentMinor>
+      <CurrentMinor Condition="'$(CurrentMinor)' == '-1'">0</CurrentMinor>
+    </PropertyGroup>
+    
+    <!-- Extract the suffix part (e.g., "6-g7da69ade" from "v0.15.0-6-g7da69ade") -->
+    <PropertyGroup>
+      <GitDescribeParts>$([System.Text.RegularExpressions.Regex]::Match($(GitDescribe), '^v?[0-9.]+(-(.+))?$').Groups[2].Value)</GitDescribeParts>
+    </PropertyGroup>
+    
+    <!-- Calculate next version (always increment for next release) -->
+    <PropertyGroup>
+      <NextMajor Condition="'$(BumpMajorVersion)' == 'true'">$([MSBuild]::Add($(CurrentMajor), 1))</NextMajor>
+      <NextMajor Condition="'$(BumpMajorVersion)' != 'true'">$(CurrentMajor)</NextMajor>
+      <NextMinor Condition="'$(BumpMajorVersion)' != 'true'">$([MSBuild]::Add($(CurrentMinor), 1))</NextMinor>
+      <NextMinor Condition="'$(BumpMajorVersion)' == 'true'">0</NextMinor>
+      
+      <!-- Always use the next version (0.15.0 -> 0.15.1) -->
+      <DeterminedVersion>0.$(NextMajor).$(NextMinor)</DeterminedVersion>
+    </PropertyGroup>
+    
+    <!-- Set version suffix for develop builds -->
+    <PropertyGroup Condition="'$(IsDevelopBuild)' == 'true'">
+      <DevelopVersionSuffix Condition="'$(GitDescribeParts)' != ''">develop-$(GitDescribeParts)</DevelopVersionSuffix>
+      <DevelopVersionSuffix Condition="'$(GitDescribeParts)' == ''">develop</DevelopVersionSuffix>
+    </PropertyGroup>
+
+    <!-- Validate that DeterminedVersion starts with 0 -->
+    <PropertyGroup>
+      <DeterminedVersion Condition="'$(DeterminedVersion)' == ''">0.0.1</DeterminedVersion>
+      <FirstVersionComponent>$(DeterminedVersion.Split('.')[0])</FirstVersionComponent>
+    </PropertyGroup>
+    
+    <!-- Failsafe: If version doesn't start with 0, force it to 0.0.1 -->
+    <Warning Text="CRITICAL: Determined version '$(DeterminedVersion)' does not start with 0. Forcing to 0.0.1" 
+             Condition="'$(FirstVersionComponent)' != '0'"/>
+    <PropertyGroup Condition="'$(FirstVersionComponent)' != '0'">
+      <DeterminedVersion>0.0.1</DeterminedVersion>
+    </PropertyGroup>
+
+    <!-- Set the VersionPrefix and all related properties -->
+    <PropertyGroup>
+      <VersionPrefix>$(DeterminedVersion)</VersionPrefix>
+      <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+      <AssemblyFileVersion>$(VersionPrefix)</AssemblyFileVersion>
+      <FileVersion>$(VersionPrefix)</FileVersion>
+      <!-- For develop builds, use the calculated suffix -->
+      <VersionSuffix Condition="'$(IsDevelopBuild)' == 'true'">$(DevelopVersionSuffix)</VersionSuffix>
+      <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+      <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
+      <InformationalVersion>$(Version)</InformationalVersion>
+      <PackageVersion>$(Version)</PackageVersion>
+    </PropertyGroup>
+
+    <!-- Prepare message -->
+    <PropertyGroup>
+      <VersionSuffixForMessage Condition="'$(VersionSuffix)' != ''">-$(VersionSuffix)</VersionSuffixForMessage>
+      <VersionSuffixForMessage Condition="'$(VersionSuffix)' == ''"></VersionSuffixForMessage>
+    </PropertyGroup>
+    
+    <Message Text="Determined version: $(VersionPrefix)$(VersionSuffixForMessage) (BumpMajorVersion=$(BumpMajorVersion))" Importance="high"/>
+  </Target>
+
+  <!-- Failsafe target to validate version after all processing -->
+  <!-- This runs ALWAYS to ensure version compliance -->
+  <Target Name="ValidateVersionStartsWithZero" 
+          AfterTargets="GenerateAssemblyInfo">
+    
+    <PropertyGroup>
+      <ActualVersionPrefix>$(VersionPrefix)</ActualVersionPrefix>
+      <ActualVersionPrefix Condition="'$(ActualVersionPrefix)' == ''">$(AssemblyVersion)</ActualVersionPrefix>
+      <ActualFirstComponent Condition="'$(ActualVersionPrefix)' != ''">$(ActualVersionPrefix.Split('.')[0])</ActualFirstComponent>
+    </PropertyGroup>
+    
+    <!-- Error if version doesn't start with 0 -->
+    <Error Text="CRITICAL ERROR: Version '$(ActualVersionPrefix)' does not start with 0. BenchmarkDotNet uses 0.major.minor convention!" 
+           Condition="'$(ActualFirstComponent)' != '0' AND '$(ActualFirstComponent)' != ''"/>
+  </Target>
+
+  <!-- Additional safety: Override SDK defaults if they somehow persist -->
+  <PropertyGroup>
+    <VersionPrefix Condition="$(VersionPrefix.StartsWith('1.'))">0.0.1</VersionPrefix>
+    <AssemblyVersion Condition="$(AssemblyVersion.StartsWith('1.'))">0.0.1</AssemblyVersion>
+    <FileVersion Condition="$(FileVersion.StartsWith('1.'))">0.0.1</FileVersion>
+  </PropertyGroup>
+</Project>

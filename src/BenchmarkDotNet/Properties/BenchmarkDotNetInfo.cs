@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Properties
                 throw new ArgumentException($"Inconsistent versions: '{assemblyVersion}' and '{fullVersion}'");
             string versionSuffix = FullVersion.Substring(versionPrefix.Length).TrimStart('-');
 
-            IsDevelop = versionSuffix.StartsWith("develop");
+            IsDevelop = versionSuffix.Contains("develop");
             IsNightly = AssemblyVersion.Revision > 0;
             IsRelease = versionSuffix.IsEmpty() && AssemblyVersion.Revision <= 0;
 

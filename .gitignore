@@ -46,6 +46,7 @@ docs/apihtml
 tests/output/*
 .vs/restore.dg
 artifacts/*
+test-artifacts/*
 BDN.Generated
 BenchmarkDotNet.Samples/Properties/launchSettings.json
 src/BenchmarkDotNet/Disassemblers/net462/*
