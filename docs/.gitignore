@@ -12,3 +12,5 @@ docfx-bin
 api/*
 !api/index.md
 /index.md
+_changelog
+changelog

@@ -22,8 +22,8 @@ jobs:
     - name: Build BenchmarkDotNet
       run: ./build.cmd build
 
-    - name: Download changelog
-      run: ./build.cmd docs-update --depth 1 --preview
+    - name: Fetch changelog
+      run: ./build.cmd docs-fetch --depth 1 --preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

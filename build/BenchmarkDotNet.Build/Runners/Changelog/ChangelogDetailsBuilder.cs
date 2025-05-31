@@ -10,28 +10,21 @@ using Cake.Common.Diagnostics;
 using Cake.Core.IO;
 using Octokit;
 
-namespace BenchmarkDotNet.Build;
+namespace BenchmarkDotNet.Build.Runners.Changelog;
 
-public static class ChangeLogBuilder
+public static class ChangelogDetailsBuilder
 {
-    private class Config
+    private class Config(string currentVersion, string previousVersion, string lastCommit)
     {
-        public string CurrentVersion { get; }
-        public string PreviousVersion { get; }
-        public string LastCommit { get; }
+        public string CurrentVersion { get; } = currentVersion;
+        public string PreviousVersion { get; } = previousVersion;
+        public string LastCommit { get; } = lastCommit;
 
         public void Deconstruct(out string currentMilestone, out string previousMilestone, out string lastCommit)
         {
             currentMilestone = CurrentVersion;
             previousMilestone = PreviousVersion;
             lastCommit = LastCommit;
-        }
-
-        public Config(string currentVersion, string previousVersion, string lastCommit)
-        {
-            CurrentVersion = currentVersion;
-            PreviousVersion = previousVersion;
-            LastCommit = lastCommit;
         }
     }
 

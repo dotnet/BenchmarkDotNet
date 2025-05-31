@@ -157,6 +157,7 @@ public class BuildContext : FrostingContext
 
     public void GenerateFile(FilePath filePath, string content, bool reportNoChanges = false)
     {
+        this.EnsureDirectoryExists(filePath.GetDirectory());
         var relativePath = RootDirectory.GetRelativePath(filePath);
         if (this.FileExists(filePath))
         {
