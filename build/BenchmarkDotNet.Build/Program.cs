@@ -28,10 +28,10 @@ public class RestoreTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Examples = new[]
-            {
+            Examples =
+            [
                 new Example(Name)
-            }
+            ]
         };
     }
 }
@@ -48,10 +48,10 @@ public class BuildTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Examples = new[]
-            {
+            Examples =
+            [
                 new Example(Name).WithMsBuildArgument("Configuration", "Debug")
-            }
+            ]
         };
     }
 }
@@ -68,10 +68,10 @@ public class InstallWasmToolsWorkload : FrostingTask<BuildContext>, IHelpProvide
     {
         return new HelpInfo
         {
-            Examples = new[]
-            {
+            Examples =
+            [
                 new Example(Name)
-            }
+            ]
         };
     }
 }
@@ -88,12 +88,12 @@ public class UnitTestsTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Examples = new[]
-            {
+            Examples =
+            [
                 new Example(Name)
                     .WithArgument(KnownOptions.Exclusive)
                     .WithArgument(KnownOptions.Verbosity, "Diagnostic")
-            }
+            ]
         };
     }
 }
@@ -145,68 +145,68 @@ public class PackTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Examples = new[]
-            {
+            Examples =
+            [
                 new Example(Name)
                     .WithMsBuildArgument("VersionPrefix", "0.1.1729")
                     .WithMsBuildArgument("VersionSuffix", "preview"),
                 new Example(Name).WithArgument(KnownOptions.Stable)
-            }
+            ]
         };
     }
 }
 
 [TaskName(Name)]
-[TaskDescription("Update generated documentation files")]
-public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
+[TaskDescription("Fetch changelog files")]
+public class DocsFetchTask : FrostingTask<BuildContext>, IHelpProvider
 {
-    private const string Name = "docs-update";
-    public override void Run(BuildContext context) => context.DocumentationRunner.Update();
+    private const string Name = "docs-fetch";
+    public override void Run(BuildContext context) => context.DocumentationRunner.Fetch();
 
     public HelpInfo GetHelp()
     {
         return new HelpInfo
         {
             Description = $"This task updates the following files:\n" +
-                          $"* README.md (the number of dependent projects number)\n" +
+                          $"* Clones branch 'docs-changelog' to docs/_changelog\n" +
                           $"* Last changelog footer (if {KnownOptions.Stable.CommandLineName} is specified)\n" +
                           $"* All changelog details in docs/_changelog\n" +
-                          $"  (This dir is a cloned version of this repo from branch {Repo.ChangelogDetailsBranch})",
-            Options = new IOption[] { KnownOptions.DocsPreview, KnownOptions.DocsDepth },
-            EnvironmentVariables = new[] { EnvVar.GitHubToken },
-            Examples = new[]
-            {
+                          $"  (This dir is a cloned version of this repo from branch {Repo.ChangelogBranch})",
+            Options = [KnownOptions.DocsPreview, KnownOptions.DocsDepth],
+            EnvironmentVariables = [EnvVar.GitHubToken],
+            Examples =
+            [
                 new Example(Name)
                     .WithArgument(KnownOptions.DocsDepth, "3")
                     .WithArgument(KnownOptions.DocsPreview)
-            }
+            ]
         };
     }
 }
 
 [TaskName(Name)]
-[TaskDescription("Prepare auxiliary documentation files")]
-public class DocsPrepareTask : FrostingTask<BuildContext>, IHelpProvider
+[TaskDescription("Generate auxiliary documentation files")]
+public class DocsGenerateTask : FrostingTask<BuildContext>, IHelpProvider
 {
-    private const string Name = "docs-prepare";
-    public override void Run(BuildContext context) => context.DocumentationRunner.Prepare();
+    private const string Name = "docs-generate";
+    public override void Run(BuildContext context) => context.DocumentationRunner.Generate();
 
     public HelpInfo GetHelp()
     {
         return new HelpInfo
         {
-            Options = new IOption[] { KnownOptions.DocsPreview },
-            Examples = new[]
-            {
+            Options = [KnownOptions.DocsPreview],
+            Examples =
+            [
                 new Example(Name).WithArgument(KnownOptions.DocsPreview)
-            }
+            ]
         };
     }
 }
 
 [TaskName(Name)]
 [TaskDescription("Build final documentation")]
-[IsDependentOn(typeof(DocsPrepareTask))]
+[IsDependentOn(typeof(DocsGenerateTask))]
 public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "docs-build";
@@ -215,11 +215,11 @@ public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
     public HelpInfo GetHelp() => new()
     {
         Description = "The 'build' task should be run manually to build api docs",
-        Options = new IOption[] { KnownOptions.DocsPreview },
-        Examples = new[]
-        {
+        Options = [KnownOptions.DocsPreview],
+        Examples =
+        [
             new Example(Name).WithArgument(KnownOptions.DocsPreview)
-        }
+        ]
     };
 }
 
@@ -227,7 +227,8 @@ public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
 [TaskDescription("Release new version")]
 [IsDependentOn(typeof(BuildTask))]
 [IsDependentOn(typeof(PackTask))]
-[IsDependentOn(typeof(DocsUpdateTask))]
+[IsDependentOn(typeof(DocsFetchTask))]
+[IsDependentOn(typeof(DocsGenerateTask))]
 [IsDependentOn(typeof(DocsBuildTask))]
 public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
 {
@@ -236,10 +237,10 @@ public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
 
     public HelpInfo GetHelp() => new()
     {
-        Options = new IOption[] { KnownOptions.NextVersion, KnownOptions.Push },
-        EnvironmentVariables = new[] { EnvVar.GitHubToken, EnvVar.NuGetToken },
-        Examples = new[]
-        {
+        Options = [KnownOptions.NextVersion, KnownOptions.Push],
+        EnvironmentVariables = [EnvVar.GitHubToken, EnvVar.NuGetToken],
+        Examples =
+        [
             new Example(Name)
                 .WithArgument(KnownOptions.Stable)
                 .WithArgument(KnownOptions.NextVersion, "0.1.1729")
@@ -247,6 +248,6 @@ public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
             new Example(Name)
                 .WithArgument(KnownOptions.Stable)
                 .WithArgument(KnownOptions.Push)
-        }
+        ]
     };
 }

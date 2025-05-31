@@ -19,8 +19,8 @@ jobs:
       with:
         ref: master
 
-    - name: Download changelog
-      run: ./build.cmd docs-update --depth 1 --preview
+    - name: Fetch changelog
+      run: ./build.cmd docs-fetch --depth 1 --preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -28,8 +28,8 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: docs-changelog-details
-        FOLDER: docs/_changelog/details
+        BRANCH: docs-changelog
+        FOLDER: docs/_changelog
         GIT_CONFIG_NAME: Andrey Akinshin
         GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
         CLEAN: true
