@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.Running
             return new ParameterDefinitions(definitions);
         }
 
-        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target, SummaryStyle summaryStyle)
+        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type benchmarkType, SummaryStyle summaryStyle)
         {
             var argumentsAttributes = benchmark.GetCustomAttributes<PriorityAttribute>();
             int priority = argumentsAttributes.Select(attribute => attribute.Priority).Sum();
@@ -244,8 +244,9 @@ namespace BenchmarkDotNet.Running
                 yield break;
 
             var argumentsSourceAttribute = benchmark.GetCustomAttribute<ArgumentsSourceAttribute>();
+            var targetType = argumentsSourceAttribute.Type ?? benchmarkType;
 
-            var valuesInfo = GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name);
+            var valuesInfo = GetValidValuesForParamsSource(targetType, argumentsSourceAttribute.Name);
             for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
                 yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, summaryStyle);
         }
@@ -303,25 +304,25 @@ namespace BenchmarkDotNet.Running
             return providedValue;
         }
 
-        private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type parentType, string sourceName)
+        private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type sourceType, string sourceName)
         {
-            var paramsSourceMethod = parentType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
+            var paramsSourceMethod = sourceType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
 
             if (paramsSourceMethod != default)
                 return (paramsSourceMethod, ToArray(
-                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(parentType), null),
+                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(sourceType), null),
                     paramsSourceMethod,
-                    parentType));
+                    sourceType));
 
-            var paramsSourceProperty = parentType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
+            var paramsSourceProperty = sourceType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
 
             if (paramsSourceProperty != default)
                 return (paramsSourceProperty, ToArray(
-                    paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(parentType)),
+                    paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(sourceType)),
                     paramsSourceProperty,
-                    parentType));
+                    sourceType));
 
-            throw new InvalidBenchmarkDeclarationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
+            throw new InvalidBenchmarkDeclarationException($"{sourceType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
         }
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)
