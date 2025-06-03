@@ -198,7 +198,9 @@ namespace BenchmarkDotNet.Running
 
             var paramsSourceDefinitions = GetDefinitions<ParamsSourceAttribute>((attribute, parameterType) =>
             {
-                var paramsValues = GetValidValuesForParamsSource(type, attribute.Name);
+                var targetType = attribute.Type ?? type;
+
+                var paramsValues = GetValidValuesForParamsSource(targetType, attribute.Name);
                 return SmartParamBuilder.CreateForParams(parameterType, paramsValues.source, paramsValues.values);
             });
 
