@@ -770,6 +770,42 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        public void MethodsAndPropertiesFromAnotherClassCanBeUsedAsSources(IToolchain toolchain)
+            => CanExecute<ParamsSourcePointingToAnotherClass>(toolchain);
+
+        public class ParamsSourcePointingToAnotherClass
+        {
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Method))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Property))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            public void Test()
+            {
+                if (ParamOne != 123)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 456)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+        public static class ExternalClassWithParamsSource
+        {
+            public static IEnumerable<int> Method()
+            {
+                yield return 123;
+            }
+            public static IEnumerable<int> Property
+            {
+                get
+                {
+                    yield return 456;
+                }
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
         public void VeryLongStringsAreSupported(IToolchain toolchain) => CanExecute<WithVeryLongString>(toolchain);
 
         public class WithVeryLongString
