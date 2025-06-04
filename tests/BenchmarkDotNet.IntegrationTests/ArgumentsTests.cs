@@ -82,6 +82,28 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsFromSourceInAnotherClassArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsSourceInAnotherClass>(toolchain);
+
+        public class WithArgumentsSourceInAnotherClass
+        {
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.ArgumentsProvider))]
+            public void Simple(bool boolean, int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+        }
+        public static class ExternalClassWithArgumentsSource
+        {
+            public static IEnumerable<object[]> ArgumentsProvider()
+            {
+                yield return new object[] { true, 1 };
+                yield return new object[] { false, 2 };
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
         public void ArgumentsCanBePassedByReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithRefArguments>(toolchain);
 
         public class WithRefArguments
