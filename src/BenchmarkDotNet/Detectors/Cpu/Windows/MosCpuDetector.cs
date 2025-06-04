@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using BenchmarkDotNet.Extensions;
@@ -14,7 +15,8 @@ internal class MosCpuDetector : ICpuDetector
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
     public bool IsApplicable() => OsDetector.IsWindows() &&
-                                  RuntimeInformation.IsFullFramework &&
+                                  (RuntimeInformation.IsFullFramework ||
+                                   (RuntimeInformation.IsNetCore && Environment.Version.Major >= 5)) &&
                                   !RuntimeInformation.IsMono;
 
 #if NET6_0_OR_GREATER
