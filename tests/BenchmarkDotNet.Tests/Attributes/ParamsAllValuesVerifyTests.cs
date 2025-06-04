@@ -18,7 +18,6 @@ using Xunit;
 namespace BenchmarkDotNet.Tests.Attributes
 {
     [Collection("VerifyTests")]
-    [UsesVerify]
     public class ParamsAllValuesVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture;
