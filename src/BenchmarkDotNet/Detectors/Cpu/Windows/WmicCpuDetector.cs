@@ -13,7 +13,7 @@ internal class WmicCpuDetector : ICpuDetector
 {
     private const string DefaultWmicPath = @"C:\Windows\System32\wbem\WMIC.exe";
 
-    public bool IsApplicable() => OsDetector.IsWindows();
+    public bool IsApplicable() => OsDetector.IsWindows() && File.Exists(DefaultWmicPath);
 
     public CpuInfo? Detect()
     {
