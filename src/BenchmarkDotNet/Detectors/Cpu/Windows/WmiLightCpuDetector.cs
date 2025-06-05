@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Detectors.Cpu.Windows
         }
 
 #if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
         public bool IsApplicable()
         {
