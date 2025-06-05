@@ -63,8 +63,7 @@ namespace BenchmarkDotNet.Detectors.Cpu.Windows
 #endif
         public bool IsApplicable()
         {
-            return OsDetector.IsWindows() && (RuntimeInformation.IsNetCore ||
-                RuntimeInformation.IsFullFramework || RuntimeInformation.IsNativeAOT) && !RuntimeInformation.IsMono;
+            return OsDetector.IsWindows() && !RuntimeInformation.IsMono;
         }
     }
 }
