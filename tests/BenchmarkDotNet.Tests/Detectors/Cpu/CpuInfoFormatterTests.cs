@@ -9,7 +9,6 @@ using Xunit;
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
 [Collection("VerifyTests")]
-[UsesVerify]
 public class CpuInfoFormatterTests
 {
     [Fact]

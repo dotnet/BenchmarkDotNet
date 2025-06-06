@@ -18,7 +18,6 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Perfonar;
 
-[UsesVerify]
 public class PerfonarTests(ITestOutputHelper output)
 {
     [Theory]

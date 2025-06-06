@@ -32,24 +32,26 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.13.0]" />
+  </ItemGroup>
+  <ItemGroup>    
     <!-- We implicitly need v13.0.1 of Newtonsoft.Json for BenchmarkDotNet.IntegrationTests.NuGetReferenceTests -->
     <PackageReference Include="Newtonsoft.Json" Version="[13.0.1]" />
-    <PackageReference Include="xunit" Version="2.9.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Mono.Cecil" Version="0.11.1" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.5" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Threading.Tasks" />

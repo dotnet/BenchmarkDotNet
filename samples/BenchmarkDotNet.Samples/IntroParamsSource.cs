@@ -20,7 +20,16 @@ namespace BenchmarkDotNet.Samples
         // public static method
         public static IEnumerable<int> ValuesForB() => new[] { 10, 20 };
 
+        // public field getting its params from a method in another type
+        [ParamsSource(typeof(ParamsValues), nameof(ParamsValues.ValuesForC))]
+        public int C;
+
         [Benchmark]
-        public void Benchmark() => Thread.Sleep(A + B + 5);
+        public void Benchmark() => Thread.Sleep(A + B + C + 5);
+    }
+
+    public static class ParamsValues
+    {
+        public static IEnumerable<int> ValuesForC() => new[] { 1000, 2000 };
     }
 }

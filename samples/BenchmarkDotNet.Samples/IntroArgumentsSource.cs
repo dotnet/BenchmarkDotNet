@@ -20,9 +20,12 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        [ArgumentsSource(nameof(TimeSpans))]
+        [ArgumentsSource(typeof(BenchmarkArguments), nameof(BenchmarkArguments.TimeSpans))] // when the arguments come from a different type, specify that type here
         public void SingleArgument(TimeSpan time) => Thread.Sleep(time);
+    }
 
+    public class BenchmarkArguments
+    {
         public IEnumerable<object> TimeSpans() // for single argument it's an IEnumerable of objects (object)
         {
             yield return TimeSpan.FromMilliseconds(10);
