@@ -4,7 +4,7 @@
 // *****
 
 using AsmResolver.DotNet;
-using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
+using AsmResolver.PE.DotNet.Metadata.Tables;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
