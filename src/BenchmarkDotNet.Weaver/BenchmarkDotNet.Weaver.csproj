@@ -17,7 +17,7 @@ then run `build.cmd pack-weaver`.
   </PropertyGroup>
 
   <ItemGroup>
-	<PackageReference Include="AsmResolver.DotNet" Version="5.5.1" />
+	<PackageReference Include="AsmResolver.DotNet" Version="6.0.0-beta.3" />
 	<PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
 	<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
   </ItemGroup>
