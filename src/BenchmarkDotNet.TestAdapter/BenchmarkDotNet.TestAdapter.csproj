@@ -9,10 +9,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Use minimum supported LTSC version of Visual Studio 2022 -->
+  <!-- https://learn.microsoft.com/en-us/lifecycle/products/visual-studio-2022 -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.TestPlatform.AdapterUtilities" Version="17.7.2" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.7.2" />
-    <PackageReference Include="Microsoft.TestPlatform.TranslationLayer" Version="17.7.2" />
+    <PackageReference Include="Microsoft.TestPlatform.AdapterUtilities" Version="17.8.0" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.8.0" />
+    <PackageReference Include="Microsoft.TestPlatform.TranslationLayer" Version="17.8.0" />
   </ItemGroup>
 
   <ItemGroup>

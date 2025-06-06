@@ -15,7 +15,7 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.6.0" />
-    <PackageReference Update="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Update="FSharp.Core" Version="9.0.300" />
+    <PackageReference Update="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
 </Project>
