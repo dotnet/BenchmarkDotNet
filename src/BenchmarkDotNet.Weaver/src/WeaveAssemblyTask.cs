@@ -19,12 +19,6 @@ namespace BenchmarkDotNet.Weaver;
 public sealed class WeaveAssemblyTask : Task
 {
     /// <summary>
-    /// The directory of the output.
-    /// </summary>
-    [Required]
-    public string TargetDir { get; set; }
-
-    /// <summary>
     /// The path of the target assembly.
     /// </summary>
     [Required]
@@ -42,12 +36,12 @@ public sealed class WeaveAssemblyTask : Task
             return false;
         }
 
-        // Load the assembly using AsmResolver.
-        var module = ModuleDefinition.FromFile(TargetAssembly);
 
         bool benchmarkMethodsImplAdjusted = false;
         try
         {
+            var module = ModuleDefinition.FromFile(TargetAssembly);
+
             foreach (var type in module.GetAllTypes())
             {
                 // We can skip non-public types as they are not valid for benchmarks.
@@ -68,15 +62,14 @@ public sealed class WeaveAssemblyTask : Task
                 }
             }
 
-            // Write the modified assembly to file.
-            module.Write(TargetAssembly);
+            if (benchmarkMethodsImplAdjusted)
+            {
+                module.Write(TargetAssembly);
+            }
         }
         catch (Exception e)
         {
-            if (benchmarkMethodsImplAdjusted)
-            {
-                Log.LogWarning($"Benchmark methods were found that require NoInlining, and assembly weaving failed.{Environment.NewLine}{e}");
-            }
+            Log.LogWarning($"Assembly weaving failed. Benchmark methods found requiring NoInlining: {benchmarkMethodsImplAdjusted}. Error:{Environment.NewLine}{e}");
         }
         return true;
     }
