@@ -62,8 +62,7 @@ public sealed class WeaveAssemblyTask : Task
                     {
                         var oldImpl = method.ImplAttributes;
                         // Remove AggressiveInlining and add NoInlining.
-                        const MethodImplAttributes AggressiveInlining = (MethodImplAttributes) 512;
-                        method.ImplAttributes = (oldImpl & ~AggressiveInlining) | MethodImplAttributes.NoInlining;
+                        method.ImplAttributes = (oldImpl & ~MethodImplAttributes.AggressiveInlining) | MethodImplAttributes.NoInlining;
                         benchmarkMethodsImplAdjusted |= (oldImpl & MethodImplAttributes.NoInlining) == 0;
                     }
                 }
