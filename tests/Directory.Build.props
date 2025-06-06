@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <VSTestDiag>$(MSBuildProjectName).diag.log</VSTestDiag>
+  </PropertyGroup>
+</Project>

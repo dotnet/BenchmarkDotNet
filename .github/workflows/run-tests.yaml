@@ -6,7 +6,7 @@ on:
   push:
   
 env:
-  VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: "10000" # Increase timeout to 10 seconds(Default: 1000). See: https://github.com/microsoft/vstest/issues/2952
+  VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: "500"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
@@ -91,7 +91,7 @@ jobs:
         if: always()
         with:
           name: test-linux-trx-${{ github.run_id }}
-          path: "**/*.trx"
+          path: "**/*.diag.log"
 
   test-macos:
     runs-on: macos-15
