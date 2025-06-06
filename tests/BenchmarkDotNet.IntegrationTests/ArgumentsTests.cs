@@ -82,6 +82,28 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsFromSourceInAnotherClassArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsSourceInAnotherClass>(toolchain);
+
+        public class WithArgumentsSourceInAnotherClass
+        {
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.ArgumentsProvider))]
+            public void Simple(bool boolean, int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+        }
+        public static class ExternalClassWithArgumentsSource
+        {
+            public static IEnumerable<object[]> ArgumentsProvider()
+            {
+                yield return new object[] { true, 1 };
+                yield return new object[] { false, 2 };
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
         public void ArgumentsCanBePassedByReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithRefArguments>(toolchain);
 
         public class WithRefArguments
@@ -744,6 +766,42 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("The ParamOne value is incorrect!");
                 if (ParamTwo != 2 && ParamTwo != 3)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void MethodsAndPropertiesFromAnotherClassCanBeUsedAsSources(IToolchain toolchain)
+            => CanExecute<ParamsSourcePointingToAnotherClass>(toolchain);
+
+        public class ParamsSourcePointingToAnotherClass
+        {
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Method))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Property))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            public void Test()
+            {
+                if (ParamOne != 123)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 456)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+        public static class ExternalClassWithParamsSource
+        {
+            public static IEnumerable<int> Method()
+            {
+                yield return 123;
+            }
+            public static IEnumerable<int> Property
+            {
+                get
+                {
+                    yield return 456;
+                }
             }
         }
 
