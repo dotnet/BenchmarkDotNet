@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>Basic BenchmarkDotNet attributes that can be used to annotate your benchmarks</AssemblyTitle>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CA1825</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;NU5100;CA1825</NoWarn>
     <AssemblyName>BenchmarkDotNet.Annotations</AssemblyName>
     <PackageId>BenchmarkDotNet.Annotations</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
@@ -17,9 +17,10 @@
 
   <Choose>
 	<When Condition="'$(IsFullPack)' == 'true'">
-	  <!-- ProjectReference to ensure the nuget package has a dependency on BenchmarkDotNet.Weaver using the proper version. -->
 	  <ItemGroup>
-		<ProjectReference Include="..\BenchmarkDotNet.Weaver\BenchmarkDotNet.Weaver.csproj" />
+        <!-- Include the BenchmarkDotNet.Weaver dlls in tasks without making it an explicit dependency. -->
+        <Content Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\bin\Release\$(TargetFramework)\**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
+        <Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
 	  </ItemGroup>
 	</When>
 	<Otherwise>
