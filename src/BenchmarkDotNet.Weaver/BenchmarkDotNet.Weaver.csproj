@@ -1,5 +1,7 @@
-﻿<!-- When any changes are made to this project, increment the WeaverVersionSuffix in the common.props file,
-     then re-pack with output to \packages, and delete the old nupkg. -->
+﻿<!--
+If any changes are made to this project, increment the WeaverVersionSuffix in the common.props file,
+then run `build.cmd pack-weaver`.
+-->
 
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
