@@ -8,6 +8,7 @@ using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Workload.Install;
 using Cake.Core;
 using Cake.Core.IO;
+using System.IO;
 using System.Linq;
 
 namespace BenchmarkDotNet.Build.Runners;
@@ -24,6 +25,13 @@ public class BuildRunner
     public void PackWeaver()
     {
         var weaverPath = context.AllPackableSrcProjects.Single(p => p.GetFilename() == "BenchmarkDotNet.Weaver.csproj");
+        var outputPackageDir = weaverPath.GetDirectory().Combine("packages");
+
+        // Delete old package.
+        foreach (var file in Directory.EnumerateFiles(outputPackageDir.FullPath))
+        {
+            File.Delete(file);
+        }
 
         context.DotNetRestore(weaverPath.GetDirectory().FullPath,
             new DotNetRestoreSettings
@@ -43,7 +51,7 @@ public class BuildRunner
 
         context.DotNetPack(weaverPath.FullPath, new DotNetPackSettings
         {
-            OutputDirectory = weaverPath.GetDirectory().Combine("packages"),
+            OutputDirectory = outputPackageDir,
             MSBuildSettings = context.MsBuildSettingsPack,
             Configuration = context.BuildConfiguration
         });
