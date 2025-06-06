@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
 
-  <Target Name="WeaveAssemblies" AfterTargets="AfterBuild" >
-	<WeaveAssemblyTask TargetDir="$(TargetDir)" TargetAssembly="$(TargetDir)$(TargetFileName)" />
+  <Target Name="WeaveAssemblies" AfterTargets="CoreCompile" >
+	<WeaveAssemblyTask TargetDir="$(IntermediateOutputPath)" TargetAssembly="$(IntermediateOutputPath)$(TargetFileName)" />
   </Target>
 </Project>

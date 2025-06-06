@@ -1,22 +1,12 @@
+using AsmResolver.DotNet;
+using AsmResolver.PE.DotNet.Metadata.Tables.Rows;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using Mono.Cecil;
 
 namespace BenchmarkDotNet.Weaver;
-
-internal class CustomAssemblyResolver : DefaultAssemblyResolver
-{
-    public override AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
-        // NetStandard causes StackOverflow. https://github.com/jbevain/cecil/issues/573
-        // Mscorlib fails to resolve in Visual Studio. https://github.com/jbevain/cecil/issues/966
-        // We don't care about any types from runtime assemblies anyway, so just skip resolving them.
-        => name.Name is "netstandard" or "mscorlib" or "System.Runtime" or "System.Private.CoreLib"
-            ? null
-            : base.Resolve(name, parameters);
-}
 
 /// <summary>
 /// The Task used by MSBuild to weave the assembly.
@@ -47,29 +37,35 @@ public sealed class WeaveAssemblyTask : Task
             return false;
         }
 
-        var resolver = new CustomAssemblyResolver();
-        resolver.AddSearchDirectory(TargetDir);
-
-        // ReaderParameters { ReadWrite = true } is necessary to later write the file.
-        // https://stackoverflow.com/questions/41840455/locked-target-assembly-with-mono-cecil-and-pcl-code-injection
-        var readerParameters = new ReaderParameters
-        {
-            ReadWrite = true,
-            AssemblyResolver = resolver
-        };
+        // Load the assembly using AsmResolver.
+        var module = ModuleDefinition.FromFile(TargetAssembly);
 
         bool benchmarkMethodsImplAdjusted = false;
         try
         {
-            using var module = ModuleDefinition.ReadModule(TargetAssembly, readerParameters);
-
-            foreach (var type in module.Types)
+            foreach (var type in module.GetAllTypes())
             {
-                ProcessType(type, ref benchmarkMethodsImplAdjusted);
+                // We can skip non-public types as they are not valid for benchmarks.
+                if (type.IsNotPublic)
+                {
+                    continue;
+                }
+
+                foreach (var method in type.Methods)
+                {
+                    if (method.CustomAttributes.Any(IsBenchmarkAttribute))
+                    {
+                        var oldImpl = method.ImplAttributes;
+                        // Remove AggressiveInlining and add NoInlining.
+                        const MethodImplAttributes AggressiveInlining = (MethodImplAttributes) 512;
+                        method.ImplAttributes = (oldImpl & ~AggressiveInlining) | MethodImplAttributes.NoInlining;
+                        benchmarkMethodsImplAdjusted |= (oldImpl & MethodImplAttributes.NoInlining) == 0;
+                    }
+                }
             }
 
             // Write the modified assembly to file.
-            module.Write();
+            module.Write(TargetAssembly);
         }
         catch (Exception e)
         {
@@ -81,36 +77,10 @@ public sealed class WeaveAssemblyTask : Task
         return true;
     }
 
-    private static void ProcessType(TypeDefinition type, ref bool benchmarkMethodsImplAdjusted)
-    {
-        // We can skip non-public types as they are not valid for benchmarks.
-        if (type.IsNotPublic)
-        {
-            return;
-        }
-
-        // Remove AggressiveInlining and add NoInlining to all [Benchmark] methods.
-        foreach (var method in type.Methods)
-        {
-            if (method.CustomAttributes.Any(IsBenchmarkAttribute))
-            {
-                var oldImpl = method.ImplAttributes;
-                method.ImplAttributes = (oldImpl & ~MethodImplAttributes.AggressiveInlining) | MethodImplAttributes.NoInlining;
-                benchmarkMethodsImplAdjusted |= (oldImpl & MethodImplAttributes.NoInlining) == 0;
-            }
-        }
-
-        // Recursively process nested types
-        foreach (var nestedType in type.NestedTypes)
-        {
-            ProcessType(nestedType, ref benchmarkMethodsImplAdjusted);
-        }
-    }
-
     private static bool IsBenchmarkAttribute(CustomAttribute attribute)
     {
         // BenchmarkAttribute is unsealed, so we need to walk its hierarchy.
-        for (var attr = attribute.AttributeType; attr != null; attr = attr.Resolve()?.BaseType)
+        for (var attr = attribute.Constructor.DeclaringType; attr != null; attr = attr.Resolve()?.BaseType)
         {
             if (attr.FullName == "BenchmarkDotNet.Attributes.BenchmarkAttribute")
             {

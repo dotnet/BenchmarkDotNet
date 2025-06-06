@@ -10,12 +10,14 @@
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
 	<NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
+    <SignAssembly>false</SignAssembly>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
+	<PackageReference Include="AsmResolver.DotNet" Version="5.5.1" />
 	<PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
 	<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
-	<PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
 
   <ItemGroup>
