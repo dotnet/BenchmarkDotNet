@@ -3,6 +3,6 @@
   <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
 
   <Target Name="WeaveAssemblies" AfterTargets="AfterBuild" >
-	<WeaveAssemblyTask TargetDir="$(TargetDir)" TargetAssembly="$(TargetDir)$(TargetFileName)" />
+    <WeaveAssemblyTask TargetDir="$(TargetDir)" TargetAssembly="$(TargetDir)$(TargetFileName)" />
   </Target>
 </Project>
