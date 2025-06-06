@@ -4,6 +4,9 @@ run-name: Run tests / ${{ github.event.head_commit.message }}
 on:
   pull_request:
   push:
+  
+env:
+  VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: "10000" # Increase timeout to 10 seconds(Default: 1000). See: https://github.com/microsoft/vstest/issues/2952
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
