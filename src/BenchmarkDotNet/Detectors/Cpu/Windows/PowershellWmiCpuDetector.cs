@@ -40,6 +40,10 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
         // Optimistically, use Cross-platform new PowerShell when available but fallback to Windows PowerShell if not available.
         string powershellPath = File.Exists(windowsPowershellPath) ? powershell7PlusPath : windowsPowershellPath;
+
+        if (File.Exists(powershellPath) == false)
+            return null;
+
         string output = ProcessHelper.RunAndReadOutput(powershellPath, "Get-CimInstance Win32_Processor -Property " + argList);
         return PowershellWmiCpuInfoParser.Parse(output);
     }
