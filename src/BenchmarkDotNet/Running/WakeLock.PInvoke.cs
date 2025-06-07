@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Running;
@@ -9,15 +10,27 @@ internal partial class WakeLock
     {
         public static SafePowerHandle PowerCreateRequest(string reason)
         {
-            REASON_CONTEXT context = new REASON_CONTEXT()
+            IntPtr reasonPtr = Marshal.StringToHGlobalAuto(reason);
+            try
             {
-                Version = POWER_REQUEST_CONTEXT_VERSION,
-                Flags = POWER_REQUEST_CONTEXT_FLAGS.POWER_REQUEST_CONTEXT_SIMPLE_STRING,
-                SimpleReasonString = reason
-            };
-            SafePowerHandle safePowerHandle = PowerCreateRequest(context);
-            if (safePowerHandle.IsInvalid) { throw new Win32Exception(); }
-            return safePowerHandle;
+                REASON_CONTEXT context = new REASON_CONTEXT()
+                {
+                    Version = POWER_REQUEST_CONTEXT_VERSION,
+                    Flags = POWER_REQUEST_CONTEXT_FLAGS.POWER_REQUEST_CONTEXT_SIMPLE_STRING,
+                    Reason = new REASON_CONTEXT.REASON_CONTEXT_UNION { SimpleReasonString = reasonPtr }
+
+                };
+                SafePowerHandle safePowerHandle = PowerCreateRequest(context);
+                if (safePowerHandle.IsInvalid) { throw new Win32Exception(); }
+                return safePowerHandle;
+            }
+            finally
+            {
+                if (reasonPtr != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(reasonPtr);
+                }
+            }
         }
 
         [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
@@ -48,14 +61,34 @@ internal partial class WakeLock
         [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern bool CloseHandle(nint hObject);
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct REASON_CONTEXT
         {
             public uint Version;
 
             public POWER_REQUEST_CONTEXT_FLAGS Flags;
 
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string SimpleReasonString;
+            public REASON_CONTEXT_UNION Reason;
+
+            [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode)]
+            public struct REASON_CONTEXT_UNION
+            {
+                [FieldOffset(0)]
+                public nint SimpleReasonString;
+
+                // The DETAILED structure is not (yet) used, but needed for ARM CPUs, otherwise PowerCreateRequest fails, see #2745
+                [FieldOffset(0)]
+                public DETAILED Detailed;
+
+                [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+                public struct DETAILED
+                {
+                    public nint LocalizedReasonModule;
+                    public uint LocalizedReasonId;
+                    public uint ReasonStringCount;
+                    public nint ReasonStrings;
+                }
+            }
         }
 
         private const uint POWER_REQUEST_CONTEXT_VERSION = 0U;
