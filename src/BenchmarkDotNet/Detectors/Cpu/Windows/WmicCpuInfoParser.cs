@@ -12,7 +12,7 @@ internal static class WmicCpuInfoParser
     /// Parses wmic output and returns <see cref="CpuInfo"/>
     /// </summary>
     /// <param name="wmicOutput">Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`</param>
-    internal static CpuInfo Parse(string? wmicOutput)
+    internal static CpuInfo? Parse(string? wmicOutput)
     {
         var processorModelNames = new HashSet<string>();
         int physicalCoreCount = 0;
@@ -51,6 +51,9 @@ internal static class WmicCpuInfoParser
         Frequency? maxFrequency = sumMaxFrequency > 0 && processorsCount > 0
             ? Frequency.FromMHz(sumMaxFrequency / processorsCount)
             : null;
+
+        if (string.IsNullOrEmpty(processorName) || processorName.ToLower().Equals("unknown processor"))
+            return null;
 
         return new CpuInfo
         {
