@@ -52,7 +52,7 @@ internal static class WmicCpuInfoParser
             ? Frequency.FromMHz(sumMaxFrequency / processorsCount)
             : null;
 
-        if (string.IsNullOrEmpty(processorName) || processorName.ToLower().Equals("unknown processor"))
+        if (string.IsNullOrEmpty(processorName))
             return null;
 
         return new CpuInfo
