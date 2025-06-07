@@ -19,7 +19,6 @@ using Xunit;
 namespace BenchmarkDotNet.Tests.Exporters
 {
     [Collection("VerifyTests")]
-    [UsesVerify]
     public class MarkdownExporterVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture = Thread.CurrentThread.CurrentCulture;

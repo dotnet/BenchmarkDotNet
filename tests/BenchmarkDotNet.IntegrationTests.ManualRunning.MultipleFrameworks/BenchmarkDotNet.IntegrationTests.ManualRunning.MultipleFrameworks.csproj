@@ -5,7 +5,9 @@
     <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
     <TargetFrameworks>net461;net48;netcoreapp2.0;net8.0</TargetFrameworks>
     <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
-    <NoWarn>$(NoWarn);NETSDK1138;NU1901;NU1902;NU1903;NU1904</NoWarn>
+    <NoWarn>$(NoWarn);NETSDK1138;NU1903</NoWarn>
+    <!-- Suppress warning NU1510: PackageReference Microsoft.NETCore.App will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.-->
+    <NoWarn>$(NoWarn);NU1510</NoWarn>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyName>
@@ -25,8 +27,8 @@
     <Compile Include="..\BenchmarkDotNet.Tests\XUnit\SmartAssert.cs" Link="SmartAssert.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.0" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
+    <PackageReference Include="System.Memory" Version="[4.5.5]" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\BenchmarkDotNet.IntegrationTests.ManualRunning\xunit.runner.json">
@@ -39,10 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Microsoft.NET.Test.Sdk breaks netcoreapp2.0 -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" Condition=" '$(TargetFramework)' != 'netcoreapp2.0' " />
-    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.13.0]" Condition=" '$(TargetFramework)' != 'netcoreapp2.0' " />
+    <PackageReference Include="xunit" Version="2.9.3" />
     <!-- We use older version 2.4.1 for combatibility with netcoreapp2.0. -->
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+    <PackageReference Include="xunit.runner.visualstudio" Version="[2.4.1]">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

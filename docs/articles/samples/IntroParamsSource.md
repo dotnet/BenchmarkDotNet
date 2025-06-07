@@ -10,7 +10,7 @@ You can mark one or several fields or properties in your class by the
   [`[Params]`](xref:BenchmarkDotNet.Attributes.ParamsAttribute) attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
   (something that implements `IEnumerable`).
-The source must be within benchmarked type!
+The source may be instance or static. If the source is not in the same type as the benchmark, the type containing the source must be specified in the attribute constructor.
 
 ### Source code
 

@@ -22,7 +22,6 @@ using Xunit;
 namespace BenchmarkDotNet.Tests.Exporters
 {
     [Collection("VerifyTests")]
-    [UsesVerify]
     public class CommonExporterVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture;
