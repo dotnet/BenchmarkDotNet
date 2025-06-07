@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 
@@ -39,7 +40,10 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
            if (subDirectories.Any())
            {
-               subDirectory = subDirectories.Last();
+               subDirectory = subDirectories.Where(x => Regex.IsMatch(x, "[0-9]"))
+                   .Select(numStr => new { Value = numStr, Number = int.Parse(numStr) })
+                   .OrderByDescending(x => x.Number)
+                   .Select(x => x.Value).FirstOrDefault();
            }
 
            if (subDirectory is not null)
