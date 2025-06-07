@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -24,10 +25,16 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
 
-            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("System.Collections.Immutable", "9.0.5");
+            const string targetVersion = "9.0.5";
+
+            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("System.Collections.Immutable", targetVersion);
             var config = CreateSimpleConfig(job: job);
 
-            CanExecute<WithCallToImmutableArray>(config);
+            var report = CanExecute<WithCallToImmutableArray>(config);
+
+            // Validate NuGet package version output message
+            var stdout = GetSingleStandardOutput(report);
+            Assert.Contains($"System.Collections.Immutable: {targetVersion}", stdout);
         }
 
         [FactEnvSpecific("Roslyn toolchain does not support .NET Core", EnvRequirement.FullFrameworkOnly)]
@@ -63,6 +70,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 values = Enumerable.Range(1, 10_000)
                                    .Select(x => rand.NextDouble())
                                    .ToArray();
+
+                // Gets assembly version text from AssemblyInformationalVersion attribute.
+                var version = typeof(ImmutableArray).Assembly
+                                                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+                                                    .InformationalVersion
+                                                    .Split('+')[0];
+
+                // Print referenced NuGet package version to stdout.
+                Console.WriteLine($"System.Collections.Immutable: {version}");
             }
 
             [Benchmark]
