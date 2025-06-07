@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Immutable;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -6,7 +8,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Roslyn;
-using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,10 +24,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
 
-            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "13.0.2");
+            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("System.Collections.Immutable", "9.0.5");
             var config = CreateSimpleConfig(job: job);
 
-            CanExecute<WithCallToNewtonsoft>(config);
+            CanExecute<WithCallToImmutableArray>(config);
         }
 
         [FactEnvSpecific("Roslyn toolchain does not support .NET Core", EnvRequirement.FullFrameworkOnly)]
@@ -34,9 +35,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RoslynToolchain.Instance;
 
-            var unsupportedJob = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "13.0.2");
+            var unsupportedJob = Job.Dry.WithToolchain(toolchain).WithNuGet("System.Collections.Immutable", "9.0.5");
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
-            var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
+            var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToImmutableArray), unsupportedJobConfig);
 
             foreach (var benchmarkCase in unsupportedJobBenchmark.BenchmarksCases)
             {
@@ -45,16 +46,30 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var supportedJob = Job.Dry.WithToolchain(toolchain);
             var supportedConfig = CreateSimpleConfig(job: supportedJob);
-            var supportedBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), supportedConfig);
+            var supportedBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToImmutableArray), supportedConfig);
             foreach (var benchmarkCase in supportedBenchmark.BenchmarksCases)
             {
                 Assert.Empty(toolchain.Validate(benchmarkCase, BenchmarkRunnerClean.DefaultResolver));
             }
         }
 
-        public class WithCallToNewtonsoft
+        public class WithCallToImmutableArray
         {
-            [Benchmark] public void SerializeAnonymousObject() => JsonConvert.SerializeObject(new { hello = "world", price = 1.99, now = DateTime.UtcNow });
+            private readonly double[] values;
+
+            public WithCallToImmutableArray()
+            {
+                var rand = new Random(Seed: 0);
+                values = Enumerable.Range(1, 10_000)
+                                   .Select(x => rand.NextDouble())
+                                   .ToArray();
+            }
+
+            [Benchmark]
+            public void ToImmutableArrayBenchmark()
+            {
+                var results = values.ToImmutableArray();
+            }
         }
     }
 }
