@@ -39,7 +39,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
                                $"{WmicCpuInfoKeyNames.MaxClockSpeed}";
 
         // Optimistically, use Cross-platform new PowerShell when available but fallback to Windows PowerShell if not available.
-        string powershellPath = File.Exists(windowsPowershellPath) ? powershell7PlusPath : windowsPowershellPath;
+        string powershellPath = File.Exists(powershell7PlusPath) ? powershell7PlusPath : windowsPowershellPath;
 
         if (File.Exists(powershellPath) == false)
             return null;
