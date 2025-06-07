@@ -44,7 +44,10 @@ internal static class PowershellWmiCpuInfoParser
                 && int.TryParse(frequencyValue, out int frequency)
                 && frequency > 0)
             {
-                sumMaxFrequency += frequency;
+                if (frequency > sumMaxFrequency)
+                {
+                    sumMaxFrequency = frequency;
+                }
             }
         }
 
