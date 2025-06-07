@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Immutable;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using Newtonsoft.Json;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -26,22 +27,26 @@ namespace BenchmarkDotNet.Samples
                 var baseJob = Job.MediumRun;
 
                 string[] targetVersions = [
-                    "13.0.3",
-                    "13.0.2",
-                    "13.0.1"
+                    "9.0.3",
+                    "9.0.4",
+                    "9.0.5",
                 ];
 
                 foreach (var version in targetVersions)
                 {
-                    AddJob(baseJob.WithNuGet("Newtonsoft.Json", version)
-                                  .WithId(version));
+                    AddJob(baseJob.WithNuGet("System.Collections.Immutable", version)
+                                  .WithId("v"+version));
                 }
             }
         }
 
+        private static readonly Random rand = new Random(Seed: 0);
+        private static readonly double[] values = Enumerable.Range(1, 10_000).Select(x => rand.NextDouble()).ToArray();
+
         [Benchmark]
-        public void SerializeAnonymousObject()
-            => JsonConvert.SerializeObject(
-                new { hello = "world", price = 1.99, now = DateTime.UtcNow });
+        public void ToImmutableArrayBenchmark()
+        {
+            var results = values.ToImmutableArray();
+        }
     }
 }
