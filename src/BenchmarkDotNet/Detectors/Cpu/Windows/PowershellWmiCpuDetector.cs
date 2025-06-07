@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Helpers;
@@ -26,20 +27,47 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
         string powershell7PlusPath = $"{programFiles}{Path.DirectorySeparatorChar}Powershell{Path.DirectorySeparatorChar}";
 
+        bool CheckForPowershell7Plus = true;
+
         if (Directory.Exists(powershell7PlusPath))
         {
             //Use .Last so that we get the newest major PowerShell version
-            string subDirectory = Directory.EnumerateDirectories(powershell7PlusPath, "^[a-zA-Z]", SearchOption.AllDirectories).Last();
+           string[] subDirectories = Directory.EnumerateDirectories(powershell7PlusPath, "*", SearchOption.AllDirectories)
+               .ToArray();
 
-            powershell7PlusPath = $"{subDirectory}{Path.DirectorySeparatorChar}pwsh.exe";
+           string? subDirectory = null;
+
+           if (subDirectories.Any())
+           {
+               subDirectory = subDirectories.Last();
+           }
+
+           if (subDirectory is not null)
+           {
+               powershell7PlusPath = $"{subDirectory}{Path.DirectorySeparatorChar}pwsh.exe";
+           }
+           else
+           {
+               CheckForPowershell7Plus = false;
+           }
         }
+
         const string argList = $"{WmicCpuInfoKeyNames.Name}, " +
                                $"{WmicCpuInfoKeyNames.NumberOfCores}, " +
                                $"{WmicCpuInfoKeyNames.NumberOfLogicalProcessors}, " +
                                $"{WmicCpuInfoKeyNames.MaxClockSpeed}";
 
+        string powershellPath;
+
         // Optimistically, use Cross-platform new PowerShell when available but fallback to Windows PowerShell if not available.
-        string powershellPath = File.Exists(powershell7PlusPath) ? powershell7PlusPath : windowsPowershellPath;
+        if (CheckForPowershell7Plus)
+        {
+            powershellPath = File.Exists(powershell7PlusPath) ? powershell7PlusPath : windowsPowershellPath;
+        }
+        else
+        {
+            powershellPath = windowsPowershellPath;
+        }
 
         if (File.Exists(powershellPath) == false)
             return null;
