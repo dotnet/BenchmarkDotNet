@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Reference Include="BenchmarkDotNet.Annotations">
+      <HintPath>$(MSBuildThisFileDirectory)..\..\lib\netstandard2.0\BenchmarkDotNet.Annotations.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
+
+  <Target Name="WeaveAssemblies" AfterTargets="AfterBuild" >
+    <WeaveAssemblyTask TargetAssembly="$(TargetDir)$(TargetFileName)" />
+  </Target>
+</Project>
