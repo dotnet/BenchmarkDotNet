@@ -6,25 +6,23 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
-internal static class WmicCpuInfoParser
+internal static class PowershellWmiCpuInfoParser
 {
-    /// <summary>
-    /// Parses wmic output and returns <see cref="CpuInfo"/>
-    /// </summary>
-    /// <param name="wmicOutput">Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`</param>
-    internal static CpuInfo? Parse(string? wmicOutput)
+    internal static CpuInfo? Parse(string? powershellWmiOutput)
     {
-        if (string.IsNullOrEmpty(wmicOutput))
+        if (string.IsNullOrEmpty(powershellWmiOutput))
             return null;
 
-        var processorModelNames = new HashSet<string>();
+        HashSet<string> processorModelNames = new HashSet<string>();
+
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
         int processorsCount = 0;
-        var sumMaxFrequency = Frequency.Zero;
+        Frequency sumMaxFrequency = Frequency.Zero;
 
-        var processors = SectionsHelper.ParseSections(wmicOutput, '=');
-        foreach (var processor in processors)
+
+        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(powershellWmiOutput, ':');
+        foreach (Dictionary<string, string> processor in processors)
         {
             if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
                 int.TryParse(numberOfCoresValue, out int numberOfCores) &&
