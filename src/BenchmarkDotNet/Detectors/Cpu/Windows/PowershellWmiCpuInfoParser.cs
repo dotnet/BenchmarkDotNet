@@ -18,11 +18,11 @@ internal static class PowershellWmiCpuInfoParser
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
         int processorsCount = 0;
-        var sumMaxFrequency = Frequency.Zero;
+        Frequency sumMaxFrequency = Frequency.Zero;
 
 
-        var processors = SectionsHelper.ParseSections(powershellWmiOutput, ':');
-        foreach (var processor in processors)
+        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(powershellWmiOutput, ':');
+        foreach (Dictionary<string, string> processor in processors)
         {
             if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
                 int.TryParse(numberOfCoresValue, out int numberOfCores) &&
