@@ -27,7 +27,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
         string powershell7PlusPath = $"{programFiles}{Path.DirectorySeparatorChar}Powershell{Path.DirectorySeparatorChar}";
 
-        bool CheckForPowershell7Plus = true;
+        bool checkForPowershell7Plus = true;
 
         if (Directory.Exists(powershell7PlusPath))
         {
@@ -48,7 +48,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
            }
            else
            {
-               CheckForPowershell7Plus = false;
+               checkForPowershell7Plus = false;
            }
         }
 
@@ -60,7 +60,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
         string powershellPath;
 
         // Optimistically, use Cross-platform new PowerShell when available but fallback to Windows PowerShell if not available.
-        if (CheckForPowershell7Plus)
+        if (checkForPowershell7Plus)
         {
             powershellPath = File.Exists(powershell7PlusPath) ? powershell7PlusPath : windowsPowershellPath;
         }
