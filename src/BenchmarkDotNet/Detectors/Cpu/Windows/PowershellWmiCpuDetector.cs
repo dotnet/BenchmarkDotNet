@@ -36,15 +36,10 @@ internal class PowershellWmiCpuDetector : ICpuDetector
            string[] subDirectories = Directory.EnumerateDirectories(powershell7PlusPath, "*", SearchOption.AllDirectories)
                .ToArray();
 
-           string? subDirectory = null;
-
-           if (subDirectories.Any())
-           {
-               subDirectory = subDirectories.Where(x => Regex.IsMatch(x, "[0-9]"))
-                   .Select(numStr => new { Value = numStr, Number = int.Parse(numStr) })
-                   .OrderByDescending(x => x.Number)
-                   .Select(x => x.Value).FirstOrDefault();
-           }
+           string? subDirectory = subDirectories.Where(x => Regex.IsMatch(x, "[0-9]"))
+               .Select(x => x)
+               .OrderByDescending(x => x)
+               .FirstOrDefault();
 
            if (subDirectory is not null)
            {
