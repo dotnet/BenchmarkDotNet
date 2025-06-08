@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         private static readonly string[] ProjectExtensions = { ".csproj", ".fsproj", ".vbroj" };
 
+        private static readonly string[] SolutionExtensions = { ".sln", ".slnx" };
+
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
         [PublicAPI] public string CliPath { get; }
@@ -111,7 +113,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
+                .Any(fileInfo => SolutionExtensions.Contains(fileInfo.Extension) || fileInfo.Name == "global.json");
 
         private static bool IsRootProjectFolder(DirectoryInfo directoryInfo)
             => directoryInfo
