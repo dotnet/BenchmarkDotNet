@@ -26,7 +26,11 @@ internal class WmicCpuDetector : ICpuDetector
                                $"{WmicCpuInfoKeyNames.NumberOfLogicalProcessors}, " +
                                $"{WmicCpuInfoKeyNames.MaxClockSpeed}";
         string wmicPath = File.Exists(DefaultWmicPath) ? DefaultWmicPath : "wmic";
-        string wmicOutput = ProcessHelper.RunAndReadOutput(wmicPath, $"cpu get {argList} /Format:List");
+        string? wmicOutput = ProcessHelper.RunAndReadOutput(wmicPath, $"cpu get {argList} /Format:List");
+
+        if (string.IsNullOrEmpty(wmicOutput))
+            return null;
+
         return WmicCpuInfoParser.Parse(wmicOutput);
     }
 }
