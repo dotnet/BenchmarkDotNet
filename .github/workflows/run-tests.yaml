@@ -13,7 +13,10 @@ concurrency:
 jobs:
 
   test-windows-core:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, windows-11-arm]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
@@ -35,7 +38,10 @@ jobs:
           path: "**/*.trx"
 
   test-windows-full:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, windows-11-arm]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
