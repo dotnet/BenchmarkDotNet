@@ -90,7 +90,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-linux-trx-${{ github.run_id }}
+          name: test-linux-trx-${{ github.run_id }}-${{ matrix.os }}
           path: "**/*.trx"
 
   test-macos:
