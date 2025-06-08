@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Exporters
             return new[] { filePath };
         }
 
-        internal string GetArtifactFullName(Summary summary)
+        public string GetArtifactFullName(Summary summary)
         {
             string fileName = GetFileName(summary);
             return $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}.{FileExtension}";
