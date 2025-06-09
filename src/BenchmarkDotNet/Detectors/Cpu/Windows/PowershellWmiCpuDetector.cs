@@ -37,7 +37,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
             "Get-CimInstance Win32_Processor -Property " + argList);
 
         if (string.IsNullOrEmpty(output))
-            return CpuInfo.Unknown;
+            return null;
 
         return PowershellWmiCpuInfoParser.Parse(output);
     }
