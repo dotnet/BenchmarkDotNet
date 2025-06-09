@@ -28,7 +28,7 @@ internal static class LinuxCpuInfoParser
 
     /// <param name="cpuInfo">Output of `cat /proc/cpuinfo`</param>
     /// <param name="lscpu">Output of `lscpu`</param>
-    internal static CpuInfo Parse(string? cpuInfo, string? lscpu)
+    internal static CpuInfo Parse(string cpuInfo, string lscpu)
     {
         var processorModelNames = new HashSet<string>();
         var processorsToPhysicalCoreCount = new Dictionary<string, int>();
