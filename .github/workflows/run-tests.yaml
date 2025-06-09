@@ -62,7 +62,10 @@ jobs:
           path: "**/*.trx"
 
   test-linux:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       # Set up the environment
@@ -93,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-linux-trx-${{ github.run_id }}
+          name: test-linux-trx-${{ github.run_id }}-${{ matrix.os }}
           path: "**/*.trx"
 
   test-macos:
