@@ -92,7 +92,7 @@ internal static class LinuxCpuInfoParser
                     coresPerSocket = coreCount;
             }
         }
-        
+
         string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         int? physicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : null;
         int? physicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : coresPerSocket;
