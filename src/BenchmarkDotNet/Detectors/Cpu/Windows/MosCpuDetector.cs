@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using BenchmarkDotNet.Extensions;
@@ -28,7 +29,8 @@ internal class MosCpuDetector : ICpuDetector
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
         int processorsCount = 0;
-        int sumMaxFrequency = 0;
+        double maxFrequency = 0;
+        double nominalFrequency = 0;
 
         using (var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor"))
         {
@@ -41,14 +43,20 @@ internal class MosCpuDetector : ICpuDetector
                     processorsCount++;
                     physicalCoreCount += (int)(uint)moProcessor[WmicCpuInfoKeyNames.NumberOfCores];
                     logicalCoreCount += (int)(uint)moProcessor[WmicCpuInfoKeyNames.NumberOfLogicalProcessors];
-                    sumMaxFrequency = (int)(uint)moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed];
+                    double tempMaxFrequency = (double)moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed];
+
+                    nominalFrequency = nominalFrequency == 0 ? maxFrequency : Math.Min(nominalFrequency, maxFrequency);
+                    maxFrequency = Math.Max(maxFrequency, tempMaxFrequency);
                 }
             }
         }
 
         string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
-        Frequency? maxFrequency = sumMaxFrequency > 0 && processorsCount > 0
-            ? Frequency.FromMHz(sumMaxFrequency * 1.0 / processorsCount)
+        Frequency? maxFrequencyActual = maxFrequency > 0 && processorsCount > 0
+            ? Frequency.FromMHz(maxFrequency)
+            : null;
+        Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorsCount > 0
+            ? Frequency.FromMHz(nominalFrequency)
             : null;
 
         return new CpuInfo
@@ -57,8 +65,8 @@ internal class MosCpuDetector : ICpuDetector
             PhysicalProcessorCount = processorsCount > 0 ? processorsCount : null,
             PhysicalCoreCount = physicalCoreCount > 0 ? physicalCoreCount : null,
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : null,
-            NominalFrequencyHz = maxFrequency?.Hertz.RoundToLong(),
-            MaxFrequencyHz = maxFrequency?.Hertz.RoundToLong()
+            NominalFrequencyHz = nominalFrequencyActual?.Hertz.RoundToLong(),
+            MaxFrequencyHz = maxFrequencyActual?.Hertz.RoundToLong()
         };
     }
 }
