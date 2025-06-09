@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.13.9.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.13.9.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,6 +89,64 @@
 
 <h2 id="highlights">Highlights</h2>
 <p>This release contains bug fixes.</p>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.9">v0.13.9</a> scope,
+3 issues were resolved and 7 pull requests were merged.
+This release includes 26 commits by 5 contributors.</p>
+<h2 id="resolved-issues-3">Resolved issues (3)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2054">#2054</a> Custom logging/visualization during the benchmark run (assignee: <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2404">#2404</a> Using <code>DisassemblyDiagnoser</code> in GitHub Actions (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2432">#2432</a> Something went wrong with outliers when using <code>--launchCount</code> (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-7">Merged pull requests (7)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1882">#1882</a> use coalesce instead of join (by <a href="https://github.com/askazakov">@askazakov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2413">#2413</a> Fix linux crash from disassembler (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2420">#2420</a> Add event processor functionality (by <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2421">#2421</a> More nullability warnings fixes (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2433">#2433</a> Fix build errors with latest sdk (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2434">#2434</a> Fix Event Processors not being copied in ManualConfig.Add (by <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2435">#2435</a> Treat warnings not as errors in manual test project (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<h2 id="commits-26">Commits (26)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ece5ccfc91d92b610338b05da73d2a91508e2837">ece5cc</a> Set next BenchmarkDotNet version: 0.13.9 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ad937654174e521741aac620e16635a8ff14b1c9">ad9376</a> Add event processor functionality (#2420) (by <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8227bbfa5f4d22c51f9c3856576d3680d8fc0a92">8227bb</a> Address PR feedback (#2434) (by <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/46b3c0171709c48f58966fdf2665b5f292ff6467">46b3c0</a> Fix linux crash from disassembler (#2413) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/967a975773ebd7a9744f3875220c7db8fa647957">967a97</a> Fix build errors with latest sdk. (#2433) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dd7a9b7cd132e522951eeb6916a3aa27a24ebf59">dd7a9b</a> Treat warnings not as errors in manual test project (#2435) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/58387457bd67c62fda9c831329401fe0de4ae86f">583874</a> Print full stacktrace for GenerateException, see #2436 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6e3a159d3d3ae0d7eecc759c23a7bb0124e673df">6e3a15</a> Support WSL detection in RuntimeInformation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8986e053c2fbc0befdef7d6e1a116a7bc83da282">8986e0</a> Update myget url in README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/516bd68238c38bb6f622f71039d7b91f3f33776d">516bd6</a> Enabled nullability for BenchmarkDotNet.Diagnostics.dotTrace.csproj (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5428ebdb8b6e9a847bb8ae6cf129b7dd9d784454">5428eb</a> Fixed nullability warnings in methods signatures (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7fbbc9f506cee0048f2ea6e7af15fbe1aa0bd7f7">7fbbc9</a> Removed CanBeNull attribute (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9d7350c21b30c2655705ede68929243846b8a407">9d7350</a> Fixed warnings on null assignments (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b43d280f1673526dff865f5fbfc1848c846eacdd">b43d28</a> Fixed warnings in EngineEventLogParser (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/148165baf92233a3e3e67efc552e7528edb2fc78">148165</a> Removed an unnecessary check (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/465aaf196a43d21b516edf6e9028c672c39937b9">465aaf</a> Fixed empty catch warning (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9a7bb7d5d6c72a01f991d869b9106364c26b1fce">9a7bb7</a> [build] Bump: Microsoft.DocAsCode.App 2.67.5 -&gt; Docfx.App 2.71.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9dd7b6f4b2511bbd30ba0f6d4999f7f58cf161a6">9dd7b6</a> Fix license badge link in README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/134b8edd09ad7dad0a17728eae4e9f50e16d3fe0">134b8e</a> [build] Automatic NextVersion evaluation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8090d995e847c3c3d84db1fd5acbee312a75cf81">8090d9</a> Suppress NETSDK1138 (TFM out of support warning) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/af610eec251bfa74f7317eaec915df9b905c979b">af610e</a> Bump .NET SDK: 7.0.305-&gt;7.0.401 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8838ed4bf74377642d32774c558c0955e67c0faf">8838ed</a> [build] Fix docfx build warnings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2d379b37310983dbe645a2129066d9af65d9e0d7">2d379b</a> Remove outlier consistency check, fix #2432 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/00628ab31b79a78e1c22c298ca0086bdf28065a7">00628a</a> use coalesce instead of join (by <a href="https://github.com/askazakov">@askazakov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/411a6e7594c45c9ffa55b0b6caecb7f6ed1b3081">411a6e</a> Prepare v0.13.9 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/228a464e8be6c580ad9408e98f18813f6407fb5a">228a46</a> Rollback docfx.json (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-5">Contributors (5)</h2>
+<ul>
+<li>Alina Smirnova (<a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>askazakov (<a href="https://github.com/askazakov">@askazakov</a>)</li>
+<li>Cameron Aavik (<a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: October 05, 2023</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.9">v0.13.9</a></em>

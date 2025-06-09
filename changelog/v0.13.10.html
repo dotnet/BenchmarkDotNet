@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.13.10.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.13.10.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -89,6 +89,42 @@
 
 <h2 id="highlights">Highlights</h2>
 <p>Initial support of .NET 9 and minor bug fixes.</p>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.10">v0.13.10</a> scope,
+2 issues were resolved and 3 pull requests were merged.
+This release includes 10 commits by 4 contributors.</p>
+<h2 id="resolved-issues-2">Resolved issues (2)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2436">#2436</a> BenchmarkDotNet Access Denied Error on WSL2 when Writing to '/mnt/c/DumpStack.log.tmp' (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2455">#2455</a> .NET 9 support (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-3">Merged pull requests (3)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2447">#2447</a> Add support for wasm/net9.0 (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2453">#2453</a> feat: set RuntimeHostConfigurationOption on generated project (by <a href="https://github.com/workgroupengineering">@workgroupengineering</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2456">#2456</a> implement full .NET 9 support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="commits-10">Commits (10)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c27152b9d7b6391501abcf7e8edcb2804999622f">c27152</a> Set next BenchmarkDotNet version: 0.13.10 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2e96d29453a804cfc1b92fffeea94c866522167a">2e96d2</a> Don't show AssemblyInformationalVersion metadata in BDN BrandVersion (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d17c6ad0bd8ac15d83ced0a7522de7dd51526ad4">d17c6a</a> Support Windows 11 23H2 (10.0.22631) in OsBrandStringHelper (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/af9c5c6013b4e661cda0ff8fed40a50ae62d5a74">af9c5c</a> Exception handling in DotNetCliGenerator.GetRootDirectory, fix #2436 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e11136897bdf26c004076bcbe812bb4ae60f8859">e11136</a> [build] Bump Docfx.App: 2.71.0-&gt;2.71.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7b342f5cfb63c73708f3e69dde33d7430a3c0401">7b342f</a> Add support for wasm/net9.0 (#2447) (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e170684208103ca5ba4212ad8dc7c2aad5cf02d4">e17068</a> Adjust 'Failed to set up high priority' message (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0a734a94a13733c2950d7edbac08499c6f2c108a">0a734a</a> feat: set RuntimeHostConfigurationOption on generated project (#2453) (by <a href="https://github.com/workgroupengineering">@workgroupengineering</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ae49148a92c358676190772803fe0ed532814ce3">ae4914</a> implement full .NET 9 support (#2456) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/40c4142734ce68bdfcbccf7086ed2b724e9428bc">40c414</a> Prepare v0.13.10 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Ankit Jain (<a href="https://github.com/radical">@radical</a>)</li>
+<li>workgroupengineering (<a href="https://github.com/workgroupengineering">@workgroupengineering</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: November 01, 2023</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.10">v0.13.10</a></em>

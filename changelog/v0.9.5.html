@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.9.5.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.9.5.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -100,6 +100,83 @@
 <li>Executing single Benchmark for multiple Runtimes also with Diagnoser attached (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/pull/117">#117</a>)</li>
 <li>Misc minor changes</li>
 </ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.9.5">v0.9.5</a> scope,
+13 issues were resolved and 0 pull requests were merged.
+This release includes 45 commits by 4 contributors.</p>
+<h2 id="resolved-issues-13">Resolved issues (13)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/67">#67</a> F# requiring assembly binding redirects for FSharp.Core</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/94">#94</a> Put all the  generated artifacts in a separate folder</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/101">#101</a> Strong naming?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/107">#107</a> Specify benchmark method order</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/122">#122</a> Reports: Move params columns next to Method column</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/128">#128</a> Print dotnet cli version in EnvironmentInfo</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/129">#129</a> Improve DnxAndCoreTests</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/132">#132</a> [Bug] FileNotFoundException On 0.9.4.</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/134">#134</a> [Feature request] Release builds only?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/137">#137</a> Brand new machine with VS 2015 only b0rks</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/142">#142</a> [Suggestion] BenchmarkDotNet.Analyzers.IAnalyser - use same spelling for namespace and type?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/148">#148</a> Crash on [Params] with a string value that contains an invalid path char</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/150">#150</a> Declaring nested enums and using them as parameter value make incorrectly generated code/</li>
+</ul>
+<h2 id="merged-pull-requests-0">Merged pull requests (0)</h2>
+<h2 id="commits-45">Commits (45)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2645ef3c25225730d5f255d2e4dde8a6c10da78d">2645ef</a> use AutoGenerateBindingRedirects to avoid assembly conflicts, fixes #67 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/693b21226e1ce24b503676b521f04cea14cc49f0">693b21</a> warn user if dotnet cli is not installed and print it's version in summary, f... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bfb017fe84b55d78762cd270fbd23a8221b17645">bfb017</a> target NET46 to reference msbuild 14 that comes with VS 2015 to make BDN work... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fceb3cfb3c4a110bafb062283bc7ad3e06b5136f">fceb3c</a> fallback to bat if MSBuild dlls are not found + generate bat when needed (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/49bdf0b5aec8070ee7ae37973ff6a758cb51d079">49bdf0</a> restore: generating build script file (now for all runtimes) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b9b0bc7615eadb602b1fbb6adce054763218b9e0">b9b0bc</a> scripts: cleanup -&gt; build -&gt; show failed tests if any -&gt;cleanup, fixes #129 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ad64d8c5541a903873d6a49bb460aae107872def">ad64d8</a> Put all the generated artifacts in a separate folder, fixes #94 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/902de698c2cde8227243a19b25384753b3d18cbb">902de6</a> F# samples targeting .NET Core +classic F# part reorganization (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b31c0bbd7f6681c0ea7295a2f749683727746b18">b31c0b</a> supported languages: updated readme &amp; integration tests for Visual Basic (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/24ade7c391240de34e79fae1215d030313fb79ee">24ade7</a> handle missing MSBuild.dll, get latest msbuild in fallback script scenario, s... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d371de973ee764399e9e36f1564210958530818d">d371de</a> Spelling mistake in errors message (see #139) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c882dd906ff39b4610ec523befbb88d6b9b85967">c882dd</a> core: dependencies cleanup + getting rid of warnings (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b14e354c274e89ec78cc9fe11cd5e35b394e03a8">b14e35</a> Add IOrderProvider, fixes #107 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c95267bd5a427375e00ffa468b955df7b4f6f500">c95267</a> warn user if non-optimized dll is used, fixes #134 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5876f573b1d566d4a9048ef2b78cb8e196eea6b6">5876f5</a> Strong naming, fixes #101 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/036168eb2d97eae8b184ae8a3918a3be5a6e8eab">036168</a> Analys(z)ers unification, lets use single spelling, fixes #142 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2fa5c02a8f8751a299cb95ec423e70e72039ba43">2fa5c0</a> Update README.md (by <a href="https://github.com/JohanLarsson">@JohanLarsson</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8b8641eb193c48684de2d1a3f9a563b8d1ab8978">8b8641</a> Merge pull request #145 from JohanLarsson/master (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7345338f3020ce299c2e83a50ebd92b22406d6fb">734533</a> introducing Validators: validate benchmarks before running, return errors in ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/eaa943148d4ee9affe11682deb3f623e83fac03e">eaa943</a> ExecutionValidator: allow users to verify that all their benchmarks are runna... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e4fa4b12cec12cd8504e56fe0eefd2295389295c">e4fa4b</a> support overriding with 'stronger' validators, eliminate duplicates (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/57666a9c7fa7d4ccb00df1ba385afd39eafc914c">57666a</a> Add column order for SummaryTable, fixes #122 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/62af92614ba2180082dbcdba12ccdf97b18c0dad">62af92</a> Minor fixes in README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5e687783ad141545cc5e21c61797e03b7697f6f0">5e6877</a> updated README (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1255a43e74560e3392225b78cb839edf7e581647">1255a4</a> Initial work on BenchmarkDotNet.Diagnostics.Windows rename (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/59ca8c15a92483ec98270d5af4282cc60ad04d47">59ca8c</a> Ensure renamed diagnostics dll is loaded (BenchmarkDotNet.Diagnostics.Windows... (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/82519385f43a6ad3cb246634cb103cc5ce4fdcc9">825193</a> Added info about Diagnosers (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b836c588c19cef97abe23edb4db87bcf70916ce7">b836c5</a> Spelling/formatting (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3f74c703bd61b171a2e460cfb3371029fddf8c9f">3f74c7</a> Fixing project.json (after I overwrite previous changes) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c24a78fbc853cd9b1d80ee1c9ac23f088e1763f5">c24a78</a> Merge branch 'develop' of <a href="https://github.com/PerfDotNet/BenchmarkDotNet">https://github.com/PerfDotNet/BenchmarkDotNet</a> into ... (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8c678f204e65b6840638a808c41dd29d7de901f8">8c678f</a> reflecting recent Diagnosers-&gt;Diagnostics.Windows changes (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9bcdca0a4ad7ce7ef765d1fc46926cfc71c7020a">9bcdca</a> Executing single Benchmark for multiple Runtimes [with Diagnoser attached] #117 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4dffdb89c20cf2803ecb6e2ff7717e0b30f2f773">4dffdb</a> Switching to new ‘dotnet’ target framework monikers (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/81b1e44b9ce0e6b6df377df951cb0be385e9362a">81b1e4</a> improved Runtimes descriptions + .NET 4.6.2 support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8e92e1eb2bc3d83825b4653d32b1d57ce85d0a53">8e92e1</a> dnx452 and dnx46 support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/06efde8b6c7133e98f3fb89bd056e94fa63b4532">06efde</a> Fix in BaselineDiffColumnTest, see also #122 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f79f830fac4f42122b3b93c984f78608c54d20a3">f79f83</a> DEVELOPING.md: use stable version of dotnet cli (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c2206d068c0429629c41958ac9e470239caafc88">c2206d</a> BenchmarkDotNet/project.json: correct version for System.IO.FileSystem (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1b650d1d52ca57a607afc7b3c4b1c74dfa2b1c3e">1b650d</a> Support for nested Enums as Params values, fixes #150 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/76ef44ab442813e092c61f0c740558ca406335ec">76ef44</a> characters as Params support, including invalid path characters, fixes #148 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/14e45c1b365a7b233eae1033c75ff8062b3eabed">14e45c</a> Distinct jobs to avoid possible duplication when config is doubled (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8372547e68bd497a2b47ac6718e1db3be9a7aa43">837254</a> cleanup (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d0cf6b8f9324b10ddebe819e4f59bea1a42eeec5">d0cf6b</a> added NETCore.Platforms dependency to make dotnet cli restore our Core projects (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f7a20e87579e7ed0cd3b93d43bdb185361a4c9bb">f7a20e</a> replacing the chars that are invalid for file names, not only paths #148 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e31872d1e521da27d46a919a58fb29253562e56a">e31872</a> Set library version: 0.9.5 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Johan Larsson (<a href="https://github.com/JohanLarsson">@JohanLarsson</a>)</li>
+<li>Matt Warren (<a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.9.5">v0.9.5</a></em></p>
 <p><em>Date: May 02, 2016</em></p>

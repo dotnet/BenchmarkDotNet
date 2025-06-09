@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.13.3.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.13.3.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -195,6 +195,232 @@ As part of this hackathon we have received following PRs:</li>
 <ul>
 <li><a href="https://github.com/9ee1/Capstone.NET/pull/37">9ee1/Capstone.NET#37</a> Sign Assembly with a Strong Name (by <a href="https://github.com/9ee1">@9ee1</a>)</li>
 </ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.3">v0.13.3</a> scope,
+29 issues were resolved and 71 pull requests were merged.
+This release includes 87 commits by 22 contributors.</p>
+<h2 id="resolved-issues-29">Resolved issues (29)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/989">#989</a> [Suggestion] add API for detecting benchmark run failures. (assignee: <a href="https://github.com/emanuel-v-r">@emanuel-v-r</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1422">#1422</a> --disasm switch on ARM64 throws Exception (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1469">#1469</a> Host exe marked /largeaddressaware</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1521">#1521</a> Iteration setup and cleanup causes job baseline error with multiple runtimes passed to BenchmarkSwitcher</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1684">#1684</a> Getting System.FormatException when passing certain string as params. (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1709">#1709</a> BenchmarkSwitcher executes all benchmarks that share a base class (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1736">#1736</a> Consider adding an ExceptionDiagnoser (assignee: <a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1737">#1737</a> runtime knobs broken link (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1799">#1799</a> Enable interactive, incremental runs through the terminal (assignee: <a href="https://github.com/melias">@melias</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1839">#1839</a> Markdown output should escape the output</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1867">#1867</a> Trailing newline characters in input value break summary table</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1933">#1933</a> how to debug reflection error</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2064">#2064</a> Running with .Net 6/7 Mono JIT (assignee: <a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2070">#2070</a> BenchmarkDotNet crashing on Linux with DisassemblyDiagnoser (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2088">#2088</a> Running on Linux leaves terminal colors changed (assignee: <a href="https://github.com/farQtech">@farQtech</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2099">#2099</a> WASM is recognized as NativeAOT</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2102">#2102</a> Add benchmarking progress to console title (assignee: <a href="https://github.com/franciscomoloureiro">@franciscomoloureiro</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2125">#2125</a> Tests Just Stop Running During Run (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2126">#2126</a> DotNet 6 - VB - Error: The type or namespace name 'DeserializingBenchmarks' could not be found in the global namespace (are you missing an assembly reference?)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2131">#2131</a> --filter should include argument/params names (assignee: <a href="https://github.com/blouflashdb">@blouflashdb</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2146">#2146</a> Build warning MSB3245: Could not locate the assembly <code>Mono.Posix</code></li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2167">#2167</a> Site: No vertical bar should be displayed for the Main page</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2185">#2185</a> WarmupCount=0 doesn't work (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2187">#2187</a> Reports for InProcess jobs don't include non-Result measurements (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2189">#2189</a> broker.ProcessData() hangs if something wrong is the spawned process (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2210">#2210</a> Broken integration tests on Ubuntu 22.04 (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2211">#2211</a> Setting affinity does not work for Environment.ProcessorCount &gt;= 32 (assignee: <a href="https://github.com/Donis-">@Donis-</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2216">#2216</a> ppc64le architecture support required for running benchmarks on Power Systems (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2223">#2223</a> Disassembler fails to disassemble some methods on Linux when using recursive mode (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-71">Merged pull requests (71)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2018">#2018</a> Port JetBrains' nullability annotations and clean-up code. (by <a href="https://github.com/teo-tsirpanis">@teo-tsirpanis</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2085">#2085</a> Use latest AzDO macOS pool (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2087">#2087</a> Nit: fix broken link (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2092">#2092</a> Use Pipes for host and benchmark process communication (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2095">#2095</a> [NativeAOT] use PublishAot and don't reference ILCompiler in explicit way (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2096">#2096</a> ExecuteResult: Surface a Data property so the full output can be acce… (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2101">#2101</a> Added a command line arg for not inducing any GCs while running Benchmarks (by <a href="https://github.com/mrsharm">@mrsharm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2104">#2104</a> Fix invalid pre-requisites NativeAOT link in the 0.13.2 changelog (by <a href="https://github.com/KeterSCP">@KeterSCP</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2107">#2107</a> Implement TryGetReferencedAddress for relative branches (by <a href="https://github.com/janvorli">@janvorli</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2112">#2112</a> Disambiguate NativeAOT, and Wasm identification in BenchmarkDotNet.Po… (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2116">#2116</a> Implement apples to apples comparison mode (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2117">#2117</a> PerfCollect diagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2118">#2118</a> Resolve indirect addresses in disassembly (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2119">#2119</a> Initial version of the Arm64 instruction formatter (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2120">#2120</a> Roslyn Toolchain does not support .NET Core (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2123">#2123</a> Added other arm64 constant form extraction plus other changes (by <a href="https://github.com/janvorli">@janvorli</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2127">#2127</a> arm64 disassembler (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2132">#2132</a> fix: include argument and param names in --filter (by <a href="https://github.com/blouflashdb">@blouflashdb</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2133">#2133</a> ensure CompositeLogger is synchronized (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2134">#2134</a> [Mono] Disable LLVM JIT (by <a href="https://github.com/fanyang-mono">@fanyang-mono</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2135">#2135</a> Escape Param data for the exporters (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2136">#2136</a> Pass non escaped strings to generated project (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2137">#2137</a> Update doc links and reduce redirects (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2140">#2140</a> Update console title with benchmark information (by <a href="https://github.com/franciscomoloureiro">@franciscomoloureiro</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2142">#2142</a> Issue 2064: Mono70 moniker (by <a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2143">#2143</a> throw an exception when multiple benchmark projects with the same name are found (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2144">#2144</a> Automated spellcheck for docs via GitHub Actions (and address all raised issues) (by <a href="https://github.com/SeanKilleen">@SeanKilleen</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2145">#2145</a> Handle addresses larger than 2GB for 32-bit benchmarks #1469 (by <a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2148">#2148</a> adding validation errors when the benchmarks are unsupported (by <a href="https://github.com/emanuel-v-r">@emanuel-v-r</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2150">#2150</a> Update StaThread intro documentation (by <a href="https://github.com/norepro">@norepro</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2151">#2151</a> Fix user input matching (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2152">#2152</a> Make ParamsAllValues validator mandatory (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2154">#2154</a> remove dependency to Mono.Posix.NETStandard to unblock WASM benchmarks runs (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2158">#2158</a> Add taskbar progress (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2160">#2160</a> Corrected logic to restore foreground color in ConsoleLogger.cs (by <a href="https://github.com/farQtech">@farQtech</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2164">#2164</a> 1799 adding resume arg (by <a href="https://github.com/melias">@melias</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2168">#2168</a> Fix bugs and typos (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2169">#2169</a> Issue #1736: Add ExceptionDiagnoser (by <a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2172">#2172</a> Cleanup NuGet.config (by <a href="https://github.com/Youssef1313">@Youssef1313</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2174">#2174</a> Added the ability to not run with Evaluation Overhead (by <a href="https://github.com/mrsharm">@mrsharm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2175">#2175</a> Rename TargetCount to IterationCount in SimpleJob attribute (by <a href="https://github.com/johanvts">@johanvts</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2176">#2176</a> Fix #1521 (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2177">#2177</a> Simplify GetHashCode() (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2180">#2180</a> Fix race in AsyncProcessOutputReader (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2181">#2181</a> Fix #2167 - Give main page a title. Then the tab displays 'Home | Be…' (by <a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2182">#2182</a> Fix a threading issue in ExceptionDiagnoser #1736 (by <a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2183">#2183</a> Remove allowMultiple=true from column attributes (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2186">#2186</a> Fix EngineStage.Run for warmupCount=0 (fixes #2185) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2188">#2188</a> Engine.Run() should return the full list of performed measurements (fixes #2187) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2192">#2192</a> Add net8.0 support to all existing runtimes and toolchains (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2193">#2193</a> use ImmutableConfig when doing apples-to-apples comparison (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2196">#2196</a> Docs: Add note for ETW Profiling regarding Intel TDT (by <a href="https://github.com/rbanks54">@rbanks54</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2200">#2200</a> Fix resources leak (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2201">#2201</a> fix WASM support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2202">#2202</a> Fix job filtering (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2204">#2204</a> Deprecate RunSource/RunUrl methods (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2207">#2207</a> Avoid hangs when starting benchmark process fails (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2208">#2208</a> Fix Full Framework tests (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2209">#2209</a> Update SDK to .NET 7, re-enable tests (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2212">#2212</a> use the new, strong-name signed Capstone.NET (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2217">#2217</a> Bump Newtonsoft.Json (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2219">#2219</a> add Armv6 and Ppc64le architectures support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2220">#2220</a> Remove duplicate reference (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2221">#2221</a> NuGet.org should be the default feed for NativeAOT 7.0 ILCompiler (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2222">#2222</a> arm64 disassembler tests (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2227">#2227</a> Add support for MonoVM to MemoryDiagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2228">#2228</a> Increase max supported affinity from 31 to 64 (#2211) (by <a href="https://github.com/Donis-">@Donis-</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2230">#2230</a> Add support for .NET SDK that uses Mono instead CLR as a default VM (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2231">#2231</a> improve Android support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2234">#2234</a> Disassembler realiability fixes (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2235">#2235</a> tests can't assume x64 hardware (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="commits-87">Commits (87)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/33b288ff2918d31c461f0de64908f99e24a4b45e">33b288</a> Use latest AzDO macOS pool (#2085) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/83750baceb71cb0c81a01145a5872b63bc7db858">83750b</a> Postrelease v0.13.2 update (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/188c11c58b2c6a8e8a704c9a42b0a00b955e8406">188c11</a> Nit: fix broken link (#2087) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3a18b185f949fc5312a19197ca70b765d1a11212">3a18b1</a> use PublishAot and don't reference ILCompiler in explicit way (#2095) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8ed521f86303fc0613d5f82d9ffb592cafa0f8c9">8ed521</a> Added a command line arg for not inducing any GCs while running Benchmarks (#... (by <a href="https://github.com/mrsharm">@mrsharm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8514b239fea5939f888df2f976d4763a978b5784">8514b2</a> ExecuteResult: Surface a Data property so the full output can be accessed (#2... (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/58f2d18d67e8d21b80c9ffef8301d3d924fd3e9f">58f2d1</a> Use Pipes for host and benchmark process communication (#2092) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b525ba3d27fb4a471280256cbd9f0013c97d1281">b525ba</a> Fix invalid pre-requisites NativeAOT links in the docs (#2104) (by <a href="https://github.com/KeterSCP">@KeterSCP</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0cee16960f6f5f757158a897e762917163a43ada">0cee16</a> Disambiguate NativeAOT, and Wasm identification in BenchmarkDotNet.Portabilit... (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/21a29406406aeca1cdfa195fa86ac28d04ba8e33">21a294</a> Implement apples to apples comparison mode (#2116) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/37d0cf5d36bc2c99822084c19e53dd4c56f28715">37d0cf</a> Roslyn Toolchain does not support .NET Core (#2120) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dbccef2dc2879a44dee983f843e991d761f6462c">dbccef</a> Add workflows/docs-stable.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d03287b019f0443171de931b1330d2a129d3d91e">d03287</a> PerfCollect diagnoser (#2117) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/de5cf4f56cf10fefe9345d84401ac833c30962de">de5cf4</a> Bump docfx 2.59.3-&gt;2.59.4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7e87e825e8bfa2be4d5cbda0301b969716ea3f98">7e87e8</a> Update workflows/docs-stable.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ff443adb5a03acbc42cbd9b99052c772f2bc698c">ff443a</a> Update workflows/docs-stable.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a78c2e6a6e3db79069fb5bbbd6da6e5cbea8c029">a78c2e</a> Add write-all permissions to workflows/docs-stable.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f4d99ab7b81cccf9322fe6ae084572d8eeb9cade">f4d99a</a> arm64 disassembler (#2127) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/97c2d14f548823206cb26db5d8316fe475ae4e52">97c2d1</a> ensure access to logger is synchronized for async output reader (#2133) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9938c3c649fe2a9709eeafad5858e4a0eb2a5423">9938c3</a> include argument and param names in --filter (#2132) (by <a href="https://github.com/blouflashdb">@blouflashdb</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7f9590afbbcf8ed7e983c39634e5915c60913d78">7f9590</a> Update doc links and reduce redirects (#2137) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/95bb2aa2392a8541a6c815c6a9f95bafb3f56e5d">95bb2a</a> Escape Param data for the exporters (#2135) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ecb25bf413923ac9976ced1b55223fd89f6fb664">ecb25b</a> Pass non escaped strings to generated project (#2136) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5ed46d575ead7f3a85de5605e234f5d534f536e3">5ed46d</a> [Mono] Disable LLVM JIT (#2134) (by <a href="https://github.com/fanyang-mono">@fanyang-mono</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1f5637c784ad9887a2d5abdba54d1337655281b1">1f5637</a> throw an exception when multiple benchmark projects with the same name are fo... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/095975f40252f265254acb517a114690674d5f5a">095975</a> Handle addresses larger than 2GB for 32-bit benchmarks #1469 (#2145) (by <a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8d2379626ecfa547a2e7e6eaab808785baf484cf">8d2379</a> Update console title with benchmark information (#2140) (by <a href="https://github.com/franciscomoloureiro">@franciscomoloureiro</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f8e0a5c23883fa6ea4a975cd08a0071c4648472c">f8e0a5</a> Automated spellcheck for docs via GitHub Actions (and address all raised issu... (by <a href="https://github.com/SeanKilleen">@SeanKilleen</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/db8f8d85db44f35af97e763b90f2ffd256eb99e0">db8f8d</a> Fix spelling warning in docs/articles/configs.jobs.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/adf9d603471afd0ca14bdc9ae71c89fe8369aa00">adf9d6</a> Fix BenchmarkSwitcher user input matching (#2151) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b758d20b44e6779f1d0cbbce1e000dfe91c448b2">b758d2</a> Update StaThread intro documentation (#2150) (by <a href="https://github.com/norepro">@norepro</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/eda1a412418ba59eda676cd909accbed6756eeee">eda1a4</a> remove dependency to Mono.Posix.NETStandard to unblock WASM benchmarks runs (... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/58d4bae8996b713f21d6472702d95b21a77f79c9">58d4ba</a> Make ParamsAllValues validator mandatory (#2152) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/28bf214dee0b1f6937851e6f1d09f1f5ae133df1">28bf21</a> adding validation errors when the benchmarks are unsupported (#2148) (by <a href="https://github.com/emanuel-v-r">@emanuel-v-r</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1fb1015556039664451dd101b4e2ef9501e03805">1fb101</a> Corrected logic to restore foreground color in ConsoleLogger.cs (#2160) (by <a href="https://github.com/farQtech">@farQtech</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c02c3d82bbefa6236660a7b7405f38e739679daf">c02c3d</a> Fix bugs and typos (#2168) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0f7eb25eb4097e7926b75bf765d21a0a175a86a3">0f7eb2</a> Implement --resume support (#2164), fixes #1799  (by <a href="https://github.com/melias">@melias</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7d83758b271d901dd0c67225fcfeea1084731ed6">7d8375</a> Issue #1736: Add ExceptionDiagnoser (#2169) (by <a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/64c3a3cb4ad4057b6065a2783a4b333206f8b5e5">64c3a3</a> Implement MonoVM toolchain for net6.0 and net7.0 monikers (#2142) fixes #2064 (by <a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c6989543d2e42f1bdc316d53d3e2711cc9d3aa82">c69895</a> Add taskbar progress (#2158) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1638995e405fcfca4b6d094614a12baf20b275d1">163899</a> Cleanup NuGet.config (#2172) (by <a href="https://github.com/Youssef1313">@Youssef1313</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f4c0a718201cebe169d9695bbb11ecb32e100b2d">f4c0a7</a> Added the ability to not run with Evaluation Overhead from command line (#2174) (by <a href="https://github.com/mrsharm">@mrsharm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ce1b7491bde1ba897450a4d5ab7e0ee49ba67353">ce1b74</a> Rename TargetCount to IterationCount in SimpleJob attribute (#2175) (by <a href="https://github.com/johanvts">@johanvts</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/18c6ffdfc25ce9c94ce5e099ac659c08852789b8">18c6ff</a> Fix #1521 (#2176) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4eb6d385c33cbaaeb0185bb8b8e7eb8c587597c7">4eb6d3</a> Bump Build.csproj TFM to net6.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/279c96dd19c42422e5365508bb2d6a3258124890">279c96</a> Bump actions/checkout v2-&gt;v3 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a1c62cae153a4a237eef1ca63c308041e3e62f61">a1c62c</a> Bump actions/checkout v2-&gt;v3 for spellcheck.yml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7ba989292ef03cfec57a13700a7e4cd5508776ed">7ba989</a> Automatically generate redirects in documentation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d55c47edff3962b642d4bcfe477e5494fe65165e">d55c47</a> Remove old redirect files in documentation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b6d329d8f69dcf058791677a86c7b8277f1e0662">b6d329</a> Bump System.Drawing.Common in BenchmarkDotNet.Samples.csproj: 4.5.1-&gt;4.7.2 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ee81250d051aab59ec015518dc7a450569d9db4b">ee8125</a> Remove allowMultiple=true from column attributes (#2183) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ddd2f31c9d1b6eaf6ac40d63b782977623ca74d8">ddd2f3</a> Fix a threading issue in ExceptionDiagnoser #1736 (#2182) (by <a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/276f1add338e6a4c49053dc4809474d9ad9b91f8">276f1a</a> Fix EngineStage.Run for warmupCount=0 (fixes #2185) (#2186) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/681a6384f5ea62c4a88c8fd50b13e6c992b10c98">681a63</a> Fix #2167 - Give main page a title. Then the tab displays 'Home | BenchmarkDo... (by <a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/00f69361f1dda1b398407b07c8f4d6af9c783f50">00f693</a> Fix race in AsyncProcessOutputReader (#2180) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/36e9985b86fde72a4c1bd8003566d8a108da741d">36e998</a> Disable MemoryDiagnoserSupportsNativeAOT on osx-arm64 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9e759f9bc5f910f4816a4eb4753fa33db6e67b72">9e759f</a> Disable ThreadingDiagnoserTests with ILCompiler 6.0.0-rc.1.21420.1 on osx-arm64 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e75bdd8507b4c3042091dd7aee158ae0238b8d4d">e75bdd</a> Engine.Run() should return the full list of performed measurements (fixes #21... (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/28a8e78a721d685696dde3fdcfc1ba0f317e11c8">28a8e7</a> Simplify GetHashCode() (#2177) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/36f9e7309630b99a86940d32862c1f6135d2bab3">36f9e7</a> Set net6.0 as the first TFM for BenchmarkDotNet.Tests (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/761590eb1a0ab813e4c53ccfa8903608ae31cb12">761590</a> Add net8.0 support to all existing runtimes and toolchains (#2192) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8b6159139280d094630db16efa4c7fc75e13c8a5">8b6159</a> use ImmutableConfig when doing apples-to-apples comparison (#2193) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a4ab68f63f4185e26090ff96f41ceafef48a5d86">a4ab68</a> Docs: Add note for ETW Profiling regarding Intel TDT and Windows Defender (#2... (by <a href="https://github.com/rbanks54">@rbanks54</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9c32a878f2d7bef3314e2fd4ad7bfa1048915439">9c32a8</a> fix resources leak (#2200) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ad8e9b26ef22aa77abff2469f7668986e1449127">ad8e9b</a> fix WASM support (#2201) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ccbaf08b03b38d1d418756a9e528c60c9f4951d1">ccbaf0</a> Remove duplicated jobs when creating immutable config (#2202) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/90c82bb1e3188787471076a2604017103f93a361">90c82b</a> Deprecate methods (#2204) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/47b8b7269f561b640261fdbd6259ae082eebfb38">47b8b7</a> Avoid hangs when starting benchmark process fails (#2207) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7982b8c6500348f46ea8aa870b886f73c6f441c2">7982b8</a> Fix Full Framework tests (#2208) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/61b3c56d94a4f6f014bb58686f2f19f9268f99cb">61b3c5</a> Update SDK to .NET 7, re-enable NativeAOT tests, fix some other tests (#2209) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d383135825b66a99447bf4460255ed694375ca47">d38313</a> use the new, strong-name signed Capstone.NET (#2212) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b4015052b9e94306582d0c602c845e13eb3fa0bb">b40150</a> add Armv6 and Ppc64le architectures support (#2219) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5ce28b20ad8429caf25e1d51774569b7d9a20050">5ce28b</a> Bump Newtonsoft.Json (#2217) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3531c127d1d2521fcb5ed228c8ceb9d1eaa40872">3531c1</a> Port JetBrains' nullability annotations and clean-up code. (#2018) (by <a href="https://github.com/teo-tsirpanis">@teo-tsirpanis</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5ef855a4f23338e639d70b49bdaf895cd2537870">5ef855</a> Remove duplicate reference (#2220) (by <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ee24d7b1671683942b364ae456a415faeabc9236">ee24d7</a> NuGet.org should be the default feed for NativeAOT 7.0 ILCompiler package (#2... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/530d001aa803ab85f199816a3cb57a7775bba9ca">530d00</a> arm64 disassembler tests (#2222) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/69928565a98a26d489611a966d99e90ce52f1952">699285</a> Add support for MonoVM to MemoryDiagnoser (#2227) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0c90af71e1784f3cd304ac9fbd77f949bf991162">0c90af</a> change something small just to triegger the CI (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2cce425a69f23b2c9a0de93ceb80c0cc915e5ec6">2cce42</a> improve Android support (#2231) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a6ef739bce41e6c12e82a1866dcbf40895b3847e">a6ef73</a> don't run Long Running Test on AppVeyor, try to avoid 1h timeouts (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bf8b53163f3937f10b5d723fff15b7c51c05f758">bf8b53</a> Increase max supported affinity from 31 to 64 (#2211) (#2228) (by <a href="https://github.com/Donis-">@Donis-</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/82f03f4d4222dfcf4e19e1f32a47867342a680d1">82f03f</a> Add support for .NET SDK that uses Mono instead CLR as a default VM (#2230) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/96844853b8c15eeed65ef8349aa9dbe47fb05248">968448</a> Disassembler realiability fixes (#2234) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a098bc1761c9157dbca5bd10ef6d08840620136e">a098bc</a> tests can't assume x64 hardware (#2235) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2665ac7c38f3edecbd7f593f25941eb613cbd779">2665ac</a> Prepare v0.13.3 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0714f5f4a97bc74ff0ac5860525527c8e8825205">0714f5</a> Set library version: 0.13.3 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-22">Contributors (22)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Ankit Jain (<a href="https://github.com/radical">@radical</a>)</li>
+<li>blouflashdb (<a href="https://github.com/blouflashdb">@blouflashdb</a>)</li>
+<li>Donis- (<a href="https://github.com/Donis-">@Donis-</a>)</li>
+<li>Emanuel Ramos (<a href="https://github.com/emanuel-v-r">@emanuel-v-r</a>)</li>
+<li>Fan Yang (<a href="https://github.com/fanyang-mono">@fanyang-mono</a>)</li>
+<li>farQtech (<a href="https://github.com/farQtech">@farQtech</a>)</li>
+<li>franciscomoloureiro (<a href="https://github.com/franciscomoloureiro">@franciscomoloureiro</a>)</li>
+<li>Johan von Tangen Sivertsen (<a href="https://github.com/johanvts">@johanvts</a>)</li>
+<li>leonvandermeer (<a href="https://github.com/leonvandermeer">@leonvandermeer</a>)</li>
+<li>Maykon Elias (<a href="https://github.com/melias">@melias</a>)</li>
+<li>Mukund Raghav Sharma (Moko) (<a href="https://github.com/mrsharm">@mrsharm</a>)</li>
+<li>norepro (<a href="https://github.com/norepro">@norepro</a>)</li>
+<li>Richard Banks (<a href="https://github.com/rbanks54">@rbanks54</a>)</li>
+<li>Sean Killeen (<a href="https://github.com/SeanKilleen">@SeanKilleen</a>)</li>
+<li>Sergey Aseev (<a href="https://github.com/Serg046">@Serg046</a>)</li>
+<li>Sergiusz Zalewski (<a href="https://github.com/KeterSCP">@KeterSCP</a>)</li>
+<li>Theodore Tsirpanis (<a href="https://github.com/teo-tsirpanis">@teo-tsirpanis</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li>Yegor Stepanov (<a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
+<li>Youssef Victor (<a href="https://github.com/Youssef1313">@Youssef1313</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: December 26, 2022</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.3">v0.13.3</a></em>

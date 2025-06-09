@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.9.6.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.9.6.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -92,6 +92,81 @@
 <li>Added support for Json export (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/84">#84</a>)</li>
 <li>Bugfixes</li>
 </ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.9.6">v0.9.6</a> scope,
+11 issues were resolved and 2 pull requests were merged.
+This release includes 40 commits by 5 contributors.</p>
+<h2 id="resolved-issues-11">Resolved issues (11)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/100">#100</a> Code generation doesn't support generic classes</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/112">#112</a> Generic benchmark classes are not supported</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/140">#140</a> Readd an ability to define and to use custom Toolchain</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/141">#141</a> [Request for comments] Assembly-level config attribute?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/151">#151</a> Crash during benchmark with baseline</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/152">#152</a> MarkdownExporter.Default.ExportToLog fails with NRE for Summary with Critical Validation Errors</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/153">#153</a> ManualConfig.Add(IConfig config) does not add the validators.</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/156">#156</a> Cleanup benchmark folders</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/158">#158</a> BaselineDiffColumn: NullReferenceException if one of the benchmark methods was failed.</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/161">#161</a> Build warnings after update to 0.9.5</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/171">#171</a> Problem with ExceptionDispatchInfo (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-2">Merged pull requests (2)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/138">#138</a> Percentiles added into Statistics, StatisticColumn, BaselineDiffColumn (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/164">#164</a> Percentiles added into Statistics, StatisticColumn, BaselineDiffColumn (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+</ul>
+<h2 id="commits-40">Commits (40)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9e625a0d3d39fdbbf89740fbf8408afdbe1c6d38">9e625a</a> copying validators when merging configs, fixes #153 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5d0a7d9074496af939f65afffd17013f3efad10d">5d0a7d</a> returning empty objects instead of nulls, fixes #152 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cfff3b92b3586749a82de3d179bda423878deada">cfff3b</a> switching back to the old moniker that is supported not only by dnx and dotne... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/522fde418d0063a345c477ea8fe4c819ae19fc1f">522fde</a> Initial work on Json export (#84) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/31452f3a0698be785fa37e8668d2f54df26a5595">31452f</a> Make SimpleJson build under &quot;DNXCore,Version=v5.0&quot; -  (#84) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/48b17aac6e6ac36ee77d44b023dca24149877b10">48b17a</a> Merge branch 'develop' of github.com:PerfDotNet/BenchmarkDotNet into develop (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d8dad6cf3d41e9d48b0129b642957596587cf500">d8dad6</a> removing ClrMD dependencies that were causing troubles with nuget package rel... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0a81d4cca4dbeec8d5653dc10d54d9469fd8eb26">0a81d4</a> removing ClrMd diagnosers, they are kept in clrmd branch (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/972ea23f1a160e6cf141ec9051c41b871dd4881f">972ea2</a> setting BenchmarkDotNet version to one that is not in the Nuget yet to get do... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1e65819e68faaa3187bad7441171f324f6026223">1e6581</a> Removing final traces or Runtime and Source SourceDiagnosers (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3576d4f4ccd619bcdff79742abb4d9496da7b0fc">3576d4</a> Make BaselineDiffColumn more robust - fixes #158 and #151 (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3f0d7bbc21d5ac6c4f903e050d1a4d3ad3fba251">3f0d7b</a> Exclude &quot;BenchmarkDotNet.Artifacts&quot; folder (can get in the way when building) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/00995dfac270ae71e81897348ec379cd97fb01c3">00995d</a> Percentiles added into Statistics, StatisticColumn, BaselineDiffColumn (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2410d4c2cd772def2b7c5271f7d7ff756621891e">2410d4</a> Update project.json files (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ed75f614836b4cc990b9be8baf7ffde4af17f87d">ed75f6</a> Assembly-level config attribute, Fixes #141 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6f3a0cc97b3cb55289c61c6aab5d59e24c2b423c">6f3a0c</a> Add a BenchmarkSwitcher constructor for assembly, see #141 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4124d054a8fc6ffb12a4b81e4ec80164d12eb043">4124d0</a> Catch InvalidOperationException in ClassicBuilder (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9c8513fc02eaff368ef2955f8118173373d9871a">9c8513</a> Cleanup benchmark folders (by default!), fixes #156 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d0179f2dc0c47b759bc5f1fb997ab965700b7492">d0179f</a> merge KeepBenchmarkFiles and allow fluent api usage, #156 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b8130a47c149ca2e1ddbdc9319fe2bbaa86d7243">b8130a</a> Readd an ability to define and to use custom Toolchain, fixes #140 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8a263b23e7a70726546dbd7d020607e571f19926">8a263b</a> moving KeepBenchmarkFiles merge logic to Add method (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e1e5c7c7fc349d106d48ec0bf0cd4b13888c61c3">e1e5c7</a> Sample &amp; documentation for percentiles (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0d42625e067b8575cefc07bbabe3011f1acb08c7">0d4262</a> Merge commit '00995dfac270ae71e81897348ec379cd97fb01c3' into feature-percentiles (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/54b4f03297a31c45687b82b88c9c67da98c85241">54b4f0</a> Merge pull request #164 from ig-sinicyn/feature-percentiles (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f8278cc1dce8785411b349383889b9d591fa8165">f8278c</a> Generic benchmark support, fixes #100, fixes #112 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c280565c88e330688e2ea0c37c06317ff1e22926">c28056</a> Support Mono+.NET4.6 in CommonExtensions.ToStr. (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/285f774ea1c2cacd2ef2006be304da8e88800fc6">285f77</a> set dependencies to MSBuild dlls as &quot;type&quot;: &quot;build&quot; to make them implicit dep... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/42abd100c2089b1a11fd35a895cf499ab7a7f2e6">42abd1</a> Merge remote-tracking branch 'refs/remotes/origin/develop' into develop (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/030d6c1223a10cbb80b4d7932151c27da759bf02">030d6c</a> Rename &quot;GCDiagnoser&quot; -&gt; &quot;MemoryDiagnoser&quot; (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4e96e65cc3405f0f9cae2c649f9ef14472c3b557">4e96e6</a> give compilation error instead of warning or exception at runtime (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0fbe1054303ec6c7270d5f84948b991979992b8e">0fbe10</a> Revert &quot;give compilation error instead of warning or exception at runtime&quot; (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19708ad7bccb817423095c9cedb13a4aa53bc9f1">19708a</a> Tidy up of the Integration tests (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f7b3a459a92fa13ca7ef1246b99f5774f544dd9c">f7b3a4</a> Thread safe jobs, fixes #171 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/edf293f6d6c69d18eeb0a4f3f4725bb06efdfe74">edf293</a> DisableTestParallelization for Classic integration tests to avoid races (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/89165f2193c074a1ebb3a78d269d6c07fef444b7">89165f</a> moving dll that is required for custom path integration tests out of root folder (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cbaa3bef2a3889eef3c2262b59b7bd693217bd6b">cbaa3b</a> README: Add additional info about RPlotExprter (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1cc93674b2dbacae49b3e792be6376c5403d3285">1cc936</a> The benchmark is improperly testing the Max operation because as all the numb... (by <a href="https://github.com/redknightlois">@redknightlois</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/40a1ea0fd8fb646b71077e01b41404f1eae5ec2e">40a1ea</a> Merge pull request #173 from redknightlois/develop (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a9bf3ba0c406ac28641a59d87e0bf820046b4173">a9bf3b</a> README: add information about the diagnostics package (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5191bc98e19d97dce83fd944172d9fe491d7f8de">5191bc</a> Set library version: 0.9.6 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-5">Contributors (5)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Federico Andres Lois (<a href="https://github.com/redknightlois">@redknightlois</a>)</li>
+<li>ig-sinicyn (<a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li>Matt Warren (<a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.9.6">v0.9.6</a></em></p>
 <p><em>Date: May 11, 2016</em></p>

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.10.7.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.10.7.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -95,6 +95,58 @@
 <li>Building Sources on Linux: it's possible to build the solution (with unloaded F#/VB projects), run samples (for both net46/netcoreapp1.1), run unit tests (for netcoreapp1.1 only)</li>
 <li>Fix minor bugs in <code>JsonExporter</code> (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/451">#451</a>)</li>
 </ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.7">v0.10.7</a> scope,
+6 issues were resolved and 1 pull requests were merged.
+This release includes 24 commits by 4 contributors.</p>
+<h2 id="resolved-issues-6">Resolved issues (6)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/66">#66</a> Friendliness to LinqPad (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/248">#248</a> Support a &quot;category&quot; attribute for selecting benchmarks (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/270">#270</a> Add support for Cleanup and Setup between benchmarks (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/274">#274</a> Support for run-once Setup and Clean-up with Parameters available (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/325">#325</a> Setup &amp; Cleanup versions of attribute which would run before/after each benchmark iteration (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/445">#445</a> Missing reference to Microsoft.CodeAnalysis.CSharp when using BenchmarkDotNet in Linqpad (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-1">Merged pull requests (1)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/451">#451</a> Fix minor bugs in JsonExporter (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
+</ul>
+<h2 id="commits-24">Commits (24)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a54645f19de59e0b9f2852c194a2cc7731d17959">a54645</a> handle the LINQPad shadow copying, #445, #66 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fe3032b2f84d62b5c298e46a72caaba2ac166904">fe3032</a> Add Filters (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2e7427cc4bf43e2a46fa2cb869e275b4c9ddd101">2e7427</a> Add categories (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f96346725f6b7515e650fcaeb580960e2df8f12d">f96346</a> Add categories filters (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/34f808b16f7b0d04deef4845ee8f3666646f78d2">34f808</a> Support category filters in BenchmarkSwitcher (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/786afeecf6d1cd620e3cc169983f6c40ef55d13d">786afe</a> Implement join mode in BenchmarkSwitcher (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a77a777606e5411f88f1e7c0ef1f206fc8855096">a77a77</a> Post code review changes (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cc700677d0ca0573b08401c5b4133ff9aaed57c5">cc7006</a> Fix minor bugs in JsonExporter (#451) (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4dd789d8a5d95ffd3d35737f2ee1fc948e7bbd8d">4dd789</a> Rename Setup/Cleanup to GlobalSetup/GlobalCleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/21369c23a97207f838411da85f09ee6f7974bce4">21369c</a> Introduce IterationSetup/IterationCleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0e9be7d0160a3427d8c442970af52da192fd39bc">0e9be7</a> Add IterationSetupCleanupAnalyser (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4f3703edc2da82e94cd27792bdd7236fdb1fbf22">4f3703</a> docs: update structure (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5fe5647a158b41d0c2c949b6e04bca44ec5ff1d7">5fe564</a> docs: add info about RunStrategy.Monitoring and new Setup/Cleanup attributes (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/87ce0fec1e4700ed238865c8237917bebbb03ab5">87ce0f</a> Mark ProcessPropertiesTests as WindowsOnly (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7e479e9e09ffe75eef712a6b4989c3b18d38cba2">7e479e</a> Fix typo in File_StreamVsMemoryMapperVewStream.cs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9755141a81e567c99de07aaac32d4f181784935a">975514</a> Wrong xml doc comment (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/165b1344a2b6ebcbf75c257d2548e713e46e1ea9">165b13</a> Merge pull request #455 from ig-sinicyn/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/afa803d0e38c0e11864b2e4394d4a85d3801d944">afa803</a> better Value Types support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d16ddb499e12da0bfde740912f5b9f49c7bf4e8c">d16ddb</a> workaround for weird AppVeyor behavior (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9f3d689e372cc0b671c5c0072e557a2fff1e8965">9f3d68</a> support recursive nesting for returned types (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b7668ec6d6e14a5405756a5afb4309c9341b3422">b7668e</a> Add tests/runCoreTests.sh (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3cceb6135e376c284d2640b7653c37cb63a0c8f4">3cceb6</a> runCoreTests.sh: fix output file for integration-tests (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a21421862756f617231893a60ddcf5c70a7b9c3c">a21421</a> Make some tests Windows-only (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/00a15682dd431f624b4c8f4811cc17679f564059">00a156</a> Set library version: 0.10.7 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Anssi Kettunen (<a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
+<li>ig-sinicyn (<a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: June 05, 2017</em></p>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.7">v0.10.7</a></em></p>
