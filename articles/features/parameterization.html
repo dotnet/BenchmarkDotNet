@@ -133,7 +133,7 @@ You can mark one or several fields or properties in your class by the
 <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
-The source must be within benchmarked type!</p>
+The source may be instance or static. If the source is not in the same type as the benchmark, the type containing the source must be specified in the attribute constructor.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroParamsSource.cs">using System.Collections.Generic;
 using System.Threading;
@@ -157,8 +157,17 @@ namespace BenchmarkDotNet.Samples
         // public static method
         public static IEnumerable&lt;int&gt; ValuesForB() =&gt; new[] { 10, 20 };
 
+        // public field getting its params from a method in another type
+        [ParamsSource(typeof(ParamsValues), nameof(ParamsValues.ValuesForC))]
+        public int C;
+
         [Benchmark]
-        public void Benchmark() =&gt; Thread.Sleep(A + B + 5);
+        public void Benchmark() =&gt; Thread.Sleep(A + B + C + 5);
+    }
+
+    public static class ParamsValues
+    {
+        public static IEnumerable&lt;int&gt; ValuesForC() =&gt; new[] { 1000, 2000 };
     }
 }
 </code></pre><h3 id="output">Output</h3>
@@ -328,7 +337,7 @@ namespace BenchmarkDotNet.Samples
 <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
-The source must be within benchmarked type!</p>
+The source may be instance or static. If the source is not in the same type as the benchmark, the type containing the source must be specified in the attribute constructor.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroArgumentsSource.cs">using System;
 using System.Collections.Generic;
@@ -352,9 +361,12 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        [ArgumentsSource(nameof(TimeSpans))]
+        [ArgumentsSource(typeof(BenchmarkArguments), nameof(BenchmarkArguments.TimeSpans))] // when the arguments come from a different type, specify that type here
         public void SingleArgument(TimeSpan time) =&gt; Thread.Sleep(time);
+    }
 
+    public class BenchmarkArguments
+    {
         public IEnumerable&lt;object&gt; TimeSpans() // for single argument it's an IEnumerable of objects (object)
         {
             yield return TimeSpan.FromMilliseconds(10);

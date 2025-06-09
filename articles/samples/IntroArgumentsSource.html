@@ -93,7 +93,7 @@
 <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
-The source must be within benchmarked type!</p>
+The source may be instance or static. If the source is not in the same type as the benchmark, the type containing the source must be specified in the attribute constructor.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroArgumentsSource.cs">using System;
 using System.Collections.Generic;
@@ -117,9 +117,12 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        [ArgumentsSource(nameof(TimeSpans))]
+        [ArgumentsSource(typeof(BenchmarkArguments), nameof(BenchmarkArguments.TimeSpans))] // when the arguments come from a different type, specify that type here
         public void SingleArgument(TimeSpan time) =&gt; Thread.Sleep(time);
+    }
 
+    public class BenchmarkArguments
+    {
         public IEnumerable&lt;object&gt; TimeSpans() // for single argument it's an IEnumerable of objects (object)
         {
             yield return TimeSpan.FromMilliseconds(10);

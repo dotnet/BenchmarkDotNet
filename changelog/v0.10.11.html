@@ -96,63 +96,6 @@
 <li>Better macOS version detection (<a href="https://github.com/dotnet/BenchmarkDotNet/commit/15d72388436c1060e87662b5f4519b9e7e071627">15d72388</a>)</li>
 <li>Minor fixes and improvements</li>
 </ul>
-<h2 id="milestone-details">Milestone details</h2>
-<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.11">v0.10.11</a> scope,
-6 issues were resolved and 8 pull requests were merged.
-This release includes 18 commits by 8 contributors.</p>
-<h2 id="resolved-issues-6">Resolved issues (6)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/509">#509</a> Better formatting for the Scaled column</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/579">#579</a> Improve error message about non-optimized dependencies (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/580">#580</a> How to get benchmarks running from LINQPad? (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/587">#587</a> Support netcoreapp2.1 (assignee: <a href="https://github.com/eerhardt">@eerhardt</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/588">#588</a> Broken appveyor build</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/593">#593</a> BenchmarkDotNet is not working with LinqPad (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-</ul>
-<h2 id="merged-pull-requests-8">Merged pull requests (8)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/492">#492</a> ByRef and Stack-only support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/575">#575</a> xUnit runner upgrade and small tests refactoring (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/584">#584</a> Fixed typo. (by <a href="https://github.com/cincuranet">@cincuranet</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/589">#589</a> Add support for netcoreapp2.1 (by <a href="https://github.com/eerhardt">@eerhardt</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/590">#590</a> Add precision to Scaled Column (by <a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/591">#591</a> Fix CI build (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/592">#592</a> Removed a xunit workaround because an issue has been fixed (by <a href="https://github.com/AlekseiKudelia">@AlekseiKudelia</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/597">#597</a> Fix typo in WithCustomBuildConfiguration API (by <a href="https://github.com/benjamin-hodgson">@benjamin-hodgson</a>)</li>
-</ul>
-<h2 id="commits-18">Commits (18)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2a2e6caf7a0bc2cc58508c528c603a2d72c77b59">2a2e6c</a> ByRef and Stack-only support (#492) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/676c777a05c6f2a9be9b297df8003689af659a7d">676c77</a> xUnit runner upgrade and small tests refactoring (#575) (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7a89cd2593618fe05dac68498a701a509bd6a4f8">7a89cd</a> Fixed typo. (by <a href="https://github.com/cincuranet">@cincuranet</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dd28b2afb89b9111cc7c9bf85b055f5b3cc7cbe7">dd28b2</a> add better error text for non-optimized dlls + add it to FAQ, fixes #579 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/67e659b580b881de842f9c76dd56d0f21c447db3">67e659</a> detect LINQPad problems and tell the user how to change them, fixes #580 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/543bd6f0dff04239669ff5a190a8176844a9dcea">543bd6</a> don't warn about non-optimized LINQPad dependency (it's OK), #580 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8a94f271d4478226af0d2003a6d0932cd42ecd1d">8a94f2</a> Add support for netcoreapp2.1 (by <a href="https://github.com/eerhardt">@eerhardt</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fb39db6e0f9bcfbf9396ad7d564ec220b8834b80">fb39db</a> Merge pull request #589 from eerhardt/SupportNetCoreApp21 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ef11f065bceff6a2020bc09dd0ca535f29e5afb8">ef11f0</a> Add CoverageFilterXml in DotSettings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/962b6a708420c535ba0a8819af04b457ee2ff25a">962b6a</a> Update DotSetttings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/717b62b70a48ef20fdafb8792fe01cea63de1f78">717b62</a> BenchmarkDotNet.Horology cleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d1720b77eccb0b9a686bdfdae166edc855711572">d1720b</a> Upgrade version to 2.0.3 and explicitly specify fx version for .netcoreapp2.0 (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/94d47a39f154368519523fe99f39c640ed654baa">94d47a</a> Removed a xunit workaround because an issue has been fixed (by Aleksei Kudelia)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/15d72388436c1060e87662b5f4519b9e7e071627">15d723</a> More details in GetOsVersion on macOS (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/696f89908e82118ecf9989c2484c23a6f52ba6b2">696f89</a> Add precision to Scaled Column (#590) (by <a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e54924b5a2c5080c3e5e0b528d0d46dd9ffef889">e54924</a> Fix typo in WithCustomBuildConfiguration API (by Benjamin Hodgson)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8de978e67772ff3f1f4e47cabaa2c94ce198234c">8de978</a> Merge pull request #597 from benjamin-hodgson/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/af15109226821ffcd0774df364f6d7695c4a2fdb">af1510</a> Set library version: 0.10.11 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<h2 id="contributors-8">Contributors (8)</h2>
-<ul>
-<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li>Aleksei Kudelia</li>
-<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li>Benjamin Hodgson</li>
-<li>Christopher Gozdziewski (<a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
-<li>Eric Erhardt (<a href="https://github.com/eerhardt">@eerhardt</a>)</li>
-<li>Igor Fesenko (<a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li>Jiri Cincura ↹ (<a href="https://github.com/cincuranet">@cincuranet</a>)</li>
-</ul>
-<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: December 01, 2017</em></p>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.11">v0.10.11</a></em>

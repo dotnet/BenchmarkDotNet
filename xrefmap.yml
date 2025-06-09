@@ -901,6 +901,15 @@ references:
   fullName.vb: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.New(String)
   nameWithType: ArgumentsSourceAttribute.ArgumentsSourceAttribute(string)
   nameWithType.vb: ArgumentsSourceAttribute.New(String)
+- uid: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.#ctor(System.Type,System.String)
+  name: ArgumentsSourceAttribute(Type, string)
+  href: api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html#BenchmarkDotNet_Attributes_ArgumentsSourceAttribute__ctor_System_Type_System_String_
+  commentId: M:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.#ctor(System.Type,System.String)
+  name.vb: New(Type, String)
+  fullName: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.ArgumentsSourceAttribute(System.Type, string)
+  fullName.vb: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.New(System.Type, String)
+  nameWithType: ArgumentsSourceAttribute.ArgumentsSourceAttribute(Type, string)
+  nameWithType.vb: ArgumentsSourceAttribute.New(Type, String)
 - uid: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.#ctor*
   name: ArgumentsSourceAttribute
   href: api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html#BenchmarkDotNet_Attributes_ArgumentsSourceAttribute__ctor_
@@ -922,6 +931,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Name
   fullName: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Name
   nameWithType: ArgumentsSourceAttribute.Name
+- uid: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Type
+  name: Type
+  href: api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html#BenchmarkDotNet_Attributes_ArgumentsSourceAttribute_Type
+  commentId: P:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Type
+  fullName: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Type
+  nameWithType: ArgumentsSourceAttribute.Type
+- uid: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Type*
+  name: Type
+  href: api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html#BenchmarkDotNet_Attributes_ArgumentsSourceAttribute_Type_
+  commentId: Overload:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Type
+  fullName: BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.Type
+  nameWithType: ArgumentsSourceAttribute.Type
 - uid: BenchmarkDotNet.Attributes.ArtifactsPathAttribute
   name: ArtifactsPathAttribute
   href: api/BenchmarkDotNet.Attributes.ArtifactsPathAttribute.html
@@ -3712,6 +3733,15 @@ references:
   fullName.vb: BenchmarkDotNet.Attributes.ParamsSourceAttribute.New(String)
   nameWithType: ParamsSourceAttribute.ParamsSourceAttribute(string)
   nameWithType.vb: ParamsSourceAttribute.New(String)
+- uid: BenchmarkDotNet.Attributes.ParamsSourceAttribute.#ctor(System.Type,System.String)
+  name: ParamsSourceAttribute(Type, string)
+  href: api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html#BenchmarkDotNet_Attributes_ParamsSourceAttribute__ctor_System_Type_System_String_
+  commentId: M:BenchmarkDotNet.Attributes.ParamsSourceAttribute.#ctor(System.Type,System.String)
+  name.vb: New(Type, String)
+  fullName: BenchmarkDotNet.Attributes.ParamsSourceAttribute.ParamsSourceAttribute(System.Type, string)
+  fullName.vb: BenchmarkDotNet.Attributes.ParamsSourceAttribute.New(System.Type, String)
+  nameWithType: ParamsSourceAttribute.ParamsSourceAttribute(Type, string)
+  nameWithType.vb: ParamsSourceAttribute.New(Type, String)
 - uid: BenchmarkDotNet.Attributes.ParamsSourceAttribute.#ctor*
   name: ParamsSourceAttribute
   href: api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html#BenchmarkDotNet_Attributes_ParamsSourceAttribute__ctor_
@@ -3733,6 +3763,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Attributes.ParamsSourceAttribute.Name
   fullName: BenchmarkDotNet.Attributes.ParamsSourceAttribute.Name
   nameWithType: ParamsSourceAttribute.Name
+- uid: BenchmarkDotNet.Attributes.ParamsSourceAttribute.Type
+  name: Type
+  href: api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html#BenchmarkDotNet_Attributes_ParamsSourceAttribute_Type
+  commentId: P:BenchmarkDotNet.Attributes.ParamsSourceAttribute.Type
+  fullName: BenchmarkDotNet.Attributes.ParamsSourceAttribute.Type
+  nameWithType: ParamsSourceAttribute.Type
+- uid: BenchmarkDotNet.Attributes.ParamsSourceAttribute.Type*
+  name: Type
+  href: api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html#BenchmarkDotNet_Attributes_ParamsSourceAttribute_Type_
+  commentId: Overload:BenchmarkDotNet.Attributes.ParamsSourceAttribute.Type
+  fullName: BenchmarkDotNet.Attributes.ParamsSourceAttribute.Type
+  nameWithType: ParamsSourceAttribute.Type
 - uid: BenchmarkDotNet.Attributes.PerfCollectProfilerAttribute
   name: PerfCollectProfilerAttribute
   href: api/BenchmarkDotNet.Attributes.PerfCollectProfilerAttribute.html
@@ -21002,6 +21044,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Exporters.ExporterBase.FileNameSuffix
   fullName: BenchmarkDotNet.Exporters.ExporterBase.FileNameSuffix
   nameWithType: ExporterBase.FileNameSuffix
+- uid: BenchmarkDotNet.Exporters.ExporterBase.GetArtifactFullName(BenchmarkDotNet.Reports.Summary)
+  name: GetArtifactFullName(Summary)
+  href: api/BenchmarkDotNet.Exporters.ExporterBase.html#BenchmarkDotNet_Exporters_ExporterBase_GetArtifactFullName_BenchmarkDotNet_Reports_Summary_
+  commentId: M:BenchmarkDotNet.Exporters.ExporterBase.GetArtifactFullName(BenchmarkDotNet.Reports.Summary)
+  fullName: BenchmarkDotNet.Exporters.ExporterBase.GetArtifactFullName(BenchmarkDotNet.Reports.Summary)
+  nameWithType: ExporterBase.GetArtifactFullName(Summary)
+- uid: BenchmarkDotNet.Exporters.ExporterBase.GetArtifactFullName*
+  name: GetArtifactFullName
+  href: api/BenchmarkDotNet.Exporters.ExporterBase.html#BenchmarkDotNet_Exporters_ExporterBase_GetArtifactFullName_
+  commentId: Overload:BenchmarkDotNet.Exporters.ExporterBase.GetArtifactFullName
+  fullName: BenchmarkDotNet.Exporters.ExporterBase.GetArtifactFullName
+  nameWithType: ExporterBase.GetArtifactFullName
 - uid: BenchmarkDotNet.Exporters.ExporterBase.Name
   name: Name
   href: api/BenchmarkDotNet.Exporters.ExporterBase.html#BenchmarkDotNet_Exporters_ExporterBase_Name
@@ -38304,6 +38358,9 @@ references:
 - uid: changelog.v0.15.0
   name: BenchmarkDotNet v0.15.0
   href: changelog/v0.15.0.html
+- uid: changelog.v0.15.1
+  name: BenchmarkDotNet v0.15.1
+  href: changelog/v0.15.1.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html
