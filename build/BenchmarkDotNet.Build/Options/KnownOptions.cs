@@ -29,6 +29,12 @@ public static class KnownOptions
         Aliases = new[] { "-d" }
     };
 
+    public static readonly BoolOption ForceClone = new("--force-clone")
+    {
+        Description = "Forces re-cloning of the changelog repository, deleting any existing directory.",
+        Aliases = new[] { "-f" }
+    };
+
     public static readonly BoolOption Help = new("--help")
     {
         Description = "Prints help information",
