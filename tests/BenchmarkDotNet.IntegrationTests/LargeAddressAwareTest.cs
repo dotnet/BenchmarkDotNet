@@ -5,6 +5,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -22,13 +23,20 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("CLR is a valid job only on Windows", EnvRequirement.WindowsOnly)]
         public void BenchmarkCanAllocateMoreThan2Gb()
         {
-            var summary = BenchmarkRunner
-                .Run<NeedsMoreThan2GB>(
-                    ManualConfig.CreateEmpty()
-                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core80).WithPlatform(Platform.X64).WithId("Core"))
-                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithPlatform(Platform.X86).WithGcServer(false).WithLargeAddressAware().WithId("Framework"))
-                        .AddColumnProvider(DefaultColumnProviders.Instance)
-                        .AddLogger(new OutputLogger(output)));
+            var platform = RuntimeInformation.GetCurrentPlatform();
+            var config = ManualConfig.CreateEmpty();
+            if (platform == Platform.X64 || platform == Platform.Arm64)
+            {
+                config.AddJob(Job.Dry.WithRuntime(CoreRuntime.Core80).WithPlatform(platform).WithId("Core"));
+            }
+            if (platform == Platform.X64 || platform == Platform.X86)
+            {
+                config.AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithPlatform(Platform.X86).WithGcServer(false).WithLargeAddressAware().WithId("Framework"));
+            }
+            config.AddColumnProvider(DefaultColumnProviders.Instance)
+                  .AddLogger(new OutputLogger(output));
+
+            var summary = BenchmarkRunner.Run<NeedsMoreThan2GB>(config);
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
