@@ -39,7 +39,7 @@ internal static class PowershellWmiCpuInfoParser
             }
 
             if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue)
-                && int.TryParse(frequencyValue, out int frequency)
+                && double.TryParse(frequencyValue, out double frequency)
                 && frequency > 0)
             {
                nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
