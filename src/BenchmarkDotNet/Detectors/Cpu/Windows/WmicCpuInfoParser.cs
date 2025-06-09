@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
@@ -17,14 +18,14 @@ internal static class WmicCpuInfoParser
         if (string.IsNullOrEmpty(wmicOutput))
             return null;
 
-        var processorModelNames = new HashSet<string>();
+        HashSet<string> processorModelNames = new HashSet<string>();
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
         int processorsCount = 0;
-        Frequency maxFrequency = Frequency.Zero;
-        Frequency nominalFrequency = Frequency.Zero;
+        double maxFrequency = 0.0;
+        double nominalFrequency = 0.0;
 
-        var processors = SectionsHelper.ParseSections(wmicOutput, '=');
+        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(wmicOutput, '=');
         foreach (var processor in processors)
         {
             if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
@@ -47,21 +48,8 @@ internal static class WmicCpuInfoParser
                 && int.TryParse(frequencyValue, out int frequency)
                 && frequency > 0)
             {
-                if (frequency > maxFrequency)
-                {
-                    maxFrequency = frequency;
-                }
-
-                if (frequency < maxFrequency)
-                {
-                    if (nominalFrequency != Frequency.Zero)
-                    {
-                        if (frequency < nominalFrequency)
-                            nominalFrequency = frequency;
-                    }
-                    else
-                        nominalFrequency = frequency;
-                }
+                nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
+                maxFrequency = Math.Max(maxFrequency, frequency);
             }
         }
 

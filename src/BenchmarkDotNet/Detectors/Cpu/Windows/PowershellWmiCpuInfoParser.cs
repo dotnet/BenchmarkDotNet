@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
@@ -17,9 +18,9 @@ internal static class PowershellWmiCpuInfoParser
 
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
-        int processorsCount = 0;
-        Frequency maxFrequency = Frequency.Zero;
-        Frequency nominalFrequency = Frequency.Zero;
+        int processorCount = 0;
+        double maxFrequency = 0.0;
+        double nominalFrequency = 0.0;
 
         List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(powershellWmiOutput, ':');
         foreach (Dictionary<string, string> processor in processors)
@@ -37,43 +38,30 @@ internal static class PowershellWmiCpuInfoParser
             if (processor.TryGetValue(WmicCpuInfoKeyNames.Name, out string name))
             {
                 processorModelNames.Add(name);
-                processorsCount++;
+                processorCount++;
             }
 
             if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue)
                 && int.TryParse(frequencyValue, out int frequency)
                 && frequency > 0)
             {
-                if (frequency > maxFrequency)
-                {
-                    maxFrequency = frequency;
-                }
-
-                if (frequency < maxFrequency)
-                {
-                    if (nominalFrequency != Frequency.Zero)
-                    {
-                        if (frequency < nominalFrequency)
-                            nominalFrequency = frequency;
-                    }
-                    else
-                        nominalFrequency = frequency;
-                }
+               nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
+               maxFrequency = maxFrequency == 0 ? frequency : Math.Max(maxFrequency, nominalFrequency);
             }
         }
 
         string? processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
-        Frequency? maxFrequencyActual = maxFrequency > 0 && processorsCount > 0
+        Frequency? maxFrequencyActual = maxFrequency > 0 && processorCount > 0
             ? Frequency.FromMHz(maxFrequency)
             : null;
 
-        Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorsCount > 0 ?
+        Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorCount > 0 ?
             Frequency.FromMHz(nominalFrequency) : null;
 
         return new CpuInfo
         {
             ProcessorName = processorName,
-            PhysicalProcessorCount = processorsCount > 0 ? processorsCount : null,
+            PhysicalProcessorCount = processorCount > 0 ? processorCount : null,
             PhysicalCoreCount = physicalCoreCount > 0 ? physicalCoreCount : null,
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : null,
             NominalFrequencyHz = nominalFrequencyActual?.Hertz.RoundToLong(),
