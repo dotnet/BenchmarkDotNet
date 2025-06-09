@@ -13,11 +13,8 @@ internal static class WmicCpuInfoParser
     /// Parses wmic output and returns <see cref="CpuInfo"/>
     /// </summary>
     /// <param name="wmicOutput">Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`</param>
-    internal static CpuInfo? Parse(string? wmicOutput)
+    internal static CpuInfo Parse(string wmicOutput)
     {
-        if (string.IsNullOrEmpty(wmicOutput))
-            return CpuInfo.Unknown;
-
         HashSet<string> processorModelNames = new HashSet<string>();
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
