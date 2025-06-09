@@ -35,6 +35,10 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
         string output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
             "Get-CimInstance Win32_Processor -Property " + argList);
+
+        if (string.IsNullOrEmpty(output))
+            return CpuInfo.Unknown;
+
         return PowershellWmiCpuInfoParser.Parse(output);
     }
 }
