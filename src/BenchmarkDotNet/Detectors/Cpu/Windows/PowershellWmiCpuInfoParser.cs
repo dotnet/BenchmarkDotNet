@@ -46,7 +46,7 @@ internal static class PowershellWmiCpuInfoParser
                 && frequency > 0)
             {
                nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
-               maxFrequency = maxFrequency == 0 ? frequency : Math.Max(maxFrequency, nominalFrequency);
+               maxFrequency = Math.Max(maxFrequency, frequency);
             }
         }
 
