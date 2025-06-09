@@ -19,10 +19,13 @@
     <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="[13.0.1]" />
+    <!-- Use v9.0.3 as baseline package for WithNuGet tests -->
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.3" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
     <!-- The Test SDK is required only for the VSTest Adapter to work -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.13.0]" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <!-- This package enables the Visual Studio Profiler integration IntroVisualStudioProfiler.cs -->
     <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.0.36127.1" />
   </ItemGroup>
