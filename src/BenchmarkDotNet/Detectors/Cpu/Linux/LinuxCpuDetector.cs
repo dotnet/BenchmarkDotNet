@@ -24,10 +24,10 @@ internal class LinuxCpuDetector : ICpuDetector
             ["LANGUAGE"] = "C"
         };
 
-        string? cpuInfo = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
-        string? lscpu = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu\"", environmentVariables: languageInvariantEnvironment);
+        string? cpuInfo = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo") ?? string.Empty;
+        string? lscpu = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu\"", environmentVariables: languageInvariantEnvironment) ?? string.Empty;
 
-        if (cpuInfo is null || lscpu is null)
+        if (cpuInfo == string.Empty && lscpu == string.Empty)
             return null;
 
         return LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
