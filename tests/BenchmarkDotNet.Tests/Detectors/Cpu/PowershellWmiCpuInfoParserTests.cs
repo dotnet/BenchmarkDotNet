@@ -98,14 +98,13 @@ public class PowershellWmiCpuInfoParserTests(ITestOutputHelper output)
     [Fact]
     public void RealOneProcessorFourCoresTest()
     {
-        const string cpuInfo = @"
+        const string cpuInfo = """
 
-MaxClockSpeed:2500
-Name:Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
-NumberOfCores:4
-NumberOfLogicalProcessors:8
-
-";
+            MaxClockSpeed:2500
+            Name:Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
+            NumberOfCores:4
+            NumberOfLogicalProcessors:8
+            """;
 
         CpuInfo? actual = PowershellWmiCpuInfoParser.Parse(cpuInfo);
         CpuInfo expected = new CpuInfo
