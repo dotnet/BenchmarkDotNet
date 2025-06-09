@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
-public class PowershellWmiParserTests(ITestOutputHelper output)
+public class PowershellWmiCpuInfoParserTests(ITestOutputHelper output)
 {
     private ITestOutputHelper Output { get; } = output;
 
