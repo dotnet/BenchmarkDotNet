@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 internal static class PowershellWmiCpuInfoParser
 {
-    internal static CpuInfo? Parse(string? powershellWmiOutput)
+    internal static CpuInfo Parse(string powershellWmiOutput)
     {
         HashSet<string> processorModelNames = new HashSet<string>();
 
