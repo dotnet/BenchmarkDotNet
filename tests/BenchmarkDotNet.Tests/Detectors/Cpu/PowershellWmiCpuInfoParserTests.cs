@@ -18,6 +18,7 @@ public class PowershellWmiCpuInfoParserTests(ITestOutputHelper output)
         Output.AssertEqual(expected, actual);
     }
 
+
     [Fact]
     public void MalformedTest()
     {
@@ -30,20 +31,20 @@ public class PowershellWmiCpuInfoParserTests(ITestOutputHelper output)
     [Fact]
     public void RealTwoProcessorEightCoresTest()
     {
-        const string cpuInfo = @"
+        const string cpuInfo = """
 
-MaxClockSpeed:2400
-Name:Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-NumberOfCores:8
-NumberOfLogicalProcessors:16
+                               MaxClockSpeed:2400
+                               Name:Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+                               NumberOfCores:8
+                               NumberOfLogicalProcessors:16
 
 
-MaxClockSpeed:2400
-Name:Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-NumberOfCores:8
-NumberOfLogicalProcessors:16
+                               MaxClockSpeed:2400
+                               Name:Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+                               NumberOfCores:8
+                               NumberOfLogicalProcessors:16
 
-";
+                               """;
         CpuInfo? actual = PowershellWmiCpuInfoParser.Parse(cpuInfo);
 
         CpuInfo expected = new CpuInfo
