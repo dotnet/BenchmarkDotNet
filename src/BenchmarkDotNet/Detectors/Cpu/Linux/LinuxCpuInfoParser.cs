@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
@@ -17,6 +18,7 @@ internal static class LinuxCpuInfoParser
         internal const string CpuCores = "cpu cores";
         internal const string ModelName = "model name";
         internal const string MaxFrequency = "max freq";
+        internal const string NominalFrequency = "cpu MHz";
     }
 
     private static class Lscpu
@@ -33,7 +35,8 @@ internal static class LinuxCpuInfoParser
         var processorModelNames = new HashSet<string>();
         var processorsToPhysicalCoreCount = new Dictionary<string, int>();
         int logicalCoreCount = 0;
-        Frequency? maxFrequency = null;
+        double maxFrequency = 0.0;
+        double nominalFrequency = 0.0;
 
         var logicalCores = SectionsHelper.ParseSections(cpuInfo, ':');
         foreach (var logicalCore in logicalCores)
@@ -51,9 +54,17 @@ internal static class LinuxCpuInfoParser
             }
 
             if (logicalCore.TryGetValue(ProcCpu.MaxFrequency, out string maxCpuFreqValue) &&
-                Frequency.TryParseMHz(maxCpuFreqValue, out var maxCpuFreq))
+                double.TryParse(maxCpuFreqValue, out double maxCpuFreq)
+                && maxCpuFreq > 0)
             {
-                maxFrequency = maxCpuFreq;
+                maxFrequency = Math.Max(maxFrequency, maxCpuFreq);
+            }
+
+            if (logicalCore.TryGetValue(ProcCpu.NominalFrequency, out string nominalFreqValue) &&
+                double.TryParse(nominalFreqValue, out double nominalCpuFreq))
+            {
+                if (nominalCpuFreq > 0)
+                    nominalFrequency = Math.Min(nominalFrequency, nominalCpuFreq);
             }
         }
 
@@ -71,7 +82,7 @@ internal static class LinuxCpuInfoParser
 
                 if (name.EqualsWithIgnoreCase(Lscpu.MaxFrequency) &&
                     Frequency.TryParseMHz(value.Replace(',', '.'), out var maxFrequencyParsed)) // Example: `CPU max MHz: 3200,0000`
-                    maxFrequency = maxFrequencyParsed;
+                    maxFrequency = Math.Max(maxFrequency, maxFrequencyParsed);
 
                 if (name.EqualsWithIgnoreCase(Lscpu.ModelName))
                     processorModelNames.Add(value);
@@ -81,22 +92,34 @@ internal static class LinuxCpuInfoParser
                     coresPerSocket = coreCount;
             }
         }
-
-        var nominalFrequency = processorModelNames
-            .Select(ParseFrequencyFromBrandString)
-            .WhereNotNull()
-            .FirstOrDefault() ?? maxFrequency;
+        
         string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         int? physicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : null;
         int? physicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : coresPerSocket;
+
+        Frequency? maxFrequencyActual = maxFrequency > 0 && physicalProcessorCount > 0
+            ? Frequency.FromMHz(maxFrequency)
+            : null;
+
+        Frequency? nominalFrequencyActual = nominalFrequency > 0 && physicalProcessorCount > 0 ? Frequency.FromMHz(nominalFrequency) : null;
+
+        if (nominalFrequencyActual is null)
+        {
+            bool nominalFrequencyInBrandString = processorModelNames.Any(x => ParseFrequencyFromBrandString(x) is not null);
+
+            if (nominalFrequencyInBrandString)
+                nominalFrequencyActual = processorModelNames.Select(x => ParseFrequencyFromBrandString(x))
+                    .First(x => x is not null);
+        }
+
         return new CpuInfo
         {
             ProcessorName = processorName,
             PhysicalProcessorCount = physicalProcessorCount,
             PhysicalCoreCount = physicalCoreCount,
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : null,
-            NominalFrequencyHz = nominalFrequency?.Hertz.RoundToLong(),
-            MaxFrequencyHz = maxFrequency?.Hertz.RoundToLong()
+            NominalFrequencyHz = nominalFrequencyActual?.Hertz.RoundToLong(),
+            MaxFrequencyHz = maxFrequencyActual?.Hertz.RoundToLong()
         };
     }
 
