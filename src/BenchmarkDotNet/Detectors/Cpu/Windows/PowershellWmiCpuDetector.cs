@@ -32,10 +32,11 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
         if (Directory.Exists(powershell7PlusPath))
         {
-            //Use .Last so that we get the newest major PowerShell version
            string[] subDirectories = Directory.EnumerateDirectories(powershell7PlusPath, "*", SearchOption.AllDirectories)
                .ToArray();
 
+           //Use the highest numbered directory for PowerShell so that we get the newest major PowerShell version
+           // Example version directories are 6, 7, and in the future 8.
            string? subDirectory = subDirectories.Where(x => Regex.IsMatch(x, "[0-9]"))
                .Select(x => x)
                .OrderByDescending(x => x)
