@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.13.1.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.13.1.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -102,95 +102,6 @@
 <li>Copy GC settings from host process to the benchmark process (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/1765">#1765</a>)</li>
 <li>Do not split surrogates in shortified parameter values (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/1705">#1705</a>)</li>
 </ul>
-<h2 id="milestone-details">Milestone details</h2>
-<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.1">v0.13.1</a> scope,
-3 issues were resolved and 23 pull requests were merged.
-This release includes 36 commits by 10 contributors.</p>
-<h2 id="resolved-issues-3">Resolved issues (3)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1703">#1703</a> Unable to run benchmark when <code>ParamsSource</code> refers to string with surrogate pairs</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1713">#1713</a> System.NotSupportedException: Unknown Acknowledgment: ﻿Acknowledgment when running in a github action (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1714">#1714</a> AwaitingTasksShouldNotInterfereAllocationResults is flaky (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-</ul>
-<h2 id="merged-pull-requests-23">Merged pull requests (23)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1705">#1705</a> do not split surrogates in <code>ParameterInstance.ToDisplayText()</code> (by <a href="https://github.com/novak-as">@novak-as</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1710">#1710</a> Fix typo (by <a href="https://github.com/martincostello">@martincostello</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1712">#1712</a> add S390x architecture support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1719">#1719</a> Added UsingBrowserRuntimeWorkload (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1722">#1722</a> Add AOT options to wasm runtime (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1725">#1725</a> Add ValidateExecutableReferencesMatchSelfContained (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1729">#1729</a> Naricc/validate executable references match self contained (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1735">#1735</a> Use Utf8 not just for writing to standard output, but also for reading from standard input (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1739">#1739</a> Add support for returning unmanaged types from benchmarks (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1742">#1742</a> Fix WasmAssembliesToBundle item is empty error (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1743">#1743</a> Add linker description for wasm AOT (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1744">#1744</a> Make mono/wasm run on Windows (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1745">#1745</a> Fix #1731. (by <a href="https://github.com/cgranade">@cgranade</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1746">#1746</a> Make PrepareForWasmBuild work with wasm workload (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1748">#1748</a> Fix typo in docs (by <a href="https://github.com/Jlobblet">@Jlobblet</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1750">#1750</a> Fix pointer-returning benchmarks support for InProcessToolchain (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1751">#1751</a> disable TieredJit so it's background allocations don't show up in allocated memory reported by MemoryDiagnoser tests (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1757">#1757</a> [wasm] Add WasmMainJSPath in interpreter projects (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1762">#1762</a> MemoryDiagnoser fix (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1763">#1763</a> Pr wasm set runtimesrcdir for interpreter (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1764">#1764</a> Allow users to hide Gen X columns (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1765">#1765</a> Copy GC settings from host process (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1768">#1768</a> Fix typo in README (by <a href="https://github.com/eugene-g">@eugene-g</a>)</li>
-</ul>
-<h2 id="commits-36">Commits (36)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fe1124661c3a2c45f3234c251872b9982e2a3890">fe1124</a> Postrelease update of v0.13.0 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0388db29ec89d2ac2402007d7b286a9fc0d616e1">0388db</a> Update build-and-pack.cmd (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5c8469124736ee15cf2f94c8b5b670e95e052ce1">5c8469</a> Set release date for v0.13.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/601a1aee05972ead40781fc389a7e6870964f821">601a1a</a> Fix typo (#1710) (by <a href="https://github.com/martincostello">@martincostello</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5bc92530ecb7a7cab04dd0dd37a42f3e97232ad6">5bc925</a> do not split surrogates in <code>ParameterInstance.ToDisplayText()</code> (#1705) (by <a href="https://github.com/novak-as">@novak-as</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/891e5700f72a4615f063e3f87790724a0c1b519f">891e57</a> Add unicode testcases in ParameterInstanceTests.MaxParameterColumnWidthCanBeC... (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5d2160d5d5deee6a3b70d7cfd99d81354b1f8fba">5d2160</a> Update changelog files (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bbc4b45c5d85b4b75cf445c635f030077c0485dd">bbc4b4</a> add S390x architecture support (#1712) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bf54f01be4569fbac4a8217bb26dd9ff05b5b90c">bf54f0</a> Fix flakiness in ThreadingDiagnoserTests (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6ffdb24c4e7b6dd3011f3f113e384a587e07b8e1">6ffdb2</a> [WASM] Added UsingBrowserRuntimeWorkload (#1719) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5196e6f5854c45b3e62a8c9a0a68e92491e70d57">5196e6</a> Add AOT options to wasm runtime (#1722) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d97285236327de3cdc74f87fa6eb896b4a643630">d97285</a> Add ValidateExecutableReferencesMatchSelfContained (#1725) (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cb23e125ce436171be7fc91850dcec166c2b9b67">cb23e1</a> Delete .BenchmarkDotNet.Samples.csproj.swp (#1726) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/75f63272def862bb223a3e3e040760a71d8994d1">75f632</a> Set ValidateExecutableReferencesMatchSelfContained for Wasm (#1729) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9e7e50728154e24c79fe392074f127c31611eae1">9e7e50</a> Added <wasmnativeworkload>false</wasmnativeworkload> to Wasm cs proj. (#1734) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e7ff4cefcc8d429205a21a76045e82688ee063c5">e7ff4c</a> Use Utf8 not just for witing to standard output, but also for reading from st... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/081563ad4fbc87409289dd1d039f64dbca49c009">081563</a> Added UsingBrowserRuntimeWorkload false. (#1741) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2fefdb335c6beb20fdc3463a34fe83d52ac5d619">2fefdb</a> Fix WasmAssembliesToBundle item is empty error (#1742) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6b475f651df7f282fc6ec103fcd1355cc8789c4c">6b475f</a> Add linker description for wasm AOT (#1743) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/acb6f20d43e9ab3b3c91cb360b8202fd199e4193">acb6f2</a> Make mono/wasm run on Windows (#1744) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4b3d197a49fa2129b14c944b6ee52e6d931f79f5">4b3d19</a> Make PrepareForWasmBuild work with wasm workload (#1746) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/141ef7421496b68ded18710869509ca9c76414ec">141ef7</a> handle processes that don't exit on time more gracefully, fixes #1731. (#1745) (by <a href="https://github.com/cgranade">@cgranade</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c3fb7b9724a62048d27ef5bcaec616117d68b934">c3fb7b</a> Add support for returning unmanaged types from benchmarks (#1739) (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6f453baafa4ef800e0377ebc463ffa82b2f76368">6f453b</a> [wasm] Allow unsafe code (#1752) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c2cee254b3a9aec3a6b73bc7fd21b7f2f70ca2ec">c2cee2</a> Fix the CI (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19cbef28cba94cd4a7da6266b839d4d3fe2f14db">19cbef</a> Fix typo in docs (#1748) (by John Blundell)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1a94d4dfa65f975f49d1bc92ced5c7a45bb994d4">1a94d4</a> [wasm] Add WasmMainJSPath in interpreter projects (#1757) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/37ec19f6dba9ccee6a8f776aa3020ca189944f0c">37ec19</a> Get rid of warning (#1760) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4bd433d85fff4fb6ba8c4f8df3e685ad669e2519">4bd433</a> use benchmark process runtime, not host process runtime when deciding whether... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8cb701cc79288b34de438435736acf8e74dc9735">8cb701</a> Update OsBrandStringHelper (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8f81b5b1be90e2b5425f9571b3c3640acdfaac21">8f81b5</a> Copy GC settings from host process (#1765) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f372668e028161d0d1bf675811a6168967175034">f37266</a> Allow users to hide Gen X columns (#1764) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f9a4c194b77aa7133168f240b404da58c47d5255">f9a4c1</a> [WASM] set runtimesrcdir for interpreter (#1763) (by <a href="https://github.com/naricc">@naricc</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9e674d49feeb4647c8acc81334188e7c4587a5e9">9e674d</a> Fix typo in README (by <a href="https://github.com/eugene-g">@eugene-g</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/708be495530a968ed767a20f4623f54231d1ab9b">708be4</a> Prepare v0.13.1 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a936815f2a58d9b728cfc5fe620bba17481c180c">a93681</a> Set library version: 0.13.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<h2 id="contributors-10">Contributors (10)</h2>
-<ul>
-<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li>Andrii Kurdiumov (<a href="https://github.com/kant2002">@kant2002</a>)</li>
-<li>Cassandra Granade (<a href="https://github.com/cgranade">@cgranade</a>)</li>
-<li>Evgenii Grebeniuk (<a href="https://github.com/eugene-g">@eugene-g</a>)</li>
-<li>John Blundell</li>
-<li>Martin Costello (<a href="https://github.com/martincostello">@martincostello</a>)</li>
-<li>Nathan Ricci (<a href="https://github.com/naricc">@naricc</a>)</li>
-<li>Oleksandr Novak (<a href="https://github.com/novak-as">@novak-as</a>)</li>
-<li>Radek Doulik (<a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-</ul>
-<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: August 11, 2021</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.1">v0.13.1</a></em>

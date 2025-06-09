@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.10.9.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.10.9.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -103,97 +103,6 @@
 <li>Additional warnings for incorrect Configs (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/482">#482</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/eb84825ff08aa5d23d2d512d4d4bde3e95ca0815">eb84825f</a>)</li>
 <li>Additional warnings for F# methods with spaces (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/479">#479</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/3c2c8dec28d6c570f2901001058cd9c6000e6ca2">3c2c8dec</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/7ba1c809004e0b75eaa87724155480eaf623f8a9">7ba1c809</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/commit/3ca39afe9f0d25359f9b092181beb02d57c5ad32">3ca39afe</a>)</li>
 </ul>
-<h2 id="milestone-details">Milestone details</h2>
-<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.9">v0.10.9</a> scope,
-13 issues were resolved and 14 pull requests were merged.
-This release includes 37 commits by 10 contributors.</p>
-<h2 id="resolved-issues-13">Resolved issues (13)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/380">#380</a> Problem running benchmark due to &quot;could not copy&quot; during build (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/390">#390</a> Crashing benchmark (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/426">#426</a> Migrate from custom build scripts to Cake (C# Make)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/448">#448</a> Detect correct version of .NET Core (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/453">#453</a> MemoryDiagnoser and JsonExporter</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/469">#469</a> [Suggestion] Specify Setup per benchmark (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/474">#474</a> PlatformNotSupportedException when reading ProcessorAffinity on non-Windows platforms (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/479">#479</a> Invalid C# code generated for valid F# identifiers (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/481">#481</a> Iteration cleanup runs before the benchmark (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/482">#482</a> Benchmark seems to hang when no logger is defined (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/490">#490</a> BDN.Generated.exe is locking files when killed with ctrl+c (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/491">#491</a> UnauthorizedAccessException preventing report to be written (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/499">#499</a> Opting into app-compat switches in a benchmark doesn't work (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-</ul>
-<h2 id="merged-pull-requests-14">Merged pull requests (14)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/465">#465</a> Small correction in Filters.md (by <a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/467">#467</a> Small improvements to FAQ.md (by <a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/471">#471</a> Corrected typos in Filters.md and IntroFilters.cs (by <a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/473">#473</a> Adds ISummaryStyle information to the Exporters guide (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/475">#475</a> Cake (C# Make) integration. Migration from custom build scripts. (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/476">#476</a> Improve Xml exporter's discoverability (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/478">#478</a> Add MemoryDiagnoser results to JsonExporter output (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/480">#480</a> Fix links to Overview/FAQ (by <a href="https://github.com/davkean">@davkean</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/483">#483</a> Update jobs docs (by <a href="https://github.com/aarondandy">@aarondandy</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/488">#488</a> Improve XmlExporter (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/497">#497</a> Add temporary solution to address connectivity issues to nuget.org (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/501">#501</a> Target Setup methods for specific Benchmarks (by <a href="https://github.com/ipjohnson">@ipjohnson</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/503">#503</a> Make sure IterationCleanup is run after Jitting (by <a href="https://github.com/smitpatel">@smitpatel</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/506">#506</a> Removes a temporary solution related to connectivity issues to nuget (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-</ul>
-<h2 id="commits-37">Commits (37)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0b5657c59821216e074298cfa2821489d8d08ca9">0b5657</a> Small correction in comments (by <a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b1ad2c12a572c191a5fc3ada4126cc3c7784165d">b1ad2c</a> Merge pull request #465 from mtschneiders/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3bb154f3fef330204506409162bb7662219df0dd">3bb154</a> Small corrections to FAQ.md (by <a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1a8559f24c1e36bf235943d89e67ad83e5fcd9ce">1a8559</a> Merge pull request #467 from mtschneiders/patch-2 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fc4dfe31801bbf4b562dd7c1794999c552880b76">fc4dfe</a> Corrected typos in Filters.md and IntroFilters.cs (by <a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cb5072ca11d2cf5298c0fde5c73c4ae8c6948e01">cb5072</a> Remove UpgradeLog.htm (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7013bd10ce926657436558a2854ff8bbb3a0c234">7013bd</a> Adds ISummaryStyle information to the Exporters guide (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/345af7c40668ba886bed0c528ef9b03fdd7289f2">345af7</a> wording (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a114ea7267461ac83c566761f0160d8b8a39d148">a114ea</a> Merge pull request #473 from AmadeusW/docs/exporters (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/26d44411ea47f28a9cc7df84b2df0ef89b2bbcf7">26d444</a> Unix-related ProcessorAffinity fixes (fix #474) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2d8a53a75cddafff17212307d8666bc09757745c">2d8a53</a> Improve Xml exporter's discoverability (#476) (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/baebf9b1566aeaffbe04a536948df6a259ab54dd">baebf9</a> Add MemoryDiagnoser results to JsonExporter output (#478) (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/32993c75197230f7d322f137174f7aeee86c3ddd">32993c</a> Fix links to Overview/FAQ (by <a href="https://github.com/davkean">@davkean</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8e712cf6db8b1a4b4a3dbd0a408b76adb4f69417">8e712c</a> Merge pull request #480 from davkean/FixLinks (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/43405dc8ab37a18264713538bd1f13dd9f932a3e">43405d</a> Update jobs docs (by <a href="https://github.com/aarondandy">@aarondandy</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1bacac97cfdb9179aaec8230db53bb003da0125a">1bacac</a> Merge pull request #483 from aarondandy/docs-changes (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3c2c8dec28d6c570f2901001058cd9c6000e6ca2">3c2c8d</a> print nice error for F# methods that contain whitespaces, fixes #479 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7ba1c809004e0b75eaa87724155480eaf623f8a9">7ba1c8</a> post code review #479 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3ca39afe9f0d25359f9b092181beb02d57c5ad32">3ca39a</a> even more post code review #479 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/eb84825ff08aa5d23d2d512d4d4bde3e95ca0815">eb8482</a> warn the users if no logger, columns or exporters were defined, fixes #482 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8505abb5416bad90cda03f4972b067f9ac44b304">8505ab</a> unique file names by default, are removed after printing the results, fix #49... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3e74aa767456c174d2f3dcdfb0934f04aca98851">3e74aa</a> Improve XmlExporter (#488) (by <a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6e25773a14b2506332f8232c0ccabf5f234091e1">6e2577</a> Cake (C# Make) integration. Migration from custom build scripts. (#475) (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6e6fccfc2bfbb5f34b5f403fa404b58863a4e2d5">6e6fcc</a> Add temporary solution to address connectivity issues to nuget.org https://ap... (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dc6dc411b4d8703d0a1abafe64fb1e0b0a83af1f">dc6dc4</a> all runtime settings, that do not belong to Job must be rewritten by default ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ed586585faf90322d30a900fb6563cf0cb5dcb92">ed5865</a> Rename &quot;dotnet cli version&quot; to &quot;.NET Core SDK&quot;, see #448 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/857f2bf92458d2b6321a5a61eb0e6a61d1d10bdf">857f2b</a> Detecting the correct version of .NET Core, fixing #448 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7ec0017d95da7ff3b33514f4a1b26bdcbe3a9501">7ec001</a> Don't print information about unknown timers in HostEnvironmentInfo (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4c3c8233653873e5ed5f45b7232a1cb420a914d8">4c3c82</a> Add missing space in HostRuntimeInfo (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/da8226aa049f7034f8568dfd19a0338e32f9b1bc">da8226</a> Print actual information about .NET Framework version in summary, see #448 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cea199f74923c99f88f4bb4d53e37f86b10269b7">cea199</a> Fix MultipleRuntimesTest.SingleBenchmarkCanBeExecutedForMultpleRuntimes (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/db56bc73dc0f6fbae344c9f414e97c5cba3770b1">db56bc</a> Make sure IterationCleanup is run after Jitting (by <a href="https://github.com/smitpatel">@smitpatel</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3df90f4ff8577cd8b2d58fefb6ce4ddfe5e33597">3df90f</a> Merge pull request #503 from smitpatel/orderingissue (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1177c80e2dbe931439e44bb0ce2ce25cad8b9ba2">1177c8</a> Improve tests/runCoreTests.sh (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9769007c5e082967d1c0c6379c23d055c98d9f53">976900</a> Removes a temporary solution related to connectivity issues to nuget.org http... (by <a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/557246dbef3a9397bcd91b2c49347e939aab33cf">557246</a> Target Setup methods for specific Benchmarks (#501) (by <a href="https://github.com/ipjohnson">@ipjohnson</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/80d70aa8b6974f469d0c46ae8800955ef3af20e7">80d70a</a> Set library version: 0.10.9 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<h2 id="contributors-10">Contributors (10)</h2>
-<ul>
-<li>Aaron Dandy (<a href="https://github.com/aarondandy">@aarondandy</a>)</li>
-<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li>Amadeusz Wieczorek (<a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li>Anssi Kettunen (<a href="https://github.com/Teknikaali">@Teknikaali</a>)</li>
-<li>David Kean (<a href="https://github.com/davkean">@davkean</a>)</li>
-<li>Ian Johnson (<a href="https://github.com/ipjohnson">@ipjohnson</a>)</li>
-<li>Igor Fesenko (<a href="https://github.com/Ky7m">@Ky7m</a>)</li>
-<li>Mateus Artur Schneiders (<a href="https://github.com/mtschneiders">@mtschneiders</a>)</li>
-<li>Smit Patel (<a href="https://github.com/smitpatel">@smitpatel</a>)</li>
-</ul>
-<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: July 28, 2017</em></p>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.9">v0.10.9</a></em></p>

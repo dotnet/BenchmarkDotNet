@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.10.1.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.10.1.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -100,74 +100,6 @@
 <li>Improved information about environment in summary</li>
 <li>Minor bugfixes</li>
 </ul>
-<h2 id="milestone-details">Milestone details</h2>
-<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.1">v0.10.1</a> scope,
-9 issues were resolved and 2 pull requests were merged.
-This release includes 38 commits by 2 contributors.</p>
-<h2 id="resolved-issues-9">Resolved issues (9)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/133">#133</a> High differences between run for GC Diagnoser (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/186">#186</a> GC Diagnoser should not include allocations done by Setup method (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/200">#200</a> be accurate about allocated bytes/op (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/208">#208</a> Troubles with MemoryDiagnoserTests (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/298">#298</a> PlatformNotSupportedException when reading ProcessorAffinity on MacOS (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/301">#301</a> netcoreapp1.1 support (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/309">#309</a> Diagnosers don't export data to the measurements.csv files (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/312">#312</a> RuntimeInformation can be made static and internal (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/313">#313</a> Bug in Generator (interface as a return type) (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<h2 id="merged-pull-requests-2">Merged pull requests (2)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/284">#284</a> built-in accurate and cross platform Memory Diagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/314">#314</a> Improved information about job environments in summary (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<h2 id="commits-38">Commits (38)</h2>
-<ul>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/23f3b29b4cf0c13f49f47609b26b32a30d10289e">23f3b2</a> built-in accurate and cross platform Memory Diagnoser, fixes #186, fixes #200 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4cabc202bcb5f76a2e417d6b20aedf5c23e12e3a">4cabc2</a> don't try to use AppDomain's Monitoring in Mono since it's not implemented there (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/99c21e842ec925a51f98844959b9a49b2493e971">99c21e</a> scale GC collections count / op, makes MemoryDiagnoser output stable for benc... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e91255e2a6e5b3d0e683ee5cf1773cdbbbe3649f">e91255</a> use per mille to make the Memory Diagnoser output more human-friendly + reduc... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a0536d1b1345ae2768c0e7bc489cb3e03f72d0b9">a0536d</a> Merge branch 'master' into universalMemoryDiagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ade1bea023aab7822373d158a8617131e371a117">ade1be</a> preallocate results list in more safe, but still ugly way (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1022827bbba62e855a90c9c16e6af01830c380ea">102282</a> closed the ugly code in separate class (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7825b719577836245af262c250fcf2104f9c644d">7825b7</a> Update links in docs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/aaf7202e8f329cd29a0dcd188a08b4d758ddd8fb">aaf720</a> Fix typo (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1e2d381b6a7ba34d53140f28f4481d3d829b6260">1e2d38</a> update to netcoreapp1.1 in order to get universal cross platform memory diagn... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e69e80b46b612918a156362d88843a37f123564d">e69e80</a> don't show Gen 1 and Gen 2 columns if empty for all benchmarks (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b10a84cf157ef075838e303b313673ffd2bfd073">b10a84</a> PlatformNotSupportedException when reading ProcessorAffinity on MacOS, fixes ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2a529abfff9d72bdd4b11d82d1c918beaffaf0ff">2a529a</a> update to .NET Core 1.1, fixes #301 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e6ccee61de69c83c9ce5716819c48b9d844dc05e">e6ccee</a> always show Gen 0 column, display Gen 0/1/2 per 1k op (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3bcc59812a83e7f3983ed1708377e2984e8d7914">3bcc59</a> Merge branch 'master' into universalMemoryDiagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a098106e3e8a406908478bbce8d5a6abf5734b5f">a09810</a> make public things readonly, expensive things lazy and extend's validators in... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/eae2cd5c24fcb7388df4b3fe69b32ba9c40d8c22">eae2cd</a> added documentation and smarter bytes formatting (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1208c33828a067b74cdf87da96d4b048bd99e0bc">1208c3</a> Merge branch 'master' into universalMemoryDiagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f1f2317dafc663a2fa854ea566ede8befc68ea6d">f1f231</a> Merge pull request #284 from dotnet/universalMemoryDiagnoser (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6300a29a1146d6c0ab7514c785702f97e3ee5b97">6300a2</a> include MemoryDiagnoser's results in CsvMeasurementsExporter, fixes #309 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ddb37ed47921f990273881b8024380195ebdf1d2">ddb37e</a> don't use spaces in columns names in CSV, #309 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/112f62218ba5e044b15a1f58bfa9f9c644e21853">112f62</a> Fix stupid bug with condition for optional MedianColumn (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/60127c9e0300b3e3ea29bb5248f6753d04ef80b5">60127c</a> Remove Cpu_Ilp_RyuJit.cs because it's obsolete (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/401456b92a85342bbf4cfcc3d0b1acd926163d1a">401456</a> Print full information about a GenerateException (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0b917763b49481738742952fd3f0c03103f5d48d">0b9177</a> Support of benchmark methods with an interface as a return type, fixed #313 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b42b9e8f1aa1455c54173b9fe549ed5518869e71">b42b9e</a> Improved information about job environments in summary (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/92f1db1a83ac040630d3508f13d2af850b1b5809">92f1db</a> Improved information about job environments in summary, part 2 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5d8dd74e33650da881d1ced32b35d9e807fc1238">5d8dd7</a> Merge pull request #314 from dotnet/summary (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d279f675f966642283fa15726d342db5568e86c8">d279f6</a> Make RuntimeInformation static internal, fix #312 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1df6ca56277e842553a81e90da2430f60812a785">1df6ca</a> Minor API improvements in BenchmarkSwitcher (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c12dafb041d1ef15c6a6d34f3fbc469690b98bb8">c12daf</a> Dot't show the median column for the N=1 case (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19caa2cfec0847038ef6afe6d7a4cbc6aa89df59">19caa2</a> RyuJit is always avaiable for .NET Core (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/13e12c761f3325bcdb03c77df0969cc0e4e226e3">13e12c</a> make JitOptimizationsValidator work for .NET Core (needed properties are avai... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c17b43cf935f3252a68471eea97b2429c60752bd">c17b43</a> hide the AllocatedBytes column for Mono, show Gen 0 only if any of the benchm... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29ac9117ba573cbfd7f105b209ca50d6094e4396">29ac91</a> updated docs about Diagnosers in the Overview ;) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cc974e915b87536fd67b7fd24058c06d1221dc61">cc974e</a> Improved information about job environments in summary, part 3 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8846af5897d31f60a9aab94e0fbf888754a93486">8846af</a> Update docs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/37b126a4f053ed8f87cf775538bd3ac764eae0ea">37b126</a> Set library version: 0.10.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<h2 id="contributors-2">Contributors (2)</h2>
-<ul>
-<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-</ul>
-<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: December 04, 2016</em></p>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.1">v0.10.1</a></em></p>
