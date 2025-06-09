@@ -172,13 +172,14 @@ public class DocsFetchTask : FrostingTask<BuildContext>, IHelpProvider
                           $"* Last changelog footer (if {KnownOptions.Stable.CommandLineName} is specified)\n" +
                           $"* All changelog details in docs/_changelog\n" +
                           $"  (This dir is a cloned version of this repo from branch {Repo.ChangelogBranch})",
-            Options = [KnownOptions.DocsPreview, KnownOptions.DocsDepth],
+            Options = [KnownOptions.DocsPreview, KnownOptions.DocsDepth, KnownOptions.ForceClone],
             EnvironmentVariables = [EnvVar.GitHubToken],
             Examples =
             [
                 new Example(Name)
                     .WithArgument(KnownOptions.DocsDepth, "3")
                     .WithArgument(KnownOptions.DocsPreview)
+                    .WithArgument(KnownOptions.ForceClone)
             ]
         };
     }

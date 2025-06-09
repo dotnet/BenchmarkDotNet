@@ -17,6 +17,7 @@ public class ChangelogBuilder
     private readonly BuildContext context;
     private readonly bool preview;
     private readonly string depth;
+    private readonly bool forceClone;
 
     /// <summary>
     /// Directory with original changelog part files from branch 'docs-changelog'
@@ -33,6 +34,7 @@ public class ChangelogBuilder
         this.context = context;
         preview = KnownOptions.DocsPreview.Resolve(context);
         depth = KnownOptions.DocsDepth.Resolve(context);
+        forceClone = KnownOptions.ForceClone.Resolve(context);
 
         var docsDirectory = context.RootDirectory.Combine("docs");
         SrcDirectory = docsDirectory.Combine("_changelog");
@@ -43,7 +45,7 @@ public class ChangelogBuilder
     {
         EnvVar.GitHubToken.AssertHasValue();
 
-        EnsureSrcDirectoryExist();
+        EnsureSrcDirectoryExist(forceClone);
 
         var history = context.VersionHistory;
         var stableVersionCount = history.StableVersions.Length;
@@ -224,14 +226,31 @@ public class ChangelogBuilder
         context.GenerateFile(DocfxDirectory.CombineWithFilePath("toc.yml"), content);
     }
 
-    private void EnsureSrcDirectoryExist(bool forceClean = false)
+    private void EnsureSrcDirectoryExist(bool forceClone = false)
     {
-        if (context.DirectoryExists(SrcDirectory) && forceClean)
+        void Log(string message) => context.Information($"[Changelog] {message}");
+
+        Log($"Preparing git sub-repository for changelog branch '{Repo.ChangelogBranch}'. " +
+            $"Target directory: '{SrcDirectory}'.");
+        if (context.DirectoryExists(SrcDirectory) && forceClone)
+        {
+            Log($"Directory '{SrcDirectory}' already exists and forceClean is specified. " +
+                $"Deleting the current directory...");
             context.DeleteDirectory(
                 SrcDirectory,
                 new DeleteDirectorySettings { Force = true, Recursive = true });
+            Log($"Directory '{SrcDirectory}' deleted successfully.");
+        }
 
         if (!context.DirectoryExists(SrcDirectory))
+        {
+            Log($"Cloning branch '{Repo.ChangelogBranch}' from '{Repo.HttpsGitUrl}' to '{SrcDirectory}'.");
             context.GitRunner.Clone(SrcDirectory, Repo.HttpsGitUrl, Repo.ChangelogBranch);
+            Log($"Clone completed: '{Repo.ChangelogBranch}' -> '{SrcDirectory}'.");
+        }
+        else
+        {
+            Log($"Directory '{SrcDirectory}' already exists. Skipping clone.");
+        }
     }
 }
