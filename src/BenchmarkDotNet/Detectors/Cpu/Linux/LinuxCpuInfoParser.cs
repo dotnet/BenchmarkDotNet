@@ -61,10 +61,10 @@ internal static class LinuxCpuInfoParser
             }
 
             if (logicalCore.TryGetValue(ProcCpu.NominalFrequency, out string nominalFreqValue) &&
-                double.TryParse(nominalFreqValue, out double nominalCpuFreq))
+                double.TryParse(nominalFreqValue, out double nominalCpuFreq)
+                && nominalCpuFreq > 0)
             {
-                if (nominalCpuFreq > 0)
-                    nominalFrequency = Math.Min(nominalFrequency, nominalCpuFreq);
+                nominalFrequency = nominalFrequency == 0 ? nominalCpuFreq : Math.Min(nominalFrequency, nominalCpuFreq);
             }
         }
 
