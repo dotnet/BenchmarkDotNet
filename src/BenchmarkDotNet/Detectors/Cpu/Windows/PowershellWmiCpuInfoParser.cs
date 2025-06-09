@@ -12,7 +12,7 @@ internal static class PowershellWmiCpuInfoParser
     internal static CpuInfo? Parse(string? powershellWmiOutput)
     {
         if (string.IsNullOrEmpty(powershellWmiOutput))
-            return null;
+            return CpuInfo.Unknown;
 
         HashSet<string> processorModelNames = new HashSet<string>();
 

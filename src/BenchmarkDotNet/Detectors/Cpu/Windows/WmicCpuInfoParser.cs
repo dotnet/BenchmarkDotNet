@@ -16,7 +16,7 @@ internal static class WmicCpuInfoParser
     internal static CpuInfo? Parse(string? wmicOutput)
     {
         if (string.IsNullOrEmpty(wmicOutput))
-            return null;
+            return CpuInfo.Unknown;
 
         HashSet<string> processorModelNames = new HashSet<string>();
         int physicalCoreCount = 0;
