@@ -27,15 +27,15 @@ namespace BenchmarkDotNet.Samples
                 var baseJob = Job.MediumRun;
 
                 string[] targetVersions = [
+                    "9.0.0",
                     "9.0.3",
-                    "9.0.4",
                     "9.0.5",
                 ];
 
                 foreach (var version in targetVersions)
                 {
                     AddJob(baseJob.WithNuGet("System.Collections.Immutable", version)
-                                  .WithId("v"+version));
+                                  .WithId($"v{version}"));
                 }
             }
         }
