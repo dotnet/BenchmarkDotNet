@@ -3,7 +3,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -21,6 +21,28 @@ namespace BenchmarkDotNet.TestAdapter
         /// <returns>The benchmarks inside the assembly.</returns>
         public static BenchmarkRunInfo[] GetBenchmarksFromAssemblyPath(string assemblyPath)
         {
+#if NET462
+            // Temporary workaround for BenchmarkDotNet assembly loading issue that occurred under the following conditions:
+            //   1. Run BenchmarkDotNet.Samples project with following command.
+            //     > dotnet test -c Release --list-tests --framework net462 -tl:off
+            //   2. When using `BenchmarkDotNet.TestAdapter` package and targeting .NET Framework.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) =>
+            {
+                if (eventArgs.Name.StartsWith("BenchmarkDotNet, Version="))
+                {
+                    var baseDir = Path.GetDirectoryName(assemblyPath);
+                    var path = Path.Combine(baseDir, "BenchmarkDotNet.dll");
+                    if (File.Exists(path))
+                    {
+                        return Assembly.LoadFrom(path);
+                    }
+                }
+
+                // Fallback to default assembly resolver
+                return null;
+            };
+#endif
+
             var assembly = Assembly.LoadFrom(assemblyPath);
 
             var isDebugAssembly = assembly.IsJitOptimizationDisabled() ?? false;
