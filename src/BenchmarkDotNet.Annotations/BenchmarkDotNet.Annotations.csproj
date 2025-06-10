@@ -16,18 +16,18 @@
   </ItemGroup>
 
   <Choose>
-	<When Condition="'$(IsFullPack)' == 'true'">
-	  <ItemGroup>
+    <When Condition="'$(IsFullPack)' == 'true'">
+      <ItemGroup>
         <!-- Include the BenchmarkDotNet.Weaver dlls in tasks without making it an explicit dependency. -->
         <Content Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\bin\Release\$(TargetFramework)\**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
         <Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
-	  </ItemGroup>
-	</When>
-	<Otherwise>
-	  <!-- PackageReference for transitive weaver dependency for ProjectReferences to this. -->
-	  <ItemGroup>
-		<PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" />
-	  </ItemGroup>
-	</Otherwise>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <!-- PackageReference for transitive weaver dependency for ProjectReferences to this. -->
+      <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" />
+      </ItemGroup>
+    </Otherwise>
   </Choose>
 </Project>
