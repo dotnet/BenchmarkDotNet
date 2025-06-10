@@ -64,6 +64,9 @@ public sealed class WeaveAssemblyTask : Task
 
             if (benchmarkMethodsImplAdjusted)
             {
+                // Write to a null stream before overwriting the original file in case an exception occurs during the write (like unsupported platform).
+                // https://github.com/Washi1337/AsmResolver/issues/640
+                module.Write(Stream.Null);
                 module.Write(TargetAssembly);
             }
         }
