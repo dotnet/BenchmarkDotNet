@@ -19,7 +19,7 @@ internal static class PowershellWmiCpuInfoParser
         double maxFrequency = 0.0;
         double nominalFrequency = 0.0;
 
-        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(powershellWmiOutput, ':');
+        List<Dictionary<string, string>> processors = SectionsHelper.ParseSectionsForPowershellWmi(powershellWmiOutput, ':');
         foreach (Dictionary<string, string> processor in processors)
         {
             if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
@@ -49,8 +49,7 @@ internal static class PowershellWmiCpuInfoParser
 
         string? processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         Frequency? maxFrequencyActual = maxFrequency > 0 && processorCount > 0
-            ? Frequency.FromMHz(maxFrequency)
-            : null;
+            ? Frequency.FromMHz(maxFrequency) : null;
 
         Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorCount > 0 ?
             Frequency.FromMHz(nominalFrequency) : null;
