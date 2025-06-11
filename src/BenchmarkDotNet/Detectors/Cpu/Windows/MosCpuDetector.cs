@@ -43,11 +43,11 @@ internal class MosCpuDetector : ICpuDetector
                     processorsCount++;
                     physicalCoreCount += (int)(uint)moProcessor[WmicCpuInfoKeyNames.NumberOfCores];
                     logicalCoreCount += (int)(uint)moProcessor[WmicCpuInfoKeyNames.NumberOfLogicalProcessors];
-                    double tempMaxFrequency = (double)moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed];
+                    double tempMaxFrequency = Convert.ToDouble((uint)moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed]);
 
                     if (tempMaxFrequency > 0)
                     {
-                        nominalFrequency = nominalFrequency == 0 ? tempMaxFrequency : Math.Min(nominalFrequency, tempMaxFrequency);
+                        nominalFrequency = nominalFrequency == 0 ? Convert.ToDouble(tempMaxFrequency) : Math.Min(nominalFrequency, tempMaxFrequency);
                     }
                     maxFrequency = Math.Max(maxFrequency, tempMaxFrequency);
                 }
