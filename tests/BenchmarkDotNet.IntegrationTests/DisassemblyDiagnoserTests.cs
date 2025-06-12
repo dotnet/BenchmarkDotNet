@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory]
-        [MemberData(nameof(GetAllJits))]
+        [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory]
-        [MemberData(nameof(GetAllJits))]
+        [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, Runtime runtime)
         {
@@ -132,7 +132,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory]
-        [MemberData(nameof(GetAllJits))]
+        [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory]
-        [MemberData(nameof(GetAllJits))]
+        [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
         {

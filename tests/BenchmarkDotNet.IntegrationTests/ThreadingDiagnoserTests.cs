@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.IntegrationTests
             // yield return new object[] { InProcessEmitToolchain.Instance };
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void CompletedWorkItemCountIsAccurate(IToolchain toolchain)
         {
             var config = CreateConfig(toolchain);
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public void DoNothing() { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void LockContentionCountIsAccurate(IToolchain toolchain)
         {
             var config = CreateConfig(toolchain);
