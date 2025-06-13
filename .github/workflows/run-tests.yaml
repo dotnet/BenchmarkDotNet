@@ -91,7 +91,13 @@ jobs:
           path: "**/*.trx"
 
   test-macos:
-    runs-on: macos-15
+    runs-on: ${{ matrix.os.runs-on }}
+    strategy:
+      matrix:
+        os: [
+          { runs-on: 'macos-latest', jsvu-os: 'mac64arm' },
+          { runs-on: 'macos-13',     jsvu-os: 'mac64' },
+        ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up node
@@ -99,7 +105,7 @@ jobs:
         with:
           node-version: "22"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=mac64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+        run: npm install jsvu -g && jsvu --os=${{ matrix.os.jsvu-os }} --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
       # Build and Test
@@ -114,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-macos-trx-${{ github.run_id }}
+          name: test-macos(${{ runner.arch }})-trx-${{ github.run_id }}
           path: "**/*.trx"
 
   test-pack:

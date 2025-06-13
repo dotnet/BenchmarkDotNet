@@ -4,6 +4,7 @@ using Cake.Common.Diagnostics;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Test;
 using Cake.Core.IO;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Build.Runners;
 
@@ -47,7 +48,8 @@ public class UnitTestRunner(BuildContext context)
     private void RunTests(FilePath projectFile, string alias, string tfm)
     {
         var os = Utils.GetOs();
-        var trxFileName = $"{os}-{alias}-{tfm}.trx";
+        var arch = RuntimeInformation.OSArchitecture.ToString().ToLower();
+        var trxFileName = $"{os}({arch})-{alias}-{tfm}.trx";
         var trxFile = TestOutputDirectory.CombineWithFilePath(trxFileName);
         var settings = GetTestSettingsParameters(trxFile, tfm);
 
