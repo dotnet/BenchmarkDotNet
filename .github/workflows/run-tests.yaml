@@ -91,7 +91,7 @@ jobs:
           path: "**/*.trx"
 
   test-macos:
-    name: test-macos(${{ matrix.os.runs-on }})
+    name: test-macos (${{ matrix.os.arch }})
     runs-on: ${{ matrix.os.runs-on }}
     strategy:
       matrix:
