@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Validators;
 
@@ -28,7 +29,7 @@ public class RuntimeValidator : IValidator
         }
 
         var errors = new List<ValidationError>();
-        foreach (var benchmark in nullRuntimeBenchmarks)
+        foreach (var benchmark in nullRuntimeBenchmarks.Where(x=> !x.GetToolchain().IsInProcess))
         {
             var job = benchmark.Job;
             var jobText = job.HasValue(CharacteristicObject.IdCharacteristic)
