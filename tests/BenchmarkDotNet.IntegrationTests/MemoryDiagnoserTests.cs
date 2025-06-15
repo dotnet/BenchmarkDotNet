@@ -245,7 +245,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
                 { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
-            });
+            }, warmupCount: 2);
         }
 
         public class MultiThreadedAllocation
@@ -315,9 +315,9 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, bool disableTieredJit = true, int iterationCount = 1)
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, bool disableTieredJit = true, int iterationCount = 1, int warmupCount = 0)
         {
-            var config = CreateConfig(toolchain, disableTieredJit, iterationCount);
+            var config = CreateConfig(toolchain, disableTieredJit, iterationCount, warmupCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -358,11 +358,13 @@ namespace BenchmarkDotNet.IntegrationTests
             // This was mostly fixed in net7.0, but tiered jit thread is not guaranteed to not allocate, so we disable it just in case.
             bool disableTieredJit = true,
             // Single iteration is enough for most of the tests.
-            int iterationCount = 1)
+            int iterationCount = 1,
+            // Don't run warmup by default to save some time for our CI runs
+            int warmupCount = 0)
         {
             var job = Job.ShortRun
                 .WithEvaluateOverhead(false) // no need to run idle for this test
-                .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
+                .WithWarmupCount(warmupCount)
                 .WithIterationCount(iterationCount)
                 .WithGcForce(false)
                 .WithGcServer(false)
