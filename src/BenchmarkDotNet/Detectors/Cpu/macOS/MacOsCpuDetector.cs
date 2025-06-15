@@ -15,7 +15,11 @@ internal class MacOsCpuDetector : ICpuDetector
     {
         if (!IsApplicable()) return null;
 
-        string sysctlOutput = ProcessHelper.RunAndReadOutput("sysctl", "-a");
+        string? sysctlOutput = ProcessHelper.RunAndReadOutput("sysctl", "-a");
+
+        if (sysctlOutput is null)
+            return null;
+
         return SysctlCpuInfoParser.Parse(sysctlOutput);
     }
 }
