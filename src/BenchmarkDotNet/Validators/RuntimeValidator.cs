@@ -35,7 +35,7 @@ public class RuntimeValidator : IValidator
                 ? job.Id
                 : CharacteristicSetPresenter.Display.ToPresentation(job); // Use job text representation instead for auto generated JobId.
 
-            var message = $"Job({jobText}) don't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
+            var message = $"Job({jobText}) doesn't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
             errors.Add(new ValidationError(false, message));
         }
         return errors;
