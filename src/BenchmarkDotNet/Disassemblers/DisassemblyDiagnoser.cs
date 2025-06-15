@@ -142,9 +142,8 @@ namespace BenchmarkDotNet.Diagnosers
         private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        // when we add  macOS support, RuntimeInformation.IsMacOS() needs to be added here
         private static bool ShouldUseClrMdDisassembler(BenchmarkCase benchmarkCase)
-            => !ShouldUseMonoDisassembler(benchmarkCase) && (OsDetector.IsWindows() || OsDetector.IsLinux());
+            => !ShouldUseMonoDisassembler(benchmarkCase) && (OsDetector.IsWindows() || OsDetector.IsLinux() || OsDetector.IsMacOS());
 
         private static bool ShouldUseSameArchitectureDisassembler(BenchmarkCase benchmarkCase, DiagnoserActionParameters parameters)
         {
