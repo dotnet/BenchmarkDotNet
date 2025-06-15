@@ -17,6 +17,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliCommand
     {
+        [PublicAPI] public string ProjPath { get; }
+
         [PublicAPI] public string CliPath { get; }
 
         [PublicAPI] public string Arguments { get; }
@@ -33,9 +35,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public bool LogOutput { get; }
 
-        public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
+        public DotNetCliCommand(string projPath, string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
+            ProjPath = projPath;
             CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             Arguments = arguments;
             GenerateResult = generateResult;
@@ -47,10 +50,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public DotNetCliCommand WithArguments(string arguments)
-            => new (CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
+            => new (ProjPath, CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
+
+        public DotNetCliCommand WithProjPath(string projPath)
+            => new (projPath, CliPath, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
 
         public DotNetCliCommand WithCliPath(string cliPath)
-            => new (cliPath, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
+            => new (ProjPath, cliPath, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
@@ -72,12 +78,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (BuildPartition.ForcedNoDependenciesForIntegrationTests)
             {
                 var restoreResult = DotNetCliCommandExecutor.Execute(WithArguments(
-                    GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-dependencies", "restore-no-deps", excludeOutput: true)));
+                    GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, $"{Arguments} --no-dependencies", "restore-no-deps", excludeOutput: true)));
                 if (!restoreResult.IsSuccess)
                     return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
                 return DotNetCliCommandExecutor.Execute(WithArguments(
-                    GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)))
+                    GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)))
                     .ToBuildResult(GenerateResult);
             }
             else
@@ -119,7 +125,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             var executionTime = new TimeSpan(0);
             var stdOutput = new StringBuilder();
-            foreach (var cmd in GetAddPackagesCommands(BuildPartition))
+            foreach (var cmd in GetAddPackagesCommands(BuildPartition, ProjPath))
             {
                 var result = DotNetCliCommandExecutor.Execute(WithArguments(cmd));
                 if (!result.IsSuccess) return result;
@@ -131,31 +137,32 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public DotNetCliCommandResult Restore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments, "restore")));
+                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, Arguments, "restore")));
 
         public DotNetCliCommandResult Build()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments, "build")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, Arguments, "build")));
 
         public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore", "build-no-restore")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, $"{Arguments} --no-restore", "build-no-restore")));
 
         public DotNetCliCommandResult Publish()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments, "publish")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, Arguments, "publish")));
 
         // PublishNoBuildAndNoRestore was removed because we set --output in the build step. We use the implicit build included in the publish command.
         public DotNetCliCommandResult PublishNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore", "publish-no-restore")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjPath, $"{Arguments} --no-restore", "publish-no-restore")));
 
-        internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
-            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
+        internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition, string projPath)
+            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver, projPath);
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string projPath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
                 .AppendArgument("restore")
+                .AppendArgument(string.IsNullOrEmpty(projPath) ? string.Empty : $"\"{projPath}\"")
                 .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
@@ -164,9 +171,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .MaybeAppendOutputPaths(artifactsPaths, true, excludeOutput)
                 .ToString();
 
-        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string projPath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
-                .AppendArgument($"build -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
+                .AppendArgument("build")
+                .AppendArgument(string.IsNullOrEmpty(projPath) ? string.Empty : $"\"{projPath}\"")
+                .AppendArgument($"-c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -175,9 +184,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .MaybeAppendOutputPaths(artifactsPaths, excludeOutput: excludeOutput)
                 .ToString();
 
-        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null)
+        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string projPath, string? extraArguments = null, string? binLogSuffix = null)
             => new StringBuilder()
-                .AppendArgument($"publish -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
+                .AppendArgument("publish")
+                .AppendArgument(string.IsNullOrEmpty(projPath) ? string.Empty : $"\"{projPath}\"")
+                .AppendArgument($"-c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -204,14 +215,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }
 
-        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
+        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver, string projPath)
         {
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
                 return Enumerable.Empty<string>();
 
             var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
-            return nuGetRefs.Select(BuildAddPackageCommand);
+            return nuGetRefs.Select(nr => BuildAddPackageCommand(nr, projPath));
         }
 
         private static string GetMandatoryMsBuildSettings(string buildConfiguration)
@@ -229,11 +240,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
         }
 
-        private static string BuildAddPackageCommand(NuGetReference reference)
+        private static string BuildAddPackageCommand(NuGetReference reference, string projPath)
         {
-            var commandBuilder = new StringBuilder();
-            commandBuilder.AppendArgument("add package");
-            commandBuilder.AppendArgument(reference.PackageName);
+            var commandBuilder = new StringBuilder()
+                .AppendArgument("add")
+                .AppendArgument(string.IsNullOrEmpty(projPath) ? string.Empty : $"\"{projPath}\"")
+                .AppendArgument("package")
+                .AppendArgument(reference.PackageName);
             if (!string.IsNullOrWhiteSpace(reference.PackageVersion))
             {
                 commandBuilder.AppendArgument("-v");
