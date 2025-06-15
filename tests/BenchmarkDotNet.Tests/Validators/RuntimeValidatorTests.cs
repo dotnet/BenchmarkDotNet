@@ -40,11 +40,11 @@ public class RuntimeValidatorTests
 
         // Assert
         {
-            var expectedMessage = "Job(Dry) don't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
+            var expectedMessage = "Job(Dry) doesn't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
             Assert.Contains(expectedMessage, errors);
         }
         {
-            var expectedMessage = "Job(Toolchain=.NET 10.0) don't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
+            var expectedMessage = "Job(Toolchain=.NET 10.0) doesn't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
             Assert.Contains(expectedMessage, errors);
         }
     }
