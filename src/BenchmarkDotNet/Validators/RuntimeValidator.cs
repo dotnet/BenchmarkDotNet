@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Characteristics;
 
 namespace BenchmarkDotNet.Validators;
 
@@ -20,16 +19,25 @@ public class RuntimeValidator : IValidator
     public IEnumerable<ValidationError> Validate(ValidationParameters input)
     {
         var allBenchmarks = input.Benchmarks.ToArray();
+        var nullRuntimeBenchmarks = allBenchmarks.Where(x => x.Job.Environment.Runtime == null).ToArray();
 
-        var runtimes = allBenchmarks.Select(x => x.Job.Environment.Runtime)
-                                    .Distinct()
-                                    .ToArray();
-
-        if (runtimes.Length > 1 && runtimes.Contains(null))
+        // There is no validation error if all the runtimes are set or if all the runtimes are null.
+        if (allBenchmarks.Length == nullRuntimeBenchmarks.Length)
         {
-            // GetRuntime() method returns current environment's runtime if RuntimeCharacteristic is not set.
-            var message = "There are benchmarks that job don't have a Runtime characteristic. It's recommended explicitly specify runtime by `WithRuntime`.";
-            yield return new ValidationError(false, message);
+            return [];
         }
+
+        var errors = new List<ValidationError>();
+        foreach (var benchmark in nullRuntimeBenchmarks)
+        {
+            var job = benchmark.Job;
+            var jobText = job.HasValue(CharacteristicObject.IdCharacteristic)
+                ? job.Id
+                : CharacteristicSetPresenter.Display.ToPresentation(job); // Use job text representation instead for auto generated JobId.
+
+            var message = $"Job({jobText}) don't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
+            errors.Add(new ValidationError(false, message));
+        }
+        return errors;
     }
 }
