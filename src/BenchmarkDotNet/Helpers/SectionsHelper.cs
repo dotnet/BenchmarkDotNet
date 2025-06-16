@@ -32,5 +32,14 @@ namespace BenchmarkDotNet.Helpers
                     .Where(s => s.Count > 0)
                     .ToList();
         }
+
+        public static List<Dictionary<string, string>> ParseSectionsForPowershellWmi(string? content, char separator)
+        {
+            return
+                Regex.Split(content ?? "", "(\r*\n)")
+                    .Select(s => ParseSection(s, separator))
+                    .Where(s => s.Count > 0)
+                    .ToList();
+        }
     }
 }

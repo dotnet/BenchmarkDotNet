@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
@@ -17,6 +18,8 @@ internal static class LinuxCpuInfoParser
         internal const string CpuCores = "cpu cores";
         internal const string ModelName = "model name";
         internal const string MaxFrequency = "max freq";
+        internal const string NominalFrequencyBackup = "nominal freq";
+        internal const string NominalFrequency = "cpu MHz";
     }
 
     private static class Lscpu
@@ -28,12 +31,13 @@ internal static class LinuxCpuInfoParser
 
     /// <param name="cpuInfo">Output of `cat /proc/cpuinfo`</param>
     /// <param name="lscpu">Output of `lscpu`</param>
-    internal static CpuInfo Parse(string? cpuInfo, string? lscpu)
+    internal static CpuInfo Parse(string cpuInfo, string lscpu)
     {
         var processorModelNames = new HashSet<string>();
         var processorsToPhysicalCoreCount = new Dictionary<string, int>();
         int logicalCoreCount = 0;
-        Frequency? maxFrequency = null;
+        double maxFrequency = 0.0;
+        double nominalFrequency = 0.0;
 
         var logicalCores = SectionsHelper.ParseSections(cpuInfo, ':');
         foreach (var logicalCore in logicalCores)
@@ -51,14 +55,43 @@ internal static class LinuxCpuInfoParser
             }
 
             if (logicalCore.TryGetValue(ProcCpu.MaxFrequency, out string maxCpuFreqValue) &&
-                Frequency.TryParseMHz(maxCpuFreqValue, out var maxCpuFreq))
+                Frequency.TryParseMHz(maxCpuFreqValue.Replace(',', '.'), out Frequency maxCpuFreq)
+                && maxCpuFreq > 0)
             {
-                maxFrequency = maxCpuFreq;
+                maxFrequency = Math.Max(maxFrequency, maxCpuFreq.ToMHz());
+            }
+
+            bool nominalFrequencyHasValue = logicalCore.TryGetValue(ProcCpu.NominalFrequency, out string nominalFreqValue);
+            bool nominalFrequencyBackupHasValue = logicalCore.TryGetValue(ProcCpu.NominalFrequencyBackup, out string nominalFreqBackupValue);
+
+            double nominalCpuFreq = 0.0;
+            double nominalCpuBackupFreq = 0.0;
+
+            if (nominalFrequencyHasValue &&
+                double.TryParse(nominalFreqValue, out nominalCpuFreq)
+                && nominalCpuFreq > 0)
+            {
+                nominalCpuFreq = nominalFrequency == 0 ? nominalCpuFreq : Math.Min(nominalFrequency, nominalCpuFreq);
+            }
+            if (nominalFrequencyBackupHasValue &&
+                     double.TryParse(nominalFreqBackupValue, out nominalCpuBackupFreq)
+                     && nominalCpuBackupFreq > 0)
+            {
+                nominalCpuBackupFreq = nominalFrequency == 0 ? nominalCpuBackupFreq : Math.Min(nominalFrequency, nominalCpuBackupFreq);
+            }
+
+            if (nominalFrequencyHasValue && nominalFrequencyBackupHasValue)
+            {
+                nominalFrequency = Math.Min(nominalCpuFreq, nominalCpuBackupFreq);
+            }
+            else
+            {
+                nominalFrequency = nominalCpuFreq == 0.0 ? nominalCpuBackupFreq : nominalCpuFreq;
             }
         }
 
         int? coresPerSocket = null;
-        if (lscpu != null)
+        if (string.IsNullOrEmpty(lscpu) == false)
         {
             var lscpuParts = lscpu.Split('\n')
                 .Where(line => line.Contains(':'))
@@ -70,8 +103,8 @@ internal static class LinuxCpuInfoParser
                 string value = lscpuParts[i + 1].Trim();
 
                 if (name.EqualsWithIgnoreCase(Lscpu.MaxFrequency) &&
-                    Frequency.TryParseMHz(value.Replace(',', '.'), out var maxFrequencyParsed)) // Example: `CPU max MHz: 3200,0000`
-                    maxFrequency = maxFrequencyParsed;
+                    Frequency.TryParseMHz(value.Replace(',', '.'), out Frequency maxFrequencyParsed)) // Example: `CPU max MHz: 3200,0000`
+                    maxFrequency = Math.Max(maxFrequency, maxFrequencyParsed.ToMHz());
 
                 if (name.EqualsWithIgnoreCase(Lscpu.ModelName))
                     processorModelNames.Add(value);
@@ -82,21 +115,33 @@ internal static class LinuxCpuInfoParser
             }
         }
 
-        var nominalFrequency = processorModelNames
-            .Select(ParseFrequencyFromBrandString)
-            .WhereNotNull()
-            .FirstOrDefault() ?? maxFrequency;
         string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         int? physicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : null;
         int? physicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : coresPerSocket;
+
+        Frequency? maxFrequencyActual = maxFrequency > 0 && physicalProcessorCount > 0
+            ? Frequency.FromMHz(maxFrequency) : null;
+
+        Frequency? nominalFrequencyActual = nominalFrequency > 0 && physicalProcessorCount > 0
+            ? Frequency.FromMHz(nominalFrequency) : null;
+
+        if (nominalFrequencyActual is null)
+        {
+            bool nominalFrequencyInBrandString = processorModelNames.Any(x => ParseFrequencyFromBrandString(x) is not null);
+
+            if (nominalFrequencyInBrandString)
+                nominalFrequencyActual = processorModelNames.Select(x => ParseFrequencyFromBrandString(x))
+                    .First(x => x is not null);
+        }
+
         return new CpuInfo
         {
             ProcessorName = processorName,
             PhysicalProcessorCount = physicalProcessorCount,
             PhysicalCoreCount = physicalCoreCount,
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : null,
-            NominalFrequencyHz = nominalFrequency?.Hertz.RoundToLong(),
-            MaxFrequencyHz = maxFrequency?.Hertz.RoundToLong()
+            NominalFrequencyHz = nominalFrequencyActual?.Hertz.RoundToLong(),
+            MaxFrequencyHz = maxFrequencyActual?.Hertz.RoundToLong()
         };
     }
 
@@ -107,7 +152,7 @@ internal static class LinuxCpuInfoParser
         if (matches.Count > 0 && matches[0].Groups.Count > 1)
         {
             string match = Regex.Matches(brandString, pattern, RegexOptions.IgnoreCase)[0].Groups[1].ToString();
-            return Frequency.TryParseGHz(match, out var result) ? result : null;
+            return Frequency.TryParseGHz(match, out Frequency result) ? result : null;
         }
 
         return null;
