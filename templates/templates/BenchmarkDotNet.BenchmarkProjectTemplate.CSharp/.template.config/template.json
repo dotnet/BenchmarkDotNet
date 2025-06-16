@@ -139,7 +139,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Version of BenchmarkDotNet that will be referenced.",
-      "defaultValue": "0.15.2",
+      "defaultValue": "0.15.3",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
   },
