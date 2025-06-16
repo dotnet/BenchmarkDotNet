@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Order
 
         private readonly IComparer<string[]> categoryComparer = CategoryComparer.Instance;
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
-        private readonly IComparer<Job> jobComparer = JobComparer.Instance;
+        private readonly IComparer<Job> jobComparer;
         private readonly IComparer<Descriptor> targetComparer;
 
         public SummaryOrderPolicy SummaryOrderPolicy { get; }
@@ -27,10 +27,14 @@ namespace BenchmarkDotNet.Order
 
         public DefaultOrderer(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
-            MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
+            MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared,
+            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
         {
             SummaryOrderPolicy = summaryOrderPolicy;
             MethodOrderPolicy = methodOrderPolicy;
+            jobComparer = jobOrderPolicy == JobOrderPolicy.Default
+                ? JobComparer.Instance
+                : JobComparer.Numeric;
             targetComparer = new DescriptorComparer(methodOrderPolicy);
         }
 

@@ -16,11 +16,10 @@
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Reflection" />
-    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Use v9.0.3 as baseline package for WithNuGet tests -->
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.3" />
+    <!-- Use v9.0.0 as baseline package for WithNuGet tests -->
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />

@@ -9,9 +9,10 @@ namespace BenchmarkDotNet.Attributes
     {
         public OrdererAttribute(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
-            MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
+            MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared,
+            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
         {
-            Config = ManualConfig.CreateEmpty().WithOrderer(new DefaultOrderer(summaryOrderPolicy, methodOrderPolicy));
+            Config = ManualConfig.CreateEmpty().WithOrderer(new DefaultOrderer(summaryOrderPolicy, methodOrderPolicy, jobOrderPolicy));
         }
 
         public IConfig Config { get; }

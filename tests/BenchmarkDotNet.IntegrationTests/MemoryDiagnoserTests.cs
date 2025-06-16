@@ -36,7 +36,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetToolchains()
         {
             yield return new object[] { Job.Default.GetToolchain() };
-            yield return new object[] { InProcessEmitToolchain.Instance };
+            // InProcessEmit reports flaky allocations in current .Net 8.
+            if (!RuntimeInformation.IsNetCore)
+            {
+                yield return new object[] { InProcessEmitToolchain.Instance };
+            }
         }
 
         public class AccurateAllocations
@@ -47,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurate(IToolchain toolchain)
         {
@@ -67,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 8.0)", EnvRequirement.DotNetCoreOnly)]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
             if (OsDetector.IsMacOS())
@@ -105,7 +109,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -118,21 +122,39 @@ namespace BenchmarkDotNet.IntegrationTests
         public class NoAllocationsAtAll
         {
             [Benchmark] public void EmptyMethod() { }
+
+            [Benchmark]
+            public ulong TimeConsuming()
+            {
+                var r = 1ul;
+                for (var i = 0; i < 50_000_000; i++)
+                {
+                    r /= 1;
+                }
+                return r;
+            }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
-            if (RuntimeInformation.IsFullFramework && toolchain.IsInProcess)
-            {
-                return; // this test is flaky on Full Framework
-            }
-
             AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
             {
                 { nameof(NoAllocationsAtAll.EmptyMethod), 0 }
             });
+        }
+
+        // #1542
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void TieredJitShouldNotInterfereAllocationResults(IToolchain toolchain)
+        {
+            AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
+            {
+                { nameof(NoAllocationsAtAll.TimeConsuming), 0 }
+            },
+            disableTieredJit: false, iterationCount: 10); // 1 iteration is not enough to repro the problem
         }
 
         public class NoBoxing
@@ -140,7 +162,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTuple<int> ReturnsValueType() => new ValueTuple<int>(0);
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
         {
@@ -161,15 +183,10 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTask<int> CompletedValueTaskOfT() => new ValueTask<int>(default(int));
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
-            if (toolchain.IsInProcess)
-            {
-                return; // it's flaky: https://github.com/dotnet/BenchmarkDotNet/issues/1925
-            }
-
             AssertAllocations(toolchain, typeof(NonAllocatingAsynchronousBenchmarks), new Dictionary<string, long>
             {
                 { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTask), 0 },
@@ -191,7 +208,7 @@ namespace BenchmarkDotNet.IntegrationTests
             private void DoNotInline(object left, object right) { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocatedMemoryShouldBeScaledForOperationsPerInvoke(IToolchain toolchain)
         {
@@ -217,8 +234,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
-        //[TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
@@ -228,55 +245,79 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
                 { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
-            });
+            }, warmupCount: 2);
         }
 
         public class MultiThreadedAllocation
         {
-            public const int Size = 1_000_000;
+            public const int Size = 1024;
             public const int ThreadsCount = 10;
 
+            // We cache the threads in GlobalSetup and reuse them for each benchmark invocation
+            // to avoid measuring the cost of thread start and join, which varies across different runtimes.
             private Thread[] threads;
+            private volatile bool keepRunning = true;
+            private readonly Barrier barrier = new (ThreadsCount + 1);
+            private readonly CountdownEvent countdownEvent = new (ThreadsCount);
 
-            [IterationSetup]
-            public void SetupIteration()
+            [GlobalSetup]
+            public void Setup()
             {
                 threads = Enumerable.Range(0, ThreadsCount)
-                    .Select(_ => new Thread(() => GC.KeepAlive(new byte[Size])))
+                    .Select(_ => new Thread(() =>
+                    {
+                        while (keepRunning)
+                        {
+                            barrier.SignalAndWait();
+                            GC.KeepAlive(new byte[Size]);
+                            countdownEvent.Signal();
+                        }
+                    }))
                     .ToArray();
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                }
+            }
+
+            [GlobalCleanup]
+            public void Cleanup()
+            {
+                keepRunning = false;
+                barrier.SignalAndWait();
+                foreach (var thread in threads)
+                {
+                    thread.Join();
+                }
             }
 
             [Benchmark]
             public void Allocate()
             {
-                foreach (var thread in threads)
-                {
-                    thread.Start();
-                    thread.Join();
-                }
+                countdownEvent.Reset(ThreadsCount);
+                barrier.SignalAndWait();
+                countdownEvent.Wait();
             }
         }
 
-        [Theory(Skip = "Test is flaky even in latest .Net")]
-        [MemberData(nameof(GetToolchains))]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough", EnvRequirement.DotNetCoreOnly)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
         {
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
             long memoryAllocatedPerArray = (MultiThreadedAllocation.Size + objectAllocationOverhead + arraySizeOverhead);
-            long threadStartAndJoinOverhead = 112; // this is more or less a magic number taken from memory profiler
-            long allocatedMemoryPerThread = memoryAllocatedPerArray + threadStartAndJoinOverhead;
 
             AssertAllocations(toolchain, typeof(MultiThreadedAllocation), new Dictionary<string, long>
             {
-                { nameof(MultiThreadedAllocation.Allocate), allocatedMemoryPerThread * MultiThreadedAllocation.ThreadsCount }
+                { nameof(MultiThreadedAllocation.Allocate), memoryAllocatedPerArray * MultiThreadedAllocation.ThreadsCount }
             });
         }
 
-        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators)
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, bool disableTieredJit = true, int iterationCount = 1, int warmupCount = 0)
         {
-            var config = CreateConfig(toolchain);
+            var config = CreateConfig(toolchain, disableTieredJit, iterationCount, warmupCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -312,24 +353,37 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain)
-            => ManualConfig.CreateEmpty()
-                .AddJob(Job.ShortRun
-                    .WithEvaluateOverhead(false) // no need to run idle for this test
-                    .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
-                    .WithIterationCount(1) // single iteration is enough for us
-                    .WithGcForce(false)
-                    .WithGcServer(false)
-                    .WithGcConcurrent(false)
-                    .WithEnvironmentVariables([
-                        // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
+        private IConfig CreateConfig(IToolchain toolchain,
+            // Tiered JIT can allocate some memory on a background thread, let's disable it by default to make our tests less flaky (#1542).
+            // This was mostly fixed in net7.0, but tiered jit thread is not guaranteed to not allocate, so we disable it just in case.
+            bool disableTieredJit = true,
+            // Single iteration is enough for most of the tests.
+            int iterationCount = 1,
+            // Don't run warmup by default to save some time for our CI runs
+            int warmupCount = 0)
+        {
+            var job = Job.ShortRun
+                .WithEvaluateOverhead(false) // no need to run idle for this test
+                .WithWarmupCount(warmupCount)
+                .WithIterationCount(iterationCount)
+                .WithGcForce(false)
+                .WithGcServer(false)
+                .WithGcConcurrent(false)
+                // To prevent finalizers allocating out of our control, we hang the finalizer thread.
+                // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
+                .WithEnvironmentVariable(Engines.Engine.UnitTestBlockFinalizerEnvKey, Engines.Engine.UnitTestBlockFinalizerEnvValue)
+                .WithToolchain(toolchain);
+            return ManualConfig.CreateEmpty()
+                .AddJob(disableTieredJit
+                    ? job.WithEnvironmentVariables(
                         new EnvironmentVariable("DOTNET_TieredCompilation", "0"),
                         new EnvironmentVariable("COMPlus_TieredCompilation", "0")
-                    ])
-                    .WithToolchain(toolchain))
+                    )
+                    : job)
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)
                 .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+        }
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int CalculateRequiredSpace<T>()

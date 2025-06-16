@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [TheoryEnvSpecific(WindowsOnly, EnvRequirement.WindowsOnly)]
-        [MemberData(nameof(GetJits))]
+        [MemberData(nameof(GetJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
         {
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [TheoryEnvSpecific(WindowsOnly, EnvRequirement.WindowsOnly)]
-        [MemberData(nameof(GetJits))]
+        [MemberData(nameof(GetJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserNotCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
         {

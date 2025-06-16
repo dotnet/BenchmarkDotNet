@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ArgumentsArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArguments>(toolchain);
 
         public class WithArguments
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ArgumentsFromSourceArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsSource>(toolchain);
 
         public class WithArgumentsSource
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ArgumentsFromSourceInAnotherClassArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsSourceInAnotherClass>(toolchain);
 
         public class WithArgumentsSourceInAnotherClass
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ArgumentsCanBePassedByReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithRefArguments>(toolchain);
 
         public class WithRefArguments
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ArgumentsCanBePassedByReadonlyReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithInArguments>(toolchain);
 
         public class WithInArguments
@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void NonCompileTimeConstantsCanBeReturnedFromSource(IToolchain toolchain) => CanExecute<WithComplexTypesReturnedFromSources>(toolchain);
 
         public class WithComplexTypesReturnedFromSources
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithArray>(toolchain);
 
         public class WithArray
@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void IEnumerableCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithIEnumerable>(toolchain);
 
         public class WithIEnumerable
@@ -233,7 +233,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Any(string name, IEnumerable<int> source) => source.Any();
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void JaggedArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithJaggedArray>(toolchain);
 
         public class WithJaggedArray
@@ -269,7 +269,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void GenericTypeCanBePassedByRefAsArgument(IToolchain toolchain) => CanExecute<WithGenericByRef>(toolchain);
 
         public class WithGenericByRef
@@ -305,7 +305,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnArrayOfTypeWithNoParameterlessCtorCanBePassedAsArgument(IToolchain toolchain) => CanExecute<WithArrayOfStringAsArgument>(toolchain);
 
         public class WithArrayOfStringAsArgument
@@ -322,7 +322,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnArrayCanBePassedToBenchmarkAsSpan(IToolchain toolchain) => CanExecute<WithArrayToSpan>(toolchain);
 
         public class WithArrayToSpan
@@ -342,7 +342,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
             EnvRequirement.DotNetCoreOnly)]
-        [MemberData(nameof(GetToolchains))]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
 
         public class WithStringToReadOnlySpan
@@ -360,7 +360,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnArrayOfStringsCanBeUsedAsArgument(IToolchain toolchain) =>
             CanExecute<WithArrayOfStringFromArgumentSource>(toolchain);
 
@@ -380,7 +380,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))] // make sure BDN mimics xunit's MemberData behaviour
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)] // make sure BDN mimics xunit's MemberData behaviour
         public void AnIEnumerableOfArrayOfObjectsCanBeUsedAsArgumentForBenchmarkAcceptingSingleArgument(IToolchain toolchain)
             => CanExecute<WithIEnumerableOfArrayOfObjectsFromArgumentSource>(toolchain);
 
@@ -400,7 +400,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void BenchmarkCanAcceptFewArrays(IToolchain toolchain) => CanExecute<FewArrays>(toolchain);
 
         public class FewArrays
@@ -429,7 +429,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void VeryBigIntegersAreSupported(IToolchain toolchain) => CanExecute<WithVeryBigInteger>(toolchain);
 
         public class WithVeryBigInteger
@@ -450,7 +450,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void SpecialDoubleValuesAreSupported(IToolchain toolchain) => CanExecute<WithSpecialDoubleValues>(toolchain);
 
         public class WithSpecialDoubleValues
@@ -495,7 +495,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void SpecialFloatValuesAreSupported(IToolchain toolchain) => CanExecute<WithSpecialFloatValues>(toolchain);
 
         public class WithSpecialFloatValues
@@ -540,7 +540,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void SpecialDecimalValuesAreSupported(IToolchain toolchain) => CanExecute<WithSpecialDecimalValues>(toolchain);
 
         public class WithSpecialDecimalValues
@@ -569,7 +569,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void DateTimeCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithDateTime>(toolchain);
 
         public class WithDateTime
@@ -590,7 +590,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument(IToolchain toolchain) => CanExecute<CustomTypeThatAlsoExistsInTheSystemNamespace>(toolchain);
 
         public class CustomTypeThatAlsoExistsInTheSystemNamespace
@@ -611,7 +611,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void EnumFlagsAreSupported(IToolchain toolchain) => CanExecute<WithEnumFlags>(toolchain);
 
         public class WithEnumFlags
@@ -648,7 +648,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void UndefinedEnumValuesAreSupported(IToolchain toolchain) => CanExecute<WithUndefinedEnumValue>(toolchain);
 
         public class WithUndefinedEnumValue
@@ -674,7 +674,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfObjects(IToolchain toolchain)
             => CanExecute<WithStaticSources_EnumerableOfObjects>(toolchain);
 
@@ -722,7 +722,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfArrayOfObjects(IToolchain toolchain)
             => CanExecute<WithStaticSources_EnumerableOfArrayOfObjects>(toolchain);
 
@@ -769,7 +769,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void MethodsAndPropertiesFromAnotherClassCanBeUsedAsSources(IToolchain toolchain)
             => CanExecute<ParamsSourcePointingToAnotherClass>(toolchain);
 
@@ -805,7 +805,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void VeryLongStringsAreSupported(IToolchain toolchain) => CanExecute<WithVeryLongString>(toolchain);
 
         public class WithVeryLongString
@@ -829,7 +829,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void ComplexStringPattersAreSupported(IToolchain toolchain) => CanExecute<Perf_Regex_Industry_RustLang_Sherlock>(toolchain);
 
         public class Perf_Regex_Industry_RustLang_Sherlock
