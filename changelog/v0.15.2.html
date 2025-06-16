@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>BenchmarkDotNet v0.15.2 | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="BenchmarkDotNet v0.15.2 | BenchmarkDotNet ">
+      
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.15.2.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="changelog.v0.15.2">
+<h1 id="benchmarkdotnet-v0152">BenchmarkDotNet v0.15.2</h1>
+
+<h2 id="highlights">Highlights</h2>
+<ul>
+<li>The most significant update in this release is the enhanced accuracy of the memory diagnoser (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2562">#2562</a>). This improvement resolves the issue of incorrectly reported memory allocations (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/1542">#1542</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2582">#2582</a>).</li>
+<li>We have introduced a new feature that allows users to sort benchmark jobs in numerical order (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/2768">#2768</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2770">#2770</a>).</li>
+<li>Benchmark validation has been improved (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2771">#2771</a>).</li>
+<li>An issue with non-persistent auto-generated JobId has been fixed (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2777">#2777</a>).</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.15.2">v0.15.2</a> scope,
+5 issues were resolved and 10 pull requests were merged.
+This release includes 15 commits by 3 contributors.</p>
+<h2 id="resolved-issues-5">Resolved issues (5)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1542">#1542</a> Unexpected allocations reported in CPU-bound code (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1925">#1925</a> Flaky tests because of AssertAllocations with InProcessEmitToolchain on Windows (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2582">#2582</a> IterationSetup allocates 400B (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2768">#2768</a> [Feature Request] Add custom option to sort benchmark jobs by numeric orders (assignee: <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2779">#2779</a> <code>AllocationQuantumIsNotAnIssueForNetCore21Plus</code> tests randomly failed on <code>macos (arm64)</code></li>
+</ul>
+<h2 id="merged-pull-requests-10">Merged pull requests (10)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2562">#2562</a> Improve memory diagnoser accuracy (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2766">#2766</a> chore: Fix benchmark TestAdapter related issues (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2769">#2769</a> chore: Suppress xunit non-serializable data warnings (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2770">#2770</a> feat: Add JobOrderPolicy option to sort jobs by numeric order (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2771">#2771</a> feat: Add validator for benchmarks that contains null runtime (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2772">#2772</a> chore: Add setting to skip test reports when run-tests workflow is cancelled (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2775">#2775</a> chore: Modify macos runner image for CI (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2777">#2777</a> fix: Issue that auto-generate JobId  is changed between benchmark runs (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2780">#2780</a> chore: Skip null runtime validation for InProcessToolchain (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2782">#2782</a> chore: Add warmups steps for flaky tests (AllocationQuantumIsNotAnIssueForNetCore21Plus) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+</ul>
+<h2 id="commits-15">Commits (15)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19e907194e462edc648091ef3c2bb218d6831727">19e907</a> Set next BenchmarkDotNet version: 0.15.2 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/200260136816fa7f3f27db5710a5b805be13cb35">200260</a> [build] Enhance docs-fetch command (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3df0f1bf4ede18ccf5744a550832f4ee2d651c5e">3df0f1</a> Remove docs/_changelog folder from the main branch (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c9548fa72649c7286555ec9402fbf4893f38cd8c">c9548f</a> chore: fix benchmark testadapter related issues (#2766) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c84de9a0d4af419309743c5f86e765de8d490a90">c84de9</a> Improve memory diagnoser accuracy (#2562) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fe3b31f2ea254d1fd45a1a85d17aad5e856abdb6">fe3b31</a> chore: add setting to skip test reports when original workflow is cancelled (... (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6730bf1570bc68e403d17eeaf9749c5f9b0bee24">6730bf</a> feat: add JobOrderPolicy option to sort jobs numeric order (#2770) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a08f01c1a682e3aa7dab92c44d18b5b52a38b062">a08f01</a> chore: Modify macos runner image for CI (#2775) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/de8ba0796cdeab18fd8abc4988864a134f6dae8f">de8ba0</a> chore: suppress xunit non-serializable data warnings (#2769) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ed5316b8309c373204a471c57a65e363d399139c">ed5316</a> feat: Add validator for benchmarks that contains null runtime (#2771) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5db72844abbfd0ea317397ac3da6f5f4ee24b602">5db728</a> fix: auto-generate jobid between benchmark runs (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/27d864a41b3d97b46f45cfed747f477b82d718ab">27d864</a> chore: fix flaky memory allocation test (#2782) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5f1dcd8edba23ff9dfc6cb84f7363148aeb190fb">5f1dcd</a> chore: skip null runtime validation for inprocess toolchain (#2780) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/973f6b9a0eb1be8cda87a73b0472d9d334fb6a98">973f6b</a> [build] Allow workflow_dispatch for publish-nightly workflow (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2306babcc2430ee50f1c3ff6ba40359ae0799ee5">2306ba</a> [build] Enable --force-clone for docs-fetch in generate-gh-pages.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-3">Contributors (3)</h2>
+<ul>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>filzrev (<a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: TBA</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.15.2">v0.15.2</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.15.1...v0.15.2">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.2</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.2">https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.2</a></li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
