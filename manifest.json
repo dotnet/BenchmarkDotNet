@@ -5550,6 +5550,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Order.JobOrderPolicy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Order.JobOrderPolicy.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BenchmarkDotNet.Order.JobOrderPolicy",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Order.MethodOrderPolicy.yml",
       "output": {
         ".html": {
@@ -7521,6 +7535,20 @@
       "IsMRef": true,
       "Title": "BenchmarkDotNet.Validators.RunModeValidator",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Validators.RuntimeValidator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Validators.RuntimeValidator.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BenchmarkDotNet.Validators.RuntimeValidator",
+      "Summary": "<p sourcefile=\"api/BenchmarkDotNet.Validators.RuntimeValidator.yml\" sourcestartlinenumber=\"1\">Validator for runtime characteristic.\n<a href=\"https://github.com/dotnet/BenchmarkDotNet/issues/2609\">https://github.com/dotnet/BenchmarkDotNet/issues/2609</a></p>\n"
     },
     {
       "type": "ManagedReference",

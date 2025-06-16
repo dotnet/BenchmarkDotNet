@@ -3565,15 +3565,15 @@ references:
   commentId: T:BenchmarkDotNet.Attributes.OrdererAttribute
   fullName: BenchmarkDotNet.Attributes.OrdererAttribute
   nameWithType: OrdererAttribute
-- uid: BenchmarkDotNet.Attributes.OrdererAttribute.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy)
-  name: OrdererAttribute(SummaryOrderPolicy, MethodOrderPolicy)
-  href: api/BenchmarkDotNet.Attributes.OrdererAttribute.html#BenchmarkDotNet_Attributes_OrdererAttribute__ctor_BenchmarkDotNet_Order_SummaryOrderPolicy_BenchmarkDotNet_Order_MethodOrderPolicy_
-  commentId: M:BenchmarkDotNet.Attributes.OrdererAttribute.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy)
-  name.vb: New(SummaryOrderPolicy, MethodOrderPolicy)
-  fullName: BenchmarkDotNet.Attributes.OrdererAttribute.OrdererAttribute(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy)
-  fullName.vb: BenchmarkDotNet.Attributes.OrdererAttribute.New(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy)
-  nameWithType: OrdererAttribute.OrdererAttribute(SummaryOrderPolicy, MethodOrderPolicy)
-  nameWithType.vb: OrdererAttribute.New(SummaryOrderPolicy, MethodOrderPolicy)
+- uid: BenchmarkDotNet.Attributes.OrdererAttribute.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy,BenchmarkDotNet.Order.JobOrderPolicy)
+  name: OrdererAttribute(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
+  href: api/BenchmarkDotNet.Attributes.OrdererAttribute.html#BenchmarkDotNet_Attributes_OrdererAttribute__ctor_BenchmarkDotNet_Order_SummaryOrderPolicy_BenchmarkDotNet_Order_MethodOrderPolicy_BenchmarkDotNet_Order_JobOrderPolicy_
+  commentId: M:BenchmarkDotNet.Attributes.OrdererAttribute.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy,BenchmarkDotNet.Order.JobOrderPolicy)
+  name.vb: New(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
+  fullName: BenchmarkDotNet.Attributes.OrdererAttribute.OrdererAttribute(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy, BenchmarkDotNet.Order.JobOrderPolicy)
+  fullName.vb: BenchmarkDotNet.Attributes.OrdererAttribute.New(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy, BenchmarkDotNet.Order.JobOrderPolicy)
+  nameWithType: OrdererAttribute.OrdererAttribute(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
+  nameWithType.vb: OrdererAttribute.New(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
 - uid: BenchmarkDotNet.Attributes.OrdererAttribute.#ctor*
   name: OrdererAttribute
   href: api/BenchmarkDotNet.Attributes.OrdererAttribute.html#BenchmarkDotNet_Attributes_OrdererAttribute__ctor_
@@ -27677,15 +27677,15 @@ references:
   commentId: T:BenchmarkDotNet.Order.DefaultOrderer
   fullName: BenchmarkDotNet.Order.DefaultOrderer
   nameWithType: DefaultOrderer
-- uid: BenchmarkDotNet.Order.DefaultOrderer.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy)
-  name: DefaultOrderer(SummaryOrderPolicy, MethodOrderPolicy)
-  href: api/BenchmarkDotNet.Order.DefaultOrderer.html#BenchmarkDotNet_Order_DefaultOrderer__ctor_BenchmarkDotNet_Order_SummaryOrderPolicy_BenchmarkDotNet_Order_MethodOrderPolicy_
-  commentId: M:BenchmarkDotNet.Order.DefaultOrderer.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy)
-  name.vb: New(SummaryOrderPolicy, MethodOrderPolicy)
-  fullName: BenchmarkDotNet.Order.DefaultOrderer.DefaultOrderer(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy)
-  fullName.vb: BenchmarkDotNet.Order.DefaultOrderer.New(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy)
-  nameWithType: DefaultOrderer.DefaultOrderer(SummaryOrderPolicy, MethodOrderPolicy)
-  nameWithType.vb: DefaultOrderer.New(SummaryOrderPolicy, MethodOrderPolicy)
+- uid: BenchmarkDotNet.Order.DefaultOrderer.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy,BenchmarkDotNet.Order.JobOrderPolicy)
+  name: DefaultOrderer(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
+  href: api/BenchmarkDotNet.Order.DefaultOrderer.html#BenchmarkDotNet_Order_DefaultOrderer__ctor_BenchmarkDotNet_Order_SummaryOrderPolicy_BenchmarkDotNet_Order_MethodOrderPolicy_BenchmarkDotNet_Order_JobOrderPolicy_
+  commentId: M:BenchmarkDotNet.Order.DefaultOrderer.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy,BenchmarkDotNet.Order.JobOrderPolicy)
+  name.vb: New(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
+  fullName: BenchmarkDotNet.Order.DefaultOrderer.DefaultOrderer(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy, BenchmarkDotNet.Order.JobOrderPolicy)
+  fullName.vb: BenchmarkDotNet.Order.DefaultOrderer.New(BenchmarkDotNet.Order.SummaryOrderPolicy, BenchmarkDotNet.Order.MethodOrderPolicy, BenchmarkDotNet.Order.JobOrderPolicy)
+  nameWithType: DefaultOrderer.DefaultOrderer(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
+  nameWithType.vb: DefaultOrderer.New(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
 - uid: BenchmarkDotNet.Order.DefaultOrderer.#ctor*
   name: DefaultOrderer
   href: api/BenchmarkDotNet.Order.DefaultOrderer.html#BenchmarkDotNet_Order_DefaultOrderer__ctor_
@@ -27914,6 +27914,24 @@ references:
   commentId: Overload:BenchmarkDotNet.Order.IOrderer.SeparateLogicalGroups
   fullName: BenchmarkDotNet.Order.IOrderer.SeparateLogicalGroups
   nameWithType: IOrderer.SeparateLogicalGroups
+- uid: BenchmarkDotNet.Order.JobOrderPolicy
+  name: JobOrderPolicy
+  href: api/BenchmarkDotNet.Order.JobOrderPolicy.html
+  commentId: T:BenchmarkDotNet.Order.JobOrderPolicy
+  fullName: BenchmarkDotNet.Order.JobOrderPolicy
+  nameWithType: JobOrderPolicy
+- uid: BenchmarkDotNet.Order.JobOrderPolicy.Default
+  name: Default
+  href: api/BenchmarkDotNet.Order.JobOrderPolicy.html#BenchmarkDotNet_Order_JobOrderPolicy_Default
+  commentId: F:BenchmarkDotNet.Order.JobOrderPolicy.Default
+  fullName: BenchmarkDotNet.Order.JobOrderPolicy.Default
+  nameWithType: JobOrderPolicy.Default
+- uid: BenchmarkDotNet.Order.JobOrderPolicy.Numeric
+  name: Numeric
+  href: api/BenchmarkDotNet.Order.JobOrderPolicy.html#BenchmarkDotNet_Order_JobOrderPolicy_Numeric
+  commentId: F:BenchmarkDotNet.Order.JobOrderPolicy.Numeric
+  fullName: BenchmarkDotNet.Order.JobOrderPolicy.Numeric
+  nameWithType: JobOrderPolicy.Numeric
 - uid: BenchmarkDotNet.Order.MethodOrderPolicy
   name: MethodOrderPolicy
   href: api/BenchmarkDotNet.Order.MethodOrderPolicy.html
@@ -37919,6 +37937,42 @@ references:
   commentId: Overload:BenchmarkDotNet.Validators.RunModeValidator.Validate
   fullName: BenchmarkDotNet.Validators.RunModeValidator.Validate
   nameWithType: RunModeValidator.Validate
+- uid: BenchmarkDotNet.Validators.RuntimeValidator
+  name: RuntimeValidator
+  href: api/BenchmarkDotNet.Validators.RuntimeValidator.html
+  commentId: T:BenchmarkDotNet.Validators.RuntimeValidator
+  fullName: BenchmarkDotNet.Validators.RuntimeValidator
+  nameWithType: RuntimeValidator
+- uid: BenchmarkDotNet.Validators.RuntimeValidator.DontFailOnError
+  name: DontFailOnError
+  href: api/BenchmarkDotNet.Validators.RuntimeValidator.html#BenchmarkDotNet_Validators_RuntimeValidator_DontFailOnError
+  commentId: F:BenchmarkDotNet.Validators.RuntimeValidator.DontFailOnError
+  fullName: BenchmarkDotNet.Validators.RuntimeValidator.DontFailOnError
+  nameWithType: RuntimeValidator.DontFailOnError
+- uid: BenchmarkDotNet.Validators.RuntimeValidator.TreatsWarningsAsErrors
+  name: TreatsWarningsAsErrors
+  href: api/BenchmarkDotNet.Validators.RuntimeValidator.html#BenchmarkDotNet_Validators_RuntimeValidator_TreatsWarningsAsErrors
+  commentId: P:BenchmarkDotNet.Validators.RuntimeValidator.TreatsWarningsAsErrors
+  fullName: BenchmarkDotNet.Validators.RuntimeValidator.TreatsWarningsAsErrors
+  nameWithType: RuntimeValidator.TreatsWarningsAsErrors
+- uid: BenchmarkDotNet.Validators.RuntimeValidator.TreatsWarningsAsErrors*
+  name: TreatsWarningsAsErrors
+  href: api/BenchmarkDotNet.Validators.RuntimeValidator.html#BenchmarkDotNet_Validators_RuntimeValidator_TreatsWarningsAsErrors_
+  commentId: Overload:BenchmarkDotNet.Validators.RuntimeValidator.TreatsWarningsAsErrors
+  fullName: BenchmarkDotNet.Validators.RuntimeValidator.TreatsWarningsAsErrors
+  nameWithType: RuntimeValidator.TreatsWarningsAsErrors
+- uid: BenchmarkDotNet.Validators.RuntimeValidator.Validate(BenchmarkDotNet.Validators.ValidationParameters)
+  name: Validate(ValidationParameters)
+  href: api/BenchmarkDotNet.Validators.RuntimeValidator.html#BenchmarkDotNet_Validators_RuntimeValidator_Validate_BenchmarkDotNet_Validators_ValidationParameters_
+  commentId: M:BenchmarkDotNet.Validators.RuntimeValidator.Validate(BenchmarkDotNet.Validators.ValidationParameters)
+  fullName: BenchmarkDotNet.Validators.RuntimeValidator.Validate(BenchmarkDotNet.Validators.ValidationParameters)
+  nameWithType: RuntimeValidator.Validate(ValidationParameters)
+- uid: BenchmarkDotNet.Validators.RuntimeValidator.Validate*
+  name: Validate
+  href: api/BenchmarkDotNet.Validators.RuntimeValidator.html#BenchmarkDotNet_Validators_RuntimeValidator_Validate_
+  commentId: Overload:BenchmarkDotNet.Validators.RuntimeValidator.Validate
+  fullName: BenchmarkDotNet.Validators.RuntimeValidator.Validate
+  nameWithType: RuntimeValidator.Validate
 - uid: BenchmarkDotNet.Validators.SetupCleanupValidator
   name: SetupCleanupValidator
   href: api/BenchmarkDotNet.Validators.SetupCleanupValidator.html

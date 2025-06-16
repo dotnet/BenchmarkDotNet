@@ -109,6 +109,99 @@ It shows all important information about results in a compact and understandable
 Now it has better customization options: you can display relative performance of different environments
 (e.g., compare .NET Framework and .NET Core) and group benchmarks by categories.</li>
 </ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.12">v0.10.12</a> scope,
+15 issues were resolved and 10 pull requests were merged.
+This release includes 42 commits by 9 contributors.</p>
+<h2 id="resolved-issues-15">Resolved issues (15)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/273">#273</a> Create a tail call diagnoser</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/442">#442</a> Is it possible to configure benchmark to assign rank for runtime? (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/543">#543</a> Run Disassembly Diagnoser without extra run (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/546">#546</a> Synthesizing labels for jump targets (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/574">#574</a> Display VM hypervisor in summary section (assignee: <a href="https://github.com/lukasz-pyrzyk">@lukasz-pyrzyk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/582">#582</a> Print amount of logical and physical core (assignee: <a href="https://github.com/morgan-kn">@morgan-kn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/599">#599</a> Proper HTML escaping of BenchmarkAttribute Description</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/606">#606</a> Improve Memory Diagnoser (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/608">#608</a> Properly escaping generated markdown (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/612">#612</a> Disassembler DisassembleMethod fails with &quot;Object reference not set to an instance of an object.&quot;, (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/617">#617</a> Allow baseline per category (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/618">#618</a> Enable ApprovalTests in .NET Core 2.0 tests (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/621">#621</a> Try to search for missing references if build fails (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/622">#622</a> Support of new GC settings (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/623">#623</a> RPlotExporter uses wrong path to csv measurements (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-10">Merged pull requests (10)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/573">#573</a> Сreate a tail call diagnoser (by <a href="https://github.com/GeorgePlotnikov">@GeorgePlotnikov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/576">#576</a> Display VM name in summary section, fixes #574 (by <a href="https://github.com/lukasz-pyrzyk">@lukasz-pyrzyk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/595">#595</a> Migrate all project to new project system. (by <a href="https://github.com/mfilippov">@mfilippov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/598">#598</a> Added info about the new TailCallDiagnoser (by <a href="https://github.com/GeorgePlotnikov">@GeorgePlotnikov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/603">#603</a> Fix HTML Encoding for Html Exporter (by <a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/605">#605</a> Grammar (by <a href="https://github.com/onionhammer">@onionhammer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/607">#607</a> Print amount of logical and physical core #582 (by <a href="https://github.com/morgan-kn">@morgan-kn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/615">#615</a> Quick fix Disassembler.Program.GetMethod when more than one method found just return null (by <a href="https://github.com/nietras">@nietras</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/619">#619</a> Logical group support, fixes #617 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/620">#620</a> New README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="commits-42">Commits (42)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6f587d99897ed67c94277c4c0d34f838e586ff92">6f587d</a> Migrate all project to new project system. (by <a href="https://github.com/mfilippov">@mfilippov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/47ba57d9e196a81710eb002eb3af4fb6401b7e78">47ba57</a> added info about the new TailCallDiagnoser (by <a href="https://github.com/GeorgePlotnikov">@GeorgePlotnikov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c1a4b20b11165e696f198e0e68a0a5c2b991b65e">c1a4b2</a> Сreate a tail call diagnoser (#573) (by <a href="https://github.com/GeorgePlotnikov">@GeorgePlotnikov</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ebe3e2f90f2a974fdf1ec3524f8aa79674beccc5">ebe3e2</a> Merge pull request #598 from GeorgePlotnikov/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6249f0a4ee37904fac418cd8715af9d8f667c01d">6249f0</a> some polishing of the JIT diagnosers (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/119231c8ebf94673dcfdbd5bacc1cdfde4a294c4">119231</a> Fix HTML Encoding for Html Exporter (#603), fixes #599 (by <a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fe3f3046c26ef0a63e55c7f97651b5ee815e22ee">fe3f30</a> Disassembly Prettifier, fixes #546 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3eb63ff8c6b4a571423bc2b2d2cf086e1c2f993f">3eb63f</a> Merge pull request #595 from mfilippov/new-fs-vb-proj (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/16d03f65cd6198fd0003c7608a986b823c638538">16d03f</a> make our F# samples work for .NET Core 2.0 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d06de7af52d60a5d92b3665e9d20b0be3dfc29e7">d06de7</a> bring back our old Visual Basic and F# integration tests (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/63249b50ec6dfeb6719ba9edb911404e16bf7f02">63249b</a> &quot;Kaby Lake R&quot; and &quot;Coffee Lake&quot; support in ProcessorBrandStringHelper (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a8a09ebbc86c51167cf90f18c1658d52afcf1b70">a8a09e</a> disassembly prettifier: highlighting references to labels, jumping to next on... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e6d747efd2d19380d8da388cceb3471b5e894dbd">e6d747</a> Grammar (by <a href="https://github.com/onionhammer">@onionhammer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fef4aa67b3c3bf6aac8f2281ee8fbd763660cba4">fef4aa</a> Merge pull request #605 from onionhammer/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ffacd74b63f364e88aa8afa597fbbc84d6a564c2">ffacd7</a> don't require extra run for DisassemblyDiagnoser, fixes #543, #542 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bcac26452dbed7ba310ecef8a4ec0814cd22591d">bcac26</a> revert last commit change (run global setup regardless of Jitting) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3e87d8699b27751ef05e8303f6ccb1f6d9c74b44">3e87d8</a> don't perform an extra run to get GC stats for .NET Core, part of #550 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f87dbc5357e7f15d7913e2136ac73c8d1af8cfd1">f87dbc</a> obtain GC stats in separate iteration run, no overhead, support for iteration... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e5fe0f87dc0043a10648faf01fc29805624c5c3a">e5fe0f</a> update to C# 7.1 so we can use all the latest features (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bc50b2e851aabe15c47656897ef5024279e4e31c">bc50b2</a> build benchmarks in Parallel, part of #550 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e595902a377085cb2f44fca6fcab3efae82cda06">e59590</a> Display VM name in summary section, fixes #574 (#576) (by <a href="https://github.com/lukasz-pyrzyk">@lukasz-pyrzyk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8908f8798f0914ce6abe925a0c14e063ace6964d">8908f8</a> fix GetMethod (by <a href="https://github.com/nietras">@nietras</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4ca82db5857cda64732743bb5e47199f4300fcf5">4ca82d</a> Merge pull request #615 from nietras/disassembler-more-than-one-method-fix (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/387ae54f1fedffb78f5955c7935034ecde3cc856">387ae5</a> be more defensive when trying to read source code with disassembler, part of ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7038155d914e5679696b17d18524e8066256d14e">703815</a> docs: how to contribute to disassembler (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/242671b88d188827f0cc83a6da1dfef4986f2e03">242671</a> Enable ApprovalTests in .NET Core 2.0 tests, fixes #618 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c4d21bf7e7a022c6cffcc59ddd35415a83b93243">c4d21b</a> Print amount of logical and physical core #582 (#607) (by <a href="https://github.com/morgan-kn">@morgan-kn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e33e848e1679fc5ceb88ec27dc9ecad1041b0a34">e33e84</a> Add HtmlReady dialect for MarkdownExporter, fixes #608 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cf167b9f092abc157677081bbf2955ee50ad6934">cf167b</a> Enable html escaping for GitHub markdown dialect, fixes #608 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8bb28b30a0a2913ce8a92af8c60e27884cd7a90c">8bb28b</a> Logical group support, fixes #617 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ae87c6d54670f21707069c7d4b432ba886212312">ae87c6</a> Merge pull request #619 from dotnet/logical-groups (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/14e90bfce8c1430b6235dd6c6e7e94d7136b0d67">14e90b</a> parallel build post fix: don't write the compilation errors to NullLogger, re... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/db4ae81451251aaf5cce62b4bf059de9642e54f1">db4ae8</a> Try to search for missing references if build fails, fixes #621 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0eba0f548400531c7992f0b12d7d1766e213ba9b">0eba0f</a> Support of new GC settings, fixes #622 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e31b2d410def2b7f3941ff44059d0ffdce0dc2ab">e31b2d</a> Revert Samples/Program.cs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7f126ba124137155b146340f29117e0872be6d3e">7f126b</a> Add logs in RPlotExporter (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f8a4477120bcc8034fe5611db4de823b798cfe3a">f8a447</a> Fix path to csv in RPlotExporter, fixes #623 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/273f5083babb4d7fd19843cbf2a9401a68568e6c">273f50</a> New plots in RPlotExporter (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f293f0d5cb6ac42457a22a7637af4bd979f2e131">f293f0</a> New README.md (#620) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5e3366729a9cd0a3064d90732610c3957d7f3efb">5e3366</a> Update copyright year in docs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ab74588dd79961887879d83bca0db590966bdc40">ab7458</a> Update index in docs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4616d48e55cc06ab777b1a5b14d95672df2a22f5">4616d4</a> Set library version: 0.10.12 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-9">Contributors (9)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Christopher Gozdziewski (<a href="https://github.com/Chrisgozd">@Chrisgozd</a>)</li>
+<li>Erik O'Leary (<a href="https://github.com/onionhammer">@onionhammer</a>)</li>
+<li>Georgii Plotnikov (<a href="https://github.com/GeorgePlotnikov">@GeorgePlotnikov</a>)</li>
+<li>Irina Ananeva (<a href="https://github.com/morgan-kn">@morgan-kn</a>)</li>
+<li>Łukasz Pyrzyk (<a href="https://github.com/lukasz-pyrzyk">@lukasz-pyrzyk</a>)</li>
+<li>Mikhail Filippov (<a href="https://github.com/mfilippov">@mfilippov</a>)</li>
+<li>nietras (<a href="https://github.com/nietras">@nietras</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: January 15, 2018</em></p>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.12">v0.10.12</a></em>

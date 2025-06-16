@@ -340,6 +340,200 @@ Here is an example:</p>
 }
 </code></pre>
 <p>Special thanks to <a href="https://github.com/adamsitnik">@adamsitnik</a> for the implementation!</p>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.12.1">v0.12.1</a> scope,
+31 issues were resolved and 42 pull requests were merged.
+This release includes 85 commits by 19 contributors.</p>
+<h2 id="resolved-issues-31">Resolved issues (31)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/641">#641</a> RPlotExporter hanging (assignee: <a href="https://github.com/m-mccormick">@m-mccormick</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/899">#899</a> Tiered compilation and disassembler (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1023">#1023</a> Out of process benchmarks fail with ASP.NET Core SDK reference</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1211">#1211</a> Binding Redirect Issues When Using Xml Serializers</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1234">#1234</a> Strong type fluent API proposal (assignee: <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1238">#1238</a> RunAllJoined Causing Exception (assignee: <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1262">#1262</a> Params attribute doesn`t work in F# if you specify more than one enum value in constructor (assignee: <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1295">#1295</a> Custom format/culture for report output values (for CSV, and maybe HTML, MD)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1305">#1305</a> Copy UserSecrets from benchmark project</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1311">#1311</a> Spelling nit (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1312">#1312</a> Add an option to pass environment variables to the default job</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1315">#1315</a> Implement cross platform EventPipeProfiler diagnoser (assignee: <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1316">#1316</a> Implement Unix Disassembler for .NET Core (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1318">#1318</a> use of NugetReference[] causes System.MissingMethodException: No parameterless constructor defined for this object. (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1323">#1323</a> DisassemblyDiagnoser index outside array bounds (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1325">#1325</a> Surface native code size benchmarked code (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1326">#1326</a> BDN does not build using dotnet sdk from the command line in Linux</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1339">#1339</a> Generated code and StyleCop.Analyzers (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1348">#1348</a> Different display text for arrays depending on a value source (assignee: <a href="https://github.com/YohDeadfall">@YohDeadfall</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1350">#1350</a> Warn the user if command line arguments were not passed to the BenchmarkSwitcher</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1353">#1353</a> Show Length when param type is an array</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1361">#1361</a> SimpleJobAttribute with RunStrategy and RuntimeMoniker</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1363">#1363</a> Wrong assembly binding redirects for Microsoft.Data.SqlClient.resources ; using in Netcore3.0 project (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1364">#1364</a> Bug: Benchmark class with Console.WriteLine(1) fails for DisassemblyDiagnoser with 'Sequence contains no matching element' (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1369">#1369</a> Parameter column doesn't seem to respect culture info (assignee: <a href="https://github.com/Tyrrrz">@Tyrrrz</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1379">#1379</a> Unix CI builds are red (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1385">#1385</a> Make BaselineCustomColumn.GetValue public</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1388">#1388</a> 'ref readonly' return is not supported (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1396">#1396</a> MacOS Azure Pipeline build is broken (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1413">#1413</a> Plot with only one &quot;default&quot; Job (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1416">#1416</a> EventPipeProfiler Documentation (assignee: <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-42">Merged pull requests (42)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1258">#1258</a> Task add style cope and fxcop analyzers (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1263">#1263</a> Configuration compatibility validation (by <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1266">#1266</a> Add EnumParam preserving type information (by <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1273">#1273</a> New fluent API (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1287">#1287</a> EdPeltChangePointDetector improvements (by <a href="https://github.com/jeanbern">@jeanbern</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1300">#1300</a> Update link of &quot; official benchmarking guide&quot; to use the new recommended link (by <a href="https://github.com/eriawan">@eriawan</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1301">#1301</a> Improve BenchmarkDotNet.Templates (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1302">#1302</a> CultureInfo Refactoring (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1307">#1307</a> Fix project file order (by <a href="https://github.com/vilinski">@vilinski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1309">#1309</a> Copy UserSecrets from benchmark project (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1313">#1313</a> add possibility to specify env vars via console line arguments (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1321">#1321</a> The EventPipeProfiler cross-platform profiler (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1327">#1327</a> Add package-refs to reference assemblies for linux build (by <a href="https://github.com/damageboy">@damageboy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1329">#1329</a> Show information about docker (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1331">#1331</a> Use 24-hour time in joined summary file name (by <a href="https://github.com/jroessel">@jroessel</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1332">#1332</a> Improved and Cross platform disassembler (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1335">#1335</a> Attribute improvements (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1340">#1340</a> Improvement of csproj finding (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1349">#1349</a> Fixed display text for array parameters and arguments (by <a href="https://github.com/YohDeadfall">@YohDeadfall</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1357">#1357</a> add the <auto-generated></auto-generated> header at the top of the generated file to avoid static analysis tools from analyzing it, (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1359">#1359</a> Warn if command line arguments were not passed to the BenchmarkSwitcher (by <a href="https://github.com/suslovk">@suslovk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1365">#1365</a> Use DirtyAssemblyResolveHelper only for Full .NET Framework (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1366">#1366</a> add missing SimpleJobAttribute ctor (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1367">#1367</a> Await non-generic ValueTask returning method (by <a href="https://github.com/mayuki">@mayuki</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1372">#1372</a> Use CultureInfo when formatting parameter values (by <a href="https://github.com/Tyrrrz">@Tyrrrz</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1373">#1373</a> fixes #641 (by <a href="https://github.com/m-mccormick">@m-mccormick</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1375">#1375</a> don't require the JitDiagnosers (TailCall &amp; Inlining) to run benchmarks once again just to gather JIT info, the overhead is very small (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1376">#1376</a> update TraceEvent to 2.0.49 to get TailCalls working again (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1380">#1380</a> Bump Cake version from 0.30.0 to 0.37.0, fix #1379 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1381">#1381</a> Minor event pipe profiler improvements (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1384">#1384</a> Fix build after styleCop (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1386">#1386</a> Switch to perfolizer (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1387">#1387</a> Make BaselineCustomColumn expose &quot;GetValue&quot; as a public API (by <a href="https://github.com/damageboy">@damageboy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1389">#1389</a> Ref readonly support (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1394">#1394</a> Align homepage example with README (by <a href="https://github.com/dahlbyk">@dahlbyk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1397">#1397</a> Bump macOS Azure Pipeline vmImage to 10.14, fix #1396 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1399">#1399</a> React to .NET 5 branding changes (by <a href="https://github.com/jkotas">@jkotas</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1407">#1407</a> Improve warnings for small operations number (by <a href="https://github.com/CodeFuller">@CodeFuller</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1410">#1410</a> Updating Document - Fixing a small grammar mistake (by <a href="https://github.com/abhinavgalodha">@abhinavgalodha</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1417">#1417</a> Fix --profiler option description. (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1418">#1418</a> EventPipeProfiler documentation (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1419">#1419</a> Small fix in EventPipeProfiler documentation (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+</ul>
+<h2 id="commits-85">Commits (85)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/396d4b4e4f26e296a288e550afed4fab29cbd7a8">396d4b</a> #1262: Add EnumParam preserving type information (by <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/718b776b3d1d95fae8d07160d9a9ed60e75b57cf">718b77</a> #1262: Add tests (by <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/33ec9077d6f2f9552fe2d07b4f7f30b45078278f">33ec90</a> EdPeltChangePointDetector improvements (by <a href="https://github.com/jeanbern">@jeanbern</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7e3efce463c8a6d7f54a5022456a15da0f12433d">7e3efc</a> Postrelease update of v0.12.0 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8677b00199b65e0c4a6a04b570e0574194387449">8677b0</a> Update css in documentation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/919b7ff8ee52cd5ca07a58e7e4786cfeecc69b64">919b7f</a> Fix link to IntroThreadingDiagnoser in diagnoser.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d15ea41f45063ad29bb64f1453dac026585c9ca">4d15ea</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f2d0816b3fbee4587ec99dfcaa7cca04ba8f3c54">f2d081</a> Update link of &quot; official benchmarking guide&quot; to use the new recommended link... (by <a href="https://github.com/eriawan">@eriawan</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/05df0ebe0b701b1915ce9c5a8e7c8e0ec4f553fd">05df0e</a> Documentation: update article about command-line tool (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d69505204668a31bbad0b49c8340d4d33398cbc3">d69505</a> Improve BenchmarkDotNet.Templates (#1301) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e23755ab8ad58dde0903b6fdc938d1fa4659e2b2">e23755</a> Speed up some integration tests (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3d96bf3548f528e99ed2e23db93b1ebbb2f5de05">3d96bf</a> Update NuGet package descriptions (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/351dae96608536219034e41c58d340f70e00fe13">351dae</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5f07f4e45147468b72befa03cc0947a1de79316c">5f07f4</a> Add Windows 10 brand string for 19H1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fd92ff9161fc15847e53c24dcb8e3aaa66747549">fd92ff</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5af5c525e7801eb51354ee36bf5cc49a8a56f7ce">5af5c5</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1b923fd483061f9bf589754ee6b499f78b44d8fa">1b923f</a> Fix project file order (#1307) (by <a href="https://github.com/vilinski">@vilinski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/57b01f5f08c79647b5705ce510eb342aa95b580b">57b01f</a> Copy UserSecrets from benchmark project (#1309) (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2415fda6fb8eaf2d0f17b1828a7ee9befbd7baab">2415fd</a> Fix some typos, fix #1311 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e92d6d6e1d597d6fc00697c9a19b5a7404f96ba5">e92d6d</a> add possibility to specify env vars via console line arguments (#1313) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b7054c02872c2f741752137e7930d4f3c901354d">b7054c</a> WithNuGet should accept NuGetReferenceList, not IReadOnlyCollection&lt;NuGetRefe... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bb437b1aafa89671a297e73add73577e884f5aee">bb437b</a> Remove curly braces for single statements (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/76c675737e17969f5c8b347c5169a68f854148f0">76c675</a> Improve code readability (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8486e163bc430078c6e07dff74747b1dcc04ef55">8486e1</a> Merge pull request #1287 from jeanbern/patch-1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d6bf40fe15516c807fa0c21c22f2992448a02c50">d6bf40</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/728c40e9b74791ade77775f4d486d7bf6ae7940a">728c40</a> Support empty lines in disassembler/GetSmartPrefix, fix #1323 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0c48c2862f69a63407898680d18dd76b988c4197">0c48c2</a> CultureInfo Refactoring (#1302) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0995505f913ef666856a55e0e90da54c6af3d69f">099550</a> Switch to using ms ref aseemblies for build (#1327) (by <a href="https://github.com/damageboy">@damageboy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/55842bf6a20fc2e7177775b885c0b79687e357be">55842b</a> Merge pull request #1266 from gsomix/feature/1262-fsharp-enums (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/35d3581d114c4ab2f15d4c8ebfebf6c79ebe2156">35d358</a> Show information about docker (#1329) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b6283c5709ffcc3e19c25cc413203efa7ed19ee2">b6283c</a> Use 24-hour time in joined summary file name (#1331) (by <a href="https://github.com/jroessel">@jroessel</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/640d885ae0daddcee7c9ba9b5f1bf5790b9b5ae3">640d88</a> New fluent API (#1273), fixes #1234 (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a3f76beebeaab9a7ff32f3af6a16d79094fea3f6">a3f76b</a> Update README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4a969764162484bf61007ab63e6bfbe1101a801e">4a9697</a> Update copyright year (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5e7f01ddb91f179916661cbc3885052238c27390">5e7f01</a> add the <auto-generated></auto-generated> header at the top of the generated file to avoid s... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/07b5122fadc3da4b2da116a74e057210daf21c6b">07b512</a> Await non-generic ValueTask returning method (#1367) (by <a href="https://github.com/mayuki">@mayuki</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/479177b025cc356fa9c8b878baf4db9b0e6d5f90">479177</a> Display array length for array parameters and arguments (#1349), fixes #1348 ... (by <a href="https://github.com/YohDeadfall">@YohDeadfall</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3b8d2cd3a67150e581ccaaf3c03da08a04844c9c">3b8d2c</a> Warn if command line arguments were not passed to the BenchmarkSwitcher (#135... (by <a href="https://github.com/suslovk">@suslovk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/87d85a74d2a17701305b49e77464a7576c1b95f1">87d85a</a> Use CultureInfo when formatting parameter values (#1372) (by <a href="https://github.com/Tyrrrz">@Tyrrrz</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/310b5a93a6d2ec0edf223f4d80684d90245ee007">310b5a</a> add missing SimpleJobAttribute ctor, fixes #1361 (#1366) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6a14586c32afcae5ba0869372f60feb6fb157d39">6a1458</a> change the way RPlotExporter reads the R script output, fixes #641 (#1373) (by <a href="https://github.com/m-mccormick">@m-mccormick</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ff4c3db660c0eb8d50918070b0ad3b1134d97789">ff4c3d</a> Attribute improvements (#1335) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29eafbd4fbfbbc7dfaf5e15c598047401870e254">29eafb</a> Improvement of csproj finding (#1340) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/be21689e720c410fa01d0aa078fb855bba02d106">be2168</a> Use DirtyAssemblyResolveHelper only for Full .NET Framework (#1365) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/664ab6db6d65813f8c602c87852f732f747e2136">664ab6</a> update TraceEvent to 2.0.49 to get TailCalls working again (#1376) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b788bcb61f18d8e48e790aaedab573589ef2554d">b788bc</a> don't require the JitDiagnosers (TailCall &amp; Inlining) to run benchmarks once ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8ad2a93b9aa7ee6b70af09d63c5b1136ff07ad50">8ad2a9</a> Bump Cake version from 0.30.0 to 0.37.0, fix #1379 (#1380) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4740478f46f3c98d97d4a5b470260ebd7efa571b">474047</a> Task add style cope and fxcop analyzers (#1258) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c648ff956662abae512c579ffa7f1dc12178f6c3">c648ff</a> The EventPipeProfiler cross-platform profiler (#1321) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19169a288bd91069a925962059c2fea3a13b6ace">19169a</a> Add brand strings for latest Windows versions (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/532f84a298b6e19c2dbeb13e76e90ce6dab398f1">532f84</a> Update README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3defd7885aabee22f4a6347d3ee7f191bb6f0b31">3defd7</a> Minor event pipe profiler improvements (#1381) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/294320be9525b0ecfefd0351381756d3a3b77211">294320</a> Improved and Cross platform disassembler (#1332) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1d63d666da70530b03e392af23453bf5cd7c1784">1d63d6</a> Fix build after styleCop (#1384) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b3ba083e44d040fd269042e1e045539c165b7972">b3ba08</a> Make BaselineCustomColumn expose &quot;GetValue&quot; as a public API (#1387) (by <a href="https://github.com/damageboy">@damageboy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/54a06102a6e0cc4169d23c6f9cd2779ee408d2bf">54a061</a> Switch to perfolizer (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9ac7770682a45afb6cf4ec353f9fa3c69ece67ce">9ac777</a> Ref readonly support (#1389) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c3286f830648f28157f1587fc9ccc3a4277ddf3f">c3286f</a> Update CodeAnnotations.cs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3223c94a92050147a02482a3810860703f0c5171">3223c9</a> Code cleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c19e54a447798bfd0991fdbc8307a131623ad8b8">c19e54</a> Implement configurations compatibility validation (#1263), Closes #1238 (by <a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/df434ee282a533b6dc4e07529ea8d90e4fa37a8c">df434e</a> Align homepage example with README (#1394) (by <a href="https://github.com/dahlbyk">@dahlbyk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9a251a3baa6bb1d594c667b1e29f9e341940a61b">9a251a</a> Bump macOS Azure Pipeline vmImage to 10.14, fix #1396 (#1397) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/465ebf3fdbf20f0e9219c4c957fb33c13256fdcd">465ebf</a> React to .NET 5 branding changes (#1399) (by <a href="https://github.com/jkotas">@jkotas</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6cca72f83990f99096c5908c662b363e3299c0aa">6cca72</a> Updating a small grammar mistake (#1410) (by <a href="https://github.com/abhinavgalodha">@abhinavgalodha</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/27b32e73a0d6fde9fe7500851444a886b483d3bc">27b32e</a> Improve warnings for small operations number (#1407) (by <a href="https://github.com/CodeFuller">@CodeFuller</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2d365b1c581ba65ccb094adcade88cdfaa24b20c">2d365b</a> Fix --profiler option description. (#1417) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7902cd6de243c95861aed0b479d6c118d0711755">7902cd</a> Add macOS Catalina support in OsBrandStringHelper (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fd4c320d9dab6fc124587116bfaf6111b20ff1ab">fd4c32</a> Update README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6e13ba2c2bc8cbd8146ea9c57a605ce4a2ffe356">6e13ba</a> Resolving JobId in DefaultCharacteristicPresenter, fix #1413 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/35ebd29556e127b0f2867a73d81537a45a5cb09a">35ebd2</a> Better job id generation in SimpleJobAttribute (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bf477848a809c26ec9068943325282e748b5d230">bf4778</a> Use ASCII mode for Measurement presentation in terminal (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f6b81f2f4de14d9891f75244ebcdd8ad94373793">f6b81f</a> Display result path in RPlotExporter (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/30b269c33a18c704a4769646939a64f71eeec4d9">30b269</a> Disable plot printing in BuildPlots.R (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/27887d4b612312c74c63c0c3220351f8db8e81e4">27887d</a> Disable Rplots.pdf generation in BuildPlots.R (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/338e40b18713ccf9319c27eb4aa6a411c568314a">338e40</a> Specify uid for how-to-run.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f6dcd323c66e189dc64bf56127e488ba1735848c">f6dcd3</a> Add BenchmarkDotNet.Annotations in API documentation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b503fd7d2ccb313b8a8d67bafc5446c6baea1e0a">b503fd</a> Bump DocFX version from 2.46 to 2.51 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f457e7ff56a833c6aef11c9840d564f93ffb35fb">f457e7</a> Prepare v0.12.1 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/53d090ac85b9e53461ced11913fc46814da5d744">53d090</a> Fix documentation.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e728974133d9f9fbbd4bf015834f9e8157d80be9">e72897</a> Add v0.12.1 highlights (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2de040d0ad6bf64c60095c2a47f6264c1b3c39fa">2de040</a> Bump perfolizer version from 0.2.0 to 0.2.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/76a07049e3e829b690cc3562830f8882b078a26e">76a070</a> EventPipeProfiler documentation (#1418) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/928fb1e6d941ea6fc50b7c50809118ec952c8598">928fb1</a> EventPipeProfiler doc improvements (#1419) (by <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/12798ed26f960879ade54a4a796877ff951ff8cd">12798e</a> Update documentation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/384d479fdeb6560527f1918b0be00967fddd01dd">384d47</a> Set library version: 0.12.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-19">Contributors (19)</h2>
+<ul>
+<li>Abhinav Galodha (<a href="https://github.com/abhinavgalodha">@abhinavgalodha</a>)</li>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andreas Vilinski (<a href="https://github.com/vilinski">@vilinski</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Andrii Kurdiumov (<a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li>CodeFuller (<a href="https://github.com/CodeFuller">@CodeFuller</a>)</li>
+<li>damageboy (<a href="https://github.com/damageboy">@damageboy</a>)</li>
+<li>Eriawan Kusumawardhono (<a href="https://github.com/eriawan">@eriawan</a>)</li>
+<li>Evgeniy Andreev (<a href="https://github.com/gsomix">@gsomix</a>)</li>
+<li>Jan Kotas (<a href="https://github.com/jkotas">@jkotas</a>)</li>
+<li>Jean-Bernard Pellerin (<a href="https://github.com/jeanbern">@jeanbern</a>)</li>
+<li>Johannes Rössel [yWorks] (<a href="https://github.com/jroessel">@jroessel</a>)</li>
+<li>Keith Dahlby (<a href="https://github.com/dahlbyk">@dahlbyk</a>)</li>
+<li>Konstantin (<a href="https://github.com/suslovk">@suslovk</a>)</li>
+<li>Matt McCormick (<a href="https://github.com/m-mccormick">@m-mccormick</a>)</li>
+<li>Mayuki Sawatari (<a href="https://github.com/mayuki">@mayuki</a>)</li>
+<li>Oleksii Holub (<a href="https://github.com/Tyrrrz">@Tyrrrz</a>)</li>
+<li>Wojciech Nagórski (<a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li>Yoh Deadfall (<a href="https://github.com/YohDeadfall">@YohDeadfall</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: April 6, 2020</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.12.1">v0.12.1</a></em>

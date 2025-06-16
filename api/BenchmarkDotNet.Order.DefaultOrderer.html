@@ -135,8 +135,8 @@ Class DefaultOrderer
 
   <a id="BenchmarkDotNet_Order_DefaultOrderer__ctor_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Order_DefaultOrderer__ctor_BenchmarkDotNet_Order_SummaryOrderPolicy_BenchmarkDotNet_Order_MethodOrderPolicy_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy)">
-  DefaultOrderer(SummaryOrderPolicy, MethodOrderPolicy)
+  <h3 id="BenchmarkDotNet_Order_DefaultOrderer__ctor_BenchmarkDotNet_Order_SummaryOrderPolicy_BenchmarkDotNet_Order_MethodOrderPolicy_BenchmarkDotNet_Order_JobOrderPolicy_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.#ctor(BenchmarkDotNet.Order.SummaryOrderPolicy,BenchmarkDotNet.Order.MethodOrderPolicy,BenchmarkDotNet.Order.JobOrderPolicy)">
+  DefaultOrderer(SummaryOrderPolicy, MethodOrderPolicy, JobOrderPolicy)
   
   </h3>
 
@@ -144,7 +144,7 @@ Class DefaultOrderer
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DefaultOrderer(SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default, MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)</code></pre>
+    <pre><code class="lang-csharp hljs">public DefaultOrderer(SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default, MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared, JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -152,6 +152,8 @@ Class DefaultOrderer
     <dt><code>summaryOrderPolicy</code> <a class="xref" href="BenchmarkDotNet.Order.SummaryOrderPolicy.html">SummaryOrderPolicy</a></dt>
     <dd></dd>
     <dt><code>methodOrderPolicy</code> <a class="xref" href="BenchmarkDotNet.Order.MethodOrderPolicy.html">MethodOrderPolicy</a></dt>
+    <dd></dd>
+    <dt><code>jobOrderPolicy</code> <a class="xref" href="BenchmarkDotNet.Order.JobOrderPolicy.html">JobOrderPolicy</a></dt>
     <dd></dd>
   </dl>
 

@@ -98,6 +98,74 @@
 <li>Improved precision of nanobenchmarks</li>
 <li>Minor infrastructure changes and misc fixes</li>
 </ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.2">v0.10.2</a> scope,
+10 issues were resolved and 3 pull requests were merged.
+This release includes 30 commits by 8 contributors.</p>
+<h2 id="resolved-issues-10">Resolved issues (10)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/295">#295</a> Fix CLS-compliant warnings in Diagnostics (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/307">#307</a> Output: interpolated strings &amp; culture (assignee: <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/319">#319</a> [Request] some API to public? (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/321">#321</a> BenchmarkRunner.RunUrl throws BenchmarkSystem.IO.FileNotFoundException (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/327">#327</a> Unable to use ClassicToolchain in explicit way (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/332">#332</a> default color of terminal is changed after the run is completed (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/335">#335</a> Support benchmarking startup performance (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/337">#337</a> Problematic mechanism/docs for locating Rscript.exe</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/340">#340</a> [FeatureRequest] Enable Characteristic-based properties for non-job types. (assignee: <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/345">#345</a> Fail to run IntroAdvancedStats in dry mode (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-3">Merged pull requests (3)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/338">#338</a> Fix typo (by <a href="https://github.com/roji">@roji</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/339">#339</a> Better detection of Rscript in RPlotExporter (by <a href="https://github.com/roji">@roji</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/341">#341</a> Base types for characteristic objects: (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+</ul>
+<h2 id="commits-30">Commits (30)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e7c398fdd763a391405cfb58024653bd2ec6612d">e7c398</a> Fixes parentheses error (by Josef Ottosson)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2655b3b235d2c0d5d2f9297d0721794945d3903d">2655b3</a> Merge pull request #318 from joseftw/patch-1 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4115a25cd29d6635d4391500a9ea13094a159b69">4115a2</a> make GcStats and Net46Toolchain internal members public, fixes #319 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/52f9535da3af7e7de226bc9eca3b095047bfb434">52f953</a> ignore the CLS compilant errors for Diagnosers package, fixes #295 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d96b686e507cbc33e1eb37971cb647e8c59e3c2a">d96b68</a> Improved Consumer (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/943c49d7e075d5386b94fad00a56852e92ed4ee3">943c49</a> CLSCompliant fixes in Consumer (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f4bdae5b7e203e0f0a7d283db5faa78107674f31">f4bdae</a> specify the .NET Core sdk version in explicit way to get the solution working... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/df8c556cbdfe516e76fb932d3e3f41f1e22fa790">df8c55</a> always restore the console foreground color, fixes #332 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/24dea483b8312efba669d82a6fac3603e60050f5">24dea4</a> fix bold markup for Atlassian exporter (by <a href="https://github.com/lahma">@lahma</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d3c756a835d4648ca3cfdafe784b275c996e265">4d3c75</a> persist optimized, auto-generated dll compiled from url/plain code, fixes #321 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2e92a2819ec74d8f70dca4bd72aa15c26bc8968d">2e92a2</a> allow to set Classic/Roslyn tool chain in explicit way, fixes #327 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/aabece9377b57d88151ee02b3b4daf0200ae2efe">aabece</a> Merge pull request #329 from lahma/features/atlassian-bold-format (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/91152cf9a9d31a28b88ae5cfef95da21a7025c6c">91152c</a> ExportToFiles now accepts console logger (by <a href="https://github.com/roji">@roji</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2993751e3e4e06a4f0a5338856e2e0d6a7c5ba11">299375</a> Base types for characteristic objects: (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/afc65d1ebb4e65336d4bb2e607e5b694b1197f68">afc65d</a> Better detection of Rscript.exe in RPlotExporter (by <a href="https://github.com/roji">@roji</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/15869b994ba4329b4904bf85e648253bd00720b7">15869b</a> Merge pull request #339 from roji/rscript-detect (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9f6a82a3f0762f38cd28d6c4a8b4f87c9c540046">9f6a82</a> Merge pull request #341 from ig-sinicyn/feature-characteristic-object (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/432adfebf7f916dfc6124e1a9517c3043c865def">432adf</a> Fix typo (by <a href="https://github.com/roji">@roji</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cfa015eaffdbe3465e01551e09ab2c457d429513">cfa015</a> Merge pull request #338 from roji/dependencies-typo (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d953f0a38693f33a33430c306e331e95eecb184">4d953f</a> Temporary rollback of the link to appveyor (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1f5a6ee179b058762355d01d4944b2f6ae7cfbc2">1f5a6e</a> Update year in docs footer (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/183ab64b37545a812cf05759d361450fb6d602e7">183ab6</a> Fix warning in RoslynToolchain (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6fd9f3d970e01dc7d5f164c7691924e897f76e5b">6fd9f3</a> Used ToStr to make statistics builder culture invariant (fixed #307) (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3a3100f6416a3047af755b2ffb1f6aa5427ce0f4">3a3100</a> Merge pull request #346 from alinasmirnova/master (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7ee2f13f3ee154567a59efcc3eb74de12e98580f">7ee2f1</a> Fix in WelchTTestPValueColumn for DryJob, fixes #345 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/795f4aef8587a77eadc985708588c8b83dab94a2">795f4a</a> Disable jitting for RunStrategy=ColdStart, fixes #335 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5b5a8c59f38834c4e25c3b08d87e9c8588aca524">5b5a8c</a> Fixed typo (by <a href="https://github.com/lukasz-pyrzyk">@lukasz-pyrzyk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/54519c07a97005110879b0ecbcdf603eef461d3b">54519c</a> Merge pull request #347 from lukasz-pyrzyk/master (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fbac752a4bd8a0090d3f25ddb8073d42224db797">fbac75</a> Introduced Dummy actions (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/484f536ac30a96cdfc5a43ca84d9287450b8884c">484f53</a> Set library version: 0.10.2 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-8">Contributors (8)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Alina Smirnova (<a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>ig-sinicyn (<a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li>Josef Ottosson</li>
+<li>Łukasz Pyrzyk (<a href="https://github.com/lukasz-pyrzyk">@lukasz-pyrzyk</a>)</li>
+<li>Marko Lahma (<a href="https://github.com/lahma">@lahma</a>)</li>
+<li>Shay Rojansky (<a href="https://github.com/roji">@roji</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: January 21, 2017</em></p>
 <p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.10.2">v0.10.2</a></em></p>

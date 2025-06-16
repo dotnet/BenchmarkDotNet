@@ -89,6 +89,70 @@
 
 <h2 id="highlights">Highlights</h2>
 <p>Small improvements.</p>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.11">v0.13.11</a> scope,
+4 issues were resolved and 8 pull requests were merged.
+This release includes 28 commits by 7 contributors.</p>
+<h2 id="resolved-issues-4">Resolved issues (4)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2060">#2060</a> NativeAOT benchmark started from .Net Framework host doesn't have all intrinsics enabled (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2233">#2233</a> Q: Include hardware counters in XML output (assignee: <a href="https://github.com/nazulg">@nazulg</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2388">#2388</a> Include AVX512 in listed HardwareIntrinsics</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2463">#2463</a> Bug. Native AOT .NET 7.0 doesn't work. System.NotSupportedException: X86Serialize (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-8">Merged pull requests (8)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2412">#2412</a> Add HardwareIntrinsics AVX-512 info (by <a href="https://github.com/nietras">@nietras</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2458">#2458</a> Adds Metrics Columns to Benchmark Report Output (by <a href="https://github.com/nazulg">@nazulg</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2459">#2459</a> Enable MemoryDiagnoser on Legacy Mono (by <a href="https://github.com/MichalPetryka">@MichalPetryka</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2462">#2462</a> update SDK to .NET 8 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2464">#2464</a> Use &quot;native&quot; for .NET 8, don't use &quot;serialize&quot; for .NET 7 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2465">#2465</a> fix NativeAOT toolchain and tests (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2468">#2468</a> Add OperationsPerSecondAttribute (by <a href="https://github.com/DarkWanderer">@DarkWanderer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2475">#2475</a> Fix some tests (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<h2 id="commits-28">Commits (28)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bb55e6b067829c74e04838255e96d949857d5731">bb55e6</a> Set next BenchmarkDotNet version: 0.13.11 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/db4d8b6d8a652db4bb1e4b1b4b0cd9df917e9584">db4d8b</a> Adds Metrics Columns to Benchmark Report Output (#2458) (by <a href="https://github.com/nazulg">@nazulg</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e93b2b1b332fc90da4934025e2edba7d67a15b54">e93b2b</a> Use &quot;native&quot; for .NET 8, don't use &quot;serialize&quot; for .NET 7 (#2464) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/127157924014afe2d0b58398d682381a855d7c34">127157</a> [build] Fix spellcheck-docs workflow (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8a02ec28d55529f9be0ea66d843049738b2be8fa">8a02ec</a> [build] Use our .NET SDK on Windows (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1b39e8e6d5437bdbf0bb62986e680e54b19cc873">1b39e8</a> Suppress NU1903 in IntegrationTests.ManualRunning.MultipleFrameworks (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e90311539d78e4bf9d90c6aeae9f40219b31a4ac">e90311</a> update SDK to .NET 8 (#2462) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fc7afeddcff7a52ccee165ac99ba216e8eb138ab">fc7afe</a> Enable MemoryDiagnoser on Legacy Mono (#2459) (by <a href="https://github.com/MichalPetryka">@MichalPetryka</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/630622b6df3192f766ffa03ff07b5086e70cb264">630622</a> fix NativeAOT toolchain and tests (#2465) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/536a28e0ff2196255fb120aa0d39e40bdbde454a">536a28</a> Add HardwareIntrinsics AVX-512 info (#2412) (by <a href="https://github.com/nietras">@nietras</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3fa0456495cac82b536902b101a2972c62c3e4a8">3fa045</a> Add OperationsPerSecondAttribute (#2468) (by <a href="https://github.com/DarkWanderer">@DarkWanderer</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0583cb90739b3ee4b8258f807ef42cdc3243f82f">0583cb</a> Bump Microsoft.NETCore.Platforms: 5.0.0-&gt;6.0.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2e62b9b0a8c80255914e9e11d06d92871df40f85">2e62b9</a> Remove netcoreapp2.0;net461 from TFMs for IntegrationTests.ManualRunning.Mult... (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/92fa3f834e0519d32fd8fc97e26aa82f9626b241">92fa3f</a> Bump xunit: 2.5.0-&gt;2.6.2 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/01e2201c826dd44e089a22c40d8c3abecba320fa">01e220</a> Bump xunit.runner.visualstudio: 2.5.0-&gt;2.5.4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29a94ce301dac6121d1e0d1a0d783a6491c27703">29a94c</a> Bump Verify.Xunit: 20.3.2-&gt;20.8.2 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/538e0e1771be037ef587b08cb52515ce6daf5c0e">538e0e</a> Bump Microsoft.NET.Test.SDK: 17.6.2-&gt;17.8.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/136e4bb3f18a419df40c18a5430a29243ab57fd8">136e4b</a> Remove explicit Microsoft.NETFramework.ReferenceAssemblies reference in Bench... (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/423b8473d02d5bd59617675190660222198bf7d0">423b84</a> [build] Bump Docfx.App: 2.71.1-&gt;2.74.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/718953674a83da4de6563368f38776048024f0d3">718953</a> [build] Bump Octokit: 7.0.0-&gt;9.0.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0cce9120bd717e31a4a6a4a396faa8f38fd3cc08">0cce91</a> [build] Bump Cake.Frosting: 3.2.0-&gt;4.0.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d5dc9ca13072d384cabf565bc3622f8de5626d7">4d5dc9</a> Fix Newtonsoft.Json v13.0.1 in BenchmarkDotNet.IntegrationTests (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c7ec60ad6d4e54a99463eb46a0307196cc040940">c7ec60</a> Enable UserCanSpecifyCustomNuGetPackageDependency test on Linux (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a572db119798fb58b24437ccef6a364efd59e836">a572db</a> Bump C# LangVersion: 11.0-&gt;12.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b4ac9df9f7890ca9669e2b9c8835af35c072a453">b4ac9d</a> Nullability cleanup (2023-11-26) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5557aee0638bda38001bd6c2000164d9b96d315a">5557ae</a> [build] Bump Docfx.App: 2.74.0-&gt;2.74.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b987b99ed37455e5443ed03169890998c3152ae9">b987b9</a> Fixed some tests. (#2475) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/05eb00f3536061ca624bab3d9a4ca2f3c0be5922">05eb00</a> Prepare v0.13.11 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-7">Contributors (7)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Michał Petryka (<a href="https://github.com/MichalPetryka">@MichalPetryka</a>)</li>
+<li>Nazul Grimaldo (<a href="https://github.com/nazulg">@nazulg</a>)</li>
+<li>nietras (<a href="https://github.com/nietras">@nietras</a>)</li>
+<li>Oleg V. Kozlyuk (<a href="https://github.com/DarkWanderer">@DarkWanderer</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
 <p><em>Date: December 06, 2023</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.11">v0.13.11</a></em>
