@@ -240,5 +240,29 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
         }
 #endif
+
+        [Fact]
+        public void DoubleCanBeImplicitlyCastedToFloat() => CanExecute<ParamsImplicitDoubleToFloat>();
+
+        public class ParamsImplicitDoubleToFloat()
+        {
+            [Params(0.0, 0.05, 0.1, 0.5, 0.99, 1.0)]
+            public float ParamProperty { get; set; }
+
+            private string stringToPrint;
+
+            [GlobalSetup]
+            public void Setup()
+            {
+                var r = new Random();
+                if (r.NextSingle() < ParamProperty)
+                    stringToPrint = "Condition passed";
+                else
+                    stringToPrint = "Condition failed";
+            }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine(stringToPrint);
+        }
     }
 }
