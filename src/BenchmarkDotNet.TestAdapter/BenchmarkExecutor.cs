@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.TestAdapter
                     b.Type,
                     b.Config.AddEventProcessor(eventProcessor)
                             .AddLogger(logger)
-                            .RemoveLogger<ConsoleLogger>() // Console logs are also outputted by VSTestLogger.
+                            .RemoveLoggersOfType<ConsoleLogger>() // Console logs are also outputted by VSTestLogger.
                             .CreateImmutableConfig()))
                 .ToArray();
 
