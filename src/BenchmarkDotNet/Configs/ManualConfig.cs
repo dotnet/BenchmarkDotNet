@@ -327,6 +327,14 @@ namespace BenchmarkDotNet.Configs
             return manualConfig;
         }
 
+        internal ManualConfig RemoveLogger<T>()
+        {
+            var filterdLoggers = loggers.Where(logger => logger is not T).ToArray();
+            loggers.Clear();
+            loggers.AddRange(filterdLoggers);
+            return this;
+        }
+
         internal void RemoveAllJobs() => jobs.Clear();
 
         internal void RemoveAllDiagnosers() => diagnosers.Clear();
