@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.TestAdapter.Remoting;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -67,7 +68,10 @@ namespace BenchmarkDotNet.TestAdapter
                 .Select(b => new BenchmarkRunInfo(
                     b.BenchmarksCases,
                     b.Type,
-                    b.Config.AddEventProcessor(eventProcessor).AddLogger(logger).CreateImmutableConfig()))
+                    b.Config.AddEventProcessor(eventProcessor)
+                            .AddLogger(logger)
+                            .RemoveLoggersOfType<ConsoleLogger>() // Console logs are also outputted by VSTestLogger.
+                            .CreateImmutableConfig()))
                 .ToArray();
 
             // Run all the benchmarks, and ensure that any tests that don't have a result yet are sent.

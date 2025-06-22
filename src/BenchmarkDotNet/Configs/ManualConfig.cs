@@ -327,6 +327,12 @@ namespace BenchmarkDotNet.Configs
             return manualConfig;
         }
 
+        internal ManualConfig RemoveLoggersOfType<T>()
+        {
+            loggers.RemoveAll(logger => logger is T);
+            return this;
+        }
+
         internal void RemoveAllJobs() => jobs.Clear();
 
         internal void RemoveAllDiagnosers() => diagnosers.Clear();
