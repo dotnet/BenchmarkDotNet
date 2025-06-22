@@ -1,10 +1,13 @@
 ﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.TestAdapter.Remoting;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace BenchmarkDotNet.TestAdapter
@@ -14,6 +17,9 @@ namespace BenchmarkDotNet.TestAdapter
     /// </summary>
     internal class BenchmarkExecutor
     {
+        // Gets FieldInfo of ImmutableConfig's loggers.
+        private static readonly FieldInfo? loggersField = typeof(ImmutableConfig).GetField("loggers", BindingFlags.Instance | BindingFlags.NonPublic);
+
         private readonly CancellationTokenSource cts = new ();
 
         /// <summary>
@@ -64,10 +70,21 @@ namespace BenchmarkDotNet.TestAdapter
 
             // Modify all the benchmarks so that the event process and logger is added.
             benchmarks = benchmarks
-                .Select(b => new BenchmarkRunInfo(
-                    b.BenchmarksCases,
-                    b.Type,
-                    b.Config.AddEventProcessor(eventProcessor).AddLogger(logger).CreateImmutableConfig()))
+                .Select(b =>
+                {
+                    ImmutableConfig config = b.Config.AddEventProcessor(eventProcessor).AddLogger(logger).CreateImmutableConfig();
+
+                    // Remove console logger from ImmutableCofig to fix duplicated console logs are outputted issue.
+                    if (loggersField != null && loggersField.DeclaringType == typeof(ImmutableHashSet))
+                    {
+                        var loggers = config.GetLoggers()
+                                            .Where(x => x is not ConsoleLogger)
+                                            .ToImmutableHashSet();
+                        loggersField.SetValue(config, loggers);
+                    }
+
+                    return new BenchmarkRunInfo(b.BenchmarksCases, b.Type, config);
+                })
                 .ToArray();
 
             // Run all the benchmarks, and ensure that any tests that don't have a result yet are sent.
