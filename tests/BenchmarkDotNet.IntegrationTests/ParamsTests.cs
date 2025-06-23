@@ -246,15 +246,41 @@ namespace BenchmarkDotNet.IntegrationTests
         public void ParameterTypeDoesNotMatchParameterValueType()
         {
             // Disable fullValidation, as critical error is expected here
-            var summary = CanExecute<ParamsMixedTypes>(null, false);
+            var summary = CanExecute<ParamsMixedTypesFloatAndDouble>(null, false);
+            Assert.True(summary.HasCriticalValidationErrors, "Expected HasCriticalValidationErrors to be true");
+            Assert.True(summary.ValidationErrors.Any(validationError => validationError.Message.Contains("Parameter type does not match the parameter value type")));
+
+            summary = CanExecute<ParamsMixedTypesByteAndDouble>(null, false);
+            Assert.True(summary.HasCriticalValidationErrors, "Expected HasCriticalValidationErrors to be true");
+            Assert.True(summary.ValidationErrors.Any(validationError => validationError.Message.Contains("Parameter type does not match the parameter value type")));
+
+            summary = CanExecute<ParamsMixedTypesByteAndInt>(null, false);
             Assert.True(summary.HasCriticalValidationErrors, "Expected HasCriticalValidationErrors to be true");
             Assert.True(summary.ValidationErrors.Any(validationError => validationError.Message.Contains("Parameter type does not match the parameter value type")));
         }
 
-        public class ParamsMixedTypes()
+        public class ParamsMixedTypesFloatAndDouble()
         {
             [Params(0.0, 0.05, 0.1, 0.5, 0.99, 1.0)]
             public float ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine(ParamProperty);
+        }
+
+        public class ParamsMixedTypesByteAndDouble()
+        {
+            [Params(0.0, 0.05, 0.1, 0.5, 0.99, 1.0)]
+            public byte ParamProperty { get; set; }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine(ParamProperty);
+        }
+
+        public class ParamsMixedTypesByteAndInt()
+        {
+            [Params(0, 1, 5, 9, 10)]
+            public byte ParamProperty { get; set; }
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine(ParamProperty);
