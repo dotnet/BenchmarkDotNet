@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using Xunit;
 using Xunit.Abstractions;
@@ -242,27 +243,21 @@ namespace BenchmarkDotNet.IntegrationTests
 #endif
 
         [Fact]
-        public void DoubleCanBeImplicitlyCastedToFloat() => CanExecute<ParamsImplicitDoubleToFloat>();
+        public void ParameterTypeDoesNotMatchParameterValueType()
+        {
+            // Disable fullValidation, as critical error is expected here
+            var summary = CanExecute<ParamsMixedTypes>(null, false);
+            Assert.True(summary.HasCriticalValidationErrors, "Expected HasCriticalValidationErrors to be true");
+            Assert.True(summary.ValidationErrors.Any(validationError => validationError.Message.Contains("Parameter type does not match the parameter value type")));
+        }
 
-        public class ParamsImplicitDoubleToFloat()
+        public class ParamsMixedTypes()
         {
             [Params(0.0, 0.05, 0.1, 0.5, 0.99, 1.0)]
             public float ParamProperty { get; set; }
 
-            private string stringToPrint;
-
-            [GlobalSetup]
-            public void Setup()
-            {
-                var r = new Random();
-                if (r.NextSingle() < ParamProperty)
-                    stringToPrint = "Condition passed";
-                else
-                    stringToPrint = "Condition failed";
-            }
-
             [Benchmark]
-            public void Benchmark() => Console.WriteLine(stringToPrint);
+            public void Benchmark() => Console.WriteLine(ParamProperty);
         }
     }
 }

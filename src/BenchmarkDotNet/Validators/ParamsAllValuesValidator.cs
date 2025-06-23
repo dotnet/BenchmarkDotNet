@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Parameters;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -17,14 +18,20 @@ namespace BenchmarkDotNet.Validators
 
         private const BindingFlags ReflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input) =>
-            input.Benchmarks
+        public IEnumerable<ValidationError> Validate(ValidationParameters input)
+        {
+            var errors = input.Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
                 .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(ReflectionFlags))
                 .Distinct()
                 .Select(member => GetErrorOrDefault(member.ParameterType))
                 .Where(error => error != null);
+
+            return input.Benchmarks
+                .Aggregate(errors, (current, benchmark) => current.Concat(benchmark.Parameters.Items.Select(GetErrorOrDefault)
+                .Where(error => error != null)));
+        }
 
         private bool IsBool(Type paramType) => paramType == typeof(bool);
         private bool IsEnum(Type paramType) => paramType.GetTypeInfo().IsEnum;
@@ -59,6 +66,16 @@ namespace BenchmarkDotNet.Validators
                         TreatsWarningsAsErrors,
                         $"Type {parameterType.Name} cannot be used with [ParamsAllValues], allowed types are: bool, enum types and nullable type for another allowed type.");
             }
+        }
+
+        private ValidationError GetErrorOrDefault(ParameterInstance instance)
+        {
+            if (!instance.Definition.ParameterType.IsInstanceOfType(instance.Value))
+                return new ValidationError(
+                    TreatsWarningsAsErrors,
+                    $"Parameter type does not match the parameter value type: expected {instance.Definition.ParameterType.Name}, but got {instance.Value.GetType().Name}");
+
+            return default;
         }
     }
 }

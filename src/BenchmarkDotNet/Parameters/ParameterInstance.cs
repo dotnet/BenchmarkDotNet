@@ -33,15 +33,9 @@ namespace BenchmarkDotNet.Parameters
         public object Value => value is IParam parameter ? parameter.Value : value;
 
         public string ToSourceCode()
-        {
-            if (value is IParam parameter)
-                return parameter.ToSourceCode();
-
-            if (Definition.ParameterType.IsInstanceOfType(value))
-                return SourceCodeHelper.ToSourceCode(value);
-
-            return SourceCodeHelper.ToSourceCode(Convert.ChangeType(value, Definition.ParameterType));
-        }
+            => value is IParam parameter
+                ? parameter.ToSourceCode()
+                : SourceCodeHelper.ToSourceCode(value);
 
         private string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
