@@ -94,16 +94,20 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (OsDetector.IsMacOS()) return; // currently not supported
 
+            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 3));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
+            DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
+
+            Assert.Empty(result.Errors);
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Benchmark)}(Int32)");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Benchmark)}(Boolean)");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Static)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Instance)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Recursive)}()");
         }
 
         [Theory]
@@ -113,16 +117,20 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (OsDetector.IsMacOS()) return; // currently not supported
 
+            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
+                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 1, filters: new[] { "*WithCalls*" }));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
+            DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
+
+            Assert.Empty(result.Errors);
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Benchmark)}(Int32)");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Benchmark)}(Boolean)");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Static)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Instance)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithCalls.Recursive)}()");
         }
 
         public class Generic<T> where T : new()
@@ -138,13 +146,15 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (OsDetector.IsMacOS()) return; // currently not supported
 
+            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 3));
 
             CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var result = disassemblyDiagnoser.Results.Values.Single();
 
+            Assert.Empty(result.Errors);
             Assert.Contains(result.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().Any()));
         }
 
@@ -160,13 +170,15 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (OsDetector.IsMacOS()) return; // currently not supported
 
+            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 3));
 
             CanExecute<WithInlineable>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
+            Assert.Empty(disassemblyResult.Errors);
             Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.ToString().Contains("ret"))));
         }
 
@@ -181,12 +193,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddDiagnoser(disassemblyDiagnoser)
                 .AddLogger(new OutputLogger(Output));
 
-        private void AssertDisassembled(DisassemblyDiagnoser diagnoser, string methodSignature)
+        private void AssertDisassemblyResult(DisassemblyResult result, string methodSignature)
         {
-            DisassemblyResult result = diagnoser.Results.Single().Value;
-
             Assert.Contains(methodSignature, result.Methods.Select(m => m.Name.Split('.').Last()).ToArray());
             Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Any());
         }
+
+        private static bool IsPrintSourceSupported(Platform platform)
+            => platform != Platform.X86; // Workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2789
     }
 }
