@@ -24,7 +24,8 @@ namespace BenchmarkDotNet.Disassemblers
 
             try
             {
-                var methodsToExport = ClrMdV1Disassembler.AttachAndDisassemble(options);
+                // Update this to match SameArchitectureDisassembler if this standalone disassembler ever needs to support Arm or other architectures.
+                var methodsToExport = new IntelDisassembler().AttachAndDisassemble(options);
 
                 SaveToFile(methodsToExport, options.ResultsPath);
             }

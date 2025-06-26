@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Filters;
 using Microsoft.Diagnostics.Runtime;
-using Microsoft.Diagnostics.Runtime.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +12,6 @@ namespace BenchmarkDotNet.Disassemblers
 {
     // This Disassembler uses ClrMd v3x. Please keep it in sync with ClrMdV1Disassembler (if possible).
     internal abstract class ClrMdV3Disassembler
-
     {
         private static readonly ulong MinValidAddress = GetMinValidAddress();
 
@@ -94,7 +91,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static void FilterAndEnqueue(State state, Settings settings)
         {
-            Regex[] filters = GlobFilter.ToRegex(settings.Filters);
+            Regex[] filters = settings.Filters.ToRegex();
 
             foreach (ClrModule module in state.Runtime.EnumerateModules())
                 foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).Where(type => type is not null))

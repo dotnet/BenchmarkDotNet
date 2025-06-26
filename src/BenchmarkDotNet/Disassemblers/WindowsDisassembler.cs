@@ -113,17 +113,17 @@ namespace BenchmarkDotNet.Disassemblers
         private static void CopyAllRequiredDependencies(Assembly assemblyWithDisassemblersInResources, string destinationFolder)
         {
             // ClrMD and Iced are also embedded in the resources, we need to copy them as well
-            foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
+            foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll") || name.EndsWith(".config")))
             {
                 // dependency is sth like "BenchmarkDotNet.Disassemblers.net462.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net462.win7_x64.", string.Empty);
-                string dllPath = Path.Combine(destinationFolder, fileName);
+                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net462.", string.Empty).Replace("win7_x64.", string.Empty).Replace("win7_x86.", string.Empty);
+                string dependencyPath = Path.Combine(destinationFolder, fileName);
 
-                if (!File.Exists(dllPath))
+                if (!File.Exists(dependencyPath))
                     CopyFromResources(
                         assemblyWithDisassemblersInResources,
                         dependency,
-                        dllPath);
+                        dependencyPath);
             }
         }
 

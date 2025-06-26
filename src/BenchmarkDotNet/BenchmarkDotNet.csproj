@@ -42,8 +42,9 @@
     </ProjectReference>
     <EmbeddedResource Include="Disassemblers\net462\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
     <EmbeddedResource Include="Disassemblers\net462\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
-    <EmbeddedResource Include="Disassemblers\net462\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
-    <EmbeddedResource Include="Disassemblers\net462\win7-x64\Iced.dll" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x64\*.dll" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x64\*.config" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x86\*.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
@@ -51,8 +52,5 @@
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
     <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMembersAttribute.cs" Link="Properties\DynamicallyAccessedMembersAttribute.cs" />
     <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMemberTypes.cs" Link="Properties\DynamicallyAccessedMemberTypes.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="Disassemblers\DataContracts.cs" />
   </ItemGroup>
 </Project>

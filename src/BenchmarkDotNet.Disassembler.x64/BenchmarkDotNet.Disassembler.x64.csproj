@@ -7,15 +7,46 @@
     <AssemblyName>BenchmarkDotNet.Disassembler.x64</AssemblyName>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <PlatformTarget>x64</PlatformTarget>
-    <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
-    <DefineConstants>$(DefineConstants);CLRMDV1</DefineConstants>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\BenchmarkDotNet\Disassemblers</OutputPath>
     <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Iced" Version="1.21.0" />
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="[1.1.142101]" />
+    <!-- Necessary components for disassembly. -->
+    <Compile Include="..\BenchmarkDotNet\Disassemblers\DataContracts.cs" />
+    <Compile Include="..\BenchmarkDotNet\Disassemblers\ClrMdV3Disassembler.cs" />
+    <Compile Include="..\BenchmarkDotNet\Disassemblers\SourceCodeProvider.cs" />
+    <Compile Include="..\BenchmarkDotNet\Disassemblers\IntelDisassembler.cs" />
+    <Compile Include="..\BenchmarkDotNet\Disassemblers\DisassemblySyntax.cs" />
+
+    <!-- Dependencies. -->
+    <Compile Include="..\BenchmarkDotNet\Detectors\OsDetector.cs" />
+    <Compile Include="..\BenchmarkDotNet\Portability\RuntimeInformationShared.cs" />
+    <Compile Include="..\BenchmarkDotNet\Portability\StringExtensions.cs" />
+    <Compile Include="..\BenchmarkDotNet\Environments\Platform.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\HashCode.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\ExternalToolsHelper.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\LinuxOsReleaseHelper.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\ProcessHelper.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\SectionsHelper.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\ConsoleExitHandler.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" />
+    <Compile Include="..\BenchmarkDotNet\Loggers\ILogger.cs" />
+    <Compile Include="..\BenchmarkDotNet\Loggers\LogKind.cs" />
+    <Compile Include="..\BenchmarkDotNet\Loggers\NullLogger.cs" />
+    <Compile Include="..\BenchmarkDotNet\Loggers\AsyncProcessOutputReader.cs" />
+    <Compile Include="..\BenchmarkDotNet\Loggers\LoggerExtensions.cs" />
+    <Compile Include="..\BenchmarkDotNet\Extensions\CommonExtensionsShared.cs" />
+    <Compile Include="..\BenchmarkDotNet\Extensions\ProcessExtensionsShared.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Iced" Version="1.21.0" PrivateAssets="all" />
+    <PackageReference Include="Gee.External.Capstone" Version="2.3.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="3.1.512801" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.22" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" PrivateAssets="all" />
+    <PackageReference Include="Perfolizer" Version="0.5.3" PrivateAssets="all" />
   </ItemGroup>
 </Project>

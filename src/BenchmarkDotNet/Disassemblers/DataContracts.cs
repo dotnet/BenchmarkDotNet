@@ -38,11 +38,9 @@ namespace BenchmarkDotNet.Disassemblers
 
     public class Arm64Asm : Asm
     {
-#if !CLRMDV1 // don't include it in ClrMD V1 disassembler that supports only x86 and x64
         public Gee.External.Capstone.Arm64.Arm64Instruction Instruction { get; set; }
 
         public override string ToString() => Instruction.ToString();
-#endif
     }
 
     public class MonoCode : SourceCode

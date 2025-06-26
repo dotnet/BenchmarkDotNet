@@ -7,7 +7,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
 {
-    internal static class CommonExtensions
+    internal static partial class CommonExtensions
     {
         /// <summary>
         /// Gets column title formatted using the specified style
@@ -43,11 +43,6 @@ namespace BenchmarkDotNet.Extensions
             foreach (var item in collection)
                 hashSet.Add(item);
         }
-
-#if NETSTANDARD2_0
-        public static TValue? GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-            => dictionary.TryGetValue(key, out var value) ? value : default;
-#endif
 
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);
