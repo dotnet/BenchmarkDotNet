@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Tests
             {
                 yield return null;
                 yield return ValueTuple.Create(10);
-                yield return ValueTuple.Create(10, 20);
+                yield return (10, 20);
                 yield return (10, 20, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
             }
 
