@@ -36,6 +36,7 @@ namespace BenchmarkDotNet.Code
         private string ToInvariantCultureString()
         {
             //1
+            //2
             switch (Type.GetTypeCode(Enum.GetUnderlyingType(type)))
             {
                 case TypeCode.Byte:
