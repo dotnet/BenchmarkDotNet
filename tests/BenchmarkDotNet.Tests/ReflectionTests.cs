@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Tests
 
         public class GenericByRef
         {
-            public void TheMethod(ref ValueTuple<int, short> _) { }
+            public void TheMethod(ref (int, short) _) { }
         }
 
         [Fact]

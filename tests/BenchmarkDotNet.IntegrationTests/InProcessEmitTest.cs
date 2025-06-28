@@ -331,7 +331,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class GlobalSetupCleanupValueTaskSource
         {
-            private readonly static ValueTaskSource<int> valueTaskSource = new ();
+            private readonly static ValueTaskSource<int> valueTaskSource = new();
 
             [GlobalSetup]
             public static ValueTask GlobalSetup()

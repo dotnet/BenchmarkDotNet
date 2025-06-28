@@ -15,9 +15,9 @@ namespace BenchmarkDotNet.Columns
     {
         private static readonly SignificanceLevel DefaultSignificanceLevel = SignificanceLevel.P1E5;
 
-        public static StatisticalTestColumn CreateDefault() => new (new PercentValue(10).ToThreshold());
+        public static StatisticalTestColumn CreateDefault() => new(new PercentValue(10).ToThreshold());
 
-        public static StatisticalTestColumn Create(Threshold threshold, SignificanceLevel? significanceLevel = null) => new (threshold, significanceLevel);
+        public static StatisticalTestColumn Create(Threshold threshold, SignificanceLevel? significanceLevel = null) => new(threshold, significanceLevel);
 
         public static StatisticalTestColumn Create(string threshold, SignificanceLevel? significanceLevel = null)
         {

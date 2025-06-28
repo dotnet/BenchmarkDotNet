@@ -591,7 +591,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class AsyncValueTaskSource
         {
-            private readonly ValueTaskSource<bool> valueTaskSource = new ();
+            private readonly ValueTaskSource<bool> valueTaskSource = new();
 
             public static bool WasCalled;
 
@@ -622,7 +622,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class AsyncGenericValueTaskSource
         {
-            private readonly ValueTaskSource<int> valueTaskSource = new ();
+            private readonly ValueTaskSource<int> valueTaskSource = new();
 
             public static bool WasCalled;
 

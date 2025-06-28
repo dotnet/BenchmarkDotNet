@@ -622,8 +622,8 @@ namespace BenchmarkDotNet.Running
 
         private static (BenchmarkRunInfo[], List<ValidationError>) GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, IResolver resolver)
         {
-            List<ValidationError> validationErrors = new ();
-            List<BenchmarkRunInfo> runInfos = new (benchmarkRunInfos.Length);
+            List<ValidationError> validationErrors = new();
+            List<BenchmarkRunInfo> runInfos = new(benchmarkRunInfos.Length);
 
             if (benchmarkRunInfos.Length == 0)
             {

@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal static string Format(Arm64Asm asm, FormatterOptions formatterOptions,
             bool printInstructionAddresses, uint pointerSize, IReadOnlyDictionary<ulong, string> symbols)
         {
-            StringBuilder output = new ();
+            StringBuilder output = new();
             Arm64Instruction instruction = asm.Instruction;
 
             if (printInstructionAddresses)

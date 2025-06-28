@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Engines
         private bool EvaluateOverhead { get; }
         private bool MemoryRandomization { get; }
 
-        private readonly List<Measurement> jittingMeasurements = new (10);
+        private readonly List<Measurement> jittingMeasurements = new(10);
         private readonly bool includeExtraStats;
         private readonly Random random;
 
@@ -351,8 +351,8 @@ namespace BenchmarkDotNet.Engines
                 // ManualResetEvent(Slim) allocates when it is waited and yields the thread,
                 // so we use Monitor.Wait instead which does not allocate managed memory.
                 // This behavior is not documented, but was observed with the VS Profiler.
-                private readonly object hangLock = new ();
-                private readonly ManualResetEventSlim enteredFinalizerEvent = new (false);
+                private readonly object hangLock = new();
+                private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
 
                 ~Impl()
                 {

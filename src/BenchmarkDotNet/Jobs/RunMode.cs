@@ -191,7 +191,7 @@ namespace BenchmarkDotNet.Jobs
             set => MemoryRandomizationCharacteristic[this] = value;
         }
 
-        internal BdnExecution ToPerfonar() => new ()
+        internal BdnExecution ToPerfonar() => new()
         {
             LaunchCount = HasValue(LaunchCountCharacteristic) ? LaunchCount : null,
             WarmupCount = HasValue(WarmupCountCharacteristic) ? WarmupCount : null,
