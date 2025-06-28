@@ -2,7 +2,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class KnownIssue
     {
-        public static KnownIssue Issue2299 => new (2299, "Non-supported Mono on Linux", false);
+        public static KnownIssue Issue2299 => new(2299, "Non-supported Mono on Linux", false);
 
         public int Number { get; }
         public string Description { get; }

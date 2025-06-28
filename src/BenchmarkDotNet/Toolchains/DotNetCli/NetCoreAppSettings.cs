@@ -9,17 +9,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class NetCoreAppSettings
     {
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new ("netcoreapp2.0", null, ".NET Core 2.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new ("netcoreapp2.1", null, ".NET Core 2.1");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new ("netcoreapp2.2", null, ".NET Core 2.2");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp30 = new ("netcoreapp3.0", null, ".NET Core 3.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp31 = new ("netcoreapp3.1", null, ".NET Core 3.1");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new ("net5.0", null, ".NET 5.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp60 = new ("net6.0", null, ".NET 6.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp70 = new ("net7.0", null, ".NET 7.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp80 = new ("net8.0", null, ".NET 8.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp90 = new ("net9.0", null, ".NET 9.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp10_0 = new ("net10.0", null, ".NET 10.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp20 = new("netcoreapp2.0", null, ".NET Core 2.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp21 = new("netcoreapp2.1", null, ".NET Core 2.1");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new("netcoreapp2.2", null, ".NET Core 2.2");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp30 = new("netcoreapp3.0", null, ".NET Core 3.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp31 = new("netcoreapp3.1", null, ".NET Core 3.1");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new("net5.0", null, ".NET 5.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp60 = new("net6.0", null, ".NET 6.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp70 = new("net7.0", null, ".NET 7.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp80 = new("net8.0", null, ".NET 8.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp90 = new("net9.0", null, ".NET 9.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp10_0 = new("net10.0", null, ".NET 10.0");
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">

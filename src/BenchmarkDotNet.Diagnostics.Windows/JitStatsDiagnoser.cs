@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private sealed class MethodsJittedDescriptor : IMetricDescriptor
         {
-            internal static readonly MethodsJittedDescriptor Instance = new ();
+            internal static readonly MethodsJittedDescriptor Instance = new();
 
             public string Id => nameof(MethodsJittedDescriptor);
             public string DisplayName => "Methods JITted";
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private sealed class MethodsTieredDescriptor : IMetricDescriptor
         {
-            internal static readonly MethodsTieredDescriptor Instance = new ();
+            internal static readonly MethodsTieredDescriptor Instance = new();
 
             public string Id => nameof(MethodsTieredDescriptor);
             public string DisplayName => "Methods Tiered";
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private sealed class JitAllocatedMemoryDescriptor : IMetricDescriptor
         {
-            internal static readonly JitAllocatedMemoryDescriptor Instance = new ();
+            internal static readonly JitAllocatedMemoryDescriptor Instance = new();
 
             public string Id => nameof(JitAllocatedMemoryDescriptor);
             public string DisplayName => "JIT allocated memory";

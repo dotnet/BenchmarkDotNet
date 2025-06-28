@@ -25,9 +25,9 @@ namespace BenchmarkDotNet.TestAdapter
         private readonly Dictionary<Guid, TestCase> cases;
         private readonly TestExecutionRecorderWrapper recorder;
         private readonly CancellationToken cancellationToken;
-        private readonly Stopwatch runTimerStopwatch = new ();
-        private readonly Dictionary<Guid, TestResult> testResults = new ();
-        private readonly HashSet<Guid> sentTestResults = new ();
+        private readonly Stopwatch runTimerStopwatch = new();
+        private readonly Dictionary<Guid, TestResult> testResults = new();
+        private readonly HashSet<Guid> sentTestResults = new();
 
         public VsTestEventProcessor(
             List<TestCase> cases,

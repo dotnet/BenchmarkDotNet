@@ -257,8 +257,8 @@ namespace BenchmarkDotNet.IntegrationTests
             // to avoid measuring the cost of thread start and join, which varies across different runtimes.
             private Thread[] threads;
             private volatile bool keepRunning = true;
-            private readonly Barrier barrier = new (ThreadsCount + 1);
-            private readonly CountdownEvent countdownEvent = new (ThreadsCount);
+            private readonly Barrier barrier = new(ThreadsCount + 1);
+            private readonly CountdownEvent countdownEvent = new(ThreadsCount);
 
             [GlobalSetup]
             public void Setup()

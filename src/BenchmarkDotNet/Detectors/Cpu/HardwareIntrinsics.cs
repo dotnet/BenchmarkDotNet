@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Detectors.Cpu
 
         private static string GetShortAvx512Representation()
         {
-            StringBuilder avx512 = new ("AVX-512F");
+            StringBuilder avx512 = new("AVX-512F");
             if (IsX86Avx512CDSupported) avx512.Append("+CD");
             if (IsX86Avx512BWSupported) avx512.Append("+BW");
             if (IsX86Avx512DQSupported) avx512.Append("+DQ");

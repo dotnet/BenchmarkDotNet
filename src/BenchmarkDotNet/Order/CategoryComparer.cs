@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Order
     internal class CategoryComparer : IComparer<string[]>
     {
         private const string Separator = "§";
-        public static readonly CategoryComparer Instance = new ();
+        public static readonly CategoryComparer Instance = new();
 
         public int Compare(string[] x, string[] y)
         {

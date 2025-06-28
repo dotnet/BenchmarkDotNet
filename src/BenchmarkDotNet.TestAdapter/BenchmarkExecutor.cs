@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.TestAdapter
     /// </summary>
     internal class BenchmarkExecutor
     {
-        private readonly CancellationTokenSource cts = new ();
+        private readonly CancellationTokenSource cts = new();
 
         /// <summary>
         /// Runs all the benchmarks in the given assembly, updating the TestExecutionRecorder as they get run.

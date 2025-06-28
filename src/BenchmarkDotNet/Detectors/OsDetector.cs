@@ -13,13 +13,13 @@ namespace BenchmarkDotNet.Detectors;
 
 public class OsDetector
 {
-    public static readonly OsDetector Instance = new ();
+    public static readonly OsDetector Instance = new();
     private OsDetector() { }
 
     internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
     internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-    private readonly Lazy<OsInfo> os = new (ResolveOs);
+    private readonly Lazy<OsInfo> os = new(ResolveOs);
     public static OsInfo GetOs() => Instance.os.Value;
 
     private static OsInfo ResolveOs()

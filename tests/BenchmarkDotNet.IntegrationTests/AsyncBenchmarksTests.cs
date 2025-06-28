@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class TaskDelayMethods
         {
-            private readonly ValueTaskSource<int> valueTaskSource = new ();
+            private readonly ValueTaskSource<int> valueTaskSource = new();
 
             private const int MillisecondsDelay = 100;
 
@@ -112,8 +112,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class TaskImmediateMethods
         {
-            private readonly ValueTaskSource<int> valueTaskSource = new ();
-            private readonly ValueTaskSourceCallbackOnly<int> valueTaskSourceCallbackOnly = new ();
+            private readonly ValueTaskSource<int> valueTaskSource = new();
+            private readonly ValueTaskSourceCallbackOnly<int> valueTaskSourceCallbackOnly = new();
 
             [Benchmark]
             public Task ReturningTask() => Task.CompletedTask;

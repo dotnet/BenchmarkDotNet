@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Properties
     {
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
 
-        private static readonly Lazy<BenchmarkDotNetInfo> LazyInstance = new (() =>
+        private static readonly Lazy<BenchmarkDotNetInfo> LazyInstance = new(() =>
         {
             var assembly = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly;
             var assemblyVersion = assembly.GetName().Version;
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Properties
 
         public static BenchmarkDotNetInfo Instance { get; } = LazyInstance.Value;
 
-        public EngineInfo GetBdnEngineInfo() => new ()
+        public EngineInfo GetBdnEngineInfo() => new()
         {
             Name = BenchmarkDotNetCaption,
             Version = BrandVersion

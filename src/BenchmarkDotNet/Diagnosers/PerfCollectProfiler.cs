@@ -32,8 +32,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly PerfCollectProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
-        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new ();
-        private readonly HashSet<string> cliPathWithSymbolsInstalled = new ();
+        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new();
+        private readonly HashSet<string> cliPathWithSymbolsInstalled = new();
         private FileInfo perfCollectFile;
         private Process perfCollectProcess;
 
@@ -228,7 +228,7 @@ namespace BenchmarkDotNet.Diagnosers
             ILogger logger = parameters.Config.GetCompositeLogger();
             // We install the tool in a dedicated directory in order to always use latest version and avoid issues with broken existing configs.
             string toolPath = Path.Combine(Path.GetTempPath(), "BenchmarkDotNet", "symbols");
-            DotNetCliCommand cliCommand = new (
+            DotNetCliCommand cliCommand = new(
                 cliPath: cliPath,
                 arguments: $"tool install dotnet-symbol --tool-path \"{toolPath}\"",
                 generateResult: null,
@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private FileInfo GetTraceFile(DiagnoserActionParameters parameters, string extension)
-            => new (ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, extension)
+            => new(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, extension)
                     .Replace(" ", "_")); // perfcollect does not allow for spaces in the trace file name
     }
 }

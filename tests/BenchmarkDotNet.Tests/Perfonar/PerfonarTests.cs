@@ -137,7 +137,7 @@ public class PerfonarTests(ITestOutputHelper output)
         Host = new HostEnvironmentInfoBuilder().Build().ToPerfonar()
     };
 
-    private static PerfonarTableConfig GetDefaultTableConfig() => new ()
+    private static PerfonarTableConfig GetDefaultTableConfig() => new()
     {
         ColumnDefinitions =
         [

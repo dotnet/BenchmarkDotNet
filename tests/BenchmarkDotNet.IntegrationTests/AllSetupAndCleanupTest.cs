@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllSetupAndCleanupAttributeBenchmarksValueTaskSource
         {
-            private readonly ValueTaskSource<int> valueTaskSource = new ();
+            private readonly ValueTaskSource<int> valueTaskSource = new();
             private int setupCounter;
             private int cleanupCounter;
 
@@ -228,7 +228,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllSetupAndCleanupAttributeBenchmarksGenericValueTaskSource
         {
-            private readonly ValueTaskSource<int> valueTaskSource = new ();
+            private readonly ValueTaskSource<int> valueTaskSource = new();
             private int setupCounter;
             private int cleanupCounter;
 

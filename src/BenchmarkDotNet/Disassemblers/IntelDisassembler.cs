@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = new ();
+        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = new();
 
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
