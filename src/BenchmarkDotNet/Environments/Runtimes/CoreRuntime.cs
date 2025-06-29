@@ -99,11 +99,16 @@ namespace BenchmarkDotNet.Environments
                 return true;
             }
 
-            var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(typeof(object).Assembly.Location);
-            // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
-            if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+            string coreclrLocation = typeof(object).Assembly.Location;
+            // Single-file publish has empty assembly location.
+            if (!string.IsNullOrEmpty(coreclrLocation))
             {
-                return true;
+                var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(coreclrLocation);
+                // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
+                if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+                {
+                    return true;
+                }
             }
 
             // it's OK to use this method only after checking the previous ones
