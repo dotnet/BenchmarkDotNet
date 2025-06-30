@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Environments
             {
                 // .Net Core 3.X supports single-file publish, .Net Core 2.X does not.
                 // .Net Core 3.X fixed the version in FrameworkDescription, so we don't need to handle the case of 4.6.x in this branch.
-                var frameworkDescriptionVersion = GetParsableVersionPart(GetVersionPartFromFrameworkDescription());
+                var frameworkDescriptionVersion = GetParsableVersionPart(GetVersionFromFrameworkDescription());
                 if (Version.TryParse(frameworkDescriptionVersion, out version))
                 {
                     return true;
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Environments
             return false;
         }
 
-        internal static string GetVersionPartFromFrameworkDescription()
+        internal static string GetVersionFromFrameworkDescription()
         {
             // .NET 10.0.0-preview.5.25277.114 -> 10.0.0-preview.5.25277.114
             // .NET Core 3.1.32 -> 3.1.32

@@ -174,10 +174,10 @@ namespace BenchmarkDotNet.Portability
                 string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
                 // Single-file publish has empty assembly location.
                 if (string.IsNullOrEmpty(coreclrLocation))
-                    return CoreRuntime.GetVersionPartFromFrameworkDescription();
+                    return CoreRuntime.GetVersionFromFrameworkDescription();
                 // .Net Core 2.X has confusing FrameworkDescription like 4.6.X.
                 if (version?.Major >= 3)
-                    return $"{CoreRuntime.GetVersionPartFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
+                    return $"{CoreRuntime.GetVersionFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
                 return FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion;
             }
         }
