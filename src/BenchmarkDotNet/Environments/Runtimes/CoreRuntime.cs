@@ -110,6 +110,16 @@ namespace BenchmarkDotNet.Environments
                     return true;
                 }
             }
+            else
+            {
+                // .Net Core 3.X supports single-file publish, .Net Core 2.X does not.
+                // .Net Core 3.X fixed the version in FrameworkDescription, so we don't need to handle the case of 4.6.x in this branch.
+                var frameworkDescriptionVersion = GetParsableVersionPart(GetVersionPartFromFrameworkDescription());
+                if (Version.TryParse(frameworkDescriptionVersion, out version))
+                {
+                    return true;
+                }
+            }
 
             // it's OK to use this method only after checking the previous ones
             // because we might have a benchmark app build for .NET Core X but executed using CoreRun Y
@@ -128,6 +138,14 @@ namespace BenchmarkDotNet.Environments
 
             version = null;
             return false;
+        }
+
+        internal static string GetVersionPartFromFrameworkDescription()
+        {
+            // .NET 10.0.0-preview.5.25277.114 -> 10.0.0-preview.5.25277.114
+            // .NET Core 3.1.32 -> 3.1.32
+            string frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            return new string(frameworkDescription.SkipWhile(c => !char.IsDigit(c)).ToArray());
         }
 
         // sample input:

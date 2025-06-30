@@ -167,12 +167,12 @@ namespace BenchmarkDotNet.Portability
 
             string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
             // Handle cases where assembly location is empty (e.g. single-file publish, AOT, some test runners)
-            string fileVersion = string.IsNullOrEmpty(coreclrLocation)
-                ? "assembly location unavailable"
-                : FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion;
+            string detailedVersion = string.IsNullOrEmpty(coreclrLocation)
+                ? CoreRuntime.GetVersionPartFromFrameworkDescription()
+                : $"{CoreRuntime.GetVersionPartFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
             return CoreRuntime.TryGetVersion(out var version) && version.Major >= 5
-                ? $".NET {version} ({fileVersion})"
-                : $".NET Core {version?.ToString() ?? Unknown} ({fileVersion})";
+                ? $".NET {version} ({detailedVersion})"
+                : $".NET Core {version?.ToString() ?? Unknown} ({detailedVersion})";
         }
 
         internal static Runtime GetCurrentRuntime()
