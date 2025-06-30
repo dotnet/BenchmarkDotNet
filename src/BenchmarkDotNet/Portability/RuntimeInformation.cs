@@ -165,14 +165,21 @@ namespace BenchmarkDotNet.Portability
                 return $".NET {Environment.Version}";
             }
 
-            string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
-            // Handle cases where assembly location is empty (e.g. single-file publish, AOT, some test runners)
-            string detailedVersion = string.IsNullOrEmpty(coreclrLocation)
-                ? CoreRuntime.GetVersionPartFromFrameworkDescription()
-                : $"{CoreRuntime.GetVersionPartFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
             return CoreRuntime.TryGetVersion(out var version) && version.Major >= 5
-                ? $".NET {version} ({detailedVersion})"
-                : $".NET Core {version?.ToString() ?? Unknown} ({detailedVersion})";
+                ? $".NET {version} ({GetDetailedVersion()})"
+                : $".NET Core {version?.ToString() ?? Unknown} ({GetDetailedVersion()})";
+
+            string GetDetailedVersion()
+            {
+                string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
+                // Single-file publish has empty assembly location.
+                if (string.IsNullOrEmpty(coreclrLocation))
+                    return CoreRuntime.GetVersionPartFromFrameworkDescription();
+                // .Net Core 2.X has confusing FrameworkDescription like 4.6.X.
+                if (version?.Major >= 3)
+                    return $"{CoreRuntime.GetVersionPartFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
+                return FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion;
+            }
         }
 
         internal static Runtime GetCurrentRuntime()
