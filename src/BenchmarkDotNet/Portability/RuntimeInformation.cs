@@ -42,8 +42,6 @@ namespace BenchmarkDotNet.Portability
             FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
-        public static readonly bool IsNetNative = FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
-
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
         public static readonly bool IsWasm = OperatingSystem.IsBrowser();
@@ -52,7 +50,7 @@ namespace BenchmarkDotNet.Portability
 #endif
 
 #if NETSTANDARD2_0
-        public static readonly bool IsAot = IsAotMethod() || IsNetNative;
+        public static readonly bool IsAot = IsAotMethod() || FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsAotMethod()
         {
@@ -166,34 +164,15 @@ namespace BenchmarkDotNet.Portability
             {
                 return $".NET {Environment.Version}";
             }
-            else
-            {
-                string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
-                string corefxLocation = typeof(Regex).GetTypeInfo().Assembly.Location;
 
-                // Handle cases where assembly location is empty (e.g. single-file publish, AOT, some test runners)
-                if (string.IsNullOrEmpty(coreclrLocation) || string.IsNullOrEmpty(corefxLocation))
-                {
-                    return CoreRuntime.TryGetVersion(out var ver) && ver.Major >= 5
-                        ? $".NET {ver} (assembly location unavailable)"
-                        : $".NET Core {ver?.ToString() ?? Unknown} (assembly location unavailable)";
-                }
-
-                var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(coreclrLocation);
-                var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(corefxLocation);
-
-                if (CoreRuntime.TryGetVersion(out var version) && version.Major >= 5)
-                {
-                    // after the merge of dotnet/corefx and dotnet/coreclr into dotnet/runtime the version should always be the same
-                    Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion);
-
-                    return $".NET {version} ({coreclrAssemblyInfo.FileVersion})";
-                }
-                else
-                {
-                    return $".NET Core {version?.ToString() ?? Unknown} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
-                }
-            }
+            string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
+            // Handle cases where assembly location is empty (e.g. single-file publish, AOT, some test runners)
+            string fileVersion = string.IsNullOrEmpty(coreclrLocation)
+                ? "assembly location unavailable"
+                : FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion;
+            return CoreRuntime.TryGetVersion(out var version) && version.Major >= 5
+                ? $".NET {version} ({fileVersion})"
+                : $".NET Core {version?.ToString() ?? Unknown} ({fileVersion})";
         }
 
         internal static Runtime GetCurrentRuntime()
@@ -275,7 +254,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsNativeAOT)
                 return "NativeAOT";
-            if (IsNetNative || IsAot)
+            if (IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono
