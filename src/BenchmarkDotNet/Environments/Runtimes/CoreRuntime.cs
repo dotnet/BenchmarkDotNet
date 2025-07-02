@@ -99,11 +99,26 @@ namespace BenchmarkDotNet.Environments
                 return true;
             }
 
-            var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(typeof(object).Assembly.Location);
-            // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
-            if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+            string coreclrLocation = typeof(object).Assembly.Location;
+            // Single-file publish has empty assembly location.
+            if (!string.IsNullOrEmpty(coreclrLocation))
             {
-                return true;
+                var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(coreclrLocation);
+                // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
+                if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // .Net Core 3.X supports single-file publish, .Net Core 2.X does not.
+                // .Net Core 3.X fixed the version in FrameworkDescription, so we don't need to handle the case of 4.6.x in this branch.
+                var frameworkDescriptionVersion = GetParsableVersionPart(GetVersionFromFrameworkDescription());
+                if (Version.TryParse(frameworkDescriptionVersion, out version))
+                {
+                    return true;
+                }
             }
 
             // it's OK to use this method only after checking the previous ones
@@ -123,6 +138,14 @@ namespace BenchmarkDotNet.Environments
 
             version = null;
             return false;
+        }
+
+        internal static string GetVersionFromFrameworkDescription()
+        {
+            // .NET 10.0.0-preview.5.25277.114 -> 10.0.0-preview.5.25277.114
+            // .NET Core 3.1.32 -> 3.1.32
+            string frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            return new string(frameworkDescription.SkipWhile(c => !char.IsDigit(c)).ToArray());
         }
 
         // sample input:
