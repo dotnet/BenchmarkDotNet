@@ -63,3 +63,13 @@ Resource.designer.cs
 
 # Tests
 TestResults
+
+## Mac OS
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
