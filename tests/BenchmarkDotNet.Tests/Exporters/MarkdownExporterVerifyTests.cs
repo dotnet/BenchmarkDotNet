@@ -9,7 +9,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
