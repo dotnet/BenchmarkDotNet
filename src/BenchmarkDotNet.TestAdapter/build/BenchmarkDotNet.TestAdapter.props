@@ -14,7 +14,7 @@
       <Compile Include="$(EntryPointSourceDirectory)EntryPoint.vb" Condition="'$(Language)' == 'VB'" Visible="false"/>
     </ItemGroup>
     <PropertyGroup>
-      <!-- Disables generation of MSTest entrypoint -->
+      <!-- Disables generation of VSTest entrypoint -->
       <GenerateProgramFile>false</GenerateProgramFile>
     </PropertyGroup>
   </Target>
