@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;

@@ -1,7 +1,12 @@
-﻿using BenchmarkDotNet.Toolchains.CsProj;
+﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using System;
+using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Toolchains.Mono
 {
@@ -34,5 +39,13 @@ namespace BenchmarkDotNet.Toolchains.Mono
         public bool Equals(MonoToolchain other) => Generator.Equals(other.Generator);
 
         public override int GetHashCode() => Generator.GetHashCode();
+
+        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        {
+            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            {
+                yield return validationError;
+            }
+        }
     }
 }
