@@ -160,14 +160,16 @@ namespace BenchmarkDotNet.Extensions
                 SetClrEnvironmentVariables(start, JitInfo.DynamicPGOEnv, jitOptions.DynamicPGO.Value ? "1" : "0");
             if (jitOptions.Aggressive)
             {
-                SetClrEnvironmentVariables(start, JitInfo.AggressiveTieringEnv, "1");
+                // AggressiveTiering sets CallCountingDelayMs to 0, which breaks DisassemblyDiagnoser.
+                //SetClrEnvironmentVariables(start, JitInfo.AggressiveTieringEnv, "1");
                 SetClrEnvironmentVariables(start, JitInfo.CallCountThresholdEnv, "1");
             }
             else if (jitOptions.TieredCallCountThreshold != null)
             {
                 SetClrEnvironmentVariables(start, JitInfo.CallCountThresholdEnv, jitOptions.TieredCallCountThreshold.Value.ToString());
             }
-            SetClrEnvironmentVariables(start, JitInfo.CallCountingDelayMsEnv, "0");
+            // It should be 0, but it breaks DisassemblyDiagnoser. https://github.com/dotnet/runtime/issues/117339
+            SetClrEnvironmentVariables(start, JitInfo.CallCountingDelayMsEnv, "1");
 
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
