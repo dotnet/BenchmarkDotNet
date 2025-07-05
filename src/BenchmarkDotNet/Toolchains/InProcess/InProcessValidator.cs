@@ -125,6 +125,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 }
 #endif
             }
+            if (job.Environment.RyuJITOptions != null)
+            {
+                yield return new ValidationError(
+                    false,
+                    $"Job {job}, {nameof(RyuJITOptions)} has no effect for InProcess toolchains. You should start your process with the appropriate jit options already configured.");
+            }
         }
 
         private InProcessValidator(bool failOnErrors)

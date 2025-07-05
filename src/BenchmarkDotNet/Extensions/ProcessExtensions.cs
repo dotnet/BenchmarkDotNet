@@ -151,6 +151,25 @@ namespace BenchmarkDotNet.Extensions
             start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
 
+            var jitOptions = benchmarkCase.Job.Environment.RyuJITOptions ?? RyuJITOptions.AggressiveTiering;
+            if (jitOptions.MinOpts)
+                SetClrEnvironmentVariables(start, JitInfo.MinOptsEnv, "1");
+            if (jitOptions.Tiered != null)
+                SetClrEnvironmentVariables(start, JitInfo.TieredCompilationEnv, jitOptions.Tiered.Value ? "1" : "0");
+            if (jitOptions.DynamicPGO != null)
+                SetClrEnvironmentVariables(start, JitInfo.DynamicPGOEnv, jitOptions.DynamicPGO.Value ? "1" : "0");
+            if (jitOptions.Aggressive)
+            {
+                SetClrEnvironmentVariables(start, JitInfo.AggressiveTieringEnv, "1");
+                SetClrEnvironmentVariables(start, JitInfo.CallCountThresholdEnv, "1");
+            }
+            else if (jitOptions.TieredCallCountThreshold != null)
+            {
+                SetClrEnvironmentVariables(start, JitInfo.CallCountThresholdEnv, jitOptions.TieredCallCountThreshold.Value.ToString());
+            }
+            SetClrEnvironmentVariables(start, JitInfo.CallCountingDelayMsEnv, "0");
+
+
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
 

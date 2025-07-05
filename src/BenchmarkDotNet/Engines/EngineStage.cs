@@ -36,10 +36,10 @@ namespace BenchmarkDotNet.Engines
                     // AOT has no JIT.
                     if (!RuntimeInformation.IsAot)
                     {
-                        bool hasUnrollFactor = parameters.TargetJob.HasValue(RunMode.UnrollFactorCharacteristic);
                         var jitStage = new EngineFirstJitStage(parameters, unrollFactor);
                         yield return jitStage;
 
+                        bool hasUnrollFactor = parameters.TargetJob.HasValue(RunMode.UnrollFactorCharacteristic);
                         if (!hasUnrollFactor && !skipPilotStage)
                         {
                             // Initial pilot stage adjusts unrollFactor from a single invocation.

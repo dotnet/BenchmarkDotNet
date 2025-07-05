@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Environments;
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using static BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Portability
@@ -11,6 +10,13 @@ namespace BenchmarkDotNet.Portability
     // and source https://github.com/dotnet/runtime/blob/71c30b405516b1fe774a1bfdbc43cd804468568f/src/coreclr/vm/eeconfig.cpp
     internal static class JitInfo
     {
+        public const string MinOptsEnv = "JITMinOpts";
+        public const string TieredCompilationEnv = "TieredCompilation";
+        public const string DynamicPGOEnv = "TieredPGO";
+        public const string AggressiveTieringEnv = "TC_AggressiveTiering";
+        public const string CallCountThresholdEnv = "TC_CallCountThreshold";
+        public const string CallCountingDelayMsEnv = "TC_CallCountingDelayMs";
+
         // .Net 5 and older uses COMPlus_ prefix,
         // .Net 6+ uses DOTNET_ prefix, but still supports legacy COMPlus_.
         private static bool IsEnvVarEnabled(string name)
@@ -40,12 +46,12 @@ namespace BenchmarkDotNet.Portability
         public static readonly bool IsTiered =
             IsNetCore
             // JITMinOpts disables tiered compilation (all methods are effectively tier0 instead of tier1).
-            && !IsEnvVarEnabled("JITMinOpts")
+            && !IsEnvVarEnabled(MinOptsEnv)
             && ((CoreRuntime.TryGetVersion(out var version) && version.Major >= 3)
                 // Enabled by default in netcoreapp3.0+, check if it's disabled.
-                ? !IsEnvVarDisabled("TieredCompilation") && !IsKnobDisabled("System.Runtime.TieredCompilation")
+                ? !IsEnvVarDisabled(TieredCompilationEnv) && !IsKnobDisabled("System.Runtime.TieredCompilation")
                 // Disabled by default in netcoreapp2.X, check if it's enabled.
-                : IsEnvVarEnabled("TieredCompilation") || IsKnobEnabled("System.Runtime.TieredCompilation"));
+                : IsEnvVarEnabled(TieredCompilationEnv) || IsKnobEnabled("System.Runtime.TieredCompilation"));
 
         /// <summary>
         /// Is tiered JIT enabled with dynamic profile-guided optimization (tier0 instrumented)?
@@ -58,9 +64,9 @@ namespace BenchmarkDotNet.Portability
             && (Environment.Version.Major < 7 || (!IsEnvVarDisabled("TC_QuickJit") && !IsKnobDisabled("System.Runtime.TieredCompilation.QuickJit")))
             && (Environment.Version.Minor >= 8
                 // Enabled by default in .Net 8, check if it's disabled
-                ? !IsEnvVarDisabled("TieredPGO") && !IsKnobDisabled("System.Runtime.TieredPGO")
+                ? !IsEnvVarDisabled(DynamicPGOEnv) && !IsKnobDisabled("System.Runtime.TieredPGO")
                 // Disabled by default in earlier versions, check if it's enabled.
-                : IsEnvVarEnabled("TieredPGO") || IsKnobEnabled("System.Runtime.TieredPGO"));
+                : IsEnvVarEnabled(DynamicPGOEnv) || IsKnobEnabled("System.Runtime.TieredPGO"));
 
 
         /// <summary>
@@ -75,11 +81,11 @@ namespace BenchmarkDotNet.Portability
                 return 0;
             }
             // AggressiveTiering was added in .Net 5.
-            if (Environment.Version.Major >= 5 && IsEnvVarEnabled("TC_AggressiveTiering"))
+            if (Environment.Version.Major >= 5 && IsEnvVarEnabled(AggressiveTieringEnv))
             {
                 return 1;
             }
-            if (TryParseEnvVar("TC_CallCountThreshold", out int callCountThreshold))
+            if (TryParseEnvVar(CallCountThresholdEnv, out int callCountThreshold))
             {
                 return callCountThreshold;
             }
@@ -104,11 +110,11 @@ namespace BenchmarkDotNet.Portability
                 return TimeSpan.Zero;
             }
             // AggressiveTiering was added in .Net 5.
-            if (Environment.Version.Major >= 5 && IsEnvVarEnabled("TC_AggressiveTiering"))
+            if (Environment.Version.Major >= 5 && IsEnvVarEnabled(AggressiveTieringEnv))
             {
                 return TimeSpan.Zero;
             }
-            if (TryParseEnvVar("TC_CallCountingDelayMs", out int callCountDelay))
+            if (TryParseEnvVar(CallCountingDelayMsEnv, out int callCountDelay))
             {
                 return TimeSpan.FromMilliseconds(callCountDelay);
             }

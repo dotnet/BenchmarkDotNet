@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
@@ -82,6 +83,11 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             foreach (var validationError in DotNetSdkValidator.ValidateCoreSdks(CustomDotNetCliPath, benchmarkCase))
             {
                 yield return validationError;
+            }
+
+            if (benchmarkCase.Job.Environment.RyuJITOptions != null)
+            {
+                yield return new ValidationError(false, $"{nameof(RyuJITOptions)} has no effect in NativeAOT.");
             }
         }
     }

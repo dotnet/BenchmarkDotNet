@@ -54,6 +54,11 @@ namespace BenchmarkDotNet.Toolchains.Mono
                     "The MonoAOT toolchain does not allow specifying NuGet package dependencies",
                     benchmarkCase);
             }
+
+            if (benchmarkCase.Job.Environment.RyuJITOptions != null)
+            {
+                yield return new ValidationError(false, $"{nameof(RyuJITOptions)} has no effect in MonoAOT.");
+            }
         }
     }
 }
