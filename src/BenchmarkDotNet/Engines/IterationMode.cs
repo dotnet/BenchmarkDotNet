@@ -2,10 +2,9 @@
 {
     public enum IterationMode
     {
+        Unknown,
         Overhead,
-
         Workload,
-
-        Unknown
+        Dummy,
     }
 }

@@ -150,6 +150,11 @@ namespace BenchmarkDotNet.Extensions
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
             start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
+            // Configure JIT to tier up aggressively.
+            SetClrEnvironmentVariables(start, JitInfo.CallCountThresholdEnv, "1");
+            // Ideally we would set both of these env vars, but AggressiveTiering sets CallCountingDelayMs to 0, and that breaks DisassemblyDiagnoser. https://github.com/dotnet/runtime/issues/117339
+            //SetClrEnvironmentVariables(start, JitInfo.CallCountingDelayMsEnv, "0");
+            //SetClrEnvironmentVariables(start, JitInfo.AggressiveTieringEnv, "1");
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;

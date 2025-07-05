@@ -16,58 +16,50 @@ namespace BenchmarkDotNet.Tests.Mocks
         private readonly ITestOutputHelper output;
         private readonly Func<IterationData, TimeInterval> measure;
 
-        // ReSharper disable once NotNullMemberIsNotInitialized
-        public MockEngine(ITestOutputHelper output, Job job, Func<IterationData, TimeInterval> measure)
+        public EngineParameters Parameters { get; }
+
+        internal MockEngine(ITestOutputHelper output, Job job, Func<IterationData, TimeInterval> measure)
         {
             this.output = output;
             this.measure = measure;
-            TargetJob = job;
+            Parameters = new EngineParameters
+            {
+                TargetJob = job,
+                Dummy1Action = () => { },
+                Dummy2Action = () => { },
+                Dummy3Action = () => { },
+                WorkloadActionUnroll = _ => { },
+                WorkloadActionNoUnroll = _ => { },
+                OverheadActionUnroll = _ => { },
+                OverheadActionNoUnroll = _ => { },
+                GlobalSetupAction = () => { },
+                GlobalCleanupAction = () => { },
+                IterationSetupAction = () => { },
+                IterationCleanupAction = () => { },
+            };
         }
 
-        public void Dispose() => GlobalSetupAction?.Invoke();
+        public void Dispose() { }
 
-        [UsedImplicitly]
-        public IHost Host { get; }
-
-        public Job TargetJob { get; }
-        public long OperationsPerInvoke { get; } = 1;
-
-        [UsedImplicitly]
-        public Action GlobalSetupAction { get; set; }
-
-        [UsedImplicitly]
-        public Action GlobalCleanupAction { get; set; }
-
-        [UsedImplicitly]
-        public bool IsDiagnoserAttached { get; set; }
-
-        public Action<long> WorkloadAction { get; } = _ => { };
-        public Action<long> OverheadAction { get; } = _ => { };
-
-        [UsedImplicitly]
-        public IEngineFactory Factory => null;
-
-        public Measurement RunIteration(IterationData data)
+        private Measurement RunIteration(IterationData data)
         {
             double nanoseconds = measure(data).Nanoseconds;
-            var measurement = new Measurement(1, data.IterationMode, data.IterationStage, data.Index, data.InvokeCount * OperationsPerInvoke, nanoseconds);
+            var measurement = new Measurement(1, data.mode, data.stage, data.index, data.invokeCount, nanoseconds);
             WriteLine(measurement.ToString());
             return measurement;
         }
 
         public RunResults Run() => default;
 
-        internal (long invokeCount, List<Measurement> measurements) Run(EngineStage stage, long invokeCount = 0)
+        internal List<Measurement> Run(EngineStage stage)
         {
             var measurements = stage.GetMeasurementList();
-            int iterationIndex = 1;
-            while (stage.GetShouldRunIteration(measurements, ref invokeCount))
+            while (stage.GetShouldRunIteration(measurements, out var iterationData))
             {
-                var measurement = RunIteration(new IterationData(stage.Mode, stage.Stage, iterationIndex, invokeCount, 1));
+                var measurement = RunIteration(iterationData);
                 measurements.Add(measurement);
-                ++iterationIndex;
             }
-            return (invokeCount, measurements);
+            return measurements;
         }
 
         public void WriteLine() => output.WriteLine("");
