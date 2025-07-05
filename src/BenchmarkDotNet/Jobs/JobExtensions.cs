@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, Jit jit) => job.WithJit(jit);
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
 
-        public static Job WithJitOptions(this Job job, RyuJITOptions jitOptions) => job.WithCore(j => j.Environment.RyuJITOptions = jitOptions);
+        public static Job WithJitOptions(this Job job, RyuJitOptions jitOptions) => job.WithCore(j => j.Environment.RyuJitOptions = jitOptions);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithRuntime instead")]

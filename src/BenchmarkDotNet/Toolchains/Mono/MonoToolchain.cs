@@ -46,9 +46,9 @@ namespace BenchmarkDotNet.Toolchains.Mono
             {
                 yield return validationError;
             }
-            if (benchmarkCase.Job.Environment.RyuJITOptions != null)
+            if (benchmarkCase.Job.Environment.RyuJitOptions != null)
             {
-                yield return new ValidationError(false, $"{nameof(RyuJITOptions)} has no effect in Mono.");
+                yield return new ValidationError(false, $"{nameof(RyuJitOptions)} has no effect in Mono.");
             }
         }
     }

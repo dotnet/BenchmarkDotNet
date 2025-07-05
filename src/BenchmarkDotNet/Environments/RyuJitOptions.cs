@@ -3,16 +3,16 @@
     /// <summary>
     /// Configures the behavior of RyuJIT.
     /// </summary>
-    public sealed class RyuJITOptions(
+    public sealed class RyuJitOptions(
         bool minOpts = false,
         bool? tiered = null,
         bool? dynamicPGO = null,
         bool aggressiveTiering = true,
         int? tieredCallCountThreshold = 1)
     {
-        public static readonly RyuJITOptions RuntimeDefault = new(aggressiveTiering: false, tieredCallCountThreshold: null);
+        public static readonly RyuJitOptions RuntimeDefault = new(aggressiveTiering: false, tieredCallCountThreshold: null);
 
-        public static readonly RyuJITOptions AggressiveTiering = new();
+        public static readonly RyuJitOptions AggressiveTiering = new();
 
         /// <summary>
         /// If <see langword="true"/>, the jit will compile methods with minimal optimizations (every method will be effectively tier0 jitted instead of tier1 jitted).

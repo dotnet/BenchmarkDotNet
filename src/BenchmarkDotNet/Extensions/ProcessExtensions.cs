@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Extensions
             start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
 
-            var jitOptions = benchmarkCase.Job.Environment.RyuJITOptions ?? RyuJITOptions.AggressiveTiering;
+            var jitOptions = benchmarkCase.Job.Environment.RyuJitOptions ?? RyuJitOptions.AggressiveTiering;
             if (jitOptions.MinOpts)
                 SetClrEnvironmentVariables(start, JitInfo.MinOptsEnv, "1");
             if (jitOptions.Tiered != null)

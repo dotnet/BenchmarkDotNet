@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Jobs
     {
         public static readonly Characteristic<Platform> PlatformCharacteristic = CreateCharacteristic<Platform>(nameof(Platform));
         public static readonly Characteristic<Jit> JitCharacteristic = CreateCharacteristic<Jit>(nameof(Jit));
-        public static readonly Characteristic<RyuJITOptions> RyuJITOptionsCharacteristic = CreateCharacteristic<RyuJITOptions>(nameof(RyuJITOptions));
+        public static readonly Characteristic<RyuJitOptions> RyuJitOptionsCharacteristic = CreateCharacteristic<RyuJitOptions>(nameof(RyuJitOptions));
         public static readonly Characteristic<Runtime> RuntimeCharacteristic = CreateCharacteristic<Runtime>(nameof(Runtime));
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
@@ -66,10 +66,10 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// RyuJIT options
         /// </summary>
-        public RyuJITOptions RyuJITOptions
+        public RyuJitOptions RyuJitOptions
         {
-            get { return RyuJITOptionsCharacteristic[this]; }
-            set { RyuJITOptionsCharacteristic[this] = value; }
+            get { return RyuJitOptionsCharacteristic[this]; }
+            set { RyuJitOptionsCharacteristic[this] = value; }
         }
 
         /// <summary>
