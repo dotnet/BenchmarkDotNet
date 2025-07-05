@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Engines
 
             int minIterationCount = job.ResolveValue(RunMode.MinWarmupIterationCountCharacteristic, engine.Resolver);
             int maxIterationCount = job.ResolveValue(RunMode.MaxWarmupIterationCountCharacteristic, engine.Resolver);
-            return new EngineWarmupStageAuto(IterationMode.Overhead, minIterationCount, maxIterationCount);
+            return new EngineWarmupStageAuto(IterationMode.Workload, minIterationCount, maxIterationCount);
         }
     }
 
