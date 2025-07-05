@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Environments
             Architecture = RuntimeInformation.GetArchitecture();
             RuntimeVersion = RuntimeInformation.GetRuntimeVersion();
             Configuration = RuntimeInformation.GetConfiguration();
-            HasRyuJit = RuntimeInformation.HasRyuJit();
-            JitInfo = RuntimeInformation.GetJitInfo();
+            HasRyuJit = Portability.JitInfo.IsRyuJit;
+            JitInfo = Portability.JitInfo.GetInfo();
             HardwareIntrinsicsShort = HardwareIntrinsics.GetShortInfo();
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Environments
 
         public static IEnumerable<ValidationError> Validate(Job job)
         {
-            if (job.Environment.Jit == Jit.RyuJit && !RuntimeInformation.HasRyuJit())
+            if (job.Environment.Jit == Jit.RyuJit && !Portability.JitInfo.IsRyuJit)
                 yield return new ValidationError(true, "RyuJIT is requested but it is not available in current environment");
             var currentRuntime = RuntimeInformation.GetCurrentRuntime();
             if (job.Environment.Jit == Jit.LegacyJit && !(currentRuntime is ClrRuntime))

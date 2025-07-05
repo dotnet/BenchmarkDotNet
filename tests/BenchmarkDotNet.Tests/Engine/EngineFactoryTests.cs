@@ -64,8 +64,16 @@ namespace BenchmarkDotNet.Tests.Engine
             var job = JobsWhichDontRequireJitting[jobName];
             var engineParameters = CreateEngineParameters(mainNoUnroll: Throwing, mainUnroll: Throwing, job: job);
 
-            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
+            bool didRunStages = false;
+            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            {
+                Assert.True(stage is not EngineJitStage);
+                didRunStages = true;
+                break;
+            }
 
+            Assert.True(didRunStages);
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(0, timesIterationSetupCalled);
             Assert.Equal(0, timesBenchmarkCalled);
@@ -81,22 +89,33 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void ForDefaultSettingsVeryTimeConsumingBenchmarksAreExecutedOncePerIterationWithoutOverheadDeduction()
         {
-            var engineParameters = CreateEngineParameters(mainNoUnroll: VeryTimeConsumingSingle, mainUnroll: Throwing, job: Job.Default);
+            var engineParameters = CreateEngineParameters(mainNoUnroll: VeryTimeConsumingSingle, mainUnroll: InstantUnroll, job: Job.Default);
 
-            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
+            bool didRunActualStage = false;
+            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            {
+                Assert.NotEqual(IterationMode.Overhead, stage.Mode);
 
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    var measurement = engine.RunIteration(iterationData);
+                    stageMeasurements.Add(measurement);
+                }
+
+                if (stage is EngineActualStage { Mode: IterationMode.Workload } actualStage)
+                {
+                    Assert.Equal(1, actualStage.invokeCount);
+                    Assert.Equal(1, actualStage.unrollFactor);
+                    didRunActualStage = true;
+                    break;
+                }
+            }
+
+            Assert.True(didRunActualStage);
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(2, timesIterationSetupCalled); // 2x for Target
-            Assert.Equal(2, timesBenchmarkCalled);
-            Assert.Equal(2, timesOverheadCalled);
-            Assert.Equal(2, timesIterationCleanupCalled); // 2x for Target
             Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
-
-            Assert.Equal(1, engine.TargetJob.Run.InvocationCount); // call the benchmark once per iteration
-            Assert.Equal(1, engine.TargetJob.Run.UnrollFactor); // no unroll factor
-
-            Assert.True(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // is set to false in explicit way
-            Assert.False(engine.TargetJob.Accuracy.EvaluateOverhead); // don't evaluate overhead in that case
 
             engine.Dispose(); // cleanup is called as part of dispose
 
@@ -114,22 +133,30 @@ namespace BenchmarkDotNet.Tests.Engine
                 mainUnroll: InstantUnroll,
                 job: Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(iterationTime)));
 
-            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
+            bool didRunActualStage = false;
+            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    var measurement = engine.RunIteration(iterationData);
+                    stageMeasurements.Add(measurement);
+                }
 
+                if (stage is EngineActualStage { Mode: IterationMode.Workload } actualStage)
+                {
+                    Assert.NotEqual(1, actualStage.invokeCount + actualStage.unrollFactor);
+                    didRunActualStage = true;
+                    break;
+                }
+            }
+
+            Assert.True(didRunActualStage);
             Assert.Equal(1, timesGlobalSetupCalled);
-            // the factory should call the benchmark:
-            // 1st time with unroll factor to JIT the code
-            // one more to check that the Jitting has not dominated the reported time
-            // and one more time to JIT the 16 unroll factor case as it turned out that Jitting has dominated the time
-            Assert.Equal(1 + 1 + 1, timesIterationSetupCalled);
-            Assert.Equal(1 + 1 + 16, timesBenchmarkCalled);
-            Assert.Equal(1 + 1 + 16, timesOverheadCalled);
-            Assert.Equal(1 + 1 + 1, timesIterationCleanupCalled); // 2x for Target
+            Assert.True(timesBenchmarkCalled >= 16);
+            Assert.True(timesOverheadCalled >= 16);
             Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
-
-            Assert.False(engine.TargetJob.Run.HasValue(RunMode.InvocationCountCharacteristic)); // we need pilot stage
-
-            Assert.False(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic));
 
             engine.Dispose(); // cleanup is called as part of dispose
 
@@ -144,43 +171,34 @@ namespace BenchmarkDotNet.Tests.Engine
         public void ForJobsThatDontRequirePilotTheGlobalSetupIsCalledAndMultiActionCodeGetsJitted()
             => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default.WithInvocationCount(100));
 
-        private void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
-        {
-            var engineParameters = CreateEngineParameters(mainNoUnroll: Throwing, mainUnroll: InstantUnroll, job: job);
-
-            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
-
-            Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(1, timesIterationSetupCalled);
-            Assert.Equal(16, timesBenchmarkCalled);
-            Assert.Equal(16, timesOverheadCalled);
-            Assert.Equal(1, timesIterationCleanupCalled);
-            Assert.Equal(0, timesGlobalCleanupCalled);
-
-            Assert.False(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // remains untouched
-
-            engine.Dispose();
-
-            Assert.Equal(1, timesGlobalCleanupCalled);
-        }
-
         [Fact]
         public void NonVeryTimeConsumingBenchmarksAreExecutedMoreThanOncePerIterationWithUnrollFactorForDefaultSettings()
-        {
-            var engineParameters = CreateEngineParameters(mainNoUnroll: InstantNoUnroll, mainUnroll: InstantUnroll, job: Job.Default);
+            => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default);
 
-            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+        private void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
+        {
+            var engineParameters = CreateEngineParameters(mainNoUnroll: InstantUnroll, mainUnroll: InstantUnroll, job: job);
+
+            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
+            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    var measurement = engine.RunIteration(iterationData);
+                    stageMeasurements.Add(measurement);
+                }
+
+                Assert.IsType<EngineFirstJitStage>(stage);
+                var jitStage = (EngineFirstJitStage) stage;
+                Assert.True(jitStage.didJitUnroll);
+                break;
+            }
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(1 + 1, timesIterationSetupCalled); // once for single and & once for 16
-            Assert.Equal(1 + 16, timesBenchmarkCalled);
-            Assert.Equal(1 + 16, timesOverheadCalled);
-            Assert.Equal(1 + 1, timesIterationCleanupCalled); // once for single and & once for 16
+            Assert.True(timesBenchmarkCalled >= 16);
+            Assert.True(timesOverheadCalled >= 16);
             Assert.Equal(0, timesGlobalCleanupCalled);
-
-            Assert.False(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // remains untouched
-
-            Assert.False(engine.TargetJob.Run.HasValue(RunMode.InvocationCountCharacteristic));
 
             engine.Dispose();
 
@@ -216,22 +234,33 @@ namespace BenchmarkDotNet.Tests.Engine
 
             var engineParameters = CreateEngineParameters(mainNoUnroll: MediumNoUnroll, mainUnroll: MediumUnroll, job: Job.Default);
 
-            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
+            bool didRunPilotStage = false;
+            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    var measurement = engine.RunIteration(iterationData);
+                    stageMeasurements.Add(measurement);
+                }
 
+                if (stage is EnginePilotAfterJitStage pilotStage)
+                {
+                    Assert.Equal(1, pilotStage.unrollFactor);
+                    // We start from two (we know that 1 is not enough, the default is 4 so we need to override it).
+                    Assert.Equal(2, pilotStage.minInvokeCount);
+                    Assert.True(pilotStage.needsFurtherPilot);
+                    Assert.False(pilotStage.evaluateOverhead);
+
+                    didRunPilotStage = true;
+                    break;
+                }
+            }
+
+            Assert.True(didRunPilotStage);
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(1, timesIterationSetupCalled);
-            Assert.Equal(1, timesBenchmarkCalled); // we run it just once and we know how many times it should be invoked
-            Assert.Equal(1, timesOverheadCalled);
-            Assert.Equal(1, timesIterationCleanupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled);
-
-            Assert.False(engine.TargetJob.Run.HasValue(RunMode.InvocationCountCharacteristic)); // we need to run the pilot!
-            Assert.Equal(1, engine.TargetJob.Run.UnrollFactor); // no unroll factor!
-            Assert.Equal(2,
-                engine.TargetJob.Accuracy.MinInvokeCount); // we start from two (we know that 1 is not enough, the default is 4 so we need to override it)
-
-            Assert.True(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // is set to false in explicit way
-            Assert.False(engine.TargetJob.Accuracy.EvaluateOverhead); // don't evaluate overhead in that case
 
             engine.Dispose();
 
