@@ -150,7 +150,9 @@ namespace BenchmarkDotNet.Engines
                 _downCount++;
             }
 
-            if (Math.Abs(newInvokeCount - invokeCount) <= 1 || _downCount >= 3)
+            long diff = newInvokeCount - invokeCount;
+            if (_downCount >= 3
+                || (diff != long.MinValue && Math.Abs(diff) <= 1))
             {
                 iterationData = default;
                 return false;
