@@ -119,10 +119,23 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        public class NoAllocationsAtAll
+        public class EmptyBenchmark
         {
             [Benchmark] public void EmptyMethod() { }
+        }
 
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
+        {
+            AssertAllocations(toolchain, typeof(EmptyBenchmark), new Dictionary<string, long>
+            {
+                { nameof(EmptyBenchmark.EmptyMethod), 0 }
+            });
+        }
+
+        public class TimeConsumingBenchmark
+        {
             [Benchmark]
             public ulong TimeConsuming()
             {
@@ -135,24 +148,14 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
-        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
-        {
-            AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
-            {
-                { nameof(NoAllocationsAtAll.EmptyMethod), 0 }
-            });
-        }
-
         // #1542
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TieredJitShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
-            AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
+            AssertAllocations(toolchain, typeof(TimeConsumingBenchmark), new Dictionary<string, long>
             {
-                { nameof(NoAllocationsAtAll.TimeConsuming), 0 }
+                { nameof(TimeConsumingBenchmark.TimeConsuming), 0 }
             },
             disableTieredJit: false, iterationCount: 10); // 1 iteration is not enough to repro the problem
         }
