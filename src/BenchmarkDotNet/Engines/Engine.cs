@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Engines
             return clockSpan;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
         private unsafe void Consume(byte* _) { }
 
         [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
@@ -196,6 +196,7 @@ namespace BenchmarkDotNet.Engines
             return clock.GetElapsed();
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private (GcStats, ThreadingStats, double) GetExtraStats(IterationData data)
         {
             // Warm up the measurement functions before starting the actual measurement.
@@ -208,18 +209,13 @@ namespace BenchmarkDotNet.Engines
             var exceptionsStats = new ExceptionsStats(); // allocates
             exceptionsStats.StartListening(); // this method might allocate
 
-#if !NET7_0_OR_GREATER
-            if (JitInfo.IsTiered && CoreRuntime.TryGetVersion(out var version) && version.Major is >= 3 and <= 6)
+            if (JitInfo.IsTiered)
             {
                 // #1542
                 // We put the current thread to sleep so tiered jit can kick in, compile its stuff,
                 // and NOT allocate anything on the background thread when we are measuring allocations.
-                // This is only an issue on netcoreapp3.0 to net6.0. Tiered jit allocations were "fixed" in net7.0
-                // (maybe not completely eliminated forever, but at least reduced to a point where measurements are much more stable),
-                // and netcoreapp2.X uses only GetAllocatedBytesForCurrentThread which doesn't capture the tiered jit allocations.
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
+                Thread.Sleep(JitInfo.BackgroundCompilationDelay);
             }
-#endif
 
             // GC collect before measuring allocations.
             ForceGcCollect();
@@ -250,6 +246,7 @@ namespace BenchmarkDotNet.Engines
             return finalGcStats - initialGcStats;
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void RandomizeManagedHeapMemory()
         {
             // invoke global cleanup before global setup
@@ -268,6 +265,7 @@ namespace BenchmarkDotNet.Engines
             // we don't enforce GC.Collects here as engine does it later anyway
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void GcCollect()
         {
             if (!ForceGcCleanups)
@@ -276,6 +274,7 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         internal static void ForceGcCollect()
         {
             GC.Collect();
@@ -327,6 +326,7 @@ namespace BenchmarkDotNet.Engines
                 private readonly object hangLock = new();
                 private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
 
+                [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
                 ~Impl()
                 {
                     lock (hangLock)
@@ -336,7 +336,7 @@ namespace BenchmarkDotNet.Engines
                     }
                 }
 
-                [MethodImpl(MethodImplOptions.NoInlining)]
+                [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
                 internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
                 {
                     var impl = new Impl();
@@ -344,6 +344,7 @@ namespace BenchmarkDotNet.Engines
                 }
             }
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             internal static FinalizerBlocker MaybeStart()
             {
                 if (Environment.GetEnvironmentVariable(UnitTestBlockFinalizerEnvKey) != UnitTestBlockFinalizerEnvValue)
@@ -360,6 +361,7 @@ namespace BenchmarkDotNet.Engines
                 return new FinalizerBlocker(hangLock);
             }
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public void Dispose()
             {
                 if (hangLock is not null)
