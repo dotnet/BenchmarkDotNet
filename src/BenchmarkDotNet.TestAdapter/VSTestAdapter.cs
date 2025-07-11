@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -42,11 +43,18 @@ namespace BenchmarkDotNet.TestAdapter
             IMessageLogger logger,
             ITestCaseDiscoverySink discoverySink)
         {
+            var stopwatch = Stopwatch.StartNew();
+            var loggerHelper = new LoggerHelper(logger, stopwatch);
+            var testCaseFilter = new TestCaseFilter(discoveryContext, loggerHelper);
+
             foreach (var source in sources)
             {
                 ValidateSourceIsAssemblyOrThrow(source);
                 foreach (var testCase in GetVsTestCasesFromAssembly(source, logger))
                 {
+                    if (!testCaseFilter.MatchTestCase(testCase))
+                        continue;
+
                     discoverySink.SendTestCase(testCase);
                 }
             }
@@ -67,14 +75,19 @@ namespace BenchmarkDotNet.TestAdapter
 
             cts ??= new CancellationTokenSource();
 
+            var stopwatch = Stopwatch.StartNew();
+            var logger = new LoggerHelper(frameworkHandle, stopwatch);
+
             foreach (var testsPerAssembly in tests.GroupBy(t => t.Source))
+            {
                 RunBenchmarks(testsPerAssembly.Key, frameworkHandle, testsPerAssembly);
+            }
 
             cts = null;
         }
 
         /// <summary>
-        /// Runs all benchmarks in the given set of sources (assemblies).
+        /// Runs all/filtered benchmarks in the given set of sources (assemblies).
         /// </summary>
         /// <param name="sources">The assemblies to run.</param>
         /// <param name="runContext">A context that the run is performed in.</param>
@@ -88,8 +101,31 @@ namespace BenchmarkDotNet.TestAdapter
 
             cts ??= new CancellationTokenSource();
 
+            var stopwatch = Stopwatch.StartNew();
+            var logger = new LoggerHelper(frameworkHandle, stopwatch);
+
             foreach (var source in sources)
-                RunBenchmarks(source, frameworkHandle);
+            {
+                var filter = new TestCaseFilter(runContext!, logger, source, ["Category"]);
+                if (filter.GetTestCaseFilterValue() != "")
+                {
+                    var discoveredBenchmarks = GetVsTestCasesFromAssembly(source, frameworkHandle);
+                    var filteredTestCases = discoveredBenchmarks.Where(x => filter.MatchTestCase(x))
+                                                                .ToArray();
+
+                    if (filteredTestCases.Length == 0)
+                        continue;
+
+                    // Run filtered tests.
+                    RunBenchmarks(source, frameworkHandle, filteredTestCases);
+                }
+                else
+                {
+                    // Run all benchmarks
+                    RunBenchmarks(source, frameworkHandle);
+                }
+            }
+
 
             cts = null;
         }
