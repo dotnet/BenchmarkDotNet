@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
