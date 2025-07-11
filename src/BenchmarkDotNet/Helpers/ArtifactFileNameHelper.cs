@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Helpers
 
         internal static string GetTraceFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
-            return GetFilePath(details, null, creationTime, fileExtension, "userheap.etl".Length);
+            return GetFilePath(details, null, creationTime, fileExtension, "userheap.etl".Length - fileExtension.Length);
         }
 
         internal static string GetFilePath(DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension, int reserve)
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Helpers
 
             // long paths can be enabled on Windows but it does not mean that everything is going to work fine..
             // so we always use 260 as limit on Windows
-            int limit =  OsDetector.IsWindows()
+            int limit = OsDetector.IsWindows()
                 ? WindowsOldPathLimit - reserve
                 : CommonSenseLimit;
 
