@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Portability
                 ? TimeSpan.FromMilliseconds(250)
                 : TimeSpan.Zero;
 
-        public static bool IsRyuJit => GetIsRyuJit();
+        public static readonly bool IsRyuJit = GetIsRyuJit();
 
         private static bool GetIsRyuJit()
         {
