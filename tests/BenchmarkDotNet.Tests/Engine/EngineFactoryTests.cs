@@ -133,36 +133,35 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         [Fact]
-        public void ForJobsWithExplicitUnrollFactorTheGlobalSetupIsCalledAndMultiActionCodeGetsJitted()
-            => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default.WithUnrollFactor(16));
+        public void ForJobsWithExplicitUnrollFactorTheGlobalSetupAndUnrollAreCalled()
+            => AssertGlobalSetupWasCalledAndUnrollWasRan(Job.Default.WithUnrollFactor(16));
 
         [Fact]
-        public void ForJobsThatDontRequirePilotTheGlobalSetupIsCalledAndMultiActionCodeGetsJitted()
-            => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default.WithInvocationCount(100));
+        public void ForJobsThatDontRequirePilotTheGlobalSetupAndUnrollAreCalled()
+            => AssertGlobalSetupWasCalledAndUnrollWasRan(Job.Default.WithInvocationCount(100));
 
         [Fact]
         public void NonVeryTimeConsumingBenchmarksAreExecutedMoreThanOncePerIterationWithUnrollFactorForDefaultSettings()
-            => AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job.Default);
+            => AssertGlobalSetupWasCalledAndUnrollWasRan(Job.Default);
 
-        private void AssertGlobalSetupWasCalledAndMultiActionGotJitted(Job job)
+        private void AssertGlobalSetupWasCalledAndUnrollWasRan(Job job)
         {
             var engineParameters = CreateEngineParameters(job);
 
             var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
+            bool didRunUnroll = false;
             foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
                 {
+                    didRunUnroll |= iterationData.unrollFactor > 1;
                     var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, 1, 1);
                     stageMeasurements.Add(measurement);
                 }
-
-                Assert.IsType<EngineFirstJitStage>(stage);
-                var jitStage = (EngineFirstJitStage) stage;
-                Assert.True(jitStage.didJitUnroll);
-                break;
             }
+
+            Assert.True(didRunUnroll);
 
             Assert.Equal(1, timesGlobalSetupCalled);
             Assert.Equal(0, timesGlobalCleanupCalled);

@@ -8,9 +8,8 @@ using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
-    internal abstract class EngineJitStage(int unrollFactor, EngineParameters parameters) : EngineStage(IterationStage.Jitting, IterationMode.Workload, parameters)
+    internal abstract class EngineJitStage(EngineParameters parameters) : EngineStage(IterationStage.Jitting, IterationMode.Workload, parameters)
     {
-        protected readonly int unrollFactor = unrollFactor;
         protected readonly Action<long> dummy1Action= _ => parameters.Dummy1Action();
         protected readonly Action<long> dummy2Action= _ => parameters.Dummy2Action();
         protected readonly Action<long> dummy3Action = _ => parameters.Dummy3Action();
@@ -24,26 +23,13 @@ namespace BenchmarkDotNet.Engines
         // It is not worth spending a long time in jit stage for macro-benchmarks.
         private static readonly TimeInterval MaxTieringTime = TimeInterval.FromSeconds(10);
 
-        internal bool didJitUnroll = false;
         internal bool didStopEarly = false;
         internal Measurement lastMeasurement;
 
-        private readonly Action<long> overheadAction;
-        private readonly Action<long> workloadAction;
         private readonly IEnumerator<IterationData> enumerator;
 
-        internal EngineFirstJitStage(int unrollFactor, EngineParameters parameters) : base(unrollFactor, parameters)
+        internal EngineFirstJitStage(EngineParameters parameters) : base(parameters)
         {
-            if (unrollFactor != 1)
-            {
-                overheadAction = parameters.OverheadActionUnroll;
-                workloadAction = parameters.WorkloadActionUnroll;
-            }
-            else
-            {
-                overheadAction = parameters.OverheadActionNoUnroll;
-                workloadAction = parameters.WorkloadActionNoUnroll;
-            }
             enumerator = EnumerateIterations();
         }
 
@@ -88,9 +74,9 @@ namespace BenchmarkDotNet.Engines
         {
             ++iterationIndex;
             yield return GetDummyIterationData(dummy1Action);
-            yield return GetOverheadNoUnrollIterationData();
+            yield return GetOverheadIterationData();
             yield return GetDummyIterationData(dummy2Action);
-            yield return GetWorkloadNoUnrollIterationData();
+            yield return GetWorkloadIterationData();
             yield return GetDummyIterationData(dummy3Action);
 
             // If the jit is not tiered, we're done.
@@ -102,103 +88,33 @@ namespace BenchmarkDotNet.Engines
             // Wait enough time for jit call counting to begin.
             MaybeSleep(JitInfo.TieredDelay);
 
-            // If the jit is configured for aggressive tiering, ignore how long it takes, and run 1 set of iterations per jit tier to fully promote the methods to tier1.
-            if (JitInfo.TieredCallCountThreshold == 1)
-            {
-                ++iterationIndex;
-                yield return GetOverheadNoUnrollIterationData();
-                yield return GetWorkloadNoUnrollIterationData();
-
-                MaybeSleep(JitInfo.BackgroundCompilationDelay);
-
-                if (JitInfo.IsDPGO)
-                {
-                    ++iterationIndex;
-                    yield return GetOverheadNoUnrollIterationData();
-                    yield return GetWorkloadNoUnrollIterationData();
-                }
-
-                MaybeSleep(JitInfo.BackgroundCompilationDelay);
-
-                yield break;
-            }
-
-            // Otherwise, attempt to promote methods to tier1, but don't spend too much time in jit stage.
+            // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
             StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
 
-            ++iterationIndex;
-            yield return GetOverheadNoUnrollIterationData();
-            yield return GetWorkloadNoUnrollIterationData();
-
-            if (startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
+            for (int tierCount = JitInfo.IsDPGO ? 2 : 1; tierCount >= 0; --tierCount)
             {
-                didStopEarly = true;
-                yield break;
-            }
-
-            int tier0CallCount = JitInfo.TieredCallCountThreshold - 1;
-            // Run unroll method if it's not too many invocations.
-            if (unrollFactor <= tier0CallCount)
-            {
-                tier0CallCount -= unrollFactor;
-                ++iterationIndex;
-                yield return GetOverheadUnrollIterationData();
-                yield return GetWorkloadUnrollIterationData();
-
-                didJitUnroll = unrollFactor != 1;
-
-                if (startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
-                {
-                    didStopEarly = true;
-                    yield break;
-                }
-            }
-
-            // Run the remaining iterations without unroll.
-            for (int i = 0; i < tier0CallCount; ++i)
-            {
-                ++iterationIndex;
-                yield return GetOverheadNoUnrollIterationData();
-                yield return GetWorkloadNoUnrollIterationData();
-
-                if (startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
-                {
-                    didStopEarly = true;
-                    yield break;
-                }
-            }
-
-            MaybeSleep(JitInfo.BackgroundCompilationDelay);
-
-            if (JitInfo.IsDPGO)
-            {
-                for (int i = 0; i < JitInfo.TieredCallCountThreshold; ++i)
+                for (int callCount = JitInfo.TieredCallCountThreshold; callCount >= 0; --callCount)
                 {
                     ++iterationIndex;
-                    yield return GetOverheadNoUnrollIterationData();
-                    yield return GetWorkloadNoUnrollIterationData();
+                    yield return GetOverheadIterationData();
+                    yield return GetWorkloadIterationData();
 
-                    if (startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
+                    if ((tierCount + callCount) > 0
+                        && startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
                     {
                         didStopEarly = true;
                         yield break;
                     }
                 }
-            }
 
-            MaybeSleep(JitInfo.BackgroundCompilationDelay);
+                MaybeSleep(JitInfo.BackgroundCompilationDelay);
+            }
         }
 
-        private IterationData GetOverheadUnrollIterationData()
-            => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, unrollFactor, unrollFactor, () => { }, () => { }, overheadAction);
-
-        private IterationData GetWorkloadUnrollIterationData()
-            => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, unrollFactor, unrollFactor, parameters.IterationSetupAction, parameters.IterationCleanupAction, workloadAction);
-
-        private IterationData GetOverheadNoUnrollIterationData()
+        private IterationData GetOverheadIterationData()
             => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, 1, 1, () => { }, () => { }, parameters.OverheadActionNoUnroll);
 
-        private IterationData GetWorkloadNoUnrollIterationData()
+        private IterationData GetWorkloadIterationData()
             => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, 1, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
 
         private void MaybeSleep(TimeSpan timeSpan)
@@ -210,8 +126,10 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
-    internal sealed class EngineSecondJitStage(int unrollFactor, EngineParameters parameters) : EngineJitStage(unrollFactor, parameters)
+    internal sealed class EngineSecondJitStage(int unrollFactor, EngineParameters parameters) : EngineJitStage(parameters)
     {
+        private readonly int unrollFactor = unrollFactor;
+
         internal override List<Measurement> GetMeasurementList() => new(GetMaxCallCount());
 
         private static int GetMaxCallCount()
