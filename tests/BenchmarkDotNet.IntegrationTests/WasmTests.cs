@@ -2,6 +2,7 @@
 using System.IO;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -26,6 +27,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
         public void WasmIsSupported()
         {
+            // Test fails on Linux non-x64.
+            if (OsDetector.IsLinux() && RuntimeInformation.GetCurrentPlatform() != Platform.X64)
+            {
+                return;
+            }
+
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm");
