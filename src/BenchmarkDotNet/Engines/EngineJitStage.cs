@@ -18,6 +18,10 @@ namespace BenchmarkDotNet.Engines
             => new(IterationMode.Dummy, IterationStage.Jitting, iterationIndex, 1, 1, () => { }, () => { }, dummyAction);
     }
 
+    // We do our best to encourage the jit to fully promote methods to tier1, but tiered jit relies on heuristics,
+    // and we purposefully don't spend too much time in this stage, so we can't guarantee it.
+    // This should succeed for 99%+ of microbenchmarks. For any sufficiently short benchmarks where this fails,
+    // the following stages (Pilot and Warmup) will likely take it the rest of the way. Long-running benchmarks may never fully reach tier1.
     internal sealed class EngineFirstJitStage : EngineJitStage
     {
         // It is not worth spending a long time in jit stage for macro-benchmarks.
@@ -66,10 +70,6 @@ namespace BenchmarkDotNet.Engines
             return false;
         }
 
-        // We do our best to encourage the jit to fully promote methods to tier1, but tiered jit relies on heuristics,
-        // and we purposefully don't spend too much time in this stage, so we can't guarantee it.
-        // This should succeed for 99%+ of microbenchmarks. For any sufficiently short benchmarks where this fails,
-        // the following stages (Pilot and Warmup) will likely take it the rest of the way. Long-running benchmarks may never fully reach tier1.
         private IEnumerator<IterationData> EnumerateIterations()
         {
             ++iterationIndex;
@@ -113,6 +113,12 @@ namespace BenchmarkDotNet.Engines
 
                 MaybeSleep(JitInfo.BackgroundCompilationDelay);
             }
+
+            // Empirical evidence shows that the first call after the method is tiered up takes longer,
+            // so we run an extra iteration to ensure the next stage gets a stable measurement.
+            ++iterationIndex;
+            yield return GetOverheadIterationData();
+            yield return GetWorkloadIterationData();
         }
 
         private IterationData GetOverheadIterationData()
@@ -121,7 +127,7 @@ namespace BenchmarkDotNet.Engines
         private IterationData GetWorkloadIterationData()
             => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, 1, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
 
-        private void MaybeSleep(TimeSpan timeSpan)
+        private static void MaybeSleep(TimeSpan timeSpan)
         {
             if (timeSpan > TimeSpan.Zero)
             {
