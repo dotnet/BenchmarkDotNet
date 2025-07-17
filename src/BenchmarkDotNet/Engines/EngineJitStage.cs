@@ -91,15 +91,19 @@ namespace BenchmarkDotNet.Engines
             // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
             StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
 
-            for (int tierCount = JitInfo.IsDPGO ? 2 : 1; tierCount >= 0; --tierCount)
+            int remainingTiers = JitInfo.IsDPGO ? 2 : 1;
+            while (remainingTiers > 0)
             {
-                for (int callCount = JitInfo.TieredCallCountThreshold; callCount >= 0; --callCount)
+                --remainingTiers;
+                int remainingCalls = JitInfo.TieredCallCountThreshold;
+                while (remainingCalls > 0)
                 {
+                    --remainingCalls;
                     ++iterationIndex;
                     yield return GetOverheadIterationData();
                     yield return GetWorkloadIterationData();
 
-                    if ((tierCount + callCount) > 0
+                    if ((remainingTiers + remainingCalls) > 0
                         && startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
                     {
                         didStopEarly = true;
