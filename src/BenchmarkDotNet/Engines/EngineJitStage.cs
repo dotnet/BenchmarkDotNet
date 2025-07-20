@@ -104,6 +104,7 @@ namespace BenchmarkDotNet.Engines
             StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
 
             int remainingTiers = JitInfo.MaxTierPromotions;
+            int lastInvokeCount = 1;
             while (remainingTiers > 0)
             {
                 --remainingTiers;
@@ -112,10 +113,12 @@ namespace BenchmarkDotNet.Engines
                 {
                     // If we can run one batch of calls within the time limit (based on the last measurement), do that instead of multiple single-invocation iterations.
                     var remainingTimeLimit = MaxTieringTime.ToNanoseconds() - startedClock.GetElapsed().GetNanoseconds();
-                    int allowedCallsWithinTimeLimit = (int) Math.Floor(remainingTimeLimit / lastMeasurement.Nanoseconds);
+                    var lastMeasurementSingleInvocationTime = lastMeasurement.Nanoseconds / lastInvokeCount;
+                    int allowedCallsWithinTimeLimit = (int) Math.Floor(remainingTimeLimit / lastMeasurementSingleInvocationTime);
                     int invokeCount = allowedCallsWithinTimeLimit > 0
                         ? Math.Min(remainingCalls, allowedCallsWithinTimeLimit)
                         : 1;
+                    lastInvokeCount = invokeCount;
 
                     remainingCalls -= invokeCount;
                     ++iterationIndex;
