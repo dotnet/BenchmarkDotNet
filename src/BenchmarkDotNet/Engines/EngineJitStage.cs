@@ -47,11 +47,9 @@ namespace BenchmarkDotNet.Engines
 
         private int GetMaxMeasurementCount()
         {
-            if (!JitInfo.IsTiered)
-            {
-                return 1;
-            }
-            int count = JitInfo.MaxTierPromotions* JitInfo.TieredCallCountThreshold + 2;
+            int count = JitInfo.IsTiered
+                ? JitInfo.MaxTierPromotions * JitInfo.TieredCallCountThreshold + 2
+                : 1;
             if (evaluateOverhead)
             {
                 count *= 2;
@@ -160,7 +158,7 @@ namespace BenchmarkDotNet.Engines
             iterationIndex = evaluateOverhead ? 0 : 2;
         }
 
-        internal override List<Measurement> GetMeasurementList() => new(evaluateOverhead ? 5 : 3);
+        internal override List<Measurement> GetMeasurementList() => new(evaluateOverhead ? 2 : 1);
 
         // The benchmark method has already been jitted via *NoUnroll, we only need to jit the *Unroll methods here, which aren't tiered.
         internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)
