@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Engines
         private static readonly TimeInterval MaxTieringTime = TimeInterval.FromSeconds(10);
 
         // Jit call counting delay is only for when the app starts up. We don't need to wait for every benchmark if multiple benchmarks are ran in-process.
-        private static TimeSpan tieredDelay = JitInfo.TieredDelay;
+        private static TimeSpan s_tieredDelay = JitInfo.TieredDelay;
 
         internal bool didStopEarly = false;
         internal Measurement lastMeasurement;
@@ -83,10 +83,10 @@ namespace BenchmarkDotNet.Engines
             if (evaluateOverhead)
             {
                 yield return GetDummyIterationData(dummy1Action);
-                yield return GetOverheadIterationData();
+                yield return GetOverheadIterationData(1);
             }
             yield return GetDummyIterationData(dummy2Action);
-            yield return GetWorkloadIterationData();
+            yield return GetWorkloadIterationData(1);
             yield return GetDummyIterationData(dummy3Action);
 
             // If the jit is not tiered, we're done.
@@ -96,9 +96,9 @@ namespace BenchmarkDotNet.Engines
             }
 
             // Wait enough time for jit call counting to begin.
-            SleepHelper.SleepIfPositive(tieredDelay);
+            SleepHelper.SleepIfPositive(s_tieredDelay);
             // Don't make the next jit stage wait if it's ran in the same process.
-            tieredDelay = TimeSpan.Zero;
+            s_tieredDelay = TimeSpan.Zero;
 
             // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
             StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
@@ -110,13 +110,20 @@ namespace BenchmarkDotNet.Engines
                 int remainingCalls = JitInfo.TieredCallCountThreshold;
                 while (remainingCalls > 0)
                 {
-                    --remainingCalls;
+                    // If we can run one batch of calls within the time limit (based on the last measurement), do that instead of multiple single-invocation iterations.
+                    var remainingTimeLimit = MaxTieringTime.ToNanoseconds() - startedClock.GetElapsed().GetNanoseconds();
+                    int allowedCallsWithinTimeLimit = (int) Math.Floor(remainingTimeLimit / lastMeasurement.Nanoseconds);
+                    int invokeCount = allowedCallsWithinTimeLimit > 0
+                        ? Math.Min(remainingCalls, allowedCallsWithinTimeLimit)
+                        : 1;
+
+                    remainingCalls -= invokeCount;
                     ++iterationIndex;
                     if (evaluateOverhead)
                     {
-                        yield return GetOverheadIterationData();
+                        yield return GetOverheadIterationData(invokeCount);
                     }
-                    yield return GetWorkloadIterationData();
+                    yield return GetWorkloadIterationData(invokeCount);
 
                     if ((remainingTiers + remainingCalls) > 0
                         && startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
@@ -134,16 +141,16 @@ namespace BenchmarkDotNet.Engines
             ++iterationIndex;
             if (evaluateOverhead)
             {
-                yield return GetOverheadIterationData();
+                yield return GetOverheadIterationData(1);
             }
-            yield return GetWorkloadIterationData();
+            yield return GetWorkloadIterationData(1);
         }
 
-        private IterationData GetOverheadIterationData()
-            => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, 1, 1, () => { }, () => { }, parameters.OverheadActionNoUnroll);
+        private IterationData GetOverheadIterationData(long invokeCount)
+            => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, invokeCount, 1, () => { }, () => { }, parameters.OverheadActionNoUnroll);
 
-        private IterationData GetWorkloadIterationData()
-            => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, 1, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
+        private IterationData GetWorkloadIterationData(long invokeCount)
+            => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, invokeCount, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
     }
 
     internal sealed class EngineSecondJitStage : EngineJitStage
