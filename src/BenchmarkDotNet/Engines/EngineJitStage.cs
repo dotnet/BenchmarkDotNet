@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -27,27 +28,35 @@ namespace BenchmarkDotNet.Engines
         // It is not worth spending a long time in jit stage for macro-benchmarks.
         private static readonly TimeInterval MaxTieringTime = TimeInterval.FromSeconds(10);
 
+        // Jit call counting delay is only for when the app starts up. We don't need to wait for every benchmark if multiple benchmarks are ran in-process.
+        private static TimeSpan tieredDelay = JitInfo.TieredDelay;
+
         internal bool didStopEarly = false;
         internal Measurement lastMeasurement;
 
         private readonly IEnumerator<IterationData> enumerator;
+        private readonly bool evaluateOverhead;
 
-        internal EngineFirstJitStage(EngineParameters parameters) : base(parameters)
+        internal EngineFirstJitStage(bool evaluateOverhead, EngineParameters parameters) : base(parameters)
         {
             enumerator = EnumerateIterations();
+            this.evaluateOverhead = evaluateOverhead;
         }
 
         internal override List<Measurement> GetMeasurementList() => new(GetMaxMeasurementCount());
 
-        private static int GetMaxMeasurementCount()
+        private int GetMaxMeasurementCount()
         {
-            int tieredCallCountThreshold = JitInfo.TieredCallCountThreshold;
-            if (JitInfo.IsDPGO)
+            if (!JitInfo.IsTiered)
             {
-                tieredCallCountThreshold *= 2;
+                return 1;
             }
-            // +1 for first jit, x2 for overhead + workload
-            return (tieredCallCountThreshold + 1) * 2;
+            int count = JitInfo.MaxTierPromotions* JitInfo.TieredCallCountThreshold + 2;
+            if (evaluateOverhead)
+            {
+                count *= 2;
+            }
+            return count;
         }
 
         internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)
@@ -73,8 +82,11 @@ namespace BenchmarkDotNet.Engines
         private IEnumerator<IterationData> EnumerateIterations()
         {
             ++iterationIndex;
-            yield return GetDummyIterationData(dummy1Action);
-            yield return GetOverheadIterationData();
+            if (evaluateOverhead)
+            {
+                yield return GetDummyIterationData(dummy1Action);
+                yield return GetOverheadIterationData();
+            }
             yield return GetDummyIterationData(dummy2Action);
             yield return GetWorkloadIterationData();
             yield return GetDummyIterationData(dummy3Action);
@@ -86,12 +98,14 @@ namespace BenchmarkDotNet.Engines
             }
 
             // Wait enough time for jit call counting to begin.
-            MaybeSleep(JitInfo.TieredDelay);
+            SleepHelper.SleepIfPositive(tieredDelay);
+            // Don't make the next jit stage wait if it's ran in the same process.
+            tieredDelay = TimeSpan.Zero;
 
             // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
             StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
 
-            int remainingTiers = JitInfo.IsDPGO ? 2 : 1;
+            int remainingTiers = JitInfo.MaxTierPromotions;
             while (remainingTiers > 0)
             {
                 --remainingTiers;
@@ -100,7 +114,10 @@ namespace BenchmarkDotNet.Engines
                 {
                     --remainingCalls;
                     ++iterationIndex;
-                    yield return GetOverheadIterationData();
+                    if (evaluateOverhead)
+                    {
+                        yield return GetOverheadIterationData();
+                    }
                     yield return GetWorkloadIterationData();
 
                     if ((remainingTiers + remainingCalls) > 0
@@ -111,13 +128,16 @@ namespace BenchmarkDotNet.Engines
                     }
                 }
 
-                MaybeSleep(JitInfo.BackgroundCompilationDelay);
+                SleepHelper.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
             }
 
-            // Empirical evidence shows that the first call after the method is tiered up takes longer,
+            // Empirical evidence shows that the first call after the method is tiered up may take longer,
             // so we run an extra iteration to ensure the next stage gets a stable measurement.
             ++iterationIndex;
-            yield return GetOverheadIterationData();
+            if (evaluateOverhead)
+            {
+                yield return GetOverheadIterationData();
+            }
             yield return GetWorkloadIterationData();
         }
 
@@ -126,31 +146,21 @@ namespace BenchmarkDotNet.Engines
 
         private IterationData GetWorkloadIterationData()
             => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, 1, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
-
-        private static void MaybeSleep(TimeSpan timeSpan)
-        {
-            if (timeSpan > TimeSpan.Zero)
-            {
-                Thread.Sleep(timeSpan);
-            }
-        }
     }
 
-    internal sealed class EngineSecondJitStage(int unrollFactor, EngineParameters parameters) : EngineJitStage(parameters)
+    internal sealed class EngineSecondJitStage : EngineJitStage
     {
-        private readonly int unrollFactor = unrollFactor;
+        private readonly int unrollFactor;
+        private readonly bool evaluateOverhead;
 
-        internal override List<Measurement> GetMeasurementList() => new(GetMaxCallCount());
-
-        private static int GetMaxCallCount()
+        public EngineSecondJitStage(int unrollFactor, bool evaluateOverhead, EngineParameters parameters) : base(parameters)
         {
-            int tieredCallCountThreshold = JitInfo.TieredCallCountThreshold;
-            if (JitInfo.IsDPGO)
-            {
-                tieredCallCountThreshold *= 2;
-            }
-            return tieredCallCountThreshold + 1;
+            this.unrollFactor = unrollFactor;
+            this.evaluateOverhead = evaluateOverhead;
+            iterationIndex = evaluateOverhead ? 0 : 2;
         }
+
+        internal override List<Measurement> GetMeasurementList() => new(evaluateOverhead ? 5 : 3);
 
         // The benchmark method has already been jitted via *NoUnroll, we only need to jit the *Unroll methods here, which aren't tiered.
         internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)

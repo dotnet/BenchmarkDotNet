@@ -95,13 +95,14 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         [Theory]
-        [InlineData(120)] // 120 ms as in the bug report
-        [InlineData(250)] // 250 ms as configured in dotnet/performance repo
-        [InlineData(EngineResolver.DefaultIterationTime)] // 500 ms - the default BDN setting
-        public void BenchmarksThatRunLongerThanIterationTimeOnlyDuringFirstInvocationAreNotInvokedOncePerIteration(int iterationTime)
+        [InlineData(120, 120)] // 120 ms as in the bug report
+        [InlineData(250, 250)] // 250 ms as configured in dotnet/performance repo
+        [InlineData(EngineResolver.DefaultIterationTime, EngineResolver.DefaultIterationTime)] // 500 ms - the default BDN setting
+        [InlineData(EngineResolver.DefaultIterationTime, 20000)] // 20 seconds - twice the cutoff threshold of the old jit stage heuristic #2004
+        public void BenchmarksThatRunLongerThanIterationTimeOnlyDuringFirstInvocationAreNotInvokedOncePerIteration(int iterationTime, int callTime)
         {
-            var timeInterval = TimeInterval.FromMilliseconds(iterationTime);
-            var engineParameters = CreateEngineParameters(Job.Default.WithIterationTime(timeInterval));
+            var callTimeInterval = TimeInterval.FromMilliseconds(callTime);
+            var engineParameters = CreateEngineParameters(Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(iterationTime)));
 
             var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
             bool didRunActualStage = false;
@@ -110,9 +111,9 @@ namespace BenchmarkDotNet.Tests.Engine
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
                 {
-                    var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, 1, timeInterval.Nanoseconds);
+                    var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, 1, callTimeInterval.Nanoseconds);
                     stageMeasurements.Add(measurement);
-                    timeInterval = TimeInterval.FromNanoseconds(1);
+                    callTimeInterval = TimeInterval.FromNanoseconds(1);
                 }
 
                 if (stage is EngineActualStage { Mode: IterationMode.Workload } actualStage)

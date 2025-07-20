@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -213,12 +214,9 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
 
             // #1542
-            if (JitInfo.BackgroundCompilationDelay > TimeSpan.Zero)
-            {
-                // We put the current thread to sleep so tiered jit can kick in, compile its stuff,
-                // and NOT allocate anything on the background thread when we are measuring allocations.
-                Thread.Sleep(JitInfo.BackgroundCompilationDelay);
-            }
+            // If the jit is tiered, we put the current thread to sleep so it can kick in, compile its stuff,
+            // and NOT allocate anything on the background thread when we are measuring allocations.
+            SleepHelper.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
 
             GcStats gcStats;
             using (FinalizerBlocker.MaybeStart())

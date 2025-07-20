@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Engines
                     int minInvokeCount = parameters.TargetJob.ResolveValue(AccuracyMode.MinInvokeCountCharacteristic, parameters.Resolver);
 
                     // AOT technically doesn't have a JIT, but we run jit stage regardless because of static constructors. #2004
-                    var jitStage = new EngineFirstJitStage(parameters);
+                    var jitStage = new EngineFirstJitStage(evaluateOverhead, parameters);
                     yield return jitStage;
 
                     bool hasUnrollFactor = parameters.TargetJob.HasValue(RunMode.UnrollFactorCharacteristic);
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Engines
                     // TODO: This stage can be removed after we refactor the engine/codegen to pass the clock into the delegates.
                     if (!RuntimeInformation.IsAot && unrollFactor != 1)
                     {
-                        yield return new EngineSecondJitStage(unrollFactor, parameters);
+                        yield return new EngineSecondJitStage(unrollFactor, evaluateOverhead, parameters);
                     }
 
                     if (!skipPilotStage)
