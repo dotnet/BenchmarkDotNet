@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Engines
                         // If the jit invocation was too time consuming, just correct the values without running another invocation.
                         if (jitStage.didStopEarly)
                         {
-                            pilotStage.CorrectValues(jitStage.lastMeasurement.Nanoseconds);
+                            pilotStage.CorrectValues(jitStage.lastMeasurement);
                         }
                         else
                         {

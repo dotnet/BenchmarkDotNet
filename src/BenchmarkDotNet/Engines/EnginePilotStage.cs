@@ -46,15 +46,16 @@ namespace BenchmarkDotNet.Engines
                 return true;
             }
 
-            CorrectValues(measurements[measurements.Count - 1].Nanoseconds);
+            CorrectValues(measurements[measurements.Count - 1]);
             iterationData = default;
             return false;
         }
 
-        internal void CorrectValues(double measurementNanoseconds)
+        internal void CorrectValues(Measurement measurement)
         {
             var iterationTime = parameters.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, parameters.Resolver);
-            double timesPerIteration = iterationTime.Nanoseconds / measurementNanoseconds; // how many times can we run given benchmark per iteration
+            var singleInvokeNanoseconds = measurement.Nanoseconds * parameters.OperationsPerInvoke / measurement.Operations;
+            double timesPerIteration = iterationTime.Nanoseconds / singleInvokeNanoseconds; // how many times can we run given benchmark per iteration
             // Executing once takes longer than iteration time -> long running benchmark,
             // or executing twice would put us well past the iteration time.
             if (timesPerIteration < 1.5)
