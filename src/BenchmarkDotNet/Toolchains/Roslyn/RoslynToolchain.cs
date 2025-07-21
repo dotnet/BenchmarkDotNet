@@ -51,12 +51,14 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     benchmarkCase);
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
             {
                 yield return new ValidationError(true,
                     "The Roslyn toolchain does not allow specifying NuGet package dependencies",
                     benchmarkCase);
             }
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

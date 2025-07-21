@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -57,7 +58,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
 
+#pragma warning disable CS0618 // Type or member is obsolete
             var packagesResult = AddPackages();
+#pragma warning restore CS0618 // Type or member is obsolete
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
 
@@ -97,7 +100,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
 
+#pragma warning disable CS0618 // Type or member is obsolete
             var packagesResult = AddPackages();
+#pragma warning restore CS0618 // Type or member is obsolete
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
 
@@ -115,6 +120,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return PublishNoRestore().ToBuildResult(GenerateResult);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed")]
         public DotNetCliCommandResult AddPackages()
         {
             var executionTime = new TimeSpan(0);
@@ -150,6 +157,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore", "publish-no-restore")));
 
+        [Obsolete]
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
             => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
@@ -204,6 +212,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }
 
+        [Obsolete]
         private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
         {
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
@@ -229,6 +238,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
         }
 
+        [Obsolete]
         private static string BuildAddPackageCommand(NuGetReference reference)
         {
             var commandBuilder = new StringBuilder();

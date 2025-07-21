@@ -339,6 +339,8 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="source">(optional)Indicate the URI of the NuGet package source to use during the restore operation.</param>
         /// <param name="prerelease">(optional)Allows prerelease packages to be installed.</param>
         /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithMsBuildArguments() instead.")]
         public static Job WithNuGet(this Job job, string packageName, string? packageVersion = null, Uri? source = null, bool prerelease = false) =>
             job.WithCore(j => j.Infrastructure.NuGetReferences =
                 new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
@@ -352,8 +354,13 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job"></param>
         /// <param name="nuGetReferences">A collection of NuGet dependencies</param>
         /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithMsBuildArguments() instead.")]
         public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) =>
             job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
+
+        public static Job WithMsBuildArguments(this Job job, params string[] msBuildArguments)
+            => job.WithArguments([.. msBuildArguments.Select(a => new MsBuildArgument(a))]);
 
         // Accuracy
         /// <summary>
@@ -437,8 +444,10 @@ namespace BenchmarkDotNet.Jobs
             return newJob;
         }
 
-        internal static bool HasDynamicBuildCharacteristic(this Job job) =>
-            job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
+        internal static bool HasDynamicBuildCharacteristic(this Job job)
+#pragma warning disable CS0618 // Type or member is obsolete
+            => job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
+#pragma warning restore CS0618 // Type or member is obsolete
             || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
             || job.HasValue(InfrastructureMode.ArgumentsCharacteristic);
     }
