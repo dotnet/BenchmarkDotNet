@@ -18,11 +18,12 @@ namespace BenchmarkDotNet.Samples
     {
         // Setup your csproj like this:
         /*
+        <PropertyGroup>
+          <!-- Use 9.0.0 as default package version if not specified -->
+          <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+        </PropertyGroup>
         <ItemGroup>
-          <!-- Use v9.0.0 as baseline package -->
-          <PackageReference Include="System.Collections.Immutable" Version="9.0.0" Condition="'$(SciVersion)' == '' OR '$(SciVersion)' == '9.0.0'"/>
-          <PackageReference Include="System.Collections.Immutable" Version="9.0.3" Condition="'$(SciVersion)' == '9.0.3'"/>
-          <PackageReference Include="System.Collections.Immutable" Version="9.0.5" Condition="'$(SciVersion)' == '9.0.5'"/>
+          <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
         </ItemGroup>
         */
         // All versions of the package must be source-compatible with your benchmark code.

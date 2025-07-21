@@ -17,11 +17,12 @@
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Reflection" />
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Use 9.0.0 as baseline package for IntroNuGet -->
+    <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+  </PropertyGroup>
   <ItemGroup>
-    <!-- Use v9.0.0 as baseline package for IntroNuGet -->
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" Condition="'$(SciVersion)' == '' OR '$(SciVersion)' == '9.0.0'"/>
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.3" Condition="'$(SciVersion)' == '9.0.3'"/>
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.5" Condition="'$(SciVersion)' == '9.0.5'"/>
+    <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
