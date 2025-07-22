@@ -12,9 +12,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public const string HighPerformancePlanGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
 
-        public PowerManagementApplierTests(ITestOutputHelper output) : base(output)
-        {
-        }
+        public PowerManagementApplierTests(ITestOutputHelper output) : base(output) { }
 
         [FactEnvSpecific("Setting high-performance plan is suitable only on Windows", EnvRequirement.WindowsOnly)]
         public void TestSettingAndRevertingBackGuid()
@@ -43,26 +41,6 @@ namespace BenchmarkDotNet.IntegrationTests
             powerManagementApplier.Dispose();
 
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
-        }
-
-        [FactEnvSpecific("Should not change power plan to High Performance if it is already on Ultimate Performance", EnvRequirement.WindowsOnly)]
-        public void ShouldNotSwitchFromUltimateToHighPerformanceIfHighPerformanceIsMissing()
-        {
-            var ultimateGuid = PowerManagementApplier.Map(PowerPlan.UltimatePerformance);
-            var highGuid = PowerManagementApplier.Map(PowerPlan.HighPerformance);
-            var userPlan = PowerManagementHelper.CurrentPlan;
-
-            var logger = new OutputLogger(Output);
-            var powerManagementApplier = new PowerManagementApplier(logger);
-
-            PowerManagementHelper.Set(ultimateGuid);
-
-            powerManagementApplier.ApplyPerformancePlan(highGuid);
-
-            Assert.Equal(ultimateGuid.ToString(), PowerManagementHelper.CurrentPlan.ToString());
-
-            PowerManagementHelper.Set(userPlan.Value);
-            powerManagementApplier.Dispose();
         }
 
         [FactEnvSpecific("Should change to High Performance if user requests it and High Performance plan is present, even if currently on Ultimate Performance", EnvRequirement.WindowsOnly)]
