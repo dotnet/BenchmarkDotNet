@@ -11,21 +11,26 @@ namespace BenchmarkDotNet.Samples
     /// Benchmarks between various versions of a NuGet package
     /// </summary>
     /// <remarks>
-    /// Only supported with the CsProjCoreToolchain toolchain
+    /// Only supported with CsProj toolchains.
     /// </remarks>
     [Config(typeof(Config))]
     public class IntroNuGet
     {
-        // Specify jobs with different versions of the same NuGet package to benchmark.
-        // The NuGet versions referenced on these jobs must be greater or equal to the
-        // same NuGet version referenced in this benchmark project.
-        // Example: This benchmark project references Newtonsoft.Json 13.0.1
+        // Setup your csproj like this:
+        /*
+        <PropertyGroup>
+          <!-- Use 9.0.0 as default package version if not specified -->
+          <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+        </PropertyGroup>
+        <ItemGroup>
+          <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
+        </ItemGroup>
+        */
+        // All versions of the package must be source-compatible with your benchmark code.
         private class Config : ManualConfig
         {
             public Config()
             {
-                var baseJob = Job.MediumRun;
-
                 string[] targetVersions = [
                     "9.0.0",
                     "9.0.3",
@@ -34,8 +39,10 @@ namespace BenchmarkDotNet.Samples
 
                 foreach (var version in targetVersions)
                 {
-                    AddJob(baseJob.WithNuGet("System.Collections.Immutable", version)
-                                  .WithId($"v{version}"));
+                    AddJob(Job.MediumRun
+                        .WithMsBuildArguments($"/p:SciVersion={version}")
+                        .WithId($"v{version}")
+                    );
                 }
             }
         }

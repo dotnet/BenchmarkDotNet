@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BenchmarkDotNet.Jobs
 {
     /// <summary>
     /// An ordered list of NuGet references. Does not allow duplicate references with the same PackageName.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This type will soon be removed")]
     public class NuGetReferenceList : IReadOnlyCollection<NuGetReference>
     {
         private readonly List<NuGetReference> references = new List<NuGetReference>();

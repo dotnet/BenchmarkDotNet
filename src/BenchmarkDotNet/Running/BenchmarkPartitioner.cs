@@ -47,8 +47,10 @@ namespace BenchmarkDotNet.Running
                     return false;
                 if (AreDifferent(jobX.Infrastructure.Arguments, jobY.Infrastructure.Arguments)) // arguments can be anything (Mono runtime settings or MsBuild parameters)
                     return false;
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (AreDifferent(jobX.Infrastructure.NuGetReferences, jobY.Infrastructure.NuGetReferences))
                     return false;
+#pragma warning restore CS0618 // Type or member is obsolete
                 if (!jobX.Environment.Gc.Equals(jobY.Environment.Gc)) // GC settings are per .config/.csproj
                     return false;
 
@@ -81,8 +83,10 @@ namespace BenchmarkDotNet.Running
                 hashCode.Add(job.Infrastructure.BuildConfiguration);
                 foreach (var arg in job.Infrastructure.Arguments ?? Array.Empty<Argument>())
                     hashCode.Add(arg);
+#pragma warning disable CS0618 // Type or member is obsolete
                 foreach (var reference in job.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
                     hashCode.Add(reference);
+#pragma warning restore CS0618 // Type or member is obsolete
                 return hashCode.ToHashCode();
             }
 

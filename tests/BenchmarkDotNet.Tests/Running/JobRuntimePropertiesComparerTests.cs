@@ -95,6 +95,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
+        [System.Obsolete]
         public void CustomNuGetJobsAreGroupedByPackageVersion()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance)

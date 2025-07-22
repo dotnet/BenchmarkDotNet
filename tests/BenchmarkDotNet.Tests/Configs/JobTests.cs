@@ -441,6 +441,7 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [Fact]
+        [Obsolete]
         public static void WithNuGet()
         {
             var j = new Job("SomeId");

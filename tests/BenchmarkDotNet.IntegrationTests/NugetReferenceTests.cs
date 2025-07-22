@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        [Obsolete]
         public void UserCanSpecifyCustomNuGetPackageDependency()
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
@@ -38,6 +39,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [FactEnvSpecific("Roslyn toolchain does not support .NET Core", EnvRequirement.FullFrameworkOnly)]
+        [Obsolete]
         public void RoslynToolchainDoesNotSupportNuGetPackageDependency()
         {
             var toolchain = RoslynToolchain.Instance;
