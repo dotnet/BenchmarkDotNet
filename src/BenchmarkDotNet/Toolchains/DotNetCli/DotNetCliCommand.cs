@@ -227,7 +227,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             // we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
             // we want to avoid "file in use" and "zombie processes" issues
-            const string NoMsBuildZombieProcesses = "/p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
+            const string NoMsBuildZombieProcesses = "--nodeReuse:false /p:UseSharedCompilation=false /p:Deterministic=true";
             const string EnforceOptimizations = "/p:Optimize=true";
 
             if (string.Equals(buildConfiguration, RuntimeInformation.DebugConfigurationName, StringComparison.OrdinalIgnoreCase))
