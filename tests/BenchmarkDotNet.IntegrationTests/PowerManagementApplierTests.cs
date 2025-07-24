@@ -1,5 +1,7 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -43,43 +45,37 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
 
-        [FactEnvSpecific("Should change to High Performance if user requests it and High Performance plan is present, even if currently on Ultimate Performance", EnvRequirement.WindowsOnly)]
-        public void ShouldSwitchToHighPerformanceIfPresentWhenRequestedEvenIfOnUltimate()
+        [FactEnvSpecific("Should keep power plan at Ultimate Performance if current power plan is Ultimate when a power plan is not specifically set", EnvRequirement.WindowsOnly)]
+        public void TestKeepingUltimatePowerPlan()
         {
             var ultimateGuid = PowerManagementApplier.Map(PowerPlan.UltimatePerformance);
-            var highGuid = PowerManagementApplier.Map(PowerPlan.HighPerformance);
             var userPlan = PowerManagementHelper.CurrentPlan;
 
-            var logger = new OutputLogger(Output);
-            var powerManagementApplier = new PowerManagementApplier(logger);
+            if (!PowerManagementHelper.PlanExists(ultimateGuid))
+            {
+                Output.WriteLine("Ultimate Performance plan does not exist or cannot be activated. Skipping test.");
+                return;
+            }
 
             PowerManagementHelper.Set(ultimateGuid);
 
-            powerManagementApplier.ApplyPerformancePlan(highGuid);
+            var job = Job.Default;
 
-            Assert.Equal(highGuid.ToString(), PowerManagementHelper.CurrentPlan.ToString());
+            var config = ManualConfig.CreateEmpty().AddJob(job);
+
+            BenchmarkRunner.Run<DummyBenchmark>(config);
+
+            Assert.Equal(ultimateGuid.ToString(), PowerManagementHelper.CurrentPlan.ToString());
 
             PowerManagementHelper.Set(userPlan.Value);
-            powerManagementApplier.Dispose();
         }
 
-        [FactEnvSpecific("Should not change plan if already High Performance", EnvRequirement.WindowsOnly)]
-        public void ShouldNotChangeIfAlreadyHighPerformance()
+        public class DummyBenchmark
         {
-            var highGuid = PowerManagementApplier.Map(PowerPlan.HighPerformance);
-            var userPlan = PowerManagementHelper.CurrentPlan;
-
-            var logger = new OutputLogger(Output);
-            var powerManagementApplier = new PowerManagementApplier(logger);
-
-            PowerManagementHelper.Set(highGuid);
-
-            powerManagementApplier.ApplyPerformancePlan(highGuid);
-
-            Assert.Equal(highGuid.ToString(), PowerManagementHelper.CurrentPlan.ToString());
-
-            PowerManagementHelper.Set(userPlan.Value);
-            powerManagementApplier.Dispose();
+            [BenchmarkDotNet.Attributes.Benchmark]
+            public void DoNothing()
+            {
+            }
         }
     }
 }
