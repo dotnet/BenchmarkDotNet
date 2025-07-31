@@ -120,6 +120,8 @@ namespace BenchmarkDotNet.Configs
 
         internal bool HasPerfCollectProfiler() => diagnosers.OfType<PerfCollectProfiler>().Any();
 
+        internal bool HasDisassemblyDiagnoser() => diagnosers.OfType<DisassemblyDiagnoser>().Any();
+
         public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser() || HasExceptionDiagnoser();
 
         public IDiagnoser? GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
