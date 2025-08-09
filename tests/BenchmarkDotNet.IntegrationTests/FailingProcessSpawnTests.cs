@@ -23,6 +23,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 _ => Platform.X64
             };
 
+            if (wrongPlatform == Platform.X64 && RuntimeInformation.IsFullFramework)
+            {
+                // It seems full Framework on Arm ignores the platform and simply runs the native platform, causing this test to fail.
+                return;
+            }
+
             var invalidPlatformJob = Job.Dry.WithPlatform(wrongPlatform);
             var config = CreateSimpleConfig(job: invalidPlatformJob);
 
