@@ -99,8 +99,20 @@ namespace BenchmarkDotNet.Parameters
                 ? $"[{argumentIndex}]" // IEnumerable<object[]>
                 : string.Empty; // IEnumerable<object>
 
+            string methodCall;
+            if (((MethodInfo)source)?.IsStatic ?? ((PropertyInfo)source)?.GetMethod.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
+            {
+                // If the source member is static, we need to place the fully qualified type name before it, in case the source member is from another type that this generated type does not inherit from.
+                methodCall = $"{source.DeclaringType.GetCorrectCSharpTypeName()}.{source.Name}";
+            }
+            else
+            {
+                // If the source member is non-static, we mustn't include the type name, as this would be a compiler error when accessing a non-static source member in the base class of this generated type.
+                methodCall = source.Name;
+            }
+
             // we do something like enumerable.ElementAt(sourceIndex)[argumentIndex];
-            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({source.Name}{callPostfix}, {sourceIndex}){indexPostfix};";
+            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({methodCall}{callPostfix}, {sourceIndex}){indexPostfix};";
         }
     }
 
