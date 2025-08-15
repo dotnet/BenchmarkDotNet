@@ -24,9 +24,9 @@ namespace BenchmarkDotNet.Samples
         public void SingleArgument(TimeSpan time) => Thread.Sleep(time);
     }
 
-    public class BenchmarkArguments
+    public static class BenchmarkArguments
     {
-        public IEnumerable<object> TimeSpans() // for single argument it's an IEnumerable of objects (object)
+        public static IEnumerable<object> TimeSpans() // for single argument it's an IEnumerable of objects (object)
         {
             yield return TimeSpan.FromMilliseconds(10);
             yield return TimeSpan.FromMilliseconds(100);
