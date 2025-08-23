@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -87,19 +87,84 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArgumentsSourceInAnotherClass
         {
             [Benchmark]
-            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.ArgumentsProvider))]
-            public void Simple(bool boolean, int number)
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveType))]
+            public void OnePrimitiveType(int number)
+            {
+                if (number % 2 != 1)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoPrimitiveTypes))]
+            public void TwoPrimitiveTypes(bool boolean, int number)
             {
                 if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OneNonPrimitiveType))]
+            public void OneNonPrimitiveType(Version version)
+            {
+                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                if (versionNumbers.Distinct().Count() != 4)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoNonPrimitiveTypes))]
+            public void TwoNonPrimitiveTypes(Version version, DateTime dateTime)
+            {
+                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                if (versionNumbers.Distinct().Count() != 4)
+                    throw new InvalidOperationException("Incorrect values were passed");
+
+                if (dateTime.Month != dateTime.Day)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveAndOneNonPrimitive))]
+            public void OnePrimitiveAndOneNonPrimitive(Version version, int number)
+            {
+                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                if (versionNumbers.Distinct().Count() != 4)
+                    throw new InvalidOperationException("Incorrect values were passed");
+
+                if (number != version.Major)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
         }
         public static class ExternalClassWithArgumentsSource
         {
-            public static IEnumerable<object[]> ArgumentsProvider()
+            public static IEnumerable<int> OnePrimitiveType()
+            {
+                yield return 3;
+                yield return 5;
+            }
+
+            public static IEnumerable<object[]> TwoPrimitiveTypes()
             {
                 yield return new object[] { true, 1 };
                 yield return new object[] { false, 2 };
+            }
+
+            public static IEnumerable<Version> OneNonPrimitiveType()
+            {
+                yield return new Version(1, 2, 3, 4);
+                yield return new Version(5, 6, 7, 8);
+            }
+
+            public static IEnumerable<object[]> TwoNonPrimitiveTypes()
+            {
+                yield return new object[] { new Version(1, 2, 3, 4), new DateTime(2011, 11, 11) };
+                yield return new object[] { new Version(5, 6, 7, 8), new DateTime(2002, 02, 02) };
+            }
+
+            public static IEnumerable<object[]> OnePrimitiveAndOneNonPrimitive()
+            {
+                yield return new object[] { new Version(1, 2, 3, 4), 1 };
+                yield return new object[] { new Version(5, 6, 7, 8), 5 };
             }
         }
 
@@ -775,11 +840,17 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class ParamsSourcePointingToAnotherClass
         {
-            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Method))]
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.PrimitiveTypeMethod))]
             public int ParamOne { get; set; }
 
-            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Property))]
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.PrimitiveTypeProperty))]
             public int ParamTwo { get; set; }
+
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeMethod))]
+            public Version ParamThree { get; set; }
+
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeProperty))]
+            public Version ParamFour { get; set; }
 
             [Benchmark]
             public void Test()
@@ -788,19 +859,34 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("The ParamOne value is incorrect!");
                 if (ParamTwo != 456)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
+                if (ParamThree != new Version(1, 2, 3, 4))
+                    throw new ArgumentException("The ParamThree value is incorrect!");
+                if (ParamFour != new Version(5, 6, 7, 8))
+                    throw new ArgumentException("The ParamFour value is incorrect!");
             }
         }
         public static class ExternalClassWithParamsSource
         {
-            public static IEnumerable<int> Method()
+            public static IEnumerable<int> PrimitiveTypeMethod()
             {
                 yield return 123;
             }
-            public static IEnumerable<int> Property
+            public static IEnumerable<int> PrimitiveTypeProperty
             {
                 get
                 {
                     yield return 456;
+                }
+            }
+            public static IEnumerable<Version> NonPrimitiveTypeMethod()
+            {
+                yield return new Version(1, 2, 3, 4);
+            }
+            public static IEnumerable<Version> NonPrimitiveTypeProperty
+            {
+                get
+                {
+                    yield return new Version(5, 6, 7, 8);
                 }
             }
         }
