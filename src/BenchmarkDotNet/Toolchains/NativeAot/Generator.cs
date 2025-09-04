@@ -236,7 +236,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         private string GetCurrentInstructionSet(Platform platform)
             => string.Join(",", GetCurrentProcessInstructionSets(platform));
 
-        // based on https://github.com/dotnet/runtime/blob/ce61c09a5f6fc71d8f717d3fc4562f42171869a0/src/coreclr/tools/Common/JitInterface/CorInfoInstructionSet.cs#L727
+        // based on https://github.com/dotnet/runtime/blob/main/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
         private IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
         {
             if (!ConfigParser.TryParse(TargetFrameworkMoniker, out RuntimeMoniker runtimeMoniker))
@@ -256,39 +256,77 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 case Platform.X86:
                 case Platform.X64:
                     if (HardwareIntrinsics.IsX86BaseSupported) yield return "base";
-                    if (HardwareIntrinsics.IsX86SseSupported) yield return "sse";
-                    if (HardwareIntrinsics.IsX86Sse2Supported) yield return "sse2";
-                    if (HardwareIntrinsics.IsX86Sse3Supported) yield return "sse3";
-                    if (HardwareIntrinsics.IsX86Ssse3Supported) yield return "ssse3";
-                    if (HardwareIntrinsics.IsX86Sse41Supported) yield return "sse4.1";
-                    if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
+                    if (HardwareIntrinsics.IsX86Sse42Supported)
+                    {
+                        yield return "sse4.2";
+                        if (runtimeMoniker <= RuntimeMoniker.NativeAot90) yield return "popcnt";
+                    }
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
-                    if (HardwareIntrinsics.IsX86Avx2Supported) yield return "avx2";
-                    if (HardwareIntrinsics.IsX86Avx512FSupported) yield return "avx512f";
-                    if (HardwareIntrinsics.IsX86Avx512BWSupported) yield return "avx512bw";
-                    if (HardwareIntrinsics.IsX86Avx512CDSupported) yield return "avx512cd";
-                    if (HardwareIntrinsics.IsX86Avx512DQSupported) yield return "avx512dq";
-                    if (HardwareIntrinsics.IsX86Avx512VbmiSupported) yield return "avx512vbmi";
-                    if (HardwareIntrinsics.IsX86AesSupported) yield return "aes";
-                    if (HardwareIntrinsics.IsX86Bmi1Supported) yield return "bmi";
-                    if (HardwareIntrinsics.IsX86Bmi2Supported) yield return "bmi2";
-                    if (HardwareIntrinsics.IsX86FmaSupported) yield return "fma";
-                    if (HardwareIntrinsics.IsX86LzcntSupported) yield return "lzcnt";
-                    if (HardwareIntrinsics.IsX86PclmulqdqSupported) yield return "pclmul";
-                    if (HardwareIntrinsics.IsX86PopcntSupported) yield return "popcnt";
+                    if (HardwareIntrinsics.IsX86Avx2Supported)
+                    {
+                        yield return "avx2";
+
+                        if (runtimeMoniker <= RuntimeMoniker.NativeAot90)
+                        {
+                            yield return "bmi";
+                            yield return "bmi2";
+                            yield return "fma";
+                            yield return "lzcnt";
+                        }
+                    }
+                    if (HardwareIntrinsics.IsX86Avx512Supported && (runtimeMoniker > RuntimeMoniker.NativeAot80))
+                    {
+                        if (runtimeMoniker >= RuntimeMoniker.NativeAot10_0)
+                        {
+                            yield return "avx512";
+                        }
+                        else
+                        {
+                            yield return "avx512f";
+                            yield return "avx512f_vl";
+                            yield return "avx512bw";
+                            yield return "avx512bw_vl";
+                            yield return "avx512cd";
+                            yield return "avx512cd_vl";
+                            yield return "avx512dq";
+                            yield return "avx512dq_vl";
+                        }
+                    }
+                    if (HardwareIntrinsics.IsX86Avx512v2Supported && (runtimeMoniker > RuntimeMoniker.NativeAot80))
+                    {
+                        if (runtimeMoniker >= RuntimeMoniker.NativeAot10_0)
+                        {
+                            yield return "avx512v2";
+                        }
+                        else
+                        {
+                            yield return "avx512vbmi";
+                            yield return "avx512vbmi_vl";
+                        }
+                    }
+                    if (HardwareIntrinsics.IsX86Avx512v3Supported && (runtimeMoniker >= RuntimeMoniker.NativeAot10_0)) yield return "avx512v3";
+                    if (HardwareIntrinsics.IsX86Avx10v1Supported && (runtimeMoniker >= RuntimeMoniker.NativeAot90)) yield return "avx10v1";
+                    if (HardwareIntrinsics.IsX86Avx10v2Supported && (runtimeMoniker >= RuntimeMoniker.NativeAot10_0)) yield return "avx10v2";
+                    if (HardwareIntrinsics.IsX86AesSupported)
+                    {
+                        yield return "aes";
+                        if (runtimeMoniker <= RuntimeMoniker.NativeAot90) yield return "pclmul";
+                    }
                     if (HardwareIntrinsics.IsX86AvxVnniSupported) yield return "avxvnni";
                     if (HardwareIntrinsics.IsX86SerializeSupported && runtimeMoniker > RuntimeMoniker.NativeAot70) yield return "serialize"; // https://github.com/dotnet/BenchmarkDotNet/issues/2463#issuecomment-1809625008
                     break;
                 case Platform.Arm64:
-                    if (HardwareIntrinsics.IsArmBaseSupported) yield return "base";
-                    if (HardwareIntrinsics.IsArmAdvSimdSupported) yield return "neon";
+                    if (HardwareIntrinsics.IsArmBaseSupported)
+                    {
+                        yield return "base";
+                        yield return "neon";
+                    }
                     if (HardwareIntrinsics.IsArmAesSupported) yield return "aes";
                     if (HardwareIntrinsics.IsArmCrc32Supported) yield return "crc";
                     if (HardwareIntrinsics.IsArmDpSupported) yield return "dotprod";
                     if (HardwareIntrinsics.IsArmRdmSupported) yield return "rdma";
                     if (HardwareIntrinsics.IsArmSha1Supported) yield return "sha1";
                     if (HardwareIntrinsics.IsArmSha256Supported) yield return "sha2";
-                    // todo: handle "lse"
                     break;
                 default:
                     yield break;
