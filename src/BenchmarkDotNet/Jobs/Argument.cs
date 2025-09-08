@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Jobs
     public class MsBuildProperty : MsBuildArgument
     {
         public MsBuildProperty(string key, params string[] values)
-            : base($"/p:{key}=\"{string.Join(";", values)}")
+            : base($"/p:{key}=\\\"{string.Join(";", values)}\\\"")
         {
         }
 
