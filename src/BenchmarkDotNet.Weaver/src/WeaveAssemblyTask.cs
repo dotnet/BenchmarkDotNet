@@ -64,10 +64,28 @@ public sealed class WeaveAssemblyTask : Task
 
             if (benchmarkMethodsImplAdjusted)
             {
-                // Write to a null stream before overwriting the original file in case an exception occurs during the write (like unsupported platform).
+                // Write to a memory stream before overwriting the original file in case an exception occurs during the write (like unsupported platform).
                 // https://github.com/Washi1337/AsmResolver/issues/640
-                module.Write(Stream.Null);
-                module.Write(TargetAssembly);
+                var memoryStream = new MemoryStream();
+                try
+                {
+                    module.Write(memoryStream);
+                    using var fileStream = new FileStream(TargetAssembly, FileMode.Truncate, FileAccess.Write);
+                    memoryStream.WriteTo(fileStream);
+                }
+                catch (OutOfMemoryException)
+                {
+                    // If there is not enough memory, fallback to write to null stream then write to file.
+                    memoryStream.Dispose();
+                    memoryStream = null;
+                    GC.Collect();
+                    module.Write(Stream.Null);
+                    module.Write(TargetAssembly);
+                }
+                finally
+                {
+                    memoryStream?.Dispose();
+                }
             }
         }
         catch (Exception e)
