@@ -31,9 +31,12 @@
     <None Include="$(MSBuildThisFileDirectory)package-icon.png" Pack="True" PackagePath=""/>
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+  <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)strongNameKey.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -43,7 +46,7 @@
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
     <!-- When this is changed, optionally reset WeaverVersionSuffix, then run `build.cmd pack-weaver`. -->
-    <VersionPrefix>0.15.2</VersionPrefix>
+    <VersionPrefix>0.15.3</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">
@@ -68,8 +71,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556">
       <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 

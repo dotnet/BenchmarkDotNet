@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Environments
             return sb.ToString();
         }
 
-        internal BdnHostInfo ToPerfonar() => new ()
+        internal BdnHostInfo ToPerfonar() => new()
         {
             Cpu = Cpu.Value,
             Os = Os.Value,

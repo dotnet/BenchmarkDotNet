@@ -8,6 +8,8 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class AppConfigGenerator
@@ -26,22 +28,32 @@ namespace BenchmarkDotNet.Toolchains
 
         internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
         {
-            using (var xmlReader = XmlReader.Create(source))
+            var xmlDocument = new XmlDocument();
+
+            XmlNode configurationElement;
+
+            if (source == TextReader.Null)
             {
-                var xmlDocument = new XmlDocument();
-
-                var configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
-
-                var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
-
-                ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
-                ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
-
-                GenerateJitSettings(xmlDocument, runtimeElement, job.Environment);
-                GenerateGCSettings(xmlDocument, runtimeElement, job.Environment.Gc, resolver);
-
-                xmlDocument.Save(destination);
+                // Create a new configuration node.
+                configurationElement = xmlDocument.CreateNode(XmlNodeType.Element, "configuration", string.Empty);
+                xmlDocument.AppendChild(configurationElement);
             }
+            else
+            {
+                // Try to get configuration node from specified TextReader.
+                using var xmlReader = XmlReader.Create(source);
+                configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
+            }
+
+            var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
+
+            ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
+            ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
+
+            GenerateJitSettings(xmlDocument, runtimeElement, job.Environment);
+            GenerateGCSettings(xmlDocument, runtimeElement, job.Environment.Gc, resolver);
+
+            xmlDocument.Save(destination);
         }
 
         private static XmlNode GetOrCreateConfigurationElement(XmlDocument xmlDocument, XmlReader xmlReader)
@@ -49,19 +61,23 @@ namespace BenchmarkDotNet.Toolchains
             try
             {
                 xmlDocument.Load(xmlReader);
-
-                return xmlDocument.SelectSingleNode("/configuration");
+                var configurationNode = xmlDocument.SelectSingleNode("/configuration");
+                if (configurationNode != null)
+                    return configurationNode;
             }
-            catch // empty document
+            catch (XmlException)
             {
-                return xmlDocument.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "configuration", string.Empty));
+                // Failed to load XML content.
             }
+
+            // If the XML is invalid or configuration node is not exists. Create a new configuration element
+            return xmlDocument.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "configuration", string.Empty))!;
         }
 
         private static XmlNode GetOrCreateRuntimeElement(XmlDocument xmlDocument, XmlNode configurationElement)
         {
             return configurationElement.SelectSingleNode("runtime")
-                   ?? configurationElement.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "runtime", string.Empty));
+                   ?? configurationElement.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "runtime", string.Empty))!;
         }
 
         private static void ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(XmlNode runtimeElement)
@@ -75,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static void ClearStartupSettingsForCustomClr(XmlNode configurationElement, Runtime runtime)
+        private static void ClearStartupSettingsForCustomClr(XmlNode configurationElement, Runtime? runtime)
         {
             if (!(runtime is ClrRuntime clrRuntime) || string.IsNullOrEmpty(clrRuntime.Version))
                 return;

@@ -71,10 +71,10 @@ namespace BenchmarkDotNet.Running
 
                 PrintValidationErrors(compositeLogger, validationErrors);
 
+                eventProcessor.OnEndValidationStage(); // Ensure that OnEndValidationStage() is called when a critical validation error exists.
+
                 if (validationErrors.Any(validationError => validationError.IsCritical))
                     return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors.ToImmutableArray()) };
-
-                eventProcessor.OnEndValidationStage();
 
                 int totalBenchmarkCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 int benchmarksToRunCount = totalBenchmarkCount - (idToResume + 1); // ids are indexed from 0
@@ -622,8 +622,8 @@ namespace BenchmarkDotNet.Running
 
         private static (BenchmarkRunInfo[], List<ValidationError>) GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, IResolver resolver)
         {
-            List<ValidationError> validationErrors = new ();
-            List<BenchmarkRunInfo> runInfos = new (benchmarkRunInfos.Length);
+            List<ValidationError> validationErrors = new();
+            List<BenchmarkRunInfo> runInfos = new(benchmarkRunInfos.Length);
 
             if (benchmarkRunInfos.Length == 0)
             {

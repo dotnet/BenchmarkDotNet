@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
@@ -12,15 +13,16 @@ internal static class WmicCpuInfoParser
     /// Parses wmic output and returns <see cref="CpuInfo"/>
     /// </summary>
     /// <param name="wmicOutput">Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`</param>
-    internal static CpuInfo Parse(string? wmicOutput)
+    internal static CpuInfo Parse(string wmicOutput)
     {
-        var processorModelNames = new HashSet<string>();
+        HashSet<string> processorModelNames = new HashSet<string>();
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;
         int processorsCount = 0;
-        var sumMaxFrequency = Frequency.Zero;
+        double maxFrequency = 0.0;
+        double nominalFrequency = 0.0;
 
-        var processors = SectionsHelper.ParseSections(wmicOutput, '=');
+        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(wmicOutput, '=');
         foreach (var processor in processors)
         {
             if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
@@ -40,17 +42,20 @@ internal static class WmicCpuInfoParser
             }
 
             if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue)
-                && int.TryParse(frequencyValue, out int frequency)
+                && double.TryParse(frequencyValue, out double frequency)
                 && frequency > 0)
             {
-                sumMaxFrequency += frequency;
+                nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
+                maxFrequency = Math.Max(maxFrequency, frequency);
             }
         }
 
         string? processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
-        Frequency? maxFrequency = sumMaxFrequency > 0 && processorsCount > 0
-            ? Frequency.FromMHz(sumMaxFrequency / processorsCount)
+        Frequency? maxFrequencyActual = maxFrequency > 0 && processorsCount > 0
+            ? Frequency.FromMHz(maxFrequency)
             : null;
+
+        Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorsCount > 0 ? Frequency.FromMHz(nominalFrequency) : null;
 
         return new CpuInfo
         {
@@ -58,8 +63,8 @@ internal static class WmicCpuInfoParser
             PhysicalProcessorCount = processorsCount > 0 ? processorsCount : null,
             PhysicalCoreCount = physicalCoreCount > 0 ? physicalCoreCount : null,
             LogicalCoreCount = logicalCoreCount > 0 ? logicalCoreCount : null,
-            NominalFrequencyHz = maxFrequency?.Hertz.RoundToLong(),
-            MaxFrequencyHz = maxFrequency?.Hertz.RoundToLong()
+            NominalFrequencyHz = nominalFrequencyActual?.Hertz.RoundToLong(),
+            MaxFrequencyHz = maxFrequencyActual?.Hertz.RoundToLong()
         };
     }
 }

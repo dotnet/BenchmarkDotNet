@@ -20,7 +20,7 @@ internal static class SysctlCpuInfoParser
 
     /// <param name="sysctlOutput">Output of `sysctl -a`</param>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    internal static CpuInfo Parse(string? sysctlOutput)
+    internal static CpuInfo Parse(string sysctlOutput)
     {
         var sysctl = SectionsHelper.ParseSection(sysctlOutput, ':');
         string processorName = sysctl.GetValueOrDefault(Sysctl.ProcessorName);

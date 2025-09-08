@@ -8,6 +8,8 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <!-- Disable parallel tests between TargetFrameworks -->
+    <TestTfmsInParallel>false</TestTfmsInParallel>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />

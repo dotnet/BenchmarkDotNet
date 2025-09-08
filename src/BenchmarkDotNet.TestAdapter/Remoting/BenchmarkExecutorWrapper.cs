@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.TestAdapter.Remoting
     /// </summary>
     internal class BenchmarkExecutorWrapper : MarshalByRefObject
     {
-        private readonly BenchmarkExecutor benchmarkExecutor = new ();
+        private readonly BenchmarkExecutor benchmarkExecutor = new();
 
         public void RunBenchmarks(string assemblyPath, TestExecutionRecorderWrapper recorder, HashSet<Guid>? benchmarkIds = null)
         {

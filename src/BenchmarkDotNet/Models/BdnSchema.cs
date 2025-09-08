@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Models;
 
 internal class BdnSchema : PerfonarSchema
 {
-    public static readonly BdnSchema Instance = new ();
+    public static readonly BdnSchema Instance = new();
 
     private BdnSchema() : base("bdn")
     {

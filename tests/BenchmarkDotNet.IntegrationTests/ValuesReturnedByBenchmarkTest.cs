@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
             new object[] { InProcessEmitToolchain.Instance },
         };
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnyValueCanBeReturned(IToolchain toolchain) => CanExecute<ValuesReturnedByBenchmark>(ManualConfig.CreateEmpty().AddJob(Job.Dry.WithToolchain(toolchain)));
 
         public class ValuesReturnedByBenchmark

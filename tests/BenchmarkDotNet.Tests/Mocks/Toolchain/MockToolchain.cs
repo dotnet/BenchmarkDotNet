@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 
             public MockExecutor(Func<BenchmarkCase, List<Measurement>> measurer) => this.measurer = measurer;
 
-            public ExecuteResult Execute(ExecuteParameters executeParameters) => new (measurer(executeParameters.BenchmarkCase));
+            public ExecuteResult Execute(ExecuteParameters executeParameters) => new(measurer(executeParameters.BenchmarkCase));
         }
     }
 }

@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Benchmark() => ParamsTarget?.Data ?? 0;
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void PrivateClassWithPublicInterface_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(PrivateClassWithPublicInterface), toolchain);
 
         public class PrivateClassWithPublicInterface_Array
@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Benchmark() => ParamsTarget?.Sum(p => p?.Data ?? 0) ?? 0;
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void PrivateClassWithPublicInterface_Array_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(PrivateClassWithPublicInterface_Array), toolchain);
 
         public class PrivateClassWithPublicInterface_Enumerable
@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Benchmark() => ParamsTarget?.Sum(p => p?.Data ?? 0) ?? 0;
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void PrivateClassWithPublicInterface_Enumerable_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(PrivateClassWithPublicInterface_Enumerable), toolchain);
 
         public class PrivateClassWithPublicInterface_AsObject
@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Benchmark() => ParamsTarget?.Data ?? 0;
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void PrivateClassWithPublicInterface_AsObject_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(PrivateClassWithPublicInterface_AsObject), toolchain);
 
         public class PublicSource

@@ -312,7 +312,7 @@ namespace BenchmarkDotNet.Tests.Configs
                 Assert.Equal(warmupCount, mergedJob.Run.WarmupCount);
                 Assert.False(mergedJob.Meta.IsDefault); // after the merge the "child" job becomes a standard job
                 Assert.False(mergedJob.Meta.IsMutator); // after the merge the "child" job becomes a standard job
-                Assert.Single(mergedJob.GetCharacteristicsWithValues(), changedCharacteristic => ReferenceEquals(changedCharacteristic, Jobs.RunMode.WarmupCountCharacteristic));
+                Assert.Single(mergedJob.GetCharacteristicsWithValues(), changedCharacteristic => ReferenceEquals(changedCharacteristic, BenchmarkDotNet.Jobs.RunMode.WarmupCountCharacteristic));
             }
         }
 

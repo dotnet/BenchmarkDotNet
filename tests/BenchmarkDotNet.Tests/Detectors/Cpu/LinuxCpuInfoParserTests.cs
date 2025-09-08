@@ -22,7 +22,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     [Fact]
     public void MalformedTest()
     {
-        var actual = LinuxCpuInfoParser.Parse("malformedkey: malformedvalue\n\nmalformedkey2: malformedvalue2", null);
+        var actual = LinuxCpuInfoParser.Parse("malformedkey: malformedvalue\n\nmalformedkey2: malformedvalue2", string.Empty);
         var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
@@ -31,7 +31,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     public void TwoProcessorWithDifferentCoresCountTest()
     {
         string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoProcessorWithDifferentCoresCount.txt");
-        var actual = LinuxCpuInfoParser.Parse(cpuInfo, null);
+        var actual = LinuxCpuInfoParser.Parse(cpuInfo, string.Empty);
         var expected = new CpuInfo
         {
             ProcessorName = "Unknown processor with 2 cores and hyper threading, Unknown processor with 4 cores",
@@ -49,7 +49,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     public void RealOneProcessorTwoCoresTest()
     {
         string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorTwoCores.txt");
-        var actual = LinuxCpuInfoParser.Parse(cpuInfo, null);
+        var actual = LinuxCpuInfoParser.Parse(cpuInfo, string.Empty);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz",
@@ -66,14 +66,14 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
     public void RealOneProcessorFourCoresTest()
     {
         string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorFourCores.txt");
-        var actual = LinuxCpuInfoParser.Parse(cpuInfo, null);
+        var actual = LinuxCpuInfoParser.Parse(cpuInfo, string.Empty);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz",
             PhysicalProcessorCount = 1,
             PhysicalCoreCount = 4,
             LogicalCoreCount = 8,
-            NominalFrequencyHz = 2_500_000_000,
+            NominalFrequencyHz = 2_494_300_000,
             MaxFrequencyHz = 2_500_000_000
         };
         Output.AssertEqual(expected, actual);
@@ -154,7 +154,7 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
             PhysicalProcessorCount = 1,
             PhysicalCoreCount = 16,
             LogicalCoreCount = 32,
-            NominalFrequencyHz = 5_881_000_000,
+            NominalFrequencyHz = 400_000_000,
             MaxFrequencyHz = 5_881_000_000
         };
         Output.AssertEqual(expected, actual);

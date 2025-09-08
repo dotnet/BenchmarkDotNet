@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
-using Microsoft.Win32;
-using Perfolizer.Helpers;
 using static System.Runtime.InteropServices.RuntimeInformation;
-using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace BenchmarkDotNet.Portability
 {
@@ -27,47 +21,36 @@ namespace BenchmarkDotNet.Portability
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
+        // Many of these checks allocate and/or are expensive to compute. We store the results in static readonly fields to keep Engine non-allocating.
+        // Static readonly fields are used instead of properties to avoid an extra getter method call that might not be tier1 jitted.
+        // This class is internal, so we don't need to expose these as properties.
+
         /// <summary>
         /// returns true for both the old (implementation of .NET Framework) and new Mono (.NET 6+ flavour)
         /// </summary>
-        public static bool IsMono { get; } =
-            Type.GetType("Mono.RuntimeStructs") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
+        public static readonly bool IsMono = Type.GetType("Mono.RuntimeStructs") != null;
 
-        public static bool IsOldMono { get; } = Type.GetType("Mono.Runtime") != null;
+        public static readonly bool IsOldMono = Type.GetType("Mono.Runtime") != null;
 
-        public static bool IsNewMono { get; } = IsMono && !IsOldMono;
+        public static readonly bool IsNewMono = IsMono && !IsOldMono;
 
-        public static bool IsFullFramework =>
+        public static readonly bool IsFullFramework =
 #if NET6_0_OR_GREATER
+            // This could be const, but we want to avoid unreachable code warnings.
             false;
 #else
             FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
-        [PublicAPI]
-        public static bool IsNetNative => FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
-
-        public static bool IsNetCore
-            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-               && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
-
-        public static bool IsNativeAOT
-            => Environment.Version.Major >= 5
-               && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
-               && !IsWasm; // Wasm also returns "" for assembly locations
-
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
-#endif
-        public static bool IsWasm =>
-#if NET6_0_OR_GREATER
-            OperatingSystem.IsBrowser();
+        public static readonly bool IsWasm = OperatingSystem.IsBrowser();
 #else
-            IsOSPlatform(OSPlatform.Create("BROWSER"));
+        public static readonly bool IsWasm = IsOSPlatform(OSPlatform.Create("BROWSER"));
 #endif
 
 #if NETSTANDARD2_0
-        public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
+        public static readonly bool IsAot = IsAotMethod() || FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsAotMethod()
         {
@@ -85,11 +68,32 @@ namespace BenchmarkDotNet.Portability
             return false;
         }
 #else
-        public static bool IsAot => !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+        public static readonly bool IsAot = !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
 
-        public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
+        public static bool IsNetCore
+            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+                && !IsAot;
 
+        public static bool IsNativeAOT
+            => Environment.Version.Major >= 5
+               && IsAot
+               && !IsWasm && !IsMono; // Wasm and MonoAOTLLVM are also AOT
+
+
+        public static readonly bool IsTieredJitEnabled =
+            IsNetCore
+            && (Environment.Version.Major < 3
+                // Disabled by default in netcoreapp2.X, check if it's enabled.
+                ? Environment.GetEnvironmentVariable("COMPlus_TieredCompilation") == "1"
+                || Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") == "1"
+                || (AppContext.TryGetSwitch("System.Runtime.TieredCompilation", out bool isEnabled) && isEnabled)
+                // Enabled by default in netcoreapp3.0+, check if it's disabled.
+                : Environment.GetEnvironmentVariable("COMPlus_TieredCompilation") != "0"
+                && Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") != "0"
+                && (!AppContext.TryGetSwitch("System.Runtime.TieredCompilation", out isEnabled) || isEnabled));
+
+        public static readonly bool IsRunningInContainer = string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
 
@@ -160,24 +164,21 @@ namespace BenchmarkDotNet.Portability
             {
                 return $".NET {Environment.Version}";
             }
-            else
+
+            return CoreRuntime.TryGetVersion(out var version) && version.Major >= 5
+                ? $".NET {version} ({GetDetailedVersion()})"
+                : $".NET Core {version?.ToString() ?? Unknown} ({GetDetailedVersion()})";
+
+            string GetDetailedVersion()
             {
-                var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
-                var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
-
-                if (CoreRuntime.TryGetVersion(out var version) && version >= new Version(5, 0))
-                {
-                    // after the merge of dotnet/corefx and dotnet/coreclr into dotnet/runtime the version should always be the same
-                    Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion);
-
-                    return $".NET {version} ({coreclrAssemblyInfo.FileVersion})";
-                }
-                else
-                {
-                    string runtimeVersion = version != default ? version.ToString() : Unknown;
-
-                    return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
-                }
+                string coreclrLocation = typeof(object).GetTypeInfo().Assembly.Location;
+                // Single-file publish has empty assembly location.
+                if (string.IsNullOrEmpty(coreclrLocation))
+                    return CoreRuntime.GetVersionFromFrameworkDescription();
+                // .Net Core 2.X has confusing FrameworkDescription like 4.6.X.
+                if (version?.Major >= 3)
+                    return $"{CoreRuntime.GetVersionFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
+                return FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion;
             }
         }
 
@@ -260,7 +261,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsNativeAOT)
                 return "NativeAOT";
-            if (IsNetNative || IsAot)
+            if (IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono

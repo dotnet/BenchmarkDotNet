@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Helpers
 
             private ValueTaskWaiter()
             {
-                resetEvent = new ();
+                resetEvent = new();
                 awaiterCallback = resetEvent.Set;
             }
 

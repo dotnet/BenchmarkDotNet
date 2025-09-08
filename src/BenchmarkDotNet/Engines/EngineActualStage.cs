@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Engines
             measurementsForStatistics = GetMeasurementList();
         }
 
-        internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
+        internal override List<Measurement> GetMeasurementList() => new(maxIterationCount);
 
         internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
         {
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Engines
     {
         private int iterationCount = 0;
 
-        internal override List<Measurement> GetMeasurementList() => new (maxIterationCount);
+        internal override List<Measurement> GetMeasurementList() => new(maxIterationCount);
 
         internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
             => ++iterationCount <= maxIterationCount;

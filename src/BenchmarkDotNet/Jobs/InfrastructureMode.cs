@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
@@ -18,6 +20,9 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = CreateCharacteristic<IEngineFactory>(nameof(EngineFactory));
         public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This will soon be removed")]
         public static readonly Characteristic<IReadOnlyCollection<NuGetReference>> NuGetReferencesCharacteristic = CreateCharacteristic<IReadOnlyCollection<NuGetReference>>(nameof(NuGetReferences));
 
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessEmitToolchain.Instance);
@@ -64,6 +69,8 @@ namespace BenchmarkDotNet.Jobs
             set => ArgumentsCharacteristic[this] = value;
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This will soon be removed")]
         public IReadOnlyCollection<NuGetReference> NuGetReferences
         {
             get => NuGetReferencesCharacteristic[this];

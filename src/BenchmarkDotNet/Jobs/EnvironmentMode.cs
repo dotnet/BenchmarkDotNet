@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Jobs
 
         internal Runtime GetRuntime() => HasValue(RuntimeCharacteristic) ? Runtime : RuntimeInformation.GetCurrentRuntime();
 
-        internal BdnEnvironment ToPerfonar() => new ()
+        internal BdnEnvironment ToPerfonar() => new()
         {
             Jit = HasValue(JitCharacteristic) ? Jit : null,
             Runtime = HasValue(RuntimeCharacteristic) ? Runtime?.RuntimeMoniker : null,

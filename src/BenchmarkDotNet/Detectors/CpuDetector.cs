@@ -11,12 +11,12 @@ namespace BenchmarkDotNet.Detectors;
 
 public class CpuDetector(params ICpuDetector[] detectors) : ICpuDetector
 {
-    public static CpuDetector CrossPlatform => new (
+    public static CpuDetector CrossPlatform => new(
         new WindowsCpuDetector(),
         new LinuxCpuDetector(),
         new MacOsCpuDetector());
 
-    private static readonly Lazy<CpuInfo?> LazyCpu = new (() => CrossPlatform.Detect());
+    private static readonly Lazy<CpuInfo?> LazyCpu = new(() => CrossPlatform.Detect());
     public static CpuInfo? Cpu => LazyCpu.Value;
 
     public bool IsApplicable() => detectors.Any(loader => loader.IsApplicable());

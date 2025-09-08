@@ -11,17 +11,17 @@ namespace BenchmarkDotNet.Environments
 {
     public class CoreRuntime : Runtime
     {
-        public static readonly CoreRuntime Core20 = new (RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
-        public static readonly CoreRuntime Core21 = new (RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
-        public static readonly CoreRuntime Core22 = new (RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
-        public static readonly CoreRuntime Core30 = new (RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
-        public static readonly CoreRuntime Core31 = new (RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
-        public static readonly CoreRuntime Core50 = new (RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
-        public static readonly CoreRuntime Core60 = new (RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
-        public static readonly CoreRuntime Core70 = new (RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
-        public static readonly CoreRuntime Core80 = new (RuntimeMoniker.Net80, "net8.0", ".NET 8.0");
-        public static readonly CoreRuntime Core90 = new (RuntimeMoniker.Net90, "net9.0", ".NET 9.0");
-        public static readonly CoreRuntime Core10_0 = new (RuntimeMoniker.Net10_0, "net10.0", ".NET 10.0");
+        public static readonly CoreRuntime Core20 = new(RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
+        public static readonly CoreRuntime Core21 = new(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
+        public static readonly CoreRuntime Core22 = new(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
+        public static readonly CoreRuntime Core30 = new(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
+        public static readonly CoreRuntime Core31 = new(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
+        public static readonly CoreRuntime Core50 = new(RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
+        public static readonly CoreRuntime Core60 = new(RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
+        public static readonly CoreRuntime Core70 = new(RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
+        public static readonly CoreRuntime Core80 = new(RuntimeMoniker.Net80, "net8.0", ".NET 8.0");
+        public static readonly CoreRuntime Core90 = new(RuntimeMoniker.Net90, "net9.0", ".NET 9.0");
+        public static readonly CoreRuntime Core10_0 = new(RuntimeMoniker.Net10_0, "net10.0", ".NET 10.0");
 
         public static CoreRuntime Latest => Core10_0; // when dotnet/runtime branches for 11.0, this will need to get updated
 
@@ -99,11 +99,26 @@ namespace BenchmarkDotNet.Environments
                 return true;
             }
 
-            var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(typeof(object).Assembly.Location);
-            // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
-            if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+            string coreclrLocation = typeof(object).Assembly.Location;
+            // Single-file publish has empty assembly location.
+            if (!string.IsNullOrEmpty(coreclrLocation))
             {
-                return true;
+                var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(coreclrLocation);
+                // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
+                if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // .Net Core 3.X supports single-file publish, .Net Core 2.X does not.
+                // .Net Core 3.X fixed the version in FrameworkDescription, so we don't need to handle the case of 4.6.x in this branch.
+                var frameworkDescriptionVersion = GetParsableVersionPart(GetVersionFromFrameworkDescription());
+                if (Version.TryParse(frameworkDescriptionVersion, out version))
+                {
+                    return true;
+                }
             }
 
             // it's OK to use this method only after checking the previous ones
@@ -123,6 +138,14 @@ namespace BenchmarkDotNet.Environments
 
             version = null;
             return false;
+        }
+
+        internal static string GetVersionFromFrameworkDescription()
+        {
+            // .NET 10.0.0-preview.5.25277.114 -> 10.0.0-preview.5.25277.114
+            // .NET Core 3.1.32 -> 3.1.32
+            string frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            return new string(frameworkDescription.SkipWhile(c => !char.IsDigit(c)).ToArray());
         }
 
         // sample input:

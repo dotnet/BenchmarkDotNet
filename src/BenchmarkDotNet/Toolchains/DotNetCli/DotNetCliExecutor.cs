@@ -75,11 +75,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            using (Process process = new () { StartInfo = startInfo })
-            using (ConsoleExitHandler consoleExitHandler = new (process, logger))
-            using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
+            using (Process process = new() { StartInfo = startInfo })
+            using (ConsoleExitHandler consoleExitHandler = new(process, logger))
+            using (AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false))
             {
-                Broker broker = new (logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                Broker broker = new(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 

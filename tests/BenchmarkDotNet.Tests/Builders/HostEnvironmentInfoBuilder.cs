@@ -23,10 +23,10 @@ namespace BenchmarkDotNet.Tests.Builders
         private bool isServerGC = false;
         private string jitInfo = "RyuJIT-v4.6.x.mock";
         private string jitModules = "clrjit-v4.6.x.mock";
-        private OsInfo os = new () { Display = "Microsoft Windows NT 10.0.x.mock" };
+        private OsInfo os = new() { Display = "Microsoft Windows NT 10.0.x.mock" };
         private string runtimeVersion = "Clr 4.0.x.mock";
 
-        private readonly CpuInfo cpu = new ()
+        private readonly CpuInfo cpu = new()
         {
             ProcessorName = "MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
             PhysicalProcessorCount = 1,

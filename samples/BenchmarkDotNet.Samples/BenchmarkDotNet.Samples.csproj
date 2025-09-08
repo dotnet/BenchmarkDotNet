@@ -13,21 +13,25 @@
     <NoWarn>$(NoWarn);CA1018;CA5351;CA1825</NoWarn>
     <!-- Disable entry point generation as this project has it's own entry point -->
     <GenerateProgramFile>false</GenerateProgramFile>
+    <!-- Disable parallel tests between TargetFrameworks -->
+    <TestTfmsInParallel>false</TestTfmsInParallel>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Reflection" />
-    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Use 9.0.0 as baseline package for IntroNuGet -->
+    <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+  </PropertyGroup>
   <ItemGroup>
-    <!-- Use v9.0.3 as baseline package for WithNuGet tests -->
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.3" />
+    <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
     <!-- The Test SDK is required only for the VSTest Adapter to work -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <!-- This package enables the Visual Studio Profiler integration IntroVisualStudioProfiler.cs -->
-    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.0.36127.1" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.0.36302.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />

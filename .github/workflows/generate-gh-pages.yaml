@@ -23,7 +23,7 @@ jobs:
       run: ./build.cmd build
 
     - name: Fetch changelog
-      run: ./build.cmd docs-fetch --depth 1 --preview
+      run: ./build.cmd docs-fetch --depth 1 --preview --force-clone
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

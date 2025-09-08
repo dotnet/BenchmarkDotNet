@@ -19,10 +19,10 @@ namespace BenchmarkDotNet.Tests.Order
 {
     public class DefaultOrdererTests
     {
-        private static Summary CreateMockSummary() => new ("", ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(),
+        private static Summary CreateMockSummary() => new("", ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(),
             "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
 
-        private static BenchmarkCase CreateBenchmarkCase(string category, int parameter, params BenchmarkLogicalGroupRule[] rules) => new (
+        private static BenchmarkCase CreateBenchmarkCase(string category, int parameter, params BenchmarkLogicalGroupRule[] rules) => new(
             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo, categories: new[] { category }),
             new Job(),
             new ParameterInstances(new[]

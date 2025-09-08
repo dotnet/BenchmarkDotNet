@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Validators
 {
     public class ParamsValidator : IValidator
     {
-        public static readonly ParamsValidator FailOnError = new ();
+        public static readonly ParamsValidator FailOnError = new();
 
         public bool TreatsWarningsAsErrors => true;
 

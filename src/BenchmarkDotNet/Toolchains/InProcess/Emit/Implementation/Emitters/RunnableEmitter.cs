@@ -917,7 +917,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             var prepareForRunMethodTemplate = typeof(RunnableReuse).GetMethod(nameof(RunnableReuse.PrepareForRun))
                 ?? throw new MissingMemberException(nameof(RunnableReuse.PrepareForRun));
-            var resultTuple = new ValueTuple<Job, EngineParameters, IEngineFactory>();
+            (Job, EngineParameters, IEngineFactory) resultTuple = new();
 
             /*
                 .method public hidebysig static

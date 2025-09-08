@@ -41,16 +41,16 @@ namespace BenchmarkDotNet.Toolchains
         {
             try
             {
-                using AnonymousPipeServerStream inputFromBenchmark = new (PipeDirection.In, HandleInheritability.Inheritable);
-                using AnonymousPipeServerStream acknowledgments = new (PipeDirection.Out, HandleInheritability.Inheritable);
+                using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
+                using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
 
                 string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString());
 
-                using (Process process = new () { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
-                using (ConsoleExitHandler consoleExitHandler = new (process, logger))
-                using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
+                using (Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
+                using (ConsoleExitHandler consoleExitHandler = new(process, logger))
+                using (AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false))
                 {
-                    Broker broker = new (logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                    Broker broker = new(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 

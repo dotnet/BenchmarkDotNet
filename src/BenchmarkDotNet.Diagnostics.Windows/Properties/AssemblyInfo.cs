@@ -7,8 +7,4 @@ using BenchmarkDotNet.Properties;
 
 [assembly: CLSCompliant(true)]
 
-#if RELEASE
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
-#else
-[assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
-#endif

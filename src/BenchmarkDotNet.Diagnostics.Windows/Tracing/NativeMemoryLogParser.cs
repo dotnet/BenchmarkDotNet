@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             this.benchmarkCase = benchmarkCase;
             this.logger = logger;
 
-            moduleName = programName;
+            moduleName = programName.ToLowerInvariant();
             functionNames = new[]
             {
                 nameof(EngineParameters.WorkloadActionUnroll),

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Engines
         private bool EvaluateOverhead { get; }
         private bool MemoryRandomization { get; }
 
-        private readonly List<Measurement> jittingMeasurements = new (10);
+        private readonly List<Measurement> jittingMeasurements = new(10);
         private readonly bool includeExtraStats;
         private readonly Random random;
 
@@ -220,31 +221,56 @@ namespace BenchmarkDotNet.Engines
 
         private (GcStats, ThreadingStats, double) GetExtraStats(IterationData data)
         {
-            // we enable monitoring after main target run, for this single iteration which is executed at the end
-            // so even if we enable AppDomain monitoring in separate process
-            // it does not matter, because we have already obtained the results!
-            EnableMonitoring();
+            // Warm up the measurement functions before starting the actual measurement.
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
+            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
 
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
             var exceptionsStats = new ExceptionsStats(); // allocates
             exceptionsStats.StartListening(); // this method might allocate
-            var initialGcStats = GcStats.ReadInitial();
 
-            WorkloadAction(data.InvokeCount / data.UnrollFactor);
+#if !NET7_0_OR_GREATER
+            if (RuntimeInformation.IsNetCore && Environment.Version.Major is >= 3 and <= 6 && RuntimeInformation.IsTieredJitEnabled)
+            {
+                // #1542
+                // We put the current thread to sleep so tiered jit can kick in, compile its stuff,
+                // and NOT allocate anything on the background thread when we are measuring allocations.
+                // This is only an issue on netcoreapp3.0 to net6.0. Tiered jit allocations were "fixed" in net7.0
+                // (maybe not completely eliminated forever, but at least reduced to a point where measurements are much more stable),
+                // and netcoreapp2.X uses only GetAllocatedBytesForCurrentThread which doesn't capture the tiered jit allocations.
+                Thread.Sleep(TimeSpan.FromMilliseconds(500));
+            }
+#endif
 
-            exceptionsStats.Stop();
-            var finalGcStats = GcStats.ReadFinal();
+            // GC collect before measuring allocations.
+            ForceGcCollect();
+            GcStats gcStats;
+            using (FinalizerBlocker.MaybeStart())
+            {
+                gcStats = MeasureWithGc(data.InvokeCount / data.UnrollFactor);
+            }
+
+            exceptionsStats.Stop(); // this method might (de)allocate
             var finalThreadingStats = ThreadingStats.ReadFinal();
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
             var totalOperationsCount = data.InvokeCount * OperationsPerInvoke;
-            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(totalOperationsCount);
-            ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            return (gcStats.WithTotalOperations(totalOperationsCount),
+                (finalThreadingStats - initialThreadingStats).WithTotalOperations(totalOperationsCount),
+                exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
+        }
 
-            return (gcStats, threadingStats, exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
+        // Isolate the allocation measurement and skip tier0 jit to make sure we don't get any unexpected allocations.
+        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
+        private GcStats MeasureWithGc(long invokeCount)
+        {
+            var initialGcStats = GcStats.ReadInitial();
+            WorkloadAction(invokeCount);
+            var finalGcStats = GcStats.ReadFinal();
+            return finalGcStats - initialGcStats;
         }
 
         private void RandomizeManagedHeapMemory()
@@ -273,7 +299,7 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        private static void ForceGcCollect()
+        internal static void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -283,15 +309,6 @@ namespace BenchmarkDotNet.Engines
         public void WriteLine(string text) => Host.WriteLine(text);
 
         public void WriteLine() => Host.WriteLine();
-
-        private static void EnableMonitoring()
-        {
-            if (RuntimeInformation.IsOldMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
-                return;
-
-            if (RuntimeInformation.IsFullFramework)
-                AppDomain.MonitoringIsEnabled = true;
-        }
 
         [UsedImplicitly]
         public static class Signals
@@ -314,6 +331,72 @@ namespace BenchmarkDotNet.Engines
 
             public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
+        }
+
+        // Very long key and value so this shouldn't be used outside of unit tests.
+        internal const string UnitTestBlockFinalizerEnvKey = "BENCHMARKDOTNET_UNITTEST_BLOCK_FINALIZER_FOR_MEMORYDIAGNOSER";
+        internal const string UnitTestBlockFinalizerEnvValue = UnitTestBlockFinalizerEnvKey + "_ACTIVE";
+
+        // To prevent finalizers interfering with allocation measurements for unit tests,
+        // we block the finalizer thread until we've completed the measurement.
+        // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
+        private readonly struct FinalizerBlocker : IDisposable
+        {
+            private readonly object hangLock;
+
+            private FinalizerBlocker(object hangLock) => this.hangLock = hangLock;
+
+            private sealed class Impl
+            {
+                // ManualResetEvent(Slim) allocates when it is waited and yields the thread,
+                // so we use Monitor.Wait instead which does not allocate managed memory.
+                // This behavior is not documented, but was observed with the VS Profiler.
+                private readonly object hangLock = new();
+                private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
+
+                ~Impl()
+                {
+                    lock (hangLock)
+                    {
+                        enteredFinalizerEvent.Set();
+                        Monitor.Wait(hangLock);
+                    }
+                }
+
+                [MethodImpl(MethodImplOptions.NoInlining)]
+                internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
+                {
+                    var impl = new Impl();
+                    return (impl.hangLock, impl.enteredFinalizerEvent);
+                }
+            }
+
+            internal static FinalizerBlocker MaybeStart()
+            {
+                if (Environment.GetEnvironmentVariable(UnitTestBlockFinalizerEnvKey) != UnitTestBlockFinalizerEnvValue)
+                {
+                    return default;
+                }
+                var (hangLock, enteredFinalizerEvent) = Impl.CreateWeakly();
+                do
+                {
+                    GC.Collect();
+                    // Do NOT call GC.WaitForPendingFinalizers.
+                }
+                while (!enteredFinalizerEvent.IsSet);
+                return new FinalizerBlocker(hangLock);
+            }
+
+            public void Dispose()
+            {
+                if (hangLock is not null)
+                {
+                    lock (hangLock)
+                    {
+                        Monitor.Pulse(hangLock);
+                    }
+                }
+            }
         }
     }
 }
