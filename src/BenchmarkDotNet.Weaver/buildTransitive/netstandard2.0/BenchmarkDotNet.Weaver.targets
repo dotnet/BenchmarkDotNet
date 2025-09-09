@@ -2,7 +2,13 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
 
-  <Target Name="WeaveAssemblies" AfterTargets="AfterBuild" >
+  <Target Name="MarkShouldRunWeaveAssemblyTask" AfterTargets="Build">
+    <PropertyGroup>
+      <ShouldRunWeaveAssemblyTask>true</ShouldRunWeaveAssemblyTask>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="WeaveAssemblies" AfterTargets="MarkShouldRunWeaveAssemblyTask" BeforeTargets="Publish" Condition="'$(ShouldRunWeaveAssemblyTask)' == 'true'" >
     <WeaveAssemblyTask TargetAssembly="$(TargetDir)$(TargetFileName)" />
   </Target>
 </Project>
