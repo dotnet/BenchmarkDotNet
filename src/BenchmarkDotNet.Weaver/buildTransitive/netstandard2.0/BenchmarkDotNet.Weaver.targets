@@ -8,7 +8,7 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="WeaveAssemblies" AfterTargets="MarkShouldRunWeaveAssemblyTask" BeforeTargets="Publish" Condition="'$(ShouldRunWeaveAssemblyTask)' == 'true'" >
-    <WeaveAssemblyTask TargetAssembly="$(TargetDir)$(TargetFileName)" />
+  <Target Name="WeaveAssemblies" AfterTargets="MarkShouldRunWeaveAssemblyTask" BeforeTargets="Publish" >
+    <WeaveAssemblyTask TargetAssembly="$(TargetDir)$(TargetFileName)" Condition="'$(ShouldRunWeaveAssemblyTask)' == 'true'" />
   </Target>
 </Project>
