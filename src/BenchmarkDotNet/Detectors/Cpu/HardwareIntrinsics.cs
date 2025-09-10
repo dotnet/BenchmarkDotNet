@@ -76,7 +76,6 @@ namespace BenchmarkDotNet.Detectors.Cpu
                         if (IsX86SerializeSupported) yield return "SERIALIZE";
                         break;
                     }
-                    
                     case Platform.Arm64:
                     {
                         if (IsArmBaseSupported)
