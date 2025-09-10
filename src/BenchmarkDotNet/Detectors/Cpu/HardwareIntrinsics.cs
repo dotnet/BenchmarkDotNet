@@ -11,7 +11,7 @@ using System.Runtime.Intrinsics.Arm;
 
 namespace BenchmarkDotNet.Detectors.Cpu
 {
-    // based on https://github.com/dotnet/runtime/blob/main/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
+    // based on https://github.com/dotnet/runtime/tree/v10.0.0-rc.1.25451.107/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
     internal static class HardwareIntrinsics
     {
         internal static string GetVectorSize() => Vector.IsHardwareAccelerated ? $"VectorSize={Vector<byte>.Count * 8}" : string.Empty;

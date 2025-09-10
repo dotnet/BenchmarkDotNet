@@ -236,7 +236,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         private string GetCurrentInstructionSet(Platform platform)
             => string.Join(",", GetCurrentProcessInstructionSets(platform));
 
-        // based on https://github.com/dotnet/runtime/blob/main/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
+        // based on https://github.com/dotnet/runtime/tree/v10.0.0-rc.1.25451.107/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
         private IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
         {
             if (!ConfigParser.TryParse(TargetFrameworkMoniker, out RuntimeMoniker runtimeMoniker))
@@ -258,7 +258,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86BaseSupported) yield return "base";
                     if (HardwareIntrinsics.IsX86Sse42Supported)
                     {
-                        yield return "sse4.2";
+                        if (runtimeMoniker <= RuntimeMoniker.NativeAot10_0) yield return "sse4.2";
                         if (runtimeMoniker <= RuntimeMoniker.NativeAot90) yield return "popcnt";
                     }
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
