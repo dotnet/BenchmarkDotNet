@@ -62,10 +62,10 @@ namespace BenchmarkDotNet.Detectors.Cpu
                         if (IsX86Avx10v1Supported)
                         {
                             yield return "AVX10v1";
-                            yield return "AVX512 BF16+FP16"
+                            yield return "AVX512 BF16+FP16";
                         }
-                        if (IsX86Avx512v3Supported) yield return "AVX512 BITALG+VBMI2+VNNI+VPOPCNTDQ"
-                        if (IsX86Avx512v2Supported) yield return "AVX512 IFMA+VBMI"
+                        if (IsX86Avx512v3Supported) yield return "AVX512 BITALG+VBMI2+VNNI+VPOPCNTDQ";
+                        if (IsX86Avx512v2Supported) yield return "AVX512 IFMA+VBMI";
                         if (IsX86Avx512Supported) yield return "AVX512 F+BW+CD+DQ+VL";
                         if (IsX86Avx2Supported) yield return "AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE";
                         if (IsX86AvxSupported) yield return "AVX";
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Detectors.Cpu
             Sse2.IsSupported;
 #elif NETSTANDARD
             GetIsSupported("System.Runtime.Intrinsics.X86.X86Base") &&
-            GetIsSupported("System.Runtime.Intrinsics.X86.Sse")
+            GetIsSupported("System.Runtime.Intrinsics.X86.Sse") &&
             GetIsSupported("System.Runtime.Intrinsics.X86.Sse2");
 #endif
 
