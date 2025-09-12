@@ -232,8 +232,24 @@ namespace BenchmarkDotNet.Running
                 {
                     var benchmark = benchmarks[i];
 
-                    powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode
-                        ?? benchmark.Job.ResolveValue(EnvironmentMode.PowerPlanModeCharacteristic, EnvironmentResolver.Instance).GetValueOrDefault());
+                    bool userExplicitlySetPlan = benchmark.Job.HasValue(EnvironmentMode.PowerPlanModeCharacteristic);
+
+                    var requestedPlan = benchmark.Job.Environment.PowerPlanMode
+                        ?? benchmark.Job.ResolveValue(EnvironmentMode.PowerPlanModeCharacteristic, EnvironmentResolver.Instance).GetValueOrDefault();
+
+                    // If the plan is not explicitly set and would downgrade Ultimate, skip changing
+                    if (!userExplicitlySetPlan && requestedPlan == PowerManagementApplier.Map(PowerPlan.HighPerformance))
+                    {
+                        var ultimateGuid = PowerManagementApplier.Map(PowerPlan.UltimatePerformance);
+                        var currentPlan = PowerManagementHelper.CurrentPlan;
+                        if (currentPlan.HasValue && currentPlan.Value == ultimateGuid)
+                        {
+                            logger.WriteLineInfo("Already on Ultimate Performance; not switching to High Performance since no plan explicitly set in Job.");
+                            continue;
+                        }
+                    }
+
+                    powerManagementApplier.ApplyPerformancePlan(requestedPlan);
 
                     var info = buildResults[benchmark];
                     var buildResult = info.buildResult;
