@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Portability;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,9 +8,6 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal static class MethodBuilderExtensions
     {
-        public static Type[] GetParameterTypes(this MethodBase method) =>
-            method.GetParameters().Select(p => p.ParameterType).ToArray();
-
         public static ParameterInfo[] GetEmitParameters(this MethodBuilder method, IEnumerable<ParameterInfo> signatureParameters) =>
             signatureParameters
                 .Select(p =>
