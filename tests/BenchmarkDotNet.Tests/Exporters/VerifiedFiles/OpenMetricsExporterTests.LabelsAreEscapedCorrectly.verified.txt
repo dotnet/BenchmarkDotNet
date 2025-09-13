@@ -1,0 +1,51 @@
+﻿# HELP benchmark_error_nanoseconds Standard error of the mean execution time in nanoseconds.
+# TYPE benchmark_error_nanoseconds gauge
+# UNIT benchmark_error_nanoseconds nanoseconds
+benchmark_error_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0
+# HELP benchmark_execution_time_nanoseconds Mean execution time in nanoseconds.
+# TYPE benchmark_execution_time_nanoseconds gauge
+# UNIT benchmark_execution_time_nanoseconds nanoseconds
+benchmark_execution_time_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0.1
+# HELP benchmark_gc_gen0_collections_total Total number of Gen 0 garbage collections during the benchmark execution.
+# TYPE benchmark_gc_gen0_collections_total counter
+benchmark_gc_gen0_collections_total{method="Foo", type="MockBenchmarkClass"} 0
+# HELP benchmark_gc_gen1_collections_total Total number of Gen 1 garbage collections during the benchmark execution.
+# TYPE benchmark_gc_gen1_collections_total counter
+benchmark_gc_gen1_collections_total{method="Foo", type="MockBenchmarkClass"} 0
+# HELP benchmark_gc_gen2_collections_total Total number of Gen 2 garbage collections during the benchmark execution.
+# TYPE benchmark_gc_gen2_collections_total counter
+benchmark_gc_gen2_collections_total{method="Foo", type="MockBenchmarkClass"} 0
+# HELP benchmark_gc_total_operations_total Total number of garbage collection operations during the benchmark execution.
+# TYPE benchmark_gc_total_operations_total counter
+benchmark_gc_total_operations_total{method="Foo", type="MockBenchmarkClass"} 0
+# HELP benchmark_label_with_dash Additional metric label_with-dash
+# TYPE benchmark_label_with_dash gauge
+benchmark_label_with_dash{method="Foo", type="MockBenchmarkClass"} 84
+# HELP benchmark_label_with_dot Additional metric label.with.dot
+# TYPE benchmark_label_with_dot gauge
+benchmark_label_with_dot{method="Foo", type="MockBenchmarkClass"} 168
+# HELP benchmark_label_with_space Additional metric label with space
+# TYPE benchmark_label_with_space gauge
+benchmark_label_with_space{method="Foo", type="MockBenchmarkClass"} 126
+# HELP benchmark_label_with_special_chars Additional metric label with special chars !@#$%^&*()
+# TYPE benchmark_label_with_special_chars gauge
+benchmark_label_with_special_chars{method="Foo", type="MockBenchmarkClass"} 210
+# HELP benchmark_label_with_special_chars_in_the_middle Additional metric label with special !@#$%^&*()chars in the middle
+# TYPE benchmark_label_with_special_chars_in_the_middle gauge
+benchmark_label_with_special_chars_in_the_middle{method="Foo", type="MockBenchmarkClass"} 210
+# HELP benchmark_label_with_underscore Additional metric label_with_underscore
+# TYPE benchmark_label_with_underscore gauge
+benchmark_label_with_underscore{method="Foo", type="MockBenchmarkClass"} 42
+# HELP benchmark_p90_nanoseconds 90th percentile execution time in nanoseconds.
+# TYPE benchmark_p90_nanoseconds gauge
+# UNIT benchmark_p90_nanoseconds nanoseconds
+benchmark_p90_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0.1
+# HELP benchmark_p95_nanoseconds 95th percentile execution time in nanoseconds.
+# TYPE benchmark_p95_nanoseconds gauge
+# UNIT benchmark_p95_nanoseconds nanoseconds
+benchmark_p95_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0.1
+# HELP benchmark_stddev_nanoseconds Standard deviation of execution time in nanoseconds.
+# TYPE benchmark_stddev_nanoseconds gauge
+# UNIT benchmark_stddev_nanoseconds nanoseconds
+benchmark_stddev_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0
+# EOF
