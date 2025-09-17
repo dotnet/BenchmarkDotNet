@@ -5158,34 +5158,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Jobs.NuGetReference.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Jobs.NuGetReference.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BenchmarkDotNet.Jobs.NuGetReference",
-      "Summary": null
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Jobs.NuGetReferenceList.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Jobs.NuGetReferenceList.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "BenchmarkDotNet.Jobs.NuGetReferenceList",
-      "Summary": "<p sourcefile=\"api/BenchmarkDotNet.Jobs.NuGetReferenceList.yml\" sourcestartlinenumber=\"1\">An ordered list of NuGet references. Does not allow duplicate references with the same PackageName.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Jobs.RunMode.yml",
       "output": {
         ".html": {
@@ -9314,6 +9286,16 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.15.2.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.15.3.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.15.3.html"
         }
       },
       "version": ""
