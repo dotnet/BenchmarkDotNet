@@ -2,7 +2,7 @@
   <PropertyGroup>
     <EntryPointSourceDirectory>$(MSBuildThisFileDirectory)..\entrypoints\</EntryPointSourceDirectory>
     <!-- Disable parallel tests between TargetFrameworks, if it's not explicitly specified. -->
-    <TestTfmsInParallel Condition="'$(TestTfmsInParallel)' = ''">false</TestTfmsInParallel>
+    <TestTfmsInParallel Condition="'$(TestTfmsInParallel)' == ''">false</TestTfmsInParallel>
   </PropertyGroup>
   <!-- 
     Microsoft.NET.Test.Sdk uses a property called "GenerateProgramFile" to determine whether it generates an entry 
