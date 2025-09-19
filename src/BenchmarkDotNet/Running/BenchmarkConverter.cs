@@ -308,7 +308,7 @@ namespace BenchmarkDotNet.Running
 
         private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type sourceType, string sourceName)
         {
-            var paramsSourceMethod = sourceType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
+            var paramsSourceMethod = sourceType.GetAllMethods().FirstOrDefault(method => method.Name == sourceName && method.IsPublic);
 
             if (paramsSourceMethod != default)
                 return (paramsSourceMethod, ToArray(
@@ -316,7 +316,7 @@ namespace BenchmarkDotNet.Running
                     paramsSourceMethod,
                     sourceType));
 
-            var paramsSourceProperty = sourceType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
+            var paramsSourceProperty = sourceType.GetAllProperties().FirstOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
 
             if (paramsSourceProperty != default)
                 return (paramsSourceProperty, ToArray(
