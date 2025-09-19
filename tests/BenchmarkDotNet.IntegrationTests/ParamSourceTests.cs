@@ -14,7 +14,7 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ParamSourceTests: BenchmarkTestExecutor
+    public class ParamSourceTests : BenchmarkTestExecutor
     {
         public ParamSourceTests(ITestOutputHelper output) : base(output) { }
 
@@ -204,5 +204,43 @@ namespace BenchmarkDotNet.IntegrationTests
             //   public void SourceWithExplicitCastToTarget_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), toolchain);
             Assert.ThrowsAny<Exception>(() => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), InProcessEmitToolchain.Instance));
         }
+
+        public abstract class OverridePropertyBase
+        {
+            public abstract int[] GetSourceProperty { get; }
+
+            [ParamsSource(nameof(GetSourceProperty))]
+            public int ParamsTarget { get; set; }
+        }
+
+        public class OverrideProperty : OverridePropertyBase
+        {
+            public override int[] GetSourceProperty => new int[] { 1, 2, 3 };
+
+            [Benchmark]
+            public int Benchmark() => ParamsTarget;
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void OverrideProperty_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(OverrideProperty), toolchain);
+
+        public abstract class OverrideMethodBase
+        {
+            public abstract int[] GetSourceMethod();
+
+            [ParamsSource(nameof(GetSourceMethod))]
+            public int ParamsTarget { get; set; }
+        }
+
+        public class OverrideMethod : OverrideMethodBase
+        {
+            public override int[] GetSourceMethod() => new int[] { 1, 2, 3 };
+
+            [Benchmark]
+            public int Benchmark() => ParamsTarget;
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void OverrideMethod_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(OverrideMethod), toolchain);
     }
 }
