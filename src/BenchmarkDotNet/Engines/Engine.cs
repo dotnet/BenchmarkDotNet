@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.Engines
             // #1542
             // If the jit is tiered, we put the current thread to sleep so it can kick in, compile its stuff,
             // and NOT allocate anything on the background thread when we are measuring allocations.
-            SleepHelper.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
+            SleepIfPositive(JitInfo.BackgroundCompilationDelay);
 
             GcStats gcStats;
             using (FinalizerBlocker.MaybeStart())
@@ -233,6 +233,15 @@ namespace BenchmarkDotNet.Engines
             return (gcStats.WithTotalOperations(totalOperationsCount),
                 (finalThreadingStats - initialThreadingStats).WithTotalOperations(totalOperationsCount),
                 exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
+        }
+
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
+        internal static void SleepIfPositive(TimeSpan timeSpan)
+        {
+            if (timeSpan > TimeSpan.Zero)
+            {
+                Thread.Sleep(timeSpan);
+            }
         }
 
         // Isolate the allocation measurement and skip tier0 jit to make sure we don't get any unexpected allocations.
