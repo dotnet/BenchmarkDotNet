@@ -25,9 +25,6 @@ namespace BenchmarkDotNet.Tests.Mocks
             Parameters = new EngineParameters
             {
                 TargetJob = job,
-                Dummy1Action = () => { },
-                Dummy2Action = () => { },
-                Dummy3Action = () => { },
                 WorkloadActionUnroll = _ => { },
                 WorkloadActionNoUnroll = _ => { },
                 OverheadActionUnroll = _ => { },

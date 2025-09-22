@@ -39,9 +39,6 @@ namespace BenchmarkDotNet.Engines
             {
                 WorkloadActionNoUnroll = engineParameters.WorkloadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionNoUnroll)),
                 WorkloadActionUnroll = engineParameters.WorkloadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionUnroll)),
-                Dummy1Action = engineParameters.Dummy1Action ?? throw new ArgumentNullException(nameof(EngineParameters.Dummy1Action)),
-                Dummy2Action = engineParameters.Dummy2Action ?? throw new ArgumentNullException(nameof(EngineParameters.Dummy2Action)),
-                Dummy3Action = engineParameters.Dummy3Action ?? throw new ArgumentNullException(nameof(EngineParameters.Dummy3Action)),
                 OverheadActionNoUnroll = engineParameters.OverheadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionNoUnroll)),
                 OverheadActionUnroll = engineParameters.OverheadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionUnroll)),
                 GlobalSetupAction = engineParameters.GlobalSetupAction ?? throw new ArgumentNullException(nameof(EngineParameters.GlobalSetupAction)),
@@ -103,12 +100,9 @@ namespace BenchmarkDotNet.Engines
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
                 {
                     var measurement = RunIteration(iterationData);
-                    if (iterationData.mode != IterationMode.Dummy)
-                    {
-                        stageMeasurements.Add(measurement);
-                        // Actual Workload is always the last stage, so we use the same data to run extra stats.
-                        extraStatsIterationData = iterationData;
-                    }
+                    stageMeasurements.Add(measurement);
+                    // Actual Workload is always the last stage, so we use the same data to run extra stats.
+                    extraStatsIterationData = iterationData;
                 }
                 measurements.AddRange(stageMeasurements);
 
@@ -148,14 +142,14 @@ namespace BenchmarkDotNet.Engines
 
             GcCollect();
 
-            if (EngineEventSource.Log.IsEnabled() && data.mode != IterationMode.Dummy)
+            if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStart(data.mode, data.stage, totalOperations);
 
             var clockSpan = randomizeMemory
                 ? MeasureWithRandomStack(data.workloadAction, invokeCount / unrollFactor)
                 : Measure(data.workloadAction, invokeCount / unrollFactor);
 
-            if (EngineEventSource.Log.IsEnabled() && data.mode != IterationMode.Dummy)
+            if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.mode, data.stage, totalOperations);
 
             data.cleanupAction();
@@ -167,10 +161,7 @@ namespace BenchmarkDotNet.Engines
 
             // Results
             var measurement = new Measurement(0, data.mode, data.stage, data.index, totalOperations, clockSpan.GetNanoseconds());
-            if (data.mode != IterationMode.Dummy)
-            {
-                Host.WriteLine(measurement.ToString());
-            }
+            Host.WriteLine(measurement.ToString());
             return measurement;
         }
 

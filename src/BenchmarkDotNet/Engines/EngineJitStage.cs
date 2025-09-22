@@ -9,12 +9,6 @@ namespace BenchmarkDotNet.Engines;
 
 internal abstract class EngineJitStage(EngineParameters parameters) : EngineStage(IterationStage.Jitting, IterationMode.Workload, parameters)
 {
-    protected readonly Action<long> dummy1Action= _ => parameters.Dummy1Action();
-    protected readonly Action<long> dummy2Action= _ => parameters.Dummy2Action();
-    protected readonly Action<long> dummy3Action = _ => parameters.Dummy3Action();
-
-    protected IterationData GetDummyIterationData(Action<long> dummyAction)
-        => new(IterationMode.Dummy, IterationStage.Jitting, iterationIndex, 1, 1, () => { }, () => { }, dummyAction);
 }
 
 // We do our best to encourage the jit to fully promote methods to tier1, but tiered jit relies on heuristics,
@@ -80,12 +74,9 @@ internal sealed class EngineFirstJitStage : EngineJitStage
         ++iterationIndex;
         if (evaluateOverhead)
         {
-            yield return GetDummyIterationData(dummy1Action);
             yield return GetOverheadIterationData(1);
         }
-        yield return GetDummyIterationData(dummy2Action);
         yield return GetWorkloadIterationData(1);
-        yield return GetDummyIterationData(dummy3Action);
 
         // If the jit is not tiered, we're done.
         if (!JitInfo.IsTiered)
@@ -173,14 +164,11 @@ internal sealed class EngineSecondJitStage : EngineJitStage
     {
         iterationData = ++iterationIndex switch
         {
-            1 => GetDummyIterationData(dummy1Action),
-            2 => new(IterationMode.Overhead, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.OverheadActionUnroll),
-            3 => GetDummyIterationData(dummy2Action),
+            1 => new(IterationMode.Overhead, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.OverheadActionUnroll),
             // IterationSetup/Cleanup are only used for *NoUnroll benchmarks
-            4 => new(IterationMode.Workload, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.WorkloadActionUnroll),
-            5 => GetDummyIterationData(dummy3Action),
+            2 => new(IterationMode.Workload, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.WorkloadActionUnroll),
             _ => default
         };
-        return iterationIndex <= 5;
+        return iterationIndex <= 2;
     }
 }

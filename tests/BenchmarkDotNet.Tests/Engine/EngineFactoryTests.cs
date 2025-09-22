@@ -217,9 +217,6 @@ namespace BenchmarkDotNet.Tests.Engine
         private EngineParameters CreateEngineParameters(Job job)
             => new()
             {
-                Dummy1Action = () => { },
-                Dummy2Action = () => { },
-                Dummy3Action = () => { },
                 GlobalSetupAction = GlobalSetup,
                 GlobalCleanupAction = GlobalCleanup,
                 Host = new NoAcknowledgementConsoleHost(),

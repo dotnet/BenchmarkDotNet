@@ -118,9 +118,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
                 var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
                 var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance);
-                var dummy1 = BenchmarkActionFactory.CreateDummy();
-                var dummy2 = BenchmarkActionFactory.CreateDummy();
-                var dummy3 = BenchmarkActionFactory.CreateDummy();
 
                 FillMembers(instance, benchmarkCase);
 
@@ -135,9 +132,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     Host = host,
                     WorkloadActionNoUnroll = workloadAction.InvokeNoUnroll,
                     WorkloadActionUnroll = workloadAction.InvokeUnroll,
-                    Dummy1Action = dummy1.InvokeSingle,
-                    Dummy2Action = dummy2.InvokeSingle,
-                    Dummy3Action = dummy3.InvokeSingle,
                     OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,
                     OverheadActionUnroll = overheadAction.InvokeUnroll,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
