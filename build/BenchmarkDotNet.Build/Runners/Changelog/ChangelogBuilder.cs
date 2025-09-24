@@ -244,8 +244,8 @@ public class ChangelogBuilder
 
         if (!context.DirectoryExists(SrcDirectory))
         {
-            Log($"Cloning branch '{Repo.ChangelogBranch}' from '{Repo.HttpsGitUrl}' to '{SrcDirectory}'.");
-            context.GitRunner.Clone(SrcDirectory, Repo.HttpsGitUrl, Repo.ChangelogBranch);
+            Log($"Cloning branch '{Repo.ChangelogBranch}' from '{Repo.SshGitUrl}' to '{SrcDirectory}'.");
+            context.GitRunner.Clone(SrcDirectory, Repo.SshGitUrl, Repo.ChangelogBranch);
             Log($"Clone completed: '{Repo.ChangelogBranch}' -> '{SrcDirectory}'.");
         }
         else

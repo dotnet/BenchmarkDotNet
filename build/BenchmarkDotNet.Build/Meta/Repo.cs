@@ -10,7 +10,7 @@ public static class Repo
     public const string Owner = "dotnet";
     public const string Name = "BenchmarkDotNet";
     public const string HttpsUrlBase = $"https://github.com/{Owner}/{Name}";
-    public const string HttpsGitUrl =  $"{HttpsUrlBase}.git";
+    public const string SshGitUrl =  $"git@github.com:{Owner}/{Name}.git";
     
     public const string ChangelogBranch = "docs-changelog";
     public const string DocsStableBranch = "docs-stable";
