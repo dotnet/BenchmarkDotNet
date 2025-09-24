@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.9.9.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.9.9.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -87,6 +87,110 @@
         <article data-uid="changelog.v0.9.9">
 <h1 id="benchmarkdotnet-v099">BenchmarkDotNet v0.9.9</h1>
 
+<ul>
+<li>Attribute config style (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/166">#166</a>)</li>
+<li><a href="https://perfdotnet.github.io/BenchmarkDotNet/index.htm">Online documentation</a> (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/219">#219</a>)</li>
+<li>Mono LLVM support (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/226">#226</a>)</li>
+<li>Async method support (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/236">#236</a>)</li>
+<li>NuGet packages and repo layout restructuring (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/225">#225</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/228">#228</a>)</li>
+<li><code>[Cleanup]</code> attribute (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/215">#215</a>)</li>
+<li>New statistics columns: <code>Skewness</code>, <code>Kurtosis</code>, <code>WelchTTestPValue</code>, Improved math for the <code>Scaled</code> column</li>
+<li>Now current default branch is <code>master</code></li>
+<li>Minor improvements and bug fixes</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.9.9">v0.9.9</a> scope,
+14 issues were resolved and 1 pull requests were merged.
+This release includes 46 commits by 4 contributors.</p>
+<h2 id="resolved-issues-14">Resolved issues (14)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/166">#166</a> Suggestion: Attribute Config style (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/215">#215</a> Allow a [Cleanup] method to be specified</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/219">#219</a> Online documentation and API reference</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/223">#223</a> Add support for System.Type in Params</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/224">#224</a> [Breaking change] BenchmarkAttribute become sealed.</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/225">#225</a> Refactoring the roslyn dependency into another package</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/226">#226</a> Support Mono/LLVM as a runtime/jit</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/227">#227</a> Suggestion: change default branch (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/228">#228</a> Suggestion: clean up the root folder</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/231">#231</a> Add references to default framework assemblies (System.Runtime etc)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/232">#232</a> Make all tests use OutputLogger (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/235">#235</a> Don't show non-error output of dotnet cli (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/236">#236</a> Possibility to benchmark asynchronous methods (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/240">#240</a> Total Time reports hour rounded up</li>
+</ul>
+<h2 id="merged-pull-requests-1">Merged pull requests (1)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/233">#233</a> Add support of Cleanup attribute #215 (by <a href="https://github.com/DenisIstomin">@DenisIstomin</a>)</li>
+</ul>
+<h2 id="commits-46">Commits (46)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f9f7481deb1bbb1d166d8c1d9ac15b1ff5ddd172">f9f748</a> Improved &quot;Scaled&quot; column (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5d7ba933e6bf5b4210787c83dab8dee138131d83">5d7ba9</a> Warmup improvements (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/664c6474810d6a2fbcf024dffe2b075e5ef44eed">664c64</a> Add Skewness, Kurtosis, and WelchTTestPValue columns and configs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c9e802175535adcaaa890df03f557669abf9c189">c9e802</a> Attribute Config style, fixes #166 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/37817322cc6630cab021783277f43a7a17f8cbe3">378173</a> README: add supported OS (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/50ac57a0118eb13319e66a436bd4eddc0cb4676a">50ac57</a> Make Benchmark, Params and Setup attributes non-sealed again, fixes #224, #57 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b9c8157fbe2d95e50ce9407d4997e651614d3bd4">b9c815</a> Support Mono/LLVM as a runtime/jit, fixes #226 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cdfbd5ab6e5533e72185c57cf6c8f7c9f9813d08">cdfbd5</a> Update info about default branch, see #227 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/42e9b90f5ef4e5d71fb92c2a1bd450541380bed6">42e9b9</a> Add System.Type support in Params, fixes #223 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/db3dc3ffeef3ae0e886acbd0176174f5e4d50968">db3dc3</a> Suggestion: clean up the root folder, fixes #228 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4e1db34851bdb7cba0188c28974af96edfbacb36">4e1db3</a> use shorter names for test for xunit test runner (method name instead of full... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a35b226071ab0066d56f382f1cd240f31b6ceef0">a35b22</a> make sure all framework assemblies are referenced, #231 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19426aeb92ed5307d2a143b7f7e9c7748a1009b7">19426a</a> spliting BenchmarkDotNet.dll to few dlls to avoid mandatory Roslyn dependency... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/356a395a0d22cb6a0d451267fc120e947e186c5f">356a39</a> move BenchmarkRunner's core  to separate class to .Core project so it can be ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0121a6fde69d6a15485fa3773706212ef945fac7">0121a6</a> minor cleanup: rename LLVM =&gt; Llvm, remove [Obsolete] things (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fb8047f25dc2f9622f88ba802d6e359251ccf86e">fb8047</a> Make all tests use OutputLogger, fixes #232 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ae17a7f0df0cb8ea494fa8ca5dd8c5791bd429c0">ae17a7</a> Add support of Cleanup attribute, fix #215 (by <a href="https://github.com/DenisIstomin">@DenisIstomin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3bf9c0899d5b35a3bf2b63d5d860e343ae12a30d">3bf9c0</a> Merge branch 'master' of <a href="https://github.com/PerfDotNet/BenchmarkDotNet">https://github.com/PerfDotNet/BenchmarkDotNet</a> (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/355c6f6a20a6ae1927626665406be1f15f3ac8ef">355c6f</a> Don't show non-error output of dotnet cli, fixes #235 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/76df80ea2a2c1a4d2e116b6c2ed49c52880fb106">76df80</a> Possibility to benchmark asynchronous methods #236 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3ab5784cdf54b6f2ea503ef94da537e5918bc12b">3ab578</a> use GetAwaiter().GetResult() for Tasks instead of .Wait or .Result, #236 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d1db7ded6b21ca2ae5f0a5c748eb80d801deb218">d1db7d</a> Added documentation source and output based on readme.md (by <a href="https://github.com/FransBouma">@FransBouma</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ac8cf2880662c23fb7c211dd4b00fb6d1fde3b9d">ac8cf2</a> Updated folder structure, removed html output, updated gitignore (by <a href="https://github.com/FransBouma">@FransBouma</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bed0f9c95089b45073a3ce42351e5bb5ee60e97c">bed0f9</a> Removed unused folder copy directive from docnet.json (by <a href="https://github.com/FransBouma">@FransBouma</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/650fca6daf832ed8a49d8e4e916f73d0679d88a2">650fca</a> Merge pull request #239 from FransBouma/master (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/aceb968db2dd706d84e61926110a464b9728bcbf">aceb96</a> Added Api docs generation directives (by <a href="https://github.com/FransBouma">@FransBouma</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a9ee7c41b89c97ecda06fa9efd9f8abf852e3db3">a9ee7c</a> Fix in total time formatting, fix #240 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1d21410d2de6d41889bd5701a4945292bcb9075c">1d2141</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7b9fdbaefa2fc373d207cd57ea7a6591a00c98a6">7b9fdb</a> Fixed a couple of issues with api doc generation (by <a href="https://github.com/FransBouma">@FransBouma</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/682837cc52a258b011ebe53ba371cb745682f255">682837</a> Merge pull request #243 from FransBouma/master (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9a2cf20559a4dc149a9ad6c8d01d113ae94e7afd">9a2cf2</a> docs improvements (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/33492541b3e41a2e79357d98f2cab1fb887932ab">334925</a> Rename: GarbageCollection -&gt; GcMode (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7a740a117345780bb08fb7e40fa5038d47b8e083">7a740a</a> SummaryTableTests and minor refactorings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c9d358f78b0c85f6b51aeeefc4b08279eb01d734">c9d358</a> Transform GcModeColumn with null values to a trivial column (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cb63595015ef9f1db333ce3dd028fe08d08a479c">cb6359</a> Improved HardwareTimerKind detection (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/04f7364e2ebee815bcad70efb780dbc2d657d6d9">04f736</a> Fix references in the IntegrationTests project files (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a9403a9693a27b9470a35f8c74318d365a88b2a6">a9403a</a> Fix warnings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/691a058f5d63ae6f18b5e9d4089abc30ae94ed6b">691a05</a> BenchmarkDotNet.Tests: Remove the System.Globalization dependency (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9e97d7075e874485e80bd22ffe10c0101bbfae22">9e97d7</a> Show JitModules in EnvInfo only for the classic toolchain (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8235184d2205685d02cd8dfe1e0f992aef71ce8f">823518</a> Improved docs (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5fb8549b83f7fd39ab93b35b00fc33dc845012c5">5fb854</a> Update README (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5ebf8bbb185316b31449966a0133823eff6f7afb">5ebf8b</a> Minor fixes (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/086dfd67c8b500bcaec16aab853dc5dcdb9f565c">086dfd</a> generic wrapper for config values (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/cf58b07079c6b49fd112fa0821d1d1116c7d9237">cf58b0</a> Merge branch 'gc' (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bbccbede0210573c898565a00811664fac743963">bbccbe</a> docs: add informations about NuGet packages (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/60bea388230ba87e65c5cbb2dc87c6b74089126d">60bea3</a> Set library version: 0.9.9 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Denis Istomin (<a href="https://github.com/DenisIstomin">@DenisIstomin</a>)</li>
+<li>Frans Bouma (<a href="https://github.com/FransBouma">@FransBouma</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: August 18, 2016</em></p>
+<p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.9.9">v0.9.9</a></em></p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.9.9">https://www.nuget.org/packages/BenchmarkDotNet/0.9.9</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Core/0.9.9">https://www.nuget.org/packages/BenchmarkDotNet.Core/0.9.9</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/0.9.9">https://www.nuget.org/packages/BenchmarkDotNet.Toolchains.Roslyn/0.9.9</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.9.9">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.9.9</a></li>
+</ul>
+<p><em>Online Documentation:</em> <a href="https://perfdotnet.github.io/BenchmarkDotNet/">https://perfdotnet.github.io/BenchmarkDotNet/</a></p>
 
 </article>
 

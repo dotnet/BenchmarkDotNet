@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.15.1.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.15.1.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -87,6 +87,86 @@
         <article data-uid="changelog.v0.15.1">
 <h1 id="benchmarkdotnet-v0151">BenchmarkDotNet v0.15.1</h1>
 
+<h2 id="highlights">Highlights</h2>
+<ul>
+<li>Added support for *.slnx (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/2763">#2763</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2764">#2764</a>)</li>
+<li>Enabled ArgumentsSource to reference methods in other types (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/2744">#2744</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2748">#2748</a>)</li>
+<li>Resolved fatal errors for ARM CPUs (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/2745">#2745</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2756">#2756</a>)</li>
+<li>Fixed bugs related to support for Android, browser, iOS, and tvOS (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/2739">#2739</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2741">#2741</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2740">#2740</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2742">#2742</a>)</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.15.1">v0.15.1</a> scope,
+6 issues were resolved and 12 pull requests were merged.
+This release includes 17 commits by 6 contributors.</p>
+<h2 id="resolved-issues-6">Resolved issues (6)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2619">#2619</a> Added support to get exported file paths</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2739">#2739</a> System.PlatformNotSupportedException thrown in DisposeAtProcessTermination with Android (assignee: <a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2740">#2740</a> System.NullReferenceException in thrown in ZeroMeasurementAnalyser with Android (assignee: <a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2744">#2744</a> Allow ArgumentsSource to reference methods in other types (assignee: <a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2745">#2745</a> Running benchmark with BenchmarkDotNet 15.0 fails with Fatal error. 0xC0000005, WakeLock (assignee: <a href="https://github.com/christiannagel">@christiannagel</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2763">#2763</a> Unable to find Solution root directory if benchmark project uses .slnx</li>
+</ul>
+<h2 id="merged-pull-requests-12">Merged pull requests (12)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2738">#2738</a> chore: Update run-tests.yaml (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2741">#2741</a> Fix #2739: OS check for platform specific event (by <a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2742">#2742</a> Fix #2740: Use CpuInfo.Unknown if CpuDetector.Detect() does not find supported OS (by <a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2746">#2746</a> [build] Rework changelog generation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2748">#2748</a> Allow ArgumentsSource to reference methods in other types (by <a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2750">#2750</a> deps: Update package dependencies (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2752">#2752</a> chore: Fix the line endings in the files to LF. (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2755">#2755</a> chore: Update Microsoft.NET.Test.Sdk version (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2756">#2756</a> Refactor WakeLock.PInvoke for compatibility with the ARM CPU #2745 (by <a href="https://github.com/christiannagel">@christiannagel</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2759">#2759</a> chore: Change ExporterBase::GetArtifactFullName accessibility to public (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2762">#2762</a> Bump .NET SDK: 8.0.401-&gt;8.0.410 (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2764">#2764</a> Test for both .sln and .slnx when searching for solution file (by <a href="https://github.com/bstordrup">@bstordrup</a>)</li>
+</ul>
+<h2 id="commits-17">Commits (17)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/37b5ca505eb1783194c3f82b57c01b0aa149c489">37b5ca</a> Set next BenchmarkDotNet version: 0.15.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7306cdf5e9aed7aeeefc4a4361dbd9bb371ca80a">7306cd</a> [build] Bump actions/upload-artifact in generate-gh-pages: v1-&gt;v4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a0ad259a72d31945d0dda19e1cd188c8506b52fe">a0ad25</a> [build] Bump actions/download-artifact in generate-gh-pages: v1-&gt;v4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c21ac5a4e976aa38f91c5509cfa3231975768b93">c21ac5</a> [build] Improve generate-gh-pages.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2b6d7c796b5ba667c4729aabc1baa1181c556ef7">2b6d7c</a> chore: update run-tests.yaml (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7da69ade92ad898406229ff7d9ba931236804538">7da69a</a> Bump Perfolizer: 0.5.2-&gt;0.5.3 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c0bcfb965752d9d7ffe32e0a93e95bfec5c09b36">c0bcfb</a> Fix #2740: Use Cpu.Unknown if using unsupported OS (by <a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8bf4623c41201bc9877ea4976c24f6c8c0ebd969">8bf462</a> Fix #2739: OS check for platform exclusive event (#2741) (by <a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/93d12c42c0adbc33702cdc42e1fc494d2c919208">93d12c</a> [build] Rework changelog generation (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/67664a313fba76cff2d8f53fe2b77f4bd08fefe5">67664a</a> deps: Update package dependencies (#2750) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ba1f9982bc920d95ee6b84d4d731cf3ada40df9e">ba1f99</a> Allow ArgumentsSource to reference methods in other types (#2748) (by <a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0134497366cb7276116fae416c1f5040123de466">013449</a> chore: fix line-endings to lf (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/68feeb4adb923c970074cb122426678438daa2df">68feeb</a> Refactor WakeLock.PInvoke for compatibility with the ARM CPU #2745 (#2756) (by <a href="https://github.com/christiannagel">@christiannagel</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5c9d070671aa9d7cf93ee3b54c8ed52b15046108">5c9d07</a> chore: Update Microsoft.NET.Test.Sdk version (#2755) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d8eea0d0027f6e4dd061df67b016c6c15dd2b8dd">d8eea0</a> chore: modify ExporterBase::GetArtifactFullName accessibility (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/78a6b10690b058d0db8ac3b9e55f7d9aee5eb895">78a6b1</a> Test for both .sln and .slnx when searching for solution file (#2764) (by <a href="https://github.com/bstordrup">@bstordrup</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0d909f3eacf64aa1a02f188142ff420845ec0b22">0d909f</a> deps: update dotnet sdk version to 8.0.410 (#2762) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+</ul>
+<h2 id="contributors-6">Contributors (6)</h2>
+<ul>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Benny Tordrup (<a href="https://github.com/bstordrup">@bstordrup</a>)</li>
+<li>BraedenLS (<a href="https://github.com/BraedenLS">@BraedenLS</a>)</li>
+<li>Christian Nagel (<a href="https://github.com/christiannagel">@christiannagel</a>)</li>
+<li>filzrev (<a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li>Jimmy Cushnie (<a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: June 9, 2025</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.15.1">v0.15.1</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.15.0...v0.15.1">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.1">https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.1</a></li>
+</ul>
 
 </article>
 

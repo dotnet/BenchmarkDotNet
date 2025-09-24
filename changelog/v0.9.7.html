@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.9.7.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.9.7.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -87,6 +87,72 @@
         <article data-uid="changelog.v0.9.7">
 <h1 id="benchmarkdotnet-v097">BenchmarkDotNet v0.9.7</h1>
 
+<ul>
+<li>.NET Core RC2 support (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/pull/187">#187</a>)</li>
+<li>Bugfixes</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.9.7">v0.9.7</a> scope,
+8 issues were resolved and 0 pull requests were merged.
+This release includes 27 commits by 3 contributors.</p>
+<h2 id="resolved-issues-8">Resolved issues (8)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/168">#168</a> Unable to run tests locally</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/170">#170</a> Error handling in the spawned Benchmark process (assignee: <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/172">#172</a> Ensure CsvMeasurementsExporter is enabled when RPlotExporter is used (assignee: <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/179">#179</a> Job.GetAllProperties(): old property names are used</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/181">#181</a> CompositeValidator: some validators will be skipped</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/183">#183</a> [Suggestion] Make ValidationError public</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/187">#187</a> .NET Core RC2 (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/192">#192</a> Avoid creating .cs files at execution time</li>
+</ul>
+<h2 id="merged-pull-requests-0">Merged pull requests (0)</h2>
+<h2 id="commits-27">Commits (27)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7568c06e8647f0bc4e8d53d1a00c61b526ec0289">7568c0</a> Initial work on #130 (currently just matching existing behaviour) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/34965eef529c8adc59e31b70ba1f88efdc930034">34965e</a> Fixes #170 (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d6d32088df7c18a7be287c6ecd6fe265b35edbb">4d6d32</a> Remove &quot;@&quot; from the ProcessorName (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/57b40243235c7bf7a9088affec6d7b241c8c2037">57b402</a> Specify HintPath for all referenced assemblies (for mono support) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0d065b97a58e74348a1e5a2793328a0146ea7dde">0d065b</a> Merge branch 'develop' of github.com:PerfDotNet/BenchmarkDotNet into develop (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c24a9cf8aad0cc013c977317e2f62a643e3b8047">c24a9c</a> Less &quot;magic&quot; strings - Fixes #179 (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1371eae3cfffa22d1fe8dd4c4a1af64b99060fdf">1371ea</a> Allow Exporters to have dependencies, fixes #172 (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d6a55c58747a33b2efbbb39664ac3458b00cc8d7">d6a55c</a> Further work on #130 (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e0ebd475e2d91da1c5710b9e456aa6ee91a57423">e0ebd4</a> Tidy up of the Json exporter code (part of #189) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ae330c416595e3da361c1676a3718b0abae2db50">ae330c</a> Allow formatted/indented Json (see #189) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/83fd20c79bbdbe456a34b5474be729b2e4ef5a54">83fd20</a> Also allow args with &quot;--&quot;, i.e. --exporters=json (see #189) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/78af456094a99c4efc10cd5b977b4551cdf86d82">78af45</a> File missing from previous check-in &quot;ae330c4&quot; (#189) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9352d0c7a2491aa9f2fd9f9e0e3b141430b59b80">9352d0</a> &quot;Measurments&quot; -&gt; &quot;Measurements&quot; (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a345070175928d593f981077edab58823f4b4a36">a34507</a> .NET Core RC2 support, fixes #187 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0c9524481fd6e51d4c5552dd71b7aa340d104a54">0c9524</a> remove IValidationError interface, make the implementation public, fixes #183 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/30a6ec9463886e56f9f58624f07b6de833c1e4ec">30a6ec</a> Avoid creating .cs files at execution time, fixes #192 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/792176d1a39a22adfb542d5c5df3fb7373889e5c">792176</a> hiding CompositeValidator, fix few typos, fixes #181 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a345e71e178cdf7f1745902360cb73523bce9851">a345e7</a> Use short, hard coded name for folders to avoid PathTooLongEx if user does no... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/354b28662d9987133ab58b605349ff5aba3ef9bc">354b28</a> minor cleanup after moving to RC2 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/53b7ffd9cf607f04991da5167ce6817cbf8bcaf3">53b7ff</a> dotnet cli bug workaround,  Tornhoof's idea (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8e6d304afc7d400bd3f13dde084eaf56b1f85423">8e6d30</a> added missing Nuget feeds to NuGet.Config, removed launchSettings which we do... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9addd0cfeb6d2ce95d736c3f8e0046e59f6f402e">9addd0</a> Improvements in MethodInvoker (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ccd91dc7070cb3fc99f61b8137433297bbd27113">ccd91d</a> Update Chronometer.HardwareTimerKind (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e9db3d26992bc9792bc412dcf65f8029a013ceb8">e9db3d</a> Update year in LICENSE.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/acd01956e8a5572516a2756f6e348eb34d2986dc">acd019</a> updated docs for .NET Core RC2 #187 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/605aa1c5ce801c12913b0104c9f977058a2e4645">605aa1</a> README.md: add a link to BenchmarkDotNet.Diagnostics.Windows (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/571b3dec965d6341ed5a3432c5ac75458f2c7457">571b3d</a> Set library version: 0.9.7 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-3">Contributors (3)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Matt Warren (<a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.9.7">v0.9.7</a></em></p>
+<p><em>Date: May 29, 2016</em></p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.9.7">https://www.nuget.org/packages/BenchmarkDotNet/0.9.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.9.7-beta">https://www.nuget.org/packages/BenchmarkDotNet/0.9.7-beta</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.9.7">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.9.7</a></li>
+</ul>
 
 </article>
 

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.9.4.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.9.4.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -87,6 +87,116 @@
         <article data-uid="changelog.v0.9.4">
 <h1 id="benchmarkdotnet-v094">BenchmarkDotNet v0.9.4</h1>
 
+<ul>
+<li>Improved messages about error in benchmarks, see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/104">#104</a></li>
+<li>Natural sort order, see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/92">#92</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/95">#95</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/97">#97</a></li>
+<li>Improved <code>double</code>/<code>float</code>/<code>decimal</code>/<code>enum</code> support for Params, see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/96">#96</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/105">#105</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/116">#116</a></li>
+<li>Now environment info includes information about <code>HardwareTimerKind</code> and <code>JitModules</code></li>
+<li>Added <code>DryConfig</code></li>
+<li>Improved export performance, closed <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/119">#119</a>, merged <a href="https://github.com/PerfDotNet/BenchmarkDotNet/pull/124">#124</a></li>
+<li>Better cmd-line discoverability (see <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/78">#78</a>), e.g. run <code>Benchmark.exe --help</code> and some useful information will be printed</li>
+<li>Supporting all kinds of references for generated project (exact version, custom paths, GAC, sub-folders, dependent assemblies not copied), closed <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/41">#41</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/49">#49</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/72">#72</a>, <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/123">#123</a>, merged <a href="https://github.com/PerfDotNet/BenchmarkDotNet/pull/125">#125</a></li>
+<li>Friendliness to LinqPad restored, closed <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues/66">#66</a>, merged <a href="https://github.com/PerfDotNet/BenchmarkDotNet/pull/125">#125</a></li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.9.4">v0.9.4</a> scope,
+13 issues were resolved and 2 pull requests were merged.
+This release includes 55 commits by 4 contributors.</p>
+<h2 id="resolved-issues-13">Resolved issues (13)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/41">#41</a> Seems, not supported &quot;sub-folder&quot;</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/49">#49</a> Dependent assemblies are not copied or added to the project file.</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/72">#72</a> Referenced assembly dll-file (directly via file) not referenced in generated Program.csproj</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/78">#78</a> Better command line discoverability (assignee: <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/92">#92</a> Results in the R graphs aren't displayed in a &quot;Natural Sort Order&quot;</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/95">#95</a> Results should preserve the order of param values definition</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/96">#96</a> Implement enums as valid Param for test</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/97">#97</a> Params changes an order</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/104">#104</a> System.InvalidOperationException: StatSummary: Sequence contains no elements</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/105">#105</a> Params Attribute bug with float type</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/116">#116</a> Issue when ParamAttribute decorated property is double and current system culture has comma as decimal separator</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/119">#119</a> For large benchmarks report exporting is very, very slow and has a massive Gen2 heap</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/123">#123</a> Can not run benchmark that references custom framework library (like WindowsBase)</li>
+</ul>
+<h2 id="merged-pull-requests-2">Merged pull requests (2)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/124">#124</a> Faster export (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/125">#125</a> supporting all kinds of references for generated project (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="commits-55">Commits (55)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/74789dac32b63dc68ef9fc9a5e76a9b3b6cdc47a">74789d</a> Sort results by Parameter, in a Natural Sort Order (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fec115216e622b3362980c0ea5991442f13b76af">fec115</a> ParameterComparer refacotring (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9d38562ee2241139c27dfc37f60f0bb897e58736">9d3856</a> Add information about JIT modules in EnvironmentHelper (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7667ee321320b76be7a41ee02320b03cc5976153">7667ee</a> Adding TraceEvent library for parsing ETW Events (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ae71f296843b2d9bd05892477241c4193573b42e">ae71f2</a> More work on the GC/Allocation diagnostics (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/efa7391d05b550ec5715a18c205924f94265bd0b">efa739</a> Allow diagnosers to be run from cmd line or via [Config(..)] (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/633f1c414dac352eb33b6d28a7ab381c871ea5e8">633f1c</a> Throw an error when invalid Config(..) options are specified (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/04678af2a0f50d06292bbdd0dabf07b3bd810cb8">04678a</a> Add information about HardwareTimerKind (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7f3cf06dfae24a7873f1e0b8ad6c7ff7623717ce">7f3cf0</a> Fix in GetCorrectTypeNameTest (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d9b8909e85587acef17f7f6c1e310eb1f0178e4b">d9b890</a> Fix in HardwareTimerKind (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/416e36eb6bcb71d025cb9c7bd416df127d83a2ba">416e36</a> Natural sort order for CsvMeasurementsExporter and plots, Fixed #92 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dfc54aeb19996e4a2f6104fe8687cc558496a0ac">dfc54a</a> Ensure we sort the results by Method Name/Description (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fa6c627776d2560e709150a50a7af1fdfae8af3e">fa6c62</a> Changed GCDiagnoser to inspect live ETW event stream instead of recording to ... (by <a href="https://github.com/goldshtn">@goldshtn</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d3f7ce6294fe94150c810bc27122d2aa927748dc">d3f7ce</a> Params: float/double/decimal support, Fixed #105 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7bce9b1d1ab92a4095cbf6332f5359736877729e">7bce9b</a> Params: enum support, Fixed #96 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4890dd5717843a00100eedcc55166d3375a82232">4890dd</a> Merge pull request #106 from goldshtn/develop (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9072b9819d440e2c9c6c9a3aac4bfe90edbe3f6b">9072b9</a> More robust when a benchmark throws an exception (see #104) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2b9162d75af7cb851122d7e1e3993a02ce258eee">2b9162</a> Work on #73 - highlighting in the Console output (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f624833aba851a1fb38d9519d6e8c453229a8b1a">f62483</a> Work on #73 - highlighting in the Console output (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a639d5abf26bc8d2ac25cc00ca2748867bff3532">a639d5</a> Work on #73 - highlighting in Markdown output (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1457feb8cde35d1f0ce06f48b6b29f300f7e13f7">1457fe</a> Changing [ConfigWithDryJobs] -&gt; [DryConfig] (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/396b7dc74b20eb8a6a091a0c1d27e5cb45768e49">396b7d</a> Diagnostics for &quot;JIT In-lining&quot; events (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7a1027cd954ebb120a4659d8db2a58e04401abdf">7a1027</a> Merge remote-tracking branch 'origin/master' into develop (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6ec7f0e35ba6cf61b79e39849c79d2b64a229fbb">6ec7f0</a> GC Diagnosers: reference to nuget package, unit test for both CLASSIC and DNX (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9e70594b4323211dda7a42806b38ee15d7857fcb">9e7059</a> Proper XML Doc comment for DryConfig attribute (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ad6be7f7326cd8acbc05565193ccf4acf684a366">ad6be7</a> README.md: update (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a4d0b85d8b9358b0d4f421e6c332b9d649099212">a4d0b8</a> Merge branch 'master' into develop (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/71e9119474c0030a87719b91c283bb76fd0d1260">71e911</a> perf:  CSV export: less allocations, reusing JobShortInfo (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/409b5e1cc65b1e44f430f6ea3d1a1dd2244619f6">409b5e</a> perf: logging with less allocations (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/be6bfc1880bf83e44c73b8b6d6e32373d6c8cbe6">be6bfc</a> perf: simpified LoggerWithPrefix, no need to check for multiple lines because... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ade8a1af06fe42bc3e522e7a927d6fc5714600bf">ade8a1</a> perf: avoid string.Concat and string.PadLeft (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f070eb43fdffa02819ee0fe4abe800d700bd35e8">f070eb</a> perf: reuse AllProperties, reduced complexity (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/57c88bb6440a1aa805adf3fe932c5871454e550d">57c88b</a> perf: deffer export to enable continuous progress updates instead of single l... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/40071d68dc3ab84b51588013aa2c61b56946524d">40071d</a> loggers: final cleanup and fix for doubled new lines for diagnosers (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c468547441e9bd6f4c2e695b9b7ad457aa899c9a">c46854</a> supporting all kinds of references for generated project. This closes #49, cl... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a36e3414db97343bbe0bfbedff85b8cb912ee7a4">a36e34</a> Initial work on better cmd line discoverability (part of #78) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3f0752bfbd9c4d57fd9a6732fd7f6253cb333c9c">3f0752</a> Better formatting in the Baseline column (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8ab1a2b65f78384d1aa667a65ec4bd11d1404eda">8ab1a2</a> More samples (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1981a3aba04e1d4d1e8384836a38eb094c43225c">1981a3</a> Refactoring of ConfigParser code (part of #78) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3d1ebaa9fcf7f74a9e8a724d49ddc43c57560027">3d1eba</a> Allows &quot;Exporters&quot; and &quot;Analysers&quot; to be specified via cmd line (part of #78) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5d195ad4b85cf2d5dcae1f472098cc89f627294c">5d195a</a> Allow &quot;all&quot; option, i.e. &quot;exporters=all&quot; (part of #78) (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2146b83daa30d7e297e4ebac86b51b93352b42bf">2146b8</a> Added some tests for ConfigParser (by <a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/582e08929566b41fa48f1cb76a468e344d872937">582e08</a> Merge pull request #124 from PerfDotNet/perf (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/84e67d1089978577d99b720532e9b17438ef2e91">84e67d</a> README: Update team section (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d600156eff57f68b6726014a6a940dadd282dc7">4d6001</a> README: add FAQ question (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/43ade3c4daf0f64f7acdeffc99c34c0c56ab6a7b">43ade3</a> BenchmarkDotNet.Samples: add #CLASSIC_RELEASE in launchSettings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e3c2d12f38c3a97e8571c1b5a49db18436b6af3c">e3c2d1</a> README: some improvements (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c416c4512a85a7b2df447e88d1a9283174923fed">c416c4</a> use the highest used target framework version to avoid framework mismatches +... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8a49b393eddebef3787d323a7af02cb76ceb5002">8a49b3</a> Merge branch 'develop' into references (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/23b2eafe08de826297beefc99cc5300e5a5e503c">23b2ea</a> integration tests for complex references scenarios (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ddfa4a295e6a3d9844d5203ef3ef980150a5c579">ddfa4a</a> classic: specify full name and use newer msbuild dlls to avoid calling extra bat (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/79e8eb4a0a2c07ba9a9af5a15c0d45f7d1402758">79e8eb</a> code cleanup after LINQPad 4 &amp; 5 verification (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/445137fbba9d292f47dfd10a0b11fc7e073cfc7c">445137</a> Merge pull request #125 from PerfDotNet/references (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4f1e1f0ef72a0b9c52c033bf0b86a20c78f36e8f">4f1e1f</a> Update package description (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0f55318e680b7cfcc20da0cbff62af485b9f19c3">0f5531</a> Set library version: 0.9.4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Matt Warren (<a href="https://github.com/mattwarren">@mattwarren</a>)</li>
+<li>Sasha Goldshtein (<a href="https://github.com/goldshtn">@goldshtn</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.9.4">v0.9.4</a></em></p>
+<p><em>Date: March 24, 2016</em></p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.9.4">https://www.nuget.org/packages/BenchmarkDotNet/0.9.4</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.9.4-beta">https://www.nuget.org/packages/BenchmarkDotNet/0.9.4-beta</a></li>
+</ul>
 
 </article>
 

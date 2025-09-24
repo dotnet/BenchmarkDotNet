@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.11.1.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.11.1.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -87,6 +87,86 @@
         <article data-uid="changelog.v0.11.1">
 <h1 id="benchmarkdotnet-v0111">BenchmarkDotNet v0.11.1</h1>
 
+<p>This release includes some minor improvements and bug fixes:</p>
+<ul>
+<li>Fixed <code>RPlotExporter</code> (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/852">#852</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/issues/855">#855</a>).
+In v0.11.0, the plot generation was broken because of the huge renaming in <a href="https://github.com/dotnet/BenchmarkDotNet/issues/787">#787</a>.</li>
+<li><a class="xref" href="../articles/samples/IntroArgumentsSource.html">ArgumentsSource</a> now supports additional types like
+<code>Type</code> (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/840">#840</a>),
+<code>BigInteger</code> (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/850">#850</a>),
+<code>DateTime</code> (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/853">#853</a>),
+and special double values like <code>double.NaN</code>  (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/851">#851</a>)</li>
+<li>Generated projects ignore Directory.Build.props and Directory.Build.targets files <a href="https://github.com/dotnet/BenchmarkDotNet/pull/854">#854</a></li>
+<li>Now it's possible to run benchmarks with CoreRun (<a href="https://github.com/dotnet/BenchmarkDotNet/commit/de152c7acc71eddeaa304c846cc67e6a54ca7a0f">de152c</a>, <a href="https://github.com/dotnet/BenchmarkDotNet/pull/857">#857</a>)</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.11.1">v0.11.1</a> scope,
+7 issues were resolved and 2 pull requests were merged.
+This release includes 29 commits by 4 contributors.</p>
+<h2 id="resolved-issues-7">Resolved issues (7)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/840">#840</a> ArgumentsSource doesn't work with System.RuntimeType (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/850">#850</a> Handle BigIntegers arguments properly (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/851">#851</a> Handle double special values like NaN etc (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/852">#852</a> BuildPlots script generates empty pictures (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/853">#853</a> ArgumentsSource containing IFormattable leads to Compile Exceptions (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/855">#855</a> Empty plot (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/857">#857</a> Improve user experience for working with local CoreFX builds (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-2">Merged pull requests (2)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/839">#839</a> Small Typo in changelog (by <a href="https://github.com/Tornhoof">@Tornhoof</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/854">#854</a> Exclude Directory.Build.props/targets from generated csproj files (by <a href="https://github.com/agocke">@agocke</a>)</li>
+</ul>
+<h2 id="commits-29">Commits (29)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c37aa8680bc6fde2f3a0eb300ca2f2234dbbcf8d">c37aa8</a> Postrelease update of v0.11.0 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b7f7fcdb8a3ba0e5e32c4cbe5f65b5add8642e0b">b7f7fc</a> Handle private types in GetCorrectCSharpTypeName, fixes #840 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/52215889370659058ff0ed9a70f018c41c527bb1">522158</a> Handle private types in GetCorrectCSharpTypeName (part 2), fixes #840 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/64acde9dbb1507a1423750888f74e9014a7f62a8">64acde</a> small typo (#839) (by <a href="https://github.com/Tornhoof">@Tornhoof</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/521c2289c5956bbd2a14eacac6303dfb557cb68a">521c22</a> Add travis_wait for build.sh (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a8a0da9a147b4dd7eab2320cea351ad8fdbb1f30">a8a0da</a> Update BenchmarkDotNet.sln.DotSettings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9ab58a96f87eb2781a8bcc360bf88846d3985a05">9ab58a</a> Introduce BenchmarkDotNet.Samples.csproj.DotSettings (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3ce9fe9e311b56a573e521c76ea9f6a4dfcdc298">3ce9fe</a> BenchmarkDotNet.Samples Cleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a04a23aee9cf0df038083d2fad998097cb57d2de">a04a23</a> Cleanup: spelling issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c377844397375bd835358c2526672c6fb90497cb">c37784</a> Cleanup: code style issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5f84526b97acb99ef13248d8762fcedfdcaa38ff">5f8452</a> Cleanup: Redundancies in Code issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a76f438a81e3e0235a2e9b1249a5280038189689">a76f43</a> Cleanup: Common Practices and Code Improvements in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2d062972eacb6f1106a7863036bf9512c3c3d0e6">2d0629</a> Cleanup: Redundancies in Symbol Declarations Issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5a76897b4d5c3501750bf266111706faf974cc7e">5a7689</a> Cleanup: Constraints Violations Issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/02df24538062851041e933ac0fe511ad8db20e77">02df24</a> Cleanup: Language Usage Opportunities in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/93ed395caee38c592de079d57e22644ebecd1bfd">93ed39</a> Cleanup: Potential Code Quality Issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/538f568fc6d55ad05951f72a46049fcef6f27321">538f56</a> Cleanup: more issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/559773646b56a0dbf9887a90ffad373a904d8bc5">559773</a> Cleanup: more issues in BenchmarkDotNet (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29471e8a6a800bf389590b9ac76df6c1845b2f2f">29471e</a> add support for BigIntegers + include namespace of the arugments, fixes #850 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2aff9f3ac32dd06fe2ef029b0016935ad4f94ee7">2aff9f</a> Handle double and float special values like NaN, PositiveInfinity etc, fixes ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1a68edb73c5db791f4ecc5dec0869545aa446b5c">1a68ed</a> properties of SummaryStyle must have public setter (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5cfb5b6650168af7f368062ca552fd125d739a5d">5cfb5b</a> support DateTimes for [Arguments/Params Source], fixes #853 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2be698ba3893610c698ff6aa0f0a6f0aa8fbd669">2be698</a> Fix RPlots, fixes #852 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7ee3cf3151def1cc302e02c73a4fcd1303da8b29">7ee3cf</a> Exclude Directory.Build.props/targets from generated csproj files (by <a href="https://github.com/agocke">@agocke</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/20e901502756df4d96ee3d148c542a1b374af364">20e901</a> Merge pull request #854 from agocke/fix-csproj-template (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/de152c7acc71eddeaa304c846cc67e6a54ca7a0f">de152c</a> allow the users to run benchmarks with CoreRun, #857 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f00ac05c82cf0ca98a4adfca98049ea53fe8a092">f00ac0</a> Increase travis timeout (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/071e58d882084dcc9196c9dd8065a5bd1101cdd5">071e58</a> docs: add changelog for v0.11.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c5e58679dfb793165cc3ca66c761306228ac3b73">c5e586</a> Set library version: 0.11.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Andy Gocke (<a href="https://github.com/agocke">@agocke</a>)</li>
+<li>Stefan (<a href="https://github.com/Tornhoof">@Tornhoof</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: August 22, 2018</em></p>
+<p><em>Milestone: <a href="https://github.com/PerfDotNet/BenchmarkDotNet/issues?q=milestone%3Av0.11.1">v0.11.1</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.11.0...v0.11.1">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.11.1">https://www.nuget.org/packages/BenchmarkDotNet/0.11.1</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.11.1">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.11.1</a></li>
+</ul>
 
 </article>
 

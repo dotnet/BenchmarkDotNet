@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.15.3.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.15.3.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -87,6 +87,120 @@
         <article data-uid="changelog.v0.15.3">
 <h1 id="benchmarkdotnet-v0153">BenchmarkDotNet v0.15.3</h1>
 
+<h2 id="highlights">Highlights</h2>
+<p>Improvements:</p>
+<ul>
+<li>Naot instruction set support for .NET 10+, migrate to ISA groupings in CPU summary <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2828">#2828</a></li>
+<li>Support benchmark filtering for TestAdapter <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2662">#2662</a> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2788">#2788</a></li>
+<li>Support non-primitive external types in <code>ArgumentsSource</code> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2820">#2820</a></li>
+<li>Enable MSBuild parallel build via <code>--nodeReuse:false</code> <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2693">#2693</a> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2814">#2814</a></li>
+<li>Improve CPU detection <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2747">#2747</a> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2749">#2749</a></li>
+<li>Enable assembly signing for debug build <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2774">#2774</a></li>
+</ul>
+<p>Deprecations:</p>
+<ul>
+<li>Deprecated <code>WithNuget</code> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2812">#2812</a></li>
+</ul>
+<p>Bug fixes:</p>
+<ul>
+<li>Fix <code>InvalidOperationException</code> in diagnosers <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2758">#2758</a> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2805">#2805</a></li>
+<li>Fix file detection in <code>NativeMemoryProfiler</code> <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2794">#2794</a> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2795">#2795</a></li>
+<li>Fix long file paths issue in <code>EtwProfiler</code> <a href="https://github.com/dotnet/BenchmarkDotNet/issues/2807">#2807</a> <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2808">#2808</a></li>
+<li>Fix log duplications in TestAdapter <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2790">#2790</a></li>
+<li>Fix x86 disassembler error for net462 <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2792">#2792</a></li>
+<li>Fix <code>IsNetCore</code> and <code>IsNativeAOT</code> for single-file apps without AOT <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2799">#2799</a></li>
+<li>Fix density plot generation in <code>RPlotExporter</code> for latest version of R <a href="https://github.com/dotnet/BenchmarkDotNet/pull/2809">#2809</a></li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.15.3">v0.15.3</a> scope,
+6 issues were resolved and 20 pull requests were merged.
+This release includes 23 commits by 9 contributors.</p>
+<h2 id="resolved-issues-6">Resolved issues (6)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2662">#2662</a> Unable to filter benchmarks with TestAdapter</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2693">#2693</a> Feature: Add extensibility to the  DotnetCliCommand (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2747">#2747</a> &quot;Unknown processor&quot; on Windows (assignee: <a href="https://github.com/alastairlundy">@alastairlundy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2758">#2758</a> [Bug] <code>InvalidOperationException</code> thrown on some conditions when using <code>BenchmarkDotNetDiagnosers</code> (assignee: <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2794">#2794</a> NativeMemoryProfiler no longer works as of 0.15 (assignee: <a href="https://github.com/mriehm">@mriehm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2807">#2807</a> EtwProfiler traces fail to merge if path approaches 260 chars (assignee: <a href="https://github.com/mriehm">@mriehm</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-20">Merged pull requests (20)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2749">#2749</a> Fix &quot;Unknown Processor&quot; on Windows if WMIC is not present (by <a href="https://github.com/alastairlundy">@alastairlundy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2774">#2774</a> chore: Enable assembly signing for debug build (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2788">#2788</a> feat: Add filter support for TestAdapter (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2790">#2790</a> fix: Console logs are outputted twice when using TestAdapter (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2792">#2792</a> chore: Fix x86 disassembler error for net462 (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2795">#2795</a> Lowercase programName in NativeMemoryLogParser.cs (by <a href="https://github.com/mriehm">@mriehm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2796">#2796</a> chore: Replace StyleCop.Analyzer library to unstable version (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2797">#2797</a> chore: Add GitHub Actions workflow that run selected tests (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2799">#2799</a> Fix <code>IsNetCore</code> and <code>IsNativeAOT</code> for single-file apps without AOT (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2802">#2802</a> Fix comment in package props about GenerateProgramFile (by <a href="https://github.com/Youssef1313">@Youssef1313</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2805">#2805</a> deps: Update BenchmarkDotNetDiagnosers package version (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2808">#2808</a> Fix EtwProfiler for file paths slightly under 260 chars (by <a href="https://github.com/mriehm">@mriehm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2809">#2809</a> Fix density plot error by using correct bandwidth string in BuildPlots.R (by <a href="https://github.com/AtomChen0425">@AtomChen0425</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2812">#2812</a> Deprecate <code>WithNuget</code> (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2813">#2813</a> chore: Fix flaky AllocationQuantumIsNotAnIssueForNetCore21Plus tests on macos (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2814">#2814</a> Use <code>--nodeReuse:false</code> (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2816">#2816</a> chore: Ensure <code>EventProcessor::OnEndValidationStage</code> is called when critical validation error contained (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2817">#2817</a> chore: Suppress XmlException thrown internally on <code>AppConfigGenerator::Generate</code> method (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2820">#2820</a> Fix ArgumentsSource on external types not working if the argument type is not primitive (by <a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2828">#2828</a> Update the naot instruction set support for .NET 10+ (by <a href="https://github.com/tannergooding">@tannergooding</a>)</li>
+</ul>
+<h2 id="commits-23">Commits (23)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ffce52e3b45792a064b8be10342ff3266bdb91df">ffce52</a> Set next BenchmarkDotNet version: 0.15.3 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7d4210d65feb632cd77d7e00685a5b89322be18a">7d4210</a> Fix &quot;Unknown Processor&quot; on Windows if WMIC is not present (#2749) (by <a href="https://github.com/alastairlundy">@alastairlundy</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f8390f8ff1af22928d094c58773723fb8b099019">f8390f</a> chore: enable assembly signing for debug build (#2774) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/799ecfc514f310efcd93d274199795f2ae4e276e">799ecf</a> fix: Console logs are outputted twice when using TestAdapter (#2790) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b6de7258d5dcff845b9e1ecce023c1796c3ba168">b6de72</a> Lowercase programName in NativeMemoryLogParser.cs (#2795) (by <a href="https://github.com/mriehm">@mriehm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/aeedf36e92e7b107f5f999e08fa33a00210a7b67">aeedf3</a> chore: fix x86 disassembler error for net462 (#2792) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/da43e0bca46c6d4a6b7ba8389a333d980149e88c">da43e0</a> chore: Replace StyleCop.Analyzer library to unstable version (#2796) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ab703aa85361a002be756616d26253e3485e8383">ab703a</a> chore: add workflow to run selected tests (#2797) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4f646d3663a5947cddee2ace92219b1755dee962">4f646d</a> Fix <code>IsNetCore</code> and <code>IsNativeAOT</code> for single-file apps without AOT (#2799) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d990f104cd27ae9af12210b4e21a31ceb5986464">d990f1</a> Fix comment in package props about GenerateProgramFile (#2802) (by <a href="https://github.com/Youssef1313">@Youssef1313</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a15782f7682a384eeb7e52bc010cc793f7900a1b">a15782</a> Fix workload warmup mode. (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/604ff55c00edb3d778e484f56cbc9b50d66245ea">604ff5</a> deps: update BenchmarkDotNetDiagnosers package version (#2805) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/197d8ed98fd6e373d268baac977997ca3a6b5ab4">197d8e</a> Split <code>TimeConsumingBenchmark</code> class to reduce test time. (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/81a4e552005a24f01788f4aae861398da77021c3">81a4e5</a> Fix EtwProfiler for file paths slightly under 260 chars (#2808) (by <a href="https://github.com/mriehm">@mriehm</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8b62787c79f1513b2868b4d4d685d79a7f3acd51">8b6278</a> feat: add vstestadapter filter support (#2788) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7250970347cffd7e83da5521c46d75a1c492dd2a">725097</a> chore: fix flaky memorydiagnoser tests on macos (#2813) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a9cd7803d143003860581cef69e542d5fce0a87f">a9cd78</a> Deprecate <code>WithNuget</code> (#2812) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/daa233906cc5aba9aa94d4bc1b3dc449e42806e9">daa233</a> Use <code>--nodeReuse:false</code>. (#2814) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e2d30d37433444b0f43088727a14885d76c56bfc">e2d30d</a> chore: ensure EventProcessor::OnEndValidationStage is called when critical va... (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e7cf8b4a25aec2c561029e6e665c0942c2c042da">e7cf8b</a> chore: suppress XmlException thrown when TextReader.Null passed (#2817) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e704adb6926f4743a361800676817094ca1787d0">e704ad</a> Fix ArgumentsSource on external types not working if the argument type is not... (by <a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0806c67ffb4029e0043d66cb23a12b15dfb0051f">0806c6</a> Update the naot instruction set support for .NET 10+ (#2828) (by <a href="https://github.com/tannergooding">@tannergooding</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/96620b63b1e3633a7b51ea699ae940254aa365d1">96620b</a> Fix typo in BuildPlots.R (by <a href="https://github.com/AtomChen0425">@AtomChen0425</a>)</li>
+</ul>
+<h2 id="contributors-9">Contributors (9)</h2>
+<ul>
+<li>Alastair Lundy (<a href="https://github.com/alastairlundy">@alastairlundy</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>filzrev (<a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li>Jimmy Cushnie (<a href="https://github.com/JimmyCushnie">@JimmyCushnie</a>)</li>
+<li>Mark Riehm (<a href="https://github.com/mriehm">@mriehm</a>)</li>
+<li>Tanner Gooding (<a href="https://github.com/tannergooding">@tannergooding</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li>Youssef Victor (<a href="https://github.com/Youssef1313">@Youssef1313</a>)</li>
+<li>Yuhang Chen (<a href="https://github.com/AtomChen0425">@AtomChen0425</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: September 17, 2025</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.15.3">v0.15.3</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.15.2...v0.15.3">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.3</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.3">https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.3</a></li>
+</ul>
 
 </article>
 
