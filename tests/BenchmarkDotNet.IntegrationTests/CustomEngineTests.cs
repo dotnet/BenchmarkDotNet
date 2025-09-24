@@ -7,7 +7,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Characteristics;
 using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -85,18 +84,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
             public void Dispose() => GlobalCleanupAction?.Invoke();
 
-            public IHost Host { get; }
-            public void WriteLine() { }
-            public void WriteLine(string line) { }
-            public Job TargetJob { get; }
-            public long OperationsPerInvoke { get; }
             public Action GlobalSetupAction { get; set; }
             public Action GlobalCleanupAction { get; set; }
-            public Action<long> WorkloadAction { get; }
-            public Action<long> OverheadAction { get; }
-            public IResolver Resolver { get; }
-
-            public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }
         }
     }
 }
