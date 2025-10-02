@@ -1,0 +1,34 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <!-- If the RuntimeIdentifier is explicitly specified. Use the specified target platform. -->
+    <BenchmarkDotNetTargetPlatform>$(RuntimeIdentifier)</BenchmarkDotNetTargetPlatform>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(BenchmarkDotNetTargetPlatform)' == ''">
+    <!-- If RuntimeIdentifier is not specified Use current build platform -->
+    <!-- List of runtimes supported by Gee.External.Capstone: https://github.com/9ee1/Capstone.NET/tree/master/Gee.External.Capstone/runtimes -->
+    <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('Windows'))">win</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx</BenchmarkDotNetTargetPlatform>
+
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">$(BenchmarkDotNetTargetPlatform)-x64</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'">$(BenchmarkDotNetTargetPlatform)-x86</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm'">$(BenchmarkDotNetTargetPlatform)-arm</BenchmarkDotNetTargetPlatform>
+    <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">$(BenchmarkDotNetTargetPlatform)-arm64</BenchmarkDotNetTargetPlatform>
+  </PropertyGroup>
+
+  <Target Name="FilterBenchmarkDotNetPackageAssets" AfterTargets="ResolvePackageAssets">
+    <!-- Remove `runtimes/{RuntimeIdentifier}` files that is not matched to target platform. -->
+    <ItemGroup Condition="'$(BenchmarkDotNetTargetPlatform)' != '' AND $(BenchmarkDotNetTargetPlatform) != 'all'">
+      <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)"
+                                    Condition="'%(RuntimeTargetsCopyLocalItems.NuGetPackageId)' == 'Gee.External.Capstone' AND '%(RuntimeTargetsCopyLocalItems.RuntimeIdentifier)' != '$(BenchmarkDotNetTargetPlatform)'" />
+    </ItemGroup>
+
+    <!-- Remove unnecessary satellite assemblies. -->
+    <ItemGroup>
+      <ResourceCopyLocalItems Remove="@(ResourceCopyLocalItems)"
+                              Condition="'%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.CodeAnalysis.Common' OR '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.CodeAnalysis.CSharp'"/>
+    </ItemGroup>
+  </Target>
+</Project>
