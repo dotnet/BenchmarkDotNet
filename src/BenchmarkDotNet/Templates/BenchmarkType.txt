@@ -26,9 +26,6 @@
                 Host = host,
                 WorkloadActionUnroll = instance.WorkloadActionUnroll,
                 WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
-                Dummy1Action = instance.Dummy1,
-                Dummy2Action = instance.Dummy2,
-                Dummy3Action = instance.Dummy3,
                 OverheadActionNoUnroll = instance.OverheadActionNoUnroll,
                 OverheadActionUnroll = instance.OverheadActionUnroll,
                 GlobalSetupAction = instance.globalSetupAction,
@@ -82,26 +79,6 @@
         {
             NotEleven = new System.Random(123).Next(0, 10);
             $DisassemblerEntryMethodName$();
-        }
-
-        private System.Int32 dummyVar;
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private void Dummy1()
-        {
-            @DummyUnroll@
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private void Dummy2()
-        {
-            @DummyUnroll@
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private void Dummy3()
-        {
-            @DummyUnroll@
         }
 
         private $OverheadMethodReturnTypeName$ __Overhead($ArgumentsDefinition$) // __ is to avoid possible name conflict
