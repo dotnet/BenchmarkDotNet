@@ -5,11 +5,7 @@ VisualStudioVersion = 17.0.31710.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Analyzers", "src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj", "{B7664DD5-DCDB-4324-91A9-16D242CC4498}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Analyzers.Package", "src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.Package\BenchmarkDotNet.Analyzers.Package.csproj", "{B7500BDE-4DC7-4858-968F-11889AA4F289}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Analyzers.Tests", "src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.Tests\BenchmarkDotNet.Analyzers.Tests.csproj", "{5D1F1A9E-681D-456B-A838-2EAAAD24BC7D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Analyzers.Vsix", "src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.Vsix\BenchmarkDotNet.Analyzers.Vsix.csproj", "{F3163F56-3EC2-44F8-872E-02E3114D7849}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet", "src\BenchmarkDotNet\BenchmarkDotNet.csproj", "{B5F58AA0-88F8-4C8C-B734-E1217E23079E}"
 EndProject
@@ -25,18 +21,10 @@ Global
 		{B7664DD5-DCDB-4324-91A9-16D242CC4498}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7664DD5-DCDB-4324-91A9-16D242CC4498}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7664DD5-DCDB-4324-91A9-16D242CC4498}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7500BDE-4DC7-4858-968F-11889AA4F289}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7500BDE-4DC7-4858-968F-11889AA4F289}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7500BDE-4DC7-4858-968F-11889AA4F289}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7500BDE-4DC7-4858-968F-11889AA4F289}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5D1F1A9E-681D-456B-A838-2EAAAD24BC7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5D1F1A9E-681D-456B-A838-2EAAAD24BC7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D1F1A9E-681D-456B-A838-2EAAAD24BC7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D1F1A9E-681D-456B-A838-2EAAAD24BC7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3163F56-3EC2-44F8-872E-02E3114D7849}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3163F56-3EC2-44F8-872E-02E3114D7849}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3163F56-3EC2-44F8-872E-02E3114D7849}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3163F56-3EC2-44F8-872E-02E3114D7849}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B5F58AA0-88F8-4C8C-B734-E1217E23079E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B5F58AA0-88F8-4C8C-B734-E1217E23079E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5F58AA0-88F8-4C8C-B734-E1217E23079E}.Release|Any CPU.ActiveCfg = Release|Any CPU
