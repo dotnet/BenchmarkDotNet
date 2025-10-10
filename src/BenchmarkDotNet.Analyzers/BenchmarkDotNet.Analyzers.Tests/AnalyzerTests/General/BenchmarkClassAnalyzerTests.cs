@@ -18,16 +18,17 @@
             [Fact]
             public async Task Class_with_no_methods_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-}";
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -42,22 +43,23 @@ public class BenchmarkClass
             [Fact]
             public async Task Public_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-    
-    public void NonBenchmarkMethod()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               public void NonBenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -70,17 +72,18 @@ public class BenchmarkClass
             {
                 const string benchmarkMethodName = "BenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {nonPublicClassAccessModifier}void {{|#0:{benchmarkMethodName}|}}()
-    {{
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{nonPublicClassAccessModifier}}void {|#0:{{benchmarkMethodName}}|}()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkMethodName);
@@ -96,17 +99,18 @@ public class BenchmarkClass
             [Fact]
             public async Task Nongeneric_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
-
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void NonGenericBenchmarkMethod()
-    {
-
-    }
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
+                                                           
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void NonGenericBenchmarkMethod()
+                                                               {
+                                                           
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -116,16 +120,17 @@ public class BenchmarkClass
             [Fact]
             public async Task Generic_method_not_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    public void GenericMethod<T>()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public void GenericMethod<T>()
+                                                               {
 
-    }
-}";
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -138,17 +143,18 @@ public class BenchmarkClass
             {
                 const string benchmarkMethodName = "GenericBenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    public void {benchmarkMethodName}{{|#0:<{string.Join(", ", TypeParameters.Take(typeParametersListLength))}>|}}()
-    {{
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        public void {{benchmarkMethodName}}{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkMethodName);
@@ -168,22 +174,23 @@ public class BenchmarkClass
             [Fact]
             public async Task Public_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-    
-    public void NonBenchmarkMethod()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               public void NonBenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -196,50 +203,52 @@ public class BenchmarkClass
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class Wrapper {{
-    {nonPublicClassAccessModifier}class {{|#0:{benchmarkClassName}|}}
-    {{
-        [Benchmark]
-        public void BenchmarkMethod()
-        {{
+                                                    public class Wrapper {
+                                                        {{nonPublicClassAccessModifier}}class {|#0:{{benchmarkClassName}}|}
+                                                        {
+                                                            [Benchmark]
+                                                            public void BenchmarkMethod()
+                                                            {
 
-        }}
-    }}
-}}";
+                                                            }
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
 
                 await RunAsync();
             }
-#if NET7_0_OR_GREATER
+
             [Fact]
             public async Task File_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic()
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-file class {{|#0:{benchmarkClassName}|}}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                           
+                                                             file class {|#0:{{benchmarkClassName}}|}
+                                                             {
+                                                                 [Benchmark]
+                                                                 public void BenchmarkMethod()
+                                                                 {
+                                                           
+                                                                 }
+                                                             }
+                                                             """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
 
                 await RunAsync();
             }
-#endif
-            public static TheoryData<string> NonPublicClassAccessModifiersExceptFileTheoryData => new TheoryData<string>(new NonPublicClassAccessModifiersTheoryData().Where<string>(m => m != "file "));
+
+            public static TheoryData<string> NonPublicClassAccessModifiersExceptFileTheoryData => new(new NonPublicClassAccessModifiersTheoryData().Where<string>(m => m != "file "));
         }
 
         public class ClassMustBeNonStatic : AnalyzerTestFixture<BenchmarkClassAnalyzer>
@@ -249,22 +258,23 @@ file class {{|#0:{benchmarkClassName}|}}
             [Fact]
             public async Task Instance_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-    
-    public void NonBenchmarkMethod()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               public void NonBenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -276,17 +286,18 @@ public class BenchmarkClass
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-public {{|#0:static|}} class {benchmarkClassName}
-{{
-    [Benchmark]
-    public static void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                           
+                                                             public {|#0:static|} class {{benchmarkClassName}}
+                                                             {
+                                                                 [Benchmark]
+                                                                 public static void BenchmarkMethod()
+                                                                 {
+                                                           
+                                                                 }
+                                                             }
+                                                             """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
@@ -302,27 +313,28 @@ public {{|#0:static|}} class {benchmarkClassName}
             [Fact]
             public async Task Nonabstract_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-    
-    public void NonBenchmarkMethod()
-    {
-    
-    }
-    
-    private static void NonBenchmarkMethod2()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               public void NonBenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                               
+                                                               private static void NonBenchmarkMethod2()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -334,17 +346,18 @@ public class BenchmarkClass
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-public {{|#0:abstract|}} class {benchmarkClassName}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                           
+                                                             public {|#0:abstract|} class {{benchmarkClassName}}
+                                                             {
+                                                                 [Benchmark]
+                                                                 public void BenchmarkMethod()
+                                                                 {
+                                                           
+                                                                 }
+                                                             }
+                                                             """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
@@ -360,22 +373,23 @@ public {{|#0:abstract|}} class {benchmarkClassName}
             [Fact]
             public async Task Nongeneric_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-    
-    public void NonBenchmarkMethod()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               public void NonBenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -388,18 +402,19 @@ public class BenchmarkClass
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-[GenericTypeArguments({string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))})]
-public class {benchmarkClassName}{{|#0:<{string.Join(", ", TypeParameters.Take(typeParametersListLength))}>|}}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
+                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}})]
+                                                    public class {{benchmarkClassName}}{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -412,17 +427,18 @@ public class {benchmarkClassName}{{|#0:<{string.Join(", ", TypeParameters.Take(t
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class {benchmarkClassName}{{|#0:<{string.Join(", ", TypeParameters.Take(typeParametersListLength))}>|}}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
+                                                    public class {{benchmarkClassName}}{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
@@ -444,17 +460,18 @@ public class {benchmarkClassName}{{|#0:<{string.Join(", ", TypeParameters.Take(t
             [Fact]
             public async Task Nongeneric_class_not_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-}";
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -465,18 +482,19 @@ public class BenchmarkClass
             [MemberData(nameof(TypeParametersListLength))]
             public async Task Generic_class_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-[GenericTypeArguments({string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))})]
-public class BenchmarkClass<{string.Join(", ", TypeParameters.Take(typeParametersListLength))}>
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
+                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}})]
+                                                    public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -488,18 +506,19 @@ public class BenchmarkClass<{string.Join(", ", TypeParameters.Take(typeParameter
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-[GenericTypeArguments(typeof(int))]
-public class {{|#0:{benchmarkClassName}|}}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                           
+                                                             [GenericTypeArguments(typeof(int))]
+                                                             public class {|#0:{{benchmarkClassName}}|}
+                                                             {
+                                                                 [Benchmark]
+                                                                 public void BenchmarkMethod()
+                                                                 {
+                                                           
+                                                                 }
+                                                             }
+                                                             """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
@@ -521,17 +540,18 @@ public class {{|#0:{benchmarkClassName}|}}
             [Fact]
             public async Task Nongeneric_class_not_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-}";
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -542,18 +562,19 @@ public class BenchmarkClass
             [MemberData(nameof(TypeParametersListLength))]
             public async Task Generic_class_annotated_with_the_generictypearguments_attribute_having_matching_type_argument_count_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-[GenericTypeArguments({string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))})]
-public class BenchmarkClass<{string.Join(", ", TypeParameters.Take(typeParametersListLength))}>
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
+                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}})]
+                                                    public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -567,18 +588,19 @@ public class BenchmarkClass<{string.Join(", ", TypeParameters.Take(typeParameter
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-[GenericTypeArguments({{|#0:{typeArguments}|}})]
-public class {benchmarkClassName}<T1>
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
+                                                    [GenericTypeArguments({|#0:{{typeArguments}}|})]
+                                                    public class {{benchmarkClassName}}<T1>
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(1, "", benchmarkClassName, typeArgumentCount);
@@ -600,22 +622,23 @@ public class {benchmarkClassName}<T1>
             [Fact]
             public async Task Unsealed_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
 
-    }
-    
-    public void NonBenchmarkMethod()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               public void NonBenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -627,17 +650,18 @@ public class BenchmarkClass
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-public {{|#0:sealed|}} class {benchmarkClassName}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                           
+                                                             public {|#0:sealed|} class {{benchmarkClassName}}
+                                                             {
+                                                                 [Benchmark]
+                                                                 public void BenchmarkMethod()
+                                                                 {
+                                                           
+                                                                 }
+                                                             }
+                                                             """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
@@ -653,29 +677,30 @@ public {{|#0:sealed|}} class {benchmarkClassName}
             [Fact]
             public async Task Class_with_only_one_benchmark_method_marked_as_baseline_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark(Baseline = true)]
-    public void BaselineBenchmarkMethod()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark(Baseline = true)]
+                                                               public void BaselineBenchmarkMethod()
+                                                               {
 
-    }
-    
-    [Benchmark]
-    public void NonBaselineBenchmarkMethod1()
-    {
-    
-    }
-    
-    [Benchmark(Baseline = false)]
-    public void NonBaselineBenchmarkMethod2()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               [Benchmark]
+                                                               public void NonBaselineBenchmarkMethod1()
+                                                               {
+                                                               
+                                                               }
+                                                               
+                                                               [Benchmark(Baseline = false)]
+                                                               public void NonBaselineBenchmarkMethod2()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -685,29 +710,30 @@ public class BenchmarkClass
             [Fact]
             public async Task Class_with_no_benchmark_methods_marked_as_baseline_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void NonBaselineBenchmarkMethod1()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void NonBaselineBenchmarkMethod1()
+                                                               {
 
-    }
-    
-    [Benchmark]
-    public void NonBaselineBenchmarkMethod2()
-    {
-    
-    }
-    
-    [Benchmark(Baseline = false)]
-    public void NonBaselineBenchmarkMethod3()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               [Benchmark]
+                                                               public void NonBaselineBenchmarkMethod2()
+                                                               {
+                                                               
+                                                               }
+                                                               
+                                                               [Benchmark(Baseline = false)]
+                                                               public void NonBaselineBenchmarkMethod3()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -717,43 +743,44 @@ public class BenchmarkClass
             [Fact]
             public async Task Class_with_more_than_one_benchmark_method_marked_as_baseline_should_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark({|#0:Baseline = true|})]
-    [Benchmark]
-    public void BaselineBenchmarkMethod1()
-    {
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark({|#0:Baseline = true|})]
+                                                               [Benchmark]
+                                                               public void BaselineBenchmarkMethod1()
+                                                               {
 
-    }
-    
-    [Benchmark]
-    public void NonBaselineBenchmarkMethod1()
-    {
-    
-    }
-    
-    [Benchmark(Baseline = false)]
-    public void NonBaselineBenchmarkMethod2()
-    {
-    
-    }
-    
-    [Benchmark({|#1:Baseline = true|})]
-    public void BaselineBenchmarkMethod2()
-    {
-    
-    }
-    
-    [Benchmark({|#2:Baseline = true|})]
-    [Benchmark({|#3:Baseline = true|})]
-    public void BaselineBenchmarkMethod3()
-    {
-    
-    }
-}";
+                                                               }
+                                                               
+                                                               [Benchmark]
+                                                               public void NonBaselineBenchmarkMethod1()
+                                                               {
+                                                               
+                                                               }
+                                                               
+                                                               [Benchmark(Baseline = false)]
+                                                               public void NonBaselineBenchmarkMethod2()
+                                                               {
+                                                               
+                                                               }
+                                                               
+                                                               [Benchmark({|#1:Baseline = true|})]
+                                                               public void BaselineBenchmarkMethod2()
+                                                               {
+                                                               
+                                                               }
+                                                               
+                                                               [Benchmark({|#2:Baseline = true|})]
+                                                               [Benchmark({|#3:Baseline = true|})]
+                                                               public void BaselineBenchmarkMethod3()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -766,7 +793,7 @@ public class BenchmarkClass
             }
         }
 
-        public static TheoryData<int> TypeParametersListLengthTheoryData => new TheoryData<int>(Enumerable.Range(1, TypeParametersTheoryData.Count));
+        public static TheoryData<int> TypeParametersListLengthTheoryData => new(Enumerable.Range(1, TypeParametersTheoryData.Count));
 
         private static ReadOnlyCollection<string> TypeParametersTheoryData => Enumerable.Range(0, 3)
                                                                                         .Select(i => $"TParameter{i}")

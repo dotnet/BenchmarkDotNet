@@ -19,27 +19,29 @@
             {
                 const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Running;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Running;
 
-public class Program
-{{
-    public static void Main(string[] args) {{
-        BenchmarkRunner.Run<{classWithOneBenchmarkMethodName}>();
-    }}
-}}";
+                                                    public class Program
+                                                    {
+                                                        public static void Main(string[] args) {
+                                                            BenchmarkRunner.Run<{{classWithOneBenchmarkMethodName}}>();
+                                                        }
+                                                    }
+                                                    """;
 
-                var benchmarkClassDocument =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-public class {classWithOneBenchmarkMethodName}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+                                                                         
+                                                                           public class {{classWithOneBenchmarkMethodName}}
+                                                                           {
+                                                                               [Benchmark]
+                                                                               public void BenchmarkMethod()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                           }
+                                                                           """;
 
                 TestCode = testCode;
                 AddSource(benchmarkClassDocument);
@@ -52,24 +54,26 @@ public class {classWithOneBenchmarkMethodName}
             {
                 const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Running;
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{|#0:{{classWithOneBenchmarkMethodName}}|}>();
+                                                                 }
+                                                             }
+                                                             """;
 
-public class Program
-{{
-    public static void Main(string[] args) {{
-        BenchmarkRunner.Run<{{|#0:{classWithOneBenchmarkMethodName}|}}>();
-    }}
-}}";
-
-                var benchmarkClassDocument =
-/* lang=c#-test */ $@"public class {classWithOneBenchmarkMethodName}
-{{
-    public void BenchmarkMethod()
-    {{
-
-    }}
-}}";
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           public class {{classWithOneBenchmarkMethodName}}
+                                                                           {
+                                                                               public void BenchmarkMethod()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                           }
+                                                                           """;
                 TestCode = testCode;
                 AddSource(benchmarkClassDocument);
                 AddDefaultExpectedDiagnostic(classWithOneBenchmarkMethodName);
@@ -82,37 +86,39 @@ public class Program
             {
                 const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Running;
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{{classWithOneBenchmarkMethodName}}>();
+                                                                 }
+                                                             }
+                                                             """;
 
-public class Program
-{{
-    public static void Main(string[] args) {{
-        BenchmarkRunner.Run<{classWithOneBenchmarkMethodName}>();
-    }}
-}}";
-
-                var benchmarkClassDocument =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-public class {classWithOneBenchmarkMethodName}
-{{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {{
-
-    }}
-    
-    public void BenchmarkMethod2()
-    {{
-
-    }}
-    
-    private void BenchmarkMethod3()
-    {{
-                                                                           
-    }}
-}}";
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+                                                                         
+                                                                           public class {{classWithOneBenchmarkMethodName}}
+                                                                           {
+                                                                               [Benchmark]
+                                                                               public void BenchmarkMethod()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                               
+                                                                               public void BenchmarkMethod2()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                               
+                                                                               private void BenchmarkMethod3()
+                                                                               {
+                                                                                                                                                      
+                                                                               }
+                                                                           }
+                                                                           """;
 
                 TestCode = testCode;
                 AddSource(benchmarkClassDocument);

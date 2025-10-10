@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
-    <Nullable Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net6.0'">enable</Nullable>
+    <Nullable>enable</Nullable>
     
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <SuppressTfmSupportBuildErrors>true</SuppressTfmSupportBuildErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,12 +28,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
+  </ItemGroup>
+
   <Choose>
-    <When Condition="'$(TargetFramework)' == 'net8.0'">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-      </ItemGroup>
-    </When>
     <When Condition="'$(TargetFramework)' == 'net6.0'">
       <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
@@ -40,14 +41,11 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
-    <ProjectReference Include="..\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
-  </ItemGroup>
+  <Import Project="..\..\..\build\common.props" />
 
 </Project>
