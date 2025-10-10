@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
-    <ProjectReference Include="..\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
 
   <Choose>
@@ -46,6 +46,6 @@
     </Otherwise>
   </Choose>
 
-  <Import Project="..\..\..\build\common.props" />
+  <Import Project="..\..\build\common.props" />
 
 </Project>
