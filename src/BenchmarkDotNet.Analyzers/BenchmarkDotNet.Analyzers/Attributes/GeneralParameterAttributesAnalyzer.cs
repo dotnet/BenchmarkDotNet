@@ -146,7 +146,7 @@
             {
                 declaredAttributes = fieldDeclarationSyntax.AttributeLists.SelectMany(als => als.Attributes).ToImmutableArray();
                 fieldOrPropertyIsPublic = fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.PublicKeyword);
-                
+
                 var fieldConstModifierIndex = fieldDeclarationSyntax.Modifiers.IndexOf(SyntaxKind.ConstKeyword);
                 fieldConstModifierLocation = fieldConstModifierIndex >= 0 ? fieldDeclarationSyntax.Modifiers[fieldConstModifierIndex].GetLocation() : null;
 

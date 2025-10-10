@@ -1,7 +1,6 @@
 ﻿namespace BenchmarkDotNet.Analyzers.Tests.Fixtures
 {
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Testing;
     using Microsoft.CodeAnalysis.Diagnostics;
     using Microsoft.CodeAnalysis.Testing;
@@ -18,11 +17,7 @@
     {
         private readonly CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> _analyzerTest;
 
-#if NET6_0_OR_GREATER
         private readonly DiagnosticDescriptor? _ruleUnderTest;
-#else
-        private readonly DiagnosticDescriptor _ruleUnderTest;
-#endif
 
         private AnalyzerTestFixture(bool assertUniqueSupportedDiagnostics)
         {
@@ -35,19 +30,6 @@
 #else
                                 ReferenceAssemblies = ReferenceAssemblies.NetStandard.NetStandard20,
 #endif
-                                SolutionTransforms =
-                                {
-                                    (s, pId) => s.WithProjectParseOptions(pId, new CSharpParseOptions(
-#if NET8_0_OR_GREATER
-                                                                                                      LanguageVersion.CSharp12
-#elif NET6_0_OR_GREATER
-                                                                                                      LanguageVersion.CSharp10
-#else
-                                                                                                      LanguageVersion.CSharp7_3
-#endif
-                                                                                                     ))
-                                },
-
                                 TestState =
                                 {
                                     AdditionalReferences =
@@ -70,11 +52,8 @@
         {
             var analyzer = AssertUniqueSupportedDiagnostics();
 
-#if NET6_0_OR_GREATER
-            if (diagnosticDescriptor == null!)
-#else
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (diagnosticDescriptor == null)
-#endif
             {
                 Assert.Fail("Diagnostic under test cannot be null when using this constructor");
             }
@@ -97,7 +76,9 @@
             void DisableAllSupportedDiagnosticsExceptDiagnosticUnderTest()
             {
                 _analyzerTest.DisabledDiagnostics.Clear();
-                _analyzerTest.DisabledDiagnostics.AddRange(analyzer.SupportedDiagnostics.Select(dd => dd.Id).Except(new[] { diagnosticDescriptor.Id }));
+                _analyzerTest.DisabledDiagnostics.AddRange(analyzer.SupportedDiagnostics.Select(dd => dd.Id).Except([
+                    diagnosticDescriptor.Id
+                ]));
             }
         }
 
@@ -158,11 +139,8 @@
         {
             AddExpectedDiagnostic(arguments, markupKey);
         }
-#if NET6_0_OR_GREATER
+
         private void AddExpectedDiagnostic(object[]? arguments = null, int markupKey = 0)
-#else
-        private void AddExpectedDiagnostic(object[] arguments = null, int markupKey = 0)
-#endif
         {
             if (_ruleUnderTest == null)
             {
@@ -192,38 +170,41 @@
 
         protected void ReferenceDummyAttribute()
         {
-            _analyzerTest.TestState.Sources.Add(
-@"using System;
+            _analyzerTest.TestState.Sources.Add("""
+                                                using System;
 
-public class DummyAttribute : Attribute
-{
-    
-}");
+                                                public class DummyAttribute : Attribute
+                                                {
+                                                    
+                                                }
+                                                """);
         }
 
         protected void ReferenceDummyEnum()
         {
-            _analyzerTest.TestState.Sources.Add(
-@"public enum DummyEnum
-{
-    Value1,
-    Value2,
-    Value3
-}");
+            _analyzerTest.TestState.Sources.Add("""
+                                                public enum DummyEnum
+                                                {
+                                                    Value1,
+                                                    Value2,
+                                                    Value3
+                                                }
+                                                """);
         }
 
         protected void ReferenceDummyEnumWithFlagsAttribute()
         {
-            _analyzerTest.TestState.Sources.Add(
-@"using System;
+            _analyzerTest.TestState.Sources.Add("""
+                                                using System;
 
-[Flags]
-public enum DummyEnumWithFlagsAttribute
-{
-    Value1,
-    Value2,
-    Value3
-}");
+                                                [Flags]
+                                                public enum DummyEnumWithFlagsAttribute
+                                                {
+                                                    Value1,
+                                                    Value2,
+                                                    Value3
+                                                }
+                                                """);
         }
 
         private sealed class InternalAnalyzerTest : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>

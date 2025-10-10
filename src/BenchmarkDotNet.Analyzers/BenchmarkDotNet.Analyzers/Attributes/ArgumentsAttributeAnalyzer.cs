@@ -34,7 +34,7 @@
                                                                                                                 DiagnosticSeverity.Error,
                                                                                                                 isEnabledByDefault: true,
                                                                                                                 description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Description)));
-        
+
         internal static readonly DiagnosticDescriptor MustHaveMatchingValueTypeRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ArgumentsAttribute_MustHaveMatchingValueType,
                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Title)),
                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_MessageFormat)),

@@ -18,14 +18,15 @@
                                                                                                                                  [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
                                                                                                                                  [CombinatorialMemberData(nameof(InvalidTypes))] string invalidType)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {missingParamsAttributeUsage}
-    public {invalidType} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{missingParamsAttributeUsage}}
+                                                        public {{invalidType}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -37,25 +38,25 @@ public class BenchmarkClass
             public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationTheoryData();
 
             public static IEnumerable<string> InvalidTypes => new TheoryData<string>
-                                                              {
-                                                                  "byte",
-                                                                  "char",
-                                                                  "double",
-                                                                  "float",
-                                                                  "int",
-                                                                  "long",
-                                                                  "sbyte",
-                                                                  "short",
-                                                                  "string",
-                                                                  "uint",
-                                                                  "ulong",
-                                                                  "ushort",
-                                                                                                       
-                                                                  "DummyEnumWithFlagsAttribute",
-                                                              
-                                                                  "object",
-                                                                  "System.Type"
-                                                              };
+            {
+                "byte",
+                "char",
+                "double",
+                "float",
+                "int",
+                "long",
+                "sbyte",
+                "short",
+                "string",
+                "uint",
+                "ulong",
+                "ushort",
+
+                "DummyEnumWithFlagsAttribute",
+
+                "object",
+                "System.Type"
+            };
         }
 
         public class NotAllowedOnFlagsEnumPropertyOrFieldType : AnalyzerTestFixture<ParamsAllValuesAttributeAnalyzer>
@@ -65,14 +66,15 @@ public class BenchmarkClass
             [Theory, CombinatorialData]
             public async Task A_field_or_property_of_nonnullable_nonenum_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration, [CombinatorialMemberData(nameof(NonEnumTypes))] string nonEnumType)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public {nonEnumType} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public {{nonEnumType}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -82,14 +84,15 @@ public class BenchmarkClass
             [Theory, CombinatorialData]
             public async Task A_field_or_property_of_nullable_nonenum_type_should_not_trigger_diagnostic(bool isNullable, [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration, [CombinatorialMemberData(nameof(NonEnumStructs))] string nonEnumType)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public {nonEnumType}{(isNullable ? "?" : "")} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public {{nonEnumType}}{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -99,14 +102,15 @@ public class BenchmarkClass
             [Theory, CombinatorialData]
             public async Task A_field_or_property_of_enum_type_without_a_flags_attribute_should_not_trigger_diagnostic(bool isNullable, [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public DummyEnum{(isNullable ? "?" : "")} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public DummyEnum{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyEnum();
@@ -119,14 +123,15 @@ public class BenchmarkClass
             {
                 const string enumTypeName = "DummyEnumWithFlagsAttribute";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public {{|#0:{enumTypeName}|}}{(isNullable ? "?" : "")} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public {|#0:{{enumTypeName}}|}{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyEnumWithFlagsAttribute();
@@ -137,22 +142,28 @@ public class BenchmarkClass
 
             public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationTheoryData();
 
-            public static IEnumerable<string> NonEnumStructs => new List<string> {
-                                                                                     "bool",
-                                                                                     "byte",
-                                                                                     "char",
-                                                                                     "double",
-                                                                                     "float",
-                                                                                     "int",
-                                                                                     "long",
-                                                                                     "sbyte",
-                                                                                     "short",
-                                                                                     "uint",
-                                                                                     "ulong",
-                                                                                     "ushort",
-                                                                                 }.AsReadOnly();
+            public static IEnumerable<string> NonEnumStructs => new List<string>
+            {
+                "bool",
+                "byte",
+                "char",
+                "double",
+                "float",
+                "int",
+                "long",
+                "sbyte",
+                "short",
+                "uint",
+                "ulong",
+                "ushort",
+            }.AsReadOnly();
 
-            public static IEnumerable<string> NonEnumTypes => NonEnumStructs.Concat(new[]{ "string", "object", "System.Type" });
+            public static IEnumerable<string> NonEnumTypes => NonEnumStructs.Concat(
+            [
+                "string",
+                "object",
+                "System.Type"
+            ]);
         }
 
         public class PropertyOrFieldTypeMustBeEnumOrBool : AnalyzerTestFixture<ParamsAllValuesAttributeAnalyzer>
@@ -162,14 +173,15 @@ public class BenchmarkClass
             [Theory, CombinatorialData]
             public async Task A_field_or_property_of_enum_or_bool_type_should_not_trigger_diagnostic(bool isNullable, [CombinatorialValues("DummyEnum", "bool")] string enumOrBoolType, [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public {enumOrBoolType}{(isNullable ? "?" : "")}  {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public {{enumOrBoolType}}{{(isNullable ? "?" : "")}}  {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyEnum();
@@ -180,14 +192,15 @@ public class BenchmarkClass
             [Theory, CombinatorialData]
             public async Task A_field_or_property_not_of_nonnullable_enum_or_bool_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(NonEnumOrBoolTypes))] string nonEnumOrBoolType, [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public {{|#0:{nonEnumOrBoolType}|}} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public {|#0:{{nonEnumOrBoolType}}|} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyEnum();
@@ -199,14 +212,15 @@ public class BenchmarkClass
             [Theory, CombinatorialData]
             public async Task A_field_or_property_not_of_nullable_enum_or_bool_type_should_trigger_diagnostic(bool isNullable, [CombinatorialMemberData(nameof(NonEnumOrBoolStructs))] string nonEnumOrBoolType, [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [ParamsAllValues]
-    public {{|#0:{nonEnumOrBoolType}|}}{(isNullable ? "?" : "")} {fieldOrPropertyDeclaration}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [ParamsAllValues]
+                                                        public {|#0:{{nonEnumOrBoolType}}|}{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyEnum();
@@ -217,21 +231,27 @@ public class BenchmarkClass
 
             public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationTheoryData();
 
-            public static IEnumerable<string> NonEnumOrBoolStructs => new List<string> {
-                                                                                           "byte",
-                                                                                           "char",
-                                                                                           "double",
-                                                                                           "float",
-                                                                                           "int",
-                                                                                           "long",
-                                                                                           "sbyte",
-                                                                                           "short",
-                                                                                           "uint",
-                                                                                           "ulong",
-                                                                                           "ushort"
-                                                                                       }.AsReadOnly();
+            public static IEnumerable<string> NonEnumOrBoolStructs => new List<string>
+            {
+                "byte",
+                "char",
+                "double",
+                "float",
+                "int",
+                "long",
+                "sbyte",
+                "short",
+                "uint",
+                "ulong",
+                "ushort"
+            }.AsReadOnly();
 
-            public static IEnumerable<string> NonEnumOrBoolTypes => NonEnumOrBoolStructs.Concat(new[] {  "string", "object", "System.Type" });
+            public static IEnumerable<string> NonEnumOrBoolTypes => NonEnumOrBoolStructs.Concat(
+            [
+               "string",
+               "object",
+               "System.Type"
+            ]);
         }
     }
 }

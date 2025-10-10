@@ -26,17 +26,19 @@
                     emptyArgumentsAttributeUsages.Add(emptyArgumentsAttributeUsage);
                 }
 
-                var testCode = /* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {string.Join("\n", emptyArgumentsAttributeUsages)}
-    public void BenchmarkMethod()
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{string.Join("\n", emptyArgumentsAttributeUsages)}}
+                                                        public void BenchmarkMethod()
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -65,9 +67,7 @@ public class BenchmarkClass
                                           {
                                               "[Arguments({0}new object[] {{ }}{1})]",
                                               "[Arguments({0}new object[0]{1})]",
-#if NET8_0_OR_GREATER
                                               "[Arguments({0}[]{1})]",
-#endif
                                           };
 
                 foreach (var attributeUsageBase in attributeUsagesBase)
@@ -91,18 +91,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentAttributeUsagesListLength))]
             public async Task A_method_annotated_with_at_least_one_arguments_attribute_together_with_the_benchmark_attribute_should_not_trigger_diagnostic(int argumentAttributeUsagesListLength)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    [{string.Join("]\n[", ArgumentAttributeUsages.Take(argumentAttributeUsagesListLength))}]
-    public void BenchmarkMethod()
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{string.Join("]\n[", ArgumentAttributeUsages.Take(argumentAttributeUsagesListLength))}}]
+                                                        public void BenchmarkMethod()
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -113,17 +114,18 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentAttributeUsagesListLength))]
             public async Task A_method_with_at_least_one_arguments_attribute_but_no_benchmark_attribute_should_trigger_diagnostic(int argumentAttributeUsagesListLength)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-
-public class BenchmarkClass
-{{
-    {string.Join("\n", ArgumentAttributeUsages.Take(argumentAttributeUsagesListLength).Select((a, i) => $"[{{|#{i}:{a}|}}]"))}
-    public void BenchmarkMethod()
-    {{
-    
-    }}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join("\n", ArgumentAttributeUsages.Take(argumentAttributeUsagesListLength).Select((a, i) => $"[{{|#{i}:{a}|}}]"))}}
+                                                        public void BenchmarkMethod()
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -135,7 +137,7 @@ public class BenchmarkClass
                 await RunAsync();
             }
 
-            public static TheoryData<int> ArgumentAttributeUsagesListLength => new TheoryData<int>(Enumerable.Range(1, ArgumentAttributeUsages.Count));
+            public static TheoryData<int> ArgumentAttributeUsagesListLength => new(Enumerable.Range(1, ArgumentAttributeUsages.Count));
 
             private static ReadOnlyCollection<string> ArgumentAttributeUsages => new List<string> {
                                                                                      "Arguments",
@@ -151,18 +153,19 @@ public class BenchmarkClass
             [Fact]
             public async Task A_method_annotated_with_an_arguments_attribute_and_the_benchmark_attribute_and_having_parameters_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    [Arguments(42, ""test"")]
-    public void BenchmarkMethod(int a, string b)
-    {
-    
-    }
-}";
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               [Arguments(42, "test")]
+                                                               public void BenchmarkMethod(int a, string b)
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -173,16 +176,17 @@ public class BenchmarkClass
             [MemberData(nameof(ParametersListLength))]
             public async Task A_method_with_parameters_and_no_arguments_or_benchmark_attributes_should_not_trigger_diagnostic(int parametersListLength)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    public void BenchmarkMethod({string.Join(", ", Parameters.Take(parametersListLength))})
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        public void BenchmarkMethod({{string.Join(", ", Parameters.Take(parametersListLength))}})
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -193,17 +197,18 @@ public class BenchmarkClass
             [MemberData(nameof(ParametersListLength))]
             public async Task A_method_annotated_with_the_benchmark_attribute_but_no_arguments_attribute_with_parameters_should_trigger_diagnostic(int parametersListLength)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    public void BenchmarkMethod({{|#0:{string.Join(", ", Parameters.Take(parametersListLength))}|}})
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod({|#0:{{string.Join(", ", Parameters.Take(parametersListLength))}}|})
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic();
@@ -211,7 +216,7 @@ public class BenchmarkClass
                 await RunAsync();
             }
 
-            public static TheoryData<int> ParametersListLength => new TheoryData<int>(Enumerable.Range(1, Parameters.Count));
+            public static TheoryData<int> ParametersListLength => new(Enumerable.Range(1, Parameters.Count));
 
             private static ReadOnlyCollection<string> Parameters => new List<string> {
                                                                         "int a",
@@ -227,17 +232,18 @@ public class BenchmarkClass
             [Fact]
             public async Task A_method_not_annotated_with_any_arguments_attributes_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
-    
-    }
-}";
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -248,18 +254,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentsAttributeUsages))]
             public async Task Having_a_matching_value_count_should_not_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(string a, bool b)
-    {{
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(string a, bool b)
+                                                        {
 
-    }}
-}}";
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -272,18 +279,19 @@ public class BenchmarkClass
             {
                 const string benchmarkMethodName = "BenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void {benchmarkMethodName}(string a)
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void {{benchmarkMethodName}}(string a)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(1, "", benchmarkMethodName, 0);
 
@@ -296,18 +304,19 @@ public class BenchmarkClass
             {
                 const string benchmarkMethodName = "BenchmarkMethod";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void {benchmarkMethodName}({parameterData.Parameters})
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void {{benchmarkMethodName}}({{parameterData.Parameters}})
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
                 TestCode = testCode;
                 AddExpectedDiagnostic(0, parameterData.ParameterCount, parameterData.PluralSuffix, benchmarkMethodName, 2);
                 AddExpectedDiagnostic(1, parameterData.ParameterCount, parameterData.PluralSuffix, benchmarkMethodName, 3);
@@ -315,17 +324,13 @@ public class BenchmarkClass
                 await RunAsync();
             }
 
-            public static IEnumerable<(string, int, string)> ParameterLists => new [] { ("string a", 1, ""), ("", 0, "s") };
+            public static IEnumerable<(string, int, string)> ParameterLists => [ ("string a", 1, ""), ("", 0, "s") ];
 
             public static TheoryData<string> ArgumentsAttributeUsages()
             {
                 return new TheoryData<string>(GenerateData());
 
-#if NET6_0_OR_GREATER
                 static IEnumerable<string> GenerateData()
-#else
-                IEnumerable<string> GenerateData()
-#endif
                 {
                     var nameColonUsages = new List<string>
                                           {
@@ -343,9 +348,7 @@ public class BenchmarkClass
                                               {
                                                   "[Arguments({1}{2})]",
                                                   "[Arguments({0}new object[] {{ {1} }}{2})]",
-#if NET8_0_OR_GREATER
                                                   "[Arguments({0}[ {1} ]{2})]"
-#endif
                                               };
 
                     var valueLists = new List<string>
@@ -371,11 +374,7 @@ public class BenchmarkClass
             {
                 return new TheoryData<string>(GenerateData());
 
-#if NET6_0_OR_GREATER
                 static IEnumerable<string> GenerateData()
-#else
-                IEnumerable<string> GenerateData()
-#endif
                 {
                     yield return "[{|#0:Arguments|}]";
                     yield return "[Arguments{|#0:()|}]";
@@ -397,9 +396,7 @@ public class BenchmarkClass
                                               {
                                                   "[Arguments({0}new object[] {{|#0:{{ }}|}}{1})]",
                                                   "[Arguments({0}new object[{{|#0:0|}}]{1})]",
-#if NET8_0_OR_GREATER
                                                   "[Arguments({0}{{|#0:[]|}}{1})]",
-#endif
                                               };
 
                     foreach (var attributeUsageBase in attributeUsagesBase)
@@ -433,9 +430,7 @@ public class BenchmarkClass
                                           {
                                               "[Arguments({{|#{1}:{2}|}}{3})]",
                                               "[Arguments({0}new object[] {{ {{|#{1}:{2}|}} }}{3})]",
-#if NET8_0_OR_GREATER
                                               "[Arguments({0}[ {{|#{1}:{2}|}} ]{3})]"
-#endif
                                           };
 
                 var valueLists = new List<string>
@@ -464,17 +459,18 @@ public class BenchmarkClass
             [Fact]
             public async Task A_method_not_annotated_with_any_arguments_attributes_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"using BenchmarkDotNet.Attributes;
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{
-    [Benchmark]
-    public void BenchmarkMethod()
-    {
-    
-    }
-}";
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
+                                                               
+                                                               }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -485,17 +481,18 @@ public class BenchmarkClass
             [MemberData(nameof(EmptyArgumentsAttributeUsagesWithMismatchingValueCount))]
             public async Task Having_a_mismatching_value_count_with_empty_argument_attribute_usages_should_not_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(string a)
-    {{
-    
-    }}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(string a)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
                 TestCode = testCode;
 
                 await RunAsync();
@@ -505,16 +502,18 @@ public class BenchmarkClass
             public async Task Having_a_mismatching_value_count_with_nonempty_argument_attribute_usages_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ArgumentsAttributeUsagesWithMismatchingValueCount))] string argumentsAttributeUsage,
                                                                                                                                      [CombinatorialValues("string a", "")] string parameters)
             {
-                var testCode = /* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod({parameters})
-    {{
-    
-    }}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod({{parameters}})
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
                 TestCode = testCode;
 
                 await RunAsync();
@@ -524,18 +523,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentsAttributeUsagesWithMatchingValueTypes))]
             public async Task Having_matching_value_types_should_not_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(int a, string b)
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(int a, string b)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -546,18 +546,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentsAttributeUsagesWithConvertibleValueTypes))]
             public async Task Providing_convertible_value_types_should_not_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(int a, string b)
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(int a, string b)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -568,18 +569,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentsAttributeUsagesWithMatchingValueTypes))]
             public async Task Having_unknown_parameter_type_should_not_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(unkown a, string b)
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(unkown a, string b)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -592,18 +594,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentsAttributeUsagesWithMismatchingValueTypesWithLocationMarker))]
             public async Task Having_mismatching_or_not_convertible_value_types_should_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(byte a, bool b)
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(byte a, bool b)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -618,18 +621,19 @@ public class BenchmarkClass
             [MemberData(nameof(ArgumentsAttributeUsagesWithUnknownValueTypesWithLocationMarker))]
             public async Task Providing_an_unkown_value_type_should_trigger_diagnostic(string argumentsAttributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [Benchmark]
-    {argumentsAttributeUsage}
-    public void BenchmarkMethod(byte a, bool b)
-    {{
-    
-    }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        {{argumentsAttributeUsage}}
+                                                        public void BenchmarkMethod(byte a, bool b)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -643,11 +647,7 @@ public class BenchmarkClass
             {
                 return new TheoryData<string>(GenerateData());
 
-#if NET6_0_OR_GREATER
                 static IEnumerable<string> GenerateData()
-#else
-                IEnumerable<string> GenerateData()
-#endif
                 {
                     yield return "[Arguments]";
                     yield return "[Arguments()]";
@@ -669,9 +669,7 @@ public class BenchmarkClass
                                               {
                                                   "[Arguments({0}new object[] {{ }}{1})]",
                                                   "[Arguments({0}new object[0]{1})]",
-#if NET8_0_OR_GREATER
                                                   "[Arguments({0}[]{1})]",
-#endif
                                               };
 
                     foreach (var attributeUsageBase in attributeUsagesBase)
@@ -687,29 +685,34 @@ public class BenchmarkClass
                 }
             }
 
-            public static IEnumerable<string> ArgumentsAttributeUsagesWithMismatchingValueCount() => GenerateAttributeUsages(new List<string> {
-                                                                                                                                 "42, \"test\"",
-                                                                                                                                 "\"value\", 100, true"
-                                                                                                                             });
+            public static IEnumerable<string> ArgumentsAttributeUsagesWithMismatchingValueCount() => GenerateAttributeUsages(
+            [
+                "42, \"test\"",
+                "\"value\", 100, true"
+            ]);
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithMatchingValueTypes() => new TheoryData<string>(GenerateAttributeUsages(new List<string> {
-                                                                                                                                                    "42, \"test\"",
-                                                                                                                                                    "43, \"test2\""
-                                                                                                                                                }));
+            public static TheoryData<string> ArgumentsAttributeUsagesWithMatchingValueTypes() => new(GenerateAttributeUsages(
+            [
+                "42, \"test\"",
+                "43, \"test2\""
+            ]));
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithConvertibleValueTypes() => new TheoryData<string>(GenerateAttributeUsages(new List<string> {
-                                                                                                                                                       "42, \"test\"",
-                                                                                                                                                       "(byte)5, \"test2\""
-                                                                                                                                                   }));
+            public static TheoryData<string> ArgumentsAttributeUsagesWithConvertibleValueTypes() => new(GenerateAttributeUsages(
+            [
+                "42, \"test\"",
+                "(byte)5, \"test2\""
+            ]));
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithMismatchingValueTypesWithLocationMarker() => new TheoryData<string>(GenerateAttributeUsages(new List<string> {
-                                                                                                                                                                         "{|#0:typeof(string)|}, {|#1:\"test\"|}",
-                                                                                                                                                                         "{|#2:999|}, true"
-                                                                                                                                                                     }));
+            public static TheoryData<string> ArgumentsAttributeUsagesWithMismatchingValueTypesWithLocationMarker() => new(GenerateAttributeUsages(
+            [
+                "{|#0:typeof(string)|}, {|#1:\"test\"|}",
+                "{|#2:999|}, true"
+            ]));
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithUnknownValueTypesWithLocationMarker() => new TheoryData<string>(GenerateAttributeUsages(new List<string> {
-                                                                                                                                                                     "{|#0:dummy_literal|}, true"
-                                                                                                                                                                 }));
+            public static TheoryData<string> ArgumentsAttributeUsagesWithUnknownValueTypesWithLocationMarker() => new(GenerateAttributeUsages(
+            [
+                "{|#0:dummy_literal|}, true"
+            ]));
         }
 
         private static IEnumerable<string> GenerateAttributeUsages(List<string> valueLists)
@@ -730,9 +733,7 @@ public class BenchmarkClass
                                       {
                                           "[Arguments({1}{2})]",
                                           "[Arguments({0}new object[] {{ {1} }}{2})]",
-#if NET8_0_OR_GREATER
                                           "[Arguments({0}[ {1} ]{2})]"
-#endif
                                       };
 
             foreach (var attributeUsageBase in attributeUsagesBase)

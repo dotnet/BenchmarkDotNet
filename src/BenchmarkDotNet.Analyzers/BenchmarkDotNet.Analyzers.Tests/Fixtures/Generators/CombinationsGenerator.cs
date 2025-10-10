@@ -49,11 +49,11 @@
                 yield break;
             }
 
-            IEnumerable<object[]> combinations = new[] { Array.Empty<object>() };
+            IEnumerable<object[]> combinations = [[]];
 
             foreach (var argumentValues in argumentSets)
             {
-                combinations = combinations.SelectMany(_ => argumentValues.Cast<object>(), (c, v) => c.Concat(new[] { v })
+                combinations = combinations.SelectMany(_ => argumentValues.Cast<object>(), (c, v) => c.Concat([v])
                                                                                                       .ToArray());
             }
 

@@ -21,11 +21,12 @@
             [Fact]
             public async Task A_field_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    public int _field = 0, _field2 = 1;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public int _field = 0, _field2 = 1;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -35,12 +36,13 @@
             [Fact]
             public async Task A_field_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    public int _field = 0, _field2 = 1;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               public int _field = 0, _field2 = 1;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -51,13 +53,14 @@
             [Fact]
             public async Task A_field_annotated_with_a_duplicate_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode
-= /* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    [Dummy]
-    public int _field = 0, _field2 = 1;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               [Dummy]
+                                                               public int _field = 0, _field2 = 1;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -70,14 +73,15 @@
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_field_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -105,14 +109,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -139,14 +144,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int {fieldIdentifier} = 0, field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int {{fieldIdentifier}} = 0, field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -158,11 +164,7 @@ public class BenchmarkClass
                 await RunAsync();
             }
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
             public static TheoryData<string, int, int[]> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData;
 
@@ -176,11 +178,12 @@ public class BenchmarkClass
             [Fact]
             public async Task A_property_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    public int Property { get; set; }
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public int Property { get; set; }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -190,12 +193,13 @@ public class BenchmarkClass
             [Fact]
             public async Task A_property_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    public int Property { get; set; }
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               public int Property { get; set; }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -206,13 +210,14 @@ public class BenchmarkClass
             [Fact]
             public async Task A_property_annotated_with_a_duplicate_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    [Dummy]
-    public int Property { get; set; }
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               [Dummy]
+                                                               public int Property { get; set; }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -225,14 +230,15 @@ public class BenchmarkClass
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_property_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -260,14 +266,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -294,14 +301,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int {propertyIdentifier} {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int {{propertyIdentifier}} { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -313,11 +321,7 @@ public class BenchmarkClass
                 await RunAsync();
             }
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
             public static TheoryData<string, int, int[]> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData;
 
@@ -332,11 +336,12 @@ public class BenchmarkClass
             [ClassData(typeof(NonPublicClassMemberAccessModifiersTheoryData))]
             public async Task A_nonpublic_field_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic(string classMemberAccessModifier)
             {
-                var testCode =
-/* lang=c#-test */ $@"public class BenchmarkClass
-{{
-    {classMemberAccessModifier}int _field = 0, _field2 = 1;
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{classMemberAccessModifier}}int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -347,12 +352,13 @@ public class BenchmarkClass
             [ClassData(typeof(NonPublicClassMemberAccessModifiersTheoryData))]
             public async Task A_nonpublic_field_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic(string classMemberAccessModifier)
             {
-                var testCode =
-/* lang=c#-test */ $@"public class BenchmarkClass
-{{
-    [Dummy]
-    {classMemberAccessModifier}int _field = 0, _field2 = 1;
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Dummy]
+                                                        {{classMemberAccessModifier}}int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -364,14 +370,15 @@ public class BenchmarkClass
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_public_field_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int _field = 0, _field2 = 2;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int _field = 0, _field2 = 2;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -399,14 +406,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    {classMemberAccessModifier}int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        {{classMemberAccessModifier}}int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -430,14 +438,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    {classMemberAccessModifier}int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        {{classMemberAccessModifier}}int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -450,14 +459,15 @@ public class BenchmarkClass
             {
                 const string fieldIdentifier = "_field";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attribute.AttributeUsage}]
-    {classMemberAccessModifier}int {{|#0:{fieldIdentifier}|}} = 0, field2 = 0;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attribute.AttributeUsage}}]
+                                                        {{classMemberAccessModifier}}int {|#0:{{fieldIdentifier}}|} = 0, field2 = 0;
+                                                    }
+                                                    """;
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(fieldIdentifier, attribute.AttributeName);
 
@@ -466,24 +476,14 @@ public class BenchmarkClass
 
             public static IEnumerable<object[]> DuplicateAttributeUsageCountsAndNonPublicClassMemberAccessModifiersCombinations => CombinationsGenerator.CombineArguments(DuplicateParameterAttributeUsageCounts, NonPublicClassMemberAccessModifiers);
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
-#if NET6_0_OR_GREATER
             public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
-#else
-            public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes => UniqueParameterAttributesTheoryData.Select(tdr => (tdr[0] as string, tdr[1] as string));
-#endif
+
             public static IEnumerable<string> NonPublicClassMemberAccessModifiers => new NonPublicClassMemberAccessModifiersTheoryData();
 
-#if NET6_0_OR_GREATER
             public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int)tdr[1], (tdr[2] as int[])!));
-#else
-            public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData.Select(tdr => (tdr[0] as string, (int)tdr[1], tdr[2] as int[]));
-#endif
+
             public static IEnumerable<int[]> DuplicateParameterAttributeUsageCounts => DuplicateAttributeUsageCountsTheoryData;
         }
 
@@ -495,11 +495,12 @@ public class BenchmarkClass
             [ClassData(typeof(NonPublicClassMemberAccessModifiersTheoryData))]
             public async Task A_nonpublic_property_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic(string classMemberAccessModifier)
             {
-                var testCode =
-/* lang=c#-test */ $@"public class BenchmarkClass
-{{
-    {classMemberAccessModifier}int Property {{ get; set; }}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{classMemberAccessModifier}}int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -510,12 +511,13 @@ public class BenchmarkClass
             [ClassData(typeof(NonPublicClassMemberAccessModifiersTheoryData))]
             public async Task A_nonpublic_property_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic(string classMemberAccessModifier)
             {
-                var testCode =
-/* lang=c#-test */ $@"public class BenchmarkClass
-{{
-    [Dummy]
-    {classMemberAccessModifier}int Property {{ get; set; }}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Dummy]
+                                                        {{classMemberAccessModifier}}int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -527,14 +529,15 @@ public class BenchmarkClass
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_public_property_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -562,14 +565,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    {classMemberAccessModifier}int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        {{classMemberAccessModifier}}int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -593,14 +597,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    {classMemberAccessModifier}int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        {{classMemberAccessModifier}}int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -613,14 +618,15 @@ public class BenchmarkClass
             {
                 const string propertyIdentifier = "Property";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attribute.AttributeUsage}]
-    {classMemberAccessModifier}int {{|#0:{propertyIdentifier}|}} {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attribute.AttributeUsage}}]
+                                                        {{classMemberAccessModifier}}int {|#0:{{propertyIdentifier}}|} { get; set; }
+                                                    }
+                                                    """;
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(propertyIdentifier, attribute.AttributeName);
 
@@ -629,25 +635,13 @@ public class BenchmarkClass
 
             public static IEnumerable<object[]> DuplicateAttributeUsageCountsAndNonPublicClassMemberAccessModifiersCombinations => CombinationsGenerator.CombineArguments(DuplicateParameterAttributeUsageCounts, NonPublicClassMemberAccessModifiers);
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
-#if NET6_0_OR_GREATER
             public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
-#else
-            public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes => UniqueParameterAttributesTheoryData.Select(tdr => (tdr[0] as string, tdr[1] as string));
-#endif
 
             public static IEnumerable<string> NonPublicClassMemberAccessModifiers => new NonPublicClassMemberAccessModifiersTheoryData();
 
-#if NET6_0_OR_GREATER
             public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int)tdr[1], (tdr[2] as int[])!));
-#else
-            public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData.Select(tdr => (tdr[0] as string, (int)tdr[1], tdr[2] as int[]));
-#endif
 
             public static TheoryData<int[]> DuplicateParameterAttributeUsageCounts => DuplicateAttributeUsageCountsTheoryData;
         }
@@ -659,11 +653,12 @@ public class BenchmarkClass
             [Fact]
             public async Task A_readonly_field_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    public readonly int _field = 0, _field2 = 1;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public readonly int _field = 0, _field2 = 1;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -673,12 +668,13 @@ public class BenchmarkClass
             [Fact]
             public async Task A_readonly_field_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    public readonly int _field = 0, _field2 = 1;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               public readonly int _field = 0, _field2 = 1;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -690,14 +686,15 @@ public class BenchmarkClass
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_field_without_a_readonly_modifier_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -725,14 +722,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public readonly int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public readonly int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -756,14 +754,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public readonly int _field = 0, _field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public readonly int _field = 0, _field2 = 1;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -776,25 +775,22 @@ public class BenchmarkClass
             {
                 const string fieldIdentifier = "_field";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public {{|#0:readonly|}} int {fieldIdentifier} = 0, field2 = 1;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public {|#0:readonly|} int {{fieldIdentifier}} = 0, field2 = 1;
+                                                    }
+                                                    """;
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(fieldIdentifier, attributeName);
 
                 await RunAsync();
             }
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
             public static TheoryData<string, string> UniqueParameterAttributes => UniqueParameterAttributesTheoryData;
 
@@ -810,11 +806,12 @@ public class BenchmarkClass
             [Fact]
             public async Task A_constant_field_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    public const int Constant = 0;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public const int Constant = 0;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -824,12 +821,13 @@ public class BenchmarkClass
             [Fact]
             public async Task A_constant_field_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    public const int Constant = 0;
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               public const int Constant = 0;
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -857,14 +855,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public const int Constant = 0;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public const int Constant = 0;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -888,14 +887,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public const int Constant = 0;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public const int Constant = 0;
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -908,25 +908,22 @@ public class BenchmarkClass
             {
                 const string constantIdentifier = "Constant";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public {{|#0:const|}} int {constantIdentifier} = 0;
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public {|#0:const|} int {{constantIdentifier}} = 0;
+                                                    }
+                                                    """;
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(constantIdentifier, attributeName);
 
                 await RunAsync();
             }
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
             public static TheoryData<string, string> UniqueParameterAttributes => UniqueParameterAttributesTheoryData;
 
@@ -942,11 +939,12 @@ public class BenchmarkClass
             [Fact]
             public async Task An_initonly_property_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    public int Property { get; init; }
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               public int Property { get; init; }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
 
@@ -956,12 +954,13 @@ public class BenchmarkClass
             [Fact]
             public async Task An_initonly_property_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic()
             {
-                const string testCode =
-/* lang=c#-test */ @"public class BenchmarkClass
-{
-    [Dummy]
-    public int Property { get; init; }
-}";
+                const string testCode = /* lang=c#-test */ """
+                                                           public class BenchmarkClass
+                                                           {
+                                                               [Dummy]
+                                                               public int Property { get; init; }
+                                                           }
+                                                           """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -973,14 +972,15 @@ public class BenchmarkClass
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_property_with_an_assignable_setter_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -1008,14 +1008,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int Property {{ get; init; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int Property { get; init; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -1039,14 +1040,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int Property {{ get; init; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int Property { get; init; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -1059,14 +1061,15 @@ public class BenchmarkClass
             {
                 const string propertyIdentifier = "Property";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int {propertyIdentifier} {{ get; {{|#0:init|}}; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int {{propertyIdentifier}} { get; {|#0:init|}; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(propertyIdentifier, attributeName);
@@ -1074,11 +1077,7 @@ public class BenchmarkClass
                 await RunAsync();
             }
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
             public static TheoryData<string, string> UniqueParameterAttributes => UniqueParameterAttributesTheoryData;
 
@@ -1095,11 +1094,12 @@ public class BenchmarkClass
             [MemberData(nameof(NonPublicPropertySettersTheoryData))]
             public async Task A_property_with_a_nonpublic_setter_not_annotated_with_any_parameter_attribute_should_not_trigger_diagnostic(string nonPublicPropertySetter)
             {
-                var testCode =
-/* lang=c#-test */ $@"public class BenchmarkClass
-{{
-    public int Property {nonPublicPropertySetter}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    public class BenchmarkClass
+                                                    {
+                                                        public int Property {{nonPublicPropertySetter}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -1110,12 +1110,13 @@ public class BenchmarkClass
             [MemberData(nameof(NonPublicPropertySettersTheoryData))]
             public async Task A_property_with_a_nonpublic_setter_annotated_with_a_nonparameter_attribute_should_not_trigger_diagnostic(string nonPublicPropertySetter)
             {
-                var testCode =
-/* lang=c#-test */ $@"public class BenchmarkClass
-{{
-    [Dummy]
-    public int Property {nonPublicPropertySetter}
-}}";
+                var testCode = /* lang=c#-test */ $$"""
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Dummy]
+                                                        public int Property {{nonPublicPropertySetter}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
@@ -1127,14 +1128,15 @@ public class BenchmarkClass
             [MemberData(nameof(UniqueParameterAttributeUsages))]
             public async Task A_property_with_an_assignable_setter_annotated_with_a_unique_parameter_attribute_should_not_trigger_diagnostic(string attributeUsage)
             {
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attributeUsage}]
-    public int Property {{ get; set; }}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attributeUsage}}]
+                                                        public int Property { get; set; }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -1162,14 +1164,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int Property {nonPublicPropertySetter}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int Property {{nonPublicPropertySetter}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 DisableCompilerDiagnostics();
@@ -1193,14 +1196,15 @@ public class BenchmarkClass
                     }
                 }
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    {string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}
-    public int Property {nonPublicPropertySetter}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{string.Join($"{Environment.NewLine}    ", duplicateAttributeUsages)}}
+                                                        public int Property {{nonPublicPropertySetter}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
@@ -1213,14 +1217,15 @@ public class BenchmarkClass
             {
                 const string propertyIdentifier = "Property";
 
-                var testCode =
-/* lang=c#-test */ $@"using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-public class BenchmarkClass
-{{
-    [{attribute.AttributeUsage}]
-    public int {{|#0:{propertyIdentifier}|}} {nonPublicPropertySetter}
-}}";
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{attribute.AttributeUsage}}]
+                                                        public int {|#0:{{propertyIdentifier}}|} {{nonPublicPropertySetter}}
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(propertyIdentifier, attribute.AttributeName);
@@ -1230,35 +1235,23 @@ public class BenchmarkClass
 
             public static IEnumerable<object[]> DuplicateAttributeUsageCountsAndNonPublicPropertySetterCombinations => CombinationsGenerator.CombineArguments(DuplicateParameterAttributeUsageCounts, NonPublicPropertySetters());
 
-#if NET6_0_OR_GREATER
             public static TheoryData<string> UniqueParameterAttributeUsages => new(UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!));
-#else
-            public static TheoryData<string> UniqueParameterAttributeUsages => new TheoryData<string>(UniqueParameterAttributesTheoryData.Select(tdr => tdr[1] as string));
-#endif
 
-#if NET6_0_OR_GREATER
             public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
-#else
-            public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes => UniqueParameterAttributesTheoryData.Select(tdr => (tdr[0] as string, tdr[1] as string));
-#endif
 
-#if NET6_0_OR_GREATER
             public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int)tdr[1], (tdr[2] as int[])!));
-#else
-            public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData.Select(tdr => (tdr[0] as string, (int)tdr[1], tdr[2] as int[]));
-#endif
 
             public static TheoryData<int[]> DuplicateParameterAttributeUsageCounts => DuplicateAttributeUsageCountsTheoryData;
 
             public static IEnumerable<string> NonPublicPropertySetters() => new NonPublicPropertySetterAccessModifiersTheoryData().Select<string, string>(m => $"{{ get; {m} set; }}")
-                                                                                                                                  .Concat(new[] {
-                                                                                                                                                  "{ get; }",
-                                                                                                                                                  "=> 0;"
-                                                                                                                                                });
-            public static TheoryData<string> NonPublicPropertySettersTheoryData() => new TheoryData<string>(NonPublicPropertySetters());
+                                                                                                                                  .Concat([
+                                                                                                                                              "{ get; }",
+                                                                                                                                              "=> 0;"
+                                                                                                                                          ]);
+            public static TheoryData<string> NonPublicPropertySettersTheoryData() => new(NonPublicPropertySetters());
         }
 
-        public static TheoryData<string, string> UniqueParameterAttributesTheoryData => new TheoryData<string, string>
+        public static TheoryData<string, string> UniqueParameterAttributesTheoryData => new()
                                                                                         {
                                                                                             { "Params", "Params(3)" },
                                                                                             { "ParamsSource", "ParamsSource(\"test\")" },
@@ -1280,7 +1273,7 @@ public class BenchmarkClass
             }
         }
 
-        public static TheoryData<int[]> DuplicateAttributeUsageCountsTheoryData => new TheoryData<int[]>(GenerateDuplicateAttributeUsageCombinations(UniqueParameterAttributesTheoryData));
+        public static TheoryData<int[]> DuplicateAttributeUsageCountsTheoryData => new(GenerateDuplicateAttributeUsageCombinations(UniqueParameterAttributesTheoryData));
 
         private static IEnumerable<int[]> GenerateDuplicateAttributeUsageCombinations(TheoryData<string, string> uniqueAttributeUsages)
         {
@@ -1300,15 +1293,9 @@ public class BenchmarkClass
 
         private static ReadOnlyCollection<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> GenerateDuplicateSameAttributeUsageCombinations(TheoryData<string, string> uniqueAttributeUsages)
         {
-#if NET6_0_OR_GREATER
             var uniqueAttributeUsagesList = uniqueAttributeUsages.Select(tdr => (tdr[1] as string)!)
                                                                  .ToList()
                                                                  .AsReadOnly();
-#else
-            var uniqueAttributeUsagesList = uniqueAttributeUsages.Select(tdr => tdr[1] as string)
-                                                                 .ToList()
-                                                                 .AsReadOnly();
-#endif
 
             var finalCombinationsList = new List<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)>();
 
