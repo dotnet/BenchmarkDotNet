@@ -40,17 +40,17 @@
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is InvocationExpressionSyntax invocationExpression))
+            if (context.Node is not InvocationExpressionSyntax invocationExpression)
             {
                 return;
             }
 
-            if (!(invocationExpression.Expression is MemberAccessExpressionSyntax memberAccessExpression))
+            if (invocationExpression.Expression is not MemberAccessExpressionSyntax memberAccessExpression)
             {
                 return;
             }
 
-            if (!(memberAccessExpression.Expression is IdentifierNameSyntax typeIdentifier))
+            if (memberAccessExpression.Expression is not IdentifierNameSyntax typeIdentifier)
             {
                 return;
             }
@@ -61,7 +61,7 @@
                 return;
             }
 
-            if (!(memberAccessExpression.Name is GenericNameSyntax genericMethod))
+            if (memberAccessExpression.Name is not GenericNameSyntax genericMethod)
             {
                 return;
             }

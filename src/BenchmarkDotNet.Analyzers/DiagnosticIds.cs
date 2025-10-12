@@ -7,9 +7,9 @@
         public const string General_BenchmarkClass_MethodMustBeNonGeneric = "BDN1002";
         public const string General_BenchmarkClass_ClassMustBePublic = "BDN1003";
         public const string General_BenchmarkClass_ClassMustBeNonStatic = "BDN1004";
-        public const string General_BenchmarkClass_ClassMustBeNonAbstract = "BDN1005";
-        public const string General_BenchmarkClass_ClassMustBeNonGeneric = "BDN1006";
-        public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters = "BDN1007";
+        public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract = "BDN1005";
+        public const string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute = "BDN1006";
+        public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric = "BDN1007";
         public const string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount = "BDN1008";
         public const string General_BenchmarkClass_ClassMustBeUnsealed = "BDN1009";
         public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1010";

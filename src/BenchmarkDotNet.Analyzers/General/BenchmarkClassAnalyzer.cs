@@ -43,29 +43,28 @@
                                                                                                           isEnabledByDefault: true,
                                                                                                           description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_Description)));
 
-        internal static readonly DiagnosticDescriptor ClassMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassMustBeNonAbstract,
-                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonAbstract_Title)),
-                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonAbstract_MessageFormat)),
-                                                                                                          "Usage",
-                                                                                                          DiagnosticSeverity.Error,
-                                                                                                          isEnabledByDefault: true,
-                                                                                                          description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonAbstract_Description)));
+        internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract,
+                                                                                                                                             AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title)),
+                                                                                                                                             AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat)),
+                                                                                                                                             "Usage",
+                                                                                                                                             DiagnosticSeverity.Error,
+                                                                                                                                             isEnabledByDefault: true,
+                                                                                                                                             description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description)));
 
-        internal static readonly DiagnosticDescriptor ClassMustBeNonGenericRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassMustBeNonGeneric,
-                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonGeneric_Title)),
-                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonGeneric_MessageFormat)),
-                                                                                                          "Usage",
-                                                                                                          DiagnosticSeverity.Error,
-                                                                                                          isEnabledByDefault: true,
-                                                                                                          description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonGeneric_Description)));
+        internal static readonly DiagnosticDescriptor GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute,
+                                                                                                                                                             AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title)),
+                                                                                                                                                             AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat)),
+                                                                                                                                                             "Usage",
+                                                                                                                                                             DiagnosticSeverity.Error,
+                                                                                                                                                             isEnabledByDefault: true);
 
-        internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustHaveTypeParametersRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters,
-                                                                                                                                                  AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_Title)),
-                                                                                                                                                  AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_MessageFormat)),
-                                                                                                                                                  "Usage",
-                                                                                                                                                  DiagnosticSeverity.Error,
-                                                                                                                                                  isEnabledByDefault: true,
-                                                                                                                                                  description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_Description)));
+        internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeGenericRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric,
+                                                                                                                                         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title)),
+                                                                                                                                         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat)),
+                                                                                                                                         "Usage",
+                                                                                                                                         DiagnosticSeverity.Error,
+                                                                                                                                         isEnabledByDefault: true,
+                                                                                                                                         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Description)));
 
         internal static readonly DiagnosticDescriptor GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount,
                                                                                                                                                      AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Title)),
@@ -90,18 +89,19 @@
                                                                                                                 DiagnosticSeverity.Error,
                                                                                                                 isEnabledByDefault: true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-                                                                                                           MethodMustBePublicRule,
-                                                                                                           MethodMustBeNonGenericRule,
-                                                                                                           ClassMustBePublicRule,
-                                                                                                           ClassMustBeNonStaticRule,
-                                                                                                           ClassMustBeNonAbstractRule,
-                                                                                                           ClassMustBeNonGenericRule,
-                                                                                                           ClassWithGenericTypeArgumentsAttributeMustHaveTypeParametersRule,
-                                                                                                           GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
-                                                                                                           ClassMustBeUnsealedRule,
-                                                                                                           OnlyOneMethodCanBeBaselineRule
-                                                                                                          );
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        [
+            MethodMustBePublicRule,
+            MethodMustBeNonGenericRule,
+            ClassMustBePublicRule,
+            ClassMustBeNonStaticRule,
+            ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
+            GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule,
+            ClassWithGenericTypeArgumentsAttributeMustBeGenericRule,
+            GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
+            ClassMustBeUnsealedRule,
+            OnlyOneMethodCanBeBaselineRule
+        ];
 
         public override void Initialize(AnalysisContext analysisContext)
         {
@@ -124,9 +124,15 @@
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is ClassDeclarationSyntax classDeclarationSyntax))
+            if (context.Node is not ClassDeclarationSyntax classDeclarationSyntax)
             {
                 return;
+            }
+
+            var genericTypeArgumentsAttributes = AnalyzerHelper.GetAttributes("BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute", context.Compilation, classDeclarationSyntax.AttributeLists, context.SemanticModel);
+            if (genericTypeArgumentsAttributes.Length > 0 && classDeclarationSyntax.TypeParameterList == null)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, classDeclarationSyntax.Identifier.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
             var benchmarkAttributeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation);
@@ -155,38 +161,6 @@
                 return;
             }
 
-            var genericTypeArgumentsAttributes = AnalyzerHelper.GetAttributes("BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute", context.Compilation, classDeclarationSyntax.AttributeLists, context.SemanticModel);
-            if (genericTypeArgumentsAttributes.Length == 0)
-            {
-                if (classDeclarationSyntax.TypeParameterList != null)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(ClassMustBeNonGenericRule, classDeclarationSyntax.TypeParameterList.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
-                }
-            }
-            else if (genericTypeArgumentsAttributes.Length == 1)
-            {
-                if (classDeclarationSyntax.TypeParameterList == null)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustHaveTypeParametersRule, classDeclarationSyntax.Identifier.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
-                }
-                else if (classDeclarationSyntax.TypeParameterList.Parameters.Count > 0)
-                {
-                    var genericTypeArgumentsAttribute = genericTypeArgumentsAttributes[0];
-                    if (genericTypeArgumentsAttribute.ArgumentList != null && genericTypeArgumentsAttribute.ArgumentList.Arguments.Count > 0)
-                    {
-                        if (genericTypeArgumentsAttribute.ArgumentList.Arguments.Count != classDeclarationSyntax.TypeParameterList.Parameters.Count)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule, Location.Create(context.FilterTree, genericTypeArgumentsAttribute.ArgumentList.Arguments.Span),
-                                                                       classDeclarationSyntax.TypeParameterList.Parameters.Count,
-                                                                       classDeclarationSyntax.TypeParameterList.Parameters.Count == 1 ? "" : "s",
-                                                                       classDeclarationSyntax.Identifier.ToString(),
-                                                                       genericTypeArgumentsAttribute.ArgumentList.Arguments.Count));
-                        }
-                    }
-                }
-            }
-
-
             var classIsPublic = false;
             var classStaticModifier = null as SyntaxToken?;
             var classAbstractModifier = null as SyntaxToken?;
@@ -212,14 +186,43 @@
                 }
             }
 
+            if (genericTypeArgumentsAttributes.Length == 0)
+            {
+                if (classDeclarationSyntax.TypeParameterList != null && !classAbstractModifier.HasValue)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule, classDeclarationSyntax.TypeParameterList.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
+                }
+            }
+            else
+            {
+                if (classDeclarationSyntax.TypeParameterList is { Parameters.Count: > 0 })
+                {
+                    foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
+                    {
+                        if (genericTypeArgumentsAttribute.ArgumentList is { Arguments.Count: > 0 })
+                        {
+                            if (genericTypeArgumentsAttribute.ArgumentList.Arguments.Count != classDeclarationSyntax.TypeParameterList.Parameters.Count)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule, Location.Create(context.FilterTree, genericTypeArgumentsAttribute.ArgumentList.Arguments.Span),
+                                                                           classDeclarationSyntax.TypeParameterList.Parameters.Count,
+                                                                           classDeclarationSyntax.TypeParameterList.Parameters.Count == 1 ? "" : "s",
+                                                                           classDeclarationSyntax.Identifier.ToString(),
+                                                                           genericTypeArgumentsAttribute.ArgumentList.Arguments.Count));
+                            }
+                        }
+                    }
+
+                }
+            }
+
             if (!classIsPublic)
             {
                 context.ReportDiagnostic(Diagnostic.Create(ClassMustBePublicRule, classDeclarationSyntax.Identifier.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
-            if (classAbstractModifier.HasValue)
+            if (classAbstractModifier.HasValue && genericTypeArgumentsAttributes.Length > 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(ClassMustBeNonAbstractRule, classAbstractModifier.Value.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, classAbstractModifier.Value.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
             if (classStaticModifier.HasValue)

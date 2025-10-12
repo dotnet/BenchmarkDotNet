@@ -306,12 +306,12 @@
             }
         }
 
-        public class BenchmarkClassMustBeNonAbstract : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        public class ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
-            public BenchmarkClassMustBeNonAbstract() : base(BenchmarkClassAnalyzer.ClassMustBeNonAbstractRule) { }
+            public ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule) { }
 
             [Fact]
-            public async Task Nonabstract_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
+            public async Task Nonabstract_class_not_annotated_with_any_generictypearguments_attributes_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
                 const string testCode = /* lang=c#-test */ """
                                                            using BenchmarkDotNet.Attributes;
@@ -328,8 +328,29 @@
                                                                {
                                                                
                                                                }
+                                                           }
+                                                           """;
+
+                TestCode = testCode;
+
+                await RunAsync();
+            }
+
+            [Fact]
+            public async Task Abstract_class_not_annotated_with_any_generictypearguments_attributes_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
+            {
+                const string testCode = /* lang=c#-test */ """
+                                                           using BenchmarkDotNet.Attributes;
+
+                                                           public abstract class BenchmarkClass
+                                                           {
+                                                               [Benchmark]
+                                                               public void BenchmarkMethod()
+                                                               {
+
+                                                               }
                                                                
-                                                               private static void NonBenchmarkMethod2()
+                                                               public void NonBenchmarkMethod()
                                                                {
                                                                
                                                                }
@@ -341,23 +362,28 @@
                 await RunAsync();
             }
 
-            [Fact]
-            public async Task Abstract_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic()
+            [Theory]
+            [InlineData(1)]
+            [InlineData(2)]
+            public async Task Abstract_class_annotated_with_at_least_one_generictypearguments_attribute_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int attributeUsageCount)
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                const string testCode = /* lang=c#-test */ $$"""
-                                                             using BenchmarkDotNet.Attributes;
-                                                           
-                                                             public {|#0:abstract|} class {{benchmarkClassName}}
-                                                             {
-                                                                 [Benchmark]
-                                                                 public void BenchmarkMethod()
-                                                                 {
-                                                           
-                                                                 }
-                                                             }
-                                                             """;
+                var attributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", attributeUsageCount);
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{string.Join("\n", attributeUsages)}}
+                                                    public {|#0:abstract|} class {{benchmarkClassName}}<T1>
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
                 AddDefaultExpectedDiagnostic(benchmarkClassName);
@@ -366,9 +392,9 @@
             }
         }
 
-        public class BenchmarkClassMustBeNonGeneric : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        public class GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
-            public BenchmarkClassMustBeNonGeneric() : base(BenchmarkClassAnalyzer.ClassMustBeNonGenericRule) { }
+            public GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute() : base(BenchmarkClassAnalyzer.GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule) { }
 
             [Fact]
             public async Task Nongeneric_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
@@ -396,17 +422,18 @@
                 await RunAsync();
             }
 
-            [Theory]
-            [MemberData(nameof(TypeParametersListLength))]
-            public async Task Generic_class_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
+            [Theory, CombinatorialData]
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic([CombinatorialRange(1, 3)] int attributeUsageCount,
+                                                                                                                                                                                                [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength)
             {
-                const string benchmarkClassName = "BenchmarkClass";
+                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
+                var attributeUsages = string.Join("\n", Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", attributeUsageCount));
 
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
-                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}})]
-                                                    public class {{benchmarkClassName}}{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
+                                                    {{attributeUsages}}
+                                                    public class BenchmarkClass{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
                                                     {
                                                         [Benchmark]
                                                         public void BenchmarkMethod()
@@ -423,7 +450,29 @@
 
             [Theory]
             [MemberData(nameof(TypeParametersListLength))]
-            public async Task Generic_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int typeParametersListLength)
+            public async Task Abstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    
+                                                    public abstract class BenchmarkClassBase<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                    {
+                                                        [Benchmark]
+                                                        public void BenchmarkMethod()
+                                                        {
+                                                    
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+
+                await RunAsync();
+            }
+
+            [Theory]
+            [MemberData(nameof(TypeParametersListLength))]
+            public async Task Nonabstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int typeParametersListLength)
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
@@ -446,6 +495,8 @@
                 await RunAsync();
             }
 
+            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
+
             public static TheoryData<int> TypeParametersListLength => TypeParametersListLengthTheoryData;
 
             private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
@@ -453,12 +504,12 @@
             private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
         }
 
-        public class ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        public class ClassWithGenericTypeArgumentsAttributeMustBeGeneric : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
-            public ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustHaveTypeParametersRule) { }
+            public ClassWithGenericTypeArgumentsAttributeMustBeGeneric() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeGenericRule) { }
 
             [Fact]
-            public async Task Nongeneric_class_not_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
+            public async Task Nongeneric_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
             {
                 const string testCode = /* lang=c#-test */ """
                                                            using BenchmarkDotNet.Attributes;
@@ -480,12 +531,12 @@
 
             [Theory]
             [MemberData(nameof(TypeParametersListLength))]
-            public async Task Generic_class_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
-                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}})]
+                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength))}})]
                                                     public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
                                                     {
                                                         [Benchmark]
@@ -502,7 +553,7 @@
             }
 
             [Fact]
-            public async Task Class_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_having_no_type_parameters_should_trigger_diagnostic()
+            public async Task Class_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_having_no_type_parameters_should_trigger_diagnostic()
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
@@ -525,6 +576,47 @@
 
                 await RunAsync();
             }
+
+            [Theory, CombinatorialData]
+            public async Task Nongeneric_class_annotated_with_a_generictypearguments_attribute_inheriting_from_an_abstract_generic_class_should_trigger_diagnostic([CombinatorialRange(1, 3)] int attributeUsageCount,
+                                                                                                                                                                   [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
+                var attributeUsages = string.Join("\n", Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", attributeUsageCount));
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{attributeUsages}}
+                                                    public class {|#0:{{benchmarkClassName}}|} : BenchmarkClassBase<{{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}}>
+                                                    {
+                                                    }
+                                                    """;
+
+                var benchmarkBaseClassDocument = /* lang=c#-test */ $$"""
+                                                                      using BenchmarkDotNet.Attributes;
+
+                                                                      public abstract class BenchmarkClassBase<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                                      {
+                                                                          [Benchmark]
+                                                                          public void BenchmarkMethod()
+                                                                          {
+
+                                                                          }
+                                                                      }
+                                                                      """;
+
+                TestCode = testCode;
+                AddSource(benchmarkBaseClassDocument);
+
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
 
             public static TheoryData<int> TypeParametersListLength => TypeParametersListLengthTheoryData;
 
@@ -565,7 +657,7 @@
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
-                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}})]
+                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength))}})]
                                                     public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
                                                     {
                                                         [Benchmark]
@@ -615,9 +707,9 @@
             private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
         }
 
-        public class BenchmarkClassMustBeUnsealed : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        public class ClassMustBeUnsealed : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
-            public BenchmarkClassMustBeUnsealed() : base(BenchmarkClassAnalyzer.ClassMustBeUnsealedRule) { }
+            public ClassMustBeUnsealed() : base(BenchmarkClassAnalyzer.ClassMustBeUnsealedRule) { }
 
             [Fact]
             public async Task Unsealed_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
@@ -793,12 +885,14 @@
             }
         }
 
-        public static TheoryData<int> TypeParametersListLengthTheoryData => new(Enumerable.Range(1, TypeParametersTheoryData.Count));
+        public static TheoryData<int> TypeParametersListLengthTheoryData => new(TypeParametersListLengthEnumerable);
 
-        private static ReadOnlyCollection<string> TypeParametersTheoryData => Enumerable.Range(0, 3)
+        public static IEnumerable<int> TypeParametersListLengthEnumerable => Enumerable.Range(1, TypeParametersTheoryData.Count);
+
+        private static ReadOnlyCollection<string> TypeParametersTheoryData => Enumerable.Range(1, 3)
                                                                                         .Select(i => $"TParameter{i}")
                                                                                         .ToList()
                                                                                         .AsReadOnly();
-        private static ReadOnlyCollection<string> GenericTypeArgumentsTheoryData => new List<string> { "typeof(int)", "typeof(string)", "typeof(bool)" }.AsReadOnly();
+        private static ReadOnlyCollection<string> GenericTypeArgumentsTheoryData => new List<string> { "int", "string", "bool" }.AsReadOnly();
     }
 }

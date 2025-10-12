@@ -129,29 +129,26 @@
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Description" xml:space="preserve">
     <value>A benchmark class must be an instance class</value>
   </data>
-  <data name="General_BenchmarkClass_ClassMustBeNonGeneric_Description" xml:space="preserve">
-    <value>A benchmark class not annotated with the [GenericTypeArguments] attribute must be non-generic</value>
-  </data>
-  <data name="General_BenchmarkClass_ClassMustBeNonAbstract_Description" xml:space="preserve">
-    <value>A benchmark class must be non-abstract</value>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description" xml:space="preserve">
+    <value>A benchmark class annotated with the [GenericTypeArguments] attribute must be non-abstract</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat" xml:space="preserve">
     <value>Benchmark class '{0}' cannot be static</value>
   </data>
-  <data name="General_BenchmarkClass_ClassMustBeNonAbstract_MessageFormat" xml:space="preserve">
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat" xml:space="preserve">
     <value>Benchmark class '{0}' cannot be abstract</value>
   </data>
-  <data name="General_BenchmarkClass_ClassMustBeNonGeneric_MessageFormat" xml:space="preserve">
-    <value>Benchmark class '{0}' cannot be generic</value>
+  <data name="General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat" xml:space="preserve">
+    <value>Benchmark class '{0}' cannot be generic unless declared as abstract or annotated with a [GenericTypeArguments] attribute</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Title" xml:space="preserve">
     <value>Benchmark classes must be non-static</value>
   </data>
-  <data name="General_BenchmarkClass_ClassMustBeNonAbstract_Title" xml:space="preserve">
-    <value>Benchmark classes must be non-abstract</value>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title" xml:space="preserve">
+    <value>Benchmark classes annotated with the [GenericTypeArguments] attribute must be non-abstract</value>
   </data>
-  <data name="General_BenchmarkClass_ClassMustBeNonGeneric_Title" xml:space="preserve">
-    <value>Benchmark classes not annotated with the [GenericTypeArguments] attribute must be non-generic</value>
+  <data name="General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title" xml:space="preserve">
+    <value>Benchmark classes can only be generic if they're either abstract or annotated with a [GenericTypeArguments] attribute</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBePublic_Description" xml:space="preserve">
     <value>A benchmark class must be public</value>
@@ -180,7 +177,7 @@
   <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Description" xml:space="preserve">
     <value>The number of type arguments passed to the [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
   </data>
-  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_Description" xml:space="preserve">
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Description" xml:space="preserve">
     <value>A benchmark class annotated with the [GenericTypeArguments] attribute must be generic, having between one to three type parameters</value>
   </data>
   <data name="General_BenchmarkClass_MethodMustBePublic_MessageFormat" xml:space="preserve">
@@ -192,7 +189,7 @@
   <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_MessageFormat" xml:space="preserve">
     <value>Expected {0} type argument{1} as declared on the benchmark class '{2}', but found {3}. Update the attribute usage or the type parameter list of the class declaration to match.</value>
   </data>
-  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_MessageFormat" xml:space="preserve">
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat" xml:space="preserve">
     <value>Benchmark class '{0}' must be generic</value>
   </data>
   <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat" xml:space="preserve">
@@ -207,7 +204,7 @@
   <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Title" xml:space="preserve">
     <value>Number of type arguments passed to the [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
   </data>
-  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_Title" xml:space="preserve">
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title" xml:space="preserve">
     <value>Benchmark classes annotated with the [GenericTypeArguments] attribute must be generic</value>
   </data>
   <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title" xml:space="preserve">
