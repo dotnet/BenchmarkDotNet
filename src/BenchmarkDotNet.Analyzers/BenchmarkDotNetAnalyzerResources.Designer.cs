@@ -509,60 +509,6 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A benchmark class must be non-abstract.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeNonAbstract_Description {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonAbstract_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be abstract.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeNonAbstract_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonAbstract_MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes must be non-abstract.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeNonAbstract_Title {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonAbstract_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A benchmark class not annotated with the [GenericTypeArguments] attribute must be non-generic.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeNonGeneric_Description {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonGeneric_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be generic.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeNonGeneric_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonGeneric_MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes not annotated with the [GenericTypeArguments] attribute must be non-generic.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeNonGeneric_Title {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonGeneric_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to A benchmark class must be an instance class.
         /// </summary>
         internal static string General_BenchmarkClass_ClassMustBeNonStatic_Description {
@@ -646,30 +592,79 @@ namespace BenchmarkDotNet.Analyzers {
         /// <summary>
         ///   Looks up a localized string similar to A benchmark class annotated with the [GenericTypeArguments] attribute must be generic, having between one to three type parameters.
         /// </summary>
-        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_Description {
+        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Description {
             get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParamete" +
-                        "rs_Description", resourceCulture);
+                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Descri" +
+                        "ption", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; must be generic.
         /// </summary>
-        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_MessageFormat {
+        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat {
             get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParamete" +
-                        "rs_MessageFormat", resourceCulture);
+                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Messag" +
+                        "eFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Benchmark classes annotated with the [GenericTypeArguments] attribute must be generic.
         /// </summary>
-        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters_Title {
+        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title {
             get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParamete" +
-                        "rs_Title", resourceCulture);
+                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A benchmark class annotated with the [GenericTypeArguments] attribute must be non-abstract.
+        /// </summary>
+        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_De" +
+                        "scription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be abstract.
+        /// </summary>
+        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Me" +
+                        "ssageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark classes annotated with the [GenericTypeArguments] attribute must be non-abstract.
+        /// </summary>
+        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Ti" +
+                        "tle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be generic unless declared as abstract or annotated with a [GenericTypeArguments] attribute.
+        /// </summary>
+        internal static string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgum" +
+                        "entsAttribute_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark classes can only be generic if they&apos;re either abstract or annotated with a [GenericTypeArguments] attribute.
+        /// </summary>
+        internal static string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgum" +
+                        "entsAttribute_Title", resourceCulture);
             }
         }
         

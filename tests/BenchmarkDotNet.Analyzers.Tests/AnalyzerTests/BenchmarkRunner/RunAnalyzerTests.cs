@@ -19,16 +19,16 @@
             {
                 const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
 
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Running;
-
-                                                    public class Program
-                                                    {
-                                                        public static void Main(string[] args) {
-                                                            BenchmarkRunner.Run<{{classWithOneBenchmarkMethodName}}>();
-                                                        }
-                                                    }
-                                                    """;
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{{classWithOneBenchmarkMethodName}}>();
+                                                                 }
+                                                             }
+                                                             """;
 
                 const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                                                                            using BenchmarkDotNet.Attributes;

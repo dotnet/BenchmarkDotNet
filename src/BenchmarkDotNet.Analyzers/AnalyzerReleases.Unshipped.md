@@ -12,7 +12,7 @@ BDN1003  |  Usage   | Error	   | BDN1003_General_BenchmarkClass_ClassMustBePubli
 BDN1004  |  Usage   | Error	   | BDN1004_General_BenchmarkClass_ClassMustBeNonStatic
 BDN1005  |  Usage   | Error	   | BDN1005_General_BenchmarkClass_ClassMustBeNonAbstract
 BDN1006  |  Usage   | Error	   | BDN1006_General_BenchmarkClass_ClassMustBeNonGeneric
-BDN1007  |  Usage   | Error	   | BDN1007_General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustHaveTypeParameters
+BDN1007  |  Usage   | Error	   | BDN1007_General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric
 BDN1008  |  Usage   | Error	   | BDN1008_General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount
 BDN1009  |  Usage   | Error	   | BDN1009_General_BenchmarkClass_ClassMustBeUnsealed
 BDN1010  |  Usage   | Error	   | BDN1010_General_BenchmarkClass_OnlyOneMethodCanBeBaseline
