@@ -123,14 +123,20 @@
   <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_MessageFormat" xml:space="preserve">
     <value>Intended benchmark class '{0}' has no method(s) annotated with the [Benchmark] attribute</value>
   </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat" xml:space="preserve">
+    <value>Referenced benchmark class '{0}' cannot be abstract</value>
+  </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Title" xml:space="preserve">
     <value>Benchmark class has no annotated method(s)</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title" xml:space="preserve">
+    <value>Benchmark classes must be non-abstract</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Description" xml:space="preserve">
     <value>A benchmark class must be an instance class</value>
   </data>
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description" xml:space="preserve">
-    <value>A benchmark class annotated with the [GenericTypeArguments] attribute must be non-abstract</value>
+    <value>A benchmark class annotated with a [GenericTypeArguments] attribute must be non-abstract</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat" xml:space="preserve">
     <value>Benchmark class '{0}' cannot be static</value>
@@ -175,10 +181,10 @@
     <value>A method annotated with the [Benchmark] attribute must be non-generic</value>
   </data>
   <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Description" xml:space="preserve">
-    <value>The number of type arguments passed to the [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
+    <value>The number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
   </data>
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Description" xml:space="preserve">
-    <value>A benchmark class annotated with the [GenericTypeArguments] attribute must be generic, having between one to three type parameters</value>
+    <value>A benchmark class annotated with a [GenericTypeArguments] attribute must be generic, having between one to three type parameters</value>
   </data>
   <data name="General_BenchmarkClass_MethodMustBePublic_MessageFormat" xml:space="preserve">
     <value>The benchmark method '{0}' must be public</value>
@@ -202,10 +208,10 @@
     <value>Benchmark methods must be non-generic</value>
   </data>
   <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Title" xml:space="preserve">
-    <value>Number of type arguments passed to the [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
+    <value>Number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
   </data>
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title" xml:space="preserve">
-    <value>Benchmark classes annotated with the [GenericTypeArguments] attribute must be generic</value>
+    <value>Benchmark classes annotated with a [GenericTypeArguments] attribute must be generic</value>
   </data>
   <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title" xml:space="preserve">
     <value>Only one benchmark method can be baseline</value>
@@ -348,5 +354,8 @@ Either add the [Arguments] attribute(s) or remove the parameters.</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_MessageFormat" xml:space="preserve">
     <value>The [Arguments] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description" xml:space="preserve">
+    <value>A benchmark class referenced in the BenchmarkRunner.Run method must be non-abstract</value>
   </data>
 </root>
