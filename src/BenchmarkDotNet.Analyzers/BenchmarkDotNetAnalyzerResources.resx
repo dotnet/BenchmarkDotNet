@@ -156,13 +156,7 @@
   <data name="General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title" xml:space="preserve">
     <value>Benchmark classes can only be generic if they're either abstract or annotated with a [GenericTypeArguments] attribute</value>
   </data>
-  <data name="General_BenchmarkClass_ClassMustBePublic_Description" xml:space="preserve">
-    <value>A benchmark class must be public</value>
-  </data>
-  <data name="General_BenchmarkClass_ClassMustBePublic_MessageFormat" xml:space="preserve">
-    <value>The benchmark class '{0}' must be public</value>
-  </data>
-  <data name="General_BenchmarkClass_ClassMustBePublic_Title" xml:space="preserve">
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBePublic_Title" xml:space="preserve">
     <value>Benchmark classes must be public</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description" xml:space="preserve">
@@ -357,5 +351,8 @@ Either add the [Arguments] attribute(s) or remove the parameters.</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description" xml:space="preserve">
     <value>A benchmark class referenced in the BenchmarkRunner.Run method must be non-abstract</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBePublic_MessageFormat" xml:space="preserve">
+    <value>Referenced benchmark class '{0}' must be public</value>
   </data>
 </root>

@@ -6,6 +6,7 @@
 
     using Xunit;
 
+    using System.Linq;
     using System.Threading.Tasks;
 
     public class RunAnalyzerTests
@@ -13,7 +14,7 @@
         public class General : AnalyzerTestFixture<RunAnalyzer>
         {
             [Fact]
-            public async Task Invoking_with_a_nonabstract_type_argument_class_having_only_one_and_public_method_annotated_with_the_benchmark_attribute_should_not_trigger_diagnostic()
+            public async Task Invoking_with_a_public_nonabstract_unsealed_type_argument_class_having_only_one_and_public_method_annotated_with_the_benchmark_attribute_should_not_trigger_diagnostic()
             {
                 const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
 
@@ -202,6 +203,128 @@
             }
         }
 
+        public class TypeArgumentClassMustBePublic : AnalyzerTestFixture<RunAnalyzer>
+        {
+            public TypeArgumentClassMustBePublic() : base(RunAnalyzer.TypeArgumentClassMustBePublicRule) { }
+
+            [Fact]
+            public async Task Invoking_with_a_nonpublic_class_with_multiple_inheritance_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic()
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                             using BenchmarkDotNet.Running;
+
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{|#0:{{benchmarkClassName}}|}>();
+                                                                 }
+                                                                 
+                                                                 private class {{benchmarkClassName}} : BenchmarkClassAncestor1
+                                                                 {
+                                                                 }
+                                                                 
+                                                                 private class BenchmarkClassAncestor1 : BenchmarkClassAncestor2
+                                                                 {
+                                                                     [Benchmark]
+                                                                     public void BenchmarkMethod()
+                                                                     {
+                                                                 
+                                                                     }
+                                                                 }
+                                                             }
+                                                             """;
+
+                const string benchmarkClassAncestor2Document = /* lang=c#-test */ """
+                                                                                  using BenchmarkDotNet.Attributes;
+                                                                                  
+                                                                                  public class BenchmarkClassAncestor2
+                                                                                  {
+                                                                                  }
+                                                                                  """;
+
+
+
+                TestCode = testCode;
+                AddSource(benchmarkClassAncestor2Document);
+
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            [Theory]
+            [MemberData(nameof(NonPublicClassAccessModifiersExceptFileTheoryData))]
+            public async Task Invoking_with_a_nonpublic_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(string nonPublicClassAccessModifier)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    using BenchmarkDotNet.Running;
+                                                   
+                                                    public class Program
+                                                    {
+                                                        public static void Main(string[] args) {
+                                                            BenchmarkRunner.Run<{|#0:{{benchmarkClassName}}|}>();
+                                                        }
+                                                        
+                                                        {{nonPublicClassAccessModifier}}class {{benchmarkClassName}}
+                                                        {
+                                                            [Benchmark]
+                                                            public void BenchmarkMethod()
+                                                            {
+                                                                                                                          
+                                                            }
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            [Fact]
+            public async Task Invoking_with_a_file_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic()
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Attributes;
+                                                             using BenchmarkDotNet.Running;
+
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{|#0:{{benchmarkClassName}}|}>();
+                                                                 }
+                                                             }
+                                                             
+                                                             file class {{benchmarkClassName}}
+                                                             {
+                                                                 [Benchmark]
+                                                                 public void BenchmarkMethod()
+                                                                 {
+
+                                                                 }
+                                                             }
+                                                             """;
+
+                TestCode = testCode;
+
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            public static TheoryData<string> NonPublicClassAccessModifiersExceptFileTheoryData => new(new NonPublicClassAccessModifiersTheoryData().Where<string>(m => m != "file "));
+        }
+
         public class TypeArgumentClassMustBeNonAbstract : AnalyzerTestFixture<RunAnalyzer>
         {
             public TypeArgumentClassMustBeNonAbstract() : base(RunAnalyzer.TypeArgumentClassMustBeNonAbstractRule) { }
@@ -223,8 +346,11 @@
                                                              """;
 
                 const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+                                                                           
                                                                            public abstract class {{benchmarkClassName}}
                                                                            {
+                                                                               [Benchmark]
                                                                                public void BenchmarkMethod()
                                                                                {
                                                                          
@@ -260,8 +386,11 @@
                                                              """;
 
                 const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+                                                                           
                                                                            public sealed class {{benchmarkClassName}}
                                                                            {
+                                                                               [Benchmark]
                                                                                public void BenchmarkMethod()
                                                                                {
                                                                          
