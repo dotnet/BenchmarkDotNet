@@ -509,6 +509,33 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A benchmark class referenced in the BenchmarkRunner.Run method must be non-abstract.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Referenced benchmark class &apos;{0}&apos; cannot be abstract.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark classes must be non-abstract.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A benchmark class must be an instance class.
         /// </summary>
         internal static string General_BenchmarkClass_ClassMustBeNonStatic_Description {
@@ -590,7 +617,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A benchmark class annotated with the [GenericTypeArguments] attribute must be generic, having between one to three type parameters.
+        ///   Looks up a localized string similar to A benchmark class annotated with a [GenericTypeArguments] attribute must be generic, having between one to three type parameters.
         /// </summary>
         internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Description {
             get {
@@ -610,7 +637,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes annotated with the [GenericTypeArguments] attribute must be generic.
+        ///   Looks up a localized string similar to Benchmark classes annotated with a [GenericTypeArguments] attribute must be generic.
         /// </summary>
         internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title {
             get {
@@ -619,7 +646,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A benchmark class annotated with the [GenericTypeArguments] attribute must be non-abstract.
+        ///   Looks up a localized string similar to A benchmark class annotated with a [GenericTypeArguments] attribute must be non-abstract.
         /// </summary>
         internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description {
             get {
@@ -669,7 +696,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The number of type arguments passed to the [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class.
+        ///   Looks up a localized string similar to The number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class.
         /// </summary>
         internal static string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Description {
             get {
@@ -689,7 +716,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Number of type arguments passed to the [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class.
+        ///   Looks up a localized string similar to Number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class.
         /// </summary>
         internal static string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Title {
             get {

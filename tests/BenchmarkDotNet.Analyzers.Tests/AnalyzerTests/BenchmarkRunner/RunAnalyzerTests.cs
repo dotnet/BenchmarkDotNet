@@ -10,18 +10,16 @@
 
     public class RunAnalyzerTests
     {
-        public class TypeArgumentClassMissingBenchmarkMethods : AnalyzerTestFixture<RunAnalyzer>
+        public class General : AnalyzerTestFixture<RunAnalyzer>
         {
-            public TypeArgumentClassMissingBenchmarkMethods() : base(RunAnalyzer.TypeArgumentClassMissingBenchmarkMethodsRule) { }
-
             [Fact]
-            public async Task Invoking_with_type_argument_class_having_only_one_and_public_method_annotated_with_the_benchmark_attribute_should_not_trigger_diagnostic()
+            public async Task Invoking_with_a_nonabstract_type_argument_class_having_only_one_and_public_method_annotated_with_the_benchmark_attribute_should_not_trigger_diagnostic()
             {
                 const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
 
                 const string testCode = /* lang=c#-test */ $$"""
                                                              using BenchmarkDotNet.Running;
-                                                           
+
                                                              public class Program
                                                              {
                                                                  public static void Main(string[] args) {
@@ -32,13 +30,13 @@
 
                 const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                                                                            using BenchmarkDotNet.Attributes;
-                                                                         
+
                                                                            public class {{classWithOneBenchmarkMethodName}}
                                                                            {
                                                                                [Benchmark]
                                                                                public void BenchmarkMethod()
                                                                                {
-                                                                         
+
                                                                                }
                                                                            }
                                                                            """;
@@ -48,38 +46,11 @@
 
                 await RunAsync();
             }
+        }
 
-            [Fact]
-            public async Task Invoking_with_type_argument_class_having_no_public_method_annotated_with_the_benchmark_attribute_should_trigger_diagnostic()
-            {
-                const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
-
-                const string testCode = /* lang=c#-test */ $$"""
-                                                             using BenchmarkDotNet.Running;
-                                                           
-                                                             public class Program
-                                                             {
-                                                                 public static void Main(string[] args) {
-                                                                     BenchmarkRunner.Run<{|#0:{{classWithOneBenchmarkMethodName}}|}>();
-                                                                 }
-                                                             }
-                                                             """;
-
-                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
-                                                                           public class {{classWithOneBenchmarkMethodName}}
-                                                                           {
-                                                                               public void BenchmarkMethod()
-                                                                               {
-                                                                         
-                                                                               }
-                                                                           }
-                                                                           """;
-                TestCode = testCode;
-                AddSource(benchmarkClassDocument);
-                AddDefaultExpectedDiagnostic(classWithOneBenchmarkMethodName);
-
-                await RunAsync();
-            }
+        public class TypeArgumentClassMissingBenchmarkMethods : AnalyzerTestFixture<RunAnalyzer>
+        {
+            public TypeArgumentClassMissingBenchmarkMethods() : base(RunAnalyzer.TypeArgumentClassMissingBenchmarkMethodsRule) { }
 
             [Fact]
             public async Task Invoking_with_type_argument_class_having_at_least_one_public_method_annotated_with_the_benchmark_attribute_should_not_trigger_diagnostic()
@@ -122,6 +93,75 @@
 
                 TestCode = testCode;
                 AddSource(benchmarkClassDocument);
+
+                await RunAsync();
+            }
+
+            [Fact]
+            public async Task Invoking_with_type_argument_class_having_no_public_method_annotated_with_the_benchmark_attribute_should_trigger_diagnostic()
+            {
+                const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
+
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{|#0:{{classWithOneBenchmarkMethodName}}|}>();
+                                                                 }
+                                                             }
+                                                             """;
+
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           public class {{classWithOneBenchmarkMethodName}}
+                                                                           {
+                                                                               public void BenchmarkMethod()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                           }
+                                                                           """;
+                TestCode = testCode;
+                AddSource(benchmarkClassDocument);
+                AddDefaultExpectedDiagnostic(classWithOneBenchmarkMethodName);
+
+                await RunAsync();
+            }
+        }
+
+        public class TypeArgumentClassMustBeNonAbstract : AnalyzerTestFixture<RunAnalyzer>
+        {
+            public TypeArgumentClassMustBeNonAbstract() : base(RunAnalyzer.TypeArgumentClassMustBeNonAbstractRule) { }
+
+            [Fact]
+            public async Task Invoking_with_an_abstract_benchmark_class_should_trigger_diagnostic()
+            {
+                const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
+
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{|#0:{{classWithOneBenchmarkMethodName}}|}>();
+                                                                 }
+                                                             }
+                                                             """;
+
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           public abstract class {{classWithOneBenchmarkMethodName}}
+                                                                           {
+                                                                               public void BenchmarkMethod()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                           }
+                                                                           """;
+                TestCode = testCode;
+                AddSource(benchmarkClassDocument);
+                AddDefaultExpectedDiagnostic(classWithOneBenchmarkMethodName);
 
                 await RunAsync();
             }

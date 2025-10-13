@@ -18,7 +18,19 @@
                                                                                                                               isEnabledByDefault: true,
                                                                                                                               description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Description)));
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(TypeArgumentClassMissingBenchmarkMethodsRule);
+        internal static readonly DiagnosticDescriptor TypeArgumentClassMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract,
+                                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title)),
+                                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat)),
+                                                                                                                        "Usage",
+                                                                                                                        DiagnosticSeverity.Error,
+                                                                                                                        isEnabledByDefault: true,
+                                                                                                                        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description)));
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        [
+            TypeArgumentClassMissingBenchmarkMethodsRule,
+            TypeArgumentClassMustBeNonAbstractRule
+        ];
 
         public override void Initialize(AnalysisContext analysisContext)
         {
@@ -85,14 +97,19 @@
             var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation);
             if (benchmarkAttributeTypeSymbol == null)
             {
-                ReportDiagnostic();
+                ReportDiagnostic(TypeArgumentClassMissingBenchmarkMethodsRule);
 
                 return;
             }
 
             if (!HasBenchmarkAttribute())
             {
-                ReportDiagnostic();
+                ReportDiagnostic(TypeArgumentClassMissingBenchmarkMethodsRule);
+            }
+
+            if (benchmarkClassTypeSymbol.IsAbstract)
+            {
+                ReportDiagnostic(TypeArgumentClassMustBeNonAbstractRule);
             }
 
             return;
@@ -119,9 +136,9 @@
                 return false;
             }
 
-            void ReportDiagnostic()
+            void ReportDiagnostic(DiagnosticDescriptor diagnosticDescriptor)
             {
-                context.ReportDiagnostic(Diagnostic.Create(TypeArgumentClassMissingBenchmarkMethodsRule, Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span), benchmarkClassTypeSymbol.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span), benchmarkClassTypeSymbol.ToString()));
             }
         }
     }
