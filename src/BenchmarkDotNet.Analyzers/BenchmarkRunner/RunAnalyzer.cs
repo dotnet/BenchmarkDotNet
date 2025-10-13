@@ -116,21 +116,28 @@
 
             bool HasBenchmarkAttribute()
             {
-                foreach (var member in benchmarkClassTypeSymbol.GetMembers())
+                var baseType = benchmarkClassTypeSymbol;
+
+                while (baseType != null && baseType.SpecialType != SpecialType.System_Object)
                 {
-                    if (member is IMethodSymbol)
+                    foreach (var member in baseType.GetMembers())
                     {
-                        foreach (var attributeData in member.GetAttributes())
+                        if (member is IMethodSymbol { MethodKind: MethodKind.Ordinary })
                         {
-                            if (attributeData.AttributeClass != null)
+                            foreach (var attributeData in member.GetAttributes())
                             {
-                                if (attributeData.AttributeClass.Equals(benchmarkAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                                if (attributeData.AttributeClass != null)
                                 {
-                                    return true;
+                                    if (attributeData.AttributeClass.Equals(benchmarkAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                                    {
+                                        return true;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    baseType = baseType.BaseType;
                 }
 
                 return false;
