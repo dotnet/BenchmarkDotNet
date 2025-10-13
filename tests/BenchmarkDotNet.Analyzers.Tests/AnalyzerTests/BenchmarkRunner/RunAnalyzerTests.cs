@@ -209,7 +209,7 @@
             [Fact]
             public async Task Invoking_with_an_abstract_benchmark_class_should_trigger_diagnostic()
             {
-                const string classWithOneBenchmarkMethodName = "ClassWithOneBenchmarkMethod";
+                const string benchmarkClassName = "BenchmarkClass";
 
                 const string testCode = /* lang=c#-test */ $$"""
                                                              using BenchmarkDotNet.Running;
@@ -217,13 +217,13 @@
                                                              public class Program
                                                              {
                                                                  public static void Main(string[] args) {
-                                                                     BenchmarkRunner.Run<{|#0:{{classWithOneBenchmarkMethodName}}|}>();
+                                                                     BenchmarkRunner.Run<{|#0:{{benchmarkClassName}}|}>();
                                                                  }
                                                              }
                                                              """;
 
                 const string benchmarkClassDocument = /* lang=c#-test */ $$"""
-                                                                           public abstract class {{classWithOneBenchmarkMethodName}}
+                                                                           public abstract class {{benchmarkClassName}}
                                                                            {
                                                                                public void BenchmarkMethod()
                                                                                {
@@ -233,7 +233,44 @@
                                                                            """;
                 TestCode = testCode;
                 AddSource(benchmarkClassDocument);
-                AddDefaultExpectedDiagnostic(classWithOneBenchmarkMethodName);
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+        }
+
+        public class TypeArgumentClassMustBeUnsealed : AnalyzerTestFixture<RunAnalyzer>
+        {
+            public TypeArgumentClassMustBeUnsealed() : base(RunAnalyzer.TypeArgumentClassMustBeUnsealedRule) { }
+
+            [Fact]
+            public async Task Invoking_with_a_sealed_benchmark_class_should_trigger_diagnostic()
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{|#0:{{benchmarkClassName}}|}>();
+                                                                 }
+                                                             }
+                                                             """;
+
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           public sealed class {{benchmarkClassName}}
+                                                                           {
+                                                                               public void BenchmarkMethod()
+                                                                               {
+                                                                         
+                                                                               }
+                                                                           }
+                                                                           """;
+                TestCode = testCode;
+                AddSource(benchmarkClassDocument);
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
 
                 await RunAsync();
             }

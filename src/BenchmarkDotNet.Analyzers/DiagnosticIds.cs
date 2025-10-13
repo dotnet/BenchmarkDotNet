@@ -4,6 +4,7 @@
     {
         public const string BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods = "BDN1000";
         public const string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract = "BDN1001";
+        public const string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed = "BDN1002";
         public const string General_BenchmarkClass_MethodMustBePublic = "BDN1100";
         public const string General_BenchmarkClass_MethodMustBeNonGeneric = "BDN1101";
         public const string General_BenchmarkClass_ClassMustBePublic = "BDN1102";
@@ -12,8 +13,7 @@
         public const string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute = "BDN1105";
         public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric = "BDN1106";
         public const string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount = "BDN1107";
-        public const string General_BenchmarkClass_ClassMustBeUnsealed = "BDN1108";
-        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1109";
+        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1108";
         public const string Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField = "BDN1200";
         public const string Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty = "BDN1201";
         public const string Attributes_GeneralParameterAttributes_FieldMustBePublic = "BDN1202";

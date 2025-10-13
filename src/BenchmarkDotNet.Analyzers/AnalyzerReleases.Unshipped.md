@@ -7,6 +7,7 @@ Rule ID  | Category | Severity | Notes
 ---------|----------|----------|--------------------
 BDN1000  |  Usage   | Error	   | BDN1000_BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods
 BDN1001  |  Usage   | Error	   | BDN1001_BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract
+BDN1002  |  Usage   | Error	   | BDN1002_BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed
 BDN1100  |  Usage   | Error	   | BDN1100_General_BenchmarkClass_MethodMustBePublic
 BDN1101  |  Usage   | Error	   | BDN1101_General_BenchmarkClass_MethodMustBeNonGeneric
 BDN1102  |  Usage   | Error	   | BDN1102_General_BenchmarkClass_ClassMustBePublic
@@ -15,8 +16,7 @@ BDN1104  |  Usage   | Error	   | BDN1104_General_BenchmarkClass_ClassMustBeNonAb
 BDN1105  |  Usage   | Error	   | BDN1105_General_BenchmarkClass_ClassMustBeNonGeneric
 BDN1106  |  Usage   | Error	   | BDN1106_General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric
 BDN1107  |  Usage   | Error	   | BDN1107_General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount
-BDN1108  |  Usage   | Error	   | BDN1108_General_BenchmarkClass_ClassMustBeUnsealed
-BDN1109  |  Usage   | Error	   | BDN1109_General_BenchmarkClass_OnlyOneMethodCanBeBaseline
+BDN1108  |  Usage   | Error	   | BDN1108_General_BenchmarkClass_OnlyOneMethodCanBeBaseline
 BDN1200  |  Usage   | Error	   | BDN1200_Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField
 BDN1201  |  Usage   | Error	   | BDN1201_Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty
 BDN1202  |  Usage   | Error	   | BDN1202_Attributes_GeneralParameterAttributes_FieldMustBePublic
