@@ -26,10 +26,19 @@
                                                                                                                         isEnabledByDefault: true,
                                                                                                                         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description)));
 
+        internal static readonly DiagnosticDescriptor TypeArgumentClassMustBeUnsealedRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed,
+                                                                                                                     AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Title)),
+                                                                                                                     AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_MessageFormat)),
+                                                                                                                     "Usage",
+                                                                                                                     DiagnosticSeverity.Error,
+                                                                                                                     isEnabledByDefault: true,
+                                                                                                                     description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description)));
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             TypeArgumentClassMissingBenchmarkMethodsRule,
-            TypeArgumentClassMustBeNonAbstractRule
+            TypeArgumentClassMustBeNonAbstractRule,
+            TypeArgumentClassMustBeUnsealedRule
         ];
 
         public override void Initialize(AnalysisContext analysisContext)
@@ -110,6 +119,11 @@
             if (benchmarkClassTypeSymbol.IsAbstract)
             {
                 ReportDiagnostic(TypeArgumentClassMustBeNonAbstractRule);
+            }
+
+            if (benchmarkClassTypeSymbol.IsSealed)
+            {
+                ReportDiagnostic(TypeArgumentClassMustBeUnsealedRule);
             }
 
             return;

@@ -707,61 +707,6 @@
             private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
         }
 
-        public class ClassMustBeUnsealed : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-        {
-            public ClassMustBeUnsealed() : base(BenchmarkClassAnalyzer.ClassMustBeUnsealedRule) { }
-
-            [Fact]
-            public async Task Unsealed_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
-            {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
-
-                                                           public class BenchmarkClass
-                                                           {
-                                                               [Benchmark]
-                                                               public void BenchmarkMethod()
-                                                               {
-
-                                                               }
-                                                               
-                                                               public void NonBenchmarkMethod()
-                                                               {
-                                                               
-                                                               }
-                                                           }
-                                                           """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Fact]
-            public async Task Sealed_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic()
-            {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                const string testCode = /* lang=c#-test */ $$"""
-                                                             using BenchmarkDotNet.Attributes;
-                                                           
-                                                             public {|#0:sealed|} class {{benchmarkClassName}}
-                                                             {
-                                                                 [Benchmark]
-                                                                 public void BenchmarkMethod()
-                                                                 {
-                                                           
-                                                                 }
-                                                             }
-                                                             """;
-
-                TestCode = testCode;
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
-
-                await RunAsync();
-            }
-        }
-
         public class OnlyOneMethodCanBeBaseline : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
             public OnlyOneMethodCanBeBaseline() : base(BenchmarkClassAnalyzer.OnlyOneMethodCanBeBaselineRule) { }

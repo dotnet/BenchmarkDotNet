@@ -536,6 +536,33 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A benchmark class referenced in the BenchmarkRunner.Run method must be unsealed.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Referenced benchmark class &apos;{0}&apos; cannot be sealed.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_MessageFormat {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark classes must be unsealed.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Title {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A benchmark class must be an instance class.
         /// </summary>
         internal static string General_BenchmarkClass_ClassMustBeNonStatic_Description {
@@ -586,33 +613,6 @@ namespace BenchmarkDotNet.Analyzers {
         internal static string General_BenchmarkClass_ClassMustBePublic_Title {
             get {
                 return ResourceManager.GetString("General_BenchmarkClass_ClassMustBePublic_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A benchmark class bust be unsealed.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeUnsealed_Description {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeUnsealed_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be sealed.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeUnsealed_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeUnsealed_MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes must be unsealed.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBeUnsealed_Title {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeUnsealed_Title", resourceCulture);
             }
         }
         
