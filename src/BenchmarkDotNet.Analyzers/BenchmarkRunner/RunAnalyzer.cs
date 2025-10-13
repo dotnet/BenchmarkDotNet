@@ -18,6 +18,13 @@
                                                                                                                               isEnabledByDefault: true,
                                                                                                                               description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Description)));
 
+        internal static readonly DiagnosticDescriptor TypeArgumentClassMustBePublicRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBePublic,
+                                                                                                                   AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBePublic_Title)),
+                                                                                                                   AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBePublic_MessageFormat)),
+                                                                                                                   "Usage",
+                                                                                                                   DiagnosticSeverity.Error,
+                                                                                                                   isEnabledByDefault: true);
+
         internal static readonly DiagnosticDescriptor TypeArgumentClassMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract,
                                                                                                                         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title)),
                                                                                                                         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat)),
@@ -37,6 +44,7 @@
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             TypeArgumentClassMissingBenchmarkMethodsRule,
+            TypeArgumentClassMustBePublicRule,
             TypeArgumentClassMustBeNonAbstractRule,
             TypeArgumentClassMustBeUnsealedRule
         ];
@@ -82,6 +90,8 @@
                 return;
             }
 
+            // TODO: Support Type overloads that use the typeof() expression
+
             if (memberAccessExpression.Name is not GenericNameSyntax genericMethod)
             {
                 return;
@@ -114,6 +124,11 @@
             if (!HasBenchmarkAttribute())
             {
                 ReportDiagnostic(TypeArgumentClassMissingBenchmarkMethodsRule);
+            }
+
+            if (benchmarkClassTypeSymbol.DeclaredAccessibility != Accessibility.Public)
+            {
+                ReportDiagnostic(TypeArgumentClassMustBePublicRule);
             }
 
             if (benchmarkClassTypeSymbol.IsAbstract)
@@ -159,7 +174,7 @@
 
             void ReportDiagnostic(DiagnosticDescriptor diagnosticDescriptor)
             {
-                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span), benchmarkClassTypeSymbol.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span), benchmarkClassTypeSymbol.Name));
             }
         }
     }

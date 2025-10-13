@@ -27,14 +27,6 @@
                                                                                                             isEnabledByDefault: true,
                                                                                                             description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_Description)));
 
-        internal static readonly DiagnosticDescriptor ClassMustBePublicRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassMustBePublic,
-                                                                                                       AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBePublic_Title)),
-                                                                                                       AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBePublic_MessageFormat)),
-                                                                                                       "Usage",
-                                                                                                       DiagnosticSeverity.Error,
-                                                                                                       isEnabledByDefault: true,
-                                                                                                       description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBePublic_Description)));
-
         internal static readonly DiagnosticDescriptor ClassMustBeNonStaticRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassMustBeNonStatic,
                                                                                                           AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_Title)),
                                                                                                           AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat)),
@@ -85,7 +77,6 @@
         [
             MethodMustBePublicRule,
             MethodMustBeNonGenericRule,
-            ClassMustBePublicRule,
             ClassMustBeNonStaticRule,
             ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
             GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule,
@@ -152,17 +143,12 @@
                 return;
             }
 
-            var classIsPublic = false;
             var classStaticModifier = null as SyntaxToken?;
             var classAbstractModifier = null as SyntaxToken?;
 
             foreach (var modifier in classDeclarationSyntax.Modifiers)
             {
-                if (modifier.IsKind(SyntaxKind.PublicKeyword))
-                {
-                    classIsPublic = true;
-                }
-                else if (modifier.IsKind(SyntaxKind.StaticKeyword))
+                if (modifier.IsKind(SyntaxKind.StaticKeyword))
                 {
                     classStaticModifier = modifier;
                 }
@@ -199,11 +185,6 @@
                     }
 
                 }
-            }
-
-            if (!classIsPublic)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(ClassMustBePublicRule, classDeclarationSyntax.Identifier.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
             if (classAbstractModifier.HasValue && genericTypeArgumentsAttributes.Length > 0)

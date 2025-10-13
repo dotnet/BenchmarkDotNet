@@ -536,6 +536,24 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Referenced benchmark class &apos;{0}&apos; must be public.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBePublic_MessageFormat {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBePublic_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark classes must be public.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_TypeArgumentClassMustBePublic_Title {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_TypeArgumentClassMustBePublic_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A benchmark class referenced in the BenchmarkRunner.Run method must be unsealed.
         /// </summary>
         internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description {
@@ -586,33 +604,6 @@ namespace BenchmarkDotNet.Analyzers {
         internal static string General_BenchmarkClass_ClassMustBeNonStatic_Title {
             get {
                 return ResourceManager.GetString("General_BenchmarkClass_ClassMustBeNonStatic_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A benchmark class must be public.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBePublic_Description {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBePublic_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The benchmark class &apos;{0}&apos; must be public.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBePublic_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBePublic_MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes must be public.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassMustBePublic_Title {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassMustBePublic_Title", resourceCulture);
             }
         }
         
