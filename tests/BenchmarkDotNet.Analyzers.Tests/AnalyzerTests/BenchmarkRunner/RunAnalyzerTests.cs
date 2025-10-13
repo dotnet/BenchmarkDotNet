@@ -97,6 +97,78 @@
                 await RunAsync();
             }
 
+            [Theory, CombinatorialData]
+            public async Task Invoking_with_type_argument_class_having_at_least_one_public_method_annotated_with_the_benchmark_attribute_in_one_of_its_ancestor_classes_should_not_trigger_diagnostic([CombinatorialValues("", "abstract ")] string abstractModifier)
+            {
+                const string classWithOneBenchmarkMethodName = "TopLevelBenchmarkClass";
+
+                const string testCode = /* lang=c#-test */ $$"""
+                                                             using BenchmarkDotNet.Running;
+                                                           
+                                                             public class Program
+                                                             {
+                                                                 public static void Main(string[] args) {
+                                                                     BenchmarkRunner.Run<{{classWithOneBenchmarkMethodName}}>();
+                                                                 }
+                                                             }
+                                                             """;
+
+                const string benchmarkClassDocument = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+                                                                         
+                                                                           public class {{classWithOneBenchmarkMethodName}} : BenchmarkClassAncestor1
+                                                                           {
+                                                                           }
+                                                                           """;
+
+                var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+
+                                                                           public {{abstractModifier}}class BenchmarkClassAncestor1 : BenchmarkClassAncestor2
+                                                                           {
+                                                                           }
+                                                                           """;
+
+                var benchmarkClassAncestor2Document = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+
+                                                                           public {{abstractModifier}}class BenchmarkClassAncestor2 : BenchmarkClassAncestor3
+                                                                           {
+                                                                           }
+                                                                           """;
+
+                var benchmarkClassAncestor3Document = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+
+                                                                           public {{abstractModifier}}class BenchmarkClassAncestor3
+                                                                           {
+                                                                               [Benchmark]
+                                                                               public void BenchmarkMethod()
+                                                                               {
+
+                                                                               }
+                                                                               
+                                                                               public void BenchmarkMethod2()
+                                                                               {
+
+                                                                               }
+                                                                               
+                                                                               private void BenchmarkMethod3()
+                                                                               {
+                                                                                                                                                      
+                                                                               }
+                                                                           }
+                                                                           """;
+
+                TestCode = testCode;
+                AddSource(benchmarkClassDocument);
+                AddSource(benchmarkClassAncestor1Document);
+                AddSource(benchmarkClassAncestor2Document);
+                AddSource(benchmarkClassAncestor3Document);
+
+                await RunAsync();
+            }
+
             [Fact]
             public async Task Invoking_with_type_argument_class_having_no_public_method_annotated_with_the_benchmark_attribute_should_trigger_diagnostic()
             {

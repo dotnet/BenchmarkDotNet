@@ -118,16 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Description" xml:space="preserve">
-    <value>The referenced benchmark class must have at least one method annotated with the [Benchmark] attribute</value>
+    <value>The referenced benchmark class (or any of its inherited classes) must have at least one method annotated with the [Benchmark] attribute</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_MessageFormat" xml:space="preserve">
-    <value>Intended benchmark class '{0}' has no method(s) annotated with the [Benchmark] attribute</value>
+    <value>Intended benchmark class '{0}' (or any of its ancestors) has no method(s) annotated with the [Benchmark] attribute</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat" xml:space="preserve">
     <value>Referenced benchmark class '{0}' cannot be abstract</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Title" xml:space="preserve">
-    <value>Benchmark class has no annotated method(s)</value>
+    <value>Benchmark class (or any of its ancestors) has no annotated method(s)</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title" xml:space="preserve">
     <value>Benchmark classes must be non-abstract</value>

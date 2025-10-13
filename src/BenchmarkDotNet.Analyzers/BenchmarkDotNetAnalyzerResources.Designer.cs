@@ -482,7 +482,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The referenced benchmark class must have at least one method annotated with the [Benchmark] attribute.
+        ///   Looks up a localized string similar to The referenced benchmark class (or any of its inherited classes) must have at least one method annotated with the [Benchmark] attribute.
         /// </summary>
         internal static string BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Description {
             get {
@@ -491,7 +491,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Intended benchmark class &apos;{0}&apos; has no method(s) annotated with the [Benchmark] attribute.
+        ///   Looks up a localized string similar to Intended benchmark class &apos;{0}&apos; (or any of its ancestors) has no method(s) annotated with the [Benchmark] attribute.
         /// </summary>
         internal static string BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_MessageFormat {
             get {
@@ -500,7 +500,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Benchmark class has no annotated method(s).
+        ///   Looks up a localized string similar to Benchmark class (or any of its ancestors) has no annotated method(s).
         /// </summary>
         internal static string BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Title {
             get {
