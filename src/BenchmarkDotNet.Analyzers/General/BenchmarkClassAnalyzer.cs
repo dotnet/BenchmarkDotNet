@@ -11,30 +11,6 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor MethodMustBePublicRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_MethodMustBePublic,
-                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBePublic_Title)),
-                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBePublic_MessageFormat)),
-                                                                                                        "Usage",
-                                                                                                        DiagnosticSeverity.Error,
-                                                                                                        isEnabledByDefault: true,
-                                                                                                        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBePublic_Description)));
-
-        internal static readonly DiagnosticDescriptor MethodMustBeNonGenericRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_MethodMustBeNonGeneric,
-                                                                                                            AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_Title)),
-                                                                                                            AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_MessageFormat)),
-                                                                                                            "Usage",
-                                                                                                            DiagnosticSeverity.Error,
-                                                                                                            isEnabledByDefault: true,
-                                                                                                            description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_Description)));
-
-        internal static readonly DiagnosticDescriptor ClassMustBeNonStaticRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassMustBeNonStatic,
-                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_Title)),
-                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat)),
-                                                                                                          "Usage",
-                                                                                                          DiagnosticSeverity.Error,
-                                                                                                          isEnabledByDefault: true,
-                                                                                                          description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_Description)));
-
         internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract,
                                                                                                                                              AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title)),
                                                                                                                                              AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat)),
@@ -66,6 +42,31 @@
                                                                                                                                                      isEnabledByDefault: true,
                                                                                                                                                      description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Description)));
 
+        internal static readonly DiagnosticDescriptor MethodMustBePublicRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_MethodMustBePublic,
+                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBePublic_Title)),
+                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBePublic_MessageFormat)),
+                                                                                                        "Usage",
+                                                                                                        DiagnosticSeverity.Error,
+                                                                                                        isEnabledByDefault: true,
+                                                                                                        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBePublic_Description)));
+
+        internal static readonly DiagnosticDescriptor MethodMustBeNonGenericRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_MethodMustBeNonGeneric,
+                                                                                                            AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_Title)),
+                                                                                                            AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_MessageFormat)),
+                                                                                                            "Usage",
+                                                                                                            DiagnosticSeverity.Error,
+                                                                                                            isEnabledByDefault: true,
+                                                                                                            description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_MethodMustBeNonGeneric_Description)));
+
+        internal static readonly DiagnosticDescriptor ClassMustBeNonStaticRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassMustBeNonStatic,
+                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_Title)),
+                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat)),
+                                                                                                          "Usage",
+                                                                                                          DiagnosticSeverity.Error,
+                                                                                                          isEnabledByDefault: true,
+                                                                                                          description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassMustBeNonStatic_Description)));
+
+
         internal static readonly DiagnosticDescriptor OnlyOneMethodCanBeBaselineRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_OnlyOneMethodCanBeBaseline,
                                                                                                                 AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title)),
                                                                                                                 AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat)),
@@ -75,13 +76,13 @@
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
-            MethodMustBePublicRule,
-            MethodMustBeNonGenericRule,
-            ClassMustBeNonStaticRule,
             ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
             GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule,
             ClassWithGenericTypeArgumentsAttributeMustBeGenericRule,
             GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
+            MethodMustBePublicRule,
+            MethodMustBeNonGenericRule,
+            ClassMustBeNonStaticRule,
             OnlyOneMethodCanBeBaselineRule
         ];
 
@@ -138,10 +139,6 @@
             }
 
             var benchmarkMethods = benchmarkMethodsBuilder.ToImmutable();
-            if (benchmarkMethods.Length == 0)
-            {
-                return;
-            }
 
             var classStaticModifier = null as SyntaxToken?;
             var classAbstractModifier = null as SyntaxToken?;
@@ -192,26 +189,31 @@
                 context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, classAbstractModifier.Value.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
+            if (benchmarkMethods.Length == 0)
+            {
+                return;
+            }
+
             if (classStaticModifier.HasValue)
             {
                 context.ReportDiagnostic(Diagnostic.Create(ClassMustBeNonStaticRule, classStaticModifier.Value.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
             var baselineCount = 0;
-            foreach (var benchmarkMethod in benchmarkMethods)
+            foreach (var (benchmarkMethod, baselineLocations) in benchmarkMethods)
             {
-                var methodIsPublic = benchmarkMethod.Method.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
+                var methodIsPublic = benchmarkMethod.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
                 if (!methodIsPublic)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(MethodMustBePublicRule, benchmarkMethod.Method.Identifier.GetLocation(), benchmarkMethod.Method.Identifier.ToString()));
+                    context.ReportDiagnostic(Diagnostic.Create(MethodMustBePublicRule, benchmarkMethod.Identifier.GetLocation(), benchmarkMethod.Identifier.ToString()));
                 }
 
-                if (benchmarkMethod.Method.TypeParameterList != null)
+                if (benchmarkMethod.TypeParameterList != null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(MethodMustBeNonGenericRule, benchmarkMethod.Method.TypeParameterList.GetLocation(), benchmarkMethod.Method.Identifier.ToString()));
+                    context.ReportDiagnostic(Diagnostic.Create(MethodMustBeNonGenericRule, benchmarkMethod.TypeParameterList.GetLocation(), benchmarkMethod.Identifier.ToString()));
                 }
 
-                baselineCount += benchmarkMethod.BaselineLocations.Length;
+                baselineCount += baselineLocations.Length;
             }
 
             if (baselineCount > 1)
@@ -227,7 +229,7 @@
 
             return;
 
-            ImmutableArray<Location> GetBaselineLocations(AttributeSyntax attributeSyntax)
+            static ImmutableArray<Location> GetBaselineLocations(AttributeSyntax attributeSyntax)
             {
                 var baselineLocationsBuilder = ImmutableArray.CreateBuilder<Location>();
 
