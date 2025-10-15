@@ -79,36 +79,56 @@
                 return;
             }
 
-            if (memberAccessExpression.Expression is not IdentifierNameSyntax typeIdentifier)
+            if (memberAccessExpression.Expression is not IdentifierNameSyntax identifierNameSyntax)
             {
                 return;
             }
 
-            var classMemberAccessSymbol = context.SemanticModel.GetTypeInfo(typeIdentifier).Type;
-            if (classMemberAccessSymbol is null || !classMemberAccessSymbol.Equals(context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Running.BenchmarkRunner"), SymbolEqualityComparer.Default))
+            var classMemberAccessTypeSymbol = context.SemanticModel.GetTypeInfo(identifierNameSyntax).Type;
+            if (    classMemberAccessTypeSymbol is null
+                ||  classMemberAccessTypeSymbol.TypeKind == TypeKind.Error
+                || !classMemberAccessTypeSymbol.Equals(context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Running.BenchmarkRunner"), SymbolEqualityComparer.Default))
             {
                 return;
             }
 
-            // TODO: Support Type overloads that use the typeof() expression
-
-            if (memberAccessExpression.Name is not GenericNameSyntax genericMethod)
+            if (memberAccessExpression.Name.Identifier.ValueText != "Run")
             {
                 return;
             }
 
-            if (genericMethod.Identifier.ValueText != "Run")
+            INamedTypeSymbol? benchmarkClassTypeSymbol;
+            Location? diagnosticLocation;
+
+            if (memberAccessExpression.Name is GenericNameSyntax genericMethod)
             {
-                return;
+                if (genericMethod.TypeArgumentList.Arguments.Count != 1)
+                {
+                    return;
+                }
+
+                diagnosticLocation = Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span);
+                benchmarkClassTypeSymbol = context.SemanticModel.GetTypeInfo(genericMethod.TypeArgumentList.Arguments[0]).Type as INamedTypeSymbol;
+            }
+            else
+            {
+                if (invocationExpression.ArgumentList.Arguments.Count == 0)
+                {
+                    return;
+                }
+
+                // TODO: Support analyzing an array of typeof() expressions
+                if (invocationExpression.ArgumentList.Arguments[0].Expression is not TypeOfExpressionSyntax typeOfExpression)
+                {
+                    return;
+                }
+
+                diagnosticLocation = typeOfExpression.Type.GetLocation();
+                benchmarkClassTypeSymbol = context.SemanticModel.GetTypeInfo(typeOfExpression.Type).Type as INamedTypeSymbol;
+
             }
 
-            if (genericMethod.TypeArgumentList.Arguments.Count != 1)
-            {
-                return;
-            }
-
-            var benchmarkClassTypeSymbol = context.SemanticModel.GetTypeInfo(genericMethod.TypeArgumentList.Arguments[0]).Type;
-            if (benchmarkClassTypeSymbol == null || benchmarkClassTypeSymbol.TypeKind == TypeKind.Error)
+            if (benchmarkClassTypeSymbol == null || benchmarkClassTypeSymbol.TypeKind == TypeKind.Error || (benchmarkClassTypeSymbol.IsGenericType && !benchmarkClassTypeSymbol.IsUnboundGenericType))
             {
                 return;
             }
@@ -166,7 +186,7 @@
                         }
                     }
 
-                    baseType = baseType.BaseType;
+                    baseType = baseType.OriginalDefinition.BaseType;
                 }
 
                 return false;
@@ -174,7 +194,7 @@
 
             void ReportDiagnostic(DiagnosticDescriptor diagnosticDescriptor)
             {
-                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span), benchmarkClassTypeSymbol.Name));
+                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, diagnosticLocation, AnalyzerHelper.NormalizeTypeName(benchmarkClassTypeSymbol)));
             }
         }
     }

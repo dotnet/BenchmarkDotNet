@@ -70,5 +70,25 @@
 
             return attributesBuilder.ToImmutable();
         }
+
+        public static string NormalizeTypeName(INamedTypeSymbol namedTypeSymbol)
+        {
+            string typeName;
+
+            if (namedTypeSymbol.SpecialType != SpecialType.None)
+            {
+                typeName = namedTypeSymbol.ToString();
+            }
+            else if (namedTypeSymbol.IsUnboundGenericType)
+            {
+                typeName = $"{namedTypeSymbol.Name}<{new string(',', namedTypeSymbol.TypeArguments.Length - 1)}>";
+            }
+            else
+            {
+                typeName = namedTypeSymbol.Name;
+            }
+
+            return typeName;
+        }
     }
 }
