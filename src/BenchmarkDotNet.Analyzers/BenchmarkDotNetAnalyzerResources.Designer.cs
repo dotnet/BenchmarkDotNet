@@ -563,7 +563,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Referenced benchmark class &apos;{0}&apos; cannot be sealed.
+        ///   Looks up a localized string similar to Referenced benchmark class &apos;{0}&apos; is sealed.
         /// </summary>
         internal static string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_MessageFormat {
             get {
