@@ -15,25 +15,319 @@
     {
         public class General : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
-            [Fact]
-            public async Task Class_with_no_methods_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
+            [Theory]
+            [InlineData("")]
+            [InlineData(" abstract")]
+            public async Task Class_not_annotated_with_any_generictypearguments_attributes_and_with_no_methods_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(string abstractModifier)
             {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
 
-                                                           public class BenchmarkClass
-                                                           {
-                                                               public void BenchmarkMethod()
-                                                               {
+                                                    public{{abstractModifier}} class BenchmarkClass
+                                                    {
+                                                        public void BenchmarkMethod()
+                                                        {
 
-                                                               }
-                                                           }
-                                                           """;
+                                                        }
+                                                    }
+                                                    """;
 
                 TestCode = testCode;
 
                 await RunAsync();
             }
+        }
+
+        public class ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        {
+            public ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule) { }
+
+            [Theory, CombinatorialData]
+            public async Task Abstract_class_annotated_with_at_least_one_generictypearguments_attribute_should_trigger_diagnostic([CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount, [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", genericTypeArgumentsAttributeUsageCount);
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
+                                                    public {|#0:abstract|} class {{benchmarkClassName}}<TParameter>
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+        }
+
+        public class GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        {
+            public GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute() : base(BenchmarkClassAnalyzer.GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule) { }
+
+            [Theory, CombinatorialData]
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_should_not_trigger_diagnostic([CombinatorialRange(1, 3)] int attributeUsageCount,
+                                                                                                                          [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                          [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
+                var attributeUsages = string.Join("\n", Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", attributeUsageCount));
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{attributeUsages}}
+                                                    public class BenchmarkClass{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Abstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                                                                                                             [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    
+                                                    public abstract class BenchmarkClassBase<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+                                                    
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Nonabstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                                                                                                            [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class {{benchmarkClassName}}{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
+
+            private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
+
+            private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
+        }
+
+        public class ClassWithGenericTypeArgumentsAttributeMustBeGeneric : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        {
+            public ClassWithGenericTypeArgumentsAttributeMustBeGeneric() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeGenericRule) { }
+
+            [Theory, CombinatorialData]
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_should_not_trigger_diagnostic([CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
+                                                                                                                          [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", genericTypeArgumentsAttributeUsageCount);
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
+                                                    public class BenchmarkClass<TParameter>
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Nongeneric_class_annotated_with_a_generictypearguments_attribute_should_trigger_diagnostic([CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
+                                                                                                                         [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", genericTypeArgumentsAttributeUsageCount);
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                   
+                                                    {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
+                                                    public class {|#0:{{benchmarkClassName}}|}
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+                                                   
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Nongeneric_class_annotated_with_a_generictypearguments_attribute_inheriting_from_an_abstract_generic_class_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                                                                   [CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
+                                                                                                                                                                   [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", genericTypeArgumentsAttributeUsageCount);
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
+                                                    public class {|#0:{{benchmarkClassName}}|} : BenchmarkClassBase<{{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}}>
+                                                    {
+                                                    }
+                                                    """;
+
+                var benchmarkBaseClassDocument = /* lang=c#-test */ $$"""
+                                                                      using BenchmarkDotNet.Attributes;
+
+                                                                      public abstract class BenchmarkClassBase<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                                      {
+                                                                          {{benchmarkAttributeUsage}}
+                                                                          public void BenchmarkMethod()
+                                                                          {
+
+                                                                          }
+                                                                      }
+                                                                      """;
+
+                TestCode = testCode;
+                AddSource(benchmarkBaseClassDocument);
+
+                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                await RunAsync();
+            }
+
+            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
+
+            private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
+
+            private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
+        }
+
+        public class GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount : AnalyzerTestFixture<BenchmarkClassAnalyzer>
+        {
+            public GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount() : base(BenchmarkClassAnalyzer.GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule) { }
+
+            [Theory, CombinatorialData]
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_having_matching_type_argument_count_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                                                              [CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
+                                                                                                                                                              [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", genericTypeArgumentsAttributeUsageCount);
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
+                                                    public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_having_mismatching_type_argument_count_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeArgumentsData))] (string TypeArguments, int TypeArgumentCount) typeArgumentsData,
+                                                                                                                                                             [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            {
+                const string benchmarkClassName = "BenchmarkClass";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    [GenericTypeArguments({|#0:{{typeArgumentsData.TypeArguments}}|})]
+                                                    [GenericTypeArguments(typeof(int))]
+                                                    public class {{benchmarkClassName}}<T1>
+                                                    {
+                                                        {{benchmarkAttributeUsage}}
+                                                        public void BenchmarkMethod()
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                AddDefaultExpectedDiagnostic(1, "", benchmarkClassName, typeArgumentsData.TypeArgumentCount);
+
+                await RunAsync();
+            }
+
+            public static IEnumerable<(string TypeArguments, int TypeArgumentCount)> TypeArgumentsData =>
+            [
+                ("typeof(int), typeof(string)", 2),
+                ("typeof(int), typeof(string), typeof(bool)", 3)
+            ];
+
+            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
+
+            private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
+
+            private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
         }
 
         public class MethodMustBePublic : AnalyzerTestFixture<BenchmarkClassAnalyzer>
@@ -220,407 +514,6 @@
 
                 await RunAsync();
             }
-        }
-
-        public class ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-        {
-            public ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule) { }
-
-            [Fact]
-            public async Task Nonabstract_class_not_annotated_with_any_generictypearguments_attributes_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
-            {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
-
-                                                           public class BenchmarkClass
-                                                           {
-                                                               [Benchmark]
-                                                               public void BenchmarkMethod()
-                                                               {
-
-                                                               }
-                                                               
-                                                               public void NonBenchmarkMethod()
-                                                               {
-                                                               
-                                                               }
-                                                           }
-                                                           """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Fact]
-            public async Task Abstract_class_not_annotated_with_any_generictypearguments_attributes_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
-            {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
-
-                                                           public abstract class BenchmarkClass
-                                                           {
-                                                               [Benchmark]
-                                                               public void BenchmarkMethod()
-                                                               {
-
-                                                               }
-                                                               
-                                                               public void NonBenchmarkMethod()
-                                                               {
-                                                               
-                                                               }
-                                                           }
-                                                           """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory]
-            [InlineData(1)]
-            [InlineData(2)]
-            public async Task Abstract_class_annotated_with_at_least_one_generictypearguments_attribute_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int attributeUsageCount)
-            {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                var attributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", attributeUsageCount);
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    {{string.Join("\n", attributeUsages)}}
-                                                    public {|#0:abstract|} class {{benchmarkClassName}}<T1>
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
-
-                await RunAsync();
-            }
-        }
-
-        public class GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-        {
-            public GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute() : base(BenchmarkClassAnalyzer.GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule) { }
-
-            [Fact]
-            public async Task Nongeneric_class_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
-            {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
-
-                                                           public class BenchmarkClass
-                                                           {
-                                                               [Benchmark]
-                                                               public void BenchmarkMethod()
-                                                               {
-
-                                                               }
-                                                               
-                                                               public void NonBenchmarkMethod()
-                                                               {
-                                                               
-                                                               }
-                                                           }
-                                                           """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic([CombinatorialRange(1, 3)] int attributeUsageCount,
-                                                                                                                                                                                                [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength)
-            {
-                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
-                var attributeUsages = string.Join("\n", Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", attributeUsageCount));
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    {{attributeUsages}}
-                                                    public class BenchmarkClass{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory]
-            [MemberData(nameof(TypeParametersListLength))]
-            public async Task Abstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
-            {
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-                                                    
-                                                    public abstract class BenchmarkClassBase<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-                                                    
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory]
-            [MemberData(nameof(TypeParametersListLength))]
-            public async Task Nonabstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int typeParametersListLength)
-            {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    public class {{benchmarkClassName}}{|#0:<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>|}
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
-
-                await RunAsync();
-            }
-
-            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
-
-            public static TheoryData<int> TypeParametersListLength => TypeParametersListLengthTheoryData;
-
-            private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
-
-            private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
-        }
-
-        public class ClassWithGenericTypeArgumentsAttributeMustBeGeneric : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-        {
-            public ClassWithGenericTypeArgumentsAttributeMustBeGeneric() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeGenericRule) { }
-
-            [Fact]
-            public async Task Nongeneric_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
-            {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
-
-                                                           public class BenchmarkClass
-                                                           {
-                                                               [Benchmark]
-                                                               public void BenchmarkMethod()
-                                                               {
-
-                                                               }
-                                                           }
-                                                           """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory]
-            [MemberData(nameof(TypeParametersListLength))]
-            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
-            {
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength))}})]
-                                                    public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Fact]
-            public async Task Class_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_having_no_type_parameters_should_trigger_diagnostic()
-            {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                const string testCode = /* lang=c#-test */ $$"""
-                                                             using BenchmarkDotNet.Attributes;
-                                                           
-                                                             [GenericTypeArguments(typeof(int))]
-                                                             public class {|#0:{{benchmarkClassName}}|}
-                                                             {
-                                                                 [Benchmark]
-                                                                 public void BenchmarkMethod()
-                                                                 {
-                                                           
-                                                                 }
-                                                             }
-                                                             """;
-
-                TestCode = testCode;
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Nongeneric_class_annotated_with_a_generictypearguments_attribute_inheriting_from_an_abstract_generic_class_should_trigger_diagnostic([CombinatorialRange(1, 3)] int attributeUsageCount,
-                                                                                                                                                                   [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength)
-            {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
-                var attributeUsages = string.Join("\n", Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", attributeUsageCount));
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    {{attributeUsages}}
-                                                    public class {|#0:{{benchmarkClassName}}|} : BenchmarkClassBase<{{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}}>
-                                                    {
-                                                    }
-                                                    """;
-
-                var benchmarkBaseClassDocument = /* lang=c#-test */ $$"""
-                                                                      using BenchmarkDotNet.Attributes;
-
-                                                                      public abstract class BenchmarkClassBase<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
-                                                                      {
-                                                                          [Benchmark]
-                                                                          public void BenchmarkMethod()
-                                                                          {
-
-                                                                          }
-                                                                      }
-                                                                      """;
-
-                TestCode = testCode;
-                AddSource(benchmarkBaseClassDocument);
-
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
-
-                await RunAsync();
-            }
-
-            public static IEnumerable<int> TypeParametersListLengthEnumerableLocal => TypeParametersListLengthEnumerable;
-
-            public static TheoryData<int> TypeParametersListLength => TypeParametersListLengthTheoryData;
-
-            private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
-
-            private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
-        }
-
-        public class GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-        {
-            public GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount() : base(BenchmarkClassAnalyzer.GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule) { }
-
-            [Fact]
-            public async Task Nongeneric_class_not_annotated_with_the_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic()
-            {
-                const string testCode = /* lang=c#-test */ """
-                                                           using BenchmarkDotNet.Attributes;
-
-                                                           public class BenchmarkClass
-                                                           {
-                                                               [Benchmark]
-                                                               public void BenchmarkMethod()
-                                                               {
-
-                                                               }
-                                                           }
-                                                           """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory]
-            [MemberData(nameof(TypeParametersListLength))]
-            public async Task Generic_class_annotated_with_the_generictypearguments_attribute_having_matching_type_argument_count_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic(int typeParametersListLength)
-            {
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    [GenericTypeArguments({{string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength))}})]
-                                                    public class BenchmarkClass<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory]
-            [InlineData("typeof(int), typeof(string)", 2)]
-            [InlineData("typeof(int), typeof(string), typeof(bool)", 3)]
-            public async Task Generic_class_annotated_with_the_generictypearguments_attribute_having_mismatching_type_argument_count_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(string typeArguments, int typeArgumentCount)
-            {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    [GenericTypeArguments({|#0:{{typeArguments}}|})]
-                                                    public class {{benchmarkClassName}}<T1>
-                                                    {
-                                                        [Benchmark]
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                AddDefaultExpectedDiagnostic(1, "", benchmarkClassName, typeArgumentCount);
-
-                await RunAsync();
-            }
-
-            public static TheoryData<int> TypeParametersListLength => TypeParametersListLengthTheoryData;
-
-            private static ReadOnlyCollection<string> TypeParameters => TypeParametersTheoryData;
-
-            private static ReadOnlyCollection<string> GenericTypeArguments => GenericTypeArgumentsTheoryData;
         }
 
         public class OnlyOneMethodCanBeBaseline : AnalyzerTestFixture<BenchmarkClassAnalyzer>

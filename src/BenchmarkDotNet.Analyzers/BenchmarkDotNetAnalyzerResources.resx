@@ -223,7 +223,7 @@
     <value>A property annotated with a parameter attribute must have a public setter; make sure that the access modifier of the setter is empty and that the property is not an auto-property or an expression-bodied property.</value>
   </data>
   <data name="Attributes_ParamsAttribute_UnexpectedValueType_Description" xml:space="preserve">
-    <value>The type of each value provided to the [Params] attribute must match the type of the field or property it is applied to</value>
+    <value>The type of each value provided to the [Params] attribute must match the type of (or be implicitly convertible to) the field or property it is applied to</value>
   </data>
   <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Description" xml:space="preserve">
     <value>The [ParamsAllValues] attribute cannot be applied to a field or property of an enum type marked with the [Flags] attribute. Use this attribute only with non-flags enum types, as [Flags] enums support bitwise combinations that cannot be exhaustively enumerated.</value>
@@ -289,7 +289,7 @@
     <value>Benchmark methods without [Arguments] attribute(s) cannot declare parameters</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Title" xml:space="preserve">
-    <value>Values passed to an [Arguments] attribute must match exactly the parameters declared in the targeted benchmark method in both type and order</value>
+    <value>Values passed to an [Arguments] attribute must match exactly the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
   </data>
   <data name="Attributes_GeneralParameterAttributes_PropertyMustBePublic_Title" xml:space="preserve">
     <value>Properties annotated with a parameter attribute must be public</value>
@@ -304,7 +304,7 @@
     <value>Unnecessary single value passed to [Params] attribute</value>
   </data>
   <data name="Attributes_ParamsAttribute_UnexpectedValueType_Title" xml:space="preserve">
-    <value>Type of all value(s) passed to the [Params] attribute must match the type of the annotated field or property</value>
+    <value>Type of all value(s) passed to the [Params] attribute must match the type of (or be implicitly convertible to) the annotated field or property</value>
   </data>
   <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Title" xml:space="preserve">
     <value>The [ParamsAllValues] attribute cannot be applied to fields or properties of enum types marked with [Flags]</value>
@@ -341,7 +341,7 @@
 Either add the [Arguments] attribute(s) or remove the parameters.</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description" xml:space="preserve">
-    <value>The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be convertible to) and order</value>
+    <value>The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title" xml:space="preserve">
     <value>[Arguments] attribute can only be used on methods annotated with the [Benchmark] attribute</value>

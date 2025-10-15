@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be convertible to) and order.
+        ///   Looks up a localized string similar to The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order.
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description {
             get {
@@ -136,7 +136,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Values passed to an [Arguments] attribute must match exactly the parameters declared in the targeted benchmark method in both type and order.
+        ///   Looks up a localized string similar to Values passed to an [Arguments] attribute must match exactly the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order.
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Title {
             get {
@@ -437,7 +437,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type of each value provided to the [Params] attribute must match the type of the field or property it is applied to.
+        ///   Looks up a localized string similar to The type of each value provided to the [Params] attribute must match the type of (or be implicitly convertible to) the field or property it is applied to.
         /// </summary>
         internal static string Attributes_ParamsAttribute_UnexpectedValueType_Description {
             get {
@@ -455,7 +455,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type of all value(s) passed to the [Params] attribute must match the type of the annotated field or property.
+        ///   Looks up a localized string similar to Type of all value(s) passed to the [Params] attribute must match the type of (or be implicitly convertible to) the annotated field or property.
         /// </summary>
         internal static string Attributes_ParamsAttribute_UnexpectedValueType_Title {
             get {
