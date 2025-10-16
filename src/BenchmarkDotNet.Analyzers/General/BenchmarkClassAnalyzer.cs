@@ -157,10 +157,10 @@
 
             if (genericTypeArgumentsAttributes.Length == 0)
             {
-                if (classDeclarationSyntax.TypeParameterList != null && !classAbstractModifier.HasValue)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule, classDeclarationSyntax.TypeParameterList.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
-                }
+                //if (classDeclarationSyntax.TypeParameterList != null && !classAbstractModifier.HasValue)
+                //{
+                //    context.ReportDiagnostic(Diagnostic.Create(GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule, classDeclarationSyntax.TypeParameterList.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
+                //}
             }
             else
             {

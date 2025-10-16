@@ -499,7 +499,7 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Having_a_mismatching_value_count_with_nonempty_argument_attribute_usages_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ArgumentsAttributeUsagesWithMismatchingValueCount))] string argumentsAttributeUsage,
+            public async Task Having_a_mismatching_value_count_with_nonempty_argument_attribute_usages_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
                                                                                                                                      [CombinatorialValues("string a", "")] string parameters)
             {
                 var testCode = /* lang=c#-test */ $$"""
@@ -507,7 +507,12 @@
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{argumentsAttributeUsage}}
+                                                        [{{string.Format(scalarValuesContainerAttributeArgument, """
+                                                                                                                 42, "test"
+                                                                                                                 """)}}]
+                                                        [{{string.Format(scalarValuesContainerAttributeArgument, """
+                                                                                                                 "value", 100, true
+                                                                                                                 """)}}]
                                                         public void BenchmarkMethod({{parameters}})
                                                         {
                                                         
@@ -519,9 +524,10 @@
                 await RunAsync();
             }
 
-            [Theory]
-            [MemberData(nameof(ArgumentsAttributeUsagesWithMatchingValueTypes))]
-            public async Task Having_matching_value_types_should_not_trigger_diagnostic(string argumentsAttributeUsage)
+            [Theory, CombinatorialData]
+            public async Task Providing_expected_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                          [CombinatorialMemberData(nameof(ValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                          [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -529,8 +535,8 @@
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{argumentsAttributeUsage}}
-                                                        public void BenchmarkMethod(int a, string b)
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
+                                                        public void BenchmarkMethod({{valueAndType.Value2}} a)
                                                         {
                                                         
                                                         }
@@ -538,13 +544,17 @@
                                                     """;
 
                 TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
 
                 await RunAsync();
             }
 
-            [Theory]
-            [MemberData(nameof(ArgumentsAttributeUsagesWithConvertibleValueTypes))]
-            public async Task Providing_convertible_value_types_should_not_trigger_diagnostic(string argumentsAttributeUsage)
+            [Theory, CombinatorialData]
+            public async Task Providing_integer_value_types_within_target_type_range_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
+                                                                                                                   [CombinatorialMemberData(nameof(IntegerValuesAndTypesWithinTargetTypeRange))] ValueTupleDouble<string, string> integerValueAndType,
+                                                                                                                   bool explicitCast)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -552,8 +562,8 @@
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{argumentsAttributeUsage}}
-                                                        public void BenchmarkMethod(int a, string b)
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{(explicitCast ? $"({integerValueAndType.Value2})" : "")}{integerValueAndType.Value1}")}}]
+                                                        public void BenchmarkMethod({{integerValueAndType.Value2}} a)
                                                         {
                                                         
                                                         }
@@ -561,13 +571,15 @@
                                                     """;
 
                 TestCode = testCode;
+                ReferenceDummyAttribute();
 
                 await RunAsync();
             }
 
-            [Theory]
-            [MemberData(nameof(ArgumentsAttributeUsagesWithMatchingValueTypes))]
-            public async Task Having_unknown_parameter_type_should_not_trigger_diagnostic(string argumentsAttributeUsage)
+            [Theory, CombinatorialData]
+            public async Task Providing_implicitly_convertible_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                        [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
+                                                                                                        [CombinatorialValues("(byte)42", "'c'")] string value)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -575,7 +587,32 @@
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{argumentsAttributeUsage}}
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, value)}}]
+                                                        public void BenchmarkMethod(int a)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Having_unknown_parameter_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                          [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42, \"test\"")}}]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "43, \"test2\"")}}]
                                                         public void BenchmarkMethod(unkown a, string b)
                                                         {
                                                         
@@ -584,24 +621,28 @@
                                                     """;
 
                 TestCode = testCode;
+                ReferenceDummyAttribute();
 
                 DisableCompilerDiagnostics();
 
                 await RunAsync();
             }
 
-            [Theory]
-            [MemberData(nameof(ArgumentsAttributeUsagesWithMismatchingValueTypesWithLocationMarker))]
-            public async Task Having_mismatching_or_not_convertible_value_types_should_trigger_diagnostic(string argumentsAttributeUsage)
+            [Theory, CombinatorialData]
+            public async Task Providing_an_unexpected_or_not_implicitly_convertible_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                         [CombinatorialMemberData(nameof(NotConvertibleValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
             {
+                const string expectedArgumentType = "decimal";
+
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{argumentsAttributeUsage}}
-                                                        public void BenchmarkMethod(byte a, bool b)
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{valueAndType.Value1}|}}")}}]
+                                                        public void BenchmarkMethod({{expectedArgumentType}} a)
                                                         {
                                                         
                                                         }
@@ -609,17 +650,47 @@
                                                     """;
 
                 TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
 
-                AddExpectedDiagnostic(0, "typeof(string)", "byte", "System.Type");
-                AddExpectedDiagnostic(1, "\"test\"", "bool", "string");
-                AddExpectedDiagnostic(2, "999", "byte", "int");
+                AddDefaultExpectedDiagnostic(valueAndType.Value1!, expectedArgumentType, valueAndType.Value2!);
 
                 await RunAsync();
             }
 
-            [Theory]
-            [MemberData(nameof(ArgumentsAttributeUsagesWithUnknownValueTypesWithLocationMarker))]
-            public async Task Providing_an_unkown_value_type_should_trigger_diagnostic(string argumentsAttributeUsage)
+            [Theory, CombinatorialData]
+            public async Task Providing_integer_value_types_not_within_target_type_range_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                   [CombinatorialMemberData(nameof(NotConvertibleValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                const string expectedArgumentType = "decimal";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{valueAndType.Value1}|}}")}}]
+                                                        public void BenchmarkMethod({{expectedArgumentType}} a)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                AddDefaultExpectedDiagnostic(valueAndType.Value1!, expectedArgumentType, valueAndType.Value2!);
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_an_unkown_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                       [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -627,7 +698,7 @@
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{argumentsAttributeUsage}}
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:dummy_literal|}, true")}}]
                                                         public void BenchmarkMethod(byte a, bool b)
                                                         {
                                                         
@@ -636,12 +707,15 @@
                                                     """;
 
                 TestCode = testCode;
+                ReferenceDummyAttribute();
 
                 DisableCompilerDiagnostics();
                 AddDefaultExpectedDiagnostic("dummy_literal", "byte", "<unknown>");
 
                 await RunAsync();
             }
+
+            public static IEnumerable<string> DummyAttributeUsage => DummyAttributeUsageTheoryData;
 
             public static TheoryData<string> EmptyArgumentsAttributeUsagesWithMismatchingValueCount()
             {
@@ -685,37 +759,140 @@
                 }
             }
 
-            public static IEnumerable<string> ArgumentsAttributeUsagesWithMismatchingValueCount() => GenerateAttributeUsages(
-            [
-                "42, \"test\"",
-                "\"value\", 100, true"
-            ]);
+            public static IEnumerable<string> ScalarValuesContainerAttributeArgumentEnumerableLocal => ScalarValuesContainerAttributeArgumentEnumerable();
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithMatchingValueTypes() => new(GenerateAttributeUsages(
+            public static IEnumerable<ValueTupleDouble<string, string>> IntegerValuesAndTypesWithinTargetTypeRange =>
             [
-                "42, \"test\"",
-                "43, \"test2\""
-            ]));
+                // byte (0 to 255)
+                ("0", "byte"),
+                ("100", "byte"),
+                ("255", "byte"),
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithConvertibleValueTypes() => new(GenerateAttributeUsages(
-            [
-                "42, \"test\"",
-                "(byte)5, \"test2\""
-            ]));
+                // sbyte (-128 to 127)
+                ("-128", "sbyte"),
+                ("0", "sbyte"),
+                ("127", "sbyte"),
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithMismatchingValueTypesWithLocationMarker() => new(GenerateAttributeUsages(
-            [
-                "{|#0:typeof(string)|}, {|#1:\"test\"|}",
-                "{|#2:999|}, true"
-            ]));
+                // short (-32,768 to 32,767)
+                ("-32768", "short"),
+                ("0", "short"),
+                ("32767", "short"),
 
-            public static TheoryData<string> ArgumentsAttributeUsagesWithUnknownValueTypesWithLocationMarker() => new(GenerateAttributeUsages(
+                // ushort (0 to 65,535)
+                ("0", "ushort"),
+                ("1000", "ushort"),
+                ("65535", "ushort"),
+
+                // int (-2,147,483,648 to 2,147,483,647)
+                ("-2147483648", "int"),
+                ("0", "int"),
+                ("2147483647", "int"),
+
+                // uint (0 to 4,294,967,295)
+                ("0", "uint"),
+                ("1000000", "uint"),
+                ("4294967295", "uint"),
+
+                // long (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)
+                ("-9223372036854775808", "long"),
+                ("0", "long"),
+                ("9223372036854775807", "long"),
+
+                // ulong (0 to 18,446,744,073,709,551,615)
+                ("0", "ulong"),
+                ("1000000", "ulong"),
+                ("18446744073709551615", "ulong"),
+            ];
+
+            public static IEnumerable<ValueTupleTriple<string, string, string>> IntegerValuesAndTypesNotWithinTargetTypeRange =>
             [
-                "{|#0:dummy_literal|}, true"
-            ]));
+                // byte (0 to 255) - out of range values
+                ("-1", "byte", "int"),
+                ("256", "byte", "int"),
+                ("1000", "byte", "int"),
+
+                // sbyte (-128 to 127) - out of range values
+                ("-129", "sbyte", "int"),
+                ("128", "sbyte", "int"),
+                ("500", "sbyte", "int"),
+
+                // short (-32,768 to 32,767) - out of range values
+                ("-32769", "short", "int"),
+                ("32768", "short", "int"),
+                ("100000", "short", "int"),
+
+                // ushort (0 to 65,535) - out of range values
+                ("-1", "ushort", "int"),
+                ("65536", "ushort", "int"),
+                ("100000", "ushort", "int"),
+
+                // int (-2,147,483,648 to 2,147,483,647) - out of range values
+                ("-2147483649", "int", "long"),
+                ("2147483648", "int", "uint"),
+                ("5000000000", "int", "long"),
+
+                // uint (0 to 4,294,967,295) - out of range values
+                ("-1", "uint", "int"),
+                ("4294967296", "uint", "long"),
+                ("5000000000", "uint", "long"),
+
+                // long - out of range values (exceeding long range)
+                ("9223372036854775808", "long", "ulong"),
+
+                // ulong - negative values
+                ("-1", "ulong", "int"),
+                ("-100", "ulong", "int"),
+                ("-9223372036854775808", "ulong", "long"),
+            ];
+
+            public static IEnumerable<ValueTupleDouble<string, string>> ValuesAndTypes =>
+            [
+                ( "true", "bool" ),
+                ( "(byte)123", "byte" ),
+                ( "'A'", "char" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( "123", "int" ),
+                ( "123L", "long" ),
+                ( "(sbyte)-100", "sbyte" ),
+                ( "(short)-123", "short" ),
+                ( """
+                  "test"
+                  """, "string" ),
+                ( "123U", "uint" ),
+                ( "123UL", "ulong" ),
+                ( "(ushort)123", "ushort" ),
+
+                ( """
+                  (object)"test_object"
+                  """, "object" ),
+                ( "typeof(string)", "System.Type" ),
+                ( "DummyEnum.Value1", "DummyEnum" )
+            ];
+
+            public static IEnumerable<ValueTupleDouble<string, string>> NotConvertibleValuesAndTypes =>
+            [
+                ( "true", "bool" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( """
+                  "test"
+                  """, "string" ),
+
+                ( """
+                  (object)"test_object"
+                  """, "object" ),
+                ( "typeof(string)", "System.Type" ),
+                ( "DummyEnum.Value1", "DummyEnum" )
+            ];
         }
 
-        private static IEnumerable<string> GenerateAttributeUsages(List<string> valueLists)
+        public static TheoryData<string> DummyAttributeUsageTheoryData => [
+                                                                              "",
+                                                                              "Dummy, "
+                                                                          ];
+
+        private static IEnumerable<string> ScalarValuesContainerAttributeArgumentEnumerable()
         {
             var nameColonUsages = new List<string>
                                   {
@@ -731,9 +908,9 @@
 
             var attributeUsagesBase = new List<string>
                                       {
-                                          "[Arguments({1}{2})]",
-                                          "[Arguments({0}new object[] {{ {1} }}{2})]",
-                                          "[Arguments({0}[ {1} ]{2})]"
+                                          "Arguments({{0}}{1})",
+                                          "Arguments({0}new object[] {{{{ {{0}} }}}}{1})",
+                                          "Arguments({0}[ {{0}} ]{1})"
                                       };
 
             foreach (var attributeUsageBase in attributeUsagesBase)
@@ -742,7 +919,7 @@
                 {
                     foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
                     {
-                        yield return string.Join("\n    ", valueLists.Select(vv => string.Format(attributeUsageBase, nameColonUsage, vv, priorityNamedParameterUsage)));
+                        yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
                     }
                 }
             }

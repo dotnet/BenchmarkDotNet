@@ -102,8 +102,8 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Abstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
-                                                                                                                                                                                                             [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            public async Task Abstract_generic_class_not_annotated_with_a_generictypearguments_attribute_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                                       [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -124,8 +124,8 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Nonabstract_generic_class_not_annotated_with_a_generictypearguments_attribute_and_containing_at_least_one_method_annotated_with_benchmark_attribute_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
-                                                                                                                                                                                                            [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
+            public async Task Nonabstract_generic_class_not_annotated_with_a_generictypearguments_attribute_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                                                      [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
@@ -291,7 +291,7 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_having_mismatching_type_argument_count_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeArgumentsData))] (string TypeArguments, int TypeArgumentCount) typeArgumentsData,
+            public async Task Generic_class_annotated_with_a_generictypearguments_attribute_having_mismatching_type_argument_count_should_trigger_diagnostic([CombinatorialMemberData(nameof(TypeArgumentsData))] ValueTupleDouble<string, int> typeArgumentsData,
                                                                                                                                                              [CombinatorialValues("", "[Benchmark]")] string benchmarkAttributeUsage)
             {
                 const string benchmarkClassName = "BenchmarkClass";
@@ -299,7 +299,7 @@
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
-                                                    [GenericTypeArguments({|#0:{{typeArgumentsData.TypeArguments}}|})]
+                                                    [GenericTypeArguments({|#0:{{typeArgumentsData.Value1}}|})]
                                                     [GenericTypeArguments(typeof(int))]
                                                     public class {{benchmarkClassName}}<T1>
                                                     {
@@ -312,12 +312,12 @@
                                                     """;
 
                 TestCode = testCode;
-                AddDefaultExpectedDiagnostic(1, "", benchmarkClassName, typeArgumentsData.TypeArgumentCount);
+                AddDefaultExpectedDiagnostic(1, "", benchmarkClassName, typeArgumentsData.Value2);
 
                 await RunAsync();
             }
 
-            public static IEnumerable<(string TypeArguments, int TypeArgumentCount)> TypeArgumentsData =>
+            public static IEnumerable<ValueTupleDouble<string, int>> TypeArgumentsData =>
             [
                 ("typeof(int), typeof(string)", 2),
                 ("typeof(int), typeof(string), typeof(bool)", 3)
@@ -433,7 +433,7 @@
 
             [Theory]
             [MemberData(nameof(TypeParametersListLength))]
-            public async Task Nonpublic_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int typeParametersListLength)
+            public async Task Nongeneric_method_annotated_with_benchmark_attribute_should_trigger_diagnostic(int typeParametersListLength)
             {
                 const string benchmarkMethodName = "GenericBenchmarkMethod";
 

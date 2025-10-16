@@ -2,9 +2,9 @@
 
 namespace BenchmarkDotNet.Analyzers.Tests.Fixtures
 {
-    internal sealed class FieldOrPropertyDeclarationTheoryData : TheoryData<string>
+    internal sealed class FieldOrPropertyDeclarationsTheoryData : TheoryData<string>
     {
-        public FieldOrPropertyDeclarationTheoryData()
+        public FieldOrPropertyDeclarationsTheoryData()
         {
             AddRange(
 #if NET5_0_OR_GREATER
