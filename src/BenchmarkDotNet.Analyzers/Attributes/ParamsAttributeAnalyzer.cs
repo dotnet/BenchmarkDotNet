@@ -60,7 +60,7 @@
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is AttributeSyntax attributeSyntax))
+            if (context.Node is not AttributeSyntax attributeSyntax)
             {
                 return;
             }
@@ -77,7 +77,7 @@
                 return;
             }
 
-            var attributeTarget = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax || n is PropertyDeclarationSyntax);
+            var attributeTarget = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax or PropertyDeclarationSyntax);
             if (attributeTarget == null)
             {
                 return;
@@ -169,7 +169,7 @@
                 {
                     if (collectionElementSyntax is ExpressionElementSyntax expressionElementSyntax)
                     {
-                        ReportIfUnexpectedValueTypeDiagnostic(expressionElementSyntax.Expression);
+                        ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(expressionElementSyntax.Expression);
                     }
                 }
 
@@ -190,7 +190,7 @@
                             var rankSpecifierSizeSyntax = arrayCreationExpressionSyntax.Type.RankSpecifiers.First().Sizes.First();
                             if (rankSpecifierSizeSyntax is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.IsKind(SyntaxKind.NumericLiteralExpression))
                             {
-                                if (literalExpressionSyntax.Token.Value is int rankSpecifierSize && rankSpecifierSize == 0)
+                                if (literalExpressionSyntax.Token.Value is 0)
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule,
                                                                                arrayCreationExpressionSyntax.GetLocation()));
@@ -216,7 +216,7 @@
 
                         foreach (var expressionSyntax in arrayCreationExpressionSyntax.Initializer.Expressions)
                         {
-                            ReportIfUnexpectedValueTypeDiagnostic(expressionSyntax);
+                            ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(expressionSyntax);
                         }
                     }
                 }
@@ -241,12 +241,12 @@
                     continue;
                 }
 
-                ReportIfUnexpectedValueTypeDiagnostic(parameterValueAttributeArgumentSyntax.Expression);
+                ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(parameterValueAttributeArgumentSyntax.Expression);
             }
 
             return;
 
-            void ReportIfUnexpectedValueTypeDiagnostic(ExpressionSyntax valueExpressionSyntax)
+            void ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(ExpressionSyntax valueExpressionSyntax)
             {
                 var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                 if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
@@ -254,22 +254,34 @@
                     var conversionSummary = context.Compilation.ClassifyConversion(actualValueTypeSymbol, expectedValueTypeSymbol);
                     if (!conversionSummary.IsImplicit)
                     {
-                        ReportUnexpectedValueTypeDiagnostic(valueExpressionSyntax.GetLocation(),
-                                                            valueExpressionSyntax.ToString(),
-                                                            fieldOrPropertyTypeSyntax.ToString(),
-                                                            actualValueTypeSymbol.ToString());
+                        if (conversionSummary is { IsExplicit: true, IsEnumeration: false })
+                        {
+                            var constantValue = context.SemanticModel.GetConstantValue(valueExpressionSyntax is CastExpressionSyntax castExpressionSyntax ? castExpressionSyntax.Expression : valueExpressionSyntax);
+                            if (constantValue is { HasValue: true, Value: not null })
+                            {
+                                if (AnalyzerHelper.ValueFitsInType(constantValue.Value, expectedValueTypeSymbol))
+                                {
+                                    return;
+                                }
+                            }
+                        }
+
+                        ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
+                                                                             valueExpressionSyntax.ToString(),
+                                                                             fieldOrPropertyTypeSyntax.ToString(),
+                                                                             actualValueTypeSymbol.ToString());
                     }
                 }
                 else
                 {
-                    ReportUnexpectedValueTypeDiagnostic(valueExpressionSyntax.GetLocation(),
-                                                        valueExpressionSyntax.ToString(),
-                                                        fieldOrPropertyTypeSyntax.ToString());
+                    ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
+                                                                         valueExpressionSyntax.ToString(),
+                                                                         fieldOrPropertyTypeSyntax.ToString());
                 }
 
                 return;
 
-                void ReportUnexpectedValueTypeDiagnostic(Location diagnosticLocation, string value, string expectedType, string actualType = null)
+                void ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(Location diagnosticLocation, string value, string expectedType, string? actualType = null)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(UnexpectedValueTypeRule,
                                                                diagnosticLocation,

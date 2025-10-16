@@ -35,7 +35,7 @@
                 await RunAsync();
             }
 
-            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationTheoryData();
+            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationsTheoryData();
 
             public static IEnumerable<string> InvalidTypes => new TheoryData<string>
             {
@@ -140,7 +140,7 @@
                 await RunAsync();
             }
 
-            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationTheoryData();
+            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationsTheoryData();
 
             public static IEnumerable<string> NonEnumStructs => new List<string>
             {
@@ -229,7 +229,7 @@
                 await RunAsync();
             }
 
-            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationTheoryData();
+            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationsTheoryData();
 
             public static IEnumerable<string> NonEnumOrBoolStructs => new List<string>
             {

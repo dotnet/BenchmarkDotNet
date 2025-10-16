@@ -84,10 +84,17 @@
                 return;
             }
 
+            var benchmarkRunnerTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Running.BenchmarkRunner");
+            if (   benchmarkRunnerTypeSymbol == null
+                || benchmarkRunnerTypeSymbol.TypeKind == TypeKind.Error)
+            {
+                return;
+            }
+
             var classMemberAccessTypeSymbol = context.SemanticModel.GetTypeInfo(identifierNameSyntax).Type;
             if (    classMemberAccessTypeSymbol is null
                 ||  classMemberAccessTypeSymbol.TypeKind == TypeKind.Error
-                || !classMemberAccessTypeSymbol.Equals(context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Running.BenchmarkRunner"), SymbolEqualityComparer.Default))
+                || !classMemberAccessTypeSymbol.Equals(benchmarkRunnerTypeSymbol, SymbolEqualityComparer.Default))
             {
                 return;
             }
@@ -117,7 +124,7 @@
                     return;
                 }
 
-                // TODO: Support analyzing an array of typeof() expressions
+                // TODO: Support analyzing a collection of typeof() expressions
                 if (invocationExpression.ArgumentList.Arguments[0].Expression is not TypeOfExpressionSyntax typeOfExpression)
                 {
                     return;
