@@ -612,7 +612,7 @@
                   (object)"test_object"
                   """, "object" ),
                 ( "typeof(string)", "System.Type" ),
-                ( "DummyEnum.Value1", "DummyEnum" )
+                ( "DummyEnum.Value1", "DummyEnum" ),
             ];
 
             public static IEnumerable<ValueTupleDouble<string, string>> NotConvertibleValuesAndTypes =>
@@ -695,32 +695,37 @@
 
             public static IEnumerable<string> ScalarValuesContainerAttributeArgumentWithLocationMarker()
             {
-                var nameColonUsages = new List<string>
-                                      {
-                                          "",
-                                          "values: "
-                                      };
+                return GenerateData().Distinct();
 
-                var priorityNamedParameterUsages = new List<string>
-                                                   {
-                                                       "",
-                                                       ", Priority = 1"
-                                                   };
-
-                var attributeUsagesBase = new List<string>
+                static IEnumerable<string> GenerateData()
+                {
+                    var nameColonUsages = new List<string>
                                           {
-                                              "{{{{|#0:{{0}}|}}}}{1}",
-                                              "{0}new object[] {{{{ {{{{|#0:{{0}}|}}}} }}}}{1}",
-                                              "{0}[ {{{{|#0:{{0}}|}}}} ]{1}",
+                                              "",
+                                              "values: "
                                           };
 
-                foreach (var attributeUsageBase in attributeUsagesBase)
-                {
-                    foreach (var nameColonUsage in nameColonUsages)
+                    var priorityNamedParameterUsages = new List<string>
+                                                       {
+                                                           "",
+                                                           ", Priority = 1"
+                                                       };
+
+                    var attributeUsagesBase = new List<string>
+                                              {
+                                                  "{{{{|#0:{{0}}|}}}}{1}",
+                                                  "{0}new object[] {{{{ {{{{|#0:{{0}}|}}}} }}}}{1}",
+                                                  "{0}[ {{{{|#0:{{0}}|}}}} ]{1}",
+                                              };
+
+                    foreach (var attributeUsageBase in attributeUsagesBase)
                     {
-                        foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                        foreach (var nameColonUsage in nameColonUsages)
                         {
-                            yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                            foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                            {
+                                yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                            }
                         }
                     }
                 }
@@ -734,7 +739,7 @@
 
         public static TheoryData<string> ScalarValuesContainerAttributeArgumentTheoryData()
         {
-            return new TheoryData<string>(GenerateData());
+            return new TheoryData<string>(GenerateData().Distinct());
 
             static IEnumerable<string> GenerateData()
             {

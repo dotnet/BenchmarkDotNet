@@ -148,7 +148,7 @@
     <value>Referenced generic benchmark class '{0}' has no [GenericTypeArguments] attribute(s)</value>
   </data>
   <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description" xml:space="preserve">
-    <value>A generic benchmark class referenced in the BenchmarkRunner.Run method must be must be annotated with at least one [GenericTypeArguments] attribute</value>
+    <value>A generic benchmark class referenced in the BenchmarkRunner.Run method must be annotated with at least one [GenericTypeArguments] attribute</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Title" xml:space="preserve">
     <value>Benchmark classes must be non-static</value>
@@ -250,7 +250,7 @@
     <value>Benchmark method without [Arguments] attribute(s) cannot declare parameters</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_MessageFormat" xml:space="preserve">
-    <value>Unexpected type for value '{0}'. Expected '{1}' but found '{2}'.</value>
+    <value>Unexpected type for argument value '{0}'. Expected '{1}' but found '{2}'.</value>
   </data>
   <data name="Attributes_GeneralParameterAttributes_PropertyMustBePublic_MessageFormat" xml:space="preserve">
     <value>Property '{0}' annotated with [{1}] must be public</value>

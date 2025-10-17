@@ -35,8 +35,11 @@
                                     AdditionalReferences =
                                     {
                                         "BenchmarkDotNet.dll",
-                                        "BenchmarkDotNet.Annotations.dll"
-                                    }
+                                        "BenchmarkDotNet.Annotations.dll",
+#if !NET6_0_OR_GREATER
+                                        "System.Memory.dll"
+#endif
+                    }
                                 }
                             };
 

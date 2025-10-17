@@ -3,7 +3,7 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using System.Collections.Generic;
+
     using System.Collections.Immutable;
     using System.Linq;
 
@@ -105,19 +105,44 @@
             return typeName;
         }
 
-        public static bool IsConstantAssignableToType(Compilation compilation, ITypeSymbol targetType, string valueExpression)
+        public static bool IsAssignableToField(Compilation compilation, ITypeSymbol targetType, string valueExpression)
         {
             var code = $$"""
-                         file class Internal {
-                             {{targetType}} x = {{valueExpression}};
+                         file static class Internal {
+                            static readonly {{targetType}} x = {{valueExpression}};
                          }
                          """;
 
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-            var diagnostics = compilation.AddSyntaxTrees(syntaxTree).GetSemanticModel(syntaxTree).GetMethodBodyDiagnostics();
+            var compilationErrors = compilation.AddSyntaxTrees(syntaxTree)
+                                               .GetSemanticModel(syntaxTree)
+                                               .GetMethodBodyDiagnostics()
+                                               .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
+                                               .ToList();
 
-            return diagnostics.Length == 0;
+            return compilationErrors.Count == 0;
+        }
+
+        public static bool IsAssignableToLocal(Compilation compilation, ITypeSymbol targetType, string valueExpression)
+        {
+            var code = $$"""
+                         file static class Internal {
+                            static Internal() {
+                                {{targetType}} x = {{valueExpression}};
+                            }
+                         }
+                         """;
+
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+
+            var compilationErrors = compilation.AddSyntaxTrees(syntaxTree)
+                                               .GetSemanticModel(syntaxTree)
+                                               .GetMethodBodyDiagnostics()
+                                               .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
+                                               .ToList();
+
+            return compilationErrors.Count == 0;
         }
     }
 }

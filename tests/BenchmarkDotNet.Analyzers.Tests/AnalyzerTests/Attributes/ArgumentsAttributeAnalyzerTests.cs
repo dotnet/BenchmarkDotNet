@@ -602,6 +602,30 @@
             }
 
             [Theory, CombinatorialData]
+            public async Task Providing_an_implicitly_convertible_array_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "new[] { 0, 1, 2 }")}}]
+                                                        public void BenchmarkMethod(System.Span<int> a)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
             public async Task Having_unknown_parameter_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
                                                                                           [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
             {
@@ -654,6 +678,33 @@
                 ReferenceDummyEnum();
 
                 AddDefaultExpectedDiagnostic(valueAndType.Value1!, expectedArgumentType, valueAndType.Value2!);
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_a_not_implicitly_convertible_array_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
+                                                                                                                [CombinatorialValues("System.Span<string>", "string[]")] string expectedArgumentType)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:new[] { 0, 1, 2 }|}")}}]
+                                                        public void BenchmarkMethod({{expectedArgumentType}} a)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+
+                AddDefaultExpectedDiagnostic("new[] { 0, 1, 2 }", expectedArgumentType, "int[]");
 
                 await RunAsync();
             }
@@ -867,7 +918,9 @@
                   (object)"test_object"
                   """, "object" ),
                 ( "typeof(string)", "System.Type" ),
-                ( "DummyEnum.Value1", "DummyEnum" )
+                ( "DummyEnum.Value1", "DummyEnum" ),
+
+                ( "new[] { 0, 1, 2 }", "int[]" ),
             ];
 
             public static IEnumerable<ValueTupleDouble<string, string>> NotConvertibleValuesAndTypes =>
@@ -894,35 +947,41 @@
 
         private static IEnumerable<string> ScalarValuesContainerAttributeArgumentEnumerable()
         {
-            var nameColonUsages = new List<string>
-                                  {
-                                      "",
-                                      "values: "
-                                  };
+            return GenerateData().Distinct();
 
-            var priorityNamedParameterUsages = new List<string>
-                                               {
-                                                   "",
-                                                   ", Priority = 1"
-                                               };
-
-            var attributeUsagesBase = new List<string>
+            static IEnumerable<string> GenerateData()
+            {
+                var nameColonUsages = new List<string>
                                       {
-                                          "Arguments({{0}}{1})",
-                                          "Arguments({0}new object[] {{{{ {{0}} }}}}{1})",
-                                          "Arguments({0}[ {{0}} ]{1})"
+                                          "",
+                                          "values: "
                                       };
 
-            foreach (var attributeUsageBase in attributeUsagesBase)
-            {
-                foreach (var nameColonUsage in nameColonUsages)
+                var priorityNamedParameterUsages = new List<string>
+                                                   {
+                                                       "",
+                                                       ", Priority = 1"
+                                                   };
+
+                var attributeUsagesBase = new List<string>
+                                          {
+                                              "Arguments({{0}}{1})",
+                                              "Arguments({0}new object[] {{{{ {{0}} }}}}{1})",
+                                              "Arguments({0}[ {{0}} ]{1})"
+                                          };
+
+                foreach (var attributeUsageBase in attributeUsagesBase)
                 {
-                    foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                    foreach (var nameColonUsage in nameColonUsages)
                     {
-                        yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                        foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                        {
+                            yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                        }
                     }
                 }
             }
+
         }
     }
 }
