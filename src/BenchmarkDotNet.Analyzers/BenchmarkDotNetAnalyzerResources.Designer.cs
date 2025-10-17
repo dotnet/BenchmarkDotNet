@@ -482,6 +482,36 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A generic benchmark class referenced in the BenchmarkRunner.Run method must be must be annotated with at least one [GenericTypeArguments] attribute.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgume" +
+                        "ntsAttribute_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Referenced generic benchmark class &apos;{0}&apos; has no [GenericTypeArguments] attribute(s).
+        /// </summary>
+        internal static string BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgume" +
+                        "ntsAttribute_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generic benchmark classes must be annotated with at least one [GenericTypeArguments] attribute.
+        /// </summary>
+        internal static string BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Title {
+            get {
+                return ResourceManager.GetString("BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgume" +
+                        "ntsAttribute_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The referenced benchmark class (or any of its inherited classes) must have at least one method annotated with the [Benchmark] attribute.
         /// </summary>
         internal static string BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Description {
@@ -663,26 +693,6 @@ namespace BenchmarkDotNet.Analyzers {
             get {
                 return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Ti" +
                         "tle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be generic unless declared as abstract or annotated with a [GenericTypeArguments] attribute.
-        /// </summary>
-        internal static string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgum" +
-                        "entsAttribute_MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes can only be generic if they&apos;re either abstract or annotated with a [GenericTypeArguments] attribute.
-        /// </summary>
-        internal static string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgum" +
-                        "entsAttribute_Title", resourceCulture);
             }
         }
         
