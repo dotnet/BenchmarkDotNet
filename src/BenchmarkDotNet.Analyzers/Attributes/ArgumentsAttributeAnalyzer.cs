@@ -277,24 +277,13 @@
                         continue;
                     }
 
-                    var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntaxFunc(i)).Type;
+                    var valueExpressionString = valueExpressionSyntax.ToString();
+
+                    var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                     if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
                     {
-                        var conversionSummary = context.Compilation.ClassifyConversion(actualValueTypeSymbol, methodParameterTypeSymbol);
-                        if (!conversionSummary.IsImplicit)
+                        if (!AnalyzerHelper.IsConstantAssignableToType(context.Compilation, methodParameterTypeSymbol, valueExpressionString))
                         {
-                            if (conversionSummary is { IsExplicit: true, IsEnumeration: false })
-                            {
-                                var constantValue = context.SemanticModel.GetConstantValue(valueExpressionSyntax is CastExpressionSyntax castExpressionSyntax ? castExpressionSyntax.Expression : valueExpressionSyntax);
-                                if (constantValue is { HasValue: true, Value: not null })
-                                {
-                                    if (AnalyzerHelper.ValueFitsInType(constantValue.Value, methodParameterTypeSymbol))
-                                    {
-                                        return;
-                                    }
-                                }
-                            }
-
                             ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
                                                                                  valueExpressionSyntax.ToString(),
                                                                                  methodParameterTypeSymbol.ToString(),

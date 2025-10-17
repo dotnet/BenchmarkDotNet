@@ -1,9 +1,9 @@
 ﻿namespace BenchmarkDotNet.Analyzers
 {
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    using System;
     using System.Collections.Immutable;
 
     internal static class AnalyzerHelper
@@ -92,89 +92,19 @@
             return typeName;
         }
 
-        public static bool ValueFitsInType(object value, ITypeSymbol targetType)
+        public static bool IsConstantAssignableToType(Compilation compilation, ITypeSymbol targetType, string valueExpression)
         {
+            var code = $$"""
+                         file class Internal {
+                             {{targetType}} x = {{valueExpression}};
+                         }
+                         """;
 
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-            try
-            {
-                switch (targetType.SpecialType)
-                {
-                    case SpecialType.System_Byte:
-                        var byteVal = Convert.ToInt64(value);
+            var diagnostics = compilation.AddSyntaxTrees(syntaxTree).GetSemanticModel(syntaxTree).GetMethodBodyDiagnostics();
 
-                        return byteVal is >= byte.MinValue and <= byte.MaxValue;
-
-                    case SpecialType.System_SByte:
-                        var sbyteVal = Convert.ToInt64(value);
-
-                        return sbyteVal is >= sbyte.MinValue and <= sbyte.MaxValue;
-
-                    case SpecialType.System_Int16:
-                        var int16Val = Convert.ToInt64(value);
-
-                        return int16Val is >= short.MinValue and <= short.MaxValue;
-
-                    case SpecialType.System_UInt16:
-                        var uint16Val = Convert.ToInt64(value);
-
-                        return uint16Val is >= ushort.MinValue and <= ushort.MaxValue;
-
-                    case SpecialType.System_Int32:
-                        var int32Val = Convert.ToInt64(value);
-
-                        return int32Val is >= int.MinValue and <= int.MaxValue;
-
-                    case SpecialType.System_UInt32:
-                        var uint32Val = Convert.ToInt64(value);
-
-                        return uint32Val is >= uint.MinValue and <= uint.MaxValue;
-
-                    case SpecialType.System_Int64:
-                        {
-                            _ = Convert.ToInt64(value);
-                        }
-
-                        return true;
-
-                    case SpecialType.System_UInt64:
-                        var val = Convert.ToInt64(value);
-
-                        return val >= 0;
-
-                    case SpecialType.System_Single:
-                        if (value is double)
-                        {
-                            return false;
-                        }
-
-                        var floatVal = Convert.ToSingle(value);
-
-                        return !float.IsInfinity(floatVal);
-
-                    case SpecialType.System_Double:
-                        var doubleVal = Convert.ToDouble(value);
-
-                        return !double.IsInfinity(doubleVal);
-
-                    case SpecialType.System_Decimal:
-                        if (value is double or float)
-                        {
-                            return false;
-                        }
-
-                        _ = Convert.ToDecimal(value);
-
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return diagnostics.Length == 0;
         }
     }
 }
