@@ -181,15 +181,15 @@
                 var typeParameters = string.Join(", ", TypeParameters.Take(typeParametersListLength));
 
                 var testCode = /* lang=c#-test */ $$"""
-                                                           using BenchmarkDotNet.Running;
-
-                                                           public class Program
-                                                           {
-                                                               public static void Main(string[] args) {
-                                                                   BenchmarkRunner.Run(typeof(BenchmarkClass<{{new string(',', typeParametersListLength - 1)}}>));
-                                                               }
-                                                           }
-                                                           """;
+                                                    using BenchmarkDotNet.Running;
+                                                    
+                                                    public class Program
+                                                    {
+                                                        public static void Main(string[] args) {
+                                                            BenchmarkRunner.Run(typeof(BenchmarkClass<{{new string(',', typeParametersListLength - 1)}}>));
+                                                        }
+                                                    }
+                                                    """;
 
                 var benchmarkClassDocument = /* lang=c#-test */ $$"""
                                                                   public class BenchmarkClass<{{typeParameters}}> : BenchmarkClassAncestor1<{{typeParameters}}>
@@ -754,9 +754,9 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task A_generic_class_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ClassAbstractModifiersEnumerableLocal))] string abstractModifier,
-                                                                            [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
-                                                                            [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
+            public async Task A_generic_class_not_referenced_in_run_method_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ClassAbstractModifiersEnumerableLocal))] string abstractModifier,
+                                                                                                         [CombinatorialMemberData(nameof(TypeParametersListLengthEnumerableLocal))] int typeParametersListLength,
+                                                                                                         [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
             {
                 var typeParameters = string.Join(", ", TypeParameters.Take(typeParametersListLength));
 

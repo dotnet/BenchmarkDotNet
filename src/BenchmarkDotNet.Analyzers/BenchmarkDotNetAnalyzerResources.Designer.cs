@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected type for value &apos;{0}&apos;. Expected &apos;{1}&apos; but found &apos;{2}&apos;..
+        ///   Looks up a localized string similar to Unexpected type for argument value &apos;{0}&apos;. Expected &apos;{1}&apos; but found &apos;{2}&apos;..
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_MustHaveMatchingValueType_MessageFormat {
             get {
@@ -482,7 +482,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A generic benchmark class referenced in the BenchmarkRunner.Run method must be must be annotated with at least one [GenericTypeArguments] attribute.
+        ///   Looks up a localized string similar to A generic benchmark class referenced in the BenchmarkRunner.Run method must be annotated with at least one [GenericTypeArguments] attribute.
         /// </summary>
         internal static string BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description {
             get {

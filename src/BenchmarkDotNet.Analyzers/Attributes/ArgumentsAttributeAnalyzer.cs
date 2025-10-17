@@ -176,41 +176,38 @@
                     else
                     {
                         var attributeArgumentSyntaxValueType = context.SemanticModel.GetTypeInfo(attributeArgumentSyntax.Expression).Type;
-                        if (attributeArgumentSyntaxValueType is IArrayTypeSymbol arrayTypeSymbol)
+                        if (attributeArgumentSyntaxValueType is IArrayTypeSymbol arrayTypeSymbol && arrayTypeSymbol.ElementType.SpecialType == SpecialType.System_Object)
                         {
-                            if (arrayTypeSymbol.ElementType.SpecialType == SpecialType.System_Object)
+                            if (attributeArgumentSyntax.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
                             {
-                                if (attributeArgumentSyntax.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
+                                if (arrayCreationExpressionSyntax.Initializer == null)
                                 {
-                                    if (arrayCreationExpressionSyntax.Initializer == null)
+                                    var rankSpecifierSizeSyntax = arrayCreationExpressionSyntax.Type.RankSpecifiers.First().Sizes.First();
+                                    if (rankSpecifierSizeSyntax is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.IsKind(SyntaxKind.NumericLiteralExpression))
                                     {
-                                        var rankSpecifierSizeSyntax = arrayCreationExpressionSyntax.Type.RankSpecifiers.First().Sizes.First();
-                                        if (rankSpecifierSizeSyntax is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.IsKind(SyntaxKind.NumericLiteralExpression))
+                                        if (literalExpressionSyntax.Token.Value is 0)
                                         {
-                                            if (literalExpressionSyntax.Token.Value is int rankSpecifierSize && rankSpecifierSize == 0)
+                                            if (methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
                                             {
-                                                if (methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
-                                                {
-                                                    ReportMustHaveMatchingValueCountDiagnostic(literalExpressionSyntax.GetLocation(), 0);
-                                                }
+                                                ReportMustHaveMatchingValueCountDiagnostic(literalExpressionSyntax.GetLocation(), 0);
                                             }
                                         }
                                     }
-                                    else
+                                }
+                                else
+                                {
+                                    if (methodDeclarationSyntax.ParameterList.Parameters.Count != arrayCreationExpressionSyntax.Initializer.Expressions.Count)
                                     {
-                                        if (methodDeclarationSyntax.ParameterList.Parameters.Count != arrayCreationExpressionSyntax.Initializer.Expressions.Count)
-                                        {
-                                            ReportMustHaveMatchingValueCountDiagnostic(arrayCreationExpressionSyntax.Initializer.Expressions.Count == 0
-                                                                                          ? arrayCreationExpressionSyntax.Initializer.GetLocation()
-                                                                                          : Location.Create(context.FilterTree, arrayCreationExpressionSyntax.Initializer.Expressions.Span),
-                                                                                       arrayCreationExpressionSyntax.Initializer.Expressions.Count);
+                                        ReportMustHaveMatchingValueCountDiagnostic(arrayCreationExpressionSyntax.Initializer.Expressions.Count == 0
+                                                                                      ? arrayCreationExpressionSyntax.Initializer.GetLocation()
+                                                                                      : Location.Create(context.FilterTree, arrayCreationExpressionSyntax.Initializer.Expressions.Span),
+                                                                                   arrayCreationExpressionSyntax.Initializer.Expressions.Count);
 
-                                            continue;
-                                        }
-
-                                        // ReSharper disable once PossibleNullReferenceException
-                                        ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => arrayCreationExpressionSyntax.Initializer.Expressions[i]);
+                                        continue;
                                     }
+
+                                    // ReSharper disable once PossibleNullReferenceException
+                                    ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => arrayCreationExpressionSyntax.Initializer.Expressions[i]);
                                 }
                             }
                         }
@@ -282,7 +279,7 @@
                     var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                     if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
                     {
-                        if (!AnalyzerHelper.IsConstantAssignableToType(context.Compilation, methodParameterTypeSymbol, valueExpressionString))
+                        if (!AnalyzerHelper.IsAssignableToLocal(context.Compilation, methodParameterTypeSymbol, valueExpressionString))
                         {
                             ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
                                                                                  valueExpressionSyntax.ToString(),

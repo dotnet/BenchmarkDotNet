@@ -179,45 +179,42 @@
             // Array creation expression
 
             var attributeArgumentSyntaxValueType = context.SemanticModel.GetTypeInfo(attributeArgumentSyntax.Expression).Type;
-            if (attributeArgumentSyntaxValueType is IArrayTypeSymbol arrayTypeSymbol)
+            if (attributeArgumentSyntaxValueType is IArrayTypeSymbol arrayTypeSymbol && arrayTypeSymbol.ElementType.SpecialType == SpecialType.System_Object)
             {
-                if (arrayTypeSymbol.ElementType.SpecialType == SpecialType.System_Object)
+                if (attributeArgumentSyntax.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
                 {
-                    if (attributeArgumentSyntax.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
+                    if (arrayCreationExpressionSyntax.Initializer == null)
                     {
-                        if (arrayCreationExpressionSyntax.Initializer == null)
+                        var rankSpecifierSizeSyntax = arrayCreationExpressionSyntax.Type.RankSpecifiers.First().Sizes.First();
+                        if (rankSpecifierSizeSyntax is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.IsKind(SyntaxKind.NumericLiteralExpression))
                         {
-                            var rankSpecifierSizeSyntax = arrayCreationExpressionSyntax.Type.RankSpecifiers.First().Sizes.First();
-                            if (rankSpecifierSizeSyntax is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.IsKind(SyntaxKind.NumericLiteralExpression))
+                            if (literalExpressionSyntax.Token.Value is 0)
                             {
-                                if (literalExpressionSyntax.Token.Value is 0)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule,
-                                                                               arrayCreationExpressionSyntax.GetLocation()));
-                                }
+                                context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule,
+                                                                           arrayCreationExpressionSyntax.GetLocation()));
                             }
-
-                            return;
                         }
 
-                        if (!arrayCreationExpressionSyntax.Initializer.Expressions.Any())
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule,
-                                                                       arrayCreationExpressionSyntax.Initializer.GetLocation()));
+                        return;
+                    }
 
-                            return;
-                        }
+                    if (!arrayCreationExpressionSyntax.Initializer.Expressions.Any())
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule,
+                                                                   arrayCreationExpressionSyntax.Initializer.GetLocation()));
 
-                        if (arrayCreationExpressionSyntax.Initializer.Expressions.Count == 1)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(UnnecessarySingleValuePassedToAttributeRule,
-                                                                       arrayCreationExpressionSyntax.Initializer.Expressions[0].GetLocation()));
-                        }
+                        return;
+                    }
 
-                        foreach (var expressionSyntax in arrayCreationExpressionSyntax.Initializer.Expressions)
-                        {
-                            ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(expressionSyntax);
-                        }
+                    if (arrayCreationExpressionSyntax.Initializer.Expressions.Count == 1)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(UnnecessarySingleValuePassedToAttributeRule,
+                                                                   arrayCreationExpressionSyntax.Initializer.Expressions[0].GetLocation()));
+                    }
+
+                    foreach (var expressionSyntax in arrayCreationExpressionSyntax.Initializer.Expressions)
+                    {
+                        ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(expressionSyntax);
                     }
                 }
 
@@ -253,7 +250,7 @@
                 var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                 if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
                 {
-                    if (!AnalyzerHelper.IsConstantAssignableToType(context.Compilation, expectedValueTypeSymbol, valueExpressionString))
+                    if (!AnalyzerHelper.IsAssignableToField(context.Compilation, expectedValueTypeSymbol, valueExpressionString))
                     {
                         ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
                                                                              valueExpressionString,
