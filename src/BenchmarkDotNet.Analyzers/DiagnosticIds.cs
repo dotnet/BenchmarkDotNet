@@ -4,16 +4,16 @@
     {
         public const string BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods = "BDN1000";
         public const string BenchmarkRunner_Run_TypeArgumentClassMustBePublic = "BDN1001";
-        public const string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract = "BDN1002";
-        public const string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed = "BDN1003";
+        public const string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed = "BDN1002";
+        public const string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract = "BDN1003";
+        public const string BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute = "BDN1004";
         public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract = "BDN1100";
-        public const string General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute = "BDN1101";
-        public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric = "BDN1102";
-        public const string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount = "BDN1103";
-        public const string General_BenchmarkClass_MethodMustBePublic = "BDN1104";
-        public const string General_BenchmarkClass_MethodMustBeNonGeneric = "BDN1105";
-        public const string General_BenchmarkClass_ClassMustBeNonStatic = "BDN1106";
-        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1107";
+        public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric = "BDN1101";
+        public const string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount = "BDN1102";
+        public const string General_BenchmarkClass_MethodMustBePublic = "BDN1103";
+        public const string General_BenchmarkClass_MethodMustBeNonGeneric = "BDN1104";
+        public const string General_BenchmarkClass_ClassMustBeNonStatic = "BDN1105";
+        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1106";
         public const string Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField = "BDN1200";
         public const string Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty = "BDN1201";
         public const string Attributes_GeneralParameterAttributes_FieldMustBePublic = "BDN1202";

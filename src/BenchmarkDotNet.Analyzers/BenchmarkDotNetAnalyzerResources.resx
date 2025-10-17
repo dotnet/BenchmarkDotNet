@@ -144,8 +144,11 @@
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat" xml:space="preserve">
     <value>Benchmark class '{0}' cannot be abstract</value>
   </data>
-  <data name="General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat" xml:space="preserve">
-    <value>Benchmark class '{0}' cannot be generic unless declared as abstract or annotated with a [GenericTypeArguments] attribute</value>
+  <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat" xml:space="preserve">
+    <value>Referenced generic benchmark class '{0}' has no [GenericTypeArguments] attribute(s)</value>
+  </data>
+  <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description" xml:space="preserve">
+    <value>A generic benchmark class referenced in the BenchmarkRunner.Run method must be must be annotated with at least one [GenericTypeArguments] attribute</value>
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Title" xml:space="preserve">
     <value>Benchmark classes must be non-static</value>
@@ -153,8 +156,8 @@
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title" xml:space="preserve">
     <value>Benchmark classes annotated with the [GenericTypeArguments] attribute must be non-abstract</value>
   </data>
-  <data name="General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title" xml:space="preserve">
-    <value>Benchmark classes can only be generic if they're either abstract or annotated with a [GenericTypeArguments] attribute</value>
+  <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Title" xml:space="preserve">
+    <value>Generic benchmark classes must be annotated with at least one [GenericTypeArguments] attribute</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBePublic_Title" xml:space="preserve">
     <value>Benchmark classes must be public</value>

@@ -3,8 +3,9 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-
+    using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
 
     internal static class AnalyzerHelper
     {
@@ -16,7 +17,7 @@
 
         public static bool AttributeListsContainAttribute(INamedTypeSymbol? attributeTypeSymbol, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
         {
-            if (attributeTypeSymbol == null)
+            if (attributeTypeSymbol == null || attributeTypeSymbol.TypeKind == TypeKind.Error)
             {
                 return false;
             }
@@ -39,6 +40,18 @@
             }
 
             return false;
+        }
+
+        public static bool AttributeListContainsAttribute(string attributeName, Compilation compilation, ImmutableArray<AttributeData> attributeList) => AttributeListContainsAttribute(compilation.GetTypeByMetadataName(attributeName), attributeList);
+
+        public static bool AttributeListContainsAttribute(INamedTypeSymbol? attributeTypeSymbol, ImmutableArray<AttributeData> attributeList)
+        {
+            if (attributeTypeSymbol == null || attributeTypeSymbol.TypeKind == TypeKind.Error)
+            {
+                return false;
+            }
+
+            return attributeList.Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default));
         }
 
         public static ImmutableArray<AttributeSyntax> GetAttributes(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel) => GetAttributes(compilation.GetTypeByMetadataName(attributeName), attributeLists, semanticModel);

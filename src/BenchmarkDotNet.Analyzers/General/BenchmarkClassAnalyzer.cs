@@ -19,13 +19,6 @@
                                                                                                                                              isEnabledByDefault: true,
                                                                                                                                              description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description)));
 
-        internal static readonly DiagnosticDescriptor GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute,
-                                                                                                                                                             AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_Title)),
-                                                                                                                                                             AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat)),
-                                                                                                                                                             "Usage",
-                                                                                                                                                             DiagnosticSeverity.Error,
-                                                                                                                                                             isEnabledByDefault: true);
-
         internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeGenericRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric,
                                                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title)),
                                                                                                                                          AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat)),
@@ -77,7 +70,6 @@
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
-            GenericClassMustBeAbstractOrAnnotatedWithAGenericTypeArgumentsAttributeRule,
             ClassWithGenericTypeArgumentsAttributeMustBeGenericRule,
             GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
             MethodMustBePublicRule,

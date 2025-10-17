@@ -6,6 +6,7 @@
     using Microsoft.CodeAnalysis.Diagnostics;
 
     using System.Collections.Immutable;
+    using System.Linq;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RunAnalyzer : DiagnosticAnalyzer
@@ -25,14 +26,6 @@
                                                                                                                    DiagnosticSeverity.Error,
                                                                                                                    isEnabledByDefault: true);
 
-        internal static readonly DiagnosticDescriptor TypeArgumentClassMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract,
-                                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title)),
-                                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat)),
-                                                                                                                        "Usage",
-                                                                                                                        DiagnosticSeverity.Error,
-                                                                                                                        isEnabledByDefault: true,
-                                                                                                                        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description)));
-
         internal static readonly DiagnosticDescriptor TypeArgumentClassMustBeUnsealedRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed,
                                                                                                                      AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Title)),
                                                                                                                      AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_MessageFormat)),
@@ -41,12 +34,30 @@
                                                                                                                      isEnabledByDefault: true,
                                                                                                                      description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description)));
 
+        internal static readonly DiagnosticDescriptor TypeArgumentClassMustBeNonAbstractRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract,
+                                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title)),
+                                                                                                                        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat)),
+                                                                                                                        "Usage",
+                                                                                                                        DiagnosticSeverity.Error,
+                                                                                                                        isEnabledByDefault: true,
+                                                                                                                        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description)));
+
+        internal static readonly DiagnosticDescriptor GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttributeRule = new DiagnosticDescriptor(DiagnosticIds.BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute,
+                                                                                                                                                               AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Title)),
+                                                                                                                                                               AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat)),
+                                                                                                                                                               "Usage",
+                                                                                                                                                               DiagnosticSeverity.Error,
+                                                                                                                                                               isEnabledByDefault: true,
+                                                                                                                                                               description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description)));
+
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             TypeArgumentClassMissingBenchmarkMethodsRule,
             TypeArgumentClassMustBePublicRule,
+            TypeArgumentClassMustBeUnsealedRule,
             TypeArgumentClassMustBeNonAbstractRule,
-            TypeArgumentClassMustBeUnsealedRule
+            GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttributeRule,
         ];
 
         public override void Initialize(AnalysisContext analysisContext)
@@ -143,8 +154,6 @@
             var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation);
             if (benchmarkAttributeTypeSymbol == null)
             {
-                ReportDiagnostic(TypeArgumentClassMissingBenchmarkMethodsRule);
-
                 return;
             }
 
@@ -166,6 +175,11 @@
             if (benchmarkClassTypeSymbol.IsSealed)
             {
                 ReportDiagnostic(TypeArgumentClassMustBeUnsealedRule);
+            }
+
+            if (benchmarkClassTypeSymbol.IsUnboundGenericType && !AnalyzerHelper.AttributeListContainsAttribute("BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute", context.Compilation, benchmarkClassTypeSymbol.GetAttributes()))
+            {
+                ReportDiagnostic(GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttributeRule);
             }
 
             return;
