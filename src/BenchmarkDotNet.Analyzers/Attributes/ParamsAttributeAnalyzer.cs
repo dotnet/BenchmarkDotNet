@@ -248,26 +248,15 @@
 
             void ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(ExpressionSyntax valueExpressionSyntax)
             {
+                var valueExpressionString = valueExpressionSyntax.ToString();
+
                 var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                 if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
                 {
-                    var conversionSummary = context.Compilation.ClassifyConversion(actualValueTypeSymbol, expectedValueTypeSymbol);
-                    if (!conversionSummary.IsImplicit)
+                    if (!AnalyzerHelper.IsConstantAssignableToType(context.Compilation, expectedValueTypeSymbol, valueExpressionString))
                     {
-                        if (conversionSummary is { IsExplicit: true, IsEnumeration: false })
-                        {
-                            var constantValue = context.SemanticModel.GetConstantValue(valueExpressionSyntax is CastExpressionSyntax castExpressionSyntax ? castExpressionSyntax.Expression : valueExpressionSyntax);
-                            if (constantValue is { HasValue: true, Value: not null })
-                            {
-                                if (AnalyzerHelper.ValueFitsInType(constantValue.Value, expectedValueTypeSymbol))
-                                {
-                                    return;
-                                }
-                            }
-                        }
-
                         ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
-                                                                             valueExpressionSyntax.ToString(),
+                                                                             valueExpressionString,
                                                                              fieldOrPropertyTypeSyntax.ToString(),
                                                                              actualValueTypeSymbol.ToString());
                     }
@@ -275,7 +264,7 @@
                 else
                 {
                     ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
-                                                                         valueExpressionSyntax.ToString(),
+                                                                         valueExpressionString,
                                                                          fieldOrPropertyTypeSyntax.ToString());
                 }
 
