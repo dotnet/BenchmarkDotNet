@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Disassemblers
         public Arm64RegisterId RegisterId {  get {  return _registerId; } }
     }
 
-    internal class Arm64Disassembler : ClrMdV3Disassembler
+    internal class Arm64Disassembler : ClrMdDisassembler
     {
         internal sealed class RuntimeSpecificData
         {
@@ -258,7 +258,8 @@ namespace BenchmarkDotNet.Disassemblers
                         InstructionLength = instruction.Bytes.Length,
                         Instruction = instruction,
                         ReferencedAddress = (address > ushort.MaxValue) ? address : null,
-                        IsReferencedAddressIndirect = isIndirect
+                        IsReferencedAddressIndirect = isIndirect,
+                        DisassembleSyntax = disassembler.DisassembleSyntax
                     };
                 }
             }

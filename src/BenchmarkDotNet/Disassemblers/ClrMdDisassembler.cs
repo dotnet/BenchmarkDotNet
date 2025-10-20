@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Filters;
 using Microsoft.Diagnostics.Runtime;
-using Microsoft.Diagnostics.Runtime.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,11 +8,40 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
+using JetBrains.Annotations;
+using System.ComponentModel;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    // This Disassembler uses ClrMd v3x. Please keep it in sync with ClrMdV1Disassembler (if possible).
-    internal abstract class ClrMdV3Disassembler
+    [UsedImplicitly]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public sealed class ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = null)
+    {
+        internal int ProcessId { get; } = processId;
+        internal string TypeName { get; } = typeName;
+        internal string MethodName { get; } = methodName;
+        internal bool PrintSource { get; } = printSource;
+        internal int MaxDepth { get; } = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
+        internal string[] Filters { get; } = filters;
+        internal string Syntax { get; } = syntax;
+        internal string TargetFrameworkMoniker { get; } = tfm;
+        internal string ResultsPath { get; } = resultsPath;
+
+        internal static ClrMdArgs FromArgs(string[] args)
+            => new(
+                processId: int.Parse(args[0]),
+                typeName: args[1],
+                methodName: args[2],
+                printSource: bool.Parse(args[3]),
+                maxDepth: int.Parse(args[4]),
+                resultsPath: args[5],
+                syntax: args[6],
+                tfm: args[7],
+                filters: [.. args.Skip(8)]
+            );
+    }
+
+    internal abstract class ClrMdDisassembler
 
     {
         private static readonly ulong MinValidAddress = GetMinValidAddress();
@@ -43,47 +71,49 @@ namespace BenchmarkDotNet.Disassemblers
                 && address != 0
                 && address >= MinValidAddress;
 
-        internal DisassemblyResult AttachAndDisassemble(Settings settings)
+        internal DisassemblyResult AttachAndDisassemble(ClrMdArgs settings)
         {
-            using (var dataTarget = DataTarget.AttachToProcess(
-                settings.ProcessId,
-                suspend: false))
+            // Windows CoreCLR fails to disassemble generic types when using CreateSnapshotAndAttach, and succeeds with AttachToProcess. https://github.com/microsoft/clrmd/issues/1334
+            // Non-Windows (Linux) crashes when using AttachToProcess in the same process.
+            bool createSnapshot = (!OsDetector.IsWindows() || !RuntimeInformation.IsNetCore) && settings.ProcessId == System.Diagnostics.Process.GetCurrentProcess().Id;
+            using var dataTarget = createSnapshot
+                ? DataTarget.CreateSnapshotAndAttach(settings.ProcessId)
+                : DataTarget.AttachToProcess(settings.ProcessId, suspend: false);
+
+            var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
+
+            ConfigureSymbols(dataTarget);
+
+            var state = new State(runtime, settings.TargetFrameworkMoniker);
+
+            if (settings.Filters.Length > 0)
             {
-                var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
-
-                ConfigureSymbols(dataTarget);
-
-                var state = new State(runtime, settings.TargetFrameworkMoniker);
-
-                if (settings.Filters.Length > 0)
-                {
-                    FilterAndEnqueue(state, settings);
-                }
-                else
-                {
-                    ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(settings.TypeName)).First(type => type != null);
-
-                    state.Todo.Enqueue(
-                        new MethodInfo(
-                            // the Disassembler Entry Method is always parameterless, so check by name is enough
-                            typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == settings.MethodName),
-                            0));
-                }
-
-                var disassembledMethods = Disassemble(settings, state);
-
-                // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
-                var filteredMethods = disassembledMethods.Length == 1
-                    ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
-                    : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
-
-                return new DisassemblyResult
-                {
-                    Methods = filteredMethods,
-                    SerializedAddressToNameMapping = state.AddressToNameMapping.Select(x => new DisassemblyResult.MutablePair { Key = x.Key, Value = x.Value }).ToArray(),
-                    PointerSize = (uint)IntPtr.Size
-                };
+                FilterAndEnqueue(state, settings);
             }
+            else
+            {
+                ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(settings.TypeName)).First(type => type != null);
+
+                state.Todo.Enqueue(
+                    new MethodInfo(
+                        // the Disassembler Entry Method is always parameterless, so check by name is enough
+                        typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == settings.MethodName),
+                        0));
+            }
+
+            var disassembledMethods = Disassemble(settings, state);
+
+            // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
+            var filteredMethods = disassembledMethods.Length == 1
+                ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
+                : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+
+            return new DisassemblyResult
+            {
+                Methods = filteredMethods,
+                SerializedAddressToNameMapping = state.AddressToNameMapping.Select(x => new DisassemblyResult.MutablePair { Key = x.Key, Value = x.Value }).ToArray(),
+                PointerSize = (uint) IntPtr.Size
+            };
         }
 
         private static void ConfigureSymbols(DataTarget dataTarget)
@@ -92,7 +122,7 @@ namespace BenchmarkDotNet.Disassemblers
             dataTarget.SetSymbolPath("http://msdl.microsoft.com/download/symbols");
         }
 
-        private static void FilterAndEnqueue(State state, Settings settings)
+        private static void FilterAndEnqueue(State state, ClrMdArgs settings)
         {
             Regex[] filters = GlobFilter.ToRegex(settings.Filters);
 
@@ -123,7 +153,7 @@ namespace BenchmarkDotNet.Disassemblers
                     }
         }
 
-        private DisassembledMethod[] Disassemble(Settings settings, State state)
+        private DisassembledMethod[] Disassemble(ClrMdArgs settings, State state)
         {
             var result = new List<DisassembledMethod>();
             DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), settings.Syntax);
@@ -145,7 +175,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
-        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
+        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, ClrMdArgs settings, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
         {
             var method = methodInfo.Method;
 
