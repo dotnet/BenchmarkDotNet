@@ -160,14 +160,14 @@
             }
         }
 
-        public class UnexpectedValueType : AnalyzerTestFixture<ParamsAttributeAnalyzer>
+        public class MustHaveMatchingValueType : AnalyzerTestFixture<ParamsAttributeAnalyzer>
         {
-            public UnexpectedValueType() : base(ParamsAttributeAnalyzer.UnexpectedValueTypeRule) { }
+            public MustHaveMatchingValueType() : base(ParamsAttributeAnalyzer.MustHaveMatchingValueTypeRule) { }
 
             [Theory, CombinatorialData]
             public async Task Providing_a_field_or_property_with_an_unknown_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
                                                                                                                [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                               [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument)
+                                                                                                               [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -186,10 +186,10 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_expected_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                          [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            public async Task Providing_expected_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
                                                                                           [CombinatorialMemberData(nameof(ValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
-                                                                                          [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument)
+                                                                                          [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                          [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -208,10 +208,94 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_implicitly_convertible_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                        [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                        [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument,
-                                                                                                        [CombinatorialValues("(byte)42", "'c'")] string value)
+            public async Task Providing_null_to_nullable_struct_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                         [CombinatorialMemberData(nameof(NullableStructTypes))] string type,
+                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                         [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "null")}})]
+                                                        public {{type}}? {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_expected_constant_value_type_should_not_trigger_diagnostic(bool useConstantFromOtherClass,
+                                                                                                   bool useLocalConstant,
+                                                                                                   [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                   [CombinatorialMemberData(nameof(ConstantValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                   [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)};" : "")}}
+                                                    
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)}})]
+                                                        public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                if (useConstantFromOtherClass)
+                {
+                    ReferenceConstants($"{valueAndType.Value2!}", valueAndType.Value1!);
+                }
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_expected_null_reference_constant_value_type_should_not_trigger_diagnostic(bool useConstantFromOtherClass,
+                                                                                                                  bool useLocalConstant,
+                                                                                                                  [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                  [CombinatorialMemberData(nameof(NullReferenceConstantTypes))] string type,
+                                                                                                                  [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                                  [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const {type}? _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
+                                                    
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}})]
+                                                        public {{type}}? {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                if (useConstantFromOtherClass)
+                {
+                    ReferenceConstants($"{type}?", "null");
+                }
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_implicitly_convertible_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                        [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                        [CombinatorialValues("(byte)42", "'c'")] string value,
+                                                                                                        [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -229,11 +313,11 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_integer_value_types_within_target_type_range_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                                   [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument,
+            public async Task Providing_integer_value_types_within_target_type_range_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
                                                                                                                    [CombinatorialMemberData(nameof(IntegerValuesAndTypesWithinTargetTypeRange))] ValueTupleDouble<string, string> integerValueAndType,
-                                                                                                                   bool explicitCast)
+                                                                                                                   bool explicitCast,
+                                                                                                                   [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -251,9 +335,34 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_both_expected_and_unexpected_value_types_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                           [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                           [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument)
+            public async Task Providing_an_unknown_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                            [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
+            {
+                const string expectedFieldOrPropertyType = "int";
+                const string valueWithUnknownType = "dummy_literal";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, $"42, {{|#0:{valueWithUnknownType}|}}, 33")}})]
+                                                        public {{expectedFieldOrPropertyType}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+
+                DisableCompilerDiagnostics();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_both_expected_and_unexpected_value_types_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                           [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                           [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 const string expectedFieldOrPropertyType = "int";
                 const string valueWithUnexpectedType = "\"test1\"";
@@ -276,36 +385,10 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_an_unknown_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                        [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                        [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument)
-            {
-                const string expectedFieldOrPropertyType = "int";
-                const string valueWithUnknownType = "dummy_literal";
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    public class BenchmarkClass
-                                                    {
-                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, $"42, {{|#0:{valueWithUnknownType}|}}, 33")}})]
-                                                        public {{expectedFieldOrPropertyType}} {{fieldOrPropertyDeclaration}}
-                                                    }
-                                                    """;
-                TestCode = testCode;
-                ReferenceDummyAttribute();
-
-                DisableCompilerDiagnostics();
-                AddDefaultExpectedDiagnostic(valueWithUnknownType, expectedFieldOrPropertyType, "<unknown>");
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Providing_an_unexpected_or_not_implicitly_convertible_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                                         [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            public async Task Providing_an_unexpected_or_not_implicitly_convertible_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
                                                                                                                          [CombinatorialMemberData(nameof(NotConvertibleValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
-                                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument)
+                                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                                         [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 const string expectedFieldOrPropertyType = "decimal";
 
@@ -328,10 +411,69 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_integer_value_types_not_within_target_type_range_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                                   [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgument))] string scalarValuesContainerAttributeArgument,
-                                                                                                                   [CombinatorialMemberData(nameof(IntegerValuesAndTypesNotWithinTargetTypeRange))] ValueTupleTriple<string, string, string> integerValueAndType)
+            public async Task Providing_an_unexpected_or_not_implicitly_convertible_constant_value_type_should_trigger_diagnostic(bool useConstantFromOtherClass,
+                                                                                                                                  bool useLocalConstant,
+                                                                                                                                  [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                                  [CombinatorialMemberData(nameof(NotConvertibleConstantValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                                                                  [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                                                  [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
+            {
+                const string expectedFieldOrPropertyType = "decimal";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)};" : "")}}
+                                                    
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)}|}}")}})]
+                                                        public {{expectedFieldOrPropertyType}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                if (useConstantFromOtherClass)
+                {
+                    ReferenceConstants(valueAndType.Value2!, valueAndType.Value1!);
+                }
+
+                AddDefaultExpectedDiagnostic(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!, expectedFieldOrPropertyType, valueAndType.Value2!);
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_null_to_nonnullable_struct_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                        [CombinatorialMemberData(nameof(NullableStructTypes))] string type,
+                                                                                                        [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                        [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "{|#0:null|}")}})]
+                                                        public {{type}} {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                AddDefaultExpectedDiagnostic("null", type, "null");
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_integer_value_types_not_within_target_type_range_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
+                                                                                                                   [CombinatorialMemberData(nameof(IntegerValuesAndTypesNotWithinTargetTypeRange))] ValueTupleTriple<string, string, string> integerValueAndType,
+                                                                                                                   [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -349,13 +491,11 @@
                 await RunAsync();
             }
 
-
-
             [Theory, CombinatorialData]
-            public async Task Providing_an_unexpected_array_value_type_to_params_attribute_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                                     [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            public async Task Providing_an_unexpected_array_value_type_to_params_attribute_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
                                                                                                                      [CombinatorialMemberData(nameof(ValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
-                                                                                                                     [CombinatorialMemberData(nameof(ArrayValuesContainerAttributeArgumentWithLocationMarker))] ValueTupleDouble<string, string> arrayValuesContainerAttributeArgument)
+                                                                                                                     [CombinatorialMemberData(nameof(ArrayValuesContainerAttributeArgumentWithLocationMarkerEnumerable))] ValueTupleDouble<string, string> arrayValuesContainerAttributeArgument,
+                                                                                                                     [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 const string expectedFieldOrPropertyType = "decimal";
 
@@ -382,9 +522,9 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_an_empty_array_value_when_type_of_attribute_target_is_not_object_array_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                                                             [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                                                             [CombinatorialMemberData(nameof(EmptyValuesAttributeArgument))] string emptyValuesAttributeArgument)
+            public async Task Providing_an_empty_array_value_when_type_of_attribute_target_is_not_object_array_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                                             [CombinatorialMemberData(nameof(EmptyValuesAttributeArgument))] string emptyValuesAttributeArgument,
+                                                                                                                                             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -402,9 +542,9 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_an_empty_array_value_when_type_of_attribute_target_is_object_array_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
-                                                                                                                                         [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                                                         [CombinatorialMemberData(nameof(EmptyValuesAttributeArgument))] string emptyValuesAttributeArgument)
+            public async Task Providing_an_empty_array_value_when_type_of_attribute_target_is_object_array_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                                         [CombinatorialMemberData(nameof(EmptyValuesAttributeArgument))] string emptyValuesAttributeArgument,
+                                                                                                                                         [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -546,9 +686,9 @@
                 }
             }
 
-            public static IEnumerable<string> ScalarValuesContainerAttributeArgument => ScalarValuesContainerAttributeArgumentTheoryData();
+            public static IEnumerable<string> ScalarValuesContainerAttributeArgumentEnumerable => ScalarValuesContainerAttributeArgumentTheoryData();
 
-            public static IEnumerable<ValueTupleDouble<string, string>> ArrayValuesContainerAttributeArgumentWithLocationMarker()
+            public static IEnumerable<ValueTupleDouble<string, string>> ArrayValuesContainerAttributeArgumentWithLocationMarkerEnumerable()
             {
                 var nameColonUsages = new List<string>
                                       {
@@ -628,6 +768,63 @@
                   (object)"test_object"
                   """, "object" ),
                 ( "typeof(string)", "System.Type" ),
+                ( "DummyEnum.Value1", "DummyEnum" )
+            ];
+
+            public static IEnumerable<ValueTupleDouble<string, string>> ConstantValuesAndTypes =>
+            [
+                ( "true", "bool" ),
+                ( "(byte)123", "byte" ),
+                ( "'A'", "char" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( "123", "int" ),
+                ( "123L", "long" ),
+                ( "(sbyte)-100", "sbyte" ),
+                ( "(short)-123", "short" ),
+                ( """
+                  "test"
+                  """, "string" ),
+                ( "123U", "uint" ),
+                ( "123UL", "ulong" ),
+                ( "(ushort)123", "ushort" ),
+
+                ( "DummyEnum.Value1", "DummyEnum" ),
+            ];
+
+            public static IEnumerable<string> NullableStructTypes =>
+            [
+                "bool",
+                "byte",
+                "char",
+                "double",
+                "float",
+                "int",
+                "long",
+                "sbyte",
+                "short",
+                "uint",
+                "ulong",
+                "ushort",
+                "DummyEnum",
+            ];
+
+            public static IEnumerable<string> NullReferenceConstantTypes =>
+            [
+                "object",
+                "string",
+                "System.Type",
+            ];
+
+            public static IEnumerable<ValueTupleDouble<string, string>> NotConvertibleConstantValuesAndTypes =>
+            [
+                ( "true", "bool" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( """
+                  "test"
+                  """, "string" ),
+
                 ( "DummyEnum.Value1", "DummyEnum" )
             ];
         }

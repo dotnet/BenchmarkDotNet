@@ -23,7 +23,7 @@
         public const string Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly = "BDN1206";
         public const string Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter = "BDN1207";
         public const string Attributes_ParamsAttribute_MustHaveValues = "BDN1300";
-        public const string Attributes_ParamsAttribute_UnexpectedValueType = "BDN1301";
+        public const string Attributes_ParamsAttribute_MustHaveMatchingValueType = "BDN1301";
         public const string Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute = "BDN1302";
         public const string Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType = "BDN1303";
         public const string Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool = "BDN1304";

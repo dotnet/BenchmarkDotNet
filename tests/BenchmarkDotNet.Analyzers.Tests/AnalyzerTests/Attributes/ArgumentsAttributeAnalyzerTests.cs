@@ -197,13 +197,15 @@
             [MemberData(nameof(ParametersListLength))]
             public async Task A_method_annotated_with_the_benchmark_attribute_but_no_arguments_attribute_with_parameters_should_trigger_diagnostic(int parametersListLength)
             {
+                const string benchmarkMethodName = "BenchmarkMethod";
+
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        public void BenchmarkMethod({|#0:{{string.Join(", ", Parameters.Take(parametersListLength))}}|})
+                                                        public void {{benchmarkMethodName}}({|#0:{{string.Join(", ", Parameters.Take(parametersListLength))}}|})
                                                         {
                                                         
                                                         }
@@ -211,7 +213,7 @@
                                                     """;
 
                 TestCode = testCode;
-                AddDefaultExpectedDiagnostic();
+                AddDefaultExpectedDiagnostic(benchmarkMethodName);
 
                 await RunAsync();
             }
@@ -577,6 +579,99 @@
             }
 
             [Theory, CombinatorialData]
+            public async Task Providing_null_to_nullable_struct_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                         [CombinatorialMemberData(nameof(NullableStructTypes))] string type,
+                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "null")}}]
+                                                        public void BenchmarkMethod({{type}}? a)
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_expected_constant_value_type_should_not_trigger_diagnostic(bool useConstantFromOtherClass,
+                                                                                                   bool useLocalConstant,
+                                                                                                   [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                   [CombinatorialMemberData(nameof(ConstantValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)};" : "")}}
+                                                    
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)}}]
+                                                        public void BenchmarkMethod({{valueAndType.Value2}} a)
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                if (useConstantFromOtherClass)
+                {
+                    ReferenceConstants($"{valueAndType.Value2!}", valueAndType.Value1!);
+                }
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_expected_null_reference_constant_value_type_should_not_trigger_diagnostic(bool useConstantFromOtherClass,
+                                                                                                                  bool useLocalConstant,
+                                                                                                                  [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                  [CombinatorialMemberData(nameof(NullReferenceConstantTypes))] string type,
+                                                                                                                  [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const {type}? _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
+                                                    
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}]
+                                                        public void BenchmarkMethod({{type}} a)
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                if (useConstantFromOtherClass)
+                {
+                    ReferenceConstants($"{type}?", "null");
+                }
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
             public async Task Providing_implicitly_convertible_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
                                                                                                         [CombinatorialValues("(byte)42", "'c'")] string value)
@@ -602,8 +697,8 @@
             }
 
             [Theory, CombinatorialData]
-            public async Task Providing_an_implicitly_convertible_array_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            public async Task Providing_an_implicitly_convertible_array_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                 [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -653,6 +748,32 @@
             }
 
             [Theory, CombinatorialData]
+            public async Task Providing_an_unkown_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                           [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:dummy_literal|}, true")}}]
+                                                        public void BenchmarkMethod(byte a, bool b)
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+
+                DisableCompilerDiagnostics();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
             public async Task Providing_an_unexpected_or_not_implicitly_convertible_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
                                                                                                                          [CombinatorialMemberData(nameof(NotConvertibleValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
                                                                                                                          [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
@@ -678,6 +799,71 @@
                 ReferenceDummyEnum();
 
                 AddDefaultExpectedDiagnostic(valueAndType.Value1!, expectedArgumentType, valueAndType.Value2!);
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_an_unexpected_or_not_implicitly_convertible_constant_value_type_should_trigger_diagnostic(bool useConstantFromOtherClass,
+                                                                                                                                  bool useLocalConstant,
+                                                                                                                                  [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                                  [CombinatorialMemberData(nameof(NotConvertibleConstantValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
+                                                                                                                                  [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                const string expectedArgumentType = "decimal";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)};" : "")}}
+                                                    
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)}|}}")}}]
+                                                        public void BenchmarkMethod({{expectedArgumentType}} a)
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                if (useConstantFromOtherClass)
+                {
+                    ReferenceConstants(valueAndType.Value2!, valueAndType.Value1!);
+                }
+
+                AddDefaultExpectedDiagnostic(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!, expectedArgumentType, valueAndType.Value2!);
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_null_to_nonnullable_struct_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                        [CombinatorialMemberData(nameof(NullableStructTypes))] string type,
+                                                                                                        [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        [Benchmark]
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:null|}")}}]
+                                                        public void BenchmarkMethod({{type}} a)
+                                                        {
+
+                                                        }
+                                                    }
+                                                    """;
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceDummyEnum();
+
+                AddDefaultExpectedDiagnostic("null", type, "null");
 
                 await RunAsync();
             }
@@ -711,37 +897,8 @@
 
             [Theory, CombinatorialData]
             public async Task Providing_integer_value_types_not_within_target_type_range_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                                   [CombinatorialMemberData(nameof(NotConvertibleValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
-                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
-            {
-                const string expectedArgumentType = "decimal";
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    public class BenchmarkClass
-                                                    {
-                                                        [Benchmark]
-                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{valueAndType.Value1}|}}")}}]
-                                                        public void BenchmarkMethod({{expectedArgumentType}} a)
-                                                        {
-                                                        
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                ReferenceDummyAttribute();
-                ReferenceDummyEnum();
-
-                AddDefaultExpectedDiagnostic(valueAndType.Value1!, expectedArgumentType, valueAndType.Value2!);
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Providing_an_unkown_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                       [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+                                                                                                                   [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
+                                                                                                                   [CombinatorialMemberData(nameof(IntegerValuesAndTypesNotWithinTargetTypeRange))] ValueTupleTriple<string, string, string> integerValueAndType)
             {
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
@@ -749,19 +906,16 @@
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:dummy_literal|}, true")}}]
-                                                        public void BenchmarkMethod(byte a, bool b)
+                                                        [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{integerValueAndType.Value1}|}}")}}]
+                                                        public void BenchmarkMethod({{integerValueAndType.Value2}} a)
                                                         {
-                                                        
+
                                                         }
                                                     }
                                                     """;
-
                 TestCode = testCode;
                 ReferenceDummyAttribute();
-
-                DisableCompilerDiagnostics();
-                AddDefaultExpectedDiagnostic("dummy_literal", "byte", "<unknown>");
+                AddDefaultExpectedDiagnostic(integerValueAndType.Value1!, integerValueAndType.Value2!, integerValueAndType.Value3!);
 
                 await RunAsync();
             }
@@ -936,6 +1090,63 @@
                   (object)"test_object"
                   """, "object" ),
                 ( "typeof(string)", "System.Type" ),
+                ( "DummyEnum.Value1", "DummyEnum" )
+            ];
+
+            public static IEnumerable<ValueTupleDouble<string, string>> ConstantValuesAndTypes =>
+            [
+                ( "true", "bool" ),
+                ( "(byte)123", "byte" ),
+                ( "'A'", "char" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( "123", "int" ),
+                ( "123L", "long" ),
+                ( "(sbyte)-100", "sbyte" ),
+                ( "(short)-123", "short" ),
+                ( """
+                  "test"
+                  """, "string" ),
+                ( "123U", "uint" ),
+                ( "123UL", "ulong" ),
+                ( "(ushort)123", "ushort" ),
+
+                ( "DummyEnum.Value1", "DummyEnum" ),
+            ];
+
+            public static IEnumerable<string> NullableStructTypes =>
+            [
+                "bool",
+                "byte",
+                "char",
+                "double",
+                "float",
+                "int",
+                "long",
+                "sbyte",
+                "short",
+                "uint",
+                "ulong",
+                "ushort",
+                "DummyEnum",
+            ];
+
+            public static IEnumerable<string> NullReferenceConstantTypes =>
+            [
+                "object",
+                "string",
+                "System.Type",
+            ];
+
+            public static IEnumerable<ValueTupleDouble<string, string>> NotConvertibleConstantValuesAndTypes =>
+            [
+                ( "true", "bool" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( """
+                  "test"
+                  """, "string" ),
+
                 ( "DummyEnum.Value1", "DummyEnum" )
             ];
         }

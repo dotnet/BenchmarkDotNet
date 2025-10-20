@@ -75,16 +75,18 @@
                                                                                                               isEnabledByDefault: true,
                                                                                                               description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Description)));
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-                                                                                                           MutuallyExclusiveOnFieldRule,
-                                                                                                           MutuallyExclusiveOnPropertyRule,
-                                                                                                           FieldMustBePublic,
-                                                                                                           PropertyMustBePublic,
-                                                                                                           NotValidOnReadonlyFieldRule,
-                                                                                                           NotValidOnConstantFieldRule,
-                                                                                                           PropertyCannotBeInitOnlyRule,
-                                                                                                           PropertyMustHavePublicSetterRule
-                                                                                                          );
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        [
+            MutuallyExclusiveOnFieldRule,
+            MutuallyExclusiveOnPropertyRule,
+            FieldMustBePublic,
+            PropertyMustBePublic,
+            NotValidOnReadonlyFieldRule,
+            NotValidOnConstantFieldRule,
+            PropertyCannotBeInitOnlyRule,
+            PropertyMustHavePublicSetterRule
+        ];
+
         public override void Initialize(AnalysisContext analysisContext)
         {
             analysisContext.EnableConcurrentExecution();
@@ -106,7 +108,7 @@
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is AttributeSyntax attributeSyntax))
+            if (context.Node is not AttributeSyntax attributeSyntax)
             {
                 return;
             }
@@ -118,14 +120,16 @@
 
             var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
             if (   attributeSyntaxTypeSymbol == null
-                ||     !attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default)
-                    && !attributeSyntaxTypeSymbol.Equals(paramsSourceAttributeTypeSymbol, SymbolEqualityComparer.Default)
-                    && !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                || attributeSyntaxTypeSymbol.TypeKind == TypeKind.Error
+                ||
+                       (!attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default)
+                     && !attributeSyntaxTypeSymbol.Equals(paramsSourceAttributeTypeSymbol, SymbolEqualityComparer.Default)
+                     && !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol, SymbolEqualityComparer.Default)))
             {
                 return;
             }
 
-            var attributeTarget = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax || n is PropertyDeclarationSyntax);
+            var attributeTarget = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax or PropertyDeclarationSyntax);
             if (attributeTarget == null)
             {
                 return;
@@ -197,15 +201,15 @@
         }
 
         private static void AnalyzeFieldOrPropertySymbol(SyntaxNodeAnalysisContext context,
-                                                         INamedTypeSymbol paramsAttributeTypeSymbol,
-                                                         INamedTypeSymbol paramsSourceAttributeTypeSymbol,
-                                                         INamedTypeSymbol paramsAllValuesAttributeTypeSymbol,
+                                                         INamedTypeSymbol? paramsAttributeTypeSymbol,
+                                                         INamedTypeSymbol? paramsSourceAttributeTypeSymbol,
+                                                         INamedTypeSymbol? paramsAllValuesAttributeTypeSymbol,
                                                          ImmutableArray<AttributeSyntax> declaredAttributes,
                                                          bool fieldOrPropertyIsPublic,
-                                                         Location fieldConstModifierLocation,
-                                                         Location fieldReadonlyModifierLocation,
+                                                         Location? fieldConstModifierLocation,
+                                                         Location? fieldReadonlyModifierLocation,
                                                          string fieldOrPropertyIdentifier,
-                                                         Location propertyInitAccessorKeywordLocation,
+                                                         Location? propertyInitAccessorKeywordLocation,
                                                          bool propertyIsMissingAssignableSetter,
                                                          Location fieldOrPropertyIdentifierLocation,
                                                          DiagnosticDescriptor fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule,
@@ -296,9 +300,9 @@
         }
 
         private static bool AllAttributeTypeSymbolsExist(in SyntaxNodeAnalysisContext context,
-                                                        out INamedTypeSymbol paramsAttributeTypeSymbol,
-                                                        out INamedTypeSymbol paramsSourceAttributeTypeSymbol,
-                                                        out INamedTypeSymbol paramsAllValuesAttributeTypeSymbol)
+                                                        out INamedTypeSymbol? paramsAttributeTypeSymbol,
+                                                        out INamedTypeSymbol? paramsSourceAttributeTypeSymbol,
+                                                        out INamedTypeSymbol? paramsAllValuesAttributeTypeSymbol)
         {
             paramsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ParamsAttribute");
             if (paramsAttributeTypeSymbol == null)

@@ -89,7 +89,7 @@
             {
                 if (hasBenchmarkAttribute && methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(MethodWithoutAttributeMustHaveNoParametersRule, Location.Create(context.FilterTree, methodDeclarationSyntax.ParameterList.Parameters.Span)));
+                    context.ReportDiagnostic(Diagnostic.Create(MethodWithoutAttributeMustHaveNoParametersRule, Location.Create(context.FilterTree, methodDeclarationSyntax.ParameterList.Parameters.Span), methodDeclarationSyntax.Identifier.ToString()));
                 }
 
                 return;
@@ -276,10 +276,16 @@
 
                     var valueExpressionString = valueExpressionSyntax.ToString();
 
+                    var constantValue = context.SemanticModel.GetConstantValue(valueExpressionSyntax);
+
                     var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                     if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
                     {
-                        if (!AnalyzerHelper.IsAssignableToLocal(context.Compilation, methodParameterTypeSymbol, valueExpressionString))
+                        if (!AnalyzerHelper.IsAssignableToLocal(context.Compilation,
+                                                                methodParameterTypeSymbol,
+                                                                valueExpressionString,
+                                                                constantValue,
+                                                                actualValueTypeSymbol.ToString()))
                         {
                             ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
                                                                                  valueExpressionSyntax.ToString(),
@@ -289,21 +295,32 @@
                     }
                     else
                     {
-                        ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
-                                                                             valueExpressionSyntax.ToString(),
-                                                                             methodParameterTypeSymbol.ToString());
+                        if (constantValue is { HasValue: true, Value: null })
+                        {
+                            if (!AnalyzerHelper.IsAssignableToLocal(context.Compilation,
+                                                                    methodParameterTypeSymbol,
+                                                                    valueExpressionString,
+                                                                    constantValue,
+                                                                    null))
+                            {
+                                ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
+                                                                                     valueExpressionString,
+                                                                                     methodParameterTypeSymbol.ToString(),
+                                                                                     "null");
+                            }
+                        }
                     }
                 }
 
                 return;
 
-                void ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(Location diagnosticLocation, string value, string expectedType, string? actualType = null)
+                void ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(Location diagnosticLocation, string value, string expectedType, string actualType)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueTypeRule,
                                                                diagnosticLocation,
                                                                value,
                                                                expectedType,
-                                                               actualType ?? "<unknown>"));
+                                                               actualType));
                 }
             }
         }

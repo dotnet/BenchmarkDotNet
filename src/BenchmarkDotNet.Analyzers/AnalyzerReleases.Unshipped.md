@@ -26,7 +26,7 @@ BDN1205  |  Usage   | Error	   | BDN1205_Attributes_GeneralParameterAttributes_N
 BDN1206  |  Usage   | Error	   | BDN1206_Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly
 BDN1207  |  Usage   | Error	   | BDN1207_Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter
 BDN1300  |  Usage   | Error	   | BDN1300_Attributes_ParamsAttribute_MustHaveValues
-BDN1301  |  Usage   | Error	   | BDN1301_Attributes_ParamsAttribute_UnexpectedValueType
+BDN1301  |  Usage   | Error	   | BDN1301_Attributes_ParamsAttribute_MustHaveMatchingValueType
 BDN1302  |  Usage   | Warning  | BDN1302_Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute
 BDN1303  |  Usage   | Error	   | BDN1303_Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType
 BDN1304  |  Usage   | Error	   | BDN1304_Attributes_ParamsAllValues_PropertyOrFieldTypeMustBeEnumOrBool
