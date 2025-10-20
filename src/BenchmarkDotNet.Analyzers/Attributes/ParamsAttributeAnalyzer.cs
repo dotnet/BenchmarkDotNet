@@ -18,13 +18,13 @@
                                                                                                     DiagnosticSeverity.Error,
                                                                                                     isEnabledByDefault: true);
 
-        internal static readonly DiagnosticDescriptor UnexpectedValueTypeRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ParamsAttribute_UnexpectedValueType,
-                                                                                                         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_UnexpectedValueType_Title)),
-                                                                                                         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_UnexpectedValueType_MessageFormat)),
-                                                                                                         "Usage",
-                                                                                                         DiagnosticSeverity.Error,
-                                                                                                         isEnabledByDefault: true,
-                                                                                                         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_UnexpectedValueType_Description)));
+        internal static readonly DiagnosticDescriptor MustHaveMatchingValueTypeRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ParamsAttribute_MustHaveMatchingValueType,
+                                                                                                               AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_MustHaveMatchingValueType_Title)),
+                                                                                                               AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_MustHaveMatchingValueType_MessageFormat)),
+                                                                                                               "Usage",
+                                                                                                               DiagnosticSeverity.Error,
+                                                                                                               isEnabledByDefault: true,
+                                                                                                               description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_MustHaveMatchingValueType_Description)));
 
         internal static readonly DiagnosticDescriptor UnnecessarySingleValuePassedToAttributeRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute,
                                                                                                                              AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_Title)),
@@ -35,7 +35,7 @@
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
                                                                                                            MustHaveValuesRule,
-                                                                                                           UnexpectedValueTypeRule,
+                                                                                                           MustHaveMatchingValueTypeRule,
                                                                                                            UnnecessarySingleValuePassedToAttributeRule
                                                                                                           );
 
@@ -48,8 +48,7 @@
             analysisContext.RegisterCompilationStartAction(ctx =>
             {
                 // Only run if BenchmarkDotNet.Annotations is referenced
-                var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(ctx.Compilation);
-                if (benchmarkAttributeTypeSymbol == null)
+                if (GetParamsAttributeTypeSymbol(ctx.Compilation) == null)
                 {
                     return;
                 }
@@ -65,11 +64,7 @@
                 return;
             }
 
-            var paramsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ParamsAttribute");
-            if (paramsAttributeTypeSymbol == null)
-            {
-                return;
-            }
+            var paramsAttributeTypeSymbol = GetParamsAttributeTypeSymbol(context.Compilation);
 
             var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
             if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default))
@@ -245,12 +240,18 @@
 
             void ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(ExpressionSyntax valueExpressionSyntax)
             {
+                var constantValue = context.SemanticModel.GetConstantValue(valueExpressionSyntax);
+
                 var valueExpressionString = valueExpressionSyntax.ToString();
 
                 var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
                 if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
                 {
-                    if (!AnalyzerHelper.IsAssignableToField(context.Compilation, expectedValueTypeSymbol, valueExpressionString))
+                    if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
+                                                            expectedValueTypeSymbol,
+                                                            valueExpressionString,
+                                                            constantValue,
+                                                            actualValueTypeSymbol.ToString()))
                     {
                         ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
                                                                              valueExpressionString,
@@ -260,22 +261,31 @@
                 }
                 else
                 {
-                    ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
-                                                                         valueExpressionString,
-                                                                         fieldOrPropertyTypeSyntax.ToString());
+                    if (constantValue is { HasValue: true, Value: null })
+                    {
+                        if (!AnalyzerHelper.IsAssignableToField(context.Compilation, expectedValueTypeSymbol, valueExpressionString, constantValue, null))
+                        {
+                            ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(valueExpressionSyntax.GetLocation(),
+                                                                                 valueExpressionString,
+                                                                                 fieldOrPropertyTypeSyntax.ToString(),
+                                                                                 "null");
+                        }
+                    }
                 }
 
                 return;
 
-                void ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(Location diagnosticLocation, string value, string expectedType, string? actualType = null)
+                void ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(Location diagnosticLocation, string value, string expectedType, string actualType)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(UnexpectedValueTypeRule,
+                    context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueTypeRule,
                                                                diagnosticLocation,
                                                                value,
                                                                expectedType,
-                                                               actualType ?? "<unknown>"));
+                                                               actualType));
                 }
             }
         }
+
+        private static INamedTypeSymbol? GetParamsAttributeTypeSymbol(Compilation compilation) => compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ParamsAttribute");
     }
 }

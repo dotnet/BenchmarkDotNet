@@ -210,6 +210,18 @@
                                                 """);
         }
 
+        protected void ReferenceConstants(string type, string value)
+        {
+            _analyzerTest.TestState.Sources.Add($$"""
+                                                  using System;
+
+                                                  public static class Constants
+                                                  {
+                                                      public const {{type}} Value = {{value}};
+                                                  }
+                                                  """);
+        }
+
         private sealed class InternalAnalyzerTest : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
         {
             protected override string DefaultTestProjectName => "BenchmarksAssemblyUnderAnalysis";

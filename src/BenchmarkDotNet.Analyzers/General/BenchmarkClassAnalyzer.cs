@@ -110,8 +110,8 @@
                 context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, classDeclarationSyntax.Identifier.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
             }
 
-            var benchmarkAttributeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation);
-            if (benchmarkAttributeSymbol == null)
+            var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation);
+            if (benchmarkAttributeTypeSymbol == null)
             {
                 return;
             }
@@ -122,7 +122,7 @@
             {
                 if (memberDeclarationSyntax is MethodDeclarationSyntax methodDeclarationSyntax)
                 {
-                    var benchmarkAttributes = AnalyzerHelper.GetAttributes(benchmarkAttributeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
+                    var benchmarkAttributes = AnalyzerHelper.GetAttributes(benchmarkAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
                     if (benchmarkAttributes.Length > 0)
                     {
                         benchmarkMethodsBuilder.Add((methodDeclarationSyntax, benchmarkAttributes.SelectMany(a => GetBaselineLocations(a)).ToImmutableArray()));

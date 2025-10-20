@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Benchmark method without [Arguments] attribute(s) cannot declare parameters.
+        ///   Looks up a localized string similar to Benchmark method &apos;{0}&apos; without [Arguments] attribute(s) cannot declare parameters.
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_MessageFormat {
             get {
@@ -419,6 +419,33 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The type of each value provided to the [Params] attribute must match the type of (or be implicitly convertible to) the field or property it is applied to.
+        /// </summary>
+        internal static string Attributes_ParamsAttribute_MustHaveMatchingValueType_Description {
+            get {
+                return ResourceManager.GetString("Attributes_ParamsAttribute_MustHaveMatchingValueType_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected type for parameter value &apos;{0}&apos;. Expected &apos;{1}&apos; but found &apos;{2}&apos;..
+        /// </summary>
+        internal static string Attributes_ParamsAttribute_MustHaveMatchingValueType_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ParamsAttribute_MustHaveMatchingValueType_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type of all value(s) passed to the [Params] attribute must match the type of (or be implicitly convertible to) the annotated field or property.
+        /// </summary>
+        internal static string Attributes_ParamsAttribute_MustHaveMatchingValueType_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ParamsAttribute_MustHaveMatchingValueType_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The [Params] attribute requires at least one value. No values were provided, or an empty array was specified..
         /// </summary>
         internal static string Attributes_ParamsAttribute_MustHaveValues_MessageFormat {
@@ -433,33 +460,6 @@ namespace BenchmarkDotNet.Analyzers {
         internal static string Attributes_ParamsAttribute_MustHaveValues_Title {
             get {
                 return ResourceManager.GetString("Attributes_ParamsAttribute_MustHaveValues_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The type of each value provided to the [Params] attribute must match the type of (or be implicitly convertible to) the field or property it is applied to.
-        /// </summary>
-        internal static string Attributes_ParamsAttribute_UnexpectedValueType_Description {
-            get {
-                return ResourceManager.GetString("Attributes_ParamsAttribute_UnexpectedValueType_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected type for parameter value &apos;{0}&apos;. Expected &apos;{1}&apos; but found &apos;{2}&apos;..
-        /// </summary>
-        internal static string Attributes_ParamsAttribute_UnexpectedValueType_MessageFormat {
-            get {
-                return ResourceManager.GetString("Attributes_ParamsAttribute_UnexpectedValueType_MessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type of all value(s) passed to the [Params] attribute must match the type of (or be implicitly convertible to) the annotated field or property.
-        /// </summary>
-        internal static string Attributes_ParamsAttribute_UnexpectedValueType_Title {
-            get {
-                return ResourceManager.GetString("Attributes_ParamsAttribute_UnexpectedValueType_Title", resourceCulture);
             }
         }
         

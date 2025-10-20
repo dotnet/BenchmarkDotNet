@@ -5,6 +5,7 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using System.Collections.Immutable;
+    using System.Globalization;
     using System.Linq;
 
     internal static class AnalyzerHelper
@@ -105,14 +106,68 @@
             return typeName;
         }
 
-        public static bool IsAssignableToField(Compilation compilation, ITypeSymbol targetType, string valueExpression)
+        public static bool IsAssignableToField(Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
         {
-            var code = $$"""
-                         file static class Internal {
-                            static readonly {{targetType}} x = {{valueExpression}};
-                         }
-                         """;
+            const string codeTemplate1 = """
+                                         file static class Internal {{
+                                            static readonly {0} x = {1};
+                                         }}
+                                         """;
 
+            const string codeTemplate2 = """
+                                         file static class Internal {{
+                                            static readonly {0} x = ({1}){2};
+                                         }}
+                                         """;
+
+            return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, targetType, valueExpression, constantValue, valueType);
+        }
+
+        public static bool IsAssignableToLocal(Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+        {
+            const string codeTemplate1 = """
+                                         file static class Internal {{
+                                            static void Method() {{
+                                                {0} x = {1};
+                                            }}
+                                         }}
+                                         """;
+
+            const string codeTemplate2 = """
+                                         file static class Internal {{
+                                            static void Method() {{
+                                                {0} x = ({1}){2};
+                                            }}
+                                         }}
+                                         """;
+
+            return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, targetType, valueExpression, constantValue, valueType);
+        }
+
+        private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+        {
+            var hasNoCompilationErrors = HasNoCompilationErrors(string.Format(codeTemplate1, targetType, valueExpression), compilation);
+            if (hasNoCompilationErrors)
+            {
+                return true;
+            }
+
+            if (!constantValue.HasValue || valueType == null)
+            {
+                return false;
+            }
+
+            var constantLiteral = FormatLiteral(constantValue.Value);
+            if (constantLiteral == null)
+            {
+                return false;
+            }
+
+            return HasNoCompilationErrors(string.Format(codeTemplate2, targetType, valueType, constantLiteral), compilation);
+        }
+
+        private static bool HasNoCompilationErrors(string code, Compilation compilation)
+        {
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
             var compilationErrors = compilation.AddSyntaxTrees(syntaxTree)
@@ -124,25 +179,27 @@
             return compilationErrors.Count == 0;
         }
 
-        public static bool IsAssignableToLocal(Compilation compilation, ITypeSymbol targetType, string valueExpression)
+        private static string? FormatLiteral(object? value)
         {
-            var code = $$"""
-                         file static class Internal {
-                            static Internal() {
-                                {{targetType}} x = {{valueExpression}};
-                            }
-                         }
-                         """;
-
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-
-            var compilationErrors = compilation.AddSyntaxTrees(syntaxTree)
-                                               .GetSemanticModel(syntaxTree)
-                                               .GetMethodBodyDiagnostics()
-                                               .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
-                                               .ToList();
-
-            return compilationErrors.Count == 0;
+            return value switch
+            {
+                byte b => b.ToString(),
+                sbyte sb => sb.ToString(),
+                short s => s.ToString(),
+                ushort us => us.ToString(),
+                int i => i.ToString(),
+                uint ui => $"{ui}U",
+                long l => $"{l}L",
+                ulong ul => $"{ul}UL",
+                float f => $"{f.ToString(CultureInfo.InvariantCulture)}F",
+                double d => $"{d.ToString(CultureInfo.InvariantCulture)}D",
+                decimal m => $"{m.ToString(CultureInfo.InvariantCulture)}M",
+                char c => $"'{c}'",
+                bool b => b ? "true" : "false",
+                string s => $"\"{s}\"",
+                null => "null",
+                _ => null
+            };
         }
     }
 }

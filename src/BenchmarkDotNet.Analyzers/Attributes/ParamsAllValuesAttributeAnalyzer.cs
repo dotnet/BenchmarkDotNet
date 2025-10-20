@@ -26,10 +26,11 @@
                                                                                                                          DiagnosticSeverity.Error,
                                                                                                                          isEnabledByDefault: true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-                                                                                                           NotAllowedOnFlagsEnumPropertyOrFieldTypeRule,
-                                                                                                           PropertyOrFieldTypeMustBeEnumOrBoolRule
-                                                                                                          );
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        [
+            NotAllowedOnFlagsEnumPropertyOrFieldTypeRule,
+            PropertyOrFieldTypeMustBeEnumOrBoolRule
+        ];
 
         public override void Initialize(AnalysisContext analysisContext)
         {
@@ -39,8 +40,7 @@
             analysisContext.RegisterCompilationStartAction(ctx =>
             {
                 // Only run if BenchmarkDotNet.Annotations is referenced
-                var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(ctx.Compilation);
-                if (benchmarkAttributeTypeSymbol == null)
+                if (GetParamsAllValuesAttributeTypeSymbol(ctx.Compilation) == null)
                 {
                     return;
                 }
@@ -51,16 +51,12 @@
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is AttributeSyntax attributeSyntax))
+            if (context.Node is not AttributeSyntax attributeSyntax)
             {
                 return;
             }
 
-            var paramsAllValuesAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ParamsAllValuesAttribute");
-            if (paramsAllValuesAttributeTypeSymbol == null)
-            {
-                return;
-            }
+            var paramsAllValuesAttributeTypeSymbol = GetParamsAllValuesAttributeTypeSymbol(context.Compilation);
 
             var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
             if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol, SymbolEqualityComparer.Default))
@@ -68,7 +64,7 @@
                 return;
             }
 
-            var attributeTarget = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax || n is PropertyDeclarationSyntax);
+            var attributeTarget = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax or PropertyDeclarationSyntax);
             if (attributeTarget == null)
             {
                 return;
@@ -90,12 +86,10 @@
                 return;
             }
 
-            AnalyzeFieldOrPropertyTypeSyntax(context,
-                                             fieldOrPropertyTypeSyntax);
+            AnalyzeFieldOrPropertyTypeSyntax(context, fieldOrPropertyTypeSyntax);
         }
 
-        private static void AnalyzeFieldOrPropertyTypeSyntax(SyntaxNodeAnalysisContext context,
-                                                             TypeSyntax fieldOrPropertyTypeSyntax)
+        private static void AnalyzeFieldOrPropertyTypeSyntax(SyntaxNodeAnalysisContext context, TypeSyntax fieldOrPropertyTypeSyntax)
         {
             if (fieldOrPropertyTypeSyntax is NullableTypeSyntax fieldOrPropertyNullableTypeSyntax)
             {
@@ -129,5 +123,7 @@
                 context.ReportDiagnostic(Diagnostic.Create(PropertyOrFieldTypeMustBeEnumOrBoolRule, fieldOrPropertyTypeSyntax.GetLocation()));
             }
         }
+
+        private static INamedTypeSymbol? GetParamsAllValuesAttributeTypeSymbol(Compilation compilation) => compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ParamsAllValuesAttribute");
     }
 }

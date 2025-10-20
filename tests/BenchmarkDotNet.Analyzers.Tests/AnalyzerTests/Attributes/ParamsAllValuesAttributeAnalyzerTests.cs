@@ -3,6 +3,7 @@
     using Fixtures;
 
     using BenchmarkDotNet.Analyzers.Attributes;
+
     using Xunit;
 
     using System.Collections.Generic;

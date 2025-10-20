@@ -225,7 +225,7 @@
   <data name="Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter_Description" xml:space="preserve">
     <value>A property annotated with a parameter attribute must have a public setter; make sure that the access modifier of the setter is empty and that the property is not an auto-property or an expression-bodied property.</value>
   </data>
-  <data name="Attributes_ParamsAttribute_UnexpectedValueType_Description" xml:space="preserve">
+  <data name="Attributes_ParamsAttribute_MustHaveMatchingValueType_Description" xml:space="preserve">
     <value>The type of each value provided to the [Params] attribute must match the type of (or be implicitly convertible to) the field or property it is applied to</value>
   </data>
   <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Description" xml:space="preserve">
@@ -247,7 +247,7 @@
     <value>Expected {0} value{1} as declared by the benchmark method '{2}', but found {3}. Update the attribute usage or method to match.</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_MessageFormat" xml:space="preserve">
-    <value>Benchmark method without [Arguments] attribute(s) cannot declare parameters</value>
+    <value>Benchmark method '{0}' without [Arguments] attribute(s) cannot declare parameters</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_MessageFormat" xml:space="preserve">
     <value>Unexpected type for argument value '{0}'. Expected '{1}' but found '{2}'.</value>
@@ -264,7 +264,7 @@
   <data name="Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_MessageFormat" xml:space="preserve">
     <value>Providing a single value to the [Params] attribute is unnecessary. This attribute is only useful when provided two or more values.</value>
   </data>
-  <data name="Attributes_ParamsAttribute_UnexpectedValueType_MessageFormat" xml:space="preserve">
+  <data name="Attributes_ParamsAttribute_MustHaveMatchingValueType_MessageFormat" xml:space="preserve">
     <value>Unexpected type for parameter value '{0}'. Expected '{1}' but found '{2}'.</value>
   </data>
   <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_MessageFormat" xml:space="preserve">
@@ -306,7 +306,7 @@
   <data name="Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_Title" xml:space="preserve">
     <value>Unnecessary single value passed to [Params] attribute</value>
   </data>
-  <data name="Attributes_ParamsAttribute_UnexpectedValueType_Title" xml:space="preserve">
+  <data name="Attributes_ParamsAttribute_MustHaveMatchingValueType_Title" xml:space="preserve">
     <value>Type of all value(s) passed to the [Params] attribute must match the type of (or be implicitly convertible to) the annotated field or property</value>
   </data>
   <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Title" xml:space="preserve">
