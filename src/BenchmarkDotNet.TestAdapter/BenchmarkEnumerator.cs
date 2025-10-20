@@ -58,7 +58,8 @@ namespace BenchmarkDotNet.TestAdapter
                         benchmarkRunInfo = new BenchmarkRunInfo(
                             benchmarkRunInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
                             benchmarkRunInfo.Type,
-                            benchmarkRunInfo.Config);
+                            benchmarkRunInfo.Config,
+                            benchmarkRunInfo.CompositeInProcessDiagnoser);
                     }
 
                     return benchmarkRunInfo;

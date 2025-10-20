@@ -16,6 +16,10 @@ namespace BenchmarkDotNet.Attributes
         /// <param name="exportCombinedDisassemblyReport">Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</param>
         /// <param name="exportDiff">Exports a diff of the assembly code to the Github markdown format. False by default.</param>
         /// <param name="filters">Glob patterns applied to full method signatures by the the disassembler.</param>
+        /// <param name="runInHost">
+        /// If <see langword="true"/>, disassembly will be ran in the host process; otherwise it will be ran in the benchmark process.
+        /// Requires host and benchmark processes to target the same platform (must have the same bit-ness) for CoreCLR.
+        /// </param>
         public DisassemblyDiagnoserAttribute(
             int maxDepth = 1,
             DisassemblySyntax syntax = DisassemblySyntax.Masm,
@@ -25,6 +29,7 @@ namespace BenchmarkDotNet.Attributes
             bool exportHtml = false,
             bool exportCombinedDisassemblyReport = false,
             bool exportDiff = false,
+            bool runInHost = false,
             params string[] filters)
         {
             Config = ManualConfig.CreateEmpty().AddDiagnoser(
@@ -38,7 +43,8 @@ namespace BenchmarkDotNet.Attributes
                         exportGithubMarkdown: exportGithubMarkdown,
                         exportHtml: exportHtml,
                         exportCombinedDisassemblyReport: exportCombinedDisassemblyReport,
-                        exportDiff: exportDiff)));
+                        exportDiff: exportDiff,
+                        runInHost: runInHost)));
         }
 
         // CLS-Compliant Code requires a constructor without an array in the argument list

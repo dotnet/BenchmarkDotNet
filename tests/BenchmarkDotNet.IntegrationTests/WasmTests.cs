@@ -1,14 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.MonoWasm;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -23,15 +26,14 @@ namespace BenchmarkDotNet.IntegrationTests
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
-        public void WasmIsSupported()
+        private ManualConfig GetConfig()
         {
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm");
             var mainJsPath = Path.Combine(AppContext.BaseDirectory, "AppBundle", "test-main.js");
 
-            var config = ManualConfig.CreateEmpty()
+            return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
                     .WithArguments([new MsBuildArgument($"/p:WasmMainJSPath={mainJsPath}")])
@@ -39,8 +41,23 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);
+        }
+
+        [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
+        public void WasmIsSupported()
+        {
+            CanExecute<WasmBenchmark>(GetConfig());
+        }
+
+        [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
+        public void WasmSupportsInProcessDiagnosers()
+        {
+            var diagnoser = new MockInProcessDiagnoser();
+            var config = GetConfig().AddDiagnoser(diagnoser);
 
             CanExecute<WasmBenchmark>(config);
+
+            Assert.Equal(["DummyResult0"], diagnoser.Results.Values);
         }
 
         public class WasmBenchmark

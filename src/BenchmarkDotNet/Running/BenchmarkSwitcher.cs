@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.Running
                                 .WithUnrollFactor(dictionary[(benchmark.Descriptor, benchmark.Parameters)].Operations % 16 == 0 ? 16 : 1),
                             benchmark.Parameters,
                             benchmark.Config)).ToArray(),
-                    benchmarkInfo.Type, benchmarkInfo.Config))
+                    benchmarkInfo.Type, benchmarkInfo.Config, benchmarkInfo.CompositeInProcessDiagnoser))
                 .ToArray();
 
             logger.WriteLineHeader("Actual benchmarking is going to happen now!");

@@ -1,5 +1,8 @@
-﻿namespace BenchmarkDotNet.Diagnosers
+﻿using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Diagnosers
 {
+    [UsedImplicitly]
     public enum RunMode : byte
     {
         /// <summary>
