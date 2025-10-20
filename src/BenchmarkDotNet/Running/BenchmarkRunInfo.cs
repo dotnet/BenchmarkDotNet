@@ -1,15 +1,17 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkRunInfo : IDisposable
     {
-        public BenchmarkRunInfo(BenchmarkCase[] benchmarksCase, Type type, ImmutableConfig config)
+        public BenchmarkRunInfo(BenchmarkCase[] benchmarksCase, Type type, ImmutableConfig config, CompositeInProcessDiagnoser compositeInProcessDiagnoser)
         {
             BenchmarksCases = benchmarksCase;
             Type = type;
             Config = config;
+            CompositeInProcessDiagnoser = compositeInProcessDiagnoser;
         }
 
         public void Dispose()
@@ -23,5 +25,6 @@ namespace BenchmarkDotNet.Running
         public BenchmarkCase[] BenchmarksCases { get; }
         public Type Type { get; }
         public ImmutableConfig Config { get; }
+        public CompositeInProcessDiagnoser CompositeInProcessDiagnoser { get; }
     }
 }

@@ -6,6 +6,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.IntegrationTests.InProcess.EmitTests;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -128,6 +129,19 @@ namespace BenchmarkDotNet.IntegrationTests
             string testLog = logger.GetLog();
             Assert.Contains(benchmarkType.Name, testLog);
             Assert.DoesNotContain("No benchmarks found", logger.GetLog());
+        }
+
+        [Fact]
+        public void InProcessEmitSupportsInProcessDiagnosers()
+        {
+            var logger = new OutputLogger(Output);
+            var diagnoser = new MockInProcessDiagnoser();
+            var config = CreateInProcessConfig(logger).AddDiagnoser(diagnoser);
+
+            var summary = CanExecute<BenchmarkAllCases>(config);
+
+            var expected = Enumerable.Repeat("DummyResult0", summary.BenchmarksCases.Length);
+            Assert.Equal(expected, diagnoser.Results.Values);
         }
 
         [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]

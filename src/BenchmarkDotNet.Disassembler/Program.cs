@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Diagnosers;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
@@ -13,18 +14,16 @@ namespace BenchmarkDotNet.Disassemblers
         // 2. disassemble the code
         // 3. save it to xml file
         // 4. detach & shut down
-        //
-        // requirements: must not have any dependencies to BenchmarkDotNet itself, KISS
         public static void Main(string[] args)
         {
-            var options = Settings.FromArgs(args);
+            var options = ClrMdArgs.FromArgs(args);
 
             if (Process.GetProcessById(options.ProcessId).HasExited) // possible when benchmark has already finished
                 throw new Exception($"The process {options.ProcessId} has already exited"); // if we don't throw here the Clrmd will fail with some mysterious HRESULT: 0xd000010a ;)
 
             try
             {
-                var methodsToExport = ClrMdV1Disassembler.AttachAndDisassemble(options);
+                var methodsToExport = DisassemblyDiagnoser.GetClrMdDisassembler().AttachAndDisassemble(options);
 
                 SaveToFile(methodsToExport, options.ResultsPath);
             }

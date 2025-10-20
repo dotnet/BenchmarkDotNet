@@ -195,7 +195,7 @@ namespace BenchmarkDotNet.Tests
             var target = new Descriptor(assemblyType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, config);
 
-            var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999) };
+            var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999, new([])) };
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", null, null, null, true);
             string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
@@ -209,7 +209,7 @@ namespace BenchmarkDotNet.Tests
             const string programName = "testProgram";
             var target = new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
-            var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) };
+            var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([])) };
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", null, null, null, true);
             var buildPartition = new BuildPartition(benchmarks, new Resolver());
             string binariesPath = projectGenerator.ResolvePathForBinaries(buildPartition, programName);
