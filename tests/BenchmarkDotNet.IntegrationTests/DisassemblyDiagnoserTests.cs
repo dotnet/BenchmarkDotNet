@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     yield return [Jit.RyuJit, Platform.X64, CsProjCoreToolchain.NetCoreApp80]; // .NET Core x64
                     // We could add Platform.X86 here, but it would make our CI more complicated.
                 }
-                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64 && OsDetector.IsLinux())
+                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64)
                 {
                     yield return [Jit.RyuJit, Platform.Arm64, CsProjCoreToolchain.NetCoreApp80]; // .NET Core arm64
                 }
@@ -90,8 +90,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -112,8 +110,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
 
@@ -140,8 +136,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -163,8 +157,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 

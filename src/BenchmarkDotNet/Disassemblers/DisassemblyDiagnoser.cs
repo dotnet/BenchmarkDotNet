@@ -124,6 +124,12 @@ namespace BenchmarkDotNet.Diagnosers
                 yield break;
             }
 
+            if (Config.RunInHost && OsDetector.IsMacOS())
+            {
+                yield return new ValidationError(true, "Disassembling in the host process is not supported on MacOS");
+                yield break;
+            }
+
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is InProcessNoEmitToolchain)
@@ -184,9 +190,8 @@ namespace BenchmarkDotNet.Diagnosers
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime
             || (RuntimeInformation.IsMono && benchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain.IsInProcess);
 
-        // when we add  macOS support, RuntimeInformation.IsMacOS() needs to be added here
         private static bool ShouldUseClrMdDisassembler(BenchmarkCase benchmarkCase)
-            => !ShouldUseMonoDisassembler(benchmarkCase) && (OsDetector.IsWindows() || OsDetector.IsLinux());
+            => !ShouldUseMonoDisassembler(benchmarkCase) && (OsDetector.IsWindows() || OsDetector.IsLinux() || OsDetector.IsMacOS());
 
         private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {
