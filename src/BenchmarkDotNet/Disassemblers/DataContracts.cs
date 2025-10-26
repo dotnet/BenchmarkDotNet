@@ -195,7 +195,7 @@ namespace BenchmarkDotNet.Disassemblers
                 // Use the Capstone disassembler to recreate the instruction from the bytes.
                 using var disassembler = CapstoneDisassembler.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
                 disassembler.EnableInstructionDetails = true;
-                disassembler.DisassembleSyntax = (DisassembleSyntax) (int) json[SyntaxKey];
+                disassembler.DisassembleSyntax = (DisassembleSyntax) Convert.ToInt32(json[SyntaxKey]);
                 byte[] bytes = Convert.FromBase64String((string) bytes64);
                 Instruction = disassembler.Disassemble(bytes, long.Parse((string) json[AddressKey])).Single();
             }
@@ -356,7 +356,7 @@ namespace BenchmarkDotNet.Disassemblers
             var addressToNameMapping = new JsonObject();
             foreach (var kvp in SerializedAddressToNameMapping)
             {
-                addressToNameMapping[$"${kvp.Key}"] = kvp.Value;
+                addressToNameMapping[kvp.Key.ToString()] = kvp.Value;
             }
             return new JsonObject
             {
@@ -389,7 +389,7 @@ namespace BenchmarkDotNet.Disassemblers
             int addressIndex = 0;
             foreach (var kvp in addressToNameMapping)
             {
-                serializedAddressToNameMapping[addressIndex].Key = ulong.Parse(kvp.Key.Substring(1));
+                serializedAddressToNameMapping[addressIndex].Key = ulong.Parse(kvp.Key);
                 serializedAddressToNameMapping[addressIndex].Value = (string) kvp.Value;
                 ++addressIndex;
             }

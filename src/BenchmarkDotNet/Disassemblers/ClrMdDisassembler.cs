@@ -10,6 +10,7 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 using System.ComponentModel;
+using Microsoft.Diagnostics.NETCore.Client;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -58,7 +59,7 @@ namespace BenchmarkDotNet.Disassemblers
                 {
                     Environments.Platform.X86 or Environments.Platform.X64 => 4096,
                     Environments.Platform.Arm64 => 0x100000000,
-                    _ => throw new NotSupportedException($"{RuntimeInformation.GetCurrentPlatform()} is not supported")
+                    var platform => throw new NotSupportedException($"{platform} is not supported")
                 };
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
@@ -71,14 +72,53 @@ namespace BenchmarkDotNet.Disassemblers
                 && address != 0
                 && address >= MinValidAddress;
 
+        private DataTarget Attach(int processId)
+        {
+            bool isSelf = processId == System.Diagnostics.Process.GetCurrentProcess().Id;
+            if (OsDetector.IsWindows())
+            {
+                // Windows CoreCLR fails to disassemble generic types when using CreateSnapshotAndAttach, and succeeds with AttachToProcess. https://github.com/microsoft/clrmd/issues/1334
+                return isSelf && !RuntimeInformation.IsNetCore
+                    ? DataTarget.CreateSnapshotAndAttach(processId)
+                    : DataTarget.AttachToProcess(processId, suspend: false);
+            }
+            if (OsDetector.IsLinux())
+            {
+                // Linux crashes when using AttachToProcess in the same process.
+                return isSelf
+                    ? DataTarget.CreateSnapshotAndAttach(processId)
+                    : DataTarget.AttachToProcess(processId, suspend: false);
+            }
+            if (OsDetector.IsMacOS())
+            {
+                // ClrMD does not support CreateSnapshotAndAttach on MacOS, and AttachToProcess is unreliable, so we have to create a dump file and load it.
+                string? dumpPath = Path.GetTempFileName();
+                try
+                {
+                    try
+                    {
+                        new DiagnosticsClient(processId).WriteDump(DumpType.Full, dumpPath, logDumpGeneration: false);
+                    }
+                    catch (ServerErrorException sxe)
+                    {
+                        throw new ArgumentException($"Unable to create a snapshot of process {processId:x}.", sxe);
+                    }
+                    return DataTarget.LoadDump(dumpPath);
+                }
+                finally
+                {
+                    if (dumpPath != null)
+                    {
+                        File.Delete(dumpPath);
+                    }
+                }
+            }
+            throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
+        }
+
         internal DisassemblyResult AttachAndDisassemble(ClrMdArgs settings)
         {
-            // Windows CoreCLR fails to disassemble generic types when using CreateSnapshotAndAttach, and succeeds with AttachToProcess. https://github.com/microsoft/clrmd/issues/1334
-            // Non-Windows (Linux) crashes when using AttachToProcess in the same process.
-            bool createSnapshot = (!OsDetector.IsWindows() || !RuntimeInformation.IsNetCore) && settings.ProcessId == System.Diagnostics.Process.GetCurrentProcess().Id;
-            using var dataTarget = createSnapshot
-                ? DataTarget.CreateSnapshotAndAttach(settings.ProcessId)
-                : DataTarget.AttachToProcess(settings.ProcessId, suspend: false);
+            using var dataTarget = Attach(settings.ProcessId);
 
             var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
 
