@@ -76,8 +76,8 @@
                                                                                                                 isEnabledByDefault: true);
 
         internal static readonly DiagnosticDescriptor OnlyOneMethodCanBeBaselinePerCategoryRule = new DiagnosticDescriptor(DiagnosticIds.General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory,
-                                                                                                                           AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title)),
-                                                                                                                           AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat)),
+                                                                                                                           AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_Title)),
+                                                                                                                           AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_MessageFormat)),
                                                                                                                            "Usage",
                                                                                                                            DiagnosticSeverity.Warning,
                                                                                                                            isEnabledByDefault: true);
