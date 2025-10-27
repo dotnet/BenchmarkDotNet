@@ -458,8 +458,7 @@
                                                 {
                                                     foreach (var benchmarkCategory in benchmarkCategoriesArray.Values)
                                                     {
-                                                        // TODO: Check if this is necessary
-                                                        if (benchmarkCategory.Kind != TypedConstantKind.Error)
+                                                        if (benchmarkCategory.Kind == TypedConstantKind.Primitive)
                                                         {
                                                             if (benchmarkCategory.Value == null)
                                                             {
