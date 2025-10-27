@@ -11,8 +11,6 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    // TODO: Verify which diagnostics rely on presence of [Benchmark] attribute on methods and test with 0, 2, or 3 attribute usages
-
     public class BenchmarkClassAnalyzerTests
     {
         public class General : AnalyzerTestFixture<BenchmarkClassAnalyzer>
@@ -625,10 +623,6 @@
         public class OnlyOneMethodCanBeBaseline : AnalyzerTestFixture<BenchmarkClassAnalyzer>
         {
             public OnlyOneMethodCanBeBaseline() : base(BenchmarkClassAnalyzer.OnlyOneMethodCanBeBaselineRule) { }
-
-            // TODO: Test with duplicate [Benchmark] attribute usage on same method (should not trigger diagnostic)
-            //  Category can contain multiple values separated by comma
-            //  Test with all types of array containers (see Parameter attribute tests)
 
             [Theory, CombinatorialData]
             public async Task Class_with_only_one_benchmark_method_marked_as_baseline_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ClassAbstractModifiersEnumerableLocal))] string abstractModifier,
@@ -1562,6 +1556,111 @@
             }
 
             [Theory, CombinatorialData]
+            public async Task Class_with_more_than_one_benchmark_method_marked_as_baseline_per_unique_category_with_unknown_values_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(ClassAbstractModifiersEnumerableLocal))] string abstractModifier,
+                                                                                                                                                                 bool useConstantsFromOtherClass,
+                                                                                                                                                                 bool useLocalConstants,
+                                                                                                                                                                 [CombinatorialMemberData(nameof(BenchmarkCategoryAttributeValuesContainerEnumerableLocal), true)] string valuesContainer,
+                                                                                                                                                                 [CombinatorialValues("dummy_literal", "1", "true")] string invalidCategoryStringValue,
+                                                                                                                                                                 bool useDuplicateInSameClass)
+            {
+                var baselineBenchmarkAttributeUsage = $"[Benchmark(Baseline = {(useLocalConstants ? "_xTrue" : useConstantsFromOtherClass ? "Constants.Value1" : "true")})]";
+                var nonBaselineBenchmarkAttributeUsage = $"[Benchmark(Baseline = {(useLocalConstants ? "_xFalse" : useConstantsFromOtherClass ? "Constants.Value2" : "false")})]";
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    
+                                                    public class BenchmarkClass : BenchmarkClassAncestor1
+                                                    {
+                                                        {{(useLocalConstants ? $"""
+                                                                               private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
+                                                                               private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
+                                                                               """ : "")}}
+                                                    
+                                                        [BenchmarkCategory({{string.Format(valuesContainer, $"""
+                                                                                                             null, {invalidCategoryStringValue}, null, "TEST", "test2"
+                                                                                                             """)}})]
+                                                        {{baselineBenchmarkAttributeUsage}}
+                                                        public void BaselineBenchmarkMethod1()
+                                                        {
+                                                                                                            
+                                                        }
+
+                                                        [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
+                                                        [BenchmarkCategory({{string.Format(valuesContainer, """
+                                                                                                            "test", null
+                                                                                                            """)}})]
+                                                        [BenchmarkCategory({{string.Format(valuesContainer, """
+                                                                                                            "test2"
+                                                                                                            """)}})]
+                                                        {{(useDuplicateInSameClass ? baselineBenchmarkAttributeUsage : "")}}
+                                                        public void BaselineBenchmarkMethod2()
+                                                        {
+                                                                                                            
+                                                        }
+                                                        
+                                                        [BenchmarkCategory("Category1")]
+                                                        {{nonBaselineBenchmarkAttributeUsage}}
+                                                        public void NonBaselineBenchmarkMethod1()
+                                                        {
+                                                                                                            
+                                                        }
+                                                        
+                                                        [BenchmarkCategory("Category1")]
+                                                        public void DummyMethod()
+                                                        {
+                                                                                                            
+                                                        }
+                                                        
+                                                        [Benchmark]
+                                                        public void NonBaselineBenchmarkMethod2()
+                                                        {
+                                                        
+                                                        }
+                                                        
+                                                        {{nonBaselineBenchmarkAttributeUsage}}
+                                                        public void NonBaselineBenchmarkMethod3()
+                                                        {
+                                                        
+                                                        }
+                                                    }
+                                                    """;
+
+                var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
+                                                                           public {{abstractModifier}}class BenchmarkClassAncestor1 : BenchmarkClassAncestor2
+                                                                           {
+                                                                           }
+                                                                           """;
+
+                var benchmarkClassAncestor2Document = /* lang=c#-test */ $$"""
+                                                                           using BenchmarkDotNet.Attributes;
+
+                                                                           public {{abstractModifier}}class BenchmarkClassAncestor2
+                                                                           {
+                                                                               {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
+                                                                           
+                                                                               [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
+                                                                               [BenchmarkCategory({{string.Format(valuesContainer, $"{invalidCategoryStringValue}, null")}})]
+                                                                               [BenchmarkCategory({{string.Format(valuesContainer, """
+                                                                                                                                   "test2"
+                                                                                                                                   """)}})]
+                                                                               {{baselineBenchmarkAttributeUsage}}
+                                                                               public void BaselineBenchmarkMethod3()
+                                                                               {
+
+                                                                               }
+                                                                           }
+                                                                           """;
+
+                TestCode = testCode;
+                ReferenceConstants(("bool", "true"), ("bool", "false"));
+                AddSource(benchmarkClassAncestor1Document);
+                AddSource(benchmarkClassAncestor2Document);
+                DisableCompilerDiagnostics();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
             public async Task Class_with_more_than_one_benchmark_method_marked_as_baseline_per_unique_category_should_trigger_diagnostic([CombinatorialMemberData(nameof(ClassAbstractModifiersEnumerableLocal))] string abstractModifier,
                                                                                                                                          bool useConstantsFromOtherClass,
                                                                                                                                          bool useLocalConstants,
@@ -1591,7 +1690,6 @@
                                                                                                             
                                                         }
                                                         
-
                                                         [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
                                                         [BenchmarkCategory({{string.Format(valuesContainer, """
                                                                                                             "test", null
@@ -1696,7 +1794,6 @@
 
         public static IEnumerable<string> BenchmarkAttributeUsagesEnumerable => [ "", "[Benchmark] " ];
 
-        //TODO: Move to a common helper class
         public static IEnumerable<string> EmptyBenchmarkCategoryAttributeArgumentEnumerable()
         {
             yield return "";
