@@ -781,7 +781,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only one benchmark method can be marked as baseline.
+        ///   Looks up a localized string similar to Only one benchmark method can be marked as baseline per class.
         /// </summary>
         internal static string General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat {
             get {
@@ -790,11 +790,49 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only one benchmark method can be baseline.
+        ///   Looks up a localized string similar to Only one benchmark method can be baseline per class.
         /// </summary>
         internal static string General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title {
             get {
                 return ResourceManager.GetString("General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one benchmark method can be marked as baseline per class and category.
+        /// </summary>
+        internal static string General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one benchmark method can be baseline per class and category.
+        /// </summary>
+        internal static string General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_Title {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Passing a single null argument creates a null params array. Use multiple arguments (e.g., null, &quot;SomeCategory&quot;, ...) or a non-null value instead..
+        /// </summary>
+        internal static string General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_M" +
+                        "essageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single null argument to the [BenchmarkCategory] attribute results in unintended null array.
+        /// </summary>
+        internal static string General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_Title {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_T" +
+                        "itle", resourceCulture);
             }
         }
     }

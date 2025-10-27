@@ -133,9 +133,24 @@
             AddExpectedDiagnostic(arguments);
         }
 
+        protected void AddDefaultExpectedDiagnostic(DiagnosticSeverity effectiveDiagnosticSeverity)
+        {
+            AddExpectedDiagnostic(effectiveDiagnosticSeverity: effectiveDiagnosticSeverity);
+        }
+
+        protected void AddDefaultExpectedDiagnostic(DiagnosticSeverity effectiveDiagnosticSeverity, params object[] arguments)
+        {
+            AddExpectedDiagnostic(arguments, effectiveDiagnosticSeverity: effectiveDiagnosticSeverity);
+        }
+
         protected void AddExpectedDiagnostic(int markupKey)
         {
             AddExpectedDiagnostic(null, markupKey);
+        }
+
+        protected void AddExpectedDiagnostic(int markupKey, DiagnosticSeverity effectiveDiagnosticSeverity)
+        {
+            AddExpectedDiagnostic(null, markupKey, effectiveDiagnosticSeverity);
         }
 
         protected void AddExpectedDiagnostic(int markupKey, params object[] arguments)
@@ -143,7 +158,12 @@
             AddExpectedDiagnostic(arguments, markupKey);
         }
 
-        private void AddExpectedDiagnostic(object[]? arguments = null, int markupKey = 0)
+        protected void AddExpectedDiagnostic(int markupKey, DiagnosticSeverity effectiveDiagnosticSeverity, params object[] arguments)
+        {
+            AddExpectedDiagnostic(arguments, markupKey, effectiveDiagnosticSeverity);
+        }
+
+        private void AddExpectedDiagnostic(object[]? arguments = null, int markupKey = 0, DiagnosticSeverity? effectiveDiagnosticSeverity = null)
         {
             if (_ruleUnderTest == null)
             {
@@ -156,6 +176,11 @@
             if (arguments != null)
             {
                 diagnosticResult = diagnosticResult.WithArguments(arguments);
+            }
+
+            if (effectiveDiagnosticSeverity.HasValue)
+            {
+                diagnosticResult = diagnosticResult.WithSeverity(effectiveDiagnosticSeverity.Value);
             }
 
             _analyzerTest.ExpectedDiagnostics.Add(diagnosticResult);
@@ -218,6 +243,18 @@
                                                   public static class Constants
                                                   {
                                                       public const {{type}} Value = {{value}};
+                                                  }
+                                                  """);
+        }
+
+        protected void ReferenceConstants(params (string Type, string Value)[] constants)
+        {
+            _analyzerTest.TestState.Sources.Add($$"""
+                                                  using System;
+
+                                                  public static class Constants
+                                                  {
+                                                      {{string.Join("\n   ", constants.Select((c, i) => $"public const {c.Type} Value{i + 1} = {c.Value};"))}}
                                                   }
                                                   """);
         }

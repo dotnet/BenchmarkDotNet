@@ -16,7 +16,9 @@ BDN1102  |  Usage   | Error	   | BDN1102_General_BenchmarkClass_GenericTypeArgum
 BDN1103  |  Usage   | Error	   | BDN1103_General_BenchmarkClass_MethodMustBePublic
 BDN1104  |  Usage   | Error	   | BDN1104_General_BenchmarkClass_MethodMustBeNonGeneric
 BDN1105  |  Usage   | Error	   | BDN1105_General_BenchmarkClass_ClassMustBeNonStatic
-BDN1106  |  Usage   | Error	   | BDN1106_General_BenchmarkClass_OnlyOneMethodCanBeBaseline
+BDN1106  |  Usage   | Error	   | BDN1106_General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed
+BDN1107  |  Usage   | Error	   | BDN1107_General_BenchmarkClass_OnlyOneMethodCanBeBaseline
+BDN1108  |  Usage   | Warning  | BDN1108_General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory
 BDN1200  |  Usage   | Error	   | BDN1200_Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField
 BDN1201  |  Usage   | Error	   | BDN1201_Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty
 BDN1202  |  Usage   | Error	   | BDN1202_Attributes_GeneralParameterAttributes_FieldMustBePublic
