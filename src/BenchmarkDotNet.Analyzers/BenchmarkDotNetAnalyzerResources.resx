@@ -196,7 +196,13 @@
     <value>Benchmark class '{0}' must be generic</value>
   </data>
   <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat" xml:space="preserve">
-    <value>Only one benchmark method can be marked as baseline</value>
+    <value>Only one benchmark method can be marked as baseline per class</value>
+  </data>
+  <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_MessageFormat" xml:space="preserve">
+    <value>Only one benchmark method can be marked as baseline per class and category</value>
+  </data>
+  <data name="General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_MessageFormat" xml:space="preserve">
+    <value>Passing a single null argument creates a null params array. Use multiple arguments (e.g., null, "SomeCategory", ...) or a non-null value instead.</value>
   </data>
   <data name="General_BenchmarkClass_MethodMustBePublic_Title" xml:space="preserve">
     <value>Benchmark methods must be public</value>
@@ -211,7 +217,13 @@
     <value>Benchmark classes annotated with a [GenericTypeArguments] attribute must be generic</value>
   </data>
   <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title" xml:space="preserve">
-    <value>Only one benchmark method can be baseline</value>
+    <value>Only one benchmark method can be baseline per class</value>
+  </data>
+  <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_Title" xml:space="preserve">
+    <value>Only one benchmark method can be baseline per class and category</value>
+  </data>
+  <data name="General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_Title" xml:space="preserve">
+    <value>Single null argument to the [BenchmarkCategory] attribute results in unintended null array</value>
   </data>
   <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField_Description" xml:space="preserve">
     <value>Parameter attributes are mutually exclusive; only one of the attributes [Params], [ParamsSource] or [ParamsAllValues] can be applied to a field at any one time</value>

@@ -13,7 +13,9 @@
         public const string General_BenchmarkClass_MethodMustBePublic = "BDN1103";
         public const string General_BenchmarkClass_MethodMustBeNonGeneric = "BDN1104";
         public const string General_BenchmarkClass_ClassMustBeNonStatic = "BDN1105";
-        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1106";
+        public const string General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed = "BDN1106";
+        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaseline = "BDN1107";
+        public const string General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory = "BDN1108";
         public const string Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField = "BDN1200";
         public const string Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty = "BDN1201";
         public const string Attributes_GeneralParameterAttributes_FieldMustBePublic = "BDN1202";

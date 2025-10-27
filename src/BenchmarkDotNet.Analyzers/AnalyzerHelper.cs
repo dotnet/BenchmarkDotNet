@@ -4,6 +4,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Globalization;
     using System.Linq;
@@ -86,6 +87,37 @@
             return attributesBuilder.ToImmutable();
         }
 
+        public static int GetAttributeUsageCount(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel) => GetAttributeUsageCount(compilation.GetTypeByMetadataName(attributeName), attributeLists, semanticModel);
+
+        public static int GetAttributeUsageCount(INamedTypeSymbol? attributeTypeSymbol, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
+        {
+            var attributeUsageCount = 0;
+
+            if (attributeTypeSymbol == null)
+            {
+                return 0;
+            }
+
+            foreach (var attributeListSyntax in attributeLists)
+            {
+                foreach (var attributeSyntax in attributeListSyntax.Attributes)
+                {
+                    var attributeSyntaxTypeSymbol = semanticModel.GetTypeInfo(attributeSyntax).Type;
+                    if (attributeSyntaxTypeSymbol == null)
+                    {
+                        continue;
+                    }
+
+                    if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
+                    {
+                        attributeUsageCount++;
+                    }
+                }
+            }
+
+            return attributeUsageCount;
+        }
+
         public static string NormalizeTypeName(INamedTypeSymbol namedTypeSymbol)
         {
             string typeName;
@@ -146,8 +178,8 @@
 
         private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
         {
-            var hasNoCompilationErrors = HasNoCompilationErrors(string.Format(codeTemplate1, targetType, valueExpression), compilation);
-            if (hasNoCompilationErrors)
+            var hasCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, targetType, valueExpression), compilation);
+            if (hasCompilerDiagnostics)
             {
                 return true;
             }
@@ -163,20 +195,20 @@
                 return false;
             }
 
-            return HasNoCompilationErrors(string.Format(codeTemplate2, targetType, valueType, constantLiteral), compilation);
+            return HasNoCompilerDiagnostics(string.Format(codeTemplate2, targetType, valueType, constantLiteral), compilation);
         }
 
-        private static bool HasNoCompilationErrors(string code, Compilation compilation)
+        private static bool HasNoCompilerDiagnostics(string code, Compilation compilation)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-            var compilationErrors = compilation.AddSyntaxTrees(syntaxTree)
-                                               .GetSemanticModel(syntaxTree)
-                                               .GetMethodBodyDiagnostics()
-                                               .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
-                                               .ToList();
+            var compilerDiagnostics = compilation.AddSyntaxTrees(syntaxTree)
+                                                 .GetSemanticModel(syntaxTree)
+                                                 .GetMethodBodyDiagnostics()
+                                                 .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
+                                                 .ToList();
 
-            return compilationErrors.Count == 0;
+            return compilerDiagnostics.Count == 0;
         }
 
         private static string? FormatLiteral(object? value)
@@ -200,6 +232,12 @@
                 null => "null",
                 _ => null
             };
+        }
+
+        public static void Deconstruct<T1, T2>(this KeyValuePair<T1, T2> tuple, out T1 key, out T2 value)
+        {
+            key = tuple.Key;
+            value = tuple.Value;
         }
     }
 }
