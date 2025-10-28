@@ -15,6 +15,7 @@
     <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="Attributes\CodeAnnotations.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" PrivateAssets="all" />
+    <None Include="$(OutputPath)\netstandard2.0\BenchmarkDotNet.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>
