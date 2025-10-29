@@ -63,15 +63,14 @@ namespace BenchmarkDotNet.Diagnosers
         public const string HeaderKey = "// InProcessDiagnoser";
         public const string ResultsKey = $"{HeaderKey}Results";
 
-        public IEnumerable<string> GetHandlersSourceCode(BenchmarkCase benchmarkCase)
-            => inProcessDiagnosers
-                .Select((d, i) => d.GetHandlerSourceCode(benchmarkCase, i))
-                .Where(s => !string.IsNullOrEmpty(s));
+        public IEnumerable<string> GetSourceCode(BenchmarkCase benchmarkCase)
+            => GetInProcessDiagnoserRouters(benchmarkCase)
+                .Select(router => router.ToSourceCode());
 
-        public IReadOnlyList<IInProcessDiagnoserHandler> GetInProcessHandlers(BenchmarkCase benchmarkCase)
-            => [.. inProcessDiagnosers
-                .Select((d, i) => d.GetHandler(benchmarkCase, i))
-                .WhereNotNull()];
+        public IEnumerable<InProcessDiagnoserRouter> GetInProcessDiagnoserRouters(BenchmarkCase benchmarkCase)
+            => inProcessDiagnosers
+                .Select((d, i) => new InProcessDiagnoserRouter() { index = i, runMode = d.GetRunMode(benchmarkCase), handler = d.GetHandler(benchmarkCase) })
+                .Where(router => router.handler != null);
 
         public void DeserializeResults(int index, BenchmarkCase benchmarkCase, string results)
             => inProcessDiagnosers[index].DeserializeResults(benchmarkCase, results);
@@ -79,7 +78,7 @@ namespace BenchmarkDotNet.Diagnosers
 
     [UsedImplicitly]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class CompositeInProcessDiagnoserHandler(IReadOnlyList<IInProcessDiagnoserHandler> handlers, IHost host, RunMode runMode, InProcessDiagnoserActionArgs parameters)
+    public sealed class CompositeInProcessDiagnoserHandler(IReadOnlyList<InProcessDiagnoserRouter> routers, IHost host, RunMode runMode, InProcessDiagnoserActionArgs parameters)
     {
         public void Handle(BenchmarkSignal signal)
         {
@@ -88,11 +87,11 @@ namespace BenchmarkDotNet.Diagnosers
                 return;
             }
 
-            foreach (var handler in handlers)
+            foreach (var router in routers)
             {
-                if (handler.RunMode == runMode)
+                if (router.runMode == runMode)
                 {
-                    handler.Handle(signal, parameters);
+                    router.handler.Handle(signal, parameters);
                 }
             }
 
@@ -101,19 +100,19 @@ namespace BenchmarkDotNet.Diagnosers
                 return;
             }
 
-            foreach (var handler in handlers)
+            foreach (var router in routers)
             {
-                if (handler.RunMode != runMode)
+                if (router.runMode != runMode)
                 {
                     continue;
                 }
 
-                var results = handler.SerializeResults();
+                var results = router.handler.SerializeResults();
                 // Send header with the diagnoser index for routing, and line count of payload (user handler may include newlines in their serialized results).
                 // Ideally we would simply use results.Length, write it directly to host, then the host reads the exact count of chars.
                 // But WasmExecutor does not use Broker, and reads all output, so we need to instead use line count and prepend every line with CompositeInProcessDiagnoser.ResultsKey.
                 var resultsLines = results.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-                host.WriteLine($"{CompositeInProcessDiagnoser.HeaderKey} {handler.Index} {resultsLines.Length}");
+                host.WriteLine($"{CompositeInProcessDiagnoser.HeaderKey} {router.index} {resultsLines.Length}");
                 foreach (var line in resultsLines)
                 {
                     host.WriteLine($"{CompositeInProcessDiagnoser.ResultsKey} {line}");
