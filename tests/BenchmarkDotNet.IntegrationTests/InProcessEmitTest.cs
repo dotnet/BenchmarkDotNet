@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = CanExecute<BenchmarkAllCases>(config);
 
-            var expected = Enumerable.Repeat("DummyResult0", summary.BenchmarksCases.Length);
+            var expected = Enumerable.Repeat("MockResult", summary.BenchmarksCases.Length);
             Assert.Equal(expected, diagnoser.Results.Values);
         }
 

@@ -216,40 +216,19 @@ namespace BenchmarkDotNet.Diagnosers
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
             => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.InstructionLength)));
 
-        string IInProcessDiagnoser.GetHandlerSourceCode(BenchmarkCase benchmarkCase, int index)
+        IInProcessDiagnoserHandler? IInProcessDiagnoser.GetHandler(BenchmarkCase benchmarkCase)
         {
-            // Mono disassembler always runs another process.
-            if (Config.RunInHost || ShouldUseMonoDisassembler(benchmarkCase))
+            if (GetRunMode(benchmarkCase) == RunMode.None
+                || Config.RunInHost
+                // Mono disassembler always runs another process.
+                || ShouldUseMonoDisassembler(benchmarkCase)
+                // We don't use handler for InProcess toolchains, the host diagnoser already handles it without needing to serialize data.
+                || benchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain.IsInProcess)
             {
                 return null;
             }
-            var runMode = GetRunMode(benchmarkCase);
-            if (runMode == RunMode.None)
-            {
-                return null;
-            }
-
-            var clrMdArgs = BuildDisassemblerSettings(benchmarkCase, null, 0);
-            return $$"""
-                new {{typeof(DisassemblyDiagnoserInProcessHandler).GetCorrectCSharpTypeName()}}() {
-                    {{nameof(DisassemblyDiagnoserInProcessHandler.Index)}} = {{index}},
-                    {{nameof(DisassemblyDiagnoserInProcessHandler.RunMode)}} = {{SourceCodeHelper.ToSourceCode(runMode)}},
-                    {{nameof(DisassemblyDiagnoserInProcessHandler.ClrMdArgs)}} = new {{typeof(ClrMdArgs).GetCorrectCSharpTypeName()}}(
-                        {{typeof(Process).GetCorrectCSharpTypeName()}}.{{nameof(Process.GetCurrentProcess)}}().{{nameof(Process.Id)}},
-                        instance.GetType().FullName,
-                        {{SourceCodeHelper.ToSourceCode(clrMdArgs.MethodName)}},
-                        {{SourceCodeHelper.ToSourceCode(clrMdArgs.PrintSource)}},
-                        {{clrMdArgs.MaxDepth}},
-                        {{SourceCodeHelper.ToSourceCode(clrMdArgs.Syntax)}},
-                        {{SourceCodeHelper.ToSourceCode(clrMdArgs.TargetFrameworkMoniker)}},
-                        {{SourceCodeHelper.ToSourceCode(clrMdArgs.Filters)}}
-                    )
-                }
-                """;
+            return new DisassemblyDiagnoserInProcessHandler(BuildDisassemblerSettings(benchmarkCase, null, 0));
         }
-
-        // We don't use handler for InProcess toolchains, the host diagnoser already handles it without needing to serialize data.
-        IInProcessDiagnoserHandler IInProcessDiagnoser.GetHandler(BenchmarkCase benchmarkCase, int index) => null;
 
         void IInProcessDiagnoser.DeserializeResults(BenchmarkCase benchmarkCase, string results)
         {
@@ -277,19 +256,15 @@ namespace BenchmarkDotNet.Diagnosers
 
     [UsedImplicitly]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class DisassemblyDiagnoserInProcessHandler : IInProcessDiagnoserHandler
+    public sealed class DisassemblyDiagnoserInProcessHandler(ClrMdArgs clrMdArgs) : IInProcessDiagnoserHandler
     {
         private DisassemblyResult _result;
-
-        public int Index { get; set; }
-        public RunMode RunMode { get; set; }
-        public ClrMdArgs ClrMdArgs { get; set; }
 
         void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters)
         {
             if (signal == BenchmarkSignal.AfterEngine)
             {
-                _result = DisassemblyDiagnoser.GetClrMdDisassembler().AttachAndDisassemble(ClrMdArgs);
+                _result = DisassemblyDiagnoser.GetClrMdDisassembler().AttachAndDisassemble(clrMdArgs);
             }
         }
 
@@ -298,5 +273,21 @@ namespace BenchmarkDotNet.Diagnosers
             SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = false;
             return _result.Serialize().ToString();
         }
+
+        string IInProcessDiagnoserHandler.ToSourceCode()
+            => $"""
+                new {typeof(DisassemblyDiagnoserInProcessHandler).GetCorrectCSharpTypeName()}(
+                    new {typeof(ClrMdArgs).GetCorrectCSharpTypeName()}(
+                        {typeof(Process).GetCorrectCSharpTypeName()}.{nameof(Process.GetCurrentProcess)}().{nameof(Process.Id)},
+                        instance.GetType().FullName,
+                        {SourceCodeHelper.ToSourceCode(clrMdArgs.MethodName)},
+                        {SourceCodeHelper.ToSourceCode(clrMdArgs.PrintSource)},
+                        {clrMdArgs.MaxDepth},
+                        {SourceCodeHelper.ToSourceCode(clrMdArgs.Syntax)},
+                        {SourceCodeHelper.ToSourceCode(clrMdArgs.TargetFrameworkMoniker)},
+                        {SourceCodeHelper.ToSourceCode(clrMdArgs.Filters)}
+                    )
+                )
+                """;
     }
 }

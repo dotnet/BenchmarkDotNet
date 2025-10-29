@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 return (null, null, null);
 
             var compositeInProcessDiagnoserHandler = new CompositeInProcessDiagnoserHandler(
-                    parameters.CompositeInProcessDiagnoser.GetInProcessHandlers(benchmarkCase),
+                    [..parameters.CompositeInProcessDiagnoser.GetInProcessDiagnoserRouters(benchmarkCase)],
                     host,
                     parameters.DiagnoserRunMode,
                     new InProcessDiagnoserActionArgs(instance)

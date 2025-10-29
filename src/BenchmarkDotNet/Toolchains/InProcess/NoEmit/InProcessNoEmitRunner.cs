@@ -132,7 +132,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 host.WriteLine();
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
-                    parameters.CompositeInProcessDiagnoser.GetInProcessHandlers(benchmarkCase),
+                    [..parameters.CompositeInProcessDiagnoser.GetInProcessDiagnoserRouters(benchmarkCase)],
                     host,
                     parameters.DiagnoserRunMode,
                     new Diagnosers.InProcessDiagnoserActionArgs(instance)

@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 throw;
             }
 
-            Assert.Equal(["DummyResult0"], diagnoser.Results.Values);
+            Assert.Equal(["MockResult"], diagnoser.Results.Values);
         }
 
         private static bool GetShouldRunTest()
