@@ -9,40 +9,39 @@ using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Extensions;
 using System.Collections.Generic;
 
-namespace BenchmarkDotNet.IntegrationTests.Diagnosers
+namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
+
+public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
 {
-    public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
-    {
-        public Dictionary<BenchmarkCase, string> Results { get; } = [];
+    public Dictionary<BenchmarkCase, string> Results { get; } = [];
 
-        public IEnumerable<string> Ids => [nameof(MockInProcessDiagnoser)];
+    public IEnumerable<string> Ids => [nameof(MockInProcessDiagnoser)];
 
-        public IEnumerable<IExporter> Exporters => [];
+    public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => [];
+    public IEnumerable<IAnalyser> Analysers => [];
 
-        public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
+    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
 
-        public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoser)} results: [{string.Join(", ", Results.Values)}]");
+    public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoser)} results: [{string.Join(", ", Results.Values)}]");
 
-        public IInProcessDiagnoserHandler? GetHandler(BenchmarkCase benchmarkCase) => new MockInProcessDiagnoserHandler();
+    public IInProcessDiagnoserHandler? GetHandler(BenchmarkCase benchmarkCase) => new MockInProcessDiagnoserHandler();
 
-        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
+    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
+    public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
-        public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
+    public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
-    }
+    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
+}
 
-    public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
-    {
-        public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters) { }
+public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
+{
+    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters) { }
 
-        public string SerializeResults() => "MockResult";
+    public string SerializeResults() => "MockResult";
 
-        public string ToSourceCode()
-            => $"new {typeof(MockInProcessDiagnoserHandler).GetCorrectCSharpTypeName()}()";
-    }
+    public string ToSourceCode()
+        => $"new {typeof(MockInProcessDiagnoserHandler).GetCorrectCSharpTypeName()}()";
 }
