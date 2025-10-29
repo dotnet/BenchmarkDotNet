@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Disassemblers
             if (OsDetector.IsMacOS())
             {
                 // ClrMD does not support CreateSnapshotAndAttach on MacOS, and AttachToProcess is unreliable, so we have to create a dump file and load it.
-                string? dumpPath = Path.GetTempFileName();
+                string dumpPath = Path.GetTempFileName();
                 try
                 {
                     try
@@ -107,10 +107,7 @@ namespace BenchmarkDotNet.Disassemblers
                 }
                 finally
                 {
-                    if (dumpPath != null)
-                    {
-                        File.Delete(dumpPath);
-                    }
+                    File.Delete(dumpPath);
                 }
             }
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
