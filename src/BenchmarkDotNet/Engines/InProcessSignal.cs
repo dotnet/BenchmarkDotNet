@@ -1,28 +1,27 @@
 ﻿using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Engines
+namespace BenchmarkDotNet.Engines;
+
+[UsedImplicitly]
+public enum BenchmarkSignal
 {
-    [UsedImplicitly]
-    public enum BenchmarkSignal
-    {
-        /// <summary>
-        /// before the engine is created
-        /// </summary>
-        BeforeEngine,
+    /// <summary>
+    /// before the engine is created
+    /// </summary>
+    BeforeEngine,
 
-        /// <summary>
-        /// after globalSetup, warmup and pilot but before the main run
-        /// </summary>
-        BeforeActualRun,
+    /// <summary>
+    /// after globalSetup, warmup and pilot but before the main run
+    /// </summary>
+    BeforeActualRun,
 
-        /// <summary>
-        /// after main run, but before global Cleanup
-        /// </summary>
-        AfterActualRun,
+    /// <summary>
+    /// after main run, but before global Cleanup
+    /// </summary>
+    AfterActualRun,
 
-        /// <summary>
-        /// after the engine has completed the run
-        /// </summary>
-        AfterEngine,
-    }
+    /// <summary>
+    /// after the engine has completed the run
+    /// </summary>
+    AfterEngine,
 }
