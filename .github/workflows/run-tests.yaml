@@ -4,6 +4,7 @@ run-name: Run tests / ${{ github.event.head_commit.message }}
 on:
   pull_request:
   push:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
