@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
-                    .Replace("$InProcessDiagnosers$", string.Join($",\n", buildInfo.CompositeInProcessDiagnoser.GetHandlersSourceCode(benchmark)))
+                    .Replace("$InProcessDiagnosers$", string.Join($",\n", buildInfo.CompositeInProcessDiagnoser.GetSourceCode(benchmark)))
                     .RemoveRedundantIfDefines(compilationId);
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));

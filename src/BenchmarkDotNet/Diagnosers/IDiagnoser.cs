@@ -40,17 +40,12 @@ namespace BenchmarkDotNet.Diagnosers
     public interface IInProcessDiagnoser : IDiagnoser
     {
         /// <summary>
-        /// Gets the C# source code used to instantiate the handler in the benchmark process.
+        /// Gets the diagnoser handler.
         /// </summary>
         /// <remarks>
-        /// The source code must be a single expression.
+        /// Return <see langword="null"/> to not run the diagnoser handler for the <paramref name="benchmarkCase"/>.
         /// </remarks>
-        string GetHandlerSourceCode(BenchmarkCase benchmarkCase, int index);
-
-        /// <summary>
-        /// Gets the handler for the same process.
-        /// </summary>
-        IInProcessDiagnoserHandler GetHandler(BenchmarkCase benchmarkCase, int index);
+        IInProcessDiagnoserHandler? GetHandler(BenchmarkCase benchmarkCase);
 
         /// <summary>
         /// Deserializes the results of the handler.
@@ -64,16 +59,6 @@ namespace BenchmarkDotNet.Diagnosers
     public interface IInProcessDiagnoserHandler
     {
         /// <summary>
-        /// The index of the diagnoser.
-        /// </summary>
-        int Index { get; }
-
-        /// <summary>
-        /// The <see cref="Diagnosers.RunMode"/> of the diagnoser for the benchmark.
-        /// </summary>
-        RunMode RunMode { get; }
-
-        /// <summary>
         /// Handles the signal from the benchmark.
         /// </summary>
         void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters);
@@ -82,5 +67,14 @@ namespace BenchmarkDotNet.Diagnosers
         /// Serializes the results to be sent back to the host <see cref="IInProcessDiagnoser"/>.
         /// </summary>
         string SerializeResults();
+
+        /// <summary>
+        /// Gets the C# source code used to instantiate the handler in the benchmark process.
+        /// </summary>
+        /// <remarks>
+        /// The source code must be a single expression.
+        /// </remarks>
+        string ToSourceCode();
+
     }
 }

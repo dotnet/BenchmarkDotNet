@@ -8,7 +8,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Extensions;
 using System.Collections.Generic;
-using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers
 {
@@ -26,10 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
 
         public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoser)} results: [{string.Join(", ", Results.Values)}]");
 
-        public IInProcessDiagnoserHandler GetHandler(BenchmarkCase benchmarkCase, int index) => new MockInProcessDiagnoserHandler(index, GetRunMode(benchmarkCase));
-
-        public string GetHandlerSourceCode(BenchmarkCase benchmarkCase, int index)
-            => $"new {typeof(MockInProcessDiagnoserHandler).GetCorrectCSharpTypeName()}({index}, {SourceCodeHelper.ToSourceCode(GetRunMode(benchmarkCase))})";
+        public IInProcessDiagnoserHandler? GetHandler(BenchmarkCase benchmarkCase) => new MockInProcessDiagnoserHandler();
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
@@ -40,14 +36,13 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
     }
 
-    public sealed class MockInProcessDiagnoserHandler(int index, RunMode runMode) : IInProcessDiagnoserHandler
+    public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
     {
-        public int Index { get; } = index;
-
-        public RunMode RunMode { get; } = runMode;
-
         public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters) { }
 
-        public string SerializeResults() => $"DummyResult{Index}";
+        public string SerializeResults() => "MockResult";
+
+        public string ToSourceCode()
+            => $"new {typeof(MockInProcessDiagnoserHandler).GetCorrectCSharpTypeName()}()";
     }
 }
