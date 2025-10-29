@@ -75,6 +75,5 @@ namespace BenchmarkDotNet.Diagnosers
         /// The source code must be a single expression.
         /// </remarks>
         string ToSourceCode();
-
     }
 }
