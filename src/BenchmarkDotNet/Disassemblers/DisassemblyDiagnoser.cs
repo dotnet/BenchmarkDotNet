@@ -260,7 +260,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private DisassemblyResult _result;
 
-        void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters)
+        void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
         {
             if (signal == BenchmarkSignal.AfterEngine)
             {
