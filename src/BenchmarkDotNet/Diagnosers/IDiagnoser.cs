@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// <summary>
         /// Handles the signal from the benchmark.
         /// </summary>
-        void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters);
+        void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args);
 
         /// <summary>
         /// Serializes the results to be sent back to the host <see cref="IInProcessDiagnoser"/>.

@@ -38,7 +38,7 @@ public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
 
 public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs parameters) { }
+    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
 
     public string SerializeResults() => "MockResult";
 
