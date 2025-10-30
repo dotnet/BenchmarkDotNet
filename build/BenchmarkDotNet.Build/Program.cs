@@ -168,7 +168,7 @@ public class DocsFetchTask : FrostingTask<BuildContext>, IHelpProvider
         return new HelpInfo
         {
             Description = $"This task updates the following files:\n" +
-                          $"* Clones branch 'docs-changelog' to docs/_changelog\n" +
+                          $"* Clones or fetches branch 'docs-changelog' to docs/_changelog\n" +
                           $"* Last changelog footer (if {KnownOptions.Stable.CommandLineName} is specified)\n" +
                           $"* All changelog details in docs/_changelog\n" +
                           $"  (This dir is a cloned version of this repo from branch {Repo.ChangelogBranch})",

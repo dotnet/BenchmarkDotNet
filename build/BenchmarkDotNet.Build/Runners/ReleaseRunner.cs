@@ -56,7 +56,7 @@ public class ReleaseRunner
 
         context.GitRunner.BranchMove(Repo.DocsStableBranch, "HEAD");
         context.GitRunner.Push(Repo.MasterBranch);
-        context.GitRunner.Push(Repo.DocsStableBranch, true);
+        context.GitRunner.Push(Repo.DocsStableBranch, true, context.DocumentationRunner.ChangelogSrcDirectory);
         context.GitRunner.Push(tag);
 
         PushNupkg();

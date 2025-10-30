@@ -57,7 +57,7 @@ jobs:
       run: tree $GITHUB_WORKSPACE
 
     - name: Deploy documentation
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages

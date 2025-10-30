@@ -9,12 +9,15 @@ public static class Repo
 {
     public const string Owner = "dotnet";
     public const string Name = "BenchmarkDotNet";
-    public const string HttpsUrlBase = $"https://github.com/{Owner}/{Name}";
-    public const string HttpsGitUrl =  $"{HttpsUrlBase}.git";
+    private const string HttpsUrlBase = $"https://github.com/{Owner}/{Name}";
+    public const string SshGitUrl = $"git@github.com:{Owner}/{Name}.git";
     
     public const string ChangelogBranch = "docs-changelog";
     public const string DocsStableBranch = "docs-stable";
     public const string MasterBranch = "master";
+
+    public const string MaintainerAuthorName = "Andrey Akinshin <andrey.akinshin@gmail.com>";
+    public const string MaintainerAuthorEmail = "andrey.akinshin@gmail.com";
     
     public static async Task<int> GetDependentProjectsNumber()
     {
