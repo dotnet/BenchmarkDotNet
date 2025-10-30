@@ -38175,6 +38175,9 @@ references:
 - uid: changelog.v0.15.4
   name: BenchmarkDotNet v0.15.4
   href: changelog/v0.15.4.html
+- uid: changelog.v0.15.5
+  name: BenchmarkDotNet v0.15.5
+  href: changelog/v0.15.5.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html

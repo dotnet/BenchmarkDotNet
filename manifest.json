@@ -9312,6 +9312,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "changelog/v0.15.5.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.15.5.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "changelog/v0.7.0.md",
       "output": {
         ".html": {

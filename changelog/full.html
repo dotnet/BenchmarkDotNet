@@ -87,6 +87,60 @@
         <article data-uid="changelog.full">
 <h1 id="full-changelog">Full ChangeLog</h1>
 
+<h1 id="benchmarkdotnet-v0155">BenchmarkDotNet v0.15.5</h1>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.15.5">v0.15.5</a> scope,
+4 issues were resolved and 2 pull requests were merged.
+This release includes 11 commits by 4 contributors.</p>
+<h2 id="resolved-issues-4">Resolved issues (4)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1821">#1821</a> Negative value in historgram bucket (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2736">#2736</a> [Feature Request] Reduce output binary size of project build results (assignee: <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2773">#2773</a> [BUG] ArgumentOutOfRangeException thrown from unit test (<code>TwoSamples_Less_Than_One_CPU_Cycle_Method</code>) on CI</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2840">#2840</a> Different job names when using SimpleJobAttribute vs --runtimes (assignee: <a href="https://github.com/ritoban23">@ritoban23</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-2">Merged pull requests (2)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2737">#2737</a> feat: Add custom MsBuild targets to remove unnecessary files from bin directory (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2841">#2841</a> Fix job names consistency between SimpleJobAttribute and --runtimes (by <a href="https://github.com/ritoban23">@ritoban23</a>)</li>
+</ul>
+<h2 id="commits-11">Commits (11)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/df525dbfd5f205c741da93a307d2fafc368a65f3">df525d</a> Set next BenchmarkDotNet version: 0.15.5 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fb8bfd9ad0f7249475e87f5161b4169eb16ff0bc">fb8bfd</a> [build] Revert to https cloning for changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/44f0dc4dcbd430ed52c4a692ef2ba5a2eb6e1894">44f0dc</a> feat: Add custom MsBuild targets to remove unnecessary files from bin directo... (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e099c2eb0cb9fb49f8c2e9d1f9d94cb5e8affb4b">e099c2</a> Update run-tests.yaml (#2835) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1c3faa21ab9aac8aab277e1fd19e151768c57cba">1c3faa</a> Fix job names consistency between SimpleJobAttribute and --runtimes (#2841) (by <a href="https://github.com/ritoban23">@ritoban23</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5cae925c0374dae3eb671fe9dec9818fd62cc3db">5cae92</a> Enable workflow_dispatch for run-tests.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/40a28961766174c9eb4791794b30e762a53828fb">40a289</a> Bump Perfolizer: 0.5.3-&gt;0.5.4, see #2773 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ded3900937d896a9892363f2d38aba6218d2d855">ded390</a> Clamp histogram bin lower bounds to non-negative values, fix #1821 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0be519c2dc16dd979decb0e96a8770f97f114e8c">0be519</a> [build] Update doc generation workflow (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8397ad0c90a344c6773ef8c8329915ac47a6f77e">8397ad</a> [build] Update generate-changelog.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/36579eedd2902bba6dae2632d84738d6a6aba0c2">36579e</a> [build] Update generate-gh-pages.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-4">Contributors (4)</h2>
+<ul>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>filzrev (<a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li>Ritoban Dutta (<a href="https://github.com/ritoban23">@ritoban23</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: October 30, 2025</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.15.5">v0.15.5</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.15.4...v0.15.5">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.5</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.5">https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.5</a></li>
+</ul>
 <h1 id="benchmarkdotnet-v0154">BenchmarkDotNet v0.15.4</h1>
 <h2 id="highlights">Highlights</h2>
 <p>Allow override method/property for ParamsSource (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2832">#2832</a>)</p>
