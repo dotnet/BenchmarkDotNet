@@ -41,6 +41,8 @@ To compare different platforms the project which defines benchmarks has to targe
 > <BenchmarkDotNetTargetPlatform>all</BenchmarkDotNetTargetPlatform>
 > ```
 
+Or specify `<RuntimeIdentifier>` for the platform that it will be run on. 
+
 ### Disassembly Diagnoser for Mono on Windows
 
 If you want to get a disassembly listing for Mono on Windows, you need `as` and `x86_64-w64-mingw32-objdump.exe` tools.
