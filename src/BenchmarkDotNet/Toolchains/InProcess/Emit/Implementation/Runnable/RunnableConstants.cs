@@ -23,12 +23,8 @@
         public const string WorkloadDelegateFieldName = "workloadDelegate";
         public const string OverheadDelegateFieldName = "overheadDelegate";
         public const string NotElevenFieldName = "NotEleven";
-        public const string DummyVarFieldName = "dummyVar";
 
         public const string TrickTheJitCoreMethodName = "__TrickTheJIT__";
-        public const string Dummy1MethodName = "Dummy1";
-        public const string Dummy2MethodName = "Dummy2";
-        public const string Dummy3MethodName = "Dummy3";
         public const string WorkloadImplementationMethodName = "__Workload";
         public const string OverheadImplementationMethodName = "__Overhead";
         public const string OverheadActionUnrollMethodName = "OverheadActionUnroll";
@@ -49,7 +45,5 @@
         public const string IterationCleanupMethodName = "IterationCleanup";
 
         public const string RunMethodName = "Run";
-
-        public const int DummyUnrollFactor = 1 << 6;
     }
 }
