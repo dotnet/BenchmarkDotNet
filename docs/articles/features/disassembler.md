@@ -23,7 +23,7 @@ The configuration options available for MSBuild properties:
 
 > [!NOTE]
 > By default, BenchmarkDotNet excludes disassembler's native dependencies that aren't used on current target platform.  
-> Use the following settings when running the benchmark binary on multiple platforms.
+> Use the following settings when running the benchmark binary on a different platform than it was built on, or multiple platforms.
 >
 > ```xml
 > <BenchmarkDotNetTargetPlatform>all</BenchmarkDotNetTargetPlatform>
