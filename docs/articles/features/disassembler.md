@@ -33,6 +33,16 @@ To get the source code we need to locate and read the `.pdb` files.
 This is why we need `DebugType` and `DebugSymbols` settings.
 To compare different platforms the project which defines benchmarks has to target `AnyCPU`.
 
+> [!NOTE]
+> By default, BenchmarkDotNet excludes disassembler's native dependencies that aren't used on current target platform.  
+> Use the following settings when running the benchmark binary on a different platform than it was built on, or multiple platforms.
+>
+> ```xml
+> <BenchmarkDotNetTargetPlatform>all</BenchmarkDotNetTargetPlatform>
+> ```
+
+Or specify `<RuntimeIdentifier>` for the platform that it will be run on. 
+
 ### Disassembly Diagnoser for Mono on Windows
 
 If you want to get a disassembly listing for Mono on Windows, you need `as` and `x86_64-w64-mingw32-objdump.exe` tools.
