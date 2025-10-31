@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.Histograms;
 using Perfolizer.Mathematics.Multimodality;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -18,7 +19,10 @@ namespace BenchmarkDotNet.Extensions
         public static Func<double, string> CreateNanosecondFormatter(this Statistics s, CultureInfo cultureInfo, string format = "N3")
         {
             var timeUnit = TimeUnit.GetBestTimeUnit(s.Mean);
-            return x => TimeInterval.FromNanoseconds(x).ToString(timeUnit, format, cultureInfo, UnitHelper.DefaultPresentation);
+            return x => PerfolizerMeasurementFormatter.Instance.Format(
+                TimeInterval.FromNanoseconds(x).ToMeasurement(timeUnit),
+                format, cultureInfo, UnitHelper.DefaultPresentation
+            );
         }
 
         [PublicAPI]

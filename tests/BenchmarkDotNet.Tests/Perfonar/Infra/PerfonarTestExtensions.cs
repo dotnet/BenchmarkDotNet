@@ -1,5 +1,5 @@
-using Perfolizer.Models;
 using Perfolizer.Metrology;
+using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Tests.Perfonar.Infra;
 
@@ -9,7 +9,7 @@ public static class PerfonarTestExtensions
     {
         for (int i = 0; i < metrics.Length; i++)
         {
-            var measurement = Measurement.Parse(metrics[i]);
+            var measurement = PerfolizerMeasurementFormatter.Instance.Parse(metrics[i]);
             entry.Add(new EntryInfo
             {
                 IterationIndex = i,

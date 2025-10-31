@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using Perfolizer;
+using Pragmastat;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Analysers

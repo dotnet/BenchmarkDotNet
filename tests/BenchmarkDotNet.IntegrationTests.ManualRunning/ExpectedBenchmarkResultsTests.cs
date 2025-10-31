@@ -15,6 +15,7 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
+using Pragmastat.Metrology;
 using Xunit;
 using Xunit.Abstractions;
 
