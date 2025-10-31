@@ -23,6 +23,21 @@ public class ReleaseRunner
         this.context = context;
     }
 
+    public void VersionIncrement()
+    {
+        var currentVersion = context.VersionHistory.CurrentVersion;
+        var nextVersion = KnownOptions.NextVersion.Resolve(context);
+        if (nextVersion == "")
+        {
+            var version = Version.Parse(currentVersion);
+            nextVersion = $"{version.Major}.{version.Minor}.{version.Build + 1}";
+            context.Information($"Evaluated NextVersion: {nextVersion}");
+        }
+        UpdateVersionsTxt(nextVersion);
+        UpdateCommonPropsVersion(nextVersion);
+        UpdateTemplateVersion(nextVersion);
+    }
+
     public void Run()
     {
         KnownOptions.Stable.AssertTrue(context);
@@ -47,7 +62,7 @@ public class ReleaseRunner
 
         // Upgrade current version and commit changes
         UpdateVersionsTxt(nextVersion);
-        UpdateCommonProps(nextVersion);
+        UpdateCommonPropsVersion(nextVersion);
         context.Information($"Building {context.TemplatesTestsProjectFile}");
         context.BuildRunner.BuildProjectSilent(context.TemplatesTestsProjectFile);
         context.GitRunner.Commit($"Set next BenchmarkDotNet version: {nextVersion}");
@@ -68,15 +83,23 @@ public class ReleaseRunner
     {
         var content = context.FileReadText(context.VersionsFile).Trim();
         context.GenerateFile(context.VersionsFile, $"{content}\n{versionToAppend}");
+        context.Information($"Added v{versionToAppend} to {context.VersionsFile}");
     }
 
-    private void UpdateCommonProps(string newCurrentVersion)
+    private void UpdateCommonPropsVersion(string newCurrentVersion)
     {
         var content = Utils.ApplyRegex(
             context.FileReadText(context.CommonPropsFile),
             @"<VersionPrefix>([\d\.]+)</VersionPrefix>",
             newCurrentVersion);
         context.GenerateFile(context.CommonPropsFile, content);
+        context.Information($"Set v{newCurrentVersion} as VersionPrefix in {context.CommonPropsFile}");
+    }
+
+    private void UpdateTemplateVersion(string newCurrentVersion)
+    {
+        context.BuildRunner.BuildProjectSilent(context.TemplatesTestsProjectFile);
+        context.Information($"Set v{newCurrentVersion} in templates from {context.TemplatesTestsProjectFile}");
     }
 
     private async Task UpdateMilestones(string nextVersion)

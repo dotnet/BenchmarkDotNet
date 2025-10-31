@@ -196,10 +196,11 @@ public class DocsGenerateTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Options = [KnownOptions.DocsPreview],
+            Options = [KnownOptions.DocsPreview, KnownOptions.Stable],
             Examples =
             [
-                new Example(Name).WithArgument(KnownOptions.DocsPreview)
+                new Example(Name).WithArgument(KnownOptions.DocsPreview),
+                new Example(Name).WithArgument(KnownOptions.Stable)
             ]
         };
     }
@@ -220,6 +221,25 @@ public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
         Examples =
         [
             new Example(Name).WithArgument(KnownOptions.DocsPreview)
+        ]
+    };
+}
+
+[TaskName(Name)]
+[TaskDescription("Increments the current version")]
+public class VersionIncrementTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "version-increment";
+    public override void Run(BuildContext context) => context.ReleaseRunner.VersionIncrement();
+
+    public HelpInfo GetHelp() => new()
+    {
+        Options = [KnownOptions.NextVersion],
+        Examples =
+        [
+            new Example(Name),
+            new Example(Name)
+                .WithArgument(KnownOptions.NextVersion, "0.1.1729")
         ]
     };
 }

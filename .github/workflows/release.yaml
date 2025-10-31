@@ -1,0 +1,153 @@
+name: release
+run-name: Release new version
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "8.0.410"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: deploy # Only maintainers can execute this workflow
+    permissions:
+      contents: write
+      discussions: write
+      issues: write
+    steps:
+
+    # --- Init ---
+
+    - name: Checkout sources
+      uses: actions/checkout@v5
+
+    - name: Checkout changelog
+      uses: actions/checkout@v5
+      with:
+        ref: docs-changelog
+        path: docs/_changelog
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Read current version
+      id: version
+      run: echo "VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)" >> $GITHUB_OUTPUT
+
+    # --- Main ---
+
+    - name: Tag release
+      run: git tag v${{ steps.version.outputs.VERSION }}
+
+    - name: Build
+      run: dotnet build -c Release BenchmarkDotNet.sln
+
+    - name: Pack
+      run: |
+        rm -rf artifacts
+        dotnet pack src/BenchmarkDotNet/BenchmarkDotNet.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack src/BenchmarkDotNet.Diagnostics.dotMemory/BenchmarkDotNet.Diagnostics.dotMemory.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack src/BenchmarkDotNet.Diagnostics.dotTrace/BenchmarkDotNet.Diagnostics.dotTrace.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack src/BenchmarkDotNet.Exporters.Plotting/BenchmarkDotNet.Exporters.Plotting.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack src/BenchmarkDotNet.TestAdapter/BenchmarkDotNet.TestAdapter.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack templates/BenchmarkDotNet.Templates.csproj -c Release -o artifacts
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nupkgs
+        path: artifacts/*.nupkg
+
+    # --- Next Version ---
+
+    - name: Generate changelog
+      run: ./build.cmd docs-generate --stable
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Version increment
+      run: ./build.cmd version-increment
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }}"
+        committer_name: GitHub Actions
+        committer_email: actions@github.com
+
+    - name: Read next version
+      id: next_version
+      run: echo "NEXT_VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)" >> $GITHUB_OUTPUT
+
+    # --- Release ---
+
+    - name: Push git changes
+      uses: ad-m/github-push-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: master
+        tags: true
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: BenchmarkDotNet v${{ steps.version.outputs.VERSION }}
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        body: |
+          Full changelog: https://benchmarkdotnet.org/changelog/v${{ steps.version.outputs.VERSION }}.html
+        discussion_category_name: Announcements
+
+    - name: Close old milestone
+      uses: Akkjon/close-milestone@v2.2.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        milestone_name: v${{ steps.version.outputs.VERSION }}
+
+    - name: Create new milestone
+      uses: WyriHaximus/github-action-create-milestone@v1
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      with:
+        title: v${{ steps.next_version.outputs.NEXT_VERSION }}
+    
+    - name: Publish to NuGet
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+    # --- Documentation ---
+
+    - name: Fetch changelog
+      run: ./build.cmd docs-fetch --depth 1 --preview
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Generate changelog
+      run: ./build.cmd docs-generate --preview
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push changelog
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: docs-changelog
+        folder: docs/_changelog
+        git-config-name: GitHub Actions
+        git-config-email: actions@github.com
+        clean: true
+
+    - name: Build documentation
+      run: ./build.cmd docs-build
+
+    - name: Deploy documentation
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages
+        folder: docs/_site
+        git-config-name: GitHub Actions
+        git-config-email: actions@github.com
+        clean: true
