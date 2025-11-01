@@ -76,6 +76,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes too long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
+            host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
+
             return ExecuteResult.FromRunResults(host.RunResults, exitCode);
         }
 
@@ -99,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = InProcessNoEmitRunner.Run(host, parameters.BenchmarkCase);
+                exitCode = InProcessNoEmitRunner.Run(host, parameters);
             }
             catch (Exception ex)
             {

@@ -79,8 +79,9 @@ namespace BenchmarkDotNet.Running
             }
 
             var orderedBenchmarks = configPerType.Orderer.GetExecutionOrder(benchmarks.ToImmutableArray()).ToArray();
+            var compositeInProcessDiagnoser = new Diagnosers.CompositeInProcessDiagnoser([.. configPerType.GetDiagnosers().OfType<Diagnosers.IInProcessDiagnoser>()]);
 
-            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType);
+            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType, compositeInProcessDiagnoser);
         }
 
         private static ImmutableConfig GetFullTypeConfig(Type type, IConfig? config)

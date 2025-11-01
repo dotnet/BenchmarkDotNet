@@ -7,33 +7,29 @@ using System;
 
 namespace BenchmarkDotNet.Toolchains.Parameters
 {
-    public class ExecuteParameters
+    public class ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId,
+        ILogger logger, IResolver resolver, int launchIndex,
+        CompositeInProcessDiagnoser compositeInProcessDiagnoser,
+        IDiagnoser diagnoser = null, RunMode diagnoserRunMode = RunMode.None)
     {
         internal static readonly TimeSpan ProcessExitTimeout = TimeSpan.FromSeconds(2);
 
-        public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, int launchIndex, IDiagnoser? diagnoser = null)
-        {
-            BuildResult = buildResult;
-            BenchmarkCase = benchmarkCase;
-            BenchmarkId = benchmarkId;
-            Logger = logger;
-            Resolver = resolver;
-            Diagnoser = diagnoser;
-            LaunchIndex = launchIndex;
-        }
+        public BuildResult BuildResult { get; } = buildResult;
 
-        public BuildResult BuildResult { get;  }
+        public BenchmarkCase BenchmarkCase { get; } = benchmarkCase;
 
-        public BenchmarkCase BenchmarkCase { get; }
+        public BenchmarkId BenchmarkId { get; } = benchmarkId;
 
-        public BenchmarkId BenchmarkId { get; }
+        public ILogger Logger { get; } = logger;
 
-        public ILogger Logger { get; }
+        public IResolver Resolver { get; } = resolver;
 
-        public IResolver Resolver { get; }
+        public CompositeInProcessDiagnoser CompositeInProcessDiagnoser { get; } = compositeInProcessDiagnoser;
 
-        public IDiagnoser Diagnoser { get; }
+        public IDiagnoser? Diagnoser { get; } = diagnoser;
 
-        public int LaunchIndex { get; }
+        public int LaunchIndex { get; } = launchIndex;
+
+        public RunMode DiagnoserRunMode { get; } = diagnoserRunMode;
     }
 }

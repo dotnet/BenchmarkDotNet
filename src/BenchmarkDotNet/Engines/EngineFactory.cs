@@ -125,6 +125,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
                 engineParameters.MeasureExtraStats,
-                engineParameters.BenchmarkName);
+                engineParameters.BenchmarkName,
+                engineParameters.InProcessDiagnoserHandler);
     }
 }

@@ -28,6 +28,7 @@ namespace BenchmarkDotNet.Engines
         public bool MeasureExtraStats { get; set; }
 
         [PublicAPI] public string BenchmarkName { get;  set; }
+        public Diagnosers.CompositeInProcessDiagnoserHandler InProcessDiagnoserHandler { get; set; }
 
         public bool NeedsJitting => TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, DefaultResolver).NeedsJitting();
 
