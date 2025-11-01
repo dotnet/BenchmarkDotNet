@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -66,7 +67,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
-                    .Replace("$InProcessDiagnosers$", string.Join($",\n", buildInfo.CompositeInProcessDiagnoser.GetSourceCode(benchmark)))
+                    .Replace("$InProcessDiagnoserRouters$", GetInProcessDiagnoserRouters(buildInfo))
                     .RemoveRedundantIfDefines(compilationId);
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
@@ -248,6 +249,31 @@ namespace BenchmarkDotNet.Code
             }
 
             return factoryType.GetCorrectCSharpTypeName();
+        }
+
+        private static string GetInProcessDiagnoserRouters(BenchmarkBuildInfo buildInfo)
+        {
+            var sourceCodes = buildInfo.CompositeInProcessDiagnoser.InProcessDiagnosers
+                .Select((d, i) => ToSourceCode(d, buildInfo.BenchmarkCase, i))
+                .WhereNotNull();
+            return string.Join($",\n", sourceCodes);
+
+            static string? ToSourceCode(IInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase, int index)
+            {
+                var (handlerType, serializedConfig) = diagnoser.GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
+                if (handlerType is null)
+                {
+                    return null;
+                }
+                string routerType = typeof(InProcessDiagnoserRouter).GetCorrectCSharpTypeName();
+                return $$"""
+                new {{routerType}}() {
+                    {{nameof(InProcessDiagnoserRouter.handler)}} = {{routerType}}.{{nameof(InProcessDiagnoserRouter.Init)}}(new {{handlerType.GetCorrectCSharpTypeName()}}(), {{SourceCodeHelper.ToSourceCode(serializedConfig)}}),
+                    {{nameof(InProcessDiagnoserRouter.index)}} = {{index}},
+                    {{nameof(InProcessDiagnoserRouter.runMode)}} = {{SourceCodeHelper.ToSourceCode(diagnoser.GetRunMode(benchmarkCase))}}
+                }
+                """;
+            }
         }
 
         private static string GetParameterModifier(ParameterInfo parameterInfo)

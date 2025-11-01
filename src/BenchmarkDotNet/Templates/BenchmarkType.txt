@@ -23,7 +23,7 @@
 
             BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler compositeInProcessDiagnoserHandler = new BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler(
                 new BenchmarkDotNet.Diagnosers.InProcessDiagnoserRouter[] {
-                    $InProcessDiagnosers$
+                    $InProcessDiagnoserRouters$
                 },
                 host,
                 diagnoserRunMode,

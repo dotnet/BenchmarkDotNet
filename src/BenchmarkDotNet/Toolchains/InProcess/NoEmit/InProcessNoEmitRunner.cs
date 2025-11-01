@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -132,7 +133,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 host.WriteLine();
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
-                    [..parameters.CompositeInProcessDiagnoser.GetInProcessDiagnoserRouters(benchmarkCase)],
+                    [..parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
+                        .Select((d, i) => new Diagnosers.InProcessDiagnoserRouter()
+                        {
+                            index = i,
+                            runMode = d.GetRunMode(benchmarkCase),
+                            handler = d.GetSameProcessHandler(benchmarkCase)
+                        })
+                        .Where(r => r.handler != null)
+                        .ToArray()],
                     host,
                     parameters.DiagnoserRunMode,
                     new Diagnosers.InProcessDiagnoserActionArgs(instance)
