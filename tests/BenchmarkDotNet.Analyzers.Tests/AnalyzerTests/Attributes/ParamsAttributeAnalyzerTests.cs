@@ -504,7 +504,7 @@
 
                                                     public class BenchmarkClass
                                                     {
-                                                        [{{dummyAttributeUsage}}Params({{string.Format(arrayValuesContainerAttributeArgument.Value1, valueAndType.Value1, valueAndType.Value2)}})]
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(arrayValuesContainerAttributeArgument.Value1!, valueAndType.Value1, valueAndType.Value2)}})]
                                                         public {{expectedFieldOrPropertyType}} {{fieldOrPropertyDeclaration}}
                                                     }
                                                     """;
@@ -512,7 +512,7 @@
                 ReferenceDummyAttribute();
                 ReferenceDummyEnum();
 
-                AddDefaultExpectedDiagnostic(string.Format(arrayValuesContainerAttributeArgument.Value2,
+                AddDefaultExpectedDiagnostic(string.Format(arrayValuesContainerAttributeArgument.Value2!,
                                                            valueAndType.Value1,
                                                            valueAndType.Value2),
                                              expectedFieldOrPropertyType,
