@@ -99,6 +99,28 @@ public class UnitTestsTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Run analyzer tests")]
+[IsDependentOn(typeof(BuildTask))]
+public class AnalyzerTestsTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "analyzer-tests";
+    public override void Run(BuildContext context) => context.UnitTestRunner.RunAnalyzerTests();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples =
+            [
+                new Example(Name)
+                    .WithArgument(KnownOptions.Exclusive)
+                    .WithArgument(KnownOptions.Verbosity, "Diagnostic")
+            ]
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Run integration tests using .NET Framework 4.6.2+ (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
@@ -123,8 +145,9 @@ public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
-[TaskDescription("Run all unit and integration tests (slow)")]
+[TaskDescription("Run all unit, analyzer, and integration tests (slow)")]
 [IsDependentOn(typeof(UnitTestsTask))]
+[IsDependentOn(typeof(AnalyzerTestsTask))]
 [IsDependentOn(typeof(InTestsFullTask))]
 [IsDependentOn(typeof(InTestsCoreTask))]
 public class AllTestsTask : FrostingTask<BuildContext>, IHelpProvider
