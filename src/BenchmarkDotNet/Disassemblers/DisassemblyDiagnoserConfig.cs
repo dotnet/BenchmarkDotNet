@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             MaxDepth = maxDepth;
-            Filters = filters ?? Array.Empty<string>();
+            Filters = filters ?? [];
             Syntax = syntax;
             Formatting = formatterOptions ?? GetDefaults(syntax);
             PrintSource = printSource;

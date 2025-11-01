@@ -8,40 +8,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
-using JetBrains.Annotations;
-using System.ComponentModel;
 using Microsoft.Diagnostics.NETCore.Client;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    [UsedImplicitly]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = null)
-    {
-        internal int ProcessId { get; } = processId;
-        internal string TypeName { get; } = typeName;
-        internal string MethodName { get; } = methodName;
-        internal bool PrintSource { get; } = printSource;
-        internal int MaxDepth { get; } = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
-        internal string[] Filters { get; } = filters;
-        internal string Syntax { get; } = syntax;
-        internal string TargetFrameworkMoniker { get; } = tfm;
-        internal string ResultsPath { get; } = resultsPath;
-
-        internal static ClrMdArgs FromArgs(string[] args)
-            => new(
-                processId: int.Parse(args[0]),
-                typeName: args[1],
-                methodName: args[2],
-                printSource: bool.Parse(args[3]),
-                maxDepth: int.Parse(args[4]),
-                resultsPath: args[5],
-                syntax: args[6],
-                tfm: args[7],
-                filters: [.. args.Skip(8)]
-            );
-    }
-
     internal abstract class ClrMdDisassembler
 
     {
@@ -113,32 +83,32 @@ namespace BenchmarkDotNet.Disassemblers
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
 
-        internal DisassemblyResult AttachAndDisassemble(ClrMdArgs settings)
+        internal DisassemblyResult AttachAndDisassemble(ClrMdArgs args)
         {
-            using var dataTarget = Attach(settings.ProcessId);
+            using var dataTarget = Attach(args.ProcessId);
 
             var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
 
             ConfigureSymbols(dataTarget);
 
-            var state = new State(runtime, settings.TargetFrameworkMoniker);
+            var state = new State(runtime, args.TargetFrameworkMoniker);
 
-            if (settings.Filters.Length > 0)
+            if (args.Filters.Length > 0)
             {
-                FilterAndEnqueue(state, settings);
+                FilterAndEnqueue(state, args);
             }
             else
             {
-                ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(settings.TypeName)).First(type => type != null);
+                ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).First(type => type != null);
 
                 state.Todo.Enqueue(
                     new MethodInfo(
                         // the Disassembler Entry Method is always parameterless, so check by name is enough
-                        typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == settings.MethodName),
+                        typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == args.MethodName),
                         0));
             }
 
-            var disassembledMethods = Disassemble(settings, state);
+            var disassembledMethods = Disassemble(args, state);
 
             // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
             var filteredMethods = disassembledMethods.Length == 1
