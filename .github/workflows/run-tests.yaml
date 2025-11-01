@@ -45,6 +45,12 @@ jobs:
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
+      - name: Run task 'unit-tests'
+        shell: cmd
+        run: ./build.cmd unit-tests -e
+      - name: Run task 'analyzer-tests'
+        shell: cmd
+        run: ./build.cmd analyzer-tests -e
       - name: Run task 'in-tests-full'
         shell: cmd
         run: ./build.cmd in-tests-full -e
@@ -79,6 +85,8 @@ jobs:
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
+      - name: Run task 'analyzer-tests'
+        run: ./build.cmd analyzer-tests -e
       - name: Run task 'unit-tests'
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
@@ -116,6 +124,8 @@ jobs:
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
+      - name: Run task 'analyzer-tests'
+        run: ./build.cmd analyzer-tests -e
       - name: Run task 'unit-tests'
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'

@@ -20,6 +20,11 @@ public class UnitTestRunner(BuildContext context)
         .Combine("BenchmarkDotNet.Exporters.Plotting.Tests")
         .CombineWithFilePath("BenchmarkDotNet.Exporters.Plotting.Tests.csproj");
 
+    private FilePath AnalyzerTestsProjectFile { get; } = context.RootDirectory
+        .Combine("tests")
+        .Combine("BenchmarkDotNet.Analyzers.Tests")
+        .CombineWithFilePath("BenchmarkDotNet.Analyzers.Tests.csproj");
+
     private FilePath IntegrationTestsProjectFile { get; } = context.RootDirectory
         .Combine("tests")
         .Combine("BenchmarkDotNet.IntegrationTests")
@@ -68,6 +73,13 @@ public class UnitTestRunner(BuildContext context)
         string[] targetFrameworks = context.IsRunningOnWindows() ? ["net462", "net8.0"] : ["net8.0"];
         foreach (var targetFramework in targetFrameworks)
             RunUnitTests(targetFramework);
+    }
+
+    public void RunAnalyzerTests()
+    {
+        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net462", "net8.0"] : ["net8.0"];
+        foreach (var targetFramework in targetFrameworks)
+            RunTests(AnalyzerTestsProjectFile, "analyzer", targetFramework);
     }
 
     public void RunInTests(string tfm) => RunTests(IntegrationTestsProjectFile, "integration", tfm);
