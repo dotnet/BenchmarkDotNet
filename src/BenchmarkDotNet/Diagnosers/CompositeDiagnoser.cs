@@ -6,8 +6,6 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -63,40 +61,10 @@ namespace BenchmarkDotNet.Diagnosers
         public const string HeaderKey = "// InProcessDiagnoser";
         public const string ResultsKey = $"{HeaderKey}Results";
 
-        public IEnumerable<string> GetSourceCode(BenchmarkCase benchmarkCase)
-            => inProcessDiagnosers
-                .Select((d, i) => ToSourceCode(d, benchmarkCase, i))
-                .WhereNotNull();
-
-        public IEnumerable<InProcessDiagnoserRouter> GetInProcessDiagnoserRouters(BenchmarkCase benchmarkCase)
-            => inProcessDiagnosers
-                .Select((d, i) => new InProcessDiagnoserRouter()
-                {
-                    index = i,
-                    runMode = d.GetRunMode(benchmarkCase),
-                    handler = d.GetSameProcessHandler(benchmarkCase)
-                })
-                .Where(r => r.handler != null);
+        public IReadOnlyList<IInProcessDiagnoser> InProcessDiagnosers { get; } = inProcessDiagnosers;
 
         public void DeserializeResults(int index, BenchmarkCase benchmarkCase, string results)
-            => inProcessDiagnosers[index].DeserializeResults(benchmarkCase, results);
-
-        private static string? ToSourceCode(IInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase, int index)
-        {
-            var (handlerType, serializedConfig) = diagnoser.GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
-            if (handlerType is null)
-            {
-                return null;
-            }
-            string routerType = typeof(InProcessDiagnoserRouter).GetCorrectCSharpTypeName();
-            return $$"""
-                new {{routerType}}() {
-                    {{nameof(InProcessDiagnoserRouter.handler)}} = {{routerType}}.{{nameof(InProcessDiagnoserRouter.Init)}}(new {{handlerType.GetCorrectCSharpTypeName()}}(), {{SourceCodeHelper.ToSourceCode(serializedConfig)}}),
-                    {{nameof(InProcessDiagnoserRouter.index)}} = {{index}},
-                    {{nameof(InProcessDiagnoserRouter.runMode)}} = {{SourceCodeHelper.ToSourceCode(diagnoser.GetRunMode(benchmarkCase))}}
-                }
-                """;
-        }
+            => InProcessDiagnosers[index].DeserializeResults(benchmarkCase, results);
     }
 
     [UsedImplicitly]
