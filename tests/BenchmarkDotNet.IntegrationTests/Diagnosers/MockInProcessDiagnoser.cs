@@ -6,8 +6,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using BenchmarkDotNet.Extensions;
 using System.Collections.Generic;
+using System;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
@@ -21,11 +21,7 @@ public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
 
     public IEnumerable<IAnalyser> Analysers => [];
 
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
-
     public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoser)} results: [{string.Join(", ", Results.Values)}]");
-
-    public IInProcessDiagnoserHandler? GetHandler(BenchmarkCase benchmarkCase) => new MockInProcessDiagnoserHandler();
 
     public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
@@ -34,14 +30,21 @@ public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
     public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
     public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
+
+    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => (typeof(MockInProcessDiagnoserHandler), null);
+
+    public IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
+        => new MockInProcessDiagnoserHandler();
+
+    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
 }
 
 public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
+    public void Initialize(string? serializedConfig) { }
+
     public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
 
     public string SerializeResults() => "MockResult";
-
-    public string ToSourceCode()
-        => $"new {typeof(MockInProcessDiagnoserHandler).GetCorrectCSharpTypeName()}()";
 }

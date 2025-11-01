@@ -1,6 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using System.ComponentModel;
 
 namespace BenchmarkDotNet.Diagnosers;
@@ -13,12 +11,9 @@ public struct InProcessDiagnoserRouter
     public int index;
     public RunMode runMode;
 
-    public readonly string ToSourceCode()
-        => $$"""
-            new {{typeof(InProcessDiagnoserRouter).GetCorrectCSharpTypeName()}}() {
-                {{nameof(handler)}} = {{handler.ToSourceCode()}},
-                {{nameof(index)}} = {{index}},
-                {{nameof(runMode)}} = {{SourceCodeHelper.ToSourceCode(runMode)}}
-            }
-            """;
+    public static IInProcessDiagnoserHandler Init(IInProcessDiagnoserHandler handler, string serializedConfig)
+    {
+        handler.Initialize(serializedConfig);
+        return handler;
+    }
 }
