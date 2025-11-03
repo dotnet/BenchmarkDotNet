@@ -101,12 +101,19 @@ namespace BenchmarkDotNet.Parameters
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            string indexPostfix = parameterDefinitions.Length > 1 || isParamRefLike
-                ? $"[{argumentIndex}]" // IEnumerable<object[]>
-                : string.Empty; // IEnumerable<object>
+            MethodInfo sourceAsMethodInfo =  source as MethodInfo;
+
+            string indexPostfix;
+            if (typeof(IEnumerable<object[]>) == sourceAsMethodInfo?.ReturnType) {
+                indexPostfix = $"[{argumentIndex}]";
+            }
+            else
+            {
+                indexPostfix = string.Empty; // IEnumerable<object>
+            }
 
             string methodCall;
-            if ((source as MethodInfo)?.IsStatic ?? (source as PropertyInfo)?.GetMethod.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
+            if (sourceAsMethodInfo?.IsStatic ?? (source as PropertyInfo)?.GetMethod.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
             {
                 // If the source member is static, we need to place the fully qualified type name before it, in case the source member is from another type that this generated type does not inherit from.
                 methodCall = $"{source.DeclaringType.GetCorrectCSharpTypeName()}.{source.Name}";
