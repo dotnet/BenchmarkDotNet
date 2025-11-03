@@ -405,6 +405,29 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AnArrayFromArgumentsSourceCanBePassedToBenchmarkAsSpan(IToolchain toolchain) => CanExecute<WithArrayFromArgumentsSourceToSpan>(toolchain);
+
+        public class WithArrayFromArgumentsSourceToSpan
+        {
+            public IEnumerable<object[]> GetArray()
+            {
+                yield return new object[] { new[] { 0, 1, 2 } };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArray))]
+            public void AcceptsSpanFromArgumentsSource(Span<int> span)
+            {
+                if (span.Length != 3)
+                    throw new ArgumentException("Invalid length");
+
+                for (int i = 0; i < 3; i++)
+                    if (span[i] != i)
+                        throw new ArgumentException("Invalid value");
+            }
+        }
+
         [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
             EnvRequirement.DotNetCoreOnly)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -417,6 +440,31 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             [Arguments(expectedString)]
             public void AcceptsReadOnlySpan(ReadOnlySpan<char> notString)
+            {
+                string aString = notString.ToString();
+
+                if (aString != expectedString)
+                    throw new ArgumentException("Invalid value");
+            }
+        }
+
+        [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
+            EnvRequirement.DotNetCoreOnly)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void StringFromArgumentsSourceCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringFromArgumentsSourceToReadOnlySpan>(toolchain);
+
+        public class WithStringFromArgumentsSourceToReadOnlySpan
+        {
+            private const string expectedString = "very nice string";
+
+            public IEnumerable<object[]> GetString()
+            {
+                yield return new object[] { expectedString };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetString))]
+            public void AcceptsReadOnlySpanFromArgumentsSource(ReadOnlySpan<char> notString)
             {
                 string aString = notString.ToString();
 

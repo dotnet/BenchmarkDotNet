@@ -8,6 +8,7 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -33,9 +34,10 @@ namespace BenchmarkDotNet.Parameters
 
             if (unwrappedValue is object[] array)
             {
+                Type firstParamType = benchmark.GetParameters().FirstOrDefault()?.ParameterType;
                 // the user provided object[] for a benchmark accepting a single argument
                 if (parameterDefinitions.Length == 1 && array.Length == 1
-                    && array[0]?.GetType() == benchmark.GetParameters().FirstOrDefault()?.ParameterType) // the benchmark that accepts an object[] as argument
+                    && (array[0]?.GetType() == firstParamType || (firstParamType != null && firstParamType.IsStackOnlyWithImplicitCast(array[0])))) // the benchmark that accepts an object[] as argument
                 {
                     return new ParameterInstances(
                         new[] { Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle) });
@@ -91,16 +93,31 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            string cast = $"({parameterDefinitions[argumentIndex].ParameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
+            Type paramType = parameterDefinitions[argumentIndex].ParameterType;
+            bool isParamRefLike = RunnableReflectionHelpers.IsRefLikeType(paramType);
+
+            string cast = isParamRefLike ? $"({Value.GetType().GetCorrectCSharpTypeName()})"
+                : $"({paramType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            string indexPostfix = parameterDefinitions.Length > 1
-                ? $"[{argumentIndex}]" // IEnumerable<object[]>
-                : string.Empty; // IEnumerable<object>
+            MethodInfo sourceAsMethodInfo =  source as MethodInfo;
+            PropertyInfo sourceAsPropertyInfo = source as PropertyInfo;
+
+            Type indexableType = typeof(IEnumerable<object[]>);
+
+            string indexPostfix;
+            if (sourceAsMethodInfo?.ReturnType == indexableType ||
+                sourceAsPropertyInfo?.GetMethod.ReturnType == indexableType) {
+                indexPostfix = $"[{argumentIndex}]";
+            }
+            else
+            {
+                indexPostfix = string.Empty; // IEnumerable<object>
+            }
 
             string methodCall;
-            if ((source as MethodInfo)?.IsStatic ?? (source as PropertyInfo)?.GetMethod.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
+            if (sourceAsMethodInfo?.IsStatic ?? sourceAsPropertyInfo?.GetMethod.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
             {
                 // If the source member is static, we need to place the fully qualified type name before it, in case the source member is from another type that this generated type does not inherit from.
                 methodCall = $"{source.DeclaringType.GetCorrectCSharpTypeName()}.{source.Name}";
