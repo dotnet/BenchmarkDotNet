@@ -159,7 +159,6 @@ namespace BenchmarkDotNet.Tests
         public void Method(string arg1, string arg2, string arg3, string arg4) { }
     }
 
-#pragma warning disable BDN1401
     public class SingleDateTimeArgument
     {
         [Benchmark]
@@ -171,9 +170,7 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { DateTime.MaxValue };
         }
     }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
     public class SingleGuidArgument
     {
         [Benchmark]
@@ -185,9 +182,7 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { System.Guid.Empty };
         }
     }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
     public class WithArray
     {
         [Benchmark]
@@ -199,7 +194,6 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { new int[] { 1, 2, 3 }, 4 };
         }
     }
-#pragma warning restore BDN1401
 
     public class SimpleGeneric<T>
     {
@@ -207,7 +201,6 @@ namespace BenchmarkDotNet.Tests
         public T Method() => default(T);
     }
 
-#pragma warning disable BDN1401
     public class WithCrazyUnicodeCharacters
     {
         [Benchmark]
@@ -219,7 +212,6 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { "FOO", "\u03C3", "x\u0305" }; // https://github.com/Microsoft/xunit-performance/blob/f1d1d62a934694d8cd19063e60e04c590711d904/tests/simpleharness/Program.cs#L29
         }
     }
-#pragma warning restore BDN1401
 
     public class WithTabAndEnter
     {
@@ -228,7 +220,6 @@ namespace BenchmarkDotNet.Tests
         public void Method(string tab, string enter) { }
     }
 
-#pragma warning disable BDN1401
     public class WithBigArray
     {
         [Benchmark]
@@ -240,9 +231,7 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { Enumerable.Range(0, 100).ToArray() };
         }
     }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
     public class WithArrayOfNullStrings
     {
         public IEnumerable<object> GetArrayOfStrings()
@@ -254,7 +243,6 @@ namespace BenchmarkDotNet.Tests
         [ArgumentsSource(nameof(GetArrayOfStrings))]
         public int Method(string[] array) => array.Length;
     }
-#pragma warning restore BDN1401
 
     public class WithParameters
     {

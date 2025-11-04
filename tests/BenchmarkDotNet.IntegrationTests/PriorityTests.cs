@@ -62,11 +62,9 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public int OneArgument(int b) => E ? A + b : F;
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(NumberArguments))]
             public int ManyArguments(int c, int d) => E ? A + c + d : F;
-#pragma warning restore BDN1401
 
             public IEnumerable<object[]> NumberArguments()
             {
