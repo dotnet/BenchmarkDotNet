@@ -66,7 +66,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class WithArgumentsSource
         {
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(ArgumentsProvider))]
             public void Simple(bool boolean, int number)
@@ -74,7 +73,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-#pragma warning restore BDN1401
 
             public IEnumerable<object[]> ArgumentsProvider()
             {
@@ -88,7 +86,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class WithArgumentsSourceInAnotherClass
         {
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveType))]
             public void OnePrimitiveType(int number)
@@ -96,9 +93,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (number % 2 != 1)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoPrimitiveTypes))]
             public void TwoPrimitiveTypes(bool boolean, int number)
@@ -106,9 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OneNonPrimitiveType))]
             public void OneNonPrimitiveType(Version version)
@@ -117,9 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (versionNumbers.Distinct().Count() != 4)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoNonPrimitiveTypes))]
             public void TwoNonPrimitiveTypes(Version version, DateTime dateTime)
@@ -131,9 +122,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (dateTime.Month != dateTime.Day)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveAndOneNonPrimitive))]
             public void OnePrimitiveAndOneNonPrimitive(Version version, int number)
@@ -145,7 +134,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (number != version.Major)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-#pragma warning restore BDN1401
         }
         public static class ExternalClassWithArgumentsSource
         {
@@ -221,7 +209,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ParamsSource(nameof(SameButStatic))]
             public Dictionary<int, string> DictionaryParamStatic;
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(NonPrimitive))]
             public void Simple(SomeClass someClass, SomeStruct someStruct)
@@ -242,7 +229,6 @@ namespace BenchmarkDotNet.IntegrationTests
                     if (someClass.Values[i] != i * 2)
                         throw new InvalidOperationException("Incorrect array values were passed");
             }
-#pragma warning restore BDN1401
 
             public IEnumerable<object[]> NonPrimitive()
             {
@@ -307,11 +293,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { "Iterator.Select.Where", Iterator().Select(i => i).Where(i => i % 2 == 0) };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(Sources))]
             public void Any(string name, IEnumerable<int> source) => source.Any();
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -319,7 +303,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class WithJaggedArray
         {
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(CreateMatrix))]
             public void Test(int[][] array)
@@ -332,7 +315,6 @@ namespace BenchmarkDotNet.IntegrationTests
                     if (array[i][j] != i)
                         throw new ArgumentException("Invalid value");
             }
-#pragma warning restore BDN1401
 
             public IEnumerable<object> CreateMatrix()
             {
@@ -369,7 +351,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetInputData))]
             public bool ValueTupleCompareNoOpt(ref Generic<int, string> byRef)
@@ -382,7 +363,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 return true;
             }
-#pragma warning restore BDN1401
 
             public IEnumerable<object> GetInputData()
             {
@@ -504,7 +484,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new string[123];
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetArrayOfString))]
             public void TypeReflectionArrayGetType(string[] array)
@@ -512,7 +491,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (array.Length != 123)
                     throw new ArgumentException("The array was empty");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)] // make sure BDN mimics xunit's MemberData behaviour
@@ -526,7 +504,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { true };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetArguments))]
             public void SingleArgument(bool boolean)
@@ -534,7 +511,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (boolean != true)
                     throw new ArgumentException("The value of boolean was incorrect");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -551,7 +527,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetArrays))]
             public void AcceptsArrays(int[] even, int[] notEven)
@@ -565,7 +540,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -578,7 +552,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return BigInteger.Parse(new string(Enumerable.Repeat('1', 1000).ToArray()));
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetVeryBigInteger))]
             public void Method(BigInteger passed)
@@ -588,7 +561,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (expected != passed)
                     throw new ArgumentException("The BigInteger has wrong value!");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -606,7 +578,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { double.PositiveInfinity, nameof(double.PositiveInfinity) };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetSpecialDoubleValues))]
             public void Method(double passed, string name)
@@ -635,7 +606,6 @@ namespace BenchmarkDotNet.IntegrationTests
                         throw new InvalidOperationException($"Unknown case! {name}");
                 }
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -653,7 +623,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { float.PositiveInfinity, nameof(float.PositiveInfinity) };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetSpecialFloatValues))]
             public void Method(float passed, string name)
@@ -682,7 +651,6 @@ namespace BenchmarkDotNet.IntegrationTests
                         throw new InvalidOperationException($"Unknown case! {name}");
                 }
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -696,7 +664,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { decimal.MinValue, nameof(decimal.MinValue) };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(GetSpecialDecimalValues))]
             public void Method(decimal passed, string name)
@@ -713,7 +680,6 @@ namespace BenchmarkDotNet.IntegrationTests
                         throw new InvalidOperationException($"Unknown case! {name}");
                 }
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -726,7 +692,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new DateTime(2018, 8, 15);
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(DateTimeValues))]
             public void Test(DateTime passed)
@@ -736,7 +701,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (expected != passed)
                     throw new ArgumentException("The DateTime has wrong value!");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -846,7 +810,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ParamsSource(nameof(StaticProperty))]
             public int ParamTwo { get; set; }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(StaticMethod))]
             public void TestMethod(int argument)
@@ -858,9 +821,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (ParamTwo != 2 && ParamTwo != 3)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
             }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(StaticProperty))]
             public void TestProperty(int argument)
@@ -872,7 +833,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (ParamTwo != 2 && ParamTwo != 3)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -897,7 +857,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ParamsSource(nameof(StaticProperty))]
             public int ParamTwo { get; set; }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(StaticMethod))]
             public void TestMethod(int argument)
@@ -909,9 +868,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (ParamTwo != 2 && ParamTwo != 3)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
             }
-#pragma warning restore BDN1401
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(StaticProperty))]
             public void TestProperty(int argument)
@@ -923,7 +880,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (ParamTwo != 2 && ParamTwo != 3)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -996,7 +952,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { LongString, LongString2 };
             }
 
-#pragma warning disable BDN1401
             [Benchmark]
             [ArgumentsSource(nameof(Arguments))]
             public void Test(string first, string second)
@@ -1006,7 +961,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (second != LongString2)
                     throw new ArgumentException($"{nameof(second)} passed string has wrong value!");
             }
-#pragma warning restore BDN1401
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
