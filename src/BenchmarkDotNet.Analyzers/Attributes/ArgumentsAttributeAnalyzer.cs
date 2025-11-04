@@ -19,14 +19,6 @@
                                                                                                                 DiagnosticSeverity.Error,
                                                                                                                 isEnabledByDefault: true);
 
-        internal static readonly DiagnosticDescriptor MethodWithoutAttributeMustHaveNoParametersRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters,
-                                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Title)),
-                                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_MessageFormat)),
-                                                                                                                                "Usage",
-                                                                                                                                DiagnosticSeverity.Error,
-                                                                                                                                isEnabledByDefault: true,
-                                                                                                                                description: BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Description);
-
         internal static readonly DiagnosticDescriptor MustHaveMatchingValueCountRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount,
                                                                                                                 AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Title)),
                                                                                                                 AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_MessageFormat)),
@@ -46,7 +38,6 @@
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             RequiresBenchmarkAttributeRule,
-            MethodWithoutAttributeMustHaveNoParametersRule,
             MustHaveMatchingValueCountRule,
             MustHaveMatchingValueTypeRule
         ];
@@ -77,7 +68,9 @@
             }
 
             var argumentsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsAttribute");
-            if (argumentsAttributeTypeSymbol == null)
+            var argumentsSourceAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsSourceAttribute");
+
+            if (argumentsAttributeTypeSymbol == null || argumentsSourceAttributeTypeSymbol == null)
             {
                 return;
             }
@@ -87,11 +80,6 @@
             var argumentsAttributes = AnalyzerHelper.GetAttributes(argumentsAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
             if (argumentsAttributes.Length == 0)
             {
-                if (hasBenchmarkAttribute && methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(MethodWithoutAttributeMustHaveNoParametersRule, Location.Create(context.FilterTree, methodDeclarationSyntax.ParameterList.Parameters.Span), methodDeclarationSyntax.Identifier.ToString()));
-                }
-
                 return;
             }
 

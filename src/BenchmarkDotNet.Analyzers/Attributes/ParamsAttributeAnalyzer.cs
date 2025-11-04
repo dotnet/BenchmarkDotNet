@@ -30,14 +30,15 @@
                                                                                                                              AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_Title)),
                                                                                                                              AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_MessageFormat)),
                                                                                                                              "Usage",
-                                                                                                                             DiagnosticSeverity.Warning,
+                                                                                                                             DiagnosticSeverity.Info,
                                                                                                                              isEnabledByDefault: true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-                                                                                                           MustHaveValuesRule,
-                                                                                                           MustHaveMatchingValueTypeRule,
-                                                                                                           UnnecessarySingleValuePassedToAttributeRule
-                                                                                                          );
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        [
+            MustHaveValuesRule,
+            MustHaveMatchingValueTypeRule,
+            UnnecessarySingleValuePassedToAttributeRule
+        ];
 
         public override void Initialize(AnalysisContext analysisContext)
         {

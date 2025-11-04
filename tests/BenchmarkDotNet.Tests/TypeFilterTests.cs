@@ -278,6 +278,7 @@ namespace BenchmarkDotNet.Tests
         public T Create() => Activator.CreateInstance<T>();
     }
 
+#pragma warning disable BDN1401
     [Run]
     public class ClassE
     {
@@ -292,6 +293,7 @@ namespace BenchmarkDotNet.Tests
         [ArgumentsSource(nameof(Values))]
         public string Method1(uint value) => value.ToString();
     }
+#pragma warning restore BDN1401
 }
 
 namespace BenchmarkDotNet.NOTTests

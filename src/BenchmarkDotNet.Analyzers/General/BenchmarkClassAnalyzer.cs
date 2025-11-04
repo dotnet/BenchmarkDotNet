@@ -145,24 +145,21 @@
                     context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, classAbstractModifier.Value.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
                 }
 
-                if (classDeclarationSyntax.TypeParameterList == null || classDeclarationSyntax.TypeParameterList.Parameters.Count == 0)
+                foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, classDeclarationSyntax.Identifier.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
-                }
-                else
-                {
-                    foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
+                    if (classDeclarationSyntax.TypeParameterList == null || classDeclarationSyntax.TypeParameterList.Parameters.Count == 0)
                     {
-                        if (genericTypeArgumentsAttribute.ArgumentList is { Arguments.Count: > 0 })
+                        context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, genericTypeArgumentsAttribute.GetLocation()));
+                    }
+                    else if (genericTypeArgumentsAttribute.ArgumentList is { Arguments.Count: > 0 })
+                    {
+                        if (genericTypeArgumentsAttribute.ArgumentList.Arguments.Count != classDeclarationSyntax.TypeParameterList.Parameters.Count)
                         {
-                            if (genericTypeArgumentsAttribute.ArgumentList.Arguments.Count != classDeclarationSyntax.TypeParameterList.Parameters.Count)
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule, Location.Create(context.FilterTree, genericTypeArgumentsAttribute.ArgumentList.Arguments.Span),
-                                                                           classDeclarationSyntax.TypeParameterList.Parameters.Count,
-                                                                           classDeclarationSyntax.TypeParameterList.Parameters.Count == 1 ? "" : "s",
-                                                                           classDeclarationSyntax.Identifier.ToString(),
-                                                                           genericTypeArgumentsAttribute.ArgumentList.Arguments.Count));
-                            }
+                            context.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule, Location.Create(context.FilterTree, genericTypeArgumentsAttribute.ArgumentList.Arguments.Span),
+                                                                       classDeclarationSyntax.TypeParameterList.Parameters.Count,
+                                                                       classDeclarationSyntax.TypeParameterList.Parameters.Count == 1 ? "" : "s",
+                                                                       classDeclarationSyntax.Identifier.ToString(),
+                                                                       genericTypeArgumentsAttribute.ArgumentList.Arguments.Count));
                         }
                     }
                 }

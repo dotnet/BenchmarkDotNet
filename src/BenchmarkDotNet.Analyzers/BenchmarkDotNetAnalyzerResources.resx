@@ -193,7 +193,7 @@
     <value>Expected {0} type argument{1} as declared on the benchmark class '{2}', but found {3}. Update the attribute usage or the type parameter list of the class declaration to match.</value>
   </data>
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat" xml:space="preserve">
-    <value>Benchmark class '{0}' must be generic</value>
+    <value>Attribute [GenericTypeArguments] can only be applied to a generic class</value>
   </data>
   <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat" xml:space="preserve">
     <value>Only one benchmark method can be marked as baseline per class</value>
@@ -258,8 +258,8 @@
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_MessageFormat" xml:space="preserve">
     <value>Expected {0} value{1} as declared by the benchmark method '{2}', but found {3}. Update the attribute usage or method to match.</value>
   </data>
-  <data name="Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_MessageFormat" xml:space="preserve">
-    <value>Benchmark method '{0}' without [Arguments] attribute(s) cannot declare parameters</value>
+  <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_MessageFormat" xml:space="preserve">
+    <value>Benchmark method '{0}' without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_MessageFormat" xml:space="preserve">
     <value>Unexpected type for argument value '{0}'. Expected '{1}' but found '{2}'.</value>
@@ -299,9 +299,6 @@
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Title" xml:space="preserve">
     <value>Number of values passed to an [Arguments] attribute must match the number of parameters declared in the targeted benchmark method</value>
-  </data>
-  <data name="Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Title" xml:space="preserve">
-    <value>Benchmark methods without [Arguments] attribute(s) cannot declare parameters</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Title" xml:space="preserve">
     <value>Values passed to an [Arguments] attribute must match exactly the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
@@ -351,9 +348,9 @@
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Description" xml:space="preserve">
     <value>The number of values passed to an [Arguments] attribute must match the number of parameters declared in the targeted benchmark method</value>
   </data>
-  <data name="Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Description" xml:space="preserve">
-    <value>This method declares one or more parameters but is not annotated with any [Arguments] attributes. To ensure correct argument binding, methods with parameters must explicitly be annotated with one or more [Arguments] attributes.
-Either add the [Arguments] attribute(s) or remove the parameters.</value>
+  <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Description" xml:space="preserve">
+    <value>This method declares one or more parameters but is not annotated with either an [ArgumentsSource] attribute or one or more [Arguments] attributes. To ensure correct argument binding, methods with parameters must explicitly be annotated with an [ArgumentsSource] attribute or one or more [Arguments] attributes.
+Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the parameters.</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description" xml:space="preserve">
     <value>The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
@@ -369,5 +366,8 @@ Either add the [Arguments] attribute(s) or remove the parameters.</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBePublic_MessageFormat" xml:space="preserve">
     <value>Referenced benchmark class '{0}' must be public</value>
+  </data>
+  <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Title" xml:space="preserve">
+    <value>Benchmark methods without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters</value>
   </data>
 </root>

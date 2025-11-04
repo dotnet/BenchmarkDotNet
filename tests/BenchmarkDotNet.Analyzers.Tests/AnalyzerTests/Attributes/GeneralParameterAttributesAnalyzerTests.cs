@@ -906,19 +906,17 @@
             [MemberData(nameof(UniqueParameterAttributes))]
             public async Task A_constant_field_annotated_with_a_unique_parameter_attribute_should_trigger_diagnostic(string attributeName, string attributeUsage)
             {
-                const string constantIdentifier = "Constant";
-
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
                                                     public class BenchmarkClass
                                                     {
                                                         [{{attributeUsage}}]
-                                                        public {|#0:const|} int {{constantIdentifier}} = 0;
+                                                        public {|#0:const|} int Constant = 0;
                                                     }
                                                     """;
                 TestCode = testCode;
-                AddDefaultExpectedDiagnostic(constantIdentifier, attributeName);
+                AddDefaultExpectedDiagnostic(attributeName);
 
                 await RunAsync();
             }

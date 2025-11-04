@@ -254,7 +254,6 @@
                 {
                     context.ReportDiagnostic(Diagnostic.Create(NotValidOnConstantFieldRule,
                                                                fieldConstModifierLocation,
-                                                               fieldOrPropertyIdentifier,
                                                                attributeSyntax.Name.ToString()));
 
                     return;

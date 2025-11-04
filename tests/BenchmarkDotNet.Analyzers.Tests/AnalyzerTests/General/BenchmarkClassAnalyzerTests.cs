@@ -106,15 +106,14 @@
             public async Task Nongeneric_class_annotated_with_a_generictypearguments_attribute_should_trigger_diagnostic([CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
                                                                                                                          [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
             {
-                const string benchmarkClassName = "BenchmarkClass";
-
-                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", genericTypeArgumentsAttributeUsageCount);
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[{{|#{0}:GenericTypeArguments(typeof(int))|}}]", genericTypeArgumentsAttributeUsageCount)
+                                                                    .Select((a, i) => string.Format(a, i));
 
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
                                                    
                                                     {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
-                                                    public class {|#0:{{benchmarkClassName}}|}
+                                                    public class BenchmarkClass
                                                     {
                                                         {{benchmarkAttributeUsage}}
                                                         public void BenchmarkMethod()
@@ -125,7 +124,11 @@
                                                     """;
 
                 TestCode = testCode;
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                for (var i = 0; i < genericTypeArgumentsAttributeUsageCount; i++)
+                {
+                    AddExpectedDiagnostic(i);
+                }
 
                 await RunAsync();
             }
@@ -135,16 +138,15 @@
                                                                                                                                                                    [CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
                                                                                                                                                                    [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
             {
-                const string benchmarkClassName = "BenchmarkClass";
-
                 var genericTypeArguments = string.Join(", ", GenericTypeArguments.Select(ta => $"typeof({ta})").Take(typeParametersListLength));
-                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat($"[GenericTypeArguments({genericTypeArguments})]", genericTypeArgumentsAttributeUsageCount);
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat($"[{{{{|#{{0}}:GenericTypeArguments({genericTypeArguments})|}}}}]", genericTypeArgumentsAttributeUsageCount)
+                                                                    .Select((a, i) => string.Format(a, i));
 
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
                                                     {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
-                                                    public class {|#0:{{benchmarkClassName}}|} : BenchmarkClassBase<{{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}}>
+                                                    public class BenchmarkClass : BenchmarkClassBase<{{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}}>
                                                     {
                                                     }
                                                     """;
@@ -165,7 +167,10 @@
                 TestCode = testCode;
                 AddSource(benchmarkBaseClassDocument);
 
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
+                for (var i = 0; i < genericTypeArgumentsAttributeUsageCount; i++)
+                {
+                    AddExpectedDiagnostic(i);
+                }
 
                 await RunAsync();
             }

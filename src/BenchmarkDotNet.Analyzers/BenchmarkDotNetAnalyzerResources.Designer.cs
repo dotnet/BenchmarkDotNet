@@ -61,36 +61,6 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This method declares one or more parameters but is not annotated with any [Arguments] attributes. To ensure correct argument binding, methods with parameters must explicitly be annotated with one or more [Arguments] attributes.
-        ///Either add the [Arguments] attribute(s) or remove the parameters..
-        /// </summary>
-        internal static string Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Description {
-            get {
-                return ResourceManager.GetString("Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Descript" +
-                        "ion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark method &apos;{0}&apos; without [Arguments] attribute(s) cannot declare parameters.
-        /// </summary>
-        internal static string Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_MessageFormat {
-            get {
-                return ResourceManager.GetString("Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_MessageF" +
-                        "ormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark methods without [Arguments] attribute(s) cannot declare parameters.
-        /// </summary>
-        internal static string Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Title {
-            get {
-                return ResourceManager.GetString("Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The number of values passed to an [Arguments] attribute must match the number of parameters declared in the targeted benchmark method.
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Description {
@@ -159,6 +129,37 @@ namespace BenchmarkDotNet.Analyzers {
         internal static string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title {
             get {
                 return ResourceManager.GetString("Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This method declares one or more parameters but is not annotated with either an [ArgumentsSource] attribute or one or more [Arguments] attributes. To ensure correct argument binding, methods with parameters must explicitly be annotated with an [ArgumentsSource] attribute or one or more [Arguments] attributes.
+        ///Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the parameters..
+        /// </summary>
+        internal static string Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Description {
+            get {
+                return ResourceManager.GetString("Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_D" +
+                        "escription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark method &apos;{0}&apos; without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters.
+        /// </summary>
+        internal static string Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_M" +
+                        "essageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark methods without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters.
+        /// </summary>
+        internal static string Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Title {
+            get {
+                return ResourceManager.GetString("Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_T" +
+                        "itle", resourceCulture);
             }
         }
         
@@ -648,7 +649,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; must be generic.
+        ///   Looks up a localized string similar to Attribute [GenericTypeArguments] can only be applied to a generic class.
         /// </summary>
         internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat {
             get {

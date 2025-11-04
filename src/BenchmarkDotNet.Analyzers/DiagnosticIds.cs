@@ -29,9 +29,9 @@
         public const string Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute = "BDN1302";
         public const string Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType = "BDN1303";
         public const string Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool = "BDN1304";
-        public const string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute = "BDN1400";
-        public const string Attributes_ArgumentsAttribute_MethodWithoutAttributeMustHaveNoParameters = "BDN1401";
-        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1402";
-        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1403";
+        public const string Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters = "BDN1400";
+        public const string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute = "BDN1500";
+        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1501";
+        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1502";
     }
 }

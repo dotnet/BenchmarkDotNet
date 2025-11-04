@@ -115,6 +115,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.HasCriticalValidationErrors);
         }
 
+#pragma warning disable BDN1107
         public class BaselineRatioResultExtenderError
         {
             [Benchmark(Baseline = true)]
@@ -123,6 +124,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark(Baseline = true)]
             public void BenchmarkFast() => Thread.Sleep(5);
         }
+#pragma warning restore BDN1107
     }
 
     public class BaselineRatioColumnWithLongParamsTest : BenchmarkTestExecutor
