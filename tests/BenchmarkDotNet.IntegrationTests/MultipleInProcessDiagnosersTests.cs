@@ -8,9 +8,12 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using Xunit;
 using Xunit.Abstractions;
+using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.IntegrationTests;
 
@@ -18,69 +21,95 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
 {
     public MultipleInProcessDiagnosersTests(ITestOutputHelper output) : base(output) { }
 
-    public static IEnumerable<object[]> GetDiagnoserCombinations()
+    private static readonly RunMode[] AllRunModes = { RunMode.NoOverhead, RunMode.ExtraRun, RunMode.None };
+
+    private static IEnumerable<BaseMockInProcessDiagnoser[]> GetDiagnoserCombinations(int count)
     {
-        // Two diagnosers with NoOverhead
-        yield return new object[]
+        if (count == 1)
         {
-            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoser() },
-            typeof(SimpleBenchmark),
-            new[] { true, true }
-        };
+            foreach (var runMode in AllRunModes)
+            {
+                yield return [CreateDiagnoser(runMode, 0)];
+            }
+        }
+        else if (count == 2)
+        {
+            foreach (var runMode1 in AllRunModes)
+            {
+                foreach (var runMode2 in AllRunModes)
+                {
+                    yield return [CreateDiagnoser(runMode1, 0), CreateDiagnoser(runMode2, 1)];
+                }
+            }
+        }
+        else if (count == 3)
+        {
+            foreach (var runMode1 in AllRunModes)
+            {
+                foreach (var runMode2 in AllRunModes)
+                {
+                    foreach (var runMode3 in AllRunModes)
+                    {
+                        yield return [CreateDiagnoser(runMode1, 0), CreateDiagnoser(runMode2, 1), CreateDiagnoser(runMode3, 2)];
+                    }
+                }
+            }
+        }
+    }
 
-        // Two diagnosers with ExtraRun and NoOverhead
-        yield return new object[]
+    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode, int index)
+    {
+        return runMode switch
         {
-            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserExtraRun(), new MockInProcessDiagnoserNoOverhead() },
-            typeof(SimpleBenchmark),
-            new[] { true, true }
-        };
-
-        // Three diagnosers with varying run modes (None should not collect results)
-        yield return new object[]
-        {
-            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoserExtraRun(), new MockInProcessDiagnoserNone() },
-            typeof(SimpleBenchmark),
-            new[] { true, true, false }
-        };
-
-        // Three different types
-        yield return new object[]
-        {
-            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoser(), new MockInProcessDiagnoserExtraRun() },
-            typeof(SimpleBenchmark),
-            new[] { true, true, true }
-        };
-
-        // Multiple benchmarks
-        yield return new object[]
-        {
-            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoserExtraRun() },
-            typeof(MultipleBenchmarks),
-            new[] { true, true }
+            RunMode.NoOverhead => index == 0 ? new MockInProcessDiagnoserNoOverhead() : new MockInProcessDiagnoser(),
+            RunMode.ExtraRun => new MockInProcessDiagnoserExtraRun(),
+            RunMode.None => new MockInProcessDiagnoserNone(),
+            _ => throw new ArgumentException($"Unsupported run mode: {runMode}")
         };
     }
 
+    public static IEnumerable<object[]> GetTestCombinations()
+    {
+        var toolchains = new IToolchain[]
+        {
+            InProcessEmitToolchain.DontLogOutput,
+            new InProcessNoEmitToolchain(TimeSpan.Zero, true),
+            null // Default toolchain
+        };
+
+        var counts = new[] { 1, 2, 3 };
+
+        foreach (var toolchain in toolchains)
+        {
+            foreach (var count in counts)
+            {
+                foreach (var diagnosers in GetDiagnoserCombinations(count))
+                {
+                    yield return new object[] { diagnosers, toolchain };
+                }
+            }
+        }
+    }
+
     [Theory]
-    [MemberData(nameof(GetDiagnoserCombinations))]
-    public void MultipleInProcessDiagnosersWork(BaseMockInProcessDiagnoser[] diagnosers, Type benchmarkType, bool[] shouldHaveResults)
+    [MemberData(nameof(GetTestCombinations))]
+    public void MultipleInProcessDiagnosersWork(BaseMockInProcessDiagnoser[] diagnosers, IToolchain toolchain)
     {
         var logger = new OutputLogger(Output);
-        var config = CreateInProcessConfig(logger);
+        var config = CreateConfig(logger, toolchain);
 
         foreach (var diagnoser in diagnosers)
         {
             config = config.AddDiagnoser(diagnoser);
         }
 
-        var summary = CanExecute(benchmarkType, config);
+        var summary = CanExecute<SimpleBenchmark>(config);
 
-        for (int i = 0; i < diagnosers.Length; i++)
+        foreach (var diagnoser in diagnosers)
         {
-            var diagnoser = diagnosers[i];
-            var shouldHaveResult = shouldHaveResults[i];
+            bool shouldHaveResults = diagnoser.DiagnoserRunMode != RunMode.None;
 
-            if (shouldHaveResult)
+            if (shouldHaveResults)
             {
                 Assert.NotEmpty(diagnoser.Results);
                 Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
@@ -91,21 +120,18 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
                 Assert.Empty(diagnoser.Results);
             }
         }
-
-        // For multiple benchmarks, verify all benchmark methods are present
-        if (benchmarkType == typeof(MultipleBenchmarks))
-        {
-            var benchmarkMethods = summary.BenchmarksCases.Select(bc => bc.Descriptor.WorkloadMethod.Name).ToList();
-            Assert.Contains("Benchmark1", benchmarkMethods);
-            Assert.Contains("Benchmark2", benchmarkMethods);
-            Assert.Contains("Benchmark3", benchmarkMethods);
-        }
     }
 
-    private IConfig CreateInProcessConfig(OutputLogger logger)
+    private IConfig CreateConfig(OutputLogger logger, IToolchain toolchain)
     {
+        var job = Job.Dry;
+        if (toolchain != null)
+        {
+            job = job.WithToolchain(toolchain);
+        }
+
         return new ManualConfig()
-            .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.DontLogOutput))
+            .AddJob(job)
             .AddLogger(logger)
             .AddColumnProvider(DefaultColumnProviders.Instance);
     }

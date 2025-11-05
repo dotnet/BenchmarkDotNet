@@ -17,7 +17,6 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 
     public abstract string DiagnoserName { get; }
     public abstract RunMode DiagnoserRunMode { get; }
-    public abstract Type HandlerType { get; }
     public abstract string ExpectedResult { get; }
 
     public IEnumerable<string> Ids => [DiagnoserName];
@@ -36,22 +35,31 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 
     public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
 
-    public virtual (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (HandlerType, null);
+    public abstract (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase);
 
     public virtual IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-        => (IInProcessDiagnoserHandler)Activator.CreateInstance(HandlerType, ExpectedResult);
+    {
+        var (handlerType, serializedConfig) = GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
+        if (handlerType == null)
+            return null;
+        var handler = (IInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
+        handler.Initialize(serializedConfig);
+        return handler;
+    }
 
     public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
 }
 
 public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
-    private readonly string _result;
+    private string _result;
 
-    protected BaseMockInProcessDiagnoserHandler(string result) => _result = result;
+    protected BaseMockInProcessDiagnoserHandler() { }
 
-    public void Initialize(string? serializedConfig) { }
+    public void Initialize(string? serializedConfig)
+    {
+        _result = serializedConfig ?? string.Empty;
+    }
 
     public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
 
@@ -62,46 +70,48 @@ public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser
 {
     public override string DiagnoserName => nameof(MockInProcessDiagnoser);
     public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
-    public override Type HandlerType => typeof(MockInProcessDiagnoserHandler);
     public override string ExpectedResult => "MockResult";
+
+    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => (typeof(MockInProcessDiagnoserHandler), ExpectedResult);
 }
 
 public sealed class MockInProcessDiagnoserHandler : BaseMockInProcessDiagnoserHandler
 {
-    public MockInProcessDiagnoserHandler(string result) : base(result) { }
 }
 
 public sealed class MockInProcessDiagnoserNoOverhead : BaseMockInProcessDiagnoser
 {
     public override string DiagnoserName => nameof(MockInProcessDiagnoserNoOverhead);
     public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
-    public override Type HandlerType => typeof(MockInProcessDiagnoserNoOverheadHandler);
     public override string ExpectedResult => "NoOverheadResult";
+
+    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => (typeof(MockInProcessDiagnoserNoOverheadHandler), ExpectedResult);
 }
 
 public sealed class MockInProcessDiagnoserNoOverheadHandler : BaseMockInProcessDiagnoserHandler
 {
-    public MockInProcessDiagnoserNoOverheadHandler(string result) : base(result) { }
 }
 
 public sealed class MockInProcessDiagnoserExtraRun : BaseMockInProcessDiagnoser
 {
     public override string DiagnoserName => nameof(MockInProcessDiagnoserExtraRun);
     public override RunMode DiagnoserRunMode => RunMode.ExtraRun;
-    public override Type HandlerType => typeof(MockInProcessDiagnoserExtraRunHandler);
     public override string ExpectedResult => "ExtraRunResult";
+
+    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => (typeof(MockInProcessDiagnoserExtraRunHandler), ExpectedResult);
 }
 
 public sealed class MockInProcessDiagnoserExtraRunHandler : BaseMockInProcessDiagnoserHandler
 {
-    public MockInProcessDiagnoserExtraRunHandler(string result) : base(result) { }
 }
 
 public sealed class MockInProcessDiagnoserNone : BaseMockInProcessDiagnoser
 {
     public override string DiagnoserName => nameof(MockInProcessDiagnoserNone);
     public override RunMode DiagnoserRunMode => RunMode.None;
-    public override Type HandlerType => typeof(MockInProcessDiagnoserNoneHandler);
     public override string ExpectedResult => "NoneResult";
 
     public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
@@ -113,5 +123,4 @@ public sealed class MockInProcessDiagnoserNone : BaseMockInProcessDiagnoser
 
 public sealed class MockInProcessDiagnoserNoneHandler : BaseMockInProcessDiagnoserHandler
 {
-    public MockInProcessDiagnoserNoneHandler(string result) : base(result) { }
 }
