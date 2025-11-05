@@ -111,33 +111,21 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
 
         foreach (var diagnoser in diagnosers)
         {
-            // NoOverhead, ExtraRun, and SeparateLogic should collect results
-            // None should not collect results
-            bool shouldHaveResults = diagnoser.DiagnoserRunMode != RunMode.None;
-
-            if (shouldHaveResults)
+            if (diagnoser.DiagnoserRunMode == RunMode.None)
             {
-                if (diagnoser.DiagnoserRunMode == RunMode.SeparateLogic)
-                {
-                    // SeparateLogic is not yet implemented for in-process diagnosers, so we expect it to fail
-                    // This is marked as a known limitation to be fixed in the future
-                    Assert.Empty(diagnoser.Results); // Expected to fail until SeparateLogic is implemented
-                }
-                else
-                {
-                    Assert.NotEmpty(diagnoser.Results);
-                    Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
-                    Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
-                }
+                Assert.Empty(diagnoser.Results);
             }
             else
             {
-                Assert.Empty(diagnoser.Results);
+                Assert.NotEmpty(diagnoser.Results);
+                Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
+                Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
             }
         }
         Assert.Equal(
             BaseMockInProcessDiagnoser.s_completedResults,
             diagnosers
+                .Where(d => d.DiagnoserRunMode != RunMode.None)
                 .OrderBy(d => d.DiagnoserRunMode switch
                 {
                     RunMode.NoOverhead => 0,
@@ -145,8 +133,6 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
                     RunMode.SeparateLogic => 2,
                     _ => 3
                 })
-                // SeparateLogic is not yet implemented for in-process diagnosers.
-                .Where(d => d.DiagnoserRunMode is RunMode.NoOverhead or RunMode.ExtraRun)
         );
         BaseMockInProcessDiagnoser.s_completedResults.Clear();
     }
