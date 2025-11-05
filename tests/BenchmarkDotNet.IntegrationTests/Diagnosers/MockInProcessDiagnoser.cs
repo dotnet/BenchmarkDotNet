@@ -6,9 +6,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
@@ -16,7 +15,6 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 {
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
     public Dictionary<BenchmarkCase, List<BenchmarkSignal>> HandlerSignals { get; } = [];
-    public Dictionary<BenchmarkCase, DateTime> FirstSignalTimes { get; } = [];
 
     public abstract string DiagnoserName { get; }
     public abstract RunMode DiagnoserRunMode { get; }
@@ -45,44 +43,29 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
         var (handlerType, serializedConfig) = GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
         if (handlerType == null)
             return null;
-        var handler = (IInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
+        var handler = (BaseMockInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
         handler.Initialize(serializedConfig);
+        handler.SetDiagnoser(this, benchmarkCase);
         return handler;
     }
 
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results)
+    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
+
+    internal void RecordSignal(BenchmarkCase benchmarkCase, BenchmarkSignal signal)
     {
-        // Parse the serialized results: "result|signals|timestamp"
-        var parts = results.Split('|');
-        var actualResult = parts[0];
-        Results.Add(benchmarkCase, actualResult);
-
-        if (parts.Length >= 3)
+        if (!HandlerSignals.ContainsKey(benchmarkCase))
         {
-            // Parse signals
-            var signalsString = parts[1];
-            if (!string.IsNullOrEmpty(signalsString))
-            {
-                var signals = signalsString.Split(',')
-                    .Select(s => Enum.Parse<BenchmarkSignal>(s))
-                    .ToList();
-                HandlerSignals[benchmarkCase] = signals;
-            }
-
-            // Parse timestamp
-            if (long.TryParse(parts[2], out var ticks))
-            {
-                FirstSignalTimes[benchmarkCase] = new DateTime(ticks, DateTimeKind.Utc);
-            }
+            HandlerSignals[benchmarkCase] = [];
         }
+        HandlerSignals[benchmarkCase].Add(signal);
     }
 }
 
 public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
     private string _result;
-    private readonly List<BenchmarkSignal> _signals = [];
-    private DateTime _firstSignalTime;
+    private BaseMockInProcessDiagnoser _diagnoser;
+    private BenchmarkCase _benchmarkCase;
 
     protected BaseMockInProcessDiagnoserHandler() { }
 
@@ -91,22 +74,18 @@ public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHan
         _result = serializedConfig ?? string.Empty;
     }
 
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
+    internal void SetDiagnoser(BaseMockInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase)
     {
-        if (_signals.Count == 0)
-        {
-            _firstSignalTime = DateTime.UtcNow;
-        }
-        _signals.Add(signal);
+        _diagnoser = diagnoser;
+        _benchmarkCase = benchmarkCase;
     }
 
-    public string SerializeResults()
+    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
     {
-        // Encode the result with timing and signal information
-        var signalsString = string.Join(",", _signals);
-        var timestamp = _firstSignalTime.Ticks;
-        return $"{_result}|{signalsString}|{timestamp}";
+        _diagnoser?.RecordSignal(_benchmarkCase, signal);
     }
+
+    public string SerializeResults() => _result;
 }
 
 public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser
