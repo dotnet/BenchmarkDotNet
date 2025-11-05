@@ -43,19 +43,10 @@ jobs:
       run: git tag v${{ steps.version.outputs.VERSION }}
 
     - name: Build
-      run: dotnet build -c Release BenchmarkDotNet.sln
+      run: ./build.cmd build --stable
 
     - name: Pack
-      run: |
-        rm -rf artifacts
-        dotnet pack src/BenchmarkDotNet/BenchmarkDotNet.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack src/BenchmarkDotNet.Diagnostics.dotMemory/BenchmarkDotNet.Diagnostics.dotMemory.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack src/BenchmarkDotNet.Diagnostics.dotTrace/BenchmarkDotNet.Diagnostics.dotTrace.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack src/BenchmarkDotNet.Exporters.Plotting/BenchmarkDotNet.Exporters.Plotting.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack src/BenchmarkDotNet.TestAdapter/BenchmarkDotNet.TestAdapter.csproj -c Release -o artifacts --include-symbols -p:SymbolPackageFormat=snupkg
-        dotnet pack templates/BenchmarkDotNet.Templates.csproj -c Release -o artifacts
+      run: ./build.cmd pack --stable
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -77,6 +68,8 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }}"
+        author_name: GitHub Actions
+        author_email: actions@github.com
         committer_name: GitHub Actions
         committer_email: actions@github.com
 
