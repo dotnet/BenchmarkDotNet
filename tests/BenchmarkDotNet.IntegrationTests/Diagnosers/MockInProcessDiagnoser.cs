@@ -11,19 +11,24 @@ using System;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
-public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
+public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 {
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
 
-    public IEnumerable<string> Ids => [nameof(MockInProcessDiagnoser)];
+    public abstract string DiagnoserName { get; }
+    public abstract RunMode DiagnoserRunMode { get; }
+    public abstract Type HandlerType { get; }
+    public abstract string ExpectedResult { get; }
+
+    public IEnumerable<string> Ids => [DiagnoserName];
 
     public IEnumerable<IExporter> Exporters => [];
 
     public IEnumerable<IAnalyser> Analysers => [];
 
-    public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoser)} results: [{string.Join(", ", Results.Values)}]");
+    public void DisplayResults(ILogger logger) => logger.WriteLine($"{DiagnoserName} results: [{string.Join(", ", Results.Values)}]");
 
-    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
+    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => DiagnoserRunMode;
 
     public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
@@ -31,125 +36,82 @@ public sealed class MockInProcessDiagnoser : IInProcessDiagnoser
 
     public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
 
-    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserHandler), null);
+    public virtual (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => (HandlerType, null);
 
-    public IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-        => new MockInProcessDiagnoserHandler();
+    public virtual IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
+        => (IInProcessDiagnoserHandler)Activator.CreateInstance(HandlerType, ExpectedResult);
 
     public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
 }
 
-public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
+public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
+    private readonly string _result;
+
+    protected BaseMockInProcessDiagnoserHandler(string result) => _result = result;
+
     public void Initialize(string? serializedConfig) { }
 
     public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
 
-    public string SerializeResults() => "MockResult";
+    public string SerializeResults() => _result;
 }
 
-public sealed class MockInProcessDiagnoserNoOverhead : IInProcessDiagnoser
+public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser
 {
-    public Dictionary<BenchmarkCase, string> Results { get; } = [];
-
-    public IEnumerable<string> Ids => [nameof(MockInProcessDiagnoserNoOverhead)];
-
-    public IEnumerable<IExporter> Exporters => [];
-
-    public IEnumerable<IAnalyser> Analysers => [];
-
-    public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoserNoOverhead)} results: [{string.Join(", ", Results.Values)}]");
-
-    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
-
-    public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
-
-    public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
-
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
-
-    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserNoOverheadHandler), null);
-
-    public IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-        => new MockInProcessDiagnoserNoOverheadHandler();
-
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
+    public override string DiagnoserName => nameof(MockInProcessDiagnoser);
+    public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
+    public override Type HandlerType => typeof(MockInProcessDiagnoserHandler);
+    public override string ExpectedResult => "MockResult";
 }
 
-public sealed class MockInProcessDiagnoserNoOverheadHandler : IInProcessDiagnoserHandler
+public sealed class MockInProcessDiagnoserHandler : BaseMockInProcessDiagnoserHandler
 {
-    public void Initialize(string? serializedConfig) { }
-
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
-
-    public string SerializeResults() => "NoOverheadResult";
+    public MockInProcessDiagnoserHandler(string result) : base(result) { }
 }
 
-public sealed class MockInProcessDiagnoserExtraRun : IInProcessDiagnoser
+public sealed class MockInProcessDiagnoserNoOverhead : BaseMockInProcessDiagnoser
 {
-    public Dictionary<BenchmarkCase, string> Results { get; } = [];
-
-    public IEnumerable<string> Ids => [nameof(MockInProcessDiagnoserExtraRun)];
-
-    public IEnumerable<IExporter> Exporters => [];
-
-    public IEnumerable<IAnalyser> Analysers => [];
-
-    public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoserExtraRun)} results: [{string.Join(", ", Results.Values)}]");
-
-    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
-
-    public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
-
-    public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
-
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
-
-    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserExtraRunHandler), null);
-
-    public IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-        => new MockInProcessDiagnoserExtraRunHandler();
-
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
+    public override string DiagnoserName => nameof(MockInProcessDiagnoserNoOverhead);
+    public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
+    public override Type HandlerType => typeof(MockInProcessDiagnoserNoOverheadHandler);
+    public override string ExpectedResult => "NoOverheadResult";
 }
 
-public sealed class MockInProcessDiagnoserExtraRunHandler : IInProcessDiagnoserHandler
+public sealed class MockInProcessDiagnoserNoOverheadHandler : BaseMockInProcessDiagnoserHandler
 {
-    public void Initialize(string? serializedConfig) { }
-
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
-
-    public string SerializeResults() => "ExtraRunResult";
+    public MockInProcessDiagnoserNoOverheadHandler(string result) : base(result) { }
 }
 
-public sealed class MockInProcessDiagnoserNone : IInProcessDiagnoser
+public sealed class MockInProcessDiagnoserExtraRun : BaseMockInProcessDiagnoser
 {
-    public Dictionary<BenchmarkCase, string> Results { get; } = [];
+    public override string DiagnoserName => nameof(MockInProcessDiagnoserExtraRun);
+    public override RunMode DiagnoserRunMode => RunMode.ExtraRun;
+    public override Type HandlerType => typeof(MockInProcessDiagnoserExtraRunHandler);
+    public override string ExpectedResult => "ExtraRunResult";
+}
 
-    public IEnumerable<string> Ids => [nameof(MockInProcessDiagnoserNone)];
+public sealed class MockInProcessDiagnoserExtraRunHandler : BaseMockInProcessDiagnoserHandler
+{
+    public MockInProcessDiagnoserExtraRunHandler(string result) : base(result) { }
+}
 
-    public IEnumerable<IExporter> Exporters => [];
+public sealed class MockInProcessDiagnoserNone : BaseMockInProcessDiagnoser
+{
+    public override string DiagnoserName => nameof(MockInProcessDiagnoserNone);
+    public override RunMode DiagnoserRunMode => RunMode.None;
+    public override Type HandlerType => typeof(MockInProcessDiagnoserNoneHandler);
+    public override string ExpectedResult => "NoneResult";
 
-    public IEnumerable<IAnalyser> Analysers => [];
-
-    public void DisplayResults(ILogger logger) => logger.WriteLine($"{nameof(MockInProcessDiagnoserNone)} results: [{string.Join(", ", Results.Values)}]");
-
-    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.None;
-
-    public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
-
-    public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
-
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
-
-    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
         => default; // Returns default when RunMode is None
 
-    public IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
+    public override IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
         => null; // Returns null when RunMode is None
+}
 
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
+public sealed class MockInProcessDiagnoserNoneHandler : BaseMockInProcessDiagnoserHandler
+{
+    public MockInProcessDiagnoserNoneHandler(string result) : base(result) { }
 }

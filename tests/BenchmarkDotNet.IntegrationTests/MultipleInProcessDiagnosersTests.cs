@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
@@ -16,136 +18,88 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
 {
     public MultipleInProcessDiagnosersTests(ITestOutputHelper output) : base(output) { }
 
-    [Fact]
-    public void MultipleInProcessDiagnosersWithNoOverheadRunMode()
+    public static IEnumerable<object[]> GetDiagnoserCombinations()
     {
-        var logger = new OutputLogger(Output);
-        var diagnoser1 = new MockInProcessDiagnoserNoOverhead();
-        var diagnoser2 = new MockInProcessDiagnoser();
+        // Two diagnosers with NoOverhead
+        yield return new object[]
+        {
+            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoser() },
+            typeof(SimpleBenchmark),
+            new[] { true, true }
+        };
 
-        var config = CreateInProcessConfig(logger)
-            .AddDiagnoser(diagnoser1)
-            .AddDiagnoser(diagnoser2);
+        // Two diagnosers with ExtraRun and NoOverhead
+        yield return new object[]
+        {
+            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserExtraRun(), new MockInProcessDiagnoserNoOverhead() },
+            typeof(SimpleBenchmark),
+            new[] { true, true }
+        };
 
-        var summary = CanExecute<SimpleBenchmark>(config);
+        // Three diagnosers with varying run modes (None should not collect results)
+        yield return new object[]
+        {
+            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoserExtraRun(), new MockInProcessDiagnoserNone() },
+            typeof(SimpleBenchmark),
+            new[] { true, true, false }
+        };
 
-        // Both diagnosers should have results for each benchmark
-        Assert.NotEmpty(diagnoser1.Results);
-        Assert.NotEmpty(diagnoser2.Results);
-        Assert.Equal(summary.BenchmarksCases.Length, diagnoser1.Results.Count);
-        Assert.Equal(summary.BenchmarksCases.Length, diagnoser2.Results.Count);
+        // Three different types
+        yield return new object[]
+        {
+            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoser(), new MockInProcessDiagnoserExtraRun() },
+            typeof(SimpleBenchmark),
+            new[] { true, true, true }
+        };
 
-        // Verify the results are correct for each diagnoser
-        Assert.All(diagnoser1.Results.Values, result => Assert.Equal("NoOverheadResult", result));
-        Assert.All(diagnoser2.Results.Values, result => Assert.Equal("MockResult", result));
+        // Multiple benchmarks
+        yield return new object[]
+        {
+            new BaseMockInProcessDiagnoser[] { new MockInProcessDiagnoserNoOverhead(), new MockInProcessDiagnoserExtraRun() },
+            typeof(MultipleBenchmarks),
+            new[] { true, true }
+        };
     }
 
-    [Fact]
-    public void MultipleInProcessDiagnosersWithExtraRunRunMode()
+    [Theory]
+    [MemberData(nameof(GetDiagnoserCombinations))]
+    public void MultipleInProcessDiagnosersWork(BaseMockInProcessDiagnoser[] diagnosers, Type benchmarkType, bool[] shouldHaveResults)
     {
         var logger = new OutputLogger(Output);
-        var diagnoser1 = new MockInProcessDiagnoserExtraRun();
-        var diagnoser2 = new MockInProcessDiagnoserNoOverhead();
+        var config = CreateInProcessConfig(logger);
 
-        var config = CreateInProcessConfig(logger)
-            .AddDiagnoser(diagnoser1)
-            .AddDiagnoser(diagnoser2);
+        foreach (var diagnoser in diagnosers)
+        {
+            config = config.AddDiagnoser(diagnoser);
+        }
 
-        var summary = CanExecute<SimpleBenchmark>(config);
+        var summary = CanExecute(benchmarkType, config);
 
-        // Both diagnosers should have results
-        Assert.NotEmpty(diagnoser1.Results);
-        Assert.NotEmpty(diagnoser2.Results);
-        Assert.Equal(summary.BenchmarksCases.Length, diagnoser1.Results.Count);
-        Assert.Equal(summary.BenchmarksCases.Length, diagnoser2.Results.Count);
+        for (int i = 0; i < diagnosers.Length; i++)
+        {
+            var diagnoser = diagnosers[i];
+            var shouldHaveResult = shouldHaveResults[i];
 
-        // Verify the results are correct for each diagnoser
-        Assert.All(diagnoser1.Results.Values, result => Assert.Equal("ExtraRunResult", result));
-        Assert.All(diagnoser2.Results.Values, result => Assert.Equal("NoOverheadResult", result));
-    }
+            if (shouldHaveResult)
+            {
+                Assert.NotEmpty(diagnoser.Results);
+                Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
+                Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
+            }
+            else
+            {
+                Assert.Empty(diagnoser.Results);
+            }
+        }
 
-    [Fact]
-    public void MultipleInProcessDiagnosersWithVaryingRunModes()
-    {
-        var logger = new OutputLogger(Output);
-        var noOverheadDiagnoser = new MockInProcessDiagnoserNoOverhead();
-        var extraRunDiagnoser = new MockInProcessDiagnoserExtraRun();
-        var noneDiagnoser = new MockInProcessDiagnoserNone();
-
-        var config = CreateInProcessConfig(logger)
-            .AddDiagnoser(noOverheadDiagnoser)
-            .AddDiagnoser(extraRunDiagnoser)
-            .AddDiagnoser(noneDiagnoser);
-
-        var summary = CanExecute<SimpleBenchmark>(config);
-
-        // NoOverhead and ExtraRun diagnosers should have results
-        Assert.NotEmpty(noOverheadDiagnoser.Results);
-        Assert.NotEmpty(extraRunDiagnoser.Results);
-        Assert.Equal(summary.BenchmarksCases.Length, noOverheadDiagnoser.Results.Count);
-        Assert.Equal(summary.BenchmarksCases.Length, extraRunDiagnoser.Results.Count);
-
-        // None diagnoser should not have results (RunMode.None means it shouldn't run)
-        Assert.Empty(noneDiagnoser.Results);
-
-        // Verify the results are correct for diagnosers that ran
-        Assert.All(noOverheadDiagnoser.Results.Values, result => Assert.Equal("NoOverheadResult", result));
-        Assert.All(extraRunDiagnoser.Results.Values, result => Assert.Equal("ExtraRunResult", result));
-    }
-
-    [Fact]
-    public void ThreeDifferentTypesOfInProcessDiagnosers()
-    {
-        var logger = new OutputLogger(Output);
-        var noOverheadDiagnoser = new MockInProcessDiagnoserNoOverhead();
-        var mockDiagnoser = new MockInProcessDiagnoser();
-        var extraRunDiagnoser = new MockInProcessDiagnoserExtraRun();
-
-        var config = CreateInProcessConfig(logger)
-            .AddDiagnoser(noOverheadDiagnoser)
-            .AddDiagnoser(mockDiagnoser)
-            .AddDiagnoser(extraRunDiagnoser);
-
-        var summary = CanExecute<SimpleBenchmark>(config);
-
-        // All three diagnosers should have results
-        Assert.NotEmpty(noOverheadDiagnoser.Results);
-        Assert.NotEmpty(mockDiagnoser.Results);
-        Assert.NotEmpty(extraRunDiagnoser.Results);
-        Assert.Equal(summary.BenchmarksCases.Length, noOverheadDiagnoser.Results.Count);
-        Assert.Equal(summary.BenchmarksCases.Length, mockDiagnoser.Results.Count);
-        Assert.Equal(summary.BenchmarksCases.Length, extraRunDiagnoser.Results.Count);
-
-        // Verify the results are correct for each diagnoser
-        Assert.All(noOverheadDiagnoser.Results.Values, result => Assert.Equal("NoOverheadResult", result));
-        Assert.All(mockDiagnoser.Results.Values, result => Assert.Equal("MockResult", result));
-        Assert.All(extraRunDiagnoser.Results.Values, result => Assert.Equal("ExtraRunResult", result));
-    }
-
-    [Fact]
-    public void MultipleInProcessDiagnosersWithMultipleBenchmarks()
-    {
-        var logger = new OutputLogger(Output);
-        var diagnoser1 = new MockInProcessDiagnoserNoOverhead();
-        var diagnoser2 = new MockInProcessDiagnoserExtraRun();
-
-        var config = CreateInProcessConfig(logger)
-            .AddDiagnoser(diagnoser1)
-            .AddDiagnoser(diagnoser2);
-
-        var summary = CanExecute<MultipleBenchmarks>(config);
-
-        // Both diagnosers should have results for all benchmarks
-        Assert.NotEmpty(diagnoser1.Results);
-        Assert.NotEmpty(diagnoser2.Results);
-        Assert.Equal(summary.BenchmarksCases.Length, diagnoser1.Results.Count);
-        Assert.Equal(summary.BenchmarksCases.Length, diagnoser2.Results.Count);
-
-        // Verify each diagnoser has a result for each benchmark method
-        var benchmarkMethods = summary.BenchmarksCases.Select(bc => bc.Descriptor.WorkloadMethod.Name).ToList();
-        Assert.Contains("Benchmark1", benchmarkMethods);
-        Assert.Contains("Benchmark2", benchmarkMethods);
-        Assert.Contains("Benchmark3", benchmarkMethods);
+        // For multiple benchmarks, verify all benchmark methods are present
+        if (benchmarkType == typeof(MultipleBenchmarks))
+        {
+            var benchmarkMethods = summary.BenchmarksCases.Select(bc => bc.Descriptor.WorkloadMethod.Name).ToList();
+            Assert.Contains("Benchmark1", benchmarkMethods);
+            Assert.Contains("Benchmark2", benchmarkMethods);
+            Assert.Contains("Benchmark3", benchmarkMethods);
+        }
     }
 
     private IConfig CreateInProcessConfig(OutputLogger logger)
