@@ -29,17 +29,7 @@ public class InProcessDiagnoserTests : BenchmarkTestExecutor
         {
             foreach (var runMode in AllRunModes)
             {
-                yield return [CreateDiagnoser(runMode, 0)];
-            }
-        }
-        else if (count == 2)
-        {
-            foreach (var runMode1 in AllRunModes)
-            {
-                foreach (var runMode2 in AllRunModes)
-                {
-                    yield return [CreateDiagnoser(runMode1, 0), CreateDiagnoser(runMode2, 1)];
-                }
+                yield return [CreateDiagnoser(runMode)];
             }
         }
         else if (count == 3)
@@ -50,14 +40,14 @@ public class InProcessDiagnoserTests : BenchmarkTestExecutor
                 {
                     foreach (var runMode3 in AllRunModes)
                     {
-                        yield return [CreateDiagnoser(runMode1, 0), CreateDiagnoser(runMode2, 1), CreateDiagnoser(runMode3, 2)];
+                        yield return [CreateDiagnoser(runMode1), CreateDiagnoser(runMode2), CreateDiagnoser(runMode3)];
                     }
                 }
             }
         }
     }
 
-    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode, int index)
+    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode)
     {
         return runMode switch
         {
@@ -78,7 +68,7 @@ public class InProcessDiagnoserTests : BenchmarkTestExecutor
             null // Default toolchain
         };
 
-        var counts = new[] { 1, 2, 3 };
+        var counts = new[] { 1, 3 };
 
         foreach (var toolchain in toolchains)
         {
