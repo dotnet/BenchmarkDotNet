@@ -57,7 +57,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             CanExecute<WasmBenchmark>(config);
 
-            Assert.Equal(["MockResult"], diagnoser.Results.Values);
+            Assert.Equal([diagnoser.ExpectedResult], diagnoser.Results.Values);
+            Assert.Equal([diagnoser], BaseMockInProcessDiagnoser.s_completedResults);
+            BaseMockInProcessDiagnoser.s_completedResults.Clear();
         }
 
         public class WasmBenchmark
