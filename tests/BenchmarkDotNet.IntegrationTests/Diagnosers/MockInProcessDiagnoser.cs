@@ -70,27 +70,13 @@ public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser
 {
     public override string DiagnoserName => nameof(MockInProcessDiagnoser);
     public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
-    public override string ExpectedResult => "MockResult";
+    public override string ExpectedResult => "NoOverheadResult";
 
     public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
         => (typeof(MockInProcessDiagnoserHandler), ExpectedResult);
 }
 
 public sealed class MockInProcessDiagnoserHandler : BaseMockInProcessDiagnoserHandler
-{
-}
-
-public sealed class MockInProcessDiagnoserNoOverhead : BaseMockInProcessDiagnoser
-{
-    public override string DiagnoserName => nameof(MockInProcessDiagnoserNoOverhead);
-    public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
-    public override string ExpectedResult => "NoOverheadResult";
-
-    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserNoOverheadHandler), ExpectedResult);
-}
-
-public sealed class MockInProcessDiagnoserNoOverheadHandler : BaseMockInProcessDiagnoserHandler
 {
 }
 
@@ -123,4 +109,17 @@ public sealed class MockInProcessDiagnoserNone : BaseMockInProcessDiagnoser
 
 public sealed class MockInProcessDiagnoserNoneHandler : BaseMockInProcessDiagnoserHandler
 {
+}
+
+public sealed class MockInProcessDiagnoserSeparateLogic : BaseMockInProcessDiagnoser
+{
+    public override string DiagnoserName => nameof(MockInProcessDiagnoserSeparateLogic);
+    public override RunMode DiagnoserRunMode => RunMode.SeparateLogic;
+    public override string ExpectedResult => "SeparateLogicResult";
+
+    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => default; // SeparateLogic uses its own logic, not in-process handlers
+
+    public override IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
+        => null; // SeparateLogic uses its own logic, not in-process handlers
 }

@@ -21,7 +21,7 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
 {
     public MultipleInProcessDiagnosersTests(ITestOutputHelper output) : base(output) { }
 
-    private static readonly RunMode[] AllRunModes = { RunMode.NoOverhead, RunMode.ExtraRun, RunMode.None };
+    private static readonly RunMode[] AllRunModes = { RunMode.NoOverhead, RunMode.ExtraRun, RunMode.None, RunMode.SeparateLogic };
 
     private static IEnumerable<BaseMockInProcessDiagnoser[]> GetDiagnoserCombinations(int count)
     {
@@ -61,9 +61,10 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
     {
         return runMode switch
         {
-            RunMode.NoOverhead => index == 0 ? new MockInProcessDiagnoserNoOverhead() : new MockInProcessDiagnoser(),
+            RunMode.NoOverhead => new MockInProcessDiagnoser(),
             RunMode.ExtraRun => new MockInProcessDiagnoserExtraRun(),
             RunMode.None => new MockInProcessDiagnoserNone(),
+            RunMode.SeparateLogic => new MockInProcessDiagnoserSeparateLogic(),
             _ => throw new ArgumentException($"Unsupported run mode: {runMode}")
         };
     }
@@ -107,7 +108,8 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
 
         foreach (var diagnoser in diagnosers)
         {
-            bool shouldHaveResults = diagnoser.DiagnoserRunMode != RunMode.None;
+            // Only NoOverhead and ExtraRun run modes should collect results via in-process handlers
+            bool shouldHaveResults = diagnoser.DiagnoserRunMode == RunMode.NoOverhead || diagnoser.DiagnoserRunMode == RunMode.ExtraRun;
 
             if (shouldHaveResults)
             {
@@ -142,29 +144,6 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
 
         [Benchmark]
         public void BenchmarkMethod()
-        {
-            Interlocked.Increment(ref counter);
-        }
-    }
-
-    public class MultipleBenchmarks
-    {
-        private int counter;
-
-        [Benchmark]
-        public void Benchmark1()
-        {
-            Interlocked.Increment(ref counter);
-        }
-
-        [Benchmark]
-        public void Benchmark2()
-        {
-            Interlocked.Increment(ref counter);
-        }
-
-        [Benchmark]
-        public void Benchmark3()
         {
             Interlocked.Increment(ref counter);
         }
