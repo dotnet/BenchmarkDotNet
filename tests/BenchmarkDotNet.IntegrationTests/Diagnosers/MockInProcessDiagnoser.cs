@@ -14,7 +14,6 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 {
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
-    public Dictionary<BenchmarkCase, List<BenchmarkSignal>> HandlerSignals { get; } = [];
 
     public abstract string DiagnoserName { get; }
     public abstract RunMode DiagnoserRunMode { get; }
@@ -43,29 +42,17 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
         var (handlerType, serializedConfig) = GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
         if (handlerType == null)
             return null;
-        var handler = (BaseMockInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
+        var handler = (IInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
         handler.Initialize(serializedConfig);
-        handler.SetDiagnoser(this, benchmarkCase);
         return handler;
     }
 
     public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
-
-    internal void RecordSignal(BenchmarkCase benchmarkCase, BenchmarkSignal signal)
-    {
-        if (!HandlerSignals.ContainsKey(benchmarkCase))
-        {
-            HandlerSignals[benchmarkCase] = [];
-        }
-        HandlerSignals[benchmarkCase].Add(signal);
-    }
 }
 
 public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
     private string _result;
-    private BaseMockInProcessDiagnoser _diagnoser;
-    private BenchmarkCase _benchmarkCase;
 
     protected BaseMockInProcessDiagnoserHandler() { }
 
@@ -74,16 +61,7 @@ public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHan
         _result = serializedConfig ?? string.Empty;
     }
 
-    internal void SetDiagnoser(BaseMockInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase)
-    {
-        _diagnoser = diagnoser;
-        _benchmarkCase = benchmarkCase;
-    }
-
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
-    {
-        _diagnoser?.RecordSignal(_benchmarkCase, signal);
-    }
+    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
 
     public string SerializeResults() => _result;
 }
