@@ -17,9 +17,9 @@ using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.IntegrationTests;
 
-public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
+public class InProcessDiagnoserTests : BenchmarkTestExecutor
 {
-    public MultipleInProcessDiagnosersTests(ITestOutputHelper output) : base(output) { }
+    public InProcessDiagnoserTests(ITestOutputHelper output) : base(output) { }
 
     private static readonly RunMode[] AllRunModes = { RunMode.NoOverhead, RunMode.ExtraRun, RunMode.None, RunMode.SeparateLogic };
 
