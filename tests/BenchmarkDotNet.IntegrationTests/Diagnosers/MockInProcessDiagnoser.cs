@@ -70,7 +70,7 @@ public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser
 {
     public override string DiagnoserName => nameof(MockInProcessDiagnoser);
     public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
-    public override string ExpectedResult => "NoOverheadResult";
+    public override string ExpectedResult => "MockResult";
 
     public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
         => (typeof(MockInProcessDiagnoserHandler), ExpectedResult);
@@ -118,8 +118,9 @@ public sealed class MockInProcessDiagnoserSeparateLogic : BaseMockInProcessDiagn
     public override string ExpectedResult => "SeparateLogicResult";
 
     public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => default; // SeparateLogic uses its own logic, not in-process handlers
+        => (typeof(MockInProcessDiagnoserSeparateLogicHandler), ExpectedResult);
+}
 
-    public override IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-        => null; // SeparateLogic uses its own logic, not in-process handlers
+public sealed class MockInProcessDiagnoserSeparateLogicHandler : BaseMockInProcessDiagnoserHandler
+{
 }

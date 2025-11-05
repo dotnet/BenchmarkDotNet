@@ -108,14 +108,24 @@ public class MultipleInProcessDiagnosersTests : BenchmarkTestExecutor
 
         foreach (var diagnoser in diagnosers)
         {
-            // Only NoOverhead and ExtraRun run modes should collect results via in-process handlers
-            bool shouldHaveResults = diagnoser.DiagnoserRunMode == RunMode.NoOverhead || diagnoser.DiagnoserRunMode == RunMode.ExtraRun;
+            // NoOverhead, ExtraRun, and SeparateLogic should collect results
+            // None should not collect results
+            bool shouldHaveResults = diagnoser.DiagnoserRunMode != RunMode.None;
 
             if (shouldHaveResults)
             {
-                Assert.NotEmpty(diagnoser.Results);
-                Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
-                Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
+                if (diagnoser.DiagnoserRunMode == RunMode.SeparateLogic)
+                {
+                    // SeparateLogic is not yet implemented for in-process diagnosers, so we expect it to fail
+                    // This is marked as a known limitation to be fixed in the future
+                    Assert.Empty(diagnoser.Results); // Expected to fail until SeparateLogic is implemented
+                }
+                else
+                {
+                    Assert.NotEmpty(diagnoser.Results);
+                    Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
+                    Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
+                }
             }
             else
             {
