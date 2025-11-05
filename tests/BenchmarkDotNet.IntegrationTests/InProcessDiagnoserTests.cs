@@ -109,17 +109,37 @@ public class InProcessDiagnoserTests : BenchmarkTestExecutor
                     // SeparateLogic is not yet implemented for in-process diagnosers, so we expect it to fail
                     // This is marked as a known limitation to be fixed in the future
                     Assert.Empty(diagnoser.Results); // Expected to fail until SeparateLogic is implemented
+                    Assert.Empty(diagnoser.HandlerSignals); // No signals should be recorded
                 }
                 else
                 {
                     Assert.NotEmpty(diagnoser.Results);
                     Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
                     Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
+
+                    // Verify handlers were called at the correct times
+                    Assert.NotEmpty(diagnoser.HandlerSignals);
+                    Assert.Equal(summary.BenchmarksCases.Length, diagnoser.HandlerSignals.Count);
+
+                    foreach (var (benchmarkCase, signals) in diagnoser.HandlerSignals)
+                    {
+                        // Verify the handler was called with all expected signals in the correct order
+                        Assert.NotEmpty(signals);
+                        Assert.Contains(Engines.BenchmarkSignal.BeforeActualRun, signals);
+                        Assert.Contains(Engines.BenchmarkSignal.AfterActualRun, signals);
+
+                        // Verify signals are in correct order
+                        var beforeIndex = signals.IndexOf(Engines.BenchmarkSignal.BeforeActualRun);
+                        var afterIndex = signals.IndexOf(Engines.BenchmarkSignal.AfterActualRun);
+                        Assert.True(beforeIndex < afterIndex,
+                            $"BeforeActualRun should come before AfterActualRun, but got indices {beforeIndex} and {afterIndex}");
+                    }
                 }
             }
             else
             {
                 Assert.Empty(diagnoser.Results);
+                Assert.Empty(diagnoser.HandlerSignals); // None should not have any signals
             }
         }
     }
