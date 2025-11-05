@@ -6,8 +6,9 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
@@ -15,6 +16,7 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 {
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
     public Dictionary<BenchmarkCase, List<BenchmarkSignal>> HandlerSignals { get; } = [];
+    public Dictionary<BenchmarkCase, DateTime> FirstSignalTimes { get; } = [];
 
     public abstract string DiagnoserName { get; }
     public abstract RunMode DiagnoserRunMode { get; }
@@ -43,29 +45,44 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
         var (handlerType, serializedConfig) = GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
         if (handlerType == null)
             return null;
-        var handler = (BaseMockInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
+        var handler = (IInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
         handler.Initialize(serializedConfig);
-        handler.SetDiagnoser(this, benchmarkCase);
         return handler;
     }
 
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
-
-    internal void RecordSignal(BenchmarkCase benchmarkCase, BenchmarkSignal signal)
+    public void DeserializeResults(BenchmarkCase benchmarkCase, string results)
     {
-        if (!HandlerSignals.ContainsKey(benchmarkCase))
+        // Parse the serialized results: "result|signals|timestamp"
+        var parts = results.Split('|');
+        var actualResult = parts[0];
+        Results.Add(benchmarkCase, actualResult);
+
+        if (parts.Length >= 3)
         {
-            HandlerSignals[benchmarkCase] = [];
+            // Parse signals
+            var signalsString = parts[1];
+            if (!string.IsNullOrEmpty(signalsString))
+            {
+                var signals = signalsString.Split(',')
+                    .Select(s => Enum.Parse<BenchmarkSignal>(s))
+                    .ToList();
+                HandlerSignals[benchmarkCase] = signals;
+            }
+
+            // Parse timestamp
+            if (long.TryParse(parts[2], out var ticks))
+            {
+                FirstSignalTimes[benchmarkCase] = new DateTime(ticks, DateTimeKind.Utc);
+            }
         }
-        HandlerSignals[benchmarkCase].Add(signal);
     }
 }
 
 public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
     private string _result;
-    private BaseMockInProcessDiagnoser _diagnoser;
-    private BenchmarkCase _benchmarkCase;
+    private readonly List<BenchmarkSignal> _signals = [];
+    private DateTime _firstSignalTime;
 
     protected BaseMockInProcessDiagnoserHandler() { }
 
@@ -74,18 +91,22 @@ public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHan
         _result = serializedConfig ?? string.Empty;
     }
 
-    internal void SetDiagnoser(BaseMockInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase)
-    {
-        _diagnoser = diagnoser;
-        _benchmarkCase = benchmarkCase;
-    }
-
     public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
     {
-        _diagnoser?.RecordSignal(_benchmarkCase, signal);
+        if (_signals.Count == 0)
+        {
+            _firstSignalTime = DateTime.UtcNow;
+        }
+        _signals.Add(signal);
     }
 
-    public string SerializeResults() => _result;
+    public string SerializeResults()
+    {
+        // Encode the result with timing and signal information
+        var signalsString = string.Join(",", _signals);
+        var timestamp = _firstSignalTime.Ticks;
+        return $"{_result}|{signalsString}|{timestamp}";
+    }
 }
 
 public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser

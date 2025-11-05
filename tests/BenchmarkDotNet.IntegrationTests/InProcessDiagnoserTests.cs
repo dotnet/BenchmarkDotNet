@@ -142,6 +142,36 @@ public class InProcessDiagnoserTests : BenchmarkTestExecutor
                 Assert.Empty(diagnoser.HandlerSignals); // None should not have any signals
             }
         }
+
+        // Verify timing: NoOverhead diagnosers should complete before ExtraRun diagnosers
+        var noOverheadDiagnosers = diagnosers.Where(d => d.DiagnoserRunMode == RunMode.NoOverhead).ToList();
+        var extraRunDiagnosers = diagnosers.Where(d => d.DiagnoserRunMode == RunMode.ExtraRun).ToList();
+
+        if (noOverheadDiagnosers.Any() && extraRunDiagnosers.Any())
+        {
+            foreach (var benchmarkCase in summary.BenchmarksCases)
+            {
+                var noOverheadTimes = noOverheadDiagnosers
+                    .Where(d => d.FirstSignalTimes.ContainsKey(benchmarkCase))
+                    .Select(d => d.FirstSignalTimes[benchmarkCase])
+                    .ToList();
+
+                var extraRunTimes = extraRunDiagnosers
+                    .Where(d => d.FirstSignalTimes.ContainsKey(benchmarkCase))
+                    .Select(d => d.FirstSignalTimes[benchmarkCase])
+                    .ToList();
+
+                if (noOverheadTimes.Any() && extraRunTimes.Any())
+                {
+                    var latestNoOverhead = noOverheadTimes.Max();
+                    var earliestExtraRun = extraRunTimes.Min();
+
+                    Assert.True(latestNoOverhead <= earliestExtraRun,
+                        $"NoOverhead diagnosers should complete before ExtraRun diagnosers. " +
+                        $"Latest NoOverhead: {latestNoOverhead:O}, Earliest ExtraRun: {earliestExtraRun:O}");
+                }
+            }
+        }
     }
 
     private IConfig CreateConfig(OutputLogger logger, IToolchain toolchain)
