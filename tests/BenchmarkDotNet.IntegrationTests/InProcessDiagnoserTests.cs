@@ -17,77 +17,90 @@ using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 
 namespace BenchmarkDotNet.IntegrationTests;
 
-public class InProcessDiagnoserTests : BenchmarkTestExecutor
+public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public InProcessDiagnoserTests(ITestOutputHelper output) : base(output) { }
-
-    private static readonly RunMode[] AllRunModes = { RunMode.NoOverhead, RunMode.ExtraRun, RunMode.None, RunMode.SeparateLogic };
-
-    private static IEnumerable<BaseMockInProcessDiagnoser[]> GetDiagnoserCombinations(int count)
+    // For test explorer since it doesn't handle interfaces well.
+    public enum ToolchainType
     {
+        Default,
+        InProcessEmit,
+        InProcessNoEmit,
+    }
+
+    private static IEnumerable<RunMode[]> GetRunModeCombinations(int count)
+    {
+        var runModes = (RunMode[]) Enum.GetValues(typeof(RunMode));
+
         if (count == 1)
         {
-            foreach (var runMode in AllRunModes)
+            foreach (var runMode in runModes)
             {
-                yield return [CreateDiagnoser(runMode)];
+                yield return [runMode];
             }
         }
         else if (count == 3)
         {
-            foreach (var runMode1 in AllRunModes)
+            foreach (var runMode1 in runModes)
             {
-                foreach (var runMode2 in AllRunModes)
+                foreach (var runMode2 in runModes)
                 {
-                    foreach (var runMode3 in AllRunModes)
+                    foreach (var runMode3 in runModes)
                     {
-                        yield return [CreateDiagnoser(runMode1), CreateDiagnoser(runMode2), CreateDiagnoser(runMode3)];
+                        yield return [runMode1, runMode2, runMode3];
                     }
                 }
             }
         }
     }
 
-    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode)
-    {
-        return runMode switch
-        {
-            RunMode.NoOverhead => new MockInProcessDiagnoser(),
-            RunMode.ExtraRun => new MockInProcessDiagnoserExtraRun(),
-            RunMode.None => new MockInProcessDiagnoserNone(),
-            RunMode.SeparateLogic => new MockInProcessDiagnoserSeparateLogic(),
-            _ => throw new ArgumentException($"Unsupported run mode: {runMode}")
-        };
-    }
-
     public static IEnumerable<object[]> GetTestCombinations()
     {
-        var toolchains = new IToolchain[]
-        {
-            InProcessEmitToolchain.DontLogOutput,
-            new InProcessNoEmitToolchain(TimeSpan.Zero, true),
-            null // Default toolchain
-        };
-
+        var toolchains = (ToolchainType[]) Enum.GetValues(typeof(ToolchainType));
         var counts = new[] { 1, 3 };
 
         foreach (var toolchain in toolchains)
         {
             foreach (var count in counts)
             {
-                foreach (var diagnosers in GetDiagnoserCombinations(count))
+                foreach (var runModes in GetRunModeCombinations(count))
                 {
-                    yield return new object[] { diagnosers, toolchain };
+                    yield return [runModes, toolchain];
                 }
             }
         }
     }
 
+    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode)
+        => runMode switch
+        {
+            RunMode.None => new MockInProcessDiagnoserNone(),
+            RunMode.NoOverhead => new MockInProcessDiagnoser(),
+            RunMode.ExtraRun => new MockInProcessDiagnoserExtraRun(),
+            RunMode.SeparateLogic => new MockInProcessDiagnoserSeparateLogic(),
+            _ => throw new ArgumentException($"Unsupported run mode: {runMode}")
+        };
+
+    private ManualConfig CreateConfig(ToolchainType toolchain)
+    {
+        var job = toolchain switch
+        {
+            ToolchainType.InProcessEmit => Job.Dry.WithToolchain(InProcessEmitToolchain.Instance),
+            ToolchainType.InProcessNoEmit => Job.Dry.WithToolchain(InProcessNoEmitToolchain.Instance),
+            _ => Job.Dry
+        };
+
+        return new ManualConfig()
+            .AddLogger(new OutputLogger(Output))
+            .AddColumnProvider(DefaultColumnProviders.Instance)
+            .AddJob(job);
+    }
+
     [Theory]
     [MemberData(nameof(GetTestCombinations))]
-    public void MultipleInProcessDiagnosersWork(BaseMockInProcessDiagnoser[] diagnosers, IToolchain toolchain)
+    public void MultipleInProcessDiagnosersWork(RunMode[] runModes, ToolchainType toolchain)
     {
-        var logger = new OutputLogger(Output);
-        var config = CreateConfig(logger, toolchain);
+        var diagnosers = runModes.Select(CreateDiagnoser).ToArray();
+        var config = CreateConfig(toolchain);
 
         foreach (var diagnoser in diagnosers)
         {
@@ -122,20 +135,20 @@ public class InProcessDiagnoserTests : BenchmarkTestExecutor
                 Assert.Empty(diagnoser.Results);
             }
         }
-    }
-
-    private IConfig CreateConfig(OutputLogger logger, IToolchain toolchain)
-    {
-        var job = Job.Dry;
-        if (toolchain != null)
-        {
-            job = job.WithToolchain(toolchain);
-        }
-
-        return new ManualConfig()
-            .AddJob(job)
-            .AddLogger(logger)
-            .AddColumnProvider(DefaultColumnProviders.Instance);
+        Assert.Equal(
+            BaseMockInProcessDiagnoser.s_completedResults,
+            diagnosers
+                .OrderBy(d => d.DiagnoserRunMode switch
+                {
+                    RunMode.NoOverhead => 0,
+                    RunMode.ExtraRun => 1,
+                    RunMode.SeparateLogic => 2,
+                    _ => 3
+                })
+                // SeparateLogic is not yet implemented for in-process diagnosers.
+                .Where(d => d.DiagnoserRunMode is RunMode.NoOverhead or RunMode.ExtraRun)
+        );
+        BaseMockInProcessDiagnoser.s_completedResults.Clear();
     }
 
     public class SimpleBenchmark

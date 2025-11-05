@@ -13,6 +13,8 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
 public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 {
+    public static Queue<BaseMockInProcessDiagnoser> s_completedResults = new();
+
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
 
     public abstract string DiagnoserName { get; }
@@ -47,7 +49,11 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
         return handler;
     }
 
-    public void DeserializeResults(BenchmarkCase benchmarkCase, string results) => Results.Add(benchmarkCase, results);
+    public void DeserializeResults(BenchmarkCase benchmarkCase, string results)
+    {
+        Results.Add(benchmarkCase, results);
+        s_completedResults.Enqueue(this);
+    }
 }
 
 public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
