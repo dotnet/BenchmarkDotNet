@@ -26945,13 +26945,13 @@ references:
   commentId: T:BenchmarkDotNet.Mathematics.Statistics
   fullName: BenchmarkDotNet.Mathematics.Statistics
   nameWithType: Statistics
-- uid: BenchmarkDotNet.Mathematics.Statistics.#ctor(Perfolizer.Sample)
+- uid: BenchmarkDotNet.Mathematics.Statistics.#ctor(Pragmastat.Sample)
   name: Statistics(Sample)
-  href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics__ctor_Perfolizer_Sample_
-  commentId: M:BenchmarkDotNet.Mathematics.Statistics.#ctor(Perfolizer.Sample)
+  href: api/BenchmarkDotNet.Mathematics.Statistics.html#BenchmarkDotNet_Mathematics_Statistics__ctor_Pragmastat_Sample_
+  commentId: M:BenchmarkDotNet.Mathematics.Statistics.#ctor(Pragmastat.Sample)
   name.vb: New(Sample)
-  fullName: BenchmarkDotNet.Mathematics.Statistics.Statistics(Perfolizer.Sample)
-  fullName.vb: BenchmarkDotNet.Mathematics.Statistics.New(Perfolizer.Sample)
+  fullName: BenchmarkDotNet.Mathematics.Statistics.Statistics(Pragmastat.Sample)
+  fullName.vb: BenchmarkDotNet.Mathematics.Statistics.New(Pragmastat.Sample)
   nameWithType: Statistics.Statistics(Sample)
   nameWithType.vb: Statistics.New(Sample)
 - uid: BenchmarkDotNet.Mathematics.Statistics.#ctor(System.Collections.Generic.IEnumerable{System.Double})
@@ -38178,6 +38178,12 @@ references:
 - uid: changelog.v0.15.5
   name: BenchmarkDotNet v0.15.5
   href: changelog/v0.15.5.html
+- uid: changelog.v0.15.6
+  name: BenchmarkDotNet v0.15.6
+  href: changelog/v0.15.6.html
+- uid: changelog.v0.15.7
+  name: BenchmarkDotNet v0.15.7
+  href: changelog/v0.15.7.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html

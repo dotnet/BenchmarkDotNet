@@ -21,7 +21,7 @@
     "changefreq": "monthly",
     "priority": 0.8
   },
-  "source_base_path": "D:/a/BenchmarkDotNet/BenchmarkDotNet/docs",
+  "source_base_path": "/home/runner/work/BenchmarkDotNet/BenchmarkDotNet/docs",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -9316,6 +9316,26 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.15.5.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.15.6.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.15.6.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.15.7.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.15.7.html"
         }
       },
       "version": ""

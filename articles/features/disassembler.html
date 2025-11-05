@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/articles/features/disassembler.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/features/disassembler.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -109,6 +109,14 @@
 <p>To get the source code we need to locate and read the <code>.pdb</code> files.
 This is why we need <code>DebugType</code> and <code>DebugSymbols</code> settings.
 To compare different platforms the project which defines benchmarks has to target <code>AnyCPU</code>.</p>
+<div class="NOTE">
+<h5>Note</h5>
+<p>By default, BenchmarkDotNet excludes disassembler's native dependencies that aren't used on current target platform.<br>
+Use the following settings when running the benchmark binary on a different platform than it was built on, or multiple platforms.</p>
+<pre><code class="lang-xml">&lt;BenchmarkDotNetTargetPlatform&gt;all&lt;/BenchmarkDotNetTargetPlatform&gt;
+</code></pre>
+</div>
+<p>Or specify <code>&lt;RuntimeIdentifier&gt;</code> for the platform that it will be run on.</p>
 <h3 id="disassembly-diagnoser-for-mono-on-windows">Disassembly Diagnoser for Mono on Windows</h3>
 <p>If you want to get a disassembly listing for Mono on Windows, you need <code>as</code> and <code>x86_64-w64-mingw32-objdump.exe</code> tools.
 If you don't have it, you will get a warning like follows:</p>

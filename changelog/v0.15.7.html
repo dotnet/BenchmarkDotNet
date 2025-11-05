@@ -2,21 +2,21 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title> | BenchmarkDotNet </title>
+      <title>BenchmarkDotNet v0.15.7 | BenchmarkDotNet </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content=" | BenchmarkDotNet ">
+      <meta name="title" content="BenchmarkDotNet v0.15.7 | BenchmarkDotNet ">
       
       
-      <link rel="icon" href="../../logo/icon-32.png">
-      <link rel="stylesheet" href="../../public/docfx.min.css">
-      <link rel="stylesheet" href="../../public/main.css">
-      <meta name="docfx:navrel" content="../../toc.html">
-      <meta name="docfx:tocrel" content="../toc.html">
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
       
-      <meta name="docfx:rel" content="../../">
+      <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/articles/samples/IntroHardwareCounters.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.15.7.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -30,7 +30,7 @@
       <meta name="loc:copy" content="Copy">
       <meta name="loc:downloadPdf" content="Download PDF">
 
-      <script type="module" src="./../../public/docfx.min.js"></script>
+      <script type="module" src="./../public/docfx.min.js"></script>
 
       <script>
         const theme = localStorage.getItem('theme') || 'auto'
@@ -43,8 +43,8 @@
     <header class="bg-body border-bottom">
       <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
         <div class="container-xxl flex-nowrap">
-          <a class="navbar-brand" href="../../index.html">
-            <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
             
           </a>
           <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,117 +84,39 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="BenchmarkDotNet.Samples.IntroHardwareCounters">
+        <article data-uid="changelog.v0.15.7">
+<h1 id="benchmarkdotnet-v0157">BenchmarkDotNet v0.15.7</h1>
 
-<h2 id="sample-introhardwarecounters">Sample: IntroHardwareCounters</h2>
-<p>This diagnoser is not enabled in explicit way as the other diagnosers.
-You need to specify <code>[HardwareCounters]</code> and we choose the right diagnoser in the runtime.</p>
-<h3 id="source-code">Source code</h3>
-<pre><code class="lang-csharp" name="IntroHardwareCounters.cs">using System;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnosers;
-
-namespace BenchmarkDotNet.Samples
-{
-    [HardwareCounters(
-        HardwareCounter.BranchMispredictions,
-        HardwareCounter.BranchInstructions)]
-    public class IntroHardwareCounters
-    {
-        private const int N = 32767;
-        private readonly int[] sorted, unsorted;
-
-        public IntroHardwareCounters()
-        {
-            var random = new Random(0);
-            unsorted = new int[N];
-            sorted = new int[N];
-            for (int i = 0; i &lt; N; i++)
-                sorted[i] = unsorted[i] = random.Next(256);
-            Array.Sort(sorted);
-        }
-
-        private static int Branch(int[] data)
-        {
-            int sum = 0;
-            for (int i = 0; i &lt; N; i++)
-                if (data[i] &gt;= 128)
-                    sum += data[i];
-            return sum;
-        }
-
-        private static int Branchless(int[] data)
-        {
-            int sum = 0;
-            for (int i = 0; i &lt; N; i++)
-            {
-                int t = (data[i] - 128) &gt;&gt; 31;
-                sum += ~t &amp; data[i];
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public int SortedBranch() =&gt; Branch(sorted);
-
-        [Benchmark]
-        public int UnsortedBranch() =&gt; Branch(unsorted);
-
-        [Benchmark]
-        public int SortedBranchless() =&gt; Branchless(sorted);
-
-        [Benchmark]
-        public int UnsortedBranchless() =&gt; Branchless(unsorted);
-    }
-}
-</code></pre><h3 id="output">Output</h3>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Mean</th>
-<th>Mispredict rate</th>
-<th>BranchInstructions/Op</th>
-<th>BranchMispredictions/Op</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>SortedBranch</td>
-<td>21.4539 us</td>
-<td>0,04%</td>
-<td>70121</td>
-<td>24</td>
-</tr>
-<tr>
-<td>UnsortedBranch</td>
-<td>136.1139 us</td>
-<td>23,70%</td>
-<td>68788</td>
-<td>16301</td>
-</tr>
-<tr>
-<td>SortedBranchless</td>
-<td>28.6705 us</td>
-<td>0,06%</td>
-<td>35711</td>
-<td>22</td>
-</tr>
-<tr>
-<td>UnsortedBranchless</td>
-<td>28.9336 us</td>
-<td>0,05%</td>
-<td>35578</td>
-<td>17</td>
-</tr>
-</tbody>
-</table>
-<h3 id="links">Links</h3>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.15.7">v0.15.7</a> scope,
+0 issues were resolved and 0 pull requests were merged.
+This release includes 1 commits by 1 contributors.</p>
+<h2 id="resolved-issues-0">Resolved issues (0)</h2>
+<h2 id="merged-pull-requests-0">Merged pull requests (0)</h2>
+<h2 id="commits-1">Commits (1)</h2>
 <ul>
-<li><a class="xref" href="../configs/diagnosers.html">Diagnosers</a></li>
-<li>The permanent link to this sample: <a class="xref" href="IntroHardwareCounters.html">BenchmarkDotNet.Samples.IntroHardwareCounters</a></li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/77c38988b2c1ec43c6aec4f4b85fc28a65e84678">77c389</a> Set next BenchmarkDotNet version: 0.15.6 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 </ul>
-<hr>
+<h2 id="contributors-1">Contributors (1)</h2>
+<ul>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: TBA</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.15.7">v0.15.7</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.15.6...v0.15.7">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.7">https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.7</a></li>
+</ul>
 
 </article>
 
