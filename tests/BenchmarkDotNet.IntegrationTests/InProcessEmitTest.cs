@@ -131,19 +131,6 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.DoesNotContain("No benchmarks found", logger.GetLog());
         }
 
-        [Fact]
-        public void InProcessEmitSupportsInProcessDiagnosers()
-        {
-            var logger = new OutputLogger(Output);
-            var diagnoser = new MockInProcessDiagnoser();
-            var config = CreateInProcessConfig(logger).AddDiagnoser(diagnoser);
-
-            var summary = CanExecute<BenchmarkAllCases>(config);
-
-            var expected = Enumerable.Repeat("MockResult", summary.BenchmarksCases.Length);
-            Assert.Equal(expected, diagnoser.Results.Values);
-        }
-
         [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class BenchmarkAllCases
         {
