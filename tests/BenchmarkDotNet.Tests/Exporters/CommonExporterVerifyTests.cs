@@ -15,6 +15,7 @@ using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [UsedImplicitly]
         public static TheoryData<string> CultureInfoNames => TheoryDataHelper.Create(CultureInfos.Keys);
 
-        [Theory]
+        [TheoryEnvSpecific(".NET SDK is skipped in Framework, so the exported result does not match the verified file.", EnvRequirement.DotNetCoreOnly)]
         [MemberData(nameof(CultureInfoNames))]
         public Task Exporters(string cultureInfoName)
         {
