@@ -37,6 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithArguments([new MsBuildArgument($"/p:WasmMainJSPath={mainJsPath}")])
                     .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet80, javaScriptEngineArguments: "--expose_wasm --module"))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
+                .WithBuildTimeout(TimeSpan.FromSeconds(240))
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);
 
             CanExecute<WasmBenchmark>(config);

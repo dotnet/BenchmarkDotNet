@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\build\common.props" />
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net462;netcoreapp3.1</TargetFrameworks>
+        <TargetFrameworks>net8.0;net6.0;net462;netcoreapp3.1</TargetFrameworks>
         <NoWarn>$(NoWarn);1591</NoWarn>
         <AssemblyTitle>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyTitle>
         <AssemblyName>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyName>

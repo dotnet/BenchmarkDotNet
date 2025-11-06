@@ -20,7 +20,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
                 .AddLogger(logger)
-                .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80));
+                .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80))
+                .WithBuildTimeout(TimeSpan.FromSeconds(240));
             CanExecute<MonoBenchmark>(config);
         }
 

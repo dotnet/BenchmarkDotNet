@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -24,6 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var jobWithCustomConfiguration = Job.Dry.WithCustomBuildConfiguration("CUSTOM");
 
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
+            config = ((ManualConfig)config).WithBuildTimeout(TimeSpan.FromSeconds(240));
 
             var report = CanExecute<CustomBuildConfiguration>(config);
 

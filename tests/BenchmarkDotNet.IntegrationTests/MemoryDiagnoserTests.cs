@@ -386,6 +386,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         new EnvironmentVariable("COMPlus_TieredCompilation", "0")
                     )
                     : job)
+                .WithBuildTimeout(TimeSpan.FromSeconds(240)) // Increase timeout for `MemoryDiagnoserSupportsModernMono` test on macos(x64)
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)
                 .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
