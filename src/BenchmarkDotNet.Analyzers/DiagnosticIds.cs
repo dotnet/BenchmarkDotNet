@@ -25,13 +25,15 @@
         public const string Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly = "BDN1206";
         public const string Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter = "BDN1207";
         public const string Attributes_ParamsAttribute_MustHaveValues = "BDN1300";
-        public const string Attributes_ParamsAttribute_MustHaveMatchingValueType = "BDN1301";
-        public const string Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute = "BDN1302";
-        public const string Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType = "BDN1303";
-        public const string Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool = "BDN1304";
+        public const string Attributes_ParamsAttribute_SingleNullArgumentNotAllowed = "BDN1301";
+        public const string Attributes_ParamsAttribute_MustHaveMatchingValueType = "BDN1302";
+        public const string Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute = "BDN1303";
+        public const string Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType = "BDN1304";
+        public const string Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool = "BDN1305";
         public const string Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters = "BDN1400";
         public const string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute = "BDN1500";
-        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1501";
-        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1502";
+        public const string Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed = "BDN1501";
+        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1502";
+        public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1503";
     }
 }

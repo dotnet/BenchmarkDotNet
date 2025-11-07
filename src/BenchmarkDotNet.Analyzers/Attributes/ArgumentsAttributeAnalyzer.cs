@@ -19,6 +19,13 @@
                                                                                                                 DiagnosticSeverity.Error,
                                                                                                                 isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor SingleNullArgumentNotAllowedRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed,
+                                                                                                                  AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed_Title)),
+                                                                                                                  AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed_MessageFormat)),
+                                                                                                                  "Usage",
+                                                                                                                  DiagnosticSeverity.Error,
+                                                                                                                  isEnabledByDefault: true);
+
         internal static readonly DiagnosticDescriptor MustHaveMatchingValueCountRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount,
                                                                                                                 AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Title)),
                                                                                                                 AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_MessageFormat)),
@@ -38,6 +45,7 @@
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             RequiresBenchmarkAttributeRule,
+            SingleNullArgumentNotAllowedRule,
             MustHaveMatchingValueCountRule,
             MustHaveMatchingValueTypeRule
         ];
@@ -57,6 +65,7 @@
                 }
 
                 ctx.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
+                ctx.RegisterSyntaxNodeAction(AnalyzeAttributeSyntax, SyntaxKind.Attribute);
             });
         }
 
@@ -67,7 +76,7 @@
                 return;
             }
 
-            var argumentsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsAttribute");
+            var argumentsAttributeTypeSymbol = GetArgumentsAttributeTypeSymbol(context.Compilation);
             var argumentsSourceAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsSourceAttribute");
 
             if (argumentsAttributeTypeSymbol == null || argumentsSourceAttributeTypeSymbol == null)
@@ -313,6 +322,31 @@
             }
         }
 
+        private static void AnalyzeAttributeSyntax(SyntaxNodeAnalysisContext context)
+        {
+            if (context.Node is not AttributeSyntax attributeSyntax)
+            {
+                return;
+            }
+
+            var argumentsAttributeTypeSymbol = GetArgumentsAttributeTypeSymbol(context.Compilation);
+
+            var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
+            if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(argumentsAttributeTypeSymbol, SymbolEqualityComparer.Default))
+            {
+                if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
+                {
+                    var argumentSyntax = attributeSyntax.ArgumentList.Arguments[0];
+
+                    var constantValue = context.SemanticModel.GetConstantValue(argumentSyntax.Expression);
+                    if (constantValue is { HasValue: true, Value: null })
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(SingleNullArgumentNotAllowedRule, argumentSyntax.GetLocation()));
+                    }
+                }
+            }
+        }
+
         private static int? IndexOfNamedArgument(SeparatedSyntaxList<AttributeArgumentSyntax> attributeArguments)
         {
             var i = 0;
@@ -329,5 +363,7 @@
 
             return null;
         }
+
+        private static INamedTypeSymbol? GetArgumentsAttributeTypeSymbol(Compilation compilation) => compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsAttribute");
     }
 }

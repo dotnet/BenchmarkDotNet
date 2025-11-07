@@ -133,6 +133,24 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Passing a single null argument creates a null params array. Use multiple arguments (e.g., null, &quot;testValue&quot;, ...) or a non-null value instead..
+        /// </summary>
+        internal static string Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single null argument to the [Arguments] attribute results in unintended null array.
+        /// </summary>
+        internal static string Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsAttribute_SingleNullArgumentNotAllowed_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This method declares one or more parameters but is not annotated with either an [ArgumentsSource] attribute or one or more [Arguments] attributes. To ensure correct argument binding, methods with parameters must explicitly be annotated with an [ArgumentsSource] attribute or one or more [Arguments] attributes.
         ///Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the parameters..
         /// </summary>
@@ -461,6 +479,24 @@ namespace BenchmarkDotNet.Analyzers {
         internal static string Attributes_ParamsAttribute_MustHaveValues_Title {
             get {
                 return ResourceManager.GetString("Attributes_ParamsAttribute_MustHaveValues_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Passing a single null argument creates a null params array. Use multiple arguments (e.g., null, &quot;testValue&quot;, ...) or a non-null value instead..
+        /// </summary>
+        internal static string Attributes_ParamsAttribute_SingleNullArgumentNotAllowed_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ParamsAttribute_SingleNullArgumentNotAllowed_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single null argument to the [Params] attribute results in unintended null array.
+        /// </summary>
+        internal static string Attributes_ParamsAttribute_SingleNullArgumentNotAllowed_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ParamsAttribute_SingleNullArgumentNotAllowed_Title", resourceCulture);
             }
         }
         

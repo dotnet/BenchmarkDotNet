@@ -171,7 +171,7 @@
                 return;
             }
 
-            var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryTypeSymbol(context.Compilation);
+            var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryAttributeTypeSymbol(context.Compilation);
             if (benchmarkCategoryAttributeTypeSymbol == null)
             {
                 return;
@@ -537,11 +537,7 @@
                 return;
             }
 
-            var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryTypeSymbol(context.Compilation);
-            if (benchmarkCategoryAttributeTypeSymbol == null)
-            {
-                return;
-            }
+            var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryAttributeTypeSymbol(context.Compilation);
 
             var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
             if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol, SymbolEqualityComparer.Default))
@@ -559,7 +555,7 @@
             }
         }
 
-        private static INamedTypeSymbol? GetBenchmarkCategoryTypeSymbol(Compilation compilation) => compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.BenchmarkCategoryAttribute");
+        private static INamedTypeSymbol? GetBenchmarkCategoryAttributeTypeSymbol(Compilation compilation) => compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.BenchmarkCategoryAttribute");
 
         private static string FormatBenchmarkCategory(List<string?> benchmarkCategories)
         {

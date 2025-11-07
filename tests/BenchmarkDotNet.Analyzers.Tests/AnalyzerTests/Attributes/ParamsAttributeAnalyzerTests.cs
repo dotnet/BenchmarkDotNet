@@ -2,7 +2,7 @@
 {
     using Fixtures;
 
-    using BenchmarkDotNet.Analyzers.Attributes;
+    using Analyzers.Attributes;
 
     using Xunit;
 
@@ -160,6 +160,170 @@
             }
         }
 
+        public class SingleNullArgumentNotAllowed : AnalyzerTestFixture<ParamsAttributeAnalyzer>
+        {
+            public SingleNullArgumentNotAllowed() : base(ParamsAttributeAnalyzer.SingleNullArgumentNotAllowedRule)
+            {
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_a_non_null_single_argument_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
+                                                                                                 [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                 bool useConstantFromOtherClass,
+                                                                                                 bool useLocalConstant)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+                                                    
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "\"test\"")};" : "")}}
+                                                    
+                                                        [{{dummyAttributeUsage}}{{$"Params({(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "\"test\"")})"}}]
+                                                        public string {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceConstants("string", "\"test\"");
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_an_array_argument_containing_one_or_more_null_values_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
+                                                                                                                           [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                           bool useConstantsFromOtherClass,
+                                                                                                                           bool useLocalConstants,
+                                                                                                                           [CombinatorialValues("{0}", "{0}, {1}", "{1}, {0}", "{0}, {1}, {0}", "{1}, {0}, {1}")] string valuesTemplate,
+                                                                                                                           [CombinatorialMemberData(nameof(AttributeValuesContainerEnumerable))] string valuesContainer)
+            {
+                var attributeValues = string.Format(valuesContainer, string.Format(valuesTemplate,
+                                                                                   useLocalConstants ? "_xNull" : useConstantsFromOtherClass ? "Constants.Value1" : "null",
+                                                                                   useLocalConstants ? "_xValue" : useConstantsFromOtherClass ? "Constants.Value2" : "\"test\""));
+
+
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstants ? $"""
+                                                                                private const string _xNull = {(useConstantsFromOtherClass ? "Constants.Value1" : "null")};
+                                                                                private const string _xValue = {(useConstantsFromOtherClass ? "Constants.Value2" : "\"test\"")};
+                                                                                """ : "")}}
+
+                                                        [{{dummyAttributeUsage}}Params({{attributeValues}})]
+                                                        public string {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceConstants(("string", "null"), ("string", "\"test\""));
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_a_null_single_argument_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
+                                                                                         [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                         bool useConstantFromOtherClass,
+                                                                                         bool useLocalConstant)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                     using BenchmarkDotNet.Attributes;
+
+                                                     public class BenchmarkClass
+                                                     {
+                                                         {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
+
+                                                         [{{dummyAttributeUsage}}Params({|#0:{{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}|})]
+                                                         public string {{fieldOrPropertyDeclaration}}
+                                                     }
+                                                     """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceConstants("string", "null");
+
+                AddDefaultExpectedDiagnostic();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_a_null_single_argument_to_attribute_annotating_a_field_or_property_with_an_invalid_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
+                                                                                                                                                          [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                                                                                          bool useConstantFromOtherClass,
+                                                                                                                                                          bool useLocalConstant)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
+
+                                                        [{{dummyAttributeUsage}}Params({|#0:{{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}|})]
+                                                        public dummy_literal {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceConstants("string", "null");
+                DisableCompilerDiagnostics();
+
+                AddDefaultExpectedDiagnostic();
+
+                await RunAsync();
+            }
+
+            public static IEnumerable<string> FieldOrPropertyDeclarations => new FieldOrPropertyDeclarationsTheoryData();
+
+            public static IEnumerable<string> DummyAttributeUsage => DummyAttributeUsageTheoryData;
+
+            public static IEnumerable<string> AttributeValuesContainerEnumerable()
+            {
+                return GenerateData().Distinct();
+
+                static IEnumerable<string> GenerateData()
+                {
+                    var nameColonUsages = new List<string>
+                                          {
+                                              "",
+                                              "values: "
+                                          };
+
+                    var priorityNamedParameterUsages = new List<string>
+                                                       {
+                                                           "",
+                                                           ", Priority = 1"
+                                                       };
+
+                    List<string> attributeUsagesBase = [ ];
+
+                    attributeUsagesBase.AddRange([
+                                                    "{0}new object[] {{{{ {{0}} }}}}{1}",
+                                                    "{0}[ {{0}} ]{1}"
+                                                 ]);
+
+                    foreach (var attributeUsageBase in attributeUsagesBase)
+                    {
+                        foreach (var nameColonUsage in nameColonUsages)
+                        {
+                            foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                            {
+                                yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public class MustHaveMatchingValueType : AnalyzerTestFixture<ParamsAttributeAnalyzer>
         {
             public MustHaveMatchingValueType() : base(ParamsAttributeAnalyzer.MustHaveMatchingValueTypeRule) { }
@@ -209,7 +373,7 @@
 
             [Theory, CombinatorialData]
             public async Task Providing_null_to_nullable_struct_value_type_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                         [CombinatorialMemberData(nameof(NullableStructTypes))] string type,
+                                                                                                         [CombinatorialMemberData(nameof(NullableStructValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
                                                                                                          [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
                                                                                                          [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
@@ -218,8 +382,8 @@
 
                                                     public class BenchmarkClass
                                                     {
-                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "null")}})]
-                                                        public {{type}}? {{fieldOrPropertyDeclaration}}
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, $"{valueAndType.Value1}, null")}})]
+                                                        public {{valueAndType.Value2}}? {{fieldOrPropertyDeclaration}}
                                                     }
                                                     """;
                 TestCode = testCode;
@@ -447,7 +611,7 @@
 
             [Theory, CombinatorialData]
             public async Task Providing_null_to_nonnullable_struct_value_type_should_trigger_diagnostic([CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-                                                                                                        [CombinatorialMemberData(nameof(NullableStructTypes))] string type,
+                                                                                                        [CombinatorialMemberData(nameof(NullableStructValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
                                                                                                         [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument,
                                                                                                         [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
             {
@@ -456,15 +620,15 @@
 
                                                     public class BenchmarkClass
                                                     {
-                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "{|#0:null|}")}})]
-                                                        public {{type}} {{fieldOrPropertyDeclaration}}
+                                                        [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, $"{valueAndType.Value1}, {{|#0:null|}}")}})]
+                                                        public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
                                                     }
                                                     """;
                 TestCode = testCode;
                 ReferenceDummyAttribute();
                 ReferenceDummyEnum();
 
-                AddDefaultExpectedDiagnostic("null", type, "null");
+                AddDefaultExpectedDiagnostic("null", valueAndType.Value2!, "null");
 
                 await RunAsync();
             }
@@ -792,21 +956,22 @@
                 ( "DummyEnum.Value1", "DummyEnum" ),
             ];
 
-            public static IEnumerable<string> NullableStructTypes =>
+            public static IEnumerable<ValueTupleDouble<string, string>> NullableStructValuesAndTypes =>
             [
-                "bool",
-                "byte",
-                "char",
-                "double",
-                "float",
-                "int",
-                "long",
-                "sbyte",
-                "short",
-                "uint",
-                "ulong",
-                "ushort",
-                "DummyEnum",
+                ( "true", "bool" ),
+                ( "(byte)123", "byte" ),
+                ( "'A'", "char" ),
+                ( "1.0D", "double" ),
+                ( "1.0F", "float" ),
+                ( "123", "int" ),
+                ( "123L", "long" ),
+                ( "(sbyte)-100", "sbyte" ),
+                ( "(short)-123", "short" ),
+                ( "123U", "uint" ),
+                ( "123UL", "ulong" ),
+                ( "(ushort)123", "ushort" ),
+
+                ( "DummyEnum.Value1", "DummyEnum" ),
             ];
 
             public static IEnumerable<string> NullReferenceConstantTypes =>
@@ -851,6 +1016,31 @@
 
                 TestCode = testCode;
                 ReferenceDummyAttribute();
+
+                await RunAsync();
+            }
+
+            [Theory, CombinatorialData]
+            public async Task Providing_a_null_single_argument_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,
+                                                                                             [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+                                                                                             bool useConstantFromOtherClass,
+                                                                                             bool useLocalConstant)
+            {
+                var testCode = /* lang=c#-test */ $$"""
+                                                    using BenchmarkDotNet.Attributes;
+
+                                                    public class BenchmarkClass
+                                                    {
+                                                        {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
+
+                                                        [{{dummyAttributeUsage}}Params({|#0:{{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}|})]
+                                                        public string {{fieldOrPropertyDeclaration}}
+                                                    }
+                                                    """;
+
+                TestCode = testCode;
+                ReferenceDummyAttribute();
+                ReferenceConstants("string", "null");
 
                 await RunAsync();
             }

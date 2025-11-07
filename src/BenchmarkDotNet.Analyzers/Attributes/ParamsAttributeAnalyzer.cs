@@ -18,6 +18,13 @@
                                                                                                     DiagnosticSeverity.Error,
                                                                                                     isEnabledByDefault: true);
 
+        internal static readonly DiagnosticDescriptor SingleNullArgumentNotAllowedRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ParamsAttribute_SingleNullArgumentNotAllowed,
+                                                                                                                  AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_SingleNullArgumentNotAllowed_Title)),
+                                                                                                                  AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_SingleNullArgumentNotAllowed_MessageFormat)),
+                                                                                                                  "Usage",
+                                                                                                                  DiagnosticSeverity.Error,
+                                                                                                                  isEnabledByDefault: true);
+
         internal static readonly DiagnosticDescriptor MustHaveMatchingValueTypeRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_ParamsAttribute_MustHaveMatchingValueType,
                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_MustHaveMatchingValueType_Title)),
                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsAttribute_MustHaveMatchingValueType_MessageFormat)),
@@ -36,6 +43,7 @@
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
             MustHaveValuesRule,
+            SingleNullArgumentNotAllowedRule,
             MustHaveMatchingValueTypeRule,
             UnnecessarySingleValuePassedToAttributeRule
         ];
@@ -97,12 +105,14 @@
 
             AnalyzeFieldOrPropertyTypeSyntax(context,
                                              fieldOrPropertyTypeSyntax,
-                                             attributeSyntax);
+                                             attributeSyntax,
+                                             paramsAttributeTypeSymbol);
         }
 
         private static void AnalyzeFieldOrPropertyTypeSyntax(SyntaxNodeAnalysisContext context,
                                                              TypeSyntax fieldOrPropertyTypeSyntax,
-                                                             AttributeSyntax attributeSyntax)
+                                                             AttributeSyntax attributeSyntax,
+                                                             INamedTypeSymbol paramsAttributeTypeSymbol)
         {
             if (attributeSyntax.ArgumentList == null)
             {
@@ -126,6 +136,23 @@
                                                            Location.Create(context.FilterTree, attributeSyntax.ArgumentList.Arguments.Span)));
 
                 return;
+            }
+
+            var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
+            if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default))
+            {
+                if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
+                {
+                    var argumentSyntax = attributeSyntax.ArgumentList.Arguments[0];
+
+                    var constantValue = context.SemanticModel.GetConstantValue(argumentSyntax.Expression);
+                    if (constantValue is { HasValue: true, Value: null })
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(SingleNullArgumentNotAllowedRule, argumentSyntax.GetLocation()));
+
+                        return;
+                    }
+                }
             }
 
             var expectedValueTypeSymbol = context.SemanticModel.GetTypeInfo(fieldOrPropertyTypeSyntax).Type;
@@ -283,6 +310,35 @@
                                                                value,
                                                                expectedType,
                                                                actualType));
+                }
+            }
+        }
+
+        private static void AnalyzeAttributeSyntax(SyntaxNodeAnalysisContext context)
+        {
+            if (context.Node is not AttributeSyntax attributeSyntax)
+            {
+                return;
+            }
+
+            var paramsAttributeTypeSymbol = GetParamsAttributeTypeSymbol(context.Compilation);
+            if (paramsAttributeTypeSymbol == null)
+            {
+                return;
+            }
+
+            var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
+            if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default))
+            {
+                if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
+                {
+                    var argumentSyntax = attributeSyntax.ArgumentList.Arguments[0];
+
+                    var constantValue = context.SemanticModel.GetConstantValue(argumentSyntax.Expression);
+                    if (constantValue is { HasValue: true, Value: null })
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(SingleNullArgumentNotAllowedRule, argumentSyntax.GetLocation()));
+                    }
                 }
             }
         }
