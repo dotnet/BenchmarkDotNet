@@ -142,7 +142,7 @@
     <value>Benchmark class '{0}' cannot be static</value>
   </data>
   <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat" xml:space="preserve">
-    <value>Benchmark class '{0}' cannot be abstract</value>
+    <value>Attribute [GenericTypeArguments] can only be applied to a non-abstract class</value>
   </data>
   <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat" xml:space="preserve">
     <value>Referenced generic benchmark class '{0}' has no [GenericTypeArguments] attribute(s)</value>

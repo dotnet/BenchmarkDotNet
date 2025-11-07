@@ -48,13 +48,13 @@
             {
                 const string benchmarkClassName = "BenchmarkClass";
 
-                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[GenericTypeArguments(typeof(int))]", genericTypeArgumentsAttributeUsageCount);
+                var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[{{|#{0}:GenericTypeArguments(typeof(int))|}}]", genericTypeArgumentsAttributeUsageCount).Select((a, i) => string.Format(a, i));
 
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
                                                     {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
-                                                    public {|#0:abstract|} class {{benchmarkClassName}}<TParameter>
+                                                    public abstract class {{benchmarkClassName}}<TParameter>
                                                     {
                                                         {{benchmarkAttributeUsage}}
                                                         public void BenchmarkMethod()
@@ -65,7 +65,11 @@
                                                     """;
 
                 TestCode = testCode;
-                AddDefaultExpectedDiagnostic(benchmarkClassName);
+
+                for (var i = 0; i < genericTypeArgumentsAttributeUsageCount; i++)
+                {
+                    AddExpectedDiagnostic(i);
+                }
 
                 await RunAsync();
             }

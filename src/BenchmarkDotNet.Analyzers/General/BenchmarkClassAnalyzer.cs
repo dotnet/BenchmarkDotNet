@@ -140,13 +140,13 @@
             var genericTypeArgumentsAttributes = AnalyzerHelper.GetAttributes("BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute", context.Compilation, classDeclarationSyntax.AttributeLists, context.SemanticModel);
             if (genericTypeArgumentsAttributes.Length > 0 )
             {
-                if (classAbstractModifier.HasValue)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, classAbstractModifier.Value.GetLocation(), classDeclarationSyntax.Identifier.ToString()));
-                }
-
                 foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
                 {
+                    if (classAbstractModifier.HasValue)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, genericTypeArgumentsAttribute.GetLocation()));
+                    }
+
                     if (classDeclarationSyntax.TypeParameterList == null || classDeclarationSyntax.TypeParameterList.Parameters.Count == 0)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, genericTypeArgumentsAttribute.GetLocation()));

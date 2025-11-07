@@ -678,7 +678,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Benchmark class &apos;{0}&apos; cannot be abstract.
+        ///   Looks up a localized string similar to Attribute [GenericTypeArguments] can only be applied to a non-abstract class.
         /// </summary>
         internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat {
             get {
