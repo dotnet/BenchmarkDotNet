@@ -16,16 +16,23 @@
         public class General : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
         {
             [Theory, CombinatorialData]
-            public async Task A_method_annotated_with_an_arguments_attribute_with_no_values_and_the_benchmark_attribute_and_having_no_parameters_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(EmptyArgumentsAttributeUsagesEnumerableLocal))] string emptyArgumentsAttributeUsage,
-                                                                                                                                                                               [CombinatorialRange(1, 2)] int attributeUsageCount)
+            public async Task A_method_annotated_with_an_arguments_attribute_with_no_values_and_the_benchmark_attribute_and_having_no_parameters_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(EmptyArgumentsAttributeUsages))] string emptyArgumentsAttributeUsage,
+                                                                                                                                                                               [CombinatorialRange(1, 2)] int attributeUsageMultiplier)
             {
+                var emptyArgumentsAttributeUsages = new List<string>();
+
+                for (var i = 0; i < attributeUsageMultiplier; i++)
+                {
+                    emptyArgumentsAttributeUsages.Add(emptyArgumentsAttributeUsage);
+                }
+
                 var testCode = /* lang=c#-test */ $$"""
                                                     using BenchmarkDotNet.Attributes;
 
                                                     public class BenchmarkClass
                                                     {
                                                         [Benchmark]
-                                                        {{string.Join("\n", Enumerable.Repeat(emptyArgumentsAttributeUsage, attributeUsageCount))}}
+                                                        {{string.Join("\n", emptyArgumentsAttributeUsages)}}
                                                         public void BenchmarkMethod()
                                                         {
                                                         
@@ -38,7 +45,42 @@
                 await RunAsync();
             }
 
-            public static IEnumerable<string> EmptyArgumentsAttributeUsagesEnumerableLocal => EmptyArgumentsAttributeUsagesEnumerable();
+            public static IEnumerable<string> EmptyArgumentsAttributeUsages()
+            {
+                yield return "[Arguments]";
+                yield return "[Arguments()]";
+                yield return "[Arguments(Priority = 1)]";
+
+                var nameColonUsages = new List<string>
+                                      {
+                                          "",
+                                          "values: "
+                                      };
+
+                var priorityNamedParameterUsages = new List<string>
+                                                   {
+                                                       "",
+                                                       ", Priority = 1"
+                                                   };
+
+                var attributeUsagesBase = new List<string>
+                                          {
+                                              "[Arguments({0}new object[] {{ }}{1})]",
+                                              "[Arguments({0}new object[0]{1})]",
+                                              "[Arguments({0}[]{1})]",
+                                          };
+
+                foreach (var attributeUsageBase in attributeUsagesBase)
+                {
+                    foreach (var nameColonUsage in nameColonUsages)
+                    {
+                        foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                        {
+                            yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                        }
+                    }
+                }
+            }
         }
 
         public class RequiresBenchmarkAttribute : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
@@ -102,178 +144,6 @@
                                                                                      "Arguments()",
                                                                                      "Arguments(42, \"test\")"
                                                                                  }.AsReadOnly();
-        }
-
-        public class SingleNullArgumentNotAllowed : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
-        {
-            public SingleNullArgumentNotAllowed() : base(ArgumentsAttributeAnalyzer.SingleNullArgumentNotAllowedRule)
-            {
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Providing_a_non_null_single_argument_should_not_trigger_diagnostic([CombinatorialRange(1, 2)] int attributeUsageCount,
-                                                                                                 bool useConstantFromOtherClass,
-                                                                                                 bool useLocalConstant,
-                                                                                                 [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerable))] string benchmarkAttributeUsage)
-            {
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-                                                    
-                                                    public class BenchmarkClass
-                                                    {
-                                                        {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "\"test\"")};" : "")}}
-                                                    
-                                                        {{string.Join("\n", Enumerable.Repeat($"[Arguments({(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "\"test\"")})]", attributeUsageCount))}}
-                                                        {{benchmarkAttributeUsage}}
-                                                        public void BenchmarkMethod(string a)
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                ReferenceConstants("string", "\"test\"");
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Providing_an_empty_array_argument_should_not_trigger_diagnostic([CombinatorialMemberData(nameof(EmptyArgumentsAttributeUsagesEnumerableLocal))] string emptyAttributeusage,
-                                                                                              [CombinatorialRange(1, 2)] int attributeUsageCount,
-                                                                                              [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerable))] string benchmarkAttributeUsage)
-            {
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-                                                    
-                                                    public class BenchmarkClass
-                                                    {
-                                                        {{string.Join("\n", Enumerable.Repeat(emptyAttributeusage, attributeUsageCount))}}
-                                                        {{benchmarkAttributeUsage}}
-                                                        public void BenchmarkMethod()
-                                                        {
-
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Providing_an_array_argument_containing_one_or_more_null_values_should_not_trigger_diagnostic([CombinatorialRange(1, 2)] int attributeUsageCount,
-                                                                                                                           bool useConstantsFromOtherClass,
-                                                                                                                           bool useLocalConstants,
-                                                                                                                           [CombinatorialValues("{0}", "{0}, {1}", "{1}, {0}", "{0}, {1}, {0}", "{1}, {0}, {1}")] string valuesTemplate,
-                                                                                                                           [CombinatorialMemberData(nameof(AttributeValuesContainerEnumerable))] string valuesContainer,
-                                                                                                                           [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerable))] string benchmarkAttributeUsage)
-            {
-                var attributeValues = string.Format(valuesContainer, string.Format(valuesTemplate,
-                                                                                   useLocalConstants ? "_xNull" : useConstantsFromOtherClass ? "Constants.Value1" : "null",
-                                                                                   useLocalConstants ? "_xValue" : useConstantsFromOtherClass ? "Constants.Value2" : "\"test\""));
-
-
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    public class BenchmarkClass
-                                                    {
-                                                        {{(useLocalConstants ? $"""
-                                                                                private const string _xNull = {(useConstantsFromOtherClass ? "Constants.Value1" : "null")};
-                                                                                private const string _xValue = {(useConstantsFromOtherClass ? "Constants.Value2" : "\"test\"")};
-                                                                                """ : "")}}
-
-                                                        {{string.Join("\n", Enumerable.Repeat($"[Arguments({attributeValues})]", attributeUsageCount))}}
-                                                        {{benchmarkAttributeUsage}}
-                                                        public void BenchmarkMethod()
-                                                        {
-                                                        
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                ReferenceConstants(("string", "null"), ("string", "\"test\""));
-
-                await RunAsync();
-            }
-
-            [Theory, CombinatorialData]
-            public async Task Providing_a_null_single_argument_should_trigger_diagnostic([CombinatorialRange(1, 2)] int attributeUsageCount,
-                                                                                         bool useConstantFromOtherClass,
-                                                                                         bool useLocalConstant,
-                                                                                         [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerable))] string benchmarkAttributeUsage)
-            {
-                var testCode = /* lang=c#-test */ $$"""
-                                                    using BenchmarkDotNet.Attributes;
-
-                                                    public class BenchmarkClass
-                                                    {
-                                                        {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
-
-                                                        {{string.Join("\n", Enumerable.Repeat($"[Arguments({{{{|#{{0}}:{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}|}}}})]", attributeUsageCount).Select((a, i) => string.Format(a, i)))}}
-                                                        {{benchmarkAttributeUsage}}
-                                                        public void BenchmarkMethod()
-                                                        {
-                                                        
-                                                        }
-                                                    }
-                                                    """;
-
-                TestCode = testCode;
-                ReferenceConstants("string", "null");
-
-                for (var i = 0; i < attributeUsageCount; i++)
-                {
-                    AddExpectedDiagnostic(i);
-                }
-
-                await RunAsync();
-            }
-
-            public static IEnumerable<string> BenchmarkAttributeUsagesEnumerable => [ "", "[Benchmark] " ];
-
-            public static IEnumerable<string> EmptyArgumentsAttributeUsagesEnumerableLocal => EmptyArgumentsAttributeUsagesEnumerable();
-
-            public static IEnumerable<string> AttributeValuesContainerEnumerable()
-            {
-                return GenerateData().Distinct();
-
-                static IEnumerable<string> GenerateData()
-                {
-                    var nameColonUsages = new List<string>
-                                          {
-                                              "",
-                                              "values: "
-                                          };
-
-                    var priorityNamedParameterUsages = new List<string>
-                                                       {
-                                                           "",
-                                                           ", Priority = 1"
-                                                       };
-
-                    List<string> attributeUsagesBase = [ ];
-
-                    attributeUsagesBase.AddRange([
-                                                    "{0}new object[] {{{{ {{0}} }}}}{1}",
-                                                    "{0}[ {{0}} ]{1}"
-                                                 ]);
-
-                    foreach (var attributeUsageBase in attributeUsagesBase)
-                    {
-                        foreach (var nameColonUsage in nameColonUsages)
-                        {
-                            foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
-                            {
-                                yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         public class MustHaveMatchingValueCount : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
@@ -1204,43 +1074,6 @@
                                                                               "",
                                                                               "Dummy, "
                                                                           ];
-
-        public static IEnumerable<string> EmptyArgumentsAttributeUsagesEnumerable()
-        {
-            yield return "[Arguments]";
-            yield return "[Arguments()]";
-            yield return "[Arguments(Priority = 1)]";
-
-            var nameColonUsages = new List<string>
-                                  {
-                                      "",
-                                      "values: "
-                                  };
-
-            var priorityNamedParameterUsages = new List<string>
-                                               {
-                                                   "",
-                                                   ", Priority = 1"
-                                               };
-
-            var attributeUsagesBase = new List<string>
-                                      {
-                                          "[Arguments({0}new object[] {{ }}{1})]",
-                                          "[Arguments({0}new object[0]{1})]",
-                                          "[Arguments({0}[]{1})]",
-                                      };
-
-            foreach (var attributeUsageBase in attributeUsagesBase)
-            {
-                foreach (var nameColonUsage in nameColonUsages)
-                {
-                    foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
-                    {
-                        yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
-                    }
-                }
-            }
-        }
 
         private static IEnumerable<string> ScalarValuesContainerAttributeArgumentEnumerable()
         {
