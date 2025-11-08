@@ -585,6 +585,28 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
                 separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
+
+                if (compositeInProcessDiagnoser.InProcessDiagnosers.Any(d => d.GetRunMode(benchmarkCase) == Diagnosers.RunMode.SeparateLogic))
+                {
+                    var executeResult = RunExecute(
+                        logger,
+                        benchmarkCase,
+                        benchmarkId,
+                        toolchain,
+                        buildResult,
+                        resolver,
+                        extraRunCompositeDiagnoser,
+                        compositeInProcessDiagnoser,
+                        launchCount + 1,
+                        Diagnosers.RunMode.SeparateLogic);
+
+                    if (executeResult.IsSuccess)
+                    {
+                        metrics.AddRange(extraRunCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
+                    }
+
+                    logger.WriteLine();
+                }
             }
 
             return (true, executeResults, metrics);
