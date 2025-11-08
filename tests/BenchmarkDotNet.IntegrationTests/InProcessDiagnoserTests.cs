@@ -8,7 +8,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using Xunit;
@@ -64,20 +63,25 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
             {
                 foreach (var runModes in GetRunModeCombinations(count))
                 {
+                    // Default toolchain is much slower than in-process toolchains, so to prevent CI from taking too much time, we skip combinations with duplicate run modes.
+                    if (toolchain == ToolchainType.Default && runModes.Length == 3
+                        && (runModes[0] == runModes[1] || runModes[0] == runModes[2] || runModes[1] == runModes[2]))
+                    {
+                        continue;
+                    }
                     yield return [runModes, toolchain];
                 }
             }
         }
     }
 
-    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode)
-        => runMode switch
+    private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode, int index)
+        => index switch
         {
-            RunMode.None => new MockInProcessDiagnoserNone(),
-            RunMode.NoOverhead => new MockInProcessDiagnoser(),
-            RunMode.ExtraRun => new MockInProcessDiagnoserExtraRun(),
-            RunMode.SeparateLogic => new MockInProcessDiagnoserSeparateLogic(),
-            _ => throw new ArgumentException($"Unsupported run mode: {runMode}")
+            0 => new MockInProcessDiagnoser1(runMode),
+            1 => new MockInProcessDiagnoser2(runMode),
+            2 => new MockInProcessDiagnoser3(runMode),
+            _ => throw new ArgumentException($"Unsupported index: {index}")
         };
 
     private ManualConfig CreateConfig(ToolchainType toolchain)
@@ -111,7 +115,7 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
 
         foreach (var diagnoser in diagnosers)
         {
-            if (diagnoser.DiagnoserRunMode == RunMode.None)
+            if (diagnoser.RunMode == RunMode.None)
             {
                 Assert.Empty(diagnoser.Results);
             }
@@ -123,16 +127,17 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
             }
         }
         Assert.Equal(
-            BaseMockInProcessDiagnoser.s_completedResults,
             diagnosers
-                .Where(d => d.DiagnoserRunMode != RunMode.None)
-                .OrderBy(d => d.DiagnoserRunMode switch
+                .Where(d => d.RunMode != RunMode.None)
+                .OrderBy(d => d.RunMode switch
                 {
                     RunMode.NoOverhead => 0,
                     RunMode.ExtraRun => 1,
                     RunMode.SeparateLogic => 2,
                     _ => 3
                 })
+                .Select(d => d.ExpectedResult),
+            BaseMockInProcessDiagnoser.s_completedResults
         );
         BaseMockInProcessDiagnoser.s_completedResults.Clear();
     }

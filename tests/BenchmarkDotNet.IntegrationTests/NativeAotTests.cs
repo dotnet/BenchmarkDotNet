@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!GetShouldRunTest())
                 return;
 
-            var diagnoser = new MockInProcessDiagnoser();
+            var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
             var config = GetConfig().AddDiagnoser(diagnoser);
 
             try
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             Assert.Equal([diagnoser.ExpectedResult], diagnoser.Results.Values);
-            Assert.Equal([diagnoser], BaseMockInProcessDiagnoser.s_completedResults);
+            Assert.Equal([diagnoser.ExpectedResult], BaseMockInProcessDiagnoser.s_completedResults);
             BaseMockInProcessDiagnoser.s_completedResults.Clear();
         }
 

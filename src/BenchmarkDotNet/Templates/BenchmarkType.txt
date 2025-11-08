@@ -29,6 +29,11 @@
                 diagnoserRunMode,
                 new BenchmarkDotNet.Diagnosers.InProcessDiagnoserActionArgs(instance)
             );
+            if (diagnoserRunMode == BenchmarkDotNet.Diagnosers.RunMode.SeparateLogic)
+            {
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkDotNet.Engines.BenchmarkSignal.SeparateLogic);
+                return;
+            }
             compositeInProcessDiagnoserHandler.Handle(BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine);
 
             BenchmarkDotNet.Engines.EngineParameters engineParameters = new BenchmarkDotNet.Engines.EngineParameters()
