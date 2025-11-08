@@ -52,13 +52,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
         public void WasmSupportsInProcessDiagnosers()
         {
-            var diagnoser = new MockInProcessDiagnoser();
+            var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
             var config = GetConfig().AddDiagnoser(diagnoser);
 
             CanExecute<WasmBenchmark>(config);
 
             Assert.Equal([diagnoser.ExpectedResult], diagnoser.Results.Values);
-            Assert.Equal([diagnoser], BaseMockInProcessDiagnoser.s_completedResults);
+            Assert.Equal([diagnoser.ExpectedResult], BaseMockInProcessDiagnoser.s_completedResults);
             BaseMockInProcessDiagnoser.s_completedResults.Clear();
         }
 

@@ -146,6 +146,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     parameters.DiagnoserRunMode,
                     new Diagnosers.InProcessDiagnoserActionArgs(instance)
                 );
+                if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
+                {
+                    compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+                    return;
+                }
                 compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
 
                 var engineParameters = new EngineParameters

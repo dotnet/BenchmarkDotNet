@@ -11,25 +11,24 @@ using System;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
-public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
+public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDiagnoser
 {
-    public static Queue<BaseMockInProcessDiagnoser> s_completedResults = new();
+    public static Queue<string> s_completedResults = new();
 
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
 
-    public abstract string DiagnoserName { get; }
-    public abstract RunMode DiagnoserRunMode { get; }
-    public abstract string ExpectedResult { get; }
+    public RunMode RunMode { get; } = runMode;
+    public string ExpectedResult => $"MockResult-{RunMode}";
 
-    public IEnumerable<string> Ids => [DiagnoserName];
+    public IEnumerable<string> Ids => [GetType().Name];
 
     public IEnumerable<IExporter> Exporters => [];
 
     public IEnumerable<IAnalyser> Analysers => [];
 
-    public void DisplayResults(ILogger logger) => logger.WriteLine($"{DiagnoserName} results: [{string.Join(", ", Results.Values)}]");
+    public void DisplayResults(ILogger logger) => logger.WriteLine($"{GetType().Name} results: [{string.Join(", ", Results.Values)}]");
 
-    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => DiagnoserRunMode;
+    public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode;
 
     public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
@@ -37,13 +36,18 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
 
     public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
 
-    public abstract (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase);
+    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        => RunMode == RunMode.None
+            ? default
+            : (typeof(MockInProcessDiagnoserHandler), ExpectedResult);
 
     public virtual IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
     {
         var (handlerType, serializedConfig) = GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
         if (handlerType == null)
+        {
             return null;
+        }
         var handler = (IInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
         handler.Initialize(serializedConfig);
         return handler;
@@ -52,15 +56,13 @@ public abstract class BaseMockInProcessDiagnoser : IInProcessDiagnoser
     public void DeserializeResults(BenchmarkCase benchmarkCase, string results)
     {
         Results.Add(benchmarkCase, results);
-        s_completedResults.Enqueue(this);
+        s_completedResults.Enqueue(results);
     }
 }
 
-public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
+public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
     private string _result;
-
-    protected BaseMockInProcessDiagnoserHandler() { }
 
     public void Initialize(string? serializedConfig)
     {
@@ -72,61 +74,7 @@ public abstract class BaseMockInProcessDiagnoserHandler : IInProcessDiagnoserHan
     public string SerializeResults() => _result;
 }
 
-public sealed class MockInProcessDiagnoser : BaseMockInProcessDiagnoser
-{
-    public override string DiagnoserName => nameof(MockInProcessDiagnoser);
-    public override RunMode DiagnoserRunMode => RunMode.NoOverhead;
-    public override string ExpectedResult => "MockResult";
-
-    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserHandler), ExpectedResult);
-}
-
-public sealed class MockInProcessDiagnoserHandler : BaseMockInProcessDiagnoserHandler
-{
-}
-
-public sealed class MockInProcessDiagnoserExtraRun : BaseMockInProcessDiagnoser
-{
-    public override string DiagnoserName => nameof(MockInProcessDiagnoserExtraRun);
-    public override RunMode DiagnoserRunMode => RunMode.ExtraRun;
-    public override string ExpectedResult => "ExtraRunResult";
-
-    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserExtraRunHandler), ExpectedResult);
-}
-
-public sealed class MockInProcessDiagnoserExtraRunHandler : BaseMockInProcessDiagnoserHandler
-{
-}
-
-public sealed class MockInProcessDiagnoserNone : BaseMockInProcessDiagnoser
-{
-    public override string DiagnoserName => nameof(MockInProcessDiagnoserNone);
-    public override RunMode DiagnoserRunMode => RunMode.None;
-    public override string ExpectedResult => "NoneResult";
-
-    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => default; // Returns default when RunMode is None
-
-    public override IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-        => null; // Returns null when RunMode is None
-}
-
-public sealed class MockInProcessDiagnoserNoneHandler : BaseMockInProcessDiagnoserHandler
-{
-}
-
-public sealed class MockInProcessDiagnoserSeparateLogic : BaseMockInProcessDiagnoser
-{
-    public override string DiagnoserName => nameof(MockInProcessDiagnoserSeparateLogic);
-    public override RunMode DiagnoserRunMode => RunMode.SeparateLogic;
-    public override string ExpectedResult => "SeparateLogicResult";
-
-    public override (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
-        => (typeof(MockInProcessDiagnoserSeparateLogicHandler), ExpectedResult);
-}
-
-public sealed class MockInProcessDiagnoserSeparateLogicHandler : BaseMockInProcessDiagnoserHandler
-{
-}
+// Diagnosers are made unique per-type rather than per-instance, so we have to create separate types to test multiple.
+public sealed class MockInProcessDiagnoser1(RunMode runMode) : BaseMockInProcessDiagnoser(runMode) { }
+public sealed class MockInProcessDiagnoser2(RunMode runMode) : BaseMockInProcessDiagnoser(runMode) { }
+public sealed class MockInProcessDiagnoser3(RunMode runMode) : BaseMockInProcessDiagnoser(runMode) { }

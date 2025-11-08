@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Diagnosers
                 }
             }
 
-            if (signal != BenchmarkSignal.AfterEngine)
+            if (signal is not (BenchmarkSignal.AfterEngine or BenchmarkSignal.SeparateLogic))
             {
                 return;
             }

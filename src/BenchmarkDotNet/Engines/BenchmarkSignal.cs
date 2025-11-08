@@ -24,4 +24,9 @@ public enum BenchmarkSignal
     /// after the engine has completed the run
     /// </summary>
     AfterEngine,
+
+    /// <summary>
+    /// used to run some code independent of the benchmarks
+    /// </summary>
+    SeparateLogic,
 }

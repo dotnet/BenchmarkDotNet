@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             var errors = BenchmarkEnvironmentInfo.Validate(job);
             if (ValidationErrorReporter.ReportIfAny(errors, host))
-                return (null, null, null);
+                return default;
 
             var compositeInProcessDiagnoserHandler = new CompositeInProcessDiagnoserHandler(
                     parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
@@ -42,6 +42,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     parameters.DiagnoserRunMode,
                     new InProcessDiagnoserActionArgs(instance)
                 );
+            if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
+            {
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+                return default;
+            }
             compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
 
             var engineParameters = CreateEngineParameters(instance, benchmarkCase, host, compositeInProcessDiagnoserHandler);
