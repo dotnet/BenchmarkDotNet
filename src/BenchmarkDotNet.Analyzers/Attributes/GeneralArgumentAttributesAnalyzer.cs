@@ -1,71 +1,73 @@
-﻿namespace BenchmarkDotNet.Analyzers.Attributes
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
+
+namespace BenchmarkDotNet.Analyzers.Attributes;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class GeneralArgumentAttributesAnalyzer : DiagnosticAnalyzer
 {
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
+    internal static readonly DiagnosticDescriptor MethodWithoutAttributeMustHaveNoParametersRule = new(
+        DiagnosticIds.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Description);
 
-    using System.Collections.Immutable;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    [
+        MethodWithoutAttributeMustHaveNoParametersRule,
+    ];
 
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class GeneralArgumentAttributesAnalyzer : DiagnosticAnalyzer
+    public override void Initialize(AnalysisContext analysisContext)
     {
-        internal static readonly DiagnosticDescriptor MethodWithoutAttributeMustHaveNoParametersRule = new DiagnosticDescriptor(DiagnosticIds.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters,
-                                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Title)),
-                                                                                                                                AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_MessageFormat)),
-                                                                                                                                "Usage",
-                                                                                                                                DiagnosticSeverity.Error,
-                                                                                                                                isEnabledByDefault: true,
-                                                                                                                                description: BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Description);
+        analysisContext.EnableConcurrentExecution();
+        analysisContext.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [
-            MethodWithoutAttributeMustHaveNoParametersRule,
-        ];
-
-        public override void Initialize(AnalysisContext analysisContext)
+        analysisContext.RegisterCompilationStartAction(ctx =>
         {
-            analysisContext.EnableConcurrentExecution();
-            analysisContext.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
-            analysisContext.RegisterCompilationStartAction(ctx =>
+            // Only run if BenchmarkDotNet.Annotations is referenced
+            var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(ctx.Compilation);
+            if (benchmarkAttributeTypeSymbol == null)
             {
-                // Only run if BenchmarkDotNet.Annotations is referenced
-                var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(ctx.Compilation);
-                if (benchmarkAttributeTypeSymbol == null)
-                {
-                    return;
-                }
+                return;
+            }
 
-                ctx.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
-            });
+            ctx.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
+        });
+    }
+
+    private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context)
+    {
+        if (context.Node is not MethodDeclarationSyntax methodDeclarationSyntax)
+        {
+            return;
         }
 
-        private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context)
+        var argumentsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsAttribute");
+        var argumentsSourceAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsSourceAttribute");
+
+        if (argumentsAttributeTypeSymbol == null || argumentsSourceAttributeTypeSymbol == null)
         {
-            if (context.Node is not MethodDeclarationSyntax methodDeclarationSyntax)
+            return;
+        }
+
+        var hasBenchmarkAttribute = AnalyzerHelper.AttributeListsContainAttribute(AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation), methodDeclarationSyntax.AttributeLists, context.SemanticModel);
+        var hasArgumentsSourceAttribute = AnalyzerHelper.AttributeListsContainAttribute(argumentsSourceAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
+
+        var argumentsAttributes = AnalyzerHelper.GetAttributes(argumentsAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
+        if (argumentsAttributes.Length == 0)
+        {
+            if (hasBenchmarkAttribute && !hasArgumentsSourceAttribute && methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
             {
-                return;
-            }
-
-            var argumentsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsAttribute");
-            var argumentsSourceAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsSourceAttribute");
-
-            if (argumentsAttributeTypeSymbol == null || argumentsSourceAttributeTypeSymbol == null)
-            {
-                return;
-            }
-
-            var hasBenchmarkAttribute = AnalyzerHelper.AttributeListsContainAttribute(AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation), methodDeclarationSyntax.AttributeLists, context.SemanticModel);
-            var hasArgumentsSourceAttribute = AnalyzerHelper.AttributeListsContainAttribute(argumentsSourceAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
-
-            var argumentsAttributes = AnalyzerHelper.GetAttributes(argumentsAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
-            if (argumentsAttributes.Length == 0)
-            {
-                if (hasBenchmarkAttribute && !hasArgumentsSourceAttribute && methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(MethodWithoutAttributeMustHaveNoParametersRule, Location.Create(context.FilterTree, methodDeclarationSyntax.ParameterList.Parameters.Span), methodDeclarationSyntax.Identifier.ToString()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(
+                    MethodWithoutAttributeMustHaveNoParametersRule,
+                    Location.Create(context.FilterTree, methodDeclarationSyntax.ParameterList.Parameters.Span), methodDeclarationSyntax.Identifier.ToString())
+                );
             }
         }
     }

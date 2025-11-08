@@ -1,19 +1,18 @@
 ﻿using Xunit;
 
-namespace BenchmarkDotNet.Analyzers.Tests.Fixtures
+namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
+
+internal sealed class FieldOrPropertyDeclarationsTheoryData : TheoryData<string>
 {
-    internal sealed class FieldOrPropertyDeclarationsTheoryData : TheoryData<string>
+    public FieldOrPropertyDeclarationsTheoryData()
     {
-        public FieldOrPropertyDeclarationsTheoryData()
-        {
-            AddRange(
+        AddRange(
 #if NET5_0_OR_GREATER
-                     "Property { get; init; }",
+                 "Property { get; init; }",
 #else
-                     "Property { get; set; }",
+                 "Property { get; set; }",
 #endif
-                     "_field;"
-                    );
-        }
+                 "_field;"
+        );
     }
 }

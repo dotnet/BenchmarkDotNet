@@ -1,20 +1,19 @@
-﻿namespace BenchmarkDotNet.Analyzers.Tests.Fixtures
-{
-    using Xunit;
+﻿using Xunit;
 
-    internal sealed class NonPublicClassAccessModifiersTheoryData : TheoryData<string>
+namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
+
+internal sealed class NonPublicClassAccessModifiersTheoryData : TheoryData<string>
+{
+    public NonPublicClassAccessModifiersTheoryData()
     {
-        public NonPublicClassAccessModifiersTheoryData()
-        {
-            AddRange(
-                     "protected internal ",
-                     "protected ",
-                     "internal ",
-                     "private protected ",
-                     "private ",
-                     "file ",
-                     ""
-                    );
-        }
+        AddRange(
+            "protected internal ",
+            "protected ",
+            "internal ",
+            "private protected ",
+            "private ",
+            "file ",
+            ""
+        );
     }
 }
