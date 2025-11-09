@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -25,7 +24,8 @@ namespace BenchmarkDotNet.Toolchains
                 : GetToolchain(
                     benchmarkCase.GetRuntime(),
                     benchmarkCase.Descriptor,
-                    benchmarkCase.Job.HasDynamicBuildCharacteristic()
+                    benchmarkCase.Job.HasDynamicBuildCharacteristic(),
+                    benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 );
 
         internal static IToolchain GetToolchain(this Job job)
@@ -34,19 +34,25 @@ namespace BenchmarkDotNet.Toolchains
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
                     null,
-                    job.HasDynamicBuildCharacteristic()
+                    job.HasDynamicBuildCharacteristic(),
+                    job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 );
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false, bool isRuntimeExplicit = false)
         {
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework
-                        && RuntimeInformation.GetCurrentRuntime().MsBuildMoniker == runtime.MsBuildMoniker)
+                    bool ShouldUseCurrentRuntime()
                     {
-                        return RoslynToolchain.Instance;
+                        var assembly = isRuntimeExplicit
+                            ? descriptor?.WorkloadMethod.DeclaringType.Assembly
+                            : null;
+                        return runtime.MsBuildMoniker == ClrRuntime.GetTargetOrCurrentVersion(assembly).MsBuildMoniker;
                     }
+
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework && ShouldUseCurrentRuntime())
+                        return RoslynToolchain.Instance;
 
                     return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                         ? GetToolchain(clrRuntime.RuntimeMoniker)

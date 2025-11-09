@@ -24,6 +24,11 @@ namespace BenchmarkDotNet.Helpers
 
         internal static string? GetTargetFrameworkVersion(Assembly? assembly)
         {
+            if (assembly is null)
+            {
+                return null;
+            }
+
             // Look for a TargetFrameworkAttribute with a supported Framework version.
             foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
             {
