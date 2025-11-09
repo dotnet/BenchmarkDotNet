@@ -19,17 +19,23 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal static class ToolchainExtensions
     {
-        internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
+        internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase)
+            => benchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain)
+                ? toolchain
+                : GetToolchain(
+                    benchmarkCase.GetRuntime(),
+                    benchmarkCase.Descriptor,
+                    benchmarkCase.Job.HasDynamicBuildCharacteristic()
+                );
 
-        internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
-
-        private static IToolchain GetToolchain(Job job, Descriptor descriptor)
+        internal static IToolchain GetToolchain(this Job job)
             => job.Infrastructure.TryGetToolchain(out var toolchain)
                 ? toolchain
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
-                    descriptor,
-                    job.HasDynamicBuildCharacteristic());
+                    null,
+                    job.HasDynamicBuildCharacteristic()
+                );
 
         internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
         {

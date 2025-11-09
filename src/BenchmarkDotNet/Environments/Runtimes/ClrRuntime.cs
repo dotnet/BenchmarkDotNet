@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -14,14 +15,6 @@ namespace BenchmarkDotNet.Environments
         public static readonly ClrRuntime Net472 = new ClrRuntime(RuntimeMoniker.Net472, "net472", ".NET Framework 4.7.2");
         public static readonly ClrRuntime Net48 = new ClrRuntime(RuntimeMoniker.Net48, "net48", ".NET Framework 4.8");
         public static readonly ClrRuntime Net481 = new ClrRuntime(RuntimeMoniker.Net481, "net481", ".NET Framework 4.8.1");
-
-        // Use Lazy to avoid any assembly loading issues on non Windows systems, and for fast cached access for multiple reads.
-        // Also so that the value will be obtained from the first call which happens on the user's thread,
-        // then when this is read again on a background thread from the BuildInParallel step, it will return the cached result.
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-#endif
-        private static readonly Lazy<ClrRuntime> Current = new(RetrieveCurrentVersion, true);
 
         public string Version { get; }
 
@@ -57,21 +50,28 @@ namespace BenchmarkDotNet.Environments
                 throw new PlatformNotSupportedException(".NET Framework supports Windows OS only.");
             }
 
-            return Current.Value;
+            string version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion()
+                ?? FrameworkVersionHelper.GetFrameworkReleaseVersion(); // .NET Developer Pack is not installed
+            return GetRuntimeFromVersion(version);
         }
 
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-#endif
-        private static ClrRuntime RetrieveCurrentVersion()
+        internal static ClrRuntime GetTargetOrCurrentVersion(Assembly? assembly)
         {
-            // Try to determine the Framework version that the executable was compiled for.
-            string version = FrameworkVersionHelper.GetTargetFrameworkVersion()
-                // Fallback to the current running Framework version.
-                ?? FrameworkVersionHelper.GetLatestNetDeveloperPackVersion()
-                ?? FrameworkVersionHelper.GetFrameworkReleaseVersion(); // .NET Developer Pack is not installed
+            if (!OsDetector.IsWindows())
+            {
+                throw new PlatformNotSupportedException(".NET Framework supports Windows OS only.");
+            }
 
-            return version switch
+            // Try to determine the Framework version that the assembly was compiled for.
+            string? version = FrameworkVersionHelper.GetTargetFrameworkVersion(assembly);
+            return version != null
+                ? GetRuntimeFromVersion(version)
+                // Fallback to the current running Framework version.
+                : GetCurrentVersion();
+        }
+
+        private static ClrRuntime GetRuntimeFromVersion(string version)
+            => version switch
             {
                 "4.6.1" => Net461,
                 "4.6.2" => Net462,
@@ -83,6 +83,5 @@ namespace BenchmarkDotNet.Environments
                 // unlikely to happen but theoretically possible
                 _ => new ClrRuntime(RuntimeMoniker.NotRecognized, $"net{version.Replace(".", null)}", $".NET Framework {version}"),
             };
-        }
     }
 }

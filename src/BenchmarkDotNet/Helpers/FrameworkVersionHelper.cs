@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,54 +22,25 @@ namespace BenchmarkDotNet.Helpers
             (394254, "4.6.1")
         ];
 
-        internal static string? GetTargetFrameworkVersion()
+        internal static string? GetTargetFrameworkVersion(Assembly? assembly)
         {
-            // Search assemblies until we find a TargetFrameworkAttribute with a supported Framework version.
-            // We don't search all assemblies, only the entry assembly and callers.
-            foreach (var assembly in EnumerateAssemblies())
+            // Look for a TargetFrameworkAttribute with a supported Framework version.
+            foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
             {
-                foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
+                switch (attribute.FrameworkName)
                 {
-                    switch (attribute.FrameworkName)
-                    {
-                        case ".NETFramework,Version=v4.6.1": return "4.6.1";
-                        case ".NETFramework,Version=v4.6.2": return "4.6.2";
-                        case ".NETFramework,Version=v4.7": return "4.7";
-                        case ".NETFramework,Version=v4.7.1": return "4.7.1";
-                        case ".NETFramework,Version=v4.7.2": return "4.7.2";
-                        case ".NETFramework,Version=v4.8": return "4.8";
-                        case ".NETFramework,Version=v4.8.1": return "4.8.1";
-                    }
+                    case ".NETFramework,Version=v4.6.1": return "4.6.1";
+                    case ".NETFramework,Version=v4.6.2": return "4.6.2";
+                    case ".NETFramework,Version=v4.7": return "4.7";
+                    case ".NETFramework,Version=v4.7.1": return "4.7.1";
+                    case ".NETFramework,Version=v4.7.2": return "4.7.2";
+                    case ".NETFramework,Version=v4.8": return "4.8";
+                    case ".NETFramework,Version=v4.8.1": return "4.8.1";
                 }
             }
 
+            // TargetFrameworkAttribute not found, or the assembly targeted a version older than we support.
             return null;
-
-            static IEnumerable<Assembly> EnumerateAssemblies()
-            {
-                var entryAssembly = Assembly.GetEntryAssembly();
-                // Assembly.GetEntryAssembly() returns null in unit test frameworks.
-                if (entryAssembly != null)
-                {
-                    yield return entryAssembly;
-                }
-                // Search calling assemblies starting from the highest stack frame
-                // (expected to be the entry assembly if Assembly.GetEntryAssembly() returned null),
-                // excluding this assembly.
-                var stacktrace = new StackTrace(false);
-                var searchedAssemblies = new HashSet<Assembly>()
-                {
-                    stacktrace.GetFrame(0).GetMethod().ReflectedType.Assembly
-                };
-                for (int i = stacktrace.FrameCount - 1; i >= 1 ; --i)
-                {
-                    var assembly = stacktrace.GetFrame(i).GetMethod().ReflectedType.Assembly;
-                    if (searchedAssemblies.Add(assembly))
-                    {
-                        yield return assembly;
-                    }
-                }
-            }
         }
 
         internal static string GetFrameworkDescription()
