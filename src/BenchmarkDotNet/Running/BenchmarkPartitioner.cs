@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
@@ -22,18 +20,16 @@ namespace BenchmarkDotNet.Running
         {
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkRuntimePropertiesComparer();
 
-            private static readonly Runtime Current = RuntimeInformation.GetCurrentRuntime();
-
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
             {
-                if (x == null && y == null)
+                if (x == y)
                     return true;
                 if (x == null || y == null)
                     return false;
                 var jobX = x.Job;
                 var jobY = y.Job;
 
-                if (AreDifferent(GetRuntime(jobX), GetRuntime(jobY))) // Mono vs .NET vs Core
+                if (AreDifferent(x.GetRuntime(), y.GetRuntime())) // Mono vs .NET vs Core
                     return false;
                 if (AreDifferent(x.GetToolchain(), y.GetToolchain())) // Mono vs .NET vs Core vs InProcess
                     return false;
@@ -90,20 +86,8 @@ namespace BenchmarkDotNet.Running
                 return hashCode.ToHashCode();
             }
 
-            private static Runtime GetRuntime(Job job)
-                => job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                    ? job.Environment.Runtime
-                    : Current;
-
             private static bool AreDifferent(object x, object y)
-            {
-                if (x == null && y == null)
-                    return false;
-                if (x == null || y == null)
-                    return true;
-
-                return !x.Equals(y);
-            }
+                => !Equals(x, y);
 
             private static bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
             {
