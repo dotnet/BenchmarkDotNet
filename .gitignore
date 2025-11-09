@@ -54,6 +54,9 @@ src/BenchmarkDotNet/Disassemblers/BenchmarkDotNet.Disassembler.*.nupkg
 # Visual Studio 2015 cache/options directory
 .vs/
 
+# VSCode directory
+.vscode/
+
 # Cake
 tools/**
 .dotnet

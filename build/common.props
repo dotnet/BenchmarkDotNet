@@ -21,10 +21,11 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
+    <WarningsNotAsErrors>NU1900</WarningsNotAsErrors>
     <Nullable>annotations</Nullable>
     <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <NoWarn>CS9057</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

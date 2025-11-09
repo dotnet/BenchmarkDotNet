@@ -34,8 +34,11 @@ namespace BenchmarkDotNet.Tests.Running
          */
         #endregion
         #region Generic Type Tests
+
+
+#pragma warning disable BDN1000
         /// <summary>
-        /// Tests for BenchmarkRunner.Run<T> method
+        /// Tests for <see cref="BenchmarkRunner.Run{T}"/> method
         /// </summary>
         [Theory]
         [InlineData(null)]
@@ -53,6 +56,7 @@ namespace BenchmarkDotNet.Tests.Running
 
             Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
         }
+#pragma warning restore BDN1000
 
         [Theory]
         [InlineData(null)]
@@ -68,6 +72,8 @@ namespace BenchmarkDotNet.Tests.Running
         }
         #endregion
         #region Type-based Tests
+
+#pragma warning disable BDN1000
         /// <summary>
         /// Tests for BenchmarkRunner.Run(Type) method
         /// </summary>
@@ -84,6 +90,7 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
             Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
         }
+#pragma warning restore BDN1000
 
         [Theory]
         [InlineData(null)]

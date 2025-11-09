@@ -116,21 +116,11 @@ namespace BenchmarkDotNet.Tests
 
 #if NETFRAMEWORK
             if (OsDetector.IsWindows())
-                Assert.True(runtime is ClrRuntime);
+                Assert.True(runtime is ClrRuntime, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
             else
-                Assert.True(runtime is MonoRuntime);
-#elif NETCOREAPP2_1
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp21);
-#elif NETCOREAPP2_2
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp22);
-#elif NETCOREAPP3_0
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30);
-#elif NETCOREAPP3_1
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
-#elif NETCOREAPP5_0
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp50);
-#elif NET8_0
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net80);
+                Assert.True(runtime is MonoRuntime, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
+#else
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net80, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
 #endif
         }
     }

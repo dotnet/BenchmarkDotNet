@@ -1,0 +1,6 @@
+<Project>
+  <!-- ProjectReferences are not transitive, so we need to directly include the analyzers for all test projects. -->
+  <ItemGroup Condition="'$(AssemblyName)' != 'BenchmarkDotNet.Analyzers.Tests'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
+</Project>
