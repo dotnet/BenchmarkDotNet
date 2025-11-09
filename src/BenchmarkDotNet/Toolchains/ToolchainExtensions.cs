@@ -43,15 +43,11 @@ namespace BenchmarkDotNet.Toolchains
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    bool ShouldUseCurrentRuntime()
-                    {
-                        var assembly = isRuntimeExplicit
-                            ? descriptor?.WorkloadMethod.DeclaringType.Assembly
-                            : null;
-                        return runtime.MsBuildMoniker == ClrRuntime.GetTargetOrCurrentVersion(assembly).MsBuildMoniker;
-                    }
+                    bool UseRoslyn()
+                        => !isRuntimeExplicit
+                        || runtime.MsBuildMoniker == ClrRuntime.GetTargetOrCurrentVersion(descriptor?.WorkloadMethod.DeclaringType.Assembly).MsBuildMoniker;
 
-                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework && ShouldUseCurrentRuntime())
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework && UseRoslyn())
                         return RoslynToolchain.Instance;
 
                     return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
