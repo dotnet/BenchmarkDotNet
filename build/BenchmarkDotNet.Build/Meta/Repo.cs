@@ -16,8 +16,8 @@ public static class Repo
     public const string DocsStableBranch = "docs-stable";
     public const string MasterBranch = "master";
 
-    public const string MaintainerAuthorName = "Andrey Akinshin <andrey.akinshin@gmail.com>";
-    public const string MaintainerAuthorEmail = "andrey.akinshin@gmail.com";
+    public const string MaintainerAuthorName = "GitHub Actions";
+    public const string MaintainerAuthorEmail = "actions@github.com";
     
     public static async Task<int> GetDependentProjectsNumber()
     {

@@ -108,14 +108,14 @@ jobs:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
         title: v${{ steps.next_version.outputs.NEXT_VERSION }}
-    
+
     - name: Publish to NuGet
       run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
     # --- Documentation ---
 
     - name: Fetch changelog
-      run: ./build.cmd docs-fetch --depth 1 --preview
+      run: ./build.cmd docs-fetch --depth 2 --preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
