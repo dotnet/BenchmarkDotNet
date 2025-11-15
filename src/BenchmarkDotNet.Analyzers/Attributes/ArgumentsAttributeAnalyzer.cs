@@ -373,19 +373,19 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                 else if (constantValue is { HasValue: true, Value: null })
                 {
                     if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                                                            (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
-                                                            null,
-                                                            methodParameterTypeSymbol,
-                                                            valueExpressionString,
-                                                            constantValue,
-                                                            null))
+                        (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                        null,
+                        methodParameterTypeSymbol,
+                        valueExpressionString,
+                        constantValue,
+                        null))
                     {
                         ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                                                                             valueExpressionSyntax.GetLocation(),
-                                                                             valueExpressionString,
-                                                                             expectedValueTypeString,
-                                                                             "null"
-                                                                            );
+                            valueExpressionSyntax.GetLocation(),
+                            valueExpressionString,
+                            expectedValueTypeString,
+                            "null"
+                        );
                     }
                 }
             }

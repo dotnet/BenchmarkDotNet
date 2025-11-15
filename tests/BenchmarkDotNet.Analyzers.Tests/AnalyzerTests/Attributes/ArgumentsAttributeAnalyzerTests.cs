@@ -408,18 +408,18 @@ public class ArgumentsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
-                                                    public void BenchmarkMethod(int a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
+                    public void BenchmarkMethod(int a)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -435,18 +435,18 @@ public class ArgumentsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
-                                                    public void BenchmarkMethod(int a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
+                    public void BenchmarkMethod(int a)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -510,18 +510,18 @@ public class ArgumentsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "dummy_literal, true")}}]
-                                                    public void BenchmarkMethod(byte a, bool b)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "dummy_literal, true")}}]
+                    public void BenchmarkMethod(byte a, bool b)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -537,18 +537,18 @@ public class ArgumentsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}}]
-                                                    public void BenchmarkMethod(System.Type a, System.Type b)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}}]
+                    public void BenchmarkMethod(System.Type a, System.Type b)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -595,20 +595,20 @@ public class ArgumentsAttributeAnalyzerTests
             bool isNullable)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using DifferentNamespace;
+                using DifferentNamespace;
 
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
-                                                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -625,20 +625,20 @@ public class ArgumentsAttributeAnalyzerTests
             bool isNullable)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
                                                 
-                                                namespace DifferentNamespace;
+                namespace DifferentNamespace;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
-                                                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -655,19 +655,19 @@ public class ArgumentsAttributeAnalyzerTests
             bool isNullable)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using DifferentNamespace;
+                using DifferentNamespace;
                                                 
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
-                                                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -685,19 +685,19 @@ public class ArgumentsAttributeAnalyzerTests
             bool isNullable)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                namespace DifferentNamespace;
+                namespace DifferentNamespace;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
-                                                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -715,20 +715,20 @@ public class ArgumentsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
                                                 
-                                                namespace DifferentNamespace;
+                namespace DifferentNamespace;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
-                                                    public void BenchmarkMethod({{valueAndType.Value2}} a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
+                    public void BenchmarkMethod({{valueAndType.Value2}} a)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -744,20 +744,20 @@ public class ArgumentsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using DifferentNamespace;
+                using DifferentNamespace;
                                                 
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [Benchmark]
-                                                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
-                                                    public void BenchmarkMethod({{valueAndType.Value2}} a)
-                                                    {
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
+                    public void BenchmarkMethod({{valueAndType.Value2}} a)
+                    {
                                                                                     
-                                                    }
-                                                }
-                                                """;
+                    }
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();

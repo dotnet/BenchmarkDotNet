@@ -184,14 +184,14 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "42")}})]
-                                                    public int {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "42")}})]
+                    public int {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -207,14 +207,14 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerable))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "42")}})]
-                                                    public int {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "42")}})]
+                    public int {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -603,14 +603,14 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}})]
-                                                    public System.Type {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}})]
+                    public System.Type {{fieldOrPropertyDeclaration}}
+                }
+                """;
             TestCode = testCode;
             ReferenceDummyAttribute();
 
@@ -841,7 +841,9 @@ public class ParamsAttributeAnalyzerTests
         }
 
         public static IEnumerable<string> FieldOrPropertyDeclarations
+#pragma warning disable IDE0028 // Simplify collection initialization
             => new FieldOrPropertyDeclarationsTheoryData();
+#pragma warning restore IDE0028 // Simplify collection initialization
 
         public static IEnumerable<string> DummyAttributeUsage
             => DummyAttributeUsageTheoryData;
@@ -1209,7 +1211,9 @@ public class ParamsAttributeAnalyzerTests
         }
 
         public static IEnumerable<string> FieldOrPropertyDeclarations
+#pragma warning disable IDE0028 // Simplify collection initialization
             => new FieldOrPropertyDeclarationsTheoryData();
+#pragma warning restore IDE0028 // Simplify collection initialization
 
         public static IEnumerable<string> DummyAttributeUsage
             => DummyAttributeUsageTheoryData;

@@ -323,12 +323,12 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
             else if (constantValue is { HasValue: true, Value: null })
             {
                 if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                                                        (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
-                                                        null,
-                                                        expectedValueTypeSymbol,
-                                                        valueExpressionString,
-                                                        constantValue,
-                                                        null))
+                    (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                    null,
+                    expectedValueTypeSymbol,
+                    valueExpressionString,
+                    constantValue,
+                    null))
                 {
                     ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                         valueExpressionSyntax.GetLocation(),
