@@ -203,16 +203,16 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
 
     protected void ReferenceDummyEnumInDifferentNamespace()
         => _analyzerTest.TestState.Sources.Add("""
-                                               namespace DifferentNamespace;
-                                               
-                                               public enum DummyEnumInDifferentNamespace
-                                               {
-                                                   Value1,
-                                                   Value2,
-                                                   Value3
-                                               }
-                                               """
-                                              );
+            namespace DifferentNamespace;
+            
+            public enum DummyEnumInDifferentNamespace
+            {
+                Value1,
+                Value2,
+                Value3
+            }
+            """
+        );
 
     protected void ReferenceDummyEnumWithFlagsAttribute()
         => _analyzerTest.TestState.Sources.Add("""

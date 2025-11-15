@@ -234,11 +234,12 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
             var expectedValueTypeString = expectedValueTypeSymbol.ToString();
             var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
 
-            if (actualValueTypeSymbol is { TypeKind:    TypeKind.Array
-                                                     or TypeKind.Class
-                                                     or TypeKind.Struct
-                                                     or TypeKind.Enum
-                                         })
+            if (actualValueTypeSymbol is
+                { TypeKind:    TypeKind.Array
+                    or TypeKind.Class
+                    or TypeKind.Struct
+                    or TypeKind.Enum
+                })
             {
                 var actualValueTypeString = actualValueTypeSymbol.ToString();
 
@@ -249,11 +250,11 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
                     if (!actualValueTypeSymbol.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
                     {
                         ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                                                                             valueExpressionSyntax.GetLocation(),
-                                                                             valueExpressionString,
-                                                                             expectedValueTypeString,
-                                                                             actualValueTypeString
-                                                                            );
+                            valueExpressionSyntax.GetLocation(),
+                            valueExpressionString,
+                            expectedValueTypeString,
+                            actualValueTypeString
+                        );
                     }
 
                     return;
@@ -273,11 +274,11 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
                         if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
                         {
                             ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                                                                                 valueExpressionSyntax.GetLocation(),
-                                                                                 valueExpressionString,
-                                                                                 expectedValueTypeString,
-                                                                                 actualValueTypeString
-                                                                                );
+                                 valueExpressionSyntax.GetLocation(),
+                                 valueExpressionString,
+                                 expectedValueTypeString,
+                                 actualValueTypeString
+                            );
                         }
 
                         return;
@@ -304,12 +305,12 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
                 }
 
                 if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                                                        (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
-                                                        valueTypeContainingNamespace,
-                                                        expectedValueTypeSymbol,
-                                                        valueExpressionString,
-                                                        constantValue,
-                                                        actualValueTypeString))
+                        (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                        valueTypeContainingNamespace,
+                        expectedValueTypeSymbol,
+                        valueExpressionString,
+                        constantValue,
+                        actualValueTypeString))
                 {
                     ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                         valueExpressionSyntax.GetLocation(),

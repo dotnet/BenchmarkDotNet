@@ -281,16 +281,16 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using DifferentNamespace;
+                using DifferentNamespace;
 
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}})]
-                                                    public DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}})]
+                    public DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -308,16 +308,16 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                namespace DifferentNamespace;
+                namespace DifferentNamespace;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}})]
-                                                    public DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}})]
+                    public DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -335,16 +335,16 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using DifferentNamespace;
-                                                
-                                                using BenchmarkDotNet.Attributes;
+                using DifferentNamespace;
+                
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}})]
-                                                    public DummyEnumInDifferentNamespace[] {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}})]
+                    public DummyEnumInDifferentNamespace[] {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -363,16 +363,16 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                namespace DifferentNamespace;
+                namespace DifferentNamespace;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}})]
-                                                    public DummyEnumInDifferentNamespace[] {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}})]
+                    public DummyEnumInDifferentNamespace[] {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -391,16 +391,16 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using BenchmarkDotNet.Attributes;
+                using BenchmarkDotNet.Attributes;
 
-                                                namespace DifferentNamespace;
-                                                
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}})]
-                                                    public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                namespace DifferentNamespace;
+                
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}})]
+                    public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
@@ -417,16 +417,16 @@ public class ParamsAttributeAnalyzerTests
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration)
         {
             var testCode = /* lang=c#-test */ $$"""
-                                                using DifferentNamespace;
-                                                
-                                                using BenchmarkDotNet.Attributes;
+                using DifferentNamespace;
+                
+                using BenchmarkDotNet.Attributes;
 
-                                                public class BenchmarkClass
-                                                {
-                                                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}})]
-                                                    public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
-                                                }
-                                                """;
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}})]
+                    public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
+                }
+                """;
 
             TestCode = testCode;
             ReferenceDummyAttribute();
