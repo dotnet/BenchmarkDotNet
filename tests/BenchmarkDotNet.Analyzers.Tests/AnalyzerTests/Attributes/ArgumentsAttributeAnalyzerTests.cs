@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Analyzers.Attributes;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
+using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -401,6 +402,60 @@ public class ArgumentsAttributeAnalyzerTests
             await RunAsync();
         }
 
+        [Theory, CombinatorialData]
+        public async Task Analyzing_an_arguments_attribute_should_not_throw_an_inconsistent_language_versions_exception(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
+                    public void BenchmarkMethod(int a)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnum();
+            SetParseOptions(LanguageVersion.CSharp14);
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Analyzing_an_arguments_attribute_should_not_throw_an_inconsistent_syntax_tree_features_exception(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
+                    public void BenchmarkMethod(int a)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnum();
+            SetParseOptions(LanguageVersion.Default, true);
+
+            await RunAsync();
+        }
+
         [Theory]
         [MemberData(nameof(EmptyArgumentsAttributeUsagesWithMismatchingValueCount))]
         public async Task Having_a_mismatching_value_count_with_empty_argument_attribute_usages_should_not_trigger_diagnostic(string argumentsAttributeUsage)
@@ -450,12 +505,68 @@ public class ArgumentsAttributeAnalyzerTests
         }
 
         [Theory, CombinatorialData]
+        public async Task Providing_an_unknown_value_type_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "dummy_literal, true")}}]
+                    public void BenchmarkMethod(byte a, bool b)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_an_unknown_type_in_typeof_expression_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}}]
+                    public void BenchmarkMethod(System.Type a, System.Type b)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
         public async Task Providing_expected_value_type_should_not_trigger_diagnostic(
             [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
             [CombinatorialMemberData(nameof(ValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
             [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
         {
             var testCode = /* lang=c#-test */ $$"""
+                using DifferentNamespace;
+                
                 using BenchmarkDotNet.Attributes;
 
                 public class BenchmarkClass
@@ -472,6 +583,185 @@ public class ArgumentsAttributeAnalyzerTests
             TestCode = testCode;
             ReferenceDummyAttribute();
             ReferenceDummyEnum();
+            ReferenceDummyEnumInDifferentNamespace();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_expected_enum_value_type_using_not_fully_qualified_name_located_in_a_different_namespace_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
+            bool isNullable)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using DifferentNamespace;
+
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnum();
+            ReferenceDummyEnumInDifferentNamespace();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_expected_enum_value_type_using_not_fully_qualified_name_located_in_same_namespace_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument,
+            bool isNullable)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+                                                
+                namespace DifferentNamespace;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnum();
+            ReferenceDummyEnumInDifferentNamespace();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_expected_enum_value_type_array_using_not_fully_qualified_name_located_in_a_different_namespace_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ArrayValuesContainerAttributeArgumentEnumerableLocal))] string arrayValuesContainerAttributeArgument,
+            bool isNullable)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using DifferentNamespace;
+                                                
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
+                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnum();
+            ReferenceDummyEnumInDifferentNamespace();
+            DisableCompilerDiagnostics();                   // Nullable struct arrays are not supported in attributes
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_expected_enum_value_type_array_using_not_fully_qualified_name_located_in_same_namespace_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ArrayValuesContainerAttributeArgumentEnumerableLocal))] string arrayValuesContainerAttributeArgument,
+            bool isNullable)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                namespace DifferentNamespace;
+
+                public class BenchmarkClass
+                {
+                    [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
+                    public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
+                    {
+                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnum();
+            ReferenceDummyEnumInDifferentNamespace();
+            DisableCompilerDiagnostics();                   // Nullable struct arrays are not supported in attributes
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_expected_type_using_not_fully_qualified_name_located_in_same_namespace_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ValuesAndTypesInDifferentNamespace))] ValueTupleDouble<string, string> valueAndType,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+                                                
+                namespace DifferentNamespace;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
+                    public void BenchmarkMethod({{valueAndType.Value2}} a)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnumInDifferentNamespace();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_expected_type_using_not_fully_qualified_name_located_in_a_different_namespace_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ValuesAndTypesInDifferentNamespace))] ValueTupleDouble<string, string> valueAndType,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using DifferentNamespace;
+                                                
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
+                    public void BenchmarkMethod({{valueAndType.Value2}} a)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+            ReferenceDummyEnumInDifferentNamespace();
 
             await RunAsync();
         }
@@ -664,33 +954,6 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42, \"test\"")}}]
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "43, \"test2\"")}}]
                     public void BenchmarkMethod(unkown a, string b)
-                    {
-                                                    
-                    }
-                }
-                """;
-
-            TestCode = testCode;
-            ReferenceDummyAttribute();
-
-            DisableCompilerDiagnostics();
-
-            await RunAsync();
-        }
-
-        [Theory, CombinatorialData]
-        public async Task Providing_an_unkown_value_type_should_not_trigger_diagnostic(
-            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
-            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
-        {
-            var testCode = /* lang=c#-test */ $$"""
-                using BenchmarkDotNet.Attributes;
-
-                public class BenchmarkClass
-                {
-                    [Benchmark]
-                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:dummy_literal|}, true")}}]
-                    public void BenchmarkMethod(byte a, bool b)
                     {
                                                     
                     }
@@ -981,6 +1244,44 @@ public class ArgumentsAttributeAnalyzerTests
             ("-9223372036854775808", "ulong", "long"),
         ];
 
+        public static IEnumerable<string> ArrayValuesContainerAttributeArgumentEnumerableLocal()
+        {
+            string[] nameColonUsages =
+            [
+                "",
+                "values: "
+            ];
+
+            string[] priorityNamedParameterUsages =
+            [
+                "",
+                ", Priority = 1"
+            ];
+
+            List<string> arrayValuesContainers =
+            [
+                "{0}new object[] {{{{ new[] {{{{ {{0}} }}}} }}}}{1}",         // new object[] { new[] { 42 } }
+                "{0}new object[] {{{{ new {{1}}[] {{{{ {{0}} }}}} }}}}{1}",   // new object[] { new int[] { 42 } }
+                "{0}[ new[] {{{{ {{0}} }}}} ]{1}",                            // [ new[] { 42 } ]
+                "{0}[ new {{1}}[] {{{{ {{0}} }}}} ]{1}",                      // [ new int[] { 42 } ]
+                "{0}new object[] {{{{ new {{1}}[] {{{{ }}}} }}}}{1}",         // new object[] { new int[] { } }
+                "{0}[ new {{1}}[] {{{{ }}}} ]{1}",                            // [ new int[] { } ]
+                "{0}new object[] {{{{ new {{1}}[0] }}}}{1}",                  // new object[] { new int[0] }
+                "{0}[ new {{1}}[0] ]{1}"                                      // [ new int[0] ]
+            ];
+
+            foreach (var arrayValuesContainer in arrayValuesContainers)
+            {
+                foreach (var nameColonUsage in nameColonUsages)
+                {
+                    foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
+                    {
+                        yield return string.Format(arrayValuesContainer, nameColonUsage, priorityNamedParameterUsage);
+                    }
+                }
+            }
+        }
+
         public static IEnumerable<ValueTupleDouble<string, string>> ValuesAndTypes =>
         [
             ( "true", "bool" ),
@@ -1003,9 +1304,17 @@ public class ArgumentsAttributeAnalyzerTests
               (object)"test_object"
               """, "object" ),
             ( "typeof(string)", "System.Type" ),
+            ( "typeof(DummyEnumInDifferentNamespace?)", "System.Type" ),
             ( "DummyEnum.Value1", "DummyEnum" ),
 
             ( "new[] { 0, 1, 2 }", "int[]" ),
+        ];
+
+        public static IEnumerable<ValueTupleDouble<string, string>> ValuesAndTypesInDifferentNamespace =>
+        [
+            ( "typeof(DummyEnumInDifferentNamespace)", "System.Type" ),
+            ( "typeof(DummyEnumInDifferentNamespace?)", "System.Type" ),
+            ( "DummyEnumInDifferentNamespace.Value1", "DummyEnumInDifferentNamespace" ),
         ];
 
         public static IEnumerable<ValueTupleDouble<string, string>> NotConvertibleValuesAndTypes =>
