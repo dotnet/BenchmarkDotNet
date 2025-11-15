@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Analyzers;
 
 internal static class AnalyzerHelper
 {
+    internal const string InterceptorsNamespaces = "InterceptorsNamespaces";
+
     public static LocalizableResourceString GetResourceString(string name)
         => new(name, BenchmarkDotNetAnalyzerResources.ResourceManager, typeof(BenchmarkDotNetAnalyzerResources));
 
@@ -143,48 +145,58 @@ internal static class AnalyzerHelper
         return typeName;
     }
 
-    public static bool IsAssignableToField(Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+    public static bool IsAssignableToField(Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
         const string codeTemplate1 = """
+            {0}
+            
             file static class Internal {{
-            static readonly {0} x = {1};
+            static readonly {1} x = {2};
             }}
             """;
 
         const string codeTemplate2 = """
+            {0}
+            
             file static class Internal {{
-            static readonly {0} x = ({1}){2};
+            static readonly {1} x = ({2}){3};
             }}
             """;
 
-        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, targetType, valueExpression, constantValue, valueType);
+        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, languageVersion, valueTypeContainingNamespace, targetType, valueExpression, constantValue, valueType);
     }
 
-    public static bool IsAssignableToLocal(Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+    public static bool IsAssignableToLocal(Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
         const string codeTemplate1 = """
+            {0}
+            
             file static class Internal {{
             static void Method() {{
-                {0} x = {1};
+                {1} x = {2};
             }}
             }}
             """;
 
         const string codeTemplate2 = """
+            {0}
+            
             file static class Internal {{
             static void Method() {{
-                {0} x = ({1}){2};
+                {1} x = ({2}){3};
             }}
             }}
             """;
 
-        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, targetType, valueExpression, constantValue, valueType);
+        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, languageVersion, valueTypeContainingNamespace, targetType, valueExpression, constantValue, valueType);
     }
 
-    private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+    private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
-        var hasCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, targetType, valueExpression), compilation);
-        if (hasCompilerDiagnostics)
+        var usingDirective = valueTypeContainingNamespace != null ? $"using {valueTypeContainingNamespace};" : "";
+
+        var hasNoCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, usingDirective, targetType, valueExpression), compilation, languageVersion);
+        if (hasNoCompilerDiagnostics)
         {
             return true;
         }
@@ -200,16 +212,19 @@ internal static class AnalyzerHelper
             return false;
         }
 
-        return HasNoCompilerDiagnostics(string.Format(codeTemplate2, targetType, valueType, constantLiteral), compilation);
+        return HasNoCompilerDiagnostics(string.Format(codeTemplate2, usingDirective, targetType, valueType, constantLiteral), compilation, languageVersion);
     }
 
-    private static bool HasNoCompilerDiagnostics(string code, Compilation compilation)
+    private static bool HasNoCompilerDiagnostics(string code, Compilation compilation, LanguageVersion languageVersion)
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilationTestSyntaxTree = CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(languageVersion));
+
+        var syntaxTreesWithInterceptorsNamespaces = compilation.SyntaxTrees.Where(st => st.Options.Features.ContainsKey(InterceptorsNamespaces));
 
         var compilerDiagnostics = compilation
-            .AddSyntaxTrees(syntaxTree)
-            .GetSemanticModel(syntaxTree)
+            .RemoveSyntaxTrees(syntaxTreesWithInterceptorsNamespaces)
+            .AddSyntaxTrees(compilationTestSyntaxTree)
+            .GetSemanticModel(compilationTestSyntaxTree)
             .GetMethodBodyDiagnostics()
             .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
             .ToList();

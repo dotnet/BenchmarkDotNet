@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
@@ -15,7 +16,6 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
     private readonly CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> _analyzerTest;
-
     private readonly DiagnosticDescriptor? _ruleUnderTest;
 
     private AnalyzerTestFixture(bool assertUniqueSupportedDiagnostics)
@@ -54,7 +54,7 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
     {
         var analyzer = AssertUniqueSupportedDiagnostics();
 
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (diagnosticDescriptor == null)
         {
             Assert.Fail("Diagnostic under test cannot be null when using this constructor");
@@ -201,6 +201,19 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
             """
         );
 
+    protected void ReferenceDummyEnumInDifferentNamespace()
+        => _analyzerTest.TestState.Sources.Add("""
+                                               namespace DifferentNamespace;
+                                               
+                                               public enum DummyEnumInDifferentNamespace
+                                               {
+                                                   Value1,
+                                                   Value2,
+                                                   Value3
+                                               }
+                                               """
+                                              );
+
     protected void ReferenceDummyEnumWithFlagsAttribute()
         => _analyzerTest.TestState.Sources.Add("""
             using System;
@@ -236,6 +249,18 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
             }
             """
         );
+
+    protected void SetParseOptions(LanguageVersion languageVersion, bool interceptorsNamespaces = false)
+    {
+        var parseOptions = new CSharpParseOptions(languageVersion);
+
+        if (interceptorsNamespaces)
+        {
+            parseOptions = parseOptions.WithFeatures([ new KeyValuePair<string, string>(AnalyzerHelper.InterceptorsNamespaces, "") ]);
+        }
+
+        _analyzerTest.SolutionTransforms.Add((solution, projectId) => solution.WithProjectParseOptions(projectId, parseOptions));
+    }
 
     private sealed class InternalAnalyzerTest : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
     {
