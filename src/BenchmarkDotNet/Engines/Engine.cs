@@ -45,13 +45,14 @@ namespace BenchmarkDotNet.Engines
         private readonly List<Measurement> jittingMeasurements = new(10);
         private readonly bool includeExtraStats;
         private readonly Random random;
+        private readonly Diagnosers.CompositeInProcessDiagnoserHandler inProcessDiagnoserHandler;
 
         internal Engine(
             IHost host,
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, string benchmarkName)
+            bool includeExtraStats, string benchmarkName, Diagnosers.CompositeInProcessDiagnoserHandler inProcessDiagnoserHandler)
         {
 
             Host = host;
@@ -68,6 +69,7 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeExtraStats = includeExtraStats;
             BenchmarkName = benchmarkName;
+            this.inProcessDiagnoserHandler = inProcessDiagnoserHandler;
 
             Resolver = resolver;
 
@@ -117,6 +119,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.BeforeMainRun();
+                    inProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
@@ -135,6 +138,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.AfterMainRun();
+                    inProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
                 }
             }
 

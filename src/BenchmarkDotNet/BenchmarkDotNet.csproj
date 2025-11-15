@@ -36,26 +36,11 @@
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
   </ItemGroup>
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT' AND '$(UseMonoRuntime)' != 'true' ">
-    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <EmbeddedResource Include="Disassemblers\net462\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
-    <EmbeddedResource Include="Disassemblers\net462\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
-    <EmbeddedResource Include="Disassemblers\net462\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
-    <EmbeddedResource Include="Disassemblers\net462\win7-x64\Iced.dll" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
     <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMembersAttribute.cs" Link="Properties\DynamicallyAccessedMembersAttribute.cs" />
     <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMemberTypes.cs" Link="Properties\DynamicallyAccessedMemberTypes.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="Disassemblers\DataContracts.cs" />
   </ItemGroup>
 </Project>

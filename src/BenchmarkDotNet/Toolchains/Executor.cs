@@ -33,24 +33,26 @@ namespace BenchmarkDotNet.Toolchains
             }
 
             return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
-                executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
+                executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
+                executeParameters.DiagnoserRunMode);
         }
 
         private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
-            IDiagnoser diagnoser, IResolver resolver, int launchIndex)
+            IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
+            Diagnosers.RunMode diagnoserRunMode)
         {
             try
             {
                 using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
                 using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
 
-                string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString());
+                string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode);
 
                 using (Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
                 using (ConsoleExitHandler consoleExitHandler = new(process, logger))
                 using (AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false))
                 {
-                    Broker broker = new(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                    Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 

@@ -30,9 +30,11 @@ namespace BenchmarkDotNet.Running
 
         public override int GetHashCode() => Value;
 
-        public string ToArguments() => $"--benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --benchmarkId {Value}";
+        public string ToArguments(Diagnosers.RunMode diagnoserRunMode)
+            => $"--benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --diagnoserRunMode {(int) diagnoserRunMode} --benchmarkId {Value}";
 
-        public string ToArguments(string fromBenchmark, string toBenchmark) => $"{AnonymousPipesHost.AnonymousPipesDescriptors} {fromBenchmark} {toBenchmark} {ToArguments()}";
+        public string ToArguments(string fromBenchmark, string toBenchmark, Diagnosers.RunMode diagnoserRunMode)
+            => $"{AnonymousPipesHost.AnonymousPipesDescriptors} {fromBenchmark} {toBenchmark} {ToArguments(diagnoserRunMode)}";
 
         public override string ToString() => Value.ToString();
 
