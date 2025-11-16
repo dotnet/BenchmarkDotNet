@@ -38,7 +38,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
+                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
                 {
                     return true;
                 }
@@ -58,7 +58,7 @@ internal static class AnalyzerHelper
             return false;
         }
 
-        return attributeList.Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default));
+        return attributeList.Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(attributeTypeSymbol));
     }
 
     public static ImmutableArray<AttributeSyntax> GetAttributes(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
@@ -83,7 +83,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
+                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
                 {
                     attributesBuilder.Add(attributeSyntax);
                 }
@@ -115,7 +115,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
+                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
                 {
                     attributeUsageCount++;
                 }

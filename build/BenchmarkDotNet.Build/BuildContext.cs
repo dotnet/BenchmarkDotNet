@@ -30,6 +30,7 @@ public class BuildContext : FrostingContext
     public DirectoryPath ArtifactsDirectory { get; }
 
     public FilePath SolutionFile { get; }
+    public FilePath AnalyzersProjectFile { get; }
     public FilePath TemplatesTestsProjectFile { get; }
     public FilePathCollection AllPackableSrcProjects { get; }
     public FilePath VersionsFile { get; }
@@ -64,6 +65,7 @@ public class BuildContext : FrostingContext
         context.Tools.RegisterFile(toolFilePath);
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
+        AnalyzersProjectFile = RootDirectory.Combine("src").Combine("BenchmarkDotNet.Analyzers").CombineWithFilePath("BenchmarkDotNet.Analyzers.csproj");
 
         TemplatesTestsProjectFile = RootDirectory.Combine("templates")
             .CombineWithFilePath("BenchmarkDotNet.Templates.csproj");

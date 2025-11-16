@@ -428,8 +428,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
-            EnvRequirement.DotNetCoreOnly)]
+        // The string -> ReadOnlySpan<char> implicit cast operator is available only in .NET Core 2.1+ (https://github.com/dotnet/corefx/issues/30121)
+#if NETCOREAPP2_1_OR_GREATER
+        [Theory]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
 
@@ -448,8 +449,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
-            EnvRequirement.DotNetCoreOnly)]
+        [Theory]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StringFromArgumentsSourceCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringFromArgumentsSourceToReadOnlySpan>(toolchain);
 
@@ -472,6 +472,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("Invalid value");
             }
         }
+#endif
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnArrayOfStringsCanBeUsedAsArgument(IToolchain toolchain) =>

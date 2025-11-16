@@ -35,12 +35,12 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         MustHaveValuesRule,
         MustHaveMatchingValueTypeRule,
-        UnnecessarySingleValuePassedToAttributeRule
-    ];
+        UnnecessarySingleValuePassedToAttributeRule,
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -69,7 +69,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
         var paramsAttributeTypeSymbol = GetParamsAttributeTypeSymbol(context.Compilation);
 
         var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default))
+        if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol))
         {
             return;
         }
@@ -117,7 +117,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
         if (attributeSyntax.ArgumentList.Arguments.All(aas => aas.NameEquals != null))
         {
-            context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule, Location.Create(context.FilterTree, attributeSyntax.ArgumentList.Arguments.Span)));
+            context.ReportDiagnostic(Diagnostic.Create(MustHaveValuesRule, Location.Create(context.Node.SyntaxTree, attributeSyntax.ArgumentList.Arguments.Span)));
 
             return;
         }
@@ -138,8 +138,8 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+#if CODE_ANALYSIS_4_8
         // Collection expression
-
         if (attributeArgumentSyntax.Expression is CollectionExpressionSyntax collectionExpressionSyntax)
         {
             if (!collectionExpressionSyntax.Elements.Any())
@@ -163,6 +163,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
             return;
         }
+#endif
 
         // Array creation expression
 
@@ -245,9 +246,9 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
                 var typeTypeSymbol = context.Compilation.GetTypeByMetadataName("System.Type");
 
-                if (expectedValueTypeSymbol.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                if (expectedValueTypeSymbol.Equals(typeTypeSymbol))
                 {
-                    if (!actualValueTypeSymbol.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                    if (!actualValueTypeSymbol.Equals(typeTypeSymbol))
                     {
                         ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                             valueExpressionSyntax.GetLocation(),
@@ -269,9 +270,9 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
                 if (actualValueTypeSymbol is IArrayTypeSymbol actualValueArrayTypeSymbol)
                 {
-                    if (expectedValueTypeSymbol is IArrayTypeSymbol expectedValueArrayTypeSymbol && expectedValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                    if (expectedValueTypeSymbol is IArrayTypeSymbol expectedValueArrayTypeSymbol && expectedValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
                     {
-                        if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                        if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
                         {
                             ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                                  valueExpressionSyntax.GetLocation(),
@@ -293,7 +294,8 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
                     }
                     else if (actualValueArrayTypeSymbol.ElementType.TypeKind is TypeKind.Struct)
                     {
-                        if (actualValueArrayTypeSymbol.ElementType.NullableAnnotation == NullableAnnotation.Annotated)
+                        // Nullable<T>
+                        if (actualValueArrayTypeSymbol.ElementType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
                         {
                             return;
                         }
@@ -305,7 +307,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
                 }
 
                 if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                        (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                        (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
                         valueTypeContainingNamespace,
                         expectedValueTypeSymbol,
                         valueExpressionString,
@@ -323,7 +325,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
             else if (constantValue is { HasValue: true, Value: null })
             {
                 if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                    (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                    (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
                     null,
                     expectedValueTypeSymbol,
                     valueExpressionString,
