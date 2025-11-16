@@ -82,8 +82,8 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Description)));
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         MutuallyExclusiveOnFieldRule,
         MutuallyExclusiveOnPropertyRule,
         FieldMustBePublic,
@@ -91,8 +91,8 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         NotValidOnReadonlyFieldRule,
         NotValidOnConstantFieldRule,
         PropertyCannotBeInitOnlyRule,
-        PropertyMustHavePublicSetterRule
-    ];
+        PropertyMustHavePublicSetterRule,
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -128,9 +128,9 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         if (attributeSyntaxTypeSymbol == null
             || attributeSyntaxTypeSymbol.TypeKind == TypeKind.Error
             ||
-                   (!attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol, SymbolEqualityComparer.Default)
-                 && !attributeSyntaxTypeSymbol.Equals(paramsSourceAttributeTypeSymbol, SymbolEqualityComparer.Default)
-                 && !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol, SymbolEqualityComparer.Default)))
+                   (!attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol)
+                 && !attributeSyntaxTypeSymbol.Equals(paramsSourceAttributeTypeSymbol)
+                 && !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol)))
         {
             return;
         }
@@ -174,8 +174,10 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             fieldOrPropertyIsPublic = propertyDeclarationSyntax.Modifiers.Any(SyntaxKind.PublicKeyword);
             fieldOrPropertyIdentifier = propertyDeclarationSyntax.Identifier.ToString();
 
+#if CODE_ANALYSIS_3_8
             var propertyInitAccessorIndex = propertyDeclarationSyntax.AccessorList?.Accessors.IndexOf(SyntaxKind.InitAccessorDeclaration);
             propertyInitAccessorKeywordLocation = propertyInitAccessorIndex >= 0 ? propertyDeclarationSyntax.AccessorList.Accessors[propertyInitAccessorIndex.Value].Keyword.GetLocation() : null;
+#endif
 
             var propertySetAccessorIndex = propertyDeclarationSyntax.AccessorList?.Accessors.IndexOf(SyntaxKind.SetAccessorDeclaration);
             propertyIsMissingAssignableSetter = !propertySetAccessorIndex.HasValue || propertySetAccessorIndex.Value < 0 || propertyDeclarationSyntax.AccessorList.Accessors[propertySetAccessorIndex.Value].Modifiers.Any();
@@ -224,14 +226,14 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         DiagnosticDescriptor fieldOrPropertyMustBePublicDiagnosticRule,
         AttributeSyntax attributeSyntax)
     {
-        ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols =
-        [
+        ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols = new INamedTypeSymbol[]
+        {
             paramsAttributeTypeSymbol,
             paramsSourceAttributeTypeSymbol,
             paramsAllValuesAttributeTypeSymbol
-        ];
+        }.ToImmutableArray();
 
-        var parameterAttributeTypeSymbols = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        var parameterAttributeTypeSymbols = new HashSet<INamedTypeSymbol>();
 
         foreach (var declaredAttributeSyntax in declaredAttributes)
         {
@@ -240,7 +242,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var applicableParameterAttributeTypeSymbol in applicableParameterAttributeTypeSymbols)
                 {
-                    if (declaredAttributeTypeSymbol.Equals(applicableParameterAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                    if (declaredAttributeTypeSymbol.Equals(applicableParameterAttributeTypeSymbol))
                     {
                         if (!parameterAttributeTypeSymbols.Add(applicableParameterAttributeTypeSymbol))
                         {

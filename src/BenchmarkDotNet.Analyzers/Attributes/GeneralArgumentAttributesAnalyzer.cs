@@ -18,10 +18,10 @@ public class GeneralArgumentAttributesAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: BenchmarkDotNetAnalyzerResources.Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Description);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         MethodWithoutAttributeMustHaveNoParametersRule,
-    ];
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -66,7 +66,7 @@ public class GeneralArgumentAttributesAnalyzer : DiagnosticAnalyzer
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     MethodWithoutAttributeMustHaveNoParametersRule,
-                    Location.Create(context.FilterTree, methodDeclarationSyntax.ParameterList.Parameters.Span), methodDeclarationSyntax.Identifier.ToString())
+                    Location.Create(context.Node.SyntaxTree, methodDeclarationSyntax.ParameterList.Parameters.Span), methodDeclarationSyntax.Identifier.ToString())
                 );
             }
         }

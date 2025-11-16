@@ -27,11 +27,11 @@ public class ParamsAllValuesAttributeAnalyzer : DiagnosticAnalyzer
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         NotAllowedOnFlagsEnumPropertyOrFieldTypeRule,
-        PropertyOrFieldTypeMustBeEnumOrBoolRule
-    ];
+        PropertyOrFieldTypeMustBeEnumOrBoolRule,
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -60,7 +60,7 @@ public class ParamsAllValuesAttributeAnalyzer : DiagnosticAnalyzer
         var paramsAllValuesAttributeTypeSymbol = GetParamsAllValuesAttributeTypeSymbol(context.Compilation);
 
         var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol, SymbolEqualityComparer.Default))
+        if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol))
         {
             return;
         }
@@ -111,7 +111,7 @@ public class ParamsAllValuesAttributeAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
-            if (fieldOrPropertyTypeSymbol.GetAttributes().Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(flagsAttributeTypeSymbol, SymbolEqualityComparer.Default)))
+            if (fieldOrPropertyTypeSymbol.GetAttributes().Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(flagsAttributeTypeSymbol)))
             {
                 context.ReportDiagnostic(Diagnostic.Create(NotAllowedOnFlagsEnumPropertyOrFieldTypeRule, fieldOrPropertyTypeSyntax.GetLocation(), fieldOrPropertyTypeSymbol.ToString()));
             }

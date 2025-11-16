@@ -37,12 +37,12 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description)));
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         RequiresBenchmarkAttributeRule,
         MustHaveMatchingValueCountRule,
-        MustHaveMatchingValueTypeRule
-    ];
+        MustHaveMatchingValueTypeRule,
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -145,8 +145,8 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                     }
                 }
 
+#if CODE_ANALYSIS_4_8
                 // Collection expression
-
                 else if (attributeArgumentSyntax.Expression is CollectionExpressionSyntax collectionExpressionSyntax)
                 {
                     if (methodDeclarationSyntax.ParameterList.Parameters.Count != collectionExpressionSyntax.Elements.Count)
@@ -163,6 +163,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
 
                     ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => collectionExpressionSyntax.Elements[i] is ExpressionElementSyntax expressionElementSyntax ? expressionElementSyntax.Expression : null);
                 }
+#endif
 
                 // Array creation expression
                 else
@@ -193,7 +194,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                                     ReportMustHaveMatchingValueCountDiagnostic(
                                         arrayCreationExpressionSyntax.Initializer.Expressions.Count == 0
                                             ? arrayCreationExpressionSyntax.Initializer.GetLocation()
-                                            : Location.Create(context.FilterTree, arrayCreationExpressionSyntax.Initializer.Expressions.Span),
+                                            : Location.Create(context.Node.SyntaxTree, arrayCreationExpressionSyntax.Initializer.Expressions.Span),
                                         arrayCreationExpressionSyntax.Initializer.Expressions.Count
                                     );
 
@@ -216,7 +217,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                             {
                                 ReportMustHaveMatchingValueCountDiagnostic(
                                     Location.Create(
-                                        context.FilterTree,
+                                        context.Node.SyntaxTree,
                                         TextSpan.FromBounds(argumentsAttributeSyntax.ArgumentList.Arguments.Span.Start, argumentsAttributeSyntax.ArgumentList.Arguments[firstNamedArgumentIndex.Value - 1].Span.End)
                                     ),
                                     firstNamedArgumentIndex.Value
@@ -233,7 +234,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                             if (methodDeclarationSyntax.ParameterList.Parameters.Count != argumentsAttributeSyntax.ArgumentList.Arguments.Count)
                             {
                                 ReportMustHaveMatchingValueCountDiagnostic(
-                                    Location.Create(context.FilterTree, argumentsAttributeSyntax.ArgumentList.Arguments.Span),
+                                    Location.Create(context.Node.SyntaxTree, argumentsAttributeSyntax.ArgumentList.Arguments.Span),
                                     argumentsAttributeSyntax.ArgumentList.Arguments.Count
                                 );
 
@@ -295,9 +296,9 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
 
                     var typeTypeSymbol = context.Compilation.GetTypeByMetadataName("System.Type");
 
-                    if (methodParameterTypeSymbol.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                    if (methodParameterTypeSymbol.Equals(typeTypeSymbol))
                     {
-                        if (!actualValueTypeSymbol.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                        if (!actualValueTypeSymbol.Equals(typeTypeSymbol))
                         {
                             ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                                 valueExpressionSyntax.GetLocation(),
@@ -319,9 +320,9 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
 
                     if (actualValueTypeSymbol is IArrayTypeSymbol actualValueArrayTypeSymbol)
                     {
-                        if (methodParameterTypeSymbol is IArrayTypeSymbol expectedValueArrayTypeSymbol && expectedValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                        if (methodParameterTypeSymbol is IArrayTypeSymbol expectedValueArrayTypeSymbol && expectedValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
                         {
-                            if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol, SymbolEqualityComparer.Default))
+                            if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
                             {
                                 ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                                      valueExpressionSyntax.GetLocation(),
@@ -341,13 +342,15 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                                 valueTypeContainingNamespace = actualValueArrayTypeSymbol.ElementType.ContainingNamespace.ToString();
                             }
                         }
-                        else if (actualValueArrayTypeSymbol.ElementType.TypeKind is TypeKind.Struct)
+                        else if (actualValueArrayTypeSymbol.ElementType.TypeKind == TypeKind.Struct)
                         {
-                            if (actualValueArrayTypeSymbol.ElementType.NullableAnnotation == NullableAnnotation.Annotated)
+                            // Nullable<T>
+                            if (actualValueArrayTypeSymbol.ElementType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
                             {
                                 continue;
                             }
                         }
+
                         else if (actualValueArrayTypeSymbol.ElementType.TypeKind is not TypeKind.Class)
                         {
                             continue;
@@ -355,7 +358,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                     }
 
                     if (!AnalyzerHelper.IsAssignableToLocal(context.Compilation,
-                            (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                            (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
                             valueTypeContainingNamespace,
                             methodParameterTypeSymbol,
                             valueExpressionString,
@@ -373,7 +376,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                 else if (constantValue is { HasValue: true, Value: null })
                 {
                     if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                        (context.FilterTree.Options as CSharpParseOptions)!.LanguageVersion,
+                        (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
                         null,
                         methodParameterTypeSymbol,
                         valueExpressionString,
