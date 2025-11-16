@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -145,58 +146,52 @@ internal static class AnalyzerHelper
         return typeName;
     }
 
-    public static bool IsAssignableToField(Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+    public static bool IsAssignableToField(Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
         const string codeTemplate1 = """
-            {0}
-            
             file static class Internal {{
-            static readonly {1} x = {2};
+            static readonly {0} x = {1};
             }}
             """;
 
         const string codeTemplate2 = """
-            {0}
-            
             file static class Internal {{
-            static readonly {1} x = ({2}){3};
+            static readonly {0} x = ({1}){2};
             }}
             """;
 
-        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, languageVersion, valueTypeContainingNamespace, targetType, valueExpression, constantValue, valueType);
+        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, targetType, valueExpression, constantValue, valueType);
     }
 
-    public static bool IsAssignableToLocal(Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+    public static bool IsAssignableToLocal(Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
         const string codeTemplate1 = """
-            {0}
-            
             file static class Internal {{
             static void Method() {{
-                {1} x = {2};
+                {0} x = {1};
             }}
             }}
             """;
 
         const string codeTemplate2 = """
-            {0}
-            
             file static class Internal {{
             static void Method() {{
-                {1} x = ({2}){3};
+                {0} x = ({1}){2};
             }}
             }}
             """;
 
-        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, languageVersion, valueTypeContainingNamespace, targetType, valueExpression, constantValue, valueType);
+        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, targetType, valueExpression, constantValue, valueType);
     }
 
-    private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
+    private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
-        var usingDirective = valueTypeContainingNamespace != null ? $"using {valueTypeContainingNamespace};" : "";
-
-        var hasNoCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, usingDirective, targetType, valueExpression), compilation, languageVersion);
-        if (hasNoCompilerDiagnostics)
+        if (valueType == "BenchmarkDotNet.IntegrationTests.ArgumentsTests.WithUndefinedEnumValue.SomeEnum")
+        {
+            System.Diagnostics.Debugger.Launch();
+        }
+        var hasCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, targetType, valueExpression), compilation);
+        if (hasCompilerDiagnostics)
         {
             return true;
         }
@@ -212,19 +207,16 @@ internal static class AnalyzerHelper
             return false;
         }
 
-        return HasNoCompilerDiagnostics(string.Format(codeTemplate2, usingDirective, targetType, valueType, constantLiteral), compilation, languageVersion);
+        return HasNoCompilerDiagnostics(string.Format(codeTemplate2, targetType, valueType, constantLiteral), compilation);
     }
 
-    private static bool HasNoCompilerDiagnostics(string code, Compilation compilation, LanguageVersion languageVersion)
+    private static bool HasNoCompilerDiagnostics(string code, Compilation compilation)
     {
-        var compilationTestSyntaxTree = CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(languageVersion));
-
-        var syntaxTreesWithInterceptorsNamespaces = compilation.SyntaxTrees.Where(st => st.Options.Features.ContainsKey(InterceptorsNamespaces));
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
         var compilerDiagnostics = compilation
-            .RemoveSyntaxTrees(syntaxTreesWithInterceptorsNamespaces)
-            .AddSyntaxTrees(compilationTestSyntaxTree)
-            .GetSemanticModel(compilationTestSyntaxTree)
+            .AddSyntaxTrees(syntaxTree)
+            .GetSemanticModel(syntaxTree)
             .GetMethodBodyDiagnostics()
             .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
             .ToList();
@@ -259,5 +251,70 @@ internal static class AnalyzerHelper
     {
         key = tuple.Key;
         value = tuple.Value;
+    }
+
+    public static Location GetLocation(this AttributeData attributeData)
+        => attributeData.ApplicationSyntaxReference.SyntaxTree.GetLocation(attributeData.ApplicationSyntaxReference.Span);
+
+    public static bool IsAssignable(TypedConstant constant, ExpressionSyntax expression, ITypeSymbol targetType, Compilation compilation)
+    {
+        if (constant.IsNull)
+        {
+            // Check if targetType is a reference type or nullable.
+            return targetType.IsReferenceType || targetType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+        }
+
+        var sourceType = constant.Type;
+        if (sourceType == null)
+        {
+            return false;
+        }
+
+        // Test if the constant value is implicitly assignable.
+        var conversion = compilation.ClassifyConversion(sourceType, targetType);
+        if (conversion.IsImplicit)
+        {
+            return true;
+        }
+
+        // Int32 values fail the test to smaller types, but it's still valid in the generated code to assign the literal to a smaller integer type,
+        // so test if the expression is implicitly assignable.
+        var semanticModel = compilation.GetSemanticModel(expression.SyntaxTree);
+        conversion = semanticModel.ClassifyConversion(expression, targetType);
+        return conversion.IsImplicit;
+    }
+
+    // Assumes a single `params object[] values` constructor
+    public static ExpressionSyntax GetAttributeParamsArgumentExpression(this AttributeData attributeData, int index)
+    {
+        Debug.Assert(index >= 0);
+        // Properties must come after constructor arguments, so we don't need to worry about it here.
+        var attrSyntax = (AttributeSyntax) attributeData.ApplicationSyntaxReference.GetSyntax();
+        var args = attrSyntax.ArgumentList.Arguments;
+        Debug.Assert(args is { Count: > 0 });
+        var maybeArrayExpression = args[0].Expression;
+
+#if CODE_ANALYSIS_4_8
+        if (maybeArrayExpression is CollectionExpressionSyntax collectionExpressionSyntax)
+        {
+            Debug.Assert(index < collectionExpressionSyntax.Elements.Count);
+            return ((ExpressionElementSyntax) collectionExpressionSyntax.Elements[index]).Expression;
+        }
+#endif
+
+        if (maybeArrayExpression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
+        {
+            if (arrayCreationExpressionSyntax.Initializer == null)
+            {
+                return maybeArrayExpression;
+            }
+            Debug.Assert(index < arrayCreationExpressionSyntax.Initializer.Expressions.Count);
+            return arrayCreationExpressionSyntax.Initializer.Expressions[index];
+        }
+
+        // Params values
+        Debug.Assert(index < args.Count);
+        Debug.Assert(args[index].NameEquals is null);
+        return args[index].Expression;
     }
 }

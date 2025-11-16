@@ -4,7 +4,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace BenchmarkDotNet.Analyzers.Attributes;
 
@@ -37,11 +39,21 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description)));
 
+    internal static readonly DiagnosticDescriptor RequiresParametersRule = new(
+        DiagnosticIds.Attributes_ArgumentsAttribute_RequiresParameters,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_RequiresParameters_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description)));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
         RequiresBenchmarkAttributeRule,
         MustHaveMatchingValueCountRule,
         MustHaveMatchingValueTypeRule,
+        RequiresParametersRule,
     }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
@@ -58,17 +70,18 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
-            ctx.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
+            ctx.RegisterSymbolAction(AnalyzeMethodSymbol, SymbolKind.Method);
         });
     }
 
-    private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeMethodSymbol(SymbolAnalysisContext context)
     {
-        if (context.Node is not MethodDeclarationSyntax methodDeclarationSyntax)
+        if (context.Symbol is not IMethodSymbol methodSymbol)
         {
             return;
         }
 
+        var benchmarkAttributeTypeSymbol = AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation);
         var argumentsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsAttribute");
         var argumentsSourceAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ArgumentsSourceAttribute");
 
@@ -77,343 +90,114 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var hasBenchmarkAttribute = AnalyzerHelper.AttributeListsContainAttribute(AnalyzerHelper.GetBenchmarkAttributeTypeSymbol(context.Compilation), methodDeclarationSyntax.AttributeLists, context.SemanticModel);
+        bool hasBenchmarkAttribute = false;
+        var argumentsAttributes = new List<AttributeData>();
+        var argumentsSourceAttributes = new List<AttributeData>();
+        foreach (var attr in methodSymbol.GetAttributes())
+        {
+            if (attr.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
+            {
+                hasBenchmarkAttribute = true;
+            }
+            else if (attr.AttributeClass.Equals(argumentsAttributeTypeSymbol))
+            {
+                argumentsAttributes.Add(attr);
+            }
+            else if (attr.AttributeClass.Equals(argumentsSourceAttributeTypeSymbol))
+            {
+                argumentsSourceAttributes.Add(attr);
+            }
+        }
 
-        var argumentsAttributes = AnalyzerHelper.GetAttributes(argumentsAttributeTypeSymbol, methodDeclarationSyntax.AttributeLists, context.SemanticModel);
-        if (argumentsAttributes.Length == 0)
+        if (argumentsAttributes.Count == 0 && argumentsSourceAttributes.Count == 0)
         {
             return;
         }
 
-        if (!hasBenchmarkAttribute)
+        bool methodHasZeroParams = methodSymbol.Parameters.Length == 0;
+        if (!hasBenchmarkAttribute || methodHasZeroParams)
         {
-            foreach (var argumentsAttributeSyntax in argumentsAttributes)
+            argumentsAttributes.AddRange(argumentsSourceAttributes);
+            foreach (var attr in argumentsAttributes)
             {
-                context.ReportDiagnostic(Diagnostic.Create(RequiresBenchmarkAttributeRule, argumentsAttributeSyntax.GetLocation()));
+                if (!hasBenchmarkAttribute)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(RequiresBenchmarkAttributeRule, attr.GetLocation()));
+                }
+                if (methodHasZeroParams)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(RequiresParametersRule, attr.GetLocation(), methodSymbol.Name));
+                }
             }
-
             return;
         }
 
-        var methodParameterTypeSymbolsBuilder = ImmutableArray.CreateBuilder<ITypeSymbol?>(methodDeclarationSyntax.ParameterList.Parameters.Count);
-
-        foreach (var parameterSyntax in methodDeclarationSyntax.ParameterList.Parameters)
+        foreach (var attr in argumentsAttributes)
         {
-            if (parameterSyntax.Type != null)
+            // [Arguments]
+            if (attr.ConstructorArguments.Length == 0)
             {
-                var expectedParameterTypeSymbol = context.SemanticModel.GetTypeInfo(parameterSyntax.Type).Type;
-                if (expectedParameterTypeSymbol != null && expectedParameterTypeSymbol.TypeKind != TypeKind.Error)
-                {
-                    methodParameterTypeSymbolsBuilder.Add(expectedParameterTypeSymbol);
-
-                    continue;
-                }
-
-                methodParameterTypeSymbolsBuilder.Add(null);
+                ReportMustHaveMatchingValueCountDiagnostic(attr.GetLocation(), 0);
+                continue;
             }
-        }
 
-        var methodParameterTypeSymbols = methodParameterTypeSymbolsBuilder.ToImmutable();
-
-        foreach (var argumentsAttributeSyntax in argumentsAttributes)
-        {
-            if (argumentsAttributeSyntax.ArgumentList == null)
+            // [Arguments(null)]
+            if (attr.ConstructorArguments[0].IsNull)
             {
-                if (methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
+                if (methodSymbol.Parameters.Length > 1)
                 {
-                    ReportMustHaveMatchingValueCountDiagnostic(argumentsAttributeSyntax.GetLocation(), 0);
+                    ReportMustHaveMatchingValueCountDiagnostic(attr.GetLocation(), 1);
                 }
-            }
-            else if (!argumentsAttributeSyntax.ArgumentList.Arguments.Any())
-            {
-                if (methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
-                {
-                    ReportMustHaveMatchingValueCountDiagnostic(argumentsAttributeSyntax.ArgumentList.GetLocation(), 0);
-                }
-            }
-            else
-            {
-                // Check if this is an explicit params array creation
-
-                var attributeArgumentSyntax = argumentsAttributeSyntax.ArgumentList.Arguments.First();
-                if (attributeArgumentSyntax.NameEquals != null)
-                {
-                    // Ignore named arguments, e.g. Priority
-                    if (methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
-                    {
-                        ReportMustHaveMatchingValueCountDiagnostic(attributeArgumentSyntax.GetLocation(), 0);
-                    }
-                }
-
-#if CODE_ANALYSIS_4_8
-                // Collection expression
-                else if (attributeArgumentSyntax.Expression is CollectionExpressionSyntax collectionExpressionSyntax)
-                {
-                    if (methodDeclarationSyntax.ParameterList.Parameters.Count != collectionExpressionSyntax.Elements.Count)
-                    {
-                        ReportMustHaveMatchingValueCountDiagnostic(
-                            collectionExpressionSyntax.Elements.Count == 0
-                                ? collectionExpressionSyntax.GetLocation()
-                                : Location.Create(context.FilterTree, collectionExpressionSyntax.Elements.Span),
-                            collectionExpressionSyntax.Elements.Count
-                        );
-
-                        continue;
-                    }
-
-                    ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => collectionExpressionSyntax.Elements[i] is ExpressionElementSyntax expressionElementSyntax ? expressionElementSyntax.Expression : null);
-                }
-#endif
-
-                // Array creation expression
                 else
                 {
-                    var attributeArgumentSyntaxValueType = context.SemanticModel.GetTypeInfo(attributeArgumentSyntax.Expression).Type;
-                    if (attributeArgumentSyntaxValueType is IArrayTypeSymbol arrayTypeSymbol && arrayTypeSymbol.ElementType.SpecialType == SpecialType.System_Object)
-                    {
-                        if (attributeArgumentSyntax.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
-                        {
-                            if (arrayCreationExpressionSyntax.Initializer == null)
-                            {
-                                var rankSpecifierSizeSyntax = arrayCreationExpressionSyntax.Type.RankSpecifiers.First().Sizes.First();
-                                if (rankSpecifierSizeSyntax is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.IsKind(SyntaxKind.NumericLiteralExpression))
-                                {
-                                    if (literalExpressionSyntax.Token.Value is 0)
-                                    {
-                                        if (methodDeclarationSyntax.ParameterList.Parameters.Count > 0)
-                                        {
-                                            ReportMustHaveMatchingValueCountDiagnostic(literalExpressionSyntax.GetLocation(), 0);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (methodDeclarationSyntax.ParameterList.Parameters.Count != arrayCreationExpressionSyntax.Initializer.Expressions.Count)
-                                {
-                                    ReportMustHaveMatchingValueCountDiagnostic(
-                                        arrayCreationExpressionSyntax.Initializer.Expressions.Count == 0
-                                            ? arrayCreationExpressionSyntax.Initializer.GetLocation()
-                                            : Location.Create(context.Node.SyntaxTree, arrayCreationExpressionSyntax.Initializer.Expressions.Span),
-                                        arrayCreationExpressionSyntax.Initializer.Expressions.Count
-                                    );
-
-                                    continue;
-                                }
-
-                                // ReSharper disable once PossibleNullReferenceException
-                                ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => arrayCreationExpressionSyntax.Initializer.Expressions[i]);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Params values
-
-                        var firstNamedArgumentIndex = IndexOfNamedArgument(argumentsAttributeSyntax.ArgumentList.Arguments);
-                        if (firstNamedArgumentIndex > 0)
-                        {
-                            if (methodDeclarationSyntax.ParameterList.Parameters.Count != firstNamedArgumentIndex.Value)
-                            {
-                                ReportMustHaveMatchingValueCountDiagnostic(
-                                    Location.Create(
-                                        context.Node.SyntaxTree,
-                                        TextSpan.FromBounds(argumentsAttributeSyntax.ArgumentList.Arguments.Span.Start, argumentsAttributeSyntax.ArgumentList.Arguments[firstNamedArgumentIndex.Value - 1].Span.End)
-                                    ),
-                                    firstNamedArgumentIndex.Value
-                                );
-
-                                continue;
-                            }
-
-                            // ReSharper disable once PossibleNullReferenceException
-                            ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => argumentsAttributeSyntax.ArgumentList.Arguments[i].Expression);
-                        }
-                        else
-                        {
-                            if (methodDeclarationSyntax.ParameterList.Parameters.Count != argumentsAttributeSyntax.ArgumentList.Arguments.Count)
-                            {
-                                ReportMustHaveMatchingValueCountDiagnostic(
-                                    Location.Create(context.Node.SyntaxTree, argumentsAttributeSyntax.ArgumentList.Arguments.Span),
-                                    argumentsAttributeSyntax.ArgumentList.Arguments.Count
-                                );
-
-                                continue;
-                            }
-
-                            // ReSharper disable once PossibleNullReferenceException
-                            ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(i => argumentsAttributeSyntax.ArgumentList.Arguments[i].Expression);
-                        }
-                    }
+                    var syntax = (AttributeSyntax) attr.ApplicationSyntaxReference.GetSyntax();
+                    AnalyzeAssignableValueType(
+                        attr.ConstructorArguments[0],
+                        syntax.ArgumentList.Arguments[0].Expression,
+                        methodSymbol.Parameters[0].Type
+                    );
                 }
+                continue;
+            }
+
+            // [Arguments(multiple, values)]
+            var actualValues = attr.ConstructorArguments[0].Values;
+            if (actualValues.Length != methodSymbol.Parameters.Length)
+            {
+                ReportMustHaveMatchingValueCountDiagnostic(attr.GetLocation(), actualValues.Length);
+                continue;
+            }
+
+            for (int i = 0; i < actualValues.Length; i++)
+            {
+                AnalyzeAssignableValueType(
+                    actualValues[i],
+                    AnalyzerHelper.GetAttributeParamsArgumentExpression(attr, i),
+                    methodSymbol.Parameters[i].Type
+                );
             }
         }
-
-        return;
 
         void ReportMustHaveMatchingValueCountDiagnostic(Location diagnosticLocation, int valueCount)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueCountRule,
+            => context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueCountRule,
                 diagnosticLocation,
-                methodDeclarationSyntax.ParameterList.Parameters.Count,
-                methodDeclarationSyntax.ParameterList.Parameters.Count == 1 ? "" : "s",
-                methodDeclarationSyntax.Identifier.ToString(),
+                methodSymbol.Parameters.Length,
+                methodSymbol.Parameters.Length == 1 ? "" : "s",
+                methodSymbol.Name,
                 valueCount)
             );
-        }
 
-        void ReportIfNotImplicitlyConvertibleValueTypeDiagnostic(Func<int, ExpressionSyntax> valueExpressionSyntaxFunc)
+        void AnalyzeAssignableValueType(TypedConstant value, ExpressionSyntax expression, ITypeSymbol parameterType)
         {
-            for (var i = 0; i < methodParameterTypeSymbols.Length; i++)
+            if (!AnalyzerHelper.IsAssignable(value, expression, parameterType, context.Compilation))
             {
-                var methodParameterTypeSymbol = methodParameterTypeSymbols[i];
-                if (methodParameterTypeSymbol == null)
-                {
-                    continue;
-                }
-
-                var valueExpressionSyntax = valueExpressionSyntaxFunc(i);
-                if (valueExpressionSyntax == null)
-                {
-                    continue;
-                }
-
-                var valueExpressionString = valueExpressionSyntax.ToString();
-
-                var constantValue = context.SemanticModel.GetConstantValue(valueExpressionSyntax);
-
-                var expectedValueTypeString = methodParameterTypeSymbol.ToString();
-                var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
-
-                if (actualValueTypeSymbol is
-                    { TypeKind:    TypeKind.Array
-                        or TypeKind.Class
-                        or TypeKind.Struct
-                        or TypeKind.Enum
-                    })
-                {
-                    var actualValueTypeString = actualValueTypeSymbol.ToString();
-
-                    var typeTypeSymbol = context.Compilation.GetTypeByMetadataName("System.Type");
-
-                    if (methodParameterTypeSymbol.Equals(typeTypeSymbol))
-                    {
-                        if (!actualValueTypeSymbol.Equals(typeTypeSymbol))
-                        {
-                            ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                                valueExpressionSyntax.GetLocation(),
-                                valueExpressionString,
-                                expectedValueTypeString,
-                                actualValueTypeString
-                            );
-                        }
-
-                        continue;
-                    }
-
-                    string? valueTypeContainingNamespace = null;
-
-                    if (actualValueTypeSymbol.TypeKind == TypeKind.Enum && !actualValueTypeSymbol.ContainingNamespace.IsGlobalNamespace)
-                    {
-                        valueTypeContainingNamespace = actualValueTypeSymbol.ContainingNamespace.ToString();
-                    }
-
-                    if (actualValueTypeSymbol is IArrayTypeSymbol actualValueArrayTypeSymbol)
-                    {
-                        if (methodParameterTypeSymbol is IArrayTypeSymbol expectedValueArrayTypeSymbol && expectedValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
-                        {
-                            if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
-                            {
-                                ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                                     valueExpressionSyntax.GetLocation(),
-                                     valueExpressionString,
-                                     expectedValueTypeString,
-                                     actualValueTypeString
-                                );
-                            }
-
-                            continue;
-                        }
-
-                        if (actualValueArrayTypeSymbol.ElementType.TypeKind == TypeKind.Enum)
-                        {
-                            if (!actualValueArrayTypeSymbol.ElementType.ContainingNamespace.IsGlobalNamespace)
-                            {
-                                valueTypeContainingNamespace = actualValueArrayTypeSymbol.ElementType.ContainingNamespace.ToString();
-                            }
-                        }
-                        else if (actualValueArrayTypeSymbol.ElementType.TypeKind == TypeKind.Struct)
-                        {
-                            // Nullable<T>
-                            if (actualValueArrayTypeSymbol.ElementType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
-                            {
-                                continue;
-                            }
-                        }
-
-                        else if (actualValueArrayTypeSymbol.ElementType.TypeKind is not TypeKind.Class)
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (!AnalyzerHelper.IsAssignableToLocal(context.Compilation,
-                            (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
-                            valueTypeContainingNamespace,
-                            methodParameterTypeSymbol,
-                            valueExpressionString,
-                            constantValue,
-                            actualValueTypeString))
-                    {
-                        ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                            valueExpressionSyntax.GetLocation(),
-                            valueExpressionString,
-                            methodParameterTypeSymbol.ToString(),
-                            actualValueTypeString
-                        );
-                    }
-                }
-                else if (constantValue is { HasValue: true, Value: null })
-                {
-                    if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                        (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
-                        null,
-                        methodParameterTypeSymbol,
-                        valueExpressionString,
-                        constantValue,
-                        null))
-                    {
-                        ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                            valueExpressionSyntax.GetLocation(),
-                            valueExpressionString,
-                            expectedValueTypeString,
-                            "null"
-                        );
-                    }
-                }
+                context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueTypeRule,
+                    expression.GetLocation(),
+                    expression.ToString(),
+                    parameterType.ToDisplayString(),
+                    value.IsNull ? "null" : value.Type.ToDisplayString())
+                );
             }
-
-            return;
-
-            void ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(Location diagnosticLocation, string value, string expectedType, string actualType)
-                => context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueTypeRule, diagnosticLocation, value, expectedType, actualType));
         }
-    }
-
-    private static int? IndexOfNamedArgument(SeparatedSyntaxList<AttributeArgumentSyntax> attributeArguments)
-    {
-        var i = 0;
-
-        foreach (var attributeArgumentSyntax in attributeArguments)
-        {
-            if (attributeArgumentSyntax.NameEquals != null)
-            {
-                return i;
-            }
-
-            i++;
-        }
-
-        return null;
     }
 }

@@ -33,4 +33,5 @@ public static class DiagnosticIds
     public const string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute = "BDN1500";
     public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1501";
     public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1502";
+    public const string Attributes_ArgumentsAttribute_RequiresParameters = "BDN1503";
 }

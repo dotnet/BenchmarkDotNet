@@ -232,110 +232,27 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
             var valueExpressionString = valueExpressionSyntax.ToString();
 
-            var expectedValueTypeString = expectedValueTypeSymbol.ToString();
             var actualValueTypeSymbol = context.SemanticModel.GetTypeInfo(valueExpressionSyntax).Type;
-
-            if (actualValueTypeSymbol is
-                { TypeKind:    TypeKind.Array
-                    or TypeKind.Class
-                    or TypeKind.Struct
-                    or TypeKind.Enum
-                })
+            if (actualValueTypeSymbol != null && actualValueTypeSymbol.TypeKind != TypeKind.Error)
             {
-                var actualValueTypeString = actualValueTypeSymbol.ToString();
-
-                var typeTypeSymbol = context.Compilation.GetTypeByMetadataName("System.Type");
-
-                if (expectedValueTypeSymbol.Equals(typeTypeSymbol))
-                {
-                    if (!actualValueTypeSymbol.Equals(typeTypeSymbol))
-                    {
-                        ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                            valueExpressionSyntax.GetLocation(),
-                            valueExpressionString,
-                            expectedValueTypeString,
-                            actualValueTypeString
-                        );
-                    }
-
-                    return;
-                }
-
-                string? valueTypeContainingNamespace = null;
-
-                if (actualValueTypeSymbol.TypeKind == TypeKind.Enum && !actualValueTypeSymbol.ContainingNamespace.IsGlobalNamespace)
-                {
-                    valueTypeContainingNamespace = actualValueTypeSymbol.ContainingNamespace.ToString();
-                }
-
-                if (actualValueTypeSymbol is IArrayTypeSymbol actualValueArrayTypeSymbol)
-                {
-                    if (expectedValueTypeSymbol is IArrayTypeSymbol expectedValueArrayTypeSymbol && expectedValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
-                    {
-                        if (!actualValueArrayTypeSymbol.ElementType.Equals(typeTypeSymbol))
-                        {
-                            ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
-                                 valueExpressionSyntax.GetLocation(),
-                                 valueExpressionString,
-                                 expectedValueTypeString,
-                                 actualValueTypeString
-                            );
-                        }
-
-                        return;
-                    }
-
-                    if (actualValueArrayTypeSymbol.ElementType.TypeKind == TypeKind.Enum)
-                    {
-                        if (!actualValueArrayTypeSymbol.ElementType.ContainingNamespace.IsGlobalNamespace)
-                        {
-                            valueTypeContainingNamespace = actualValueArrayTypeSymbol.ElementType.ContainingNamespace.ToString();
-                        }
-                    }
-                    else if (actualValueArrayTypeSymbol.ElementType.TypeKind is TypeKind.Struct)
-                    {
-                        // Nullable<T>
-                        if (actualValueArrayTypeSymbol.ElementType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
-                        {
-                            return;
-                        }
-                    }
-                    else if (actualValueArrayTypeSymbol.ElementType.TypeKind is not TypeKind.Class)
-                    {
-                        return;
-                    }
-                }
-
-                if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                        (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
-                        valueTypeContainingNamespace,
-                        expectedValueTypeSymbol,
-                        valueExpressionString,
-                        constantValue,
-                        actualValueTypeString))
+                if (!AnalyzerHelper.IsAssignableToField(context.Compilation, expectedValueTypeSymbol, valueExpressionString, constantValue, actualValueTypeSymbol.ToString()))
                 {
                     ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                         valueExpressionSyntax.GetLocation(),
                         valueExpressionString,
-                        expectedValueTypeString,
-                        actualValueTypeString
+                        fieldOrPropertyTypeSyntax.ToString(),
+                        actualValueTypeSymbol.ToString()
                     );
                 }
             }
             else if (constantValue is { HasValue: true, Value: null })
             {
-                if (!AnalyzerHelper.IsAssignableToField(context.Compilation,
-                    (context.Node.SyntaxTree.Options as CSharpParseOptions)!.LanguageVersion,
-                    null,
-                    expectedValueTypeSymbol,
-                    valueExpressionString,
-                    constantValue,
-                    null))
+                if (!AnalyzerHelper.IsAssignableToField(context.Compilation, expectedValueTypeSymbol, valueExpressionString, constantValue, null))
                 {
                     ReportValueTypeMustBeImplicitlyConvertibleDiagnostic(
                         valueExpressionSyntax.GetLocation(),
                         valueExpressionString,
-                        expectedValueTypeString,
+                        fieldOrPropertyTypeSyntax.ToString(),
                         "null"
                     );
                 }
