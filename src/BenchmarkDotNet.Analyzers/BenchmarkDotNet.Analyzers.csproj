@@ -8,13 +8,11 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <!-- Default version used by local builds. This is overridden by the build script. -->
-    <!-- Update this when tests are updated to newer TFMs. -->
     <MccVersion>4.8</MccVersion>
     <OutputPath>bin\$(Configuration)\roslyn$(MccVersion)\cs</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DefineConstants Condition="'$(MccVersion)' >= '3.8'">$(DefineConstants);CODE_ANALYSIS_3_8</DefineConstants>
     <DefineConstants Condition="'$(MccVersion)' >= '4.8'">$(DefineConstants);CODE_ANALYSIS_4_8</DefineConstants>
-    <DefineConstants Condition="'$(MccVersion)' >= '5.0'">$(DefineConstants);CODE_ANALYSIS_5_0</DefineConstants>
     <!-- New equality comparison doesn't exist in v2.8, and we only use the default comparison anyway. -->
     <!-- Formatting in AnalyzerReleases.Unshipped.md -->
     <NoWarn>$(NoWarn);RS1024;RS2007</NoWarn>
@@ -29,8 +27,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" Condition="'$(MccVersion)' == '3.8'" />
     <!-- C# 12 -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" Condition="'$(MccVersion)' == '4.8'" />
-    <!-- C# 14 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0-2.final" Condition="'$(MccVersion)' == '5.0'" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
