@@ -64,6 +64,24 @@ public class BuildRunner
         });
     }
 
+    public void BuildAnalyzers()
+    {
+        context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
+        string[] mccVersions = ["2.8", "3.8", "4.8"];
+        foreach (string version in mccVersions)
+        {
+            context.DotNetBuild(context.AnalyzersProjectFile.FullPath, new DotNetBuildSettings
+            {
+                NoRestore = true,
+                DiagnosticOutput = true,
+                MSBuildSettings = context.MsBuildSettingsBuild,
+                Configuration = context.BuildConfiguration,
+                Verbosity = context.BuildVerbosity,
+                ArgumentCustomization = args => args.Append($"-p:MccVersion={version}")
+            });
+        }
+    }
+
     public void Pack()
     {
         context.CleanDirectory(context.ArtifactsDirectory);

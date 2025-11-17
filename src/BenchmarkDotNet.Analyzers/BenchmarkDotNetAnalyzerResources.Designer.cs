@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The [Arguments] attribute can only be used on methods annotated with the [Benchmark] attribute.
+        ///   Looks up a localized string similar to The [Arguments(Source)] attribute can only be used on methods annotated with the [Benchmark] attribute.
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_MessageFormat {
             get {
@@ -124,11 +124,29 @@ namespace BenchmarkDotNet.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [Arguments] attribute can only be used on methods annotated with the [Benchmark] attribute.
+        ///   Looks up a localized string similar to [Arguments(Source)] attribute can only be used on methods annotated with the [Benchmark] attribute.
         /// </summary>
         internal static string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title {
             get {
                 return ResourceManager.GetString("Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method {0} has no parameters.
+        /// </summary>
+        internal static string Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Arguments(Source)] attribute requires at least 1 parameter.
+        /// </summary>
+        internal static string Attributes_ArgumentsAttribute_RequiresParameters_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsAttribute_RequiresParameters_Title", resourceCulture);
             }
         }
         

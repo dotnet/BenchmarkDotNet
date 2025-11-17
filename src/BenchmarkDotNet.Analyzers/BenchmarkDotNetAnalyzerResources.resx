@@ -356,10 +356,10 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
     <value>The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title" xml:space="preserve">
-    <value>[Arguments] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
+    <value>[Arguments(Source)] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
   </data>
   <data name="Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_MessageFormat" xml:space="preserve">
-    <value>The [Arguments] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
+    <value>The [Arguments(Source)] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
   </data>
   <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description" xml:space="preserve">
     <value>A benchmark class referenced in the BenchmarkRunner.Run method must be non-abstract</value>
@@ -369,5 +369,11 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   </data>
   <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Title" xml:space="preserve">
     <value>Benchmark methods without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresParameters_Title" xml:space="preserve">
+    <value>[Arguments(Source)] attribute requires at least 1 parameter</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat" xml:space="preserve">
+    <value>Method {0} has no parameters</value>
   </data>
 </root>

@@ -10,19 +10,15 @@ namespace BenchmarkDotNet.Analyzers.Tests.AnalyzerTests.Attributes;
 
 public class ArgumentsAttributeAnalyzerTests
 {
-    public class General : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    public class RequiresParameters : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
     {
-        [Theory, CombinatorialData]
-        public async Task A_method_annotated_with_an_arguments_attribute_with_no_values_and_the_benchmark_attribute_and_having_no_parameters_should_not_trigger_diagnostic(
-            [CombinatorialMemberData(nameof(EmptyArgumentsAttributeUsages))] string emptyArgumentsAttributeUsage,
-            [CombinatorialRange(1, 2)] int attributeUsageMultiplier)
-        {
-            List<string> emptyArgumentsAttributeUsages = [];
+        public RequiresParameters() : base(ArgumentsAttributeAnalyzer.RequiresParametersRule) { }
 
-            for (var i = 0; i < attributeUsageMultiplier; i++)
-            {
-                emptyArgumentsAttributeUsages.Add(emptyArgumentsAttributeUsage);
-            }
+        [Theory, CombinatorialData]
+        public async Task A_method_annotated_with_an_arguments_attribute_and_the_benchmark_attribute_and_having_no_parameters_should_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(ArgumentsAttributeUsagesWithLocationMarker))] string emptyArgumentsAttributeUsage)
+        {
+            const string benchmarkMethodName = "BenchmarkMethod";
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
@@ -30,8 +26,8 @@ public class ArgumentsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     [Benchmark]
-                    {{string.Join("\n", emptyArgumentsAttributeUsages)}}
-                    public void BenchmarkMethod()
+                    {{emptyArgumentsAttributeUsage}}
+                    public void {{benchmarkMethodName}}()
                     {
                                                     
                     }
@@ -40,14 +36,15 @@ public class ArgumentsAttributeAnalyzerTests
 
             TestCode = testCode;
 
+            AddDefaultExpectedDiagnostic(benchmarkMethodName);
             await RunAsync();
         }
 
-        public static IEnumerable<string> EmptyArgumentsAttributeUsages()
+        public static IEnumerable<string> ArgumentsAttributeUsagesWithLocationMarker()
         {
-            yield return "[Arguments]";
-            yield return "[Arguments()]";
-            yield return "[Arguments(Priority = 1)]";
+            yield return "[{|#0:Arguments|}]";
+            yield return "[{|#0:Arguments()|}]";
+            yield return "[{|#0:Arguments(Priority = 1)|}]";
 
             string[] nameColonUsages =
             [
@@ -63,9 +60,11 @@ public class ArgumentsAttributeAnalyzerTests
 
             string[] attributeUsagesBase =
             [
-                "[Arguments({0}new object[] {{ }}{1})]",
-                "[Arguments({0}new object[0]{1})]",
-                "[Arguments({0}[]{1})]",
+                "Arguments({0}new object[] {{ }}{1})",
+                "Arguments({0}new object[0]{1})",
+                "Arguments({0}[]{1})",
+                "Arguments({0}new object[] {{ 1, 2 }}{1})",
+                "Arguments({0}[1, 2]{1})",
             ];
 
             foreach (var attributeUsageBase in attributeUsagesBase)
@@ -74,7 +73,7 @@ public class ArgumentsAttributeAnalyzerTests
                 {
                     foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
                     {
-                        yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                        yield return $"[{{|#0:{string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage)}|}}]";
                     }
                 }
             }
@@ -220,8 +219,7 @@ public class ArgumentsAttributeAnalyzerTests
 
         [Theory, CombinatorialData]
         public async Task Having_a_mismatching_value_count_should_trigger_diagnostic(
-            [CombinatorialMemberData(nameof(ArgumentsAttributeUsagesWithLocationMarker))] string argumentsAttributeUsage,
-            [CombinatorialMemberData(nameof(ParameterLists))] (string Parameters, int ParameterCount, string PluralSuffix) parameterData)
+            [CombinatorialMemberData(nameof(ArgumentsAttributeUsagesWithLocationMarker))] string argumentsAttributeUsage)
         {
             const string benchmarkMethodName = "BenchmarkMethod";
 
@@ -232,24 +230,18 @@ public class ArgumentsAttributeAnalyzerTests
                 {
                     [Benchmark]
                     {{argumentsAttributeUsage}}
-                    public void {{benchmarkMethodName}}({{parameterData.Parameters}})
+                    public void {{benchmarkMethodName}}(string a)
                     {
                                                     
                     }
                 }
                 """;
             TestCode = testCode;
-            AddExpectedDiagnostic(0, parameterData.ParameterCount, parameterData.PluralSuffix, benchmarkMethodName, 2);
-            AddExpectedDiagnostic(1, parameterData.ParameterCount, parameterData.PluralSuffix, benchmarkMethodName, 3);
+            AddExpectedDiagnostic(0, 1, "", benchmarkMethodName, 2);
+            AddExpectedDiagnostic(1, 1, "", benchmarkMethodName, 3);
 
             await RunAsync();
         }
-
-        public static IEnumerable<(string, int, string)> ParameterLists =>
-        [
-            ("string a", 1, ""),
-            ("", 0, "s")
-        ];
 
         public static TheoryData<string> ArgumentsAttributeUsages()
         {
@@ -302,8 +294,8 @@ public class ArgumentsAttributeAnalyzerTests
             static IEnumerable<string> GenerateData()
             {
                 yield return "[{|#0:Arguments|}]";
-                yield return "[Arguments{|#0:()|}]";
-                yield return "[Arguments({|#0:Priority = 1|})]";
+                yield return "[{|#0:Arguments()|}]";
+                yield return "[{|#0:Arguments(Priority = 1)|}]";
 
                 string[] nameColonUsages =
                 [
@@ -319,9 +311,9 @@ public class ArgumentsAttributeAnalyzerTests
 
                 string[] attributeUsagesBase =
                 [
-                    "[Arguments({0}new object[] {{|#0:{{ }}|}}{1})]",
-                    "[Arguments({0}new object[{{|#0:0|}}]{1})]",
-                    "[Arguments({0}{{|#0:[]|}}{1})]",
+                    "Arguments({0}new object[] {{ }}{1})",
+                    "Arguments({0}new object[0]{1})",
+                    "Arguments({0}[]{1})",
                 ];
 
                 foreach (var attributeUsageBase in attributeUsagesBase)
@@ -330,7 +322,7 @@ public class ArgumentsAttributeAnalyzerTests
                     {
                         foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
                         {
-                            yield return string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage);
+                            yield return $"[{{|#0:{string.Format(attributeUsageBase, nameColonUsage, priorityNamedParameterUsage)}|}}]";
                         }
                     }
                 }
@@ -353,9 +345,9 @@ public class ArgumentsAttributeAnalyzerTests
 
             string[] attributeUsagesBase =
             [
-                "[Arguments({{|#{1}:{2}|}}{3})]",
-                "[Arguments({0}new object[] {{ {{|#{1}:{2}|}} }}{3})]",
-                "[Arguments({0}[ {{|#{1}:{2}|}} ]{3})]"
+                "Arguments({1}{2})",
+                "Arguments({0}new object[] {{ {1} }}{2})",
+                "Arguments({0}[ {1} ]{2})"
             ];
 
             string[] valueLists =
@@ -370,7 +362,7 @@ public class ArgumentsAttributeAnalyzerTests
                 {
                     foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
                     {
-                        yield return string.Join("\n    ", valueLists.Select((vv, i) => string.Format(attributeUsageBase, nameColonUsage, i, vv, priorityNamedParameterUsage)));
+                        yield return string.Join("\n    ", valueLists.Select((vv, i) => $"[{{|#{i}:{string.Format(attributeUsageBase, nameColonUsage, vv, priorityNamedParameterUsage)}|}}]"));
                     }
                 }
             }
@@ -1328,7 +1320,7 @@ public class ArgumentsAttributeAnalyzerTests
 
             ( """
               (object)"test_object"
-              """, "object" ),
+              """, "string" ),
             ( "typeof(string)", "System.Type" ),
             ( "DummyEnum.Value1", "DummyEnum" )
         ];

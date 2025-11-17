@@ -5,6 +5,12 @@
 
 Rule ID  | Category | Severity | Notes
 ---------|----------|----------|--------------------
+BDN1503  |  Usage   | Error	   | BDN1503_Attributes_ArgumentsAttribute_RequiresParameters
+
+### New Rules
+
+Rule ID  | Category | Severity | Notes
+---------|----------|----------|--------------------
 BDN1000  |  Usage   | Error	   | BDN1000_BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods
 BDN1001  |  Usage   | Error	   | BDN1001_BenchmarkRunner_Run_TypeArgumentClassMustBePublic
 BDN1002  |  Usage   | Error	   | BDN1002_BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed

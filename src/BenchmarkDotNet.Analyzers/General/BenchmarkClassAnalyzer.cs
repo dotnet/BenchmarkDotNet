@@ -90,8 +90,8 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
         ClassWithGenericTypeArgumentsAttributeMustBeGenericRule,
         GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
@@ -100,8 +100,8 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         ClassMustBeNonStaticRule,
         SingleNullArgumentToBenchmarkCategoryAttributeNotAllowedRule,
         OnlyOneMethodCanBeBaselineRule,
-        OnlyOneMethodCanBeBaselinePerCategoryRule
-    ];
+        OnlyOneMethodCanBeBaselinePerCategoryRule,
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -163,7 +163,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                     if (genericTypeArgumentsAttribute.ArgumentList.Arguments.Count != classDeclarationSyntax.TypeParameterList.Parameters.Count)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
-                            Location.Create(context.FilterTree, genericTypeArgumentsAttribute.ArgumentList.Arguments.Span),
+                            Location.Create(context.Node.SyntaxTree, genericTypeArgumentsAttribute.ArgumentList.Arguments.Span),
                             classDeclarationSyntax.TypeParameterList.Parameters.Count,
                             classDeclarationSyntax.TypeParameterList.Parameters.Count == 1 ? "" : "s",
                             classDeclarationSyntax.Identifier.ToString(),
@@ -208,11 +208,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                             continue;
                         }
 
-                        if (attributeSyntaxTypeSymbol.Equals(benchmarkAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                        if (attributeSyntaxTypeSymbol.Equals(benchmarkAttributeTypeSymbol))
                         {
                             benchmarkAttributeUsages.Add(attributeSyntax);
                         }
-                        else if (attributeSyntaxTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                        else if (attributeSyntaxTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol))
                         {
                             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
                             {
@@ -220,8 +220,8 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
                                 Optional<object?> constantValue;
 
+#if CODE_ANALYSIS_4_8
                                 // Collection expression
-
                                 if (attributeSyntax.ArgumentList.Arguments[0].Expression is CollectionExpressionSyntax collectionExpressionSyntax)
                                 {
                                     foreach (var collectionElementSyntax in collectionExpressionSyntax.Elements)
@@ -251,6 +251,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
                                     continue;
                                 }
+#endif
 
                                 // Array creation expression
 
@@ -452,11 +453,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
                                 foreach (var attribute in methodAttributes)
                                 {
-                                    if (attribute.AttributeClass.Equals(benchmarkAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                                    if (attribute.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
                                     {
                                         benchmarkAttributeUsages.Add(attribute);
                                     }
-                                    else if (attribute.AttributeClass.Equals(benchmarkCategoryAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                                    else if (attribute.AttributeClass.Equals(benchmarkCategoryAttributeTypeSymbol))
                                     {
                                         foreach (var benchmarkCategoriesArray in attribute.ConstructorArguments)
                                         {
@@ -549,7 +550,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryAttributeTypeSymbol(context.Compilation);
 
         var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol, SymbolEqualityComparer.Default))
+        if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol))
         {
             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
             {

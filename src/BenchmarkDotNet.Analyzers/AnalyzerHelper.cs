@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -17,9 +18,6 @@ internal static class AnalyzerHelper
 
     public static INamedTypeSymbol? GetBenchmarkAttributeTypeSymbol(Compilation compilation)
         => compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.BenchmarkAttribute");
-
-    public static bool AttributeListsContainAttribute(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
-        => AttributeListsContainAttribute(compilation.GetTypeByMetadataName(attributeName), attributeLists, semanticModel);
 
     public static bool AttributeListsContainAttribute(INamedTypeSymbol? attributeTypeSymbol, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
     {
@@ -38,7 +36,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
+                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
                 {
                     return true;
                 }
@@ -58,7 +56,7 @@ internal static class AnalyzerHelper
             return false;
         }
 
-        return attributeList.Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default));
+        return attributeList.Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(attributeTypeSymbol));
     }
 
     public static ImmutableArray<AttributeSyntax> GetAttributes(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
@@ -83,7 +81,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
+                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
                 {
                     attributesBuilder.Add(attributeSyntax);
                 }
@@ -91,38 +89,6 @@ internal static class AnalyzerHelper
         }
 
         return attributesBuilder.ToImmutable();
-    }
-
-    public static int GetAttributeUsageCount(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
-        => GetAttributeUsageCount(compilation.GetTypeByMetadataName(attributeName), attributeLists, semanticModel);
-
-    public static int GetAttributeUsageCount(INamedTypeSymbol? attributeTypeSymbol, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
-    {
-        var attributeUsageCount = 0;
-
-        if (attributeTypeSymbol == null)
-        {
-            return 0;
-        }
-
-        foreach (var attributeListSyntax in attributeLists)
-        {
-            foreach (var attributeSyntax in attributeListSyntax.Attributes)
-            {
-                var attributeSyntaxTypeSymbol = semanticModel.GetTypeInfo(attributeSyntax).Type;
-                if (attributeSyntaxTypeSymbol == null)
-                {
-                    continue;
-                }
-
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol, SymbolEqualityComparer.Default))
-                {
-                    attributeUsageCount++;
-                }
-            }
-        }
-
-        return attributeUsageCount;
     }
 
     public static string NormalizeTypeName(INamedTypeSymbol namedTypeSymbol)
@@ -145,119 +111,86 @@ internal static class AnalyzerHelper
         return typeName;
     }
 
-    public static bool IsAssignableToField(Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
-    {
-        const string codeTemplate1 = """
-            {0}
-            
-            file static class Internal {{
-            static readonly {1} x = {2};
-            }}
-            """;
-
-        const string codeTemplate2 = """
-            {0}
-            
-            file static class Internal {{
-            static readonly {1} x = ({2}){3};
-            }}
-            """;
-
-        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, languageVersion, valueTypeContainingNamespace, targetType, valueExpression, constantValue, valueType);
-    }
-
-    public static bool IsAssignableToLocal(Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
-    {
-        const string codeTemplate1 = """
-            {0}
-            
-            file static class Internal {{
-            static void Method() {{
-                {1} x = {2};
-            }}
-            }}
-            """;
-
-        const string codeTemplate2 = """
-            {0}
-            
-            file static class Internal {{
-            static void Method() {{
-                {1} x = ({2}){3};
-            }}
-            }}
-            """;
-
-        return IsAssignableTo(codeTemplate1, codeTemplate2, compilation, languageVersion, valueTypeContainingNamespace, targetType, valueExpression, constantValue, valueType);
-    }
-
-    private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, LanguageVersion languageVersion, string? valueTypeContainingNamespace, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
-    {
-        var usingDirective = valueTypeContainingNamespace != null ? $"using {valueTypeContainingNamespace};" : "";
-
-        var hasNoCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, usingDirective, targetType, valueExpression), compilation, languageVersion);
-        if (hasNoCompilerDiagnostics)
-        {
-            return true;
-        }
-
-        if (!constantValue.HasValue || valueType == null)
-        {
-            return false;
-        }
-
-        var constantLiteral = FormatLiteral(constantValue.Value);
-        if (constantLiteral == null)
-        {
-            return false;
-        }
-
-        return HasNoCompilerDiagnostics(string.Format(codeTemplate2, usingDirective, targetType, valueType, constantLiteral), compilation, languageVersion);
-    }
-
-    private static bool HasNoCompilerDiagnostics(string code, Compilation compilation, LanguageVersion languageVersion)
-    {
-        var compilationTestSyntaxTree = CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(languageVersion));
-
-        var syntaxTreesWithInterceptorsNamespaces = compilation.SyntaxTrees.Where(st => st.Options.Features.ContainsKey(InterceptorsNamespaces));
-
-        var compilerDiagnostics = compilation
-            .RemoveSyntaxTrees(syntaxTreesWithInterceptorsNamespaces)
-            .AddSyntaxTrees(compilationTestSyntaxTree)
-            .GetSemanticModel(compilationTestSyntaxTree)
-            .GetMethodBodyDiagnostics()
-            .Where(d => d.DefaultSeverity == DiagnosticSeverity.Error)
-            .ToList();
-
-        return compilerDiagnostics.Count == 0;
-    }
-
-    private static string? FormatLiteral(object? value)
-    {
-        return value switch
-        {
-            byte b => b.ToString(),
-            sbyte sb => sb.ToString(),
-            short s => s.ToString(),
-            ushort us => us.ToString(),
-            int i => i.ToString(),
-            uint ui => $"{ui}U",
-            long l => $"{l}L",
-            ulong ul => $"{ul}UL",
-            float f => $"{f.ToString(CultureInfo.InvariantCulture)}F",
-            double d => $"{d.ToString(CultureInfo.InvariantCulture)}D",
-            decimal m => $"{m.ToString(CultureInfo.InvariantCulture)}M",
-            char c => $"'{c}'",
-            bool b => b ? "true" : "false",
-            string s => $"\"{s}\"",
-            null => "null",
-            _ => null
-        };
-    }
-
     public static void Deconstruct<T1, T2>(this KeyValuePair<T1, T2> tuple, out T1 key, out T2 value)
     {
         key = tuple.Key;
         value = tuple.Value;
+    }
+
+    public static Location GetLocation(this AttributeData attributeData)
+        => attributeData.ApplicationSyntaxReference.SyntaxTree.GetLocation(attributeData.ApplicationSyntaxReference.Span);
+
+    public static bool IsAssignable(TypedConstant constant, ExpressionSyntax expression, ITypeSymbol targetType, Compilation compilation)
+    {
+        if (constant.IsNull)
+        {
+            // Check if targetType is a reference type or nullable.
+            return targetType.IsReferenceType || targetType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+        }
+
+        var sourceType = constant.Type;
+        if (sourceType == null)
+        {
+            return false;
+        }
+
+        // Test if the constant type is implicitly assignable.
+        var conversion = compilation.ClassifyConversion(sourceType, targetType);
+        if (conversion.IsImplicit)
+        {
+            return true;
+        }
+
+        // Int32 values fail the test to smaller types, but it's still valid in the generated code to assign the literal to a smaller integer type,
+        // so test if the expression is implicitly assignable.
+        var semanticModel = compilation.GetSemanticModel(expression.SyntaxTree);
+        // Only enums use explicit casting, so we test with explicit cast only for enums. See BenchmarkConverter.Map(...).
+        bool isEnum = targetType.TypeKind == TypeKind.Enum;
+        // The existing implementation only checks for direct enum type, not Nullable<TEnum>, so we won't check it here either unless BenchmarkConverter gets updated to handle it.
+        //bool isNullableEnum =
+        //    targetType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T &&
+        //    targetType is INamedTypeSymbol named &&
+        //    named.TypeArguments.Length == 1 &&
+        //    named.TypeArguments[0].TypeKind == TypeKind.Enum;
+        conversion = semanticModel.ClassifyConversion(expression, targetType, isEnum);
+        if (conversion.IsImplicit)
+        {
+            return true;
+        }
+        return isEnum && conversion.IsExplicit;
+    }
+
+    // Assumes a single `params object[] values` constructor
+    public static ExpressionSyntax GetAttributeParamsArgumentExpression(this AttributeData attributeData, int index)
+    {
+        Debug.Assert(index >= 0);
+        // Properties must come after constructor arguments, so we don't need to worry about it here.
+        var attrSyntax = (AttributeSyntax) attributeData.ApplicationSyntaxReference.GetSyntax();
+        var args = attrSyntax.ArgumentList.Arguments;
+        Debug.Assert(args is { Count: > 0 });
+        var maybeArrayExpression = args[0].Expression;
+
+#if CODE_ANALYSIS_4_8
+        if (maybeArrayExpression is CollectionExpressionSyntax collectionExpressionSyntax)
+        {
+            Debug.Assert(index < collectionExpressionSyntax.Elements.Count);
+            return ((ExpressionElementSyntax) collectionExpressionSyntax.Elements[index]).Expression;
+        }
+#endif
+
+        if (maybeArrayExpression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
+        {
+            if (arrayCreationExpressionSyntax.Initializer == null)
+            {
+                return maybeArrayExpression;
+            }
+            Debug.Assert(index < arrayCreationExpressionSyntax.Initializer.Expressions.Count);
+            return arrayCreationExpressionSyntax.Initializer.Expressions[index];
+        }
+
+        // Params values
+        Debug.Assert(index < args.Count);
+        Debug.Assert(args[index].NameEquals is null);
+        return args[index].Expression;
     }
 }

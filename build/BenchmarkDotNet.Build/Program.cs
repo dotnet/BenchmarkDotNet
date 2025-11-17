@@ -157,8 +157,28 @@ public class AllTestsTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Build BenchmarkDotNet.Analyzers")]
+public class BuildAnalyzersTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "build-analyzers";
+    public override void Run(BuildContext context) => context.BuildRunner.BuildAnalyzers();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples =
+            [
+                new Example(Name)
+            ]
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Pack Nupkg packages")]
 [IsDependentOn(typeof(BuildTask))]
+[IsDependentOn(typeof(BuildAnalyzersTask))]
 public class PackTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "pack";

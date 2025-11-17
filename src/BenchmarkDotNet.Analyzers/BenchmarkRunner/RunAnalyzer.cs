@@ -54,14 +54,14 @@ public class RunAnalyzer : DiagnosticAnalyzer
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description)));
 
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-    [
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
+    {
         TypeArgumentClassMissingBenchmarkMethodsRule,
         TypeArgumentClassMustBePublicRule,
         TypeArgumentClassMustBeUnsealedRule,
         TypeArgumentClassMustBeNonAbstractRule,
         GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttributeRule,
-    ];
+    }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
     {
@@ -108,7 +108,7 @@ public class RunAnalyzer : DiagnosticAnalyzer
         var classMemberAccessTypeSymbol = context.SemanticModel.GetTypeInfo(identifierNameSyntax).Type;
         if (classMemberAccessTypeSymbol is null
             || classMemberAccessTypeSymbol.TypeKind == TypeKind.Error
-            || !classMemberAccessTypeSymbol.Equals(benchmarkRunnerTypeSymbol, SymbolEqualityComparer.Default))
+            || !classMemberAccessTypeSymbol.Equals(benchmarkRunnerTypeSymbol))
         {
             return;
         }
@@ -128,7 +128,7 @@ public class RunAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
-            diagnosticLocation = Location.Create(context.FilterTree, genericMethod.TypeArgumentList.Arguments.Span);
+            diagnosticLocation = Location.Create(context.Node.SyntaxTree, genericMethod.TypeArgumentList.Arguments.Span);
             benchmarkClassTypeSymbol = context.SemanticModel.GetTypeInfo(genericMethod.TypeArgumentList.Arguments[0]).Type as INamedTypeSymbol;
         }
         else
@@ -202,7 +202,7 @@ public class RunAnalyzer : DiagnosticAnalyzer
                         {
                             if (attributeData.AttributeClass != null)
                             {
-                                if (attributeData.AttributeClass.Equals(benchmarkAttributeTypeSymbol, SymbolEqualityComparer.Default))
+                                if (attributeData.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
                                 {
                                     return true;
                                 }
