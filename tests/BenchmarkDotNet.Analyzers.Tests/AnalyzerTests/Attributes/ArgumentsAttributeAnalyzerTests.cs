@@ -497,6 +497,60 @@ public class ArgumentsAttributeAnalyzerTests
         }
 
         [Theory, CombinatorialData]
+        public async Task Providing_an_unknown_value_type_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "dummy_literal, true")}}]
+                    public void BenchmarkMethod(byte a, bool b)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Providing_an_unknown_type_in_typeof_expression_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}}]
+                    public void BenchmarkMethod(System.Type a, System.Type b)
+                    {
+                                                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
         public async Task Providing_expected_value_type_should_not_trigger_diagnostic(
             [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
             [CombinatorialMemberData(nameof(ValuesAndTypes))] ValueTupleDouble<string, string> valueAndType,
@@ -874,6 +928,34 @@ public class ArgumentsAttributeAnalyzerTests
 
             TestCode = testCode;
             ReferenceDummyAttribute();
+
+            await RunAsync();
+        }
+
+        [Theory, CombinatorialData]
+        public async Task Having_unknown_parameter_type_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(DummyAttributeUsage))] string dummyAttributeUsage,
+            [CombinatorialMemberData(nameof(ScalarValuesContainerAttributeArgumentEnumerableLocal))] string scalarValuesContainerAttributeArgument)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42, \"test\"")}}]
+                    [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "43, \"test2\"")}}]
+                    public void BenchmarkMethod(unkown a, string b)
+                    {
+                                                    
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+            ReferenceDummyAttribute();
+
+            DisableCompilerDiagnostics();
 
             await RunAsync();
         }

@@ -186,10 +186,6 @@ internal static class AnalyzerHelper
 
     private static bool IsAssignableTo(string codeTemplate1, string codeTemplate2, Compilation compilation, ITypeSymbol targetType, string valueExpression, Optional<object?> constantValue, string? valueType)
     {
-        if (valueType == "BenchmarkDotNet.IntegrationTests.ArgumentsTests.WithUndefinedEnumValue.SomeEnum")
-        {
-            System.Diagnostics.Debugger.Launch();
-        }
         var hasCompilerDiagnostics = HasNoCompilerDiagnostics(string.Format(codeTemplate1, targetType, valueExpression), compilation);
         if (hasCompilerDiagnostics)
         {
@@ -270,7 +266,7 @@ internal static class AnalyzerHelper
             return false;
         }
 
-        // Test if the constant value is implicitly assignable.
+        // Test if the constant type is implicitly assignable.
         var conversion = compilation.ClassifyConversion(sourceType, targetType);
         if (conversion.IsImplicit)
         {
@@ -280,8 +276,20 @@ internal static class AnalyzerHelper
         // Int32 values fail the test to smaller types, but it's still valid in the generated code to assign the literal to a smaller integer type,
         // so test if the expression is implicitly assignable.
         var semanticModel = compilation.GetSemanticModel(expression.SyntaxTree);
-        conversion = semanticModel.ClassifyConversion(expression, targetType);
-        return conversion.IsImplicit;
+        // Only enums use explicit casting, so we test with explicit cast only for enums. See BenchmarkConverter.Map(...).
+        bool isEnum = targetType.TypeKind == TypeKind.Enum;
+        // The existing implementation only checks for direct enum type, not Nullable<TEnum>, so we won't check it here either unless BenchmarkConverter gets updated to handle it.
+        //bool isNullableEnum =
+        //    targetType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T &&
+        //    targetType is INamedTypeSymbol named &&
+        //    named.TypeArguments.Length == 1 &&
+        //    named.TypeArguments[0].TypeKind == TypeKind.Enum;
+        conversion = semanticModel.ClassifyConversion(expression, targetType, isEnum);
+        if (conversion.IsImplicit)
+        {
+            return true;
+        }
+        return isEnum && conversion.IsExplicit;
     }
 
     // Assumes a single `params object[] values` constructor

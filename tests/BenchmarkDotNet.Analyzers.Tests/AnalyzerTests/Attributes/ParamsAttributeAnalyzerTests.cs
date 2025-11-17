@@ -138,8 +138,8 @@ public class ParamsAttributeAnalyzerTests
         public static IEnumerable<string> EmptyParamsAttributeUsagesWithLocationMarker()
         {
             yield return "{|#0:Params|}";
-            yield return "Params{|#0:()|}";
-            yield return "Params({|#0:Priority = 1|})";
+            yield return "{|#0:Params()|}";
+            yield return "{|#0:Params(Priority = 1)|}";
 
             string[] nameColonUsages =
             [
@@ -155,9 +155,9 @@ public class ParamsAttributeAnalyzerTests
 
             string[] attributeUsagesBase =
             [
-                "Params({0}new object[] {{|#0:{{ }}|}}{1})",
-                "Params({0}{{|#0:new object[0]|}}{1})",
-                "Params({0}{{|#0:[ ]|}}{1})",
+                "{{|#0:Params({0}new object[] {{ }}{1})|}}",
+                "{{|#0:Params({0}new object[0]{1})|}}",
+                "{{|#0:Params({0}[ ]{1})|}}",
             ];
 
             foreach (var attributeUsageBase in attributeUsagesBase)
@@ -1096,7 +1096,7 @@ public class ParamsAttributeAnalyzerTests
 
             ( """
               (object)"test_object"
-              """, "object" ),
+              """, "string" ),
             ( "typeof(string)", "System.Type" ),
             ( "DummyEnum.Value1", "DummyEnum" )
         ];

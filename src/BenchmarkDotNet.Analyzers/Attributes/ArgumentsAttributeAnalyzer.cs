@@ -189,6 +189,11 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
 
         void AnalyzeAssignableValueType(TypedConstant value, ExpressionSyntax expression, ITypeSymbol parameterType)
         {
+            // Don't analyze unknown types.
+            if (value.Kind == TypedConstantKind.Error || parameterType is IErrorTypeSymbol)
+            {
+                return;
+            }
             if (!AnalyzerHelper.IsAssignable(value, expression, parameterType, context.Compilation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(MustHaveMatchingValueTypeRule,
