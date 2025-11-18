@@ -17,7 +17,7 @@ BDN1104  |  Usage   | Error	   | Benchmark method is generic
 BDN1105  |  Usage   | Error	   | Benchmark class is static
 BDN1106  |  Usage   | Error	   | Single null argument passed to category
 BDN1107  |  Usage   | Error	   | Multiple baseline benchmark methods
-BDN1108  |  Usage   | Warning  | Multiple baseline benchmark methods oer category
+BDN1108  |  Usage   | Warning  | Multiple baseline benchmark methods per category
 BDN1200  |  Usage   | Error	   | More than one [Params(Source|AllValues)] on a field
 BDN1201  |  Usage   | Error	   | More than one [Params(Source|AllValues)] on a property
 BDN1202  |  Usage   | Error	   | [Params(Source|AllValues)] field is not public
