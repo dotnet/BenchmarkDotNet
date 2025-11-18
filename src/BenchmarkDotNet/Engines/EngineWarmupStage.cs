@@ -5,30 +5,37 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
 {
-    internal abstract class EngineWarmupStage(IterationMode iterationMode) : EngineStage(IterationStage.Warmup, iterationMode)
+    internal abstract class EngineWarmupStage(IterationMode iterationMode, long invokeCount, int unrollFactor, EngineParameters parameters) : EngineStage(IterationStage.Warmup, iterationMode, parameters)
     {
         private const int MinOverheadIterationCount = 4;
         internal const int MaxOverheadIterationCount = 10;
 
-        internal static EngineWarmupStage GetOverhead()
-            => new EngineWarmupStageAuto(IterationMode.Overhead, MinOverheadIterationCount, MaxOverheadIterationCount);
+        internal static EngineWarmupStage GetOverhead(long invokeCount, int unrollFactor, EngineParameters parameters)
+            => new EngineWarmupStageAuto(IterationMode.Overhead, MinOverheadIterationCount, MaxOverheadIterationCount, invokeCount, unrollFactor, parameters);
 
-        internal static EngineWarmupStage GetWorkload(IEngine engine, RunStrategy runStrategy)
+        internal static EngineWarmupStage GetWorkload(RunStrategy runStrategy, long invokeCount, int unrollFactor, EngineParameters parameters)
         {
-            var job = engine.TargetJob;
+            var job = parameters.TargetJob;
             var count = job.ResolveValueAsNullable(RunMode.WarmupCountCharacteristic);
             if (count.HasValue && count.Value != EngineResolver.ForceAutoWarmup || runStrategy == RunStrategy.Monitoring)
             {
-                return new EngineWarmupStageSpecific(count ?? 0, IterationMode.Workload);
+                return new EngineWarmupStageSpecific(count ?? 0, IterationMode.Workload, invokeCount, unrollFactor, parameters);
             }
 
-            int minIterationCount = job.ResolveValue(RunMode.MinWarmupIterationCountCharacteristic, engine.Resolver);
-            int maxIterationCount = job.ResolveValue(RunMode.MaxWarmupIterationCountCharacteristic, engine.Resolver);
-            return new EngineWarmupStageAuto(IterationMode.Workload, minIterationCount, maxIterationCount);
+            int minIterationCount = job.ResolveValue(RunMode.MinWarmupIterationCountCharacteristic, parameters.Resolver);
+            int maxIterationCount = job.ResolveValue(RunMode.MaxWarmupIterationCountCharacteristic, parameters.Resolver);
+            return new EngineWarmupStageAuto(IterationMode.Workload, minIterationCount, maxIterationCount, invokeCount, unrollFactor, parameters);
         }
+
+        protected IterationData GetIterationData()
+            => new(Mode, Stage, ++iterationIndex, invokeCount, unrollFactor, parameters.IterationSetupAction, parameters.IterationCleanupAction,
+                Mode == IterationMode.Workload
+                ? unrollFactor == 1 ? parameters.WorkloadActionNoUnroll : parameters.WorkloadActionUnroll
+                : unrollFactor == 1 ? parameters.OverheadActionNoUnroll: parameters.OverheadActionUnroll);
     }
 
-    internal sealed class EngineWarmupStageAuto(IterationMode iterationMode, int minIterationCount, int maxIterationCount) : EngineWarmupStage(iterationMode)
+    internal sealed class EngineWarmupStageAuto(IterationMode iterationMode, int minIterationCount, int maxIterationCount, long invokeCount, int unrollFactor, EngineParameters parameters)
+        : EngineWarmupStage(iterationMode, invokeCount, unrollFactor, parameters)
     {
         private const int MinFluctuationCount = 4;
 
@@ -37,16 +44,18 @@ namespace BenchmarkDotNet.Engines
 
         internal override List<Measurement> GetMeasurementList() => new(maxIterationCount);
 
-        internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
+        internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)
         {
             int n = measurements.Count;
 
             if (n >= maxIterationCount)
             {
+                iterationData = default;
                 return false;
             }
             if (n < minIterationCount)
             {
+                iterationData = GetIterationData();
                 return true;
             }
 
@@ -62,17 +71,26 @@ namespace BenchmarkDotNet.Engines
                 }
             }
 
+            iterationData = GetIterationData();
             return fluctuationCount < MinFluctuationCount;
         }
     }
 
-    internal sealed class EngineWarmupStageSpecific(int maxIterationCount, IterationMode iterationMode) : EngineWarmupStage(iterationMode)
+    internal sealed class EngineWarmupStageSpecific(int maxIterationCount, IterationMode iterationMode, long invokeCount, int unrollFactor, EngineParameters parameters)
+        : EngineWarmupStage(iterationMode, invokeCount, unrollFactor, parameters)
     {
-        private int iterationCount = 0;
-
         internal override List<Measurement> GetMeasurementList() => new(maxIterationCount);
 
-        internal override bool GetShouldRunIteration(List<Measurement> measurements, ref long invokeCount)
-            => ++iterationCount <= maxIterationCount;
+        internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)
+        {
+            if (iterationIndex < maxIterationCount)
+            {
+                iterationData = GetIterationData();
+                return true;
+            }
+
+            iterationData = default;
+            return false;
+        }
     }
 }
