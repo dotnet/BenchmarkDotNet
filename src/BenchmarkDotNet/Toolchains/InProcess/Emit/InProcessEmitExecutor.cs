@@ -76,6 +76,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                     $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes too long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
+            host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
+
             return ExecuteResult.FromRunResults(host.RunResults, exitCode);
         }
 
@@ -111,11 +113,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 var generatedAssembly = ((InProcessEmitArtifactsPath)parameters.BuildResult.ArtifactsPaths)
                     .GeneratedAssembly;
 
-                exitCode = RunnableProgram.Run(
-                    parameters.BenchmarkId,
-                    generatedAssembly,
-                    parameters.BenchmarkCase,
-                    host);
+                exitCode = RunnableProgram.Run(generatedAssembly, host, parameters);
             }
             catch (Exception ex)
             {

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal class IntelDisassembler : ClrMdV3Disassembler
+    internal class IntelDisassembler : ClrMdDisassembler
     {
         internal sealed class RuntimeSpecificData
         {

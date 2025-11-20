@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <AssemblyTitle>BenchmarkDotNet.Disassembler</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.Disassembler</AssemblyName>
+    <PlatformTarget>x64</PlatformTarget>
+    <!-- This project is only used for debugging the disassembler, it's not included in any BenchmarkDotNet packages. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+</Project>

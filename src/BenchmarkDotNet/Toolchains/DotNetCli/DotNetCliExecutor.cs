@@ -41,9 +41,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.Logger,
                     executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser,
+                    executeParameters.CompositeInProcessDiagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver,
-                    executeParameters.LaunchIndex);
+                    executeParameters.LaunchIndex,
+                    executeParameters.DiagnoserRunMode);
             }
             finally
             {
@@ -57,10 +59,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       BenchmarkId benchmarkId,
                                       ILogger logger,
                                       ArtifactsPaths artifactsPaths,
-                                      IDiagnoser diagnoser,
+                                      IDiagnoser? diagnoser,
+                                      CompositeInProcessDiagnoser compositeInProcessDiagnoser,
                                       string executableName,
                                       IResolver resolver,
-                                      int launchIndex)
+                                      int launchIndex,
+                                      Diagnosers.RunMode diagnoserRunMode)
         {
             using AnonymousPipeServerStream inputFromBenchmark = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
             using AnonymousPipeServerStream acknowledgments = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
@@ -68,7 +72,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString())}",
+                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode)}",
                 redirectStandardOutput: true,
                 redirectStandardInput: false,
                 redirectStandardError: false); // #1629
@@ -79,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using (ConsoleExitHandler consoleExitHandler = new(process, logger))
             using (AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false))
             {
-                Broker broker = new(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
