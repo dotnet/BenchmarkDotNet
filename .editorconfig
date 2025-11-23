@@ -1,6 +1,42 @@
-﻿[*.cs]
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = unset
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# XML files
+[*.{xml,resx,ruleset,props,targets,runsettings}]
+indent_size = 2
+
+# .NET solution/project files
+[*.{slnx,csproj,vbproj]
+indent_size = 2
+
+# Shell scripts
+[*.{cmd, bat}]
+end_of_line = crlf
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# C# files
+[*.cs]
+# IDE0160: Use block-scoped namespace
+csharp_style_namespace_declarations=file_scoped:suggestion
 
 # CS1998: Async method lacks 'await' operators and will run synchronously
 dotnet_diagnostic.CS1998.severity = suggestion
+
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = warning
+
