@@ -35,7 +35,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // Validate NuGet package version output message
             var stdout = GetSingleStandardOutput(report);
-            Assert.Contains($"System.Collections.Immutable: {targetVersion}", stdout);
+
+            // When build oriject with .NET 10 SDK. PackageReference is pruned and SDK version assembly is used instead.
+            if (RuntimeInformation.IsNetCore && DotNetRuntimeHelper.GetExpectedDotNetCoreRuntimeName() == ".NET 10.0")
+                Assert.Contains(stdout, x => x.StartsWith("System.Collections.Immutable: 10.0."));
+            else
+                Assert.Contains($"System.Collections.Immutable: {targetVersion}", stdout);
         }
 
         [FactEnvSpecific("Roslyn toolchain does not support .NET Core", EnvRequirement.FullFrameworkOnly)]
