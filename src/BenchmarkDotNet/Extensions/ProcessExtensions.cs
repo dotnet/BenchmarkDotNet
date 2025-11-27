@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
@@ -13,6 +8,13 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 
 namespace BenchmarkDotNet.Extensions
@@ -210,27 +212,51 @@ namespace BenchmarkDotNet.Extensions
 
         private static (int exitCode, string output) RunProcessAndReadOutput(string fileName, string arguments, TimeSpan timeout)
         {
-            var startInfo = new ProcessStartInfo
+            using var process = new Process
             {
-                FileName = fileName,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                UseShellExecute = false
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = false,
+                    UseShellExecute = false
+                },
+                EnableRaisingEvents = true
             };
 
-            using (var process = Process.Start(startInfo))
-            {
-                if (process.WaitForExit((int)timeout.TotalMilliseconds))
-                {
-                    return (process.ExitCode, process.StandardOutput.ReadToEnd());
-                }
-                else
-                {
-                    process.Kill();
-                }
+            var stdout = new StringBuilder();
 
-                return (process.ExitCode, default);
+            var tcsExited = new TaskCompletionSource<bool>();
+            var tcsStdout = new TaskCompletionSource<bool>();
+
+            process.Exited += (_, __) => tcsExited.TrySetResult(true);
+            process.OutputDataReceived += (_, e) =>
+            {
+                if (e.Data != null)
+                    stdout.AppendLine(e.Data);
+                else
+                    tcsStdout.TrySetResult(true);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+
+            var tasks = Task.WhenAll(tcsExited.Task, tcsStdout.Task);
+            if (tasks.Wait(timeout))
+                return (process.ExitCode, stdout.ToString());
+
+            // Handle timeout
+            try
+            {
+                process.KillTree();
             }
+            catch
+            {
+                // Ignore exception
+            }
+
+            return (process.HasExited ? process.ExitCode : -1, default);
         }
 
         private static int RunProcessAndIgnoreOutput(string fileName, string arguments, TimeSpan timeout)
