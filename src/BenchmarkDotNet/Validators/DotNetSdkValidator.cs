@@ -84,11 +84,11 @@ namespace BenchmarkDotNet.Validators
                         return Enumerable.Empty<Version>();
                     }
 
+                    var output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
 
                     if (process.ExitCode == 0)
                     {
-                        var output = process.StandardOutput.ReadToEnd();
                         var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                         var versions = new List<Version>(lines.Count());
