@@ -633,7 +633,7 @@ namespace BenchmarkDotNet.Running
 
             foreach (var benchmarkRunInfo in benchmarkRunInfos)
             {
-                if (benchmarkRunInfo.BenchmarksCases.Length == 0)
+                if (!benchmarkRunInfo.ContainsBenchmarkDeclarations)
                 {
                     validationErrors.Add(new ValidationError(true, $"No [Benchmark] attribute found on '{benchmarkRunInfo.Type.Name}' benchmark case."));
                     continue;
