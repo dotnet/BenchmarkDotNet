@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Running
             else
             {
                 // When args is provided and type is invalid, we get a ValidationFailed summary
-                // instead of an unhandled exception 
+                // instead of an unhandled exception
                 Assert.NotNull(summary);
             }
         }
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Tests.Running
             else
             {
                 // When args is provided and type is invalid, we get a ValidationFailed summary
-                // instead of an unhandled exception 
+                // instead of an unhandled exception
                 Assert.NotNull(summary);
             }
         }
