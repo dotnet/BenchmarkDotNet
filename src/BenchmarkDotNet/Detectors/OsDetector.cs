@@ -8,6 +8,7 @@ using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;
 using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
+using System.Runtime.Versioning;
 
 namespace BenchmarkDotNet.Detectors;
 
@@ -113,9 +114,7 @@ public class OsDetector
         return null;
     }
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
-#endif
+    [SupportedOSPlatformGuard("windows")]
     internal static bool IsWindows() =>
 #if NET6_0_OR_GREATER
         OperatingSystem.IsWindows(); // prefer linker-friendly OperatingSystem APIs
@@ -123,9 +122,8 @@ public class OsDetector
         IsOSPlatform(OSPlatform.Windows);
 #endif
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]
-#endif
+
+    [SupportedOSPlatformGuard("linux")]
     internal static bool IsLinux() =>
 #if NET6_0_OR_GREATER
         OperatingSystem.IsLinux();
@@ -133,9 +131,7 @@ public class OsDetector
         IsOSPlatform(OSPlatform.Linux);
 #endif
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatformGuard("macos")]
-#endif
+    [SupportedOSPlatformGuard("macos")]
     // ReSharper disable once InconsistentNaming
     internal static bool IsMacOS() =>
 #if NET6_0_OR_GREATER
@@ -144,9 +140,7 @@ public class OsDetector
         IsOSPlatform(OSPlatform.OSX);
 #endif
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatformGuard("android")]
-#endif
+    [SupportedOSPlatformGuard("android")]
     internal static bool IsAndroid() =>
 #if NET6_0_OR_GREATER
         OperatingSystem.IsAndroid();
@@ -154,9 +148,7 @@ public class OsDetector
         Type.GetType("Java.Lang.Object, Mono.Android") != null;
 #endif
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatformGuard("ios")]
-#endif
+    [SupportedOSPlatformGuard("ios")]
     // ReSharper disable once InconsistentNaming
     internal static bool IsIOS() =>
 #if NET6_0_OR_GREATER
@@ -165,9 +157,7 @@ public class OsDetector
         Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
 #endif
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatformGuard("tvos")]
-#endif
+    [SupportedOSPlatformGuard("tvos")]
     // ReSharper disable once InconsistentNaming
     internal static bool IsTvOS() =>
 #if NET6_0_OR_GREATER
