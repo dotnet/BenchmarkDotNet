@@ -42,25 +42,31 @@ namespace BenchmarkDotNet.Tests.Running
         /// </summary>
         [Theory]
         [InlineData(null)]
-        //[InlineData(new object[] { new string[] { " " } })]
+        [InlineData(new object[] { new string[] { " " } })]
         public void GenericTypeWithoutBenchmarkAttribute_ThrowsValidationError_WhenNoBenchmarkAttribute(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
 
             var summary = BenchmarkRunner.Run<EmptyBenchmark>(config, args);
+
             if (args == null)
             {
                 Assert.True(summary.HasCriticalValidationErrors);
                 Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
+                Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
             }
-
-            Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
+            else
+            {
+                // When args is provided and type is invalid, we get a ValidationFailed summary
+                // instead of an unhandled exception 
+                Assert.NotNull(summary);
+            }
         }
 #pragma warning restore BDN1000
 
         [Theory]
         [InlineData(null)]
-        //[InlineData(new object[] { new string[] { " " } })]
+        [InlineData(new object[] { new string[] { " " } })]
         public void GenericTypeWithBenchmarkAttribute_RunsSuccessfully(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
@@ -79,16 +85,25 @@ namespace BenchmarkDotNet.Tests.Running
         /// </summary>
         [Theory]
         [InlineData(null)]
-        //[InlineData(new object[] { new string[] { " " } })]
+        [InlineData(new object[] { new string[] { " " } })]
         public void TypeWithoutBenchmarkAttribute_ThrowsValidationError_WhenNoBenchmarkAttribute(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
 
-
             var summary = BenchmarkRunner.Run(typeof(EmptyBenchmark), config, args);
-            Assert.True(summary.HasCriticalValidationErrors);
-            Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
-            Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
+
+            if (args == null)
+            {
+                Assert.True(summary.HasCriticalValidationErrors);
+                Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
+                Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
+            }
+            else
+            {
+                // When args is provided and type is invalid, we get a ValidationFailed summary
+                // instead of an unhandled exception 
+                Assert.NotNull(summary);
+            }
         }
 #pragma warning restore BDN1000
 

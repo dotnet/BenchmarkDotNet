@@ -86,14 +86,23 @@ namespace BenchmarkDotNet.Running
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig? config, string[]? args)
-            => (args == null
+        {
+            var summaries = args == null
                 ? BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) })
-                : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args, config, false))
-                .Single();
+                : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args, config, false);
+
+            return summaries.SingleOrDefault()
+                ?? Summary.ValidationFailed($"No benchmarks found in type '{type.Name}'", string.Empty, string.Empty);
+        }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig? config = null)
-            => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
+        {
+            var summaries = BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) });
+
+            return summaries.SingleOrDefault()
+                ?? Summary.ValidationFailed($"No benchmarks found in type '{type.Name}'", string.Empty, string.Empty);
+        }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig? config, string[]? args)
