@@ -26,7 +26,8 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         {
             foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
-                logger.WriteLine($"## {summary[benchmarkCase].GetRuntimeInfo()}");
+                logger.WriteLine($"## {summary[benchmarkCase].GetRuntimeInfo()} (Job: {benchmarkCase.Job.DisplayInfo})");
+                logger.WriteLine();
 
                 Export(logger, results[benchmarkCase], config);
             }
