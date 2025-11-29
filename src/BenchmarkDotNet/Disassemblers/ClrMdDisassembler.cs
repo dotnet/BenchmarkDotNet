@@ -129,9 +129,9 @@ namespace BenchmarkDotNet.Disassemblers
             dataTarget.SetSymbolPath("http://msdl.microsoft.com/download/symbols");
         }
 
-        private static void FilterAndEnqueue(State state, ClrMdArgs settings)
+        private static void FilterAndEnqueue(State state, ClrMdArgs args)
         {
-            Regex[] filters = GlobFilter.ToRegex(settings.Filters);
+            Regex[] filters = GlobFilter.ToRegex(args.Filters);
 
             foreach (ClrModule module in state.Runtime.EnumerateModules())
                 foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).Where(type => type is not null))
@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Disassemblers
                                 if (filter.IsMatch(method.Signature))
                                 {
                                     state.Todo.Enqueue(new MethodInfo(method,
-                                        depth: settings.MaxDepth)); // don't allow for recursive disassembling
+                                        depth: args.MaxDepth)); // don't allow for recursive disassembling
                                     break;
                                 }
                             }
@@ -160,10 +160,10 @@ namespace BenchmarkDotNet.Disassemblers
                     }
         }
 
-        private DisassembledMethod[] Disassemble(ClrMdArgs settings, State state)
+        private DisassembledMethod[] Disassemble(ClrMdArgs args, State state)
         {
             var result = new List<DisassembledMethod>();
-            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), settings.Syntax);
+            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), args.Syntax);
 
             using var sourceCodeProvider = new SourceCodeProvider();
             while (state.Todo.Count != 0)
@@ -173,8 +173,8 @@ namespace BenchmarkDotNet.Disassemblers
                 if (!state.HandledMethods.Add(methodInfo.Method)) // add it now to avoid StackOverflow for recursive methods
                     continue; // already handled
 
-                if (settings.MaxDepth >= methodInfo.Depth)
-                    result.Add(DisassembleMethod(methodInfo, state, settings, syntax, sourceCodeProvider));
+                if (args.MaxDepth >= methodInfo.Depth)
+                    result.Add(DisassembleMethod(methodInfo, state, args, syntax, sourceCodeProvider));
             }
 
             return result.ToArray();
@@ -182,7 +182,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
-        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, ClrMdArgs settings, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
+        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, ClrMdArgs args, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
         {
             var method = methodInfo.Method;
 
@@ -200,7 +200,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var codes = new List<SourceCode>();
-            if (settings.PrintSource && method.ILOffsetMap.Length > 0)
+            if (args.PrintSource && method.ILOffsetMap.Length > 0)
             {
                 // we use HashSet to prevent from duplicates
                 var uniqueSourceCodeLines = new HashSet<Sharp>(new SharpComparer());
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Disassemblers
                 codes.AddRange(Decode(map, state, methodInfo.Depth, method, syntax));
             }
 
-            Map[] maps = settings.PrintSource
+            Map[] maps = args.PrintSource
                 ? codes.GroupBy(code => code.InstructionPointer).OrderBy(group => group.Key).Select(group => new Map() { SourceCodes = group.ToArray() }).ToArray()
                 : new[] { new Map() { SourceCodes = codes.ToArray() } };
 
