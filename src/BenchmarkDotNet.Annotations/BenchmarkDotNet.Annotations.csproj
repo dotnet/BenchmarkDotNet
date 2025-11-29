@@ -13,7 +13,10 @@
   </PropertyGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>
-    <PolySharpIncludeRuntimeSupportedAttributes>true</PolySharpIncludeRuntimeSupportedAttributes>
+    <PolySharpIncludeGeneratedTypes>
+      System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute,
+      System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes
+    </PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PolySharp" Version="1.15.0">
