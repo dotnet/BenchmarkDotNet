@@ -39,10 +39,6 @@
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
-    <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMembersAttribute.cs" Link="Properties\DynamicallyAccessedMembersAttribute.cs" />
-    <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMemberTypes.cs" Link="Properties\DynamicallyAccessedMemberTypes.cs" />
-  </ItemGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>
     <PolySharpIncludeRuntimeSupportedAttributes>true</PolySharpIncludeRuntimeSupportedAttributes>
