@@ -6,6 +6,7 @@ using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
@@ -42,8 +43,8 @@ namespace BenchmarkDotNet.Portability
             FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
+        [SupportedOSPlatformGuard("browser")]
 #if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
         public static readonly bool IsWasm = OperatingSystem.IsBrowser();
 #else
         public static readonly bool IsWasm = IsOSPlatform(OSPlatform.Create("BROWSER"));

@@ -83,10 +83,7 @@ namespace BenchmarkDotNet.Helpers
             return "4.8.1"; // most probably the last major release of Full .NET Framework
         }
 
-
-#if NET6_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
             using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
@@ -96,9 +93,7 @@ namespace BenchmarkDotNet.Helpers
             return Convert.ToInt32(ndpKey.GetValue("Release"));
         }
 
-#if NET6_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
         internal static string? GetLatestNetDeveloperPackVersion()
         {
             if (GetReleaseNumberFromWindowsRegistry() is not int releaseNumber)

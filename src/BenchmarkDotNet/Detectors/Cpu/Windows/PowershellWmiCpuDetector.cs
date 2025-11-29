@@ -21,9 +21,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
 
     public bool IsApplicable() => OsDetector.IsWindows();
 
-    #if NET6_0_OR_GREATER
     [SupportedOSPlatform("windows")]
-    #endif
     public CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using System.Runtime.Versioning;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
@@ -11,16 +12,12 @@ namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 internal class MosCpuDetector : ICpuDetector
 {
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-#endif
+    [SupportedOSPlatform("windows")]
     public bool IsApplicable() => OsDetector.IsWindows() &&
                                   RuntimeInformation.IsFullFramework &&
                                   !RuntimeInformation.IsMono;
 
-#if NET6_0_OR_GREATER
-    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-#endif
+    [SupportedOSPlatform("windows")]
     public CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
