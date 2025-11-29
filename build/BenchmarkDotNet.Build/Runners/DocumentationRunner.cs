@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
+using BenchmarkDotNet.Build.Options;
 using BenchmarkDotNet.Build.Runners.Changelog;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
@@ -21,6 +22,9 @@ public class DocumentationRunner
     private readonly FilePath redirectFile;
     private readonly FilePath readmeFile;
     private readonly FilePath rootIndexFile;
+    private readonly FilePath analyzersShippedFile;
+    private readonly FilePath analyzersUnshippedFile;
+    private readonly FilePath analyzersPageFile;
 
     public DirectoryPath ChangelogSrcDirectory => changelogBuilder.SrcDirectory;
 
@@ -35,6 +39,33 @@ public class DocumentationRunner
         docfxJsonFile = docsDirectory.CombineWithFilePath("docfx.json");
         readmeFile = context.RootDirectory.CombineWithFilePath("README.md");
         rootIndexFile = docsDirectory.CombineWithFilePath("index.md");
+
+        var analyzersDirectory = context.RootDirectory.Combine("src").Combine("BenchmarkDotNet.Analyzers");
+        analyzersShippedFile = analyzersDirectory.CombineWithFilePath("AnalyzerReleases.Shipped.md");
+        analyzersUnshippedFile = analyzersDirectory.CombineWithFilePath("AnalyzerReleases.Unshipped.md");
+        analyzersPageFile = docsGeneratedDirectory.Combine("articles").CombineWithFilePath("analyzers.md");
+    }
+
+    public void MoveAnalyzerRules()
+    {
+        if (new FileInfo(analyzersUnshippedFile.FullPath).Length == 0)
+        {
+            return;
+        }
+
+        string tempFile = System.IO.Path.GetTempFileName();
+        using (var writer = new StreamWriter(tempFile))
+        {
+            writer.WriteLine($"## {KnownOptions.CurrentVersion.Resolve(context)}");
+            CopyLines(writer, analyzersUnshippedFile);
+            writer.WriteLine();
+            writer.WriteLine();
+            CopyLines(writer, analyzersShippedFile);
+        }
+
+        File.Delete(analyzersShippedFile.FullPath);
+        File.Move(tempFile, analyzersShippedFile.FullPath);
+        File.WriteAllText(analyzersUnshippedFile.FullPath, string.Empty);
     }
 
     public void Fetch()
@@ -49,6 +80,7 @@ public class DocumentationRunner
 
         UpdateReadme();
         GenerateIndexMd();
+        GenerateAnalyzersPage();
     }
 
     public void Build()
@@ -89,6 +121,24 @@ public class DocumentationRunner
         content.Append(context.FileReadText(readmeFile));
 
         context.GenerateFile(rootIndexFile, content);
+    }
+
+    private void GenerateAnalyzersPage()
+    {
+        using var writer = new StreamWriter(analyzersPageFile.FullPath);
+        writer.WriteLine($"# Roslyn Analyzers for C#");
+        writer.WriteLine();
+        CopyLines(writer, analyzersShippedFile);
+    }
+
+    private static void CopyLines(StreamWriter writer, FilePath filePath)
+    {
+        using var reader = new StreamReader(filePath.FullPath);
+        while (reader.ReadLine() is { } line)
+        {
+            writer.WriteLine();
+            writer.Write(line);
+        }
     }
 
     private void GenerateRedirects()
