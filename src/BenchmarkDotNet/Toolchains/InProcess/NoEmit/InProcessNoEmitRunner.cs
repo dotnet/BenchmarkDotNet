@@ -132,12 +132,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
                     parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
-                        .Select((d, i) => new Diagnosers.InProcessDiagnoserRouter()
-                        {
-                            index = i,
-                            runMode = d.GetRunMode(benchmarkCase),
-                            handler = Diagnosers.InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
-                        })
+                        .Select((d, i) => Diagnosers.InProcessDiagnoserRouter.Create(d, benchmarkCase, i))
                         .Where(r => r.handler != null)
                         .ToArray(),
                     host,

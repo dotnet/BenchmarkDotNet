@@ -30,12 +30,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             var compositeInProcessDiagnoserHandler = new CompositeInProcessDiagnoserHandler(
                 parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
-                    .Select((d, i) => new InProcessDiagnoserRouter()
-                    {
-                        index = i,
-                        runMode = d.GetRunMode(benchmarkCase),
-                        handler = InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
-                    })
+                    .Select((d, i) => InProcessDiagnoserRouter.Create(d, benchmarkCase, i))
                     .Where(r => r.handler != null)
                     .ToArray(),
                 host,

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 using System;
 using System.ComponentModel;
 
@@ -18,8 +19,18 @@ public struct InProcessDiagnoserRouter
         return handler;
     }
 
-    internal static IInProcessDiagnoserHandler? CreateOrNull(InProcessDiagnoserHandlerData data)
-        => data.HandlerType is null
-        ? null
-        : Init((IInProcessDiagnoserHandler) Activator.CreateInstance(data.HandlerType), data.SerializedConfig);
+    internal static InProcessDiagnoserRouter Create(IInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase, int index)
+    {
+        var data = diagnoser.GetHandlerData(benchmarkCase);
+        if (data.HandlerType is null)
+        {
+            return default;
+        }
+        return new()
+        {
+            handler = Init((IInProcessDiagnoserHandler) Activator.CreateInstance(data.HandlerType), data.SerializedConfig),
+            index = index,
+            runMode = diagnoser.GetRunMode(benchmarkCase)
+        };
+    }
 }
