@@ -18,14 +18,14 @@ BDN1105  |  Usage   | Error	   | Benchmark class is static
 BDN1106  |  Usage   | Error	   | Single null argument passed to category
 BDN1107  |  Usage   | Error	   | Multiple baseline benchmark methods
 BDN1108  |  Usage   | Warning  | Multiple baseline benchmark methods per category
-BDN1200  |  Usage   | Error	   | More than one [Params(Source|AllValues)] on a field
-BDN1201  |  Usage   | Error	   | More than one [Params(Source|AllValues)] on a property
-BDN1202  |  Usage   | Error	   | [Params(Source|AllValues)] field is not public
-BDN1203  |  Usage   | Error	   | [Params(Source|AllValues)] property is not public
-BDN1204  |  Usage   | Error	   | [Params(Source|AllValues)] field is readonly
-BDN1205  |  Usage   | Error	   | [Params(Source|AllValues)] field is constant
-BDN1206  |  Usage   | Error	   | [Params(Source|AllValues)] property is init only
-BDN1207  |  Usage   | Error	   | [Params(Source|AllValues)] has no public setter
+BDN1200  |  Usage   | Error	   | More than one [Params(Source\|AllValues)] on a field
+BDN1201  |  Usage   | Error	   | More than one [Params(Source\|AllValues)] on a property
+BDN1202  |  Usage   | Error	   | [Params(Source\|AllValues)] field is not public
+BDN1203  |  Usage   | Error	   | [Params(Source\|AllValues)] property is not public
+BDN1204  |  Usage   | Error	   | [Params(Source\|AllValues)] field is readonly
+BDN1205  |  Usage   | Error	   | [Params(Source\|AllValues)] field is constant
+BDN1206  |  Usage   | Error	   | [Params(Source\|AllValues)] property is init only
+BDN1207  |  Usage   | Error	   | [Params(Source\|AllValues)] has no public setter
 BDN1300  |  Usage   | Error	   | [Params] has no values
 BDN1301  |  Usage   | Error	   | [Params] values do not match the type of the field or property
 BDN1302  |  Usage   | Info	   | [Params] used with a single value
