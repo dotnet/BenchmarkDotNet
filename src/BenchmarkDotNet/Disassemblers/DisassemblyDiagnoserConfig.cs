@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// <param name="exportDiff">Exports a diff of the assembly code to the Github markdown format. False by default.</param>
         /// <param name="runInHost">
         /// If <see langword="true"/>, disassembly will be ran in the host process; otherwise it will be ran in the benchmark process.
-        /// Requires host and benchmark processes to target the same platform (must have the same bit-ness) for CoreCLR.
+        /// Requires host and benchmark processes to target the same platform (must have the same bit-ness).
         /// </param>
         [PublicAPI]
         public DisassemblyDiagnoserConfig(

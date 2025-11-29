@@ -10,14 +10,10 @@ public enum BenchmarkSignal
     /// </summary>
     BeforeEngine,
 
-    /// <summary>
-    /// after globalSetup, warmup and pilot but before the main run
-    /// </summary>
+    /// <inheritdoc cref="HostSignal.BeforeActualRun"/>
     BeforeActualRun,
 
-    /// <summary>
-    /// after main run, but before global Cleanup
-    /// </summary>
+    /// <inheritdoc cref="HostSignal.AfterActualRun"/>
     AfterActualRun,
 
     /// <summary>
