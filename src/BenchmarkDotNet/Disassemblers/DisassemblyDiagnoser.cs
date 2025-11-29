@@ -215,16 +215,18 @@ namespace BenchmarkDotNet.Diagnosers
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
             => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.InstructionLength)));
 
-        (Type? handlerType, string? serializedConfig) IInProcessDiagnoser.GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+        InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         {
             if (GetRunMode(benchmarkCase) == RunMode.None
                 || Config.RunInHost
+                // We don't use handler for InProcess toolchains, the host diagnoser already handles it without needing to serialize data.
+                || (benchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain.IsInProcess)
                 // Mono disassembler always runs another process.
                 || ShouldUseMonoDisassembler(benchmarkCase))
             {
                 return default;
             }
-            return (typeof(DisassemblyDiagnoserInProcessHandler), BuildClrMdArgs(benchmarkCase, null, 0).Serialize());
+            return new(typeof(DisassemblyDiagnoserInProcessHandler), BuildClrMdArgs(benchmarkCase, null, 0).Serialize());
         }
 
         void IInProcessDiagnoser.DeserializeResults(BenchmarkCase benchmarkCase, string results)
@@ -234,9 +236,6 @@ namespace BenchmarkDotNet.Diagnosers
             result.Deserialize(json);
             this.results.Add(benchmarkCase, result);
         }
-
-        // We don't use handler for InProcess toolchains, the host diagnoser already handles it without needing to serialize data.
-        public IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase) => null;
 
         private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
         {

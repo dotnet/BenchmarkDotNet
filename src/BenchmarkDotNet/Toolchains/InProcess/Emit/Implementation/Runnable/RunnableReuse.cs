@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         {
                             index = i,
                             runMode = d.GetRunMode(benchmarkCase),
-                            handler = d.GetSameProcessHandler(benchmarkCase)
+                            handler = InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
                         })
                         .Where(r => r.handler != null)
                         .ToArray(),

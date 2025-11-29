@@ -136,7 +136,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                         {
                             index = i,
                             runMode = d.GetRunMode(benchmarkCase),
-                            handler = d.GetSameProcessHandler(benchmarkCase)
+                            handler = Diagnosers.InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
                         })
                         .Where(r => r.handler != null)
                         .ToArray()],

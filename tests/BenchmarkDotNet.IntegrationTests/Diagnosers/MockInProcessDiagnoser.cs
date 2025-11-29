@@ -7,7 +7,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using System.Collections.Generic;
-using System;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
@@ -36,22 +35,10 @@ public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDi
 
     public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
 
-    public (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase)
+    InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         => RunMode == RunMode.None
             ? default
-            : (typeof(MockInProcessDiagnoserHandler), ExpectedResult);
-
-    public virtual IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase)
-    {
-        var (handlerType, serializedConfig) = GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
-        if (handlerType == null)
-        {
-            return null;
-        }
-        var handler = (IInProcessDiagnoserHandler)Activator.CreateInstance(handlerType);
-        handler.Initialize(serializedConfig);
-        return handler;
-    }
+            : new(typeof(MockInProcessDiagnoserHandler), ExpectedResult);
 
     public void DeserializeResults(BenchmarkCase benchmarkCase, string results)
     {

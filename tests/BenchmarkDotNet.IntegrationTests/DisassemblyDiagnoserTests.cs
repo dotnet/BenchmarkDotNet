@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetAllJits()
         {
-            yield return [RuntimeInformation.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.DontLogOutput]; // InProcess
+            yield return [RuntimeInformation.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Instance]; // InProcess
 
             if (RuntimeInformation.IsFullFramework)
             {

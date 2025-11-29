@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -42,24 +40,14 @@ namespace BenchmarkDotNet.Diagnosers
     public interface IInProcessDiagnoser : IDiagnoser
     {
         /// <summary>
-        /// Gets the type of the handler that will run in the separate benchmark process and its serialized config.
+        /// Gets the data used to construct the <see cref="IInProcessDiagnoserHandler"/> that will run in the benchmark process.
         /// </summary>
         /// <remarks>
-        /// The handlerType must implement <see cref="IInProcessDiagnoserHandler"/> and have a publicly accessible default constructor.
+        /// The <see cref="InProcessDiagnoserHandlerData.HandlerType"/> must implement <see cref="IInProcessDiagnoserHandler"/> and have a publicly accessible default constructor.
         /// <para/>
         /// Return <see langword="default"/> to not run the diagnoser handler for the <paramref name="benchmarkCase"/>.
         /// </remarks>
-        (Type? handlerType, string? serializedConfig) GetSeparateProcessHandlerTypeAndSerializedConfig(BenchmarkCase benchmarkCase);
-
-        // GetSameProcessHandler is needed to prevent the handler type from being trimmed for InProcess toolchains.
-
-        /// <summary>
-        /// Gets the handler that will run in the same process.
-        /// </summary>
-        /// <remarks>
-        /// Return <see langword="null"/> to not run the diagnoser handler for the <paramref name="benchmarkCase"/>.
-        /// </remarks>
-        IInProcessDiagnoserHandler? GetSameProcessHandler(BenchmarkCase benchmarkCase);
+        InProcessDiagnoserHandlerData GetHandlerData(BenchmarkCase benchmarkCase);
 
         /// <summary>
         /// Deserializes the results of the handler.

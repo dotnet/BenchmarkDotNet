@@ -260,15 +260,15 @@ namespace BenchmarkDotNet.Code
 
             static string? ToSourceCode(IInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase, int index)
             {
-                var (handlerType, serializedConfig) = diagnoser.GetSeparateProcessHandlerTypeAndSerializedConfig(benchmarkCase);
-                if (handlerType is null)
+                var handlerData = diagnoser.GetHandlerData(benchmarkCase);
+                if (handlerData.HandlerType is null)
                 {
                     return null;
                 }
                 string routerType = typeof(InProcessDiagnoserRouter).GetCorrectCSharpTypeName();
                 return $$"""
                 new {{routerType}}() {
-                    {{nameof(InProcessDiagnoserRouter.handler)}} = {{routerType}}.{{nameof(InProcessDiagnoserRouter.Init)}}(new {{handlerType.GetCorrectCSharpTypeName()}}(), {{SourceCodeHelper.ToSourceCode(serializedConfig)}}),
+                    {{nameof(InProcessDiagnoserRouter.handler)}} = {{routerType}}.{{nameof(InProcessDiagnoserRouter.Init)}}(new {{handlerData.HandlerType.GetCorrectCSharpTypeName()}}(), {{SourceCodeHelper.ToSourceCode(handlerData.SerializedConfig)}}),
                     {{nameof(InProcessDiagnoserRouter.index)}} = {{index}},
                     {{nameof(InProcessDiagnoserRouter.runMode)}} = {{SourceCodeHelper.ToSourceCode(diagnoser.GetRunMode(benchmarkCase))}}
                 }
