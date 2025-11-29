@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 host.WriteLine();
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
-                    [..parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
+                    parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
                         .Select((d, i) => new Diagnosers.InProcessDiagnoserRouter()
                         {
                             index = i,
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                             handler = Diagnosers.InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
                         })
                         .Where(r => r.handler != null)
-                        .ToArray()],
+                        .ToArray(),
                     host,
                     parameters.DiagnoserRunMode,
                     new Diagnosers.InProcessDiagnoserActionArgs(instance)

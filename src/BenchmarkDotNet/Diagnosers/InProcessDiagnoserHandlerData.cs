@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace BenchmarkDotNet.Diagnosers;
 
 /// <summary>
-/// The data used to construct the <see cref="IInProcessDiagnoserHandler"/> in the separate process.
+/// The data used to construct the <see cref="IInProcessDiagnoserHandler"/> in the benchmark process.
 /// </summary>
 /// <param name="handlerType">The type of the <see cref="IInProcessDiagnoserHandler"/>.</param>
 /// <param name="serializedConfig">The serialized config that will be passed to <see cref="IInProcessDiagnoserHandler.Initialize(string?)"/>.</param>

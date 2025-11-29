@@ -29,19 +29,19 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 return default;
 
             var compositeInProcessDiagnoserHandler = new CompositeInProcessDiagnoserHandler(
-                    parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
-                        .Select((d, i) => new InProcessDiagnoserRouter()
-                        {
-                            index = i,
-                            runMode = d.GetRunMode(benchmarkCase),
-                            handler = InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
-                        })
-                        .Where(r => r.handler != null)
-                        .ToArray(),
-                    host,
-                    parameters.DiagnoserRunMode,
-                    new InProcessDiagnoserActionArgs(instance)
-                );
+                parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
+                    .Select((d, i) => new InProcessDiagnoserRouter()
+                    {
+                        index = i,
+                        runMode = d.GetRunMode(benchmarkCase),
+                        handler = InProcessDiagnoserRouter.CreateOrNull(d.GetHandlerData(benchmarkCase))
+                    })
+                    .Where(r => r.handler != null)
+                    .ToArray(),
+                host,
+                parameters.DiagnoserRunMode,
+                new InProcessDiagnoserActionArgs(instance)
+            );
             if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
             {
                 compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
