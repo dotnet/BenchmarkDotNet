@@ -90,7 +90,8 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             return filePath;
         }
 
-        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
+        private static string GetImportantInfo(BenchmarkReport benchmarkReport) =>
+            $"{benchmarkReport.GetRuntimeInfo()} (Job: {benchmarkReport.BenchmarkCase.Job.DisplayInfo})";
 
         private static void RunGitDiff(string firstFile, string secondFile, StringBuilder result)
         {
