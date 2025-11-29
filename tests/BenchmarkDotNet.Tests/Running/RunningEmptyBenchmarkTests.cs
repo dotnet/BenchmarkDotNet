@@ -313,11 +313,6 @@ namespace BenchmarkDotNet.Tests.Running
         [Fact]
         public void AssemblyWithBenchmarks_RunsNothing_WhenAllBenchmarksFilteredOutFromOneTypeWithBenchmarkAttributePresent()
         {
-
-            // Skip test on .NET Framework 4.6.2
-            if (RuntimeInformation.FrameworkDescription.Contains(".NET Framework 4"))
-                return;
-
             // Create a mock assembly with benchmark types
             var assemblyName = new AssemblyName("MockAssemblyWithBenchmarks");
             var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
