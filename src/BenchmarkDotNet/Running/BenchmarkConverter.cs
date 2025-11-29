@@ -59,6 +59,8 @@ namespace BenchmarkDotNet.Running
 
             var benchmarks = new List<BenchmarkCase>();
 
+            bool containsBenchmarkDeclarations = false;
+
             foreach (var target in targets)
             {
                 var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, configPerType.SummaryStyle).ToArray();
@@ -75,12 +77,14 @@ namespace BenchmarkDotNet.Running
                     from parameterInstance in parameterInstances
                     select BenchmarkCase.Create(target, job, parameterInstance, configPerMethod);
 
+                if (benchmarksForTarget.Any() && !containsBenchmarkDeclarations) containsBenchmarkDeclarations = true;
+
                 benchmarks.AddRange(GetFilteredBenchmarks(benchmarksForTarget, configPerMethod.GetFilters()));
             }
 
             var orderedBenchmarks = configPerType.Orderer.GetExecutionOrder(benchmarks.ToImmutableArray()).ToArray();
 
-            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType);
+            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType, containsBenchmarkDeclarations);
         }
 
         private static ImmutableConfig GetFullTypeConfig(Type type, IConfig? config)

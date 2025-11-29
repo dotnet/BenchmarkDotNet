@@ -9,6 +9,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Filters;
 
 namespace BenchmarkDotNet.Tests.Running
 {
@@ -232,8 +233,8 @@ namespace BenchmarkDotNet.Tests.Running
         #region Assembly Tests
         // In this tests there is no config and logger because the logger is initiated at CreateCompositeLogger when the BenchmarkRunInfo[] is empty
         // those cannot be inserted using config
-        [Theory]
 
+        [Theory]
         [InlineData(null)]
         [InlineData(new object[] { new string[] { " " } })]
         public void AssemblyWithoutBenchmarks_ThrowsValidationError_WhenNoBenchmarksFound(string[]? args)
@@ -308,6 +309,42 @@ namespace BenchmarkDotNet.Tests.Running
                 Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());
             }
         }
+
+        [Fact]
+        public void AssemblyWithBenchmarks_RunsNothing_WhenAllBenchmarksFilteredOutFromOneTypeWithBenchmarkAttributePresent()
+        {
+            // Create a mock assembly with benchmark types
+            var assemblyName = new AssemblyName("MockAssemblyWithBenchmarks");
+            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule("MockModule");
+
+            // Create a benchmark type
+            var benchmarkTypeBuilder = moduleBuilder.DefineType("MockBenchmark", TypeAttributes.Public);
+            var benchmarkMethod = benchmarkTypeBuilder.DefineMethod("Benchmark", MethodAttributes.Public, typeof(void), Type.EmptyTypes);
+
+            // Generate method body
+            var ilGenerator = benchmarkMethod.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ret); // Just return from the method
+
+            var benchmarkAttributeCtor = typeof(BenchmarkAttribute).GetConstructor(new[] { typeof(int), typeof(string) });
+            if (benchmarkAttributeCtor == null)
+                throw new InvalidOperationException("Could not find BenchmarkAttribute constructor");
+            benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
+                benchmarkAttributeCtor,
+                new object[] { 0, "" }));
+            benchmarkTypeBuilder.CreateType();
+
+            Summary[] summaries = null;
+
+            GetConfigWithLogger(out var logger, out var config);
+
+            config.AddFilter(new NameFilter(name => name != "Benchmark")); // Filter out only benchmark method on MockBenchmark
+
+            summaries = BenchmarkRunner.Run(assemblyBuilder, config);
+            Assert.DoesNotContain(GetValidationErrorForType(benchmarkTypeBuilder), logger.GetLog());
+            Assert.Contains(GetExporterNoBenchmarksError(), logger.GetLog());
+        }
+
         #endregion
         #region Helper Methods
         private string GetValidationErrorForType(Type type)
@@ -328,6 +365,11 @@ namespace BenchmarkDotNet.Tests.Running
         private string GetGeneralValidationError()
         {
             return $"No benchmarks were found.";
+        }
+
+        private string GetExporterNoBenchmarksError()
+        {
+            return "There are no benchmarks found";
         }
 
         private void GetConfigWithLogger(out AccumulationLogger logger, out ManualConfig manualConfig)
