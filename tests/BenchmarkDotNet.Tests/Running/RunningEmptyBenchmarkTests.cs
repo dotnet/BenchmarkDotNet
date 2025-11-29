@@ -58,8 +58,9 @@ namespace BenchmarkDotNet.Tests.Running
             else
             {
                 // When args is provided and type is invalid, we get a ValidationFailed summary
-                // instead of an unhandled exception
+                // instead of an unhandled exception (fix for issue #2724)
                 Assert.NotNull(summary);
+                Assert.Contains("No benchmarks found", summary.Title);
             }
         }
 #pragma warning restore BDN1000
@@ -101,8 +102,9 @@ namespace BenchmarkDotNet.Tests.Running
             else
             {
                 // When args is provided and type is invalid, we get a ValidationFailed summary
-                // instead of an unhandled exception
+                // instead of an unhandled exception (fix for issue #2724)
                 Assert.NotNull(summary);
+                Assert.Contains("No benchmarks found", summary.Title);
             }
         }
 #pragma warning restore BDN1000
