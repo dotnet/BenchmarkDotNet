@@ -3469,6 +3469,30 @@ references:
   fullName.vb: BenchmarkDotNet.Attributes.NamespaceColumnAttribute.New
   nameWithType: NamespaceColumnAttribute.NamespaceColumnAttribute
   nameWithType.vb: NamespaceColumnAttribute.New
+- uid: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute
+  name: OpenMetricsExporterAttribute
+  href: api/BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.html
+  commentId: T:BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute
+  fullName: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute
+  nameWithType: OpenMetricsExporterAttribute
+- uid: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.#ctor
+  name: OpenMetricsExporterAttribute()
+  href: api/BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.html#BenchmarkDotNet_Attributes_OpenMetricsExporterAttribute__ctor
+  commentId: M:BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.OpenMetricsExporterAttribute()
+  fullName.vb: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.New()
+  nameWithType: OpenMetricsExporterAttribute.OpenMetricsExporterAttribute()
+  nameWithType.vb: OpenMetricsExporterAttribute.New()
+- uid: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.#ctor*
+  name: OpenMetricsExporterAttribute
+  href: api/BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.html#BenchmarkDotNet_Attributes_OpenMetricsExporterAttribute__ctor_
+  commentId: Overload:BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.OpenMetricsExporterAttribute
+  fullName.vb: BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.New
+  nameWithType: OpenMetricsExporterAttribute.OpenMetricsExporterAttribute
+  nameWithType.vb: OpenMetricsExporterAttribute.New
 - uid: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute
   name: OperatingSystemsArchitectureFilterAttribute
   href: api/BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html
@@ -20918,6 +20942,12 @@ references:
   commentId: F:BenchmarkDotNet.Exporters.DefaultExporters.Markdown
   fullName: BenchmarkDotNet.Exporters.DefaultExporters.Markdown
   nameWithType: DefaultExporters.Markdown
+- uid: BenchmarkDotNet.Exporters.DefaultExporters.OpenMetrics
+  name: OpenMetrics
+  href: api/BenchmarkDotNet.Exporters.DefaultExporters.html#BenchmarkDotNet_Exporters_DefaultExporters_OpenMetrics
+  commentId: F:BenchmarkDotNet.Exporters.DefaultExporters.OpenMetrics
+  fullName: BenchmarkDotNet.Exporters.DefaultExporters.OpenMetrics
+  nameWithType: DefaultExporters.OpenMetrics
 - uid: BenchmarkDotNet.Exporters.DefaultExporters.Plain
   name: Plain
   href: api/BenchmarkDotNet.Exporters.DefaultExporters.html#BenchmarkDotNet_Exporters_DefaultExporters_Plain
@@ -21533,6 +21563,78 @@ references:
   commentId: F:BenchmarkDotNet.Exporters.MarkdownExporter.UseHeaderSeparatingRow
   fullName: BenchmarkDotNet.Exporters.MarkdownExporter.UseHeaderSeparatingRow
   nameWithType: MarkdownExporter.UseHeaderSeparatingRow
+- uid: BenchmarkDotNet.Exporters.OpenMetrics
+  name: BenchmarkDotNet.Exporters.OpenMetrics
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.html
+  commentId: N:BenchmarkDotNet.Exporters.OpenMetrics
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics
+  nameWithType: BenchmarkDotNet.Exporters.OpenMetrics
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter
+  name: OpenMetricsExporter
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html
+  commentId: T:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter
+  nameWithType: OpenMetricsExporter
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.#ctor
+  name: OpenMetricsExporter()
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter__ctor
+  commentId: M:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.OpenMetricsExporter()
+  fullName.vb: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.New()
+  nameWithType: OpenMetricsExporter.OpenMetricsExporter()
+  nameWithType.vb: OpenMetricsExporter.New()
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.#ctor*
+  name: OpenMetricsExporter
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter__ctor_
+  commentId: Overload:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.OpenMetricsExporter
+  fullName.vb: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.New
+  nameWithType: OpenMetricsExporter.OpenMetricsExporter
+  nameWithType.vb: OpenMetricsExporter.New
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.Default
+  name: Default
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_Default
+  commentId: F:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.Default
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.Default
+  nameWithType: OpenMetricsExporter.Default
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.ExportToLog(BenchmarkDotNet.Reports.Summary,BenchmarkDotNet.Loggers.ILogger)
+  name: ExportToLog(Summary, ILogger)
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_ExportToLog_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Loggers_ILogger_
+  commentId: M:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.ExportToLog(BenchmarkDotNet.Reports.Summary,BenchmarkDotNet.Loggers.ILogger)
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.ExportToLog(BenchmarkDotNet.Reports.Summary, BenchmarkDotNet.Loggers.ILogger)
+  nameWithType: OpenMetricsExporter.ExportToLog(Summary, ILogger)
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.ExportToLog*
+  name: ExportToLog
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_ExportToLog_
+  commentId: Overload:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.ExportToLog
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.ExportToLog
+  nameWithType: OpenMetricsExporter.ExportToLog
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileCaption
+  name: FileCaption
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_FileCaption
+  commentId: P:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileCaption
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileCaption
+  nameWithType: OpenMetricsExporter.FileCaption
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileCaption*
+  name: FileCaption
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_FileCaption_
+  commentId: Overload:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileCaption
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileCaption
+  nameWithType: OpenMetricsExporter.FileCaption
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileExtension
+  name: FileExtension
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_FileExtension
+  commentId: P:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileExtension
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileExtension
+  nameWithType: OpenMetricsExporter.FileExtension
+- uid: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileExtension*
+  name: FileExtension
+  href: api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html#BenchmarkDotNet_Exporters_OpenMetrics_OpenMetricsExporter_FileExtension_
+  commentId: Overload:BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileExtension
+  fullName: BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.FileExtension
+  nameWithType: OpenMetricsExporter.FileExtension
 - uid: BenchmarkDotNet.Exporters.PlainExporter
   name: PlainExporter
   href: api/BenchmarkDotNet.Exporters.PlainExporter.html
@@ -30668,6 +30770,15 @@ references:
   commentId: T:BenchmarkDotNet.Running.BenchmarkRunInfo
   fullName: BenchmarkDotNet.Running.BenchmarkRunInfo
   nameWithType: BenchmarkRunInfo
+- uid: BenchmarkDotNet.Running.BenchmarkRunInfo.#ctor(BenchmarkDotNet.Running.BenchmarkCase[],System.Type,BenchmarkDotNet.Configs.ImmutableConfig,System.Boolean)
+  name: BenchmarkRunInfo(BenchmarkCase[], Type, ImmutableConfig, bool)
+  href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo__ctor_BenchmarkDotNet_Running_BenchmarkCase___System_Type_BenchmarkDotNet_Configs_ImmutableConfig_System_Boolean_
+  commentId: M:BenchmarkDotNet.Running.BenchmarkRunInfo.#ctor(BenchmarkDotNet.Running.BenchmarkCase[],System.Type,BenchmarkDotNet.Configs.ImmutableConfig,System.Boolean)
+  name.vb: New(BenchmarkCase(), Type, ImmutableConfig, Boolean)
+  fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.BenchmarkRunInfo(BenchmarkDotNet.Running.BenchmarkCase[], System.Type, BenchmarkDotNet.Configs.ImmutableConfig, bool)
+  fullName.vb: BenchmarkDotNet.Running.BenchmarkRunInfo.New(BenchmarkDotNet.Running.BenchmarkCase(), System.Type, BenchmarkDotNet.Configs.ImmutableConfig, Boolean)
+  nameWithType: BenchmarkRunInfo.BenchmarkRunInfo(BenchmarkCase[], Type, ImmutableConfig, bool)
+  nameWithType.vb: BenchmarkRunInfo.New(BenchmarkCase(), Type, ImmutableConfig, Boolean)
 - uid: BenchmarkDotNet.Running.BenchmarkRunInfo.#ctor(BenchmarkDotNet.Running.BenchmarkCase[],System.Type,BenchmarkDotNet.Configs.ImmutableConfig)
   name: BenchmarkRunInfo(BenchmarkCase[], Type, ImmutableConfig)
   href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo__ctor_BenchmarkDotNet_Running_BenchmarkCase___System_Type_BenchmarkDotNet_Configs_ImmutableConfig_
@@ -30710,6 +30821,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Running.BenchmarkRunInfo.Config
   fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.Config
   nameWithType: BenchmarkRunInfo.Config
+- uid: BenchmarkDotNet.Running.BenchmarkRunInfo.ContainsBenchmarkDeclarations
+  name: ContainsBenchmarkDeclarations
+  href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo_ContainsBenchmarkDeclarations
+  commentId: P:BenchmarkDotNet.Running.BenchmarkRunInfo.ContainsBenchmarkDeclarations
+  fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.ContainsBenchmarkDeclarations
+  nameWithType: BenchmarkRunInfo.ContainsBenchmarkDeclarations
+- uid: BenchmarkDotNet.Running.BenchmarkRunInfo.ContainsBenchmarkDeclarations*
+  name: ContainsBenchmarkDeclarations
+  href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo_ContainsBenchmarkDeclarations_
+  commentId: Overload:BenchmarkDotNet.Running.BenchmarkRunInfo.ContainsBenchmarkDeclarations
+  fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.ContainsBenchmarkDeclarations
+  nameWithType: BenchmarkRunInfo.ContainsBenchmarkDeclarations
 - uid: BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose
   name: Dispose()
   href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo_Dispose
@@ -35924,6 +36047,18 @@ references:
   fullName.vb: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.New
   nameWithType: WasmGenerator.WasmGenerator
   nameWithType.vb: WasmGenerator.New
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateLinkerDescriptionFile(BenchmarkDotNet.Toolchains.ArtifactsPaths)
+  name: GenerateLinkerDescriptionFile(ArtifactsPaths)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateLinkerDescriptionFile_BenchmarkDotNet_Toolchains_ArtifactsPaths_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateLinkerDescriptionFile(BenchmarkDotNet.Toolchains.ArtifactsPaths)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateLinkerDescriptionFile(BenchmarkDotNet.Toolchains.ArtifactsPaths)
+  nameWithType: WasmGenerator.GenerateLinkerDescriptionFile(ArtifactsPaths)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateLinkerDescriptionFile*
+  name: GenerateLinkerDescriptionFile
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateLinkerDescriptionFile_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateLinkerDescriptionFile
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateLinkerDescriptionFile
+  nameWithType: WasmGenerator.GenerateLinkerDescriptionFile
 - uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,BenchmarkDotNet.Loggers.ILogger)
   name: GenerateProject(BuildPartition, ArtifactsPaths, ILogger)
   href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_BenchmarkDotNet_Loggers_ILogger_
@@ -38184,6 +38319,12 @@ references:
 - uid: changelog.v0.15.7
   name: BenchmarkDotNet v0.15.7
   href: changelog/v0.15.7.html
+- uid: changelog.v0.15.8
+  name: BenchmarkDotNet v0.15.8
+  href: changelog/v0.15.8.html
+- uid: changelog.v0.15.9
+  name: BenchmarkDotNet v0.15.9
+  href: changelog/v0.15.9.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html

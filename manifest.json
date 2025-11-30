@@ -21,7 +21,7 @@
     "changefreq": "monthly",
     "priority": 0.8
   },
-  "source_base_path": "D:/a/BenchmarkDotNet/BenchmarkDotNet/docs",
+  "source_base_path": "/home/runner/work/BenchmarkDotNet/BenchmarkDotNet/docs",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -1501,6 +1501,20 @@
       "IsMRef": true,
       "Title": "BenchmarkDotNet.Attributes.NamespaceColumnAttribute",
       "Summary": "<p sourcefile=\"api/BenchmarkDotNet.Attributes.NamespaceColumnAttribute.yml\" sourcestartlinenumber=\"1\">Add a column with the target method namespace.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BenchmarkDotNet.Attributes.OpenMetricsExporterAttribute",
+      "Summary": null
     },
     {
       "type": "ManagedReference",
@@ -4580,6 +4594,34 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "BenchmarkDotNet.Exporters.MarkdownExporter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BenchmarkDotNet.Exporters.OpenMetrics.OpenMetricsExporter",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Exporters.OpenMetrics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Exporters.OpenMetrics.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "BenchmarkDotNet.Exporters.OpenMetrics",
       "Summary": null
     },
     {
@@ -9336,6 +9378,26 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.15.7.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.15.8.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.15.8.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.15.9.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.15.9.html"
         }
       },
       "version": ""

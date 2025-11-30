@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>BenchmarkDotNet v0.15.8 | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="BenchmarkDotNet v0.15.8 | BenchmarkDotNet ">
+      
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/master/docs/changelog/v0.15.8.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="changelog.v0.15.8">
+<h1 id="benchmarkdotnet-v0158">BenchmarkDotNet v0.15.8</h1>
+
+<h2 id="highlights">Highlights</h2>
+<ul>
+<li>Added OpenMetrics exporter (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2801">#2801</a>)</li>
+<li>Added NO_COLOR env var support (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2870">#2870</a>)</li>
+<li>Various fixes.</li>
+</ul>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.15.8">v0.15.8</a> scope,
+8 issues were resolved and 0 pull requests were merged.
+This release includes 22 commits by 9 contributors.</p>
+<h2 id="resolved-issues-8">Resolved issues (8)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2573">#2573</a> DisassemblyDiagnoser + multiple --corerun (assignee: <a href="https://github.com/Shrinidhi203">@Shrinidhi203</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2724">#2724</a> Unhandled Exception Thrown When Running an invalid Type-Based Benchmark with Arguments (assignee: <a href="https://github.com/Shrinidhi203">@Shrinidhi203</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2800">#2800</a> Feature Request: Add OpenMetrics Exporter for GitLab CI Metrics Integration</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2860">#2860</a> BenchmarkRunner cannot Run(Assembly) if the filter eliminates all benchmark cases in any type</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2863">#2863</a> Upgrading from 0.15.6 to 0.15.7 causes compiler mismatch issues (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2864">#2864</a> 0.15.7 throws ArgumentException analyzing code causing build to fail with AD0001 error (assignee: <a href="https://github.com/silkfire">@silkfire</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2868">#2868</a> Analyzer rules documentation (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2873">#2873</a> Running benchmarks hangs at &quot;// Validating benchmarks:&quot; when you have many, many SDKs installed (assignee: <a href="https://github.com/filzrev">@filzrev</a>)</li>
+</ul>
+<h2 id="merged-pull-requests-0">Merged pull requests (0)</h2>
+<h2 id="commits-22">Commits (22)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/329f5fcea27c43df4d65118270bf6d6156c569a5">329f5f</a> Set next BenchmarkDotNet version: 0.15.7 (by <a href="https://github.com/actions-user">@actions-user</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fdebe7c33256cbcc3b3aacdb1e1560a09b6c713d">fdebe7</a> [build] Improve docs building (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fcb6d3f0fdec985d7de0faa9cd4dfad9311edb10">fcb6d3</a> Fix for issue #2864 (#2865) (by <a href="https://github.com/silkfire">@silkfire</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b1ebcb8c0deb8a2433da8fea8f6cb81000fc1d70">b1ebcb</a> Multi target analyzers (#2866) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a296be40c6649d29830deeef72698fc122669046">a296be</a> Update analyzer releases (#2867) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2d917beb9b420441a6246951016178bd0944e554">2d917b</a> Fix typo (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d2be797a77daf561630f24b235008533edb13253">d2be79</a> chore: add NO_COLOR environment variable support (#2870) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/53a8f77f363a4d927be72cf8858f1d9f1a79bdd9">53a8f7</a> fix: process deadlock issue (#2877) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b305d92a1d0e8c9c45a630ef6358e05d82b19f1d">b305d9</a> fix(wasm): prevent generated project from being trimmed out (#2872) (by <a href="https://github.com/FreyLuis">@FreyLuis</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c89b4cc8f58eeaf1e45560cd9e512206d20976cf">c89b4c</a> chore: refactor to use AsyncProcessOutputReader (#2878) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/9c1aa83fab7ad4097439fbd54a052d101a83a5ea">9c1aa8</a> chore: Add PolySharp dev dependency and cleanup #if-#endif preprocessor (#2881) (by <a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4f4bef707cf8b9a87dffa28bb7d638be78e0b895">4f4bef</a> Allow filters to filter out every benchmark from a type (Fixes #2860) (#2879) (by <a href="https://github.com/User0332">@User0332</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/33de9734ba5b8dc6729792be48a1269c00318066">33de97</a> Fix markdown parsing. (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dde78c51b05801d403fd8f6872b5674b6f8a9c86">dde78c</a> Fix unhandled exception when running invalid type-based benchmark with argume... (by <a href="https://github.com/Shrinidhi203">@Shrinidhi203</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/be0ea1e033781242f6d8ca3b4384ef88e449b9c7">be0ea1</a> Add Job info to DisassemblyDiagnoser report headers (#2884) (by <a href="https://github.com/Shrinidhi203">@Shrinidhi203</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d9e863af26eea182e4d14f6959ba3f4673117fee">d9e863</a> Use PolySharp for <code>[DynamicallyAccessedMembers]</code> (#2883) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8291376a4d550a52b0b287699d5429cef4adacbd">829137</a> feat: add OpenMetrics exporter support and update related tests (#2801) (by <a href="https://github.com/DefinitelyADev">@DefinitelyADev</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/40a8cfdc305e7b313454e39a8c94ac0b92f88271">40a8cf</a> Update release workflow for analyzers. (#2882) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/63c826cd97456cbba820184d1b689eecf45210d5">63c826</a> Fix release workflow. (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ceaa3190315b589c69f92fb89d6d371ea2e572f2">ceaa31</a> Fix argument (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b6594080c8e19dcd2ef13481640b5ea92c6fa29f">b65940</a> GenerateAnalyzersPage first. (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1e8238ef6c08e18821edae83ac8d6b0a2bb1bb98">1e8238</a> Simplify and fix move-analyzer-rules. (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<h2 id="contributors-9">Contributors (9)</h2>
+<ul>
+<li>actions-user (<a href="https://github.com/actions-user">@actions-user</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Carl Furtado (<a href="https://github.com/User0332">@User0332</a>)</li>
+<li>filzrev (<a href="https://github.com/filzrev">@filzrev</a>)</li>
+<li>Gabriel Bider (<a href="https://github.com/silkfire">@silkfire</a>)</li>
+<li>Luis Frey (<a href="https://github.com/FreyLuis">@FreyLuis</a>)</li>
+<li>Shrinidhi203 (<a href="https://github.com/Shrinidhi203">@Shrinidhi203</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li>Tsakiridis Ilias (<a href="https://github.com/DefinitelyADev">@DefinitelyADev</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: November 30, 2025</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.15.8">v0.15.8</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.15.7...v0.15.8">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Analyzers/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Analyzers/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotMemory/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Exporters.Plotting/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.15.8</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.8">https://www.nuget.org/packages/BenchmarkDotNet.TestAdapter/0.15.8</a></li>
+</ul>
+
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2024 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
