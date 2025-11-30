@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Code
 
         public string DisplayText => $"{Enum.ToObject(type, Value)}";
 
+        public string ValueText => DisplayText;
+
         public string ToSourceCode() =>
             $"({type.GetCorrectCSharpTypeName()})({ToInvariantCultureString()})";
 

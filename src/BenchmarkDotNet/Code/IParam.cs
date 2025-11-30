@@ -14,6 +14,11 @@
         string DisplayText { get; }
 
         /// <summary>
+        /// used to group the value
+        /// </summary>
+        string ValueText { get; }
+
+        /// <summary>
         /// this source code is used to create parameter for benchmark
         /// in C# source code file
         /// example: $"new Point2D({Value.X}, {Value.Y})"

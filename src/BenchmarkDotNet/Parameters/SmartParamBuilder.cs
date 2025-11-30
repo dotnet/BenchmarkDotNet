@@ -91,6 +91,8 @@ namespace BenchmarkDotNet.Parameters
 
         public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
 
+        public string ValueText => Value is Array array ? ArrayParam.GetValueString(array) : DisplayText;
+
         public string ToSourceCode()
         {
             Type paramType = parameterDefinitions[argumentIndex].ParameterType;
@@ -152,6 +154,8 @@ namespace BenchmarkDotNet.Parameters
         public object Value { get; }
 
         public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
+
+        public string ValueText => Value is Array array ? ArrayParam.GetValueString(array) : DisplayText;
 
         public string ToSourceCode()
         {

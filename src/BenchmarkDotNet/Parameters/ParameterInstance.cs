@@ -62,6 +62,31 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture, maxParameterColumnWidthFromConfig);
 
+        private string ToValueText(CultureInfo cultureInfo, int maxParameterColumnWidth)
+        {
+            switch (value)
+            {
+                case null:
+                    return NullParameterTextRepresentation;
+                case IParam parameter:
+                    return Trim(parameter.ValueText, maxParameterColumnWidth).EscapeSpecialCharacters(false);
+                case IFormattable formattable:
+                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth).EscapeSpecialCharacters(false);
+                // no trimming for types!
+                case Type type:
+                    return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+                default:
+                    return Trim(value.ToString(), maxParameterColumnWidth).EscapeSpecialCharacters(false);
+            }
+        }
+
+        public string ToValueText(SummaryStyle summary)
+        {
+            return summary != null ? ToValueText(summary.CultureInfo, summary.MaxParameterColumnWidth) : ToValueText();
+        }
+
+        public string ToValueText() => ToValueText(CultureInfo.CurrentCulture, maxParameterColumnWidthFromConfig);
+
         public override string ToString() => ToDisplayText();
 
         private static string Trim(string value, int maxDisplayTextInnerLength)
