@@ -54,7 +54,10 @@ jobs:
         name: nupkgs
         path: artifacts/*.nupkg
 
-    # --- Next Version ---
+    # --- Analyzer Rules and Next Version ---
+
+    - name: Move analyzer rules
+      run: ./build.cmd move-analyzer-rules --version v${{ steps.version.outputs.VERSION }}
 
     - name: Generate changelog
       run: ./build.cmd docs-generate --stable
@@ -67,7 +70,7 @@ jobs:
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
       with:
-        message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }}"
+        message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }} and update released analyzer rules"
         author_name: GitHub Actions
         author_email: actions@github.com
         committer_name: GitHub Actions
@@ -111,27 +114,6 @@ jobs:
 
     - name: Publish to NuGet
       run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
-    # --- Analyzer Rules ---
-
-    - name: Move analyzer rules
-      run: ./build.cmd move-analyzer-rules --version v${{ steps.version.outputs.VERSION }}
-
-    - name: Commit analyzer rules changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        message: "Update released analyzer rules"
-        author_name: GitHub Actions
-        author_email: actions@github.com
-        committer_name: GitHub Actions
-        committer_email: actions@github.com
-
-    - name: Push git changes
-      uses: ad-m/github-push-action@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: master
-        tags: false
 
     # --- Documentation ---
 
