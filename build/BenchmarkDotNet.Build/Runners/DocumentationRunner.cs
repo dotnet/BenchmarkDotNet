@@ -76,11 +76,12 @@ public class DocumentationRunner
 
     public void Generate()
     {
+        GenerateAnalyzersPage();
+
         changelogBuilder.Generate();
 
         UpdateReadme();
         GenerateIndexMd();
-        GenerateAnalyzersPage();
     }
 
     public void Build()
