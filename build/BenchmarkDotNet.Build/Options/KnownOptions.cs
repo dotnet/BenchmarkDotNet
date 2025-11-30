@@ -47,11 +47,6 @@ public static class KnownOptions
         Aliases = new[] { "-s" }
     };
 
-    public static readonly StringOption CurrentVersion = new("--current-version")
-    {
-        Description = "Specifies current version number"
-    };
-
     public static readonly StringOption NextVersion = new("--next-version")
     {
         Description = "Specifies next version number",

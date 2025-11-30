@@ -56,7 +56,7 @@ public class DocumentationRunner
         string tempFile = System.IO.Path.GetTempFileName();
         using (var writer = new StreamWriter(tempFile))
         {
-            writer.WriteLine($"## {KnownOptions.CurrentVersion.Resolve(context)}");
+            writer.WriteLine($"## v{context.VersionHistory.CurrentVersion}");
             CopyLines(writer, analyzersUnshippedFile);
             writer.WriteLine();
             writer.WriteLine();
@@ -126,6 +126,7 @@ public class DocumentationRunner
 
     private void GenerateAnalyzersPage()
     {
+        context.EnsureDirectoryExists(analyzersPageFile.GetDirectory());
         using var writer = new StreamWriter(analyzersPageFile.FullPath);
         writer.WriteLine($"# Roslyn Analyzers for C#");
         writer.WriteLine();

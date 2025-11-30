@@ -186,11 +186,9 @@ public class MoveAnalyzerRulesTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Options = [KnownOptions.CurrentVersion],
             Examples =
             [
                 new Example(Name)
-                    .WithArgument(KnownOptions.CurrentVersion, "v0.15.8")
             ]
         };
     }
