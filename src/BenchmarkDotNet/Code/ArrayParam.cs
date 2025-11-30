@@ -11,6 +11,23 @@ namespace BenchmarkDotNet.Code
     {
         public static string GetDisplayString(Array array)
             => $"{array.GetType().GetElementType()?.GetDisplayName()}[{array.Length}]";
+
+        public static string GetValueString(Array array)
+            => $"{GetDisplayString(array)} (rank {array.Rank}, hash {GetArrayValueHash(array)})";
+
+        private static int GetArrayValueHash(Array array)
+        {
+            var arrFlat = array.Cast<object>();
+
+            int hash = 0;
+
+            foreach (var elem in arrFlat)
+            {
+                hash = HashCode.Combine(hash, elem);
+            }
+
+            return hash;
+        }
     }
 
     public class ArrayParam<T> : IParam
@@ -27,6 +44,8 @@ namespace BenchmarkDotNet.Code
         public object Value => array;
 
         public string DisplayText => ArrayParam.GetDisplayString(array);
+
+        public string ValueText => ArrayParam.GetValueString(array);
 
         public string ToSourceCode()
             => $"new {typeof(T).GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", array.Select(item => toSourceCode?.Invoke(item) ?? SourceCodeHelper.ToSourceCode(item)))} }}";
