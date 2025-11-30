@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.OpenMetrics;
 using BenchmarkDotNet.Exporters.Xml;
 using JetBrains.Annotations;
 
@@ -12,6 +13,7 @@ namespace BenchmarkDotNet.Exporters
         [PublicAPI] public static readonly IExporter CsvMeasurements = CsvMeasurementsExporter.Default;
         [PublicAPI] public static readonly IExporter Html = HtmlExporter.Default;
         [PublicAPI] public static readonly IExporter Markdown = MarkdownExporter.Default;
+        [PublicAPI] public static readonly IExporter OpenMetrics = OpenMetricsExporter.Default;
         [PublicAPI] public static readonly IExporter Plain = PlainExporter.Default;
         [PublicAPI] public static readonly IExporter RPlot = RPlotExporter.Default;
 
