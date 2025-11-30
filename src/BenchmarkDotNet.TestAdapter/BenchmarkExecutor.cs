@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.TestAdapter
 
                 if (filteredCases.Count > 0)
                 {
-                    filteredBenchmarks.Add(new BenchmarkRunInfo(filteredCases.ToArray(), benchmark.Type, benchmark.Config));
+                    filteredBenchmarks.Add(new BenchmarkRunInfo(filteredCases.ToArray(), benchmark.Type, benchmark.Config, benchmark.CompositeInProcessDiagnoser));
                 }
             }
 
@@ -71,7 +71,8 @@ namespace BenchmarkDotNet.TestAdapter
                     b.Config.AddEventProcessor(eventProcessor)
                             .AddLogger(logger)
                             .RemoveLoggersOfType<ConsoleLogger>() // Console logs are also outputted by VSTestLogger.
-                            .CreateImmutableConfig()))
+                            .CreateImmutableConfig(),
+                    b.CompositeInProcessDiagnoser))
                 .ToArray();
 
             // Run all the benchmarks, and ensure that any tests that don't have a result yet are sent.

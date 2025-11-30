@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
@@ -33,6 +34,16 @@ namespace BenchmarkDotNet.Helpers
                     return $"System.DateTime.Parse(\"{dateTime.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
                 case Guid guid:
                     return $"System.Guid.Parse(\"{guid.ToString()}\")";
+                // Multi-dimensional arrays are more complex, we only need single-dimension support for now.
+                case Array { Rank: 1 } array:
+                {
+                    var elementsSourceCode = new string[array.Length];
+                    for (int i = 0; i < array.Length; ++i)
+                    {
+                        elementsSourceCode[i] = ToSourceCode(array.GetValue(i));
+                    }
+                    return $"new {array.GetType().GetElementType().GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", elementsSourceCode)} }}";
+                }
             }
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return $"({value.GetType().GetCorrectCSharpTypeName()})({ToInvariantCultureString(value)})";

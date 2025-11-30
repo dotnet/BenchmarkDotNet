@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
         {
             var sourceLocation = GetSourceLocation(method, map.ILOffset);
-            if (sourceLocation == null)
+            if (sourceLocation is not { LineNumber: > 0 })
                 yield break;
 
             for (int line = sourceLocation.LineNumber; line <= sourceLocation.LineNumberEnd; ++line)

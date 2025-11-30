@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Filters;
 using Microsoft.Diagnostics.Runtime;
-using Microsoft.Diagnostics.Runtime.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,11 +8,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
+using Microsoft.Diagnostics.NETCore.Client;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    // This Disassembler uses ClrMd v3x. Please keep it in sync with ClrMdV1Disassembler (if possible).
-    internal abstract class ClrMdV3Disassembler
+    internal abstract class ClrMdDisassembler
 
     {
         private static readonly ulong MinValidAddress = GetMinValidAddress();
@@ -30,7 +29,7 @@ namespace BenchmarkDotNet.Disassemblers
                 {
                     Environments.Platform.X86 or Environments.Platform.X64 => 4096,
                     Environments.Platform.Arm64 => 0x100000000,
-                    _ => throw new NotSupportedException($"{RuntimeInformation.GetCurrentPlatform()} is not supported")
+                    var platform => throw new NotSupportedException($"{platform} is not supported")
                 };
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
@@ -43,47 +42,85 @@ namespace BenchmarkDotNet.Disassemblers
                 && address != 0
                 && address >= MinValidAddress;
 
-        internal DisassemblyResult AttachAndDisassemble(Settings settings)
+        private DataTarget Attach(int processId)
         {
-            using (var dataTarget = DataTarget.AttachToProcess(
-                settings.ProcessId,
-                suspend: false))
+            bool isSelf = processId == System.Diagnostics.Process.GetCurrentProcess().Id;
+            if (OsDetector.IsWindows())
             {
-                var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
-
-                ConfigureSymbols(dataTarget);
-
-                var state = new State(runtime, settings.TargetFrameworkMoniker);
-
-                if (settings.Filters.Length > 0)
-                {
-                    FilterAndEnqueue(state, settings);
-                }
-                else
-                {
-                    ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(settings.TypeName)).First(type => type != null);
-
-                    state.Todo.Enqueue(
-                        new MethodInfo(
-                            // the Disassembler Entry Method is always parameterless, so check by name is enough
-                            typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == settings.MethodName),
-                            0));
-                }
-
-                var disassembledMethods = Disassemble(settings, state);
-
-                // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
-                var filteredMethods = disassembledMethods.Length == 1
-                    ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
-                    : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
-
-                return new DisassemblyResult
-                {
-                    Methods = filteredMethods,
-                    SerializedAddressToNameMapping = state.AddressToNameMapping.Select(x => new DisassemblyResult.MutablePair { Key = x.Key, Value = x.Value }).ToArray(),
-                    PointerSize = (uint)IntPtr.Size
-                };
+                // Windows CoreCLR fails to disassemble generic types when using CreateSnapshotAndAttach, and succeeds with AttachToProcess. https://github.com/microsoft/clrmd/issues/1334
+                return isSelf && !RuntimeInformation.IsNetCore
+                    ? DataTarget.CreateSnapshotAndAttach(processId)
+                    : DataTarget.AttachToProcess(processId, suspend: false);
             }
+            if (OsDetector.IsLinux())
+            {
+                // Linux crashes when using AttachToProcess in the same process.
+                return isSelf
+                    ? DataTarget.CreateSnapshotAndAttach(processId)
+                    : DataTarget.AttachToProcess(processId, suspend: false);
+            }
+            if (OsDetector.IsMacOS())
+            {
+                // ClrMD does not support CreateSnapshotAndAttach on MacOS, and AttachToProcess is unreliable, so we have to create a dump file and load it.
+                string dumpPath = Path.GetTempFileName();
+                try
+                {
+                    try
+                    {
+                        new DiagnosticsClient(processId).WriteDump(DumpType.Full, dumpPath, logDumpGeneration: false);
+                    }
+                    catch (ServerErrorException sxe)
+                    {
+                        throw new ArgumentException($"Unable to create a snapshot of process {processId:x}.", sxe);
+                    }
+                    return DataTarget.LoadDump(dumpPath);
+                }
+                finally
+                {
+                    File.Delete(dumpPath);
+                }
+            }
+            throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
+        }
+
+        internal DisassemblyResult AttachAndDisassemble(ClrMdArgs args)
+        {
+            using var dataTarget = Attach(args.ProcessId);
+
+            var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
+
+            ConfigureSymbols(dataTarget);
+
+            var state = new State(runtime, args.TargetFrameworkMoniker);
+
+            if (args.Filters.Length > 0)
+            {
+                FilterAndEnqueue(state, args);
+            }
+            else
+            {
+                ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).First(type => type != null);
+
+                state.Todo.Enqueue(
+                    new MethodInfo(
+                        // the Disassembler Entry Method is always parameterless, so check by name is enough
+                        typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == args.MethodName),
+                        0));
+            }
+
+            var disassembledMethods = Disassemble(args, state);
+
+            // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
+            var filteredMethods = disassembledMethods.Length == 1
+                ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
+                : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+
+            return new DisassemblyResult
+            {
+                Methods = filteredMethods,
+                SerializedAddressToNameMapping = state.AddressToNameMapping.Select(x => new DisassemblyResult.MutablePair { Key = x.Key, Value = x.Value }).ToArray(),
+                PointerSize = (uint) IntPtr.Size
+            };
         }
 
         private static void ConfigureSymbols(DataTarget dataTarget)
@@ -92,9 +129,9 @@ namespace BenchmarkDotNet.Disassemblers
             dataTarget.SetSymbolPath("http://msdl.microsoft.com/download/symbols");
         }
 
-        private static void FilterAndEnqueue(State state, Settings settings)
+        private static void FilterAndEnqueue(State state, ClrMdArgs args)
         {
-            Regex[] filters = GlobFilter.ToRegex(settings.Filters);
+            Regex[] filters = GlobFilter.ToRegex(args.Filters);
 
             foreach (ClrModule module in state.Runtime.EnumerateModules())
                 foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).Where(type => type is not null))
@@ -115,7 +152,7 @@ namespace BenchmarkDotNet.Disassemblers
                                 if (filter.IsMatch(method.Signature))
                                 {
                                     state.Todo.Enqueue(new MethodInfo(method,
-                                        depth: settings.MaxDepth)); // don't allow for recursive disassembling
+                                        depth: args.MaxDepth)); // don't allow for recursive disassembling
                                     break;
                                 }
                             }
@@ -123,10 +160,10 @@ namespace BenchmarkDotNet.Disassemblers
                     }
         }
 
-        private DisassembledMethod[] Disassemble(Settings settings, State state)
+        private DisassembledMethod[] Disassemble(ClrMdArgs args, State state)
         {
             var result = new List<DisassembledMethod>();
-            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), settings.Syntax);
+            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), args.Syntax);
 
             using var sourceCodeProvider = new SourceCodeProvider();
             while (state.Todo.Count != 0)
@@ -136,8 +173,8 @@ namespace BenchmarkDotNet.Disassemblers
                 if (!state.HandledMethods.Add(methodInfo.Method)) // add it now to avoid StackOverflow for recursive methods
                     continue; // already handled
 
-                if (settings.MaxDepth >= methodInfo.Depth)
-                    result.Add(DisassembleMethod(methodInfo, state, settings, syntax, sourceCodeProvider));
+                if (args.MaxDepth >= methodInfo.Depth)
+                    result.Add(DisassembleMethod(methodInfo, state, args, syntax, sourceCodeProvider));
             }
 
             return result.ToArray();
@@ -145,7 +182,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
-        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
+        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, ClrMdArgs args, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
         {
             var method = methodInfo.Method;
 
@@ -163,7 +200,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var codes = new List<SourceCode>();
-            if (settings.PrintSource && method.ILOffsetMap.Length > 0)
+            if (args.PrintSource && method.ILOffsetMap.Length > 0)
             {
                 // we use HashSet to prevent from duplicates
                 var uniqueSourceCodeLines = new HashSet<Sharp>(new SharpComparer());
@@ -180,7 +217,7 @@ namespace BenchmarkDotNet.Disassemblers
                 codes.AddRange(Decode(map, state, methodInfo.Depth, method, syntax));
             }
 
-            Map[] maps = settings.PrintSource
+            Map[] maps = args.PrintSource
                 ? codes.GroupBy(code => code.InstructionPointer).OrderBy(group => group.Key).Select(group => new Map() { SourceCodes = group.ToArray() }).ToArray()
                 : new[] { new Map() { SourceCodes = codes.ToArray() } };
 
