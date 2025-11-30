@@ -176,6 +176,27 @@ public class BuildAnalyzersTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Move updated analyzer rules from unshipped to shipped file")]
+public class MoveAnalyzerRulesTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "move-analyzer-rules";
+    public override void Run(BuildContext context) => context.DocumentationRunner.MoveAnalyzerRules();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Options = [KnownOptions.CurrentVersion],
+            Examples =
+            [
+                new Example(Name)
+                    .WithArgument(KnownOptions.CurrentVersion, "v0.15.8")
+            ]
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Pack Nupkg packages")]
 [IsDependentOn(typeof(BuildTask))]
 [IsDependentOn(typeof(BuildAnalyzersTask))]
