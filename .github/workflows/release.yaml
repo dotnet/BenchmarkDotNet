@@ -57,7 +57,7 @@ jobs:
     # --- Analyzer Rules and Next Version ---
 
     - name: Move analyzer rules
-      run: ./build.cmd move-analyzer-rules --version v${{ steps.version.outputs.VERSION }}
+      run: ./build.cmd move-analyzer-rules --current-version v${{ steps.version.outputs.VERSION }}
 
     - name: Generate changelog
       run: ./build.cmd docs-generate --stable
