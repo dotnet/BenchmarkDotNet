@@ -30,13 +30,11 @@ namespace BenchmarkDotNet.Parameters
         {
             if (x == null && y == null) return true;
 
-            // Detect IComparable implementations.
-            // This works for all primitive types in addition to user types that implement IComparable.
             if (x != null && y != null && x.GetType() == y.GetType())
             {
-                if (x is IEnumerable xEnumerable  && y is IEnumerable yEnumerable) // collection equality support
+                if (x is IEnumerable xEnumerable && y is IEnumerable yEnumerable) // Collection equality support
                 {
-                    if (x is Array xArr && y is Array yArr) // check rank here for arrays because their values will get compared when flattened
+                    if (x is Array xArr && y is Array yArr) // Check rank here for arrays because their values will get compared when flattened
                     {
                         if (xArr.Rank != yArr.Rank) return false;
                     }
