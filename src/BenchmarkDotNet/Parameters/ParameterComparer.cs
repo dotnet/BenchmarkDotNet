@@ -57,7 +57,17 @@ namespace BenchmarkDotNet.Parameters
                     if (xFlat.Length != yFlat.Length)
                         return xFlat.Length.CompareTo(yFlat.Length);
 
-                    return StructuralComparisons.StructuralComparer.Compare(xFlat, yFlat);
+                    try
+                    {
+                        return StructuralComparisons.StructuralComparer.Compare(xFlat, yFlat);
+                    }
+                    // Inner element type does not support comparison, hash elements to compare collections
+                    catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
+                    {
+                        var xFlatHashed = xFlat.Select(elem => elem.GetHashCode()).ToArray();
+                        var yFlatHashed = yFlat.Select(elem => elem.GetHashCode()).ToArray();
+                        return StructuralComparisons.StructuralComparer.Compare(xFlatHashed, yFlatHashed);
+                    }
                 }
             }
 

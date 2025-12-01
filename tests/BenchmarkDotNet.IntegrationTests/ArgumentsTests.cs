@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
@@ -316,39 +317,65 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class EnumerableOnDifferentMethods
         {
-            public IEnumerable<int> EnumerableOne()
-            {
-                yield return 1;
-                yield return 2;
-                yield return 3;
-            }
-
-            public IEnumerable<int> EnumerableTwo()
-            {
-                yield return 1;
-                yield return 2;
-                yield return 3;
-            }
-
             public IEnumerable<IEnumerable<int>> GetEnumerables()
             {
-                yield return EnumerableOne();
-                yield return EnumerableTwo();
+                yield return Enumerable.Range(1, 10);
+                yield return Enumerable.Range(2, 10);
             }
 
             [Benchmark(Baseline = true)]
             [ArgumentsSource(nameof(GetEnumerables))]
-            public void AcceptsEnumerables(IEnumerable<int> arr)
+            public void AcceptsEnumerables(IEnumerable<int> arg)
             {
-                if (arr.Count() != 3)
+                if (arg.IsEmpty())
                     throw new ArgumentException("Incorrect length");
             }
 
             [Benchmark]
             [ArgumentsSource(nameof(GetEnumerables))]
-            public void AcceptsEnumerables2(IEnumerable<int> collection)
+            public void AcceptsEnumerables2(IEnumerable<int> arg)
             {
-                if (collection.Count() != 3)
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void IEnumerableArgumentsOfDifferentLengthsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<EnumerableOfDiffLengthOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class EnumerableOfDiffLengthOnDifferentMethods
+        {
+            public IEnumerable<IEnumerable<int>> GetEnumerables()
+            {
+                yield return Enumerable.Range(1, 10);
+                yield return Enumerable.Range(1, 11);
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables2(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
                     throw new ArgumentException("Incorrect length");
             }
         }
