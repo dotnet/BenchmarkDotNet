@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
@@ -299,6 +300,60 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void IEnumerableArgumentsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<EnumerableOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class EnumerableOnDifferentMethods
+        {
+            public IEnumerable<int> EnumerableOne()
+            {
+                yield return 1;
+                yield return 2;
+                yield return 3;
+            }
+
+            public IEnumerable<int> EnumerableTwo()
+            {
+                yield return 1;
+                yield return 2;
+                yield return 3;
+            }
+
+            public IEnumerable<IEnumerable<int>> GetEnumerables()
+            {
+                yield return EnumerableOne();
+                yield return EnumerableTwo();
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables(IEnumerable<int> arr)
+            {
+                if (arr.Count() != 3)
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables2(IEnumerable<int> collection)
+            {
+                if (collection.Count() != 3)
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void JaggedArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithJaggedArray>(toolchain);
 
         public class WithJaggedArray
@@ -311,9 +366,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentNullException(nameof(array));
 
                 for (int i = 0; i < 10; i++)
-                for (int j = 0; j < i; j++)
-                    if (array[i][j] != i)
-                        throw new ArgumentException("Invalid value");
+                    for (int j = 0; j < i; j++)
+                        if (array[i][j] != i)
+                            throw new ArgumentException("Invalid value");
             }
 
             public IEnumerable<object> CreateMatrix()
@@ -540,6 +595,46 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void ArrayArgumentsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<ArrayOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class ArrayOnDifferentMethods
+        {
+            public IEnumerable<int[]> GetArrays()
+            {
+                yield return new int[] { 1, 2, 3 };
+                yield return new int[] { 2, 3, 4 };
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays(int[] arr)
+            {
+                if (arr.Length != 3)
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays2(int[] arr)
+            {
+                if (arr.Length != 3)
+                    throw new ArgumentException("Incorrect length");
             }
         }
 
@@ -1026,6 +1121,16 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
+        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig> furtherConfigure = null)
+        {
+            var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
+
+            if (furtherConfigure is not null)
+            {
+                config = furtherConfigure(config);
+            }
+
+            return CanExecute<T>(config);
+        }
     }
 }
