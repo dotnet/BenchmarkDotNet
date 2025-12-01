@@ -54,6 +54,9 @@ namespace BenchmarkDotNet.Parameters
                     var xFlat = xEnumerable.OfType<object>().ToArray();
                     var yFlat = yEnumerable.OfType<object>().ToArray();
 
+                    if (xFlat.Length != yFlat.Length)
+                        return xFlat.Length.CompareTo(yFlat.Length);
+
                     return StructuralComparisons.StructuralComparer.Compare(xFlat, yFlat);
                 }
             }

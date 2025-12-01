@@ -39,11 +39,12 @@ namespace BenchmarkDotNet.Parameters
                     if (x is Array xArr && y is Array yArr) // check rank here for arrays because their values will get compared when flattened
                     {
                         if (xArr.Rank != yArr.Rank) return false;
-                        if (xArr.Length != yArr.Length) return false;
                     }
 
                     var xFlat = xEnumerable.OfType<object>().ToArray();
                     var yFlat = yEnumerable.OfType<object>().ToArray();
+
+                    if (xFlat.Length != yFlat.Length) return false;
 
                     return StructuralComparisons.StructuralEqualityComparer.Equals(xFlat, yFlat);
                 }
