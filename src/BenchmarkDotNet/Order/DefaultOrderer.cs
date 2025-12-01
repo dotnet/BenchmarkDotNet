@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Order
                         keys.Add(benchmarkCase.Job.DisplayInfo);
                         break;
                     case BenchmarkLogicalGroupRule.ByParams:
-                        keys.Add($"Distinct Param Set {Array.FindIndex(paramSets, (paramSet) => ParameterEqualityComparer.Instance.Equals(paramSet, benchmarkCase.Parameters))}");
+                        keys.Add($"DistinctParamSet{Array.FindIndex(paramSets, (paramSet) => ParameterEqualityComparer.Instance.Equals(paramSet, benchmarkCase.Parameters))}");
                         break;
                     case BenchmarkLogicalGroupRule.ByCategory:
                         keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
