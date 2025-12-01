@@ -43,7 +43,7 @@ public class DocumentationRunner
         var analyzersDirectory = context.RootDirectory.Combine("src").Combine("BenchmarkDotNet.Analyzers");
         analyzersShippedFile = analyzersDirectory.CombineWithFilePath("AnalyzerReleases.Shipped.md");
         analyzersUnshippedFile = analyzersDirectory.CombineWithFilePath("AnalyzerReleases.Unshipped.md");
-        analyzersPageFile = docsGeneratedDirectory.Combine("articles").CombineWithFilePath("analyzers.md");
+        analyzersPageFile = docsDirectory.Combine("articles").CombineWithFilePath("analyzers.md");
     }
 
     public void MoveAnalyzerRules()
