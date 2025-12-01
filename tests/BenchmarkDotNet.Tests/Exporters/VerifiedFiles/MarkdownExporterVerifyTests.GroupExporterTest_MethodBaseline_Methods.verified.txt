@@ -7,10 +7,10 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   DefaultJob : extra output line
 
 
- Method | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup | Baseline |
-------- |---------:|--------:|--------:|------:|--------:|-----:|------------- |--------- |
- Base   | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DefaultJob   | Yes      |
- Foo    | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DefaultJob   | No       |
- Bar    | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | DefaultJob   | No       |
+ Method | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                 | Baseline |
+------- |---------:|--------:|--------:|------:|--------:|-----:|----------------------------- |--------- |
+ Base   | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DistinctParamSet0-DefaultJob | Yes      |
+ Foo    | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DistinctParamSet0-DefaultJob | No       |
+ Bar    | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | DistinctParamSet0-DefaultJob | No       |
 
 Errors: 0

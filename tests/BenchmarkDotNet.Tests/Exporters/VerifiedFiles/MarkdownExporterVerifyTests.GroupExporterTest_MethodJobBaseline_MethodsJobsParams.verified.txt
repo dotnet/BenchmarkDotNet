@@ -8,16 +8,16 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   Job2   : extra output line
 
 
- Method | Job  | Param | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup | Baseline |
-------- |----- |------ |---------:|--------:|--------:|------:|--------:|-----:|------------- |--------- |
- Foo    | Job1 | 2     | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | [Param=2]    | Yes      | ^
- Bar    | Job1 | 2     | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | [Param=2]    | No       |
- Foo    | Job2 | 2     | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | [Param=2]    | No       |
- Bar    | Job2 | 2     | 414.5 ns | 5.88 ns | 8.80 ns |  3.64 |    0.29 |    4 | [Param=2]    | No       |
-        |      |       |          |         |         |       |         |      |              |          |
- Foo    | Job1 | 10    | 514.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | [Param=10]   | Yes      | ^
- Bar    | Job1 | 10    | 614.5 ns | 5.88 ns | 8.80 ns |  1.19 |    0.03 |    2 | [Param=10]   | No       |
- Foo    | Job2 | 10    | 714.5 ns | 5.88 ns | 8.80 ns |  1.39 |    0.03 |    3 | [Param=10]   | No       |
- Bar    | Job2 | 10    | 814.5 ns | 5.88 ns | 8.80 ns |  1.58 |    0.03 |    4 | [Param=10]   | No       |
+ Method | Job  | Param | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup      | Baseline |
+------- |----- |------ |---------:|--------:|--------:|------:|--------:|-----:|------------------ |--------- |
+ Foo    | Job1 | 2     | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DistinctParamSet0 | Yes      | ^
+ Bar    | Job1 | 2     | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DistinctParamSet0 | No       |
+ Foo    | Job2 | 2     | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | DistinctParamSet0 | No       |
+ Bar    | Job2 | 2     | 414.5 ns | 5.88 ns | 8.80 ns |  3.64 |    0.29 |    4 | DistinctParamSet0 | No       |
+        |      |       |          |         |         |       |         |      |                   |          |
+ Foo    | Job1 | 10    | 514.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | DistinctParamSet1 | Yes      | ^
+ Bar    | Job1 | 10    | 614.5 ns | 5.88 ns | 8.80 ns |  1.19 |    0.03 |    2 | DistinctParamSet1 | No       |
+ Foo    | Job2 | 10    | 714.5 ns | 5.88 ns | 8.80 ns |  1.39 |    0.03 |    3 | DistinctParamSet1 | No       |
+ Bar    | Job2 | 10    | 814.5 ns | 5.88 ns | 8.80 ns |  1.58 |    0.03 |    4 | DistinctParamSet1 | No       |
 
 Errors: 0
