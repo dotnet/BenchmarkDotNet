@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -18,6 +20,7 @@ namespace BenchmarkDotNet.Parameters
                 if (compareTo != 0)
                     return compareTo;
             }
+
             return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
         }
 
@@ -25,18 +28,33 @@ namespace BenchmarkDotNet.Parameters
         {
             // Detect IComparable implementations.
             // This works for all primitive types in addition to user types that implement IComparable.
-            if (x != null && y != null && x.GetType() == y.GetType() &&
-                x is IComparable xComparable)
+            if (x != null && y != null && x.GetType() == y.GetType())
             {
-                try
+                if (x is IComparable xComparable)
                 {
-                    return xComparable.CompareTo(y);
+                    try
+                    {
+                        return xComparable.CompareTo(y);
+                    }
+                    // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
+                    // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
+                    // For now, catch and ignore the exception, and fallback to string comparison below.
+                    catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
+                    {
+                    }
                 }
-                // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
-                // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
-                // For now, catch and ignore the exception, and fallback to string comparison below.
-                catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
+                else if (x is IEnumerable xEnumerable  && y is IEnumerable yEnumerable) // collection equality support
                 {
+                    if (x is Array xArr && y is Array yArr) // check rank here for arrays because their values will get compared when flattened
+                    {
+                        if (xArr.Rank != yArr.Rank)
+                            return xArr.Rank.CompareTo(yArr.Rank);
+                    }
+
+                    var xFlat = xEnumerable.OfType<object>().ToArray();
+                    var yFlat = yEnumerable.OfType<object>().ToArray();
+
+                    return StructuralComparisons.StructuralComparer.Compare(xFlat, yFlat);
                 }
             }
 

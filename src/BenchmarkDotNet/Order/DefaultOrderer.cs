@@ -89,6 +89,8 @@ namespace BenchmarkDotNet.Order
 
         public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
+            var paramSets = allBenchmarksCases.Select(benchmarkCase => benchmarkCase.Parameters).Distinct(ParameterEqualityComparer.Instance).ToArray();
+
             var explicitRules = benchmarkCase.Config.GetLogicalGroupRules().ToList();
             var implicitRules = new List<BenchmarkLogicalGroupRule>();
             bool hasJobBaselines = allBenchmarksCases.Any(b => b.Job.Meta.Baseline);
@@ -125,7 +127,7 @@ namespace BenchmarkDotNet.Order
                         keys.Add(benchmarkCase.Job.DisplayInfo);
                         break;
                     case BenchmarkLogicalGroupRule.ByParams:
-                        keys.Add(benchmarkCase.Parameters.ValueInfo);
+                        keys.Add($"Distinct Param Set {Array.FindIndex(paramSets, (paramSet) => ParameterEqualityComparer.Instance.Equals(paramSet, benchmarkCase.Parameters))}");
                         break;
                     case BenchmarkLogicalGroupRule.ByCategory:
                         keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
