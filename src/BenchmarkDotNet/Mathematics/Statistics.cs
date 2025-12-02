@@ -10,6 +10,8 @@ using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.QuantileEstimators;
 using Pragmastat;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Mathematics
 {
     public class Statistics
@@ -138,7 +140,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
         /// </summary>
-        public Statistics Invert() => CanBeInverted() ? new Statistics(Sample.SortedValues.Select(x => 1 / x)) : null;
+        public Statistics? Invert() => CanBeInverted() ? new Statistics(Sample.SortedValues.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Mean for [X*Y].
