@@ -7,10 +7,10 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   DefaultJob : extra output line
 
 
- Method | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup | Baseline |
-------- |---------:|--------:|--------:|------:|--------:|-----:|------------- |--------- |
- Foo    | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DefaultJob   | Yes      |
- Bar    | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DefaultJob   | Yes      |
+ Method | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                 | Baseline |
+------- |---------:|--------:|--------:|------:|--------:|-----:|----------------------------- |--------- |
+ Foo    | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DistinctParamSet0-DefaultJob | Yes      |
+ Bar    | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DistinctParamSet0-DefaultJob | Yes      |
 
 Errors: 1
-* Only 1 benchmark method in a group can have "Baseline = true" applied to it, group DefaultJob in class Invalid_TwoMethodBaselines has 2
+* Only 1 benchmark method in a group can have "Baseline = true" applied to it, group DistinctParamSet0-DefaultJob in class Invalid_TwoMethodBaselines has 2

@@ -8,14 +8,14 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   Job2   : extra output line
 
 
- Method | Job  | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                | Baseline |
-------- |----- |---------:|--------:|--------:|------:|--------:|-----:|---------------------------- |--------- |
- Foo    | Job1 | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | Invalid_TwoJobBaselines.Foo | Yes      |
- Foo    | Job2 | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    2 | Invalid_TwoJobBaselines.Foo | Yes      |
-        |      |          |         |         |       |         |      |                             |          |
- Bar    | Job1 | 214.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.06 |    1 | Invalid_TwoJobBaselines.Bar | Yes      |
- Bar    | Job2 | 414.5 ns | 5.88 ns | 8.80 ns |  1.94 |    0.09 |    2 | Invalid_TwoJobBaselines.Bar | Yes      |
+ Method | Job  | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                                  | Baseline |
+------- |----- |---------:|--------:|--------:|------:|--------:|-----:|---------------------------------------------- |--------- |
+ Foo    | Job1 | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DistinctParamSet0-Invalid_TwoJobBaselines.Foo | Yes      |
+ Foo    | Job2 | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    2 | DistinctParamSet0-Invalid_TwoJobBaselines.Foo | Yes      |
+        |      |          |         |         |       |         |      |                                               |          |
+ Bar    | Job1 | 214.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.06 |    1 | DistinctParamSet0-Invalid_TwoJobBaselines.Bar | Yes      |
+ Bar    | Job2 | 414.5 ns | 5.88 ns | 8.80 ns |  1.94 |    0.09 |    2 | DistinctParamSet0-Invalid_TwoJobBaselines.Bar | Yes      |
 
 Errors: 2
-* Only 1 job in a group can have "Baseline = true" applied to it, group Invalid_TwoJobBaselines.Foo in class Invalid_TwoJobBaselines has 2
-* Only 1 job in a group can have "Baseline = true" applied to it, group Invalid_TwoJobBaselines.Bar in class Invalid_TwoJobBaselines has 2
+* Only 1 job in a group can have "Baseline = true" applied to it, group DistinctParamSet0-Invalid_TwoJobBaselines.Foo in class Invalid_TwoJobBaselines has 2
+* Only 1 job in a group can have "Baseline = true" applied to it, group DistinctParamSet0-Invalid_TwoJobBaselines.Bar in class Invalid_TwoJobBaselines has 2

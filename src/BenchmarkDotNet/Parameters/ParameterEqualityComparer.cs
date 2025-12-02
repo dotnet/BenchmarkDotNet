@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Parameters
 {
-    internal class ParameterComparer : IComparer<ParameterInstances>
+    internal class ParameterEqualityComparer : IEqualityComparer<ParameterInstances>
     {
 #if NETSTANDARD2_0
         private static readonly ConcurrentDictionary<Type, MemberInfo[]> s_tupleMembersCache = new();
@@ -29,69 +29,77 @@ namespace BenchmarkDotNet.Parameters
             });
 #endif
 
-        public static readonly ParameterComparer Instance = new ParameterComparer();
+        public static readonly ParameterEqualityComparer Instance = new ParameterEqualityComparer();
 
-        public int Compare(ParameterInstances x, ParameterInstances y)
+        public bool Equals(ParameterInstances x, ParameterInstances y)
         {
-            if (x == null && y == null) return 0;
-            if (x == null) return -1;
-            if (y == null) return 1;
+            if (x == null && y == null) return true;
+            if (x == null || y == null) return false;
 
-            for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
+            if (x.Count != y.Count) return false;
+
+            for (int i = 0; i < x.Count; i++)
             {
-                var comparison = CompareValues(x[i]?.Value, y[i]?.Value);
-                if (comparison != 0)
+                if (!ValuesEqual(x[i]?.Value, y[i]?.Value))
                 {
-                    return comparison;
+                    return false;
                 }
             }
 
-            return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
+            return true;
         }
 
-        private static int CompareValues<T1, T2>(T1 x, T2 y)
+        private static bool ValuesEqual<T1, T2>(T1 x, T2 y)
         {
-            if (x == null || y == null || x.GetType() != y.GetType())
+            if (x == null && y == null)
             {
-                return string.CompareOrdinal(x?.ToString(), y?.ToString());
+                return true;
             }
 
-            if (x is IStructuralComparable xStructuralComparable)
+            if (x == null || y == null || x.GetType() != y.GetType())
+            {
+                // The objects are of different types or one is null, they cannot be equal
+                return false;
+            }
+
+            if (x is IStructuralEquatable xStructuralEquatable)
             {
                 try
                 {
-                    return StructuralComparisons.StructuralComparer.Compare(x, y);
+                    return StructuralComparisons.StructuralEqualityComparer.Equals(xStructuralEquatable, y);
                 }
-                // https://github.com/dotnet/BenchmarkDotNet/issues/2346
                 // https://github.com/dotnet/runtime/issues/66472
                 // Unfortunately we can't rely on checking the exception message because it may change per current culture.
                 catch (ArgumentException)
                 {
-                    if (TryFallbackStructuralCompareTo(x, y, out int comparison))
+                    if (TryFallbackStructuralEquals(x, y, out bool equals))
                     {
-                        return comparison;
+                        return equals;
                     }
-                    // A complex user type did not handle a multi-dimensional array or tuple, just re-throw.
+                    // A complex user type did not handle a multi-dimensional array, just re-throw.
                     throw;
                 }
             }
 
-            if (x is IComparable xComparable)
+            if (x is IEnumerable xEnumerable) // General collection equality support
             {
-                // Tuples are already handled by IStructuralComparable case, if this throws, it's the user's own fault.
-                return xComparable.CompareTo(y);
+                return EnumerablesEqual(xEnumerable, (IEnumerable) y);
             }
 
-            if (x is IEnumerable xEnumerable) // General collection comparison support
-            {
-                return CompareEnumerables(xEnumerable, (IEnumerable) y);
-            }
-
-            // Anything else to differentiate between objects.
-            return string.CompareOrdinal(x?.ToString(), y?.ToString());
+            return FallbackSimpleEquals(x, y);
         }
 
-        private static bool TryFallbackStructuralCompareTo(object x, object y, out int comparison)
+        private static bool FallbackSimpleEquals(object x, object y)
+        {
+            if (x.Equals(y))
+            {
+                return true;
+            }
+            // Anything else to differentiate between objects (match behavior of ParameterComparer).
+            return string.Equals(x.ToString(), y.ToString(), StringComparison.Ordinal);
+        }
+
+        private static bool TryFallbackStructuralEquals(object x, object y, out bool equals)
         {
             // Check for multi-dimensional array and ITuple and re-try for each element recursively.
             if (x is Array xArr)
@@ -99,7 +107,7 @@ namespace BenchmarkDotNet.Parameters
                 Array yArr = (Array) y;
                 if (xArr.Rank != yArr.Rank)
                 {
-                    comparison = xArr.Rank.CompareTo(yArr.Rank);
+                    equals = false;
                     return true;
                 }
 
@@ -107,7 +115,7 @@ namespace BenchmarkDotNet.Parameters
                 {
                     if (xArr.GetLength(dim) != yArr.GetLength(dim))
                     {
-                        comparison = xArr.GetLength(dim).CompareTo(yArr.GetLength(dim));
+                        equals = false;
                         return true;
                     }
                 }
@@ -116,9 +124,9 @@ namespace BenchmarkDotNet.Parameters
                 if (!RuntimeInformation.IsAot && xArr.Rank is 2 or 3)
                 {
                     string methodName = xArr.Rank == 2
-                        ? nameof(CompareTwoDArray)
-                        : nameof(CompareThreeDArray);
-                    comparison = (int) typeof(ParameterComparer)
+                        ? nameof(TwoDArraysEqual)
+                        : nameof(ThreeDArraysEqual);
+                    equals = (bool) typeof(ParameterEqualityComparer)
                         .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)
                         .MakeGenericMethod(xArr.GetType().GetElementType(), yArr.GetType().GetElementType())
                         .Invoke(null, [xArr, yArr]);
@@ -127,7 +135,7 @@ namespace BenchmarkDotNet.Parameters
 
                 // 1D arrays will only hit this code path if a nested type is a multi-dimensional array.
                 // 4D and larger fall back to enumerable.
-                comparison = CompareEnumerables(xArr, yArr);
+                equals = EnumerablesEqual(xArr, yArr);
                 return true;
             }
 
@@ -136,33 +144,33 @@ namespace BenchmarkDotNet.Parameters
             string typeName = x.GetType().FullName;
             if (typeName.StartsWith("System.Tuple`"))
             {
-                comparison = CompareTuples(x, y);
+                equals = TuplesEqual(x, y);
                 return true;
             }
             else if (typeName.StartsWith("System.ValueTuple`"))
             {
-                comparison = CompareValueTuples(x, y);
+                equals = ValueTuplesEqual(x, y);
                 return true;
             }
 #else
             if (x is System.Runtime.CompilerServices.ITuple xTuple)
             {
-                comparison = CompareTuples(xTuple, (System.Runtime.CompilerServices.ITuple) y);
+                equals = TuplesEqual(xTuple, (System.Runtime.CompilerServices.ITuple) y);
                 return true;
             }
 #endif
 
             if (x is IEnumerable xEnumerable) // General collection equality support
             {
-                comparison = CompareEnumerables(xEnumerable, (IEnumerable) y);
+                equals = EnumerablesEqual(xEnumerable, (IEnumerable) y);
                 return true;
             }
 
-            comparison = 0;
+            equals = false;
             return false;
         }
 
-        private static int CompareEnumerables(IEnumerable x, IEnumerable y)
+        private static bool EnumerablesEqual(IEnumerable x, IEnumerable y)
         {
             var xEnumerator = x.GetEnumerator();
             try
@@ -172,17 +180,12 @@ namespace BenchmarkDotNet.Parameters
                 {
                     while (xEnumerator.MoveNext())
                     {
-                        if (!yEnumerator.MoveNext())
+                        if (!(yEnumerator.MoveNext() && ValuesEqual(xEnumerator.Current, yEnumerator.Current)))
                         {
-                            return -1;
-                        }
-                        int comparison = CompareValues(xEnumerator.Current, yEnumerator.Current);
-                        if (comparison != 0)
-                        {
-                            return comparison;
+                            return false;
                         }
                     }
-                    return yEnumerator.MoveNext() ? 1 : 0;
+                    return !yEnumerator.MoveNext();
                 }
                 finally
                 {
@@ -201,25 +204,24 @@ namespace BenchmarkDotNet.Parameters
             }
         }
 
-        private static int CompareTwoDArray<T1, T2>(T1[,] arrOne, T2[,] arrTwo)
+        private static bool TwoDArraysEqual<T1, T2>(T1[,] arrOne, T2[,] arrTwo)
         {
             // Assumes that arrOne & arrTwo are the same length and width.
             for (int i = 0; i < arrOne.GetLength(0); i++)
             {
                 for (int j = 0; j < arrOne.GetLength(1); j++)
                 {
-                    var comparison = CompareValues(arrOne[i, j], arrTwo[i, j]);
-                    if (comparison != 0)
+                    if (!ValuesEqual(arrOne[i, j], arrTwo[i, j]))
                     {
-                        return comparison;
+                        return false;
                     }
                 }
             }
 
-            return 0;
+            return true;
         }
 
-        private static int CompareThreeDArray<T1, T2>(T1[,,] arrOne, T2[,,] arrTwo)
+        private static bool ThreeDArraysEqual<T1, T2>(T1[,,] arrOne, T2[,,] arrTwo)
         {
             // Assumes that arrOne & arrTwo are the same length, width, and height.
             for (int i = 0; i < arrOne.GetLength(0); i++)
@@ -228,60 +230,61 @@ namespace BenchmarkDotNet.Parameters
                 {
                     for (int k = 0; k <arrOne.GetLength(2); k++)
                     {
-                        var comparison = CompareValues(arrOne[i, j, k], arrTwo[i, j, k]);
-                        if (comparison != 0)
+                        if (!ValuesEqual(arrOne[i, j, k], arrTwo[i, j, k]))
                         {
-                            return comparison;
+                            return false;
                         }
                     }
                 }
             }
 
-            return 0;
+            return true;
         }
 
 #if NETSTANDARD2_0
-        private static int CompareTuples(object x, object y)
+        private static bool TuplesEqual(object x, object y)
         {
             foreach (PropertyInfo property in GetTupleMembers(x.GetType()))
             {
-                var comparison = CompareValues(property.GetValue(x), property.GetValue(y));
-                if (comparison != 0)
+                if (!ValuesEqual(property.GetValue(x), property.GetValue(y)))
                 {
-                    return comparison;
+                    return false;
                 }
             }
 
-            return 0;
+            return true;
         }
 
-        private static int CompareValueTuples(object x, object y)
+        private static bool ValueTuplesEqual(object x, object y)
         {
             foreach (FieldInfo field in GetTupleMembers(x.GetType()))
             {
-                var comparison = CompareValues(field.GetValue(x), field.GetValue(y));
-                if (comparison != 0)
+                if (!ValuesEqual(field.GetValue(x), field.GetValue(y)))
                 {
-                    return comparison;
+                    return false;
                 }
             }
 
-            return 0;
+            return true;
         }
 #else
-        private static int CompareTuples(System.Runtime.CompilerServices.ITuple x, System.Runtime.CompilerServices.ITuple y)
+        private static bool TuplesEqual(System.Runtime.CompilerServices.ITuple x, System.Runtime.CompilerServices.ITuple y)
         {
             for (int i = 0; i < x.Length; i++)
             {
-                var comparison = CompareValues(x[i], y[i]);
-                if (comparison != 0)
+                if (!ValuesEqual(x[i], y[i]))
                 {
-                    return comparison;
+                    return false;
                 }
             }
 
-            return 0;
+            return true;
         }
 #endif
+
+        public int GetHashCode(ParameterInstances obj)
+        {
+            return obj?.ValueInfo.GetHashCode() ?? 0;
+        }
     }
 }
