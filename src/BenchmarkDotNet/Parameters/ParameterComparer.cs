@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -31,20 +32,7 @@ namespace BenchmarkDotNet.Parameters
             // This works for all primitive types in addition to user types that implement IComparable.
             if (x != null && y != null && x.GetType() == y.GetType())
             {
-                if (x is IComparable xComparable)
-                {
-                    try
-                    {
-                        return xComparable.CompareTo(y);
-                    }
-                    // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
-                    // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
-                    // For now, catch and ignore the exception, and fallback to string comparison below.
-                    catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
-                    {
-                    }
-                }
-                else if (x is IStructuralComparable)
+                if (x is IStructuralComparable xStructuralComparable)
                 {
                     if (x is Array xArr && y is Array yArr)
                     {
@@ -59,7 +47,7 @@ namespace BenchmarkDotNet.Parameters
                         //  1D, 2D, and 3D array comparison is optimized with dedicated methods
                         if (xArr.Rank == 1) return StructuralComparisonWithFallback(xArr, yArr);
 
-                        if (xArr.Rank == 2)
+                        if (xArr.Rank == 2 && !RuntimeInformation.IsAot)
                         {
                             return (int) GetType()
                                 .GetMethod(nameof(CompareTwoDimensionalArray), BindingFlags.NonPublic | BindingFlags.Instance)
@@ -67,7 +55,7 @@ namespace BenchmarkDotNet.Parameters
                                 .Invoke(this, [xArr, yArr]);
                         }
 
-                        if (xArr.Rank == 3)
+                        if (xArr.Rank == 3 && !RuntimeInformation.IsAot)
                         {
                             return (int) GetType()
                                 .GetMethod(nameof(CompareThreeDimensionalArray), BindingFlags.NonPublic | BindingFlags.Instance)
@@ -77,23 +65,70 @@ namespace BenchmarkDotNet.Parameters
 
                         return CompareEnumerables(xArr, yArr);
                     }
-                    else // Probably a user-defined IStructuralComparable, as tuples would be handled by the IComparable case
+                    else // Probably a user-defined IStructuralComparable or tuple
                     {
-                        return StructuralComparisons.StructuralComparer.Compare(x, y);
+                        return StructuralComparisonWithFallback(xStructuralComparable, (IStructuralComparable) y);
                     }
                 }
-                else if (x is IEnumerable xEnumerable  && y is IEnumerable yEnumerable) // General collection equality support
+                else if (x is IComparable xComparable)
+                {
+                    try
+                    {
+                        return xComparable.CompareTo(y);
+                    }
+                    // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
+                    // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
+                    // For now, catch and ignore the exception, and fallback to string comparison below.
+                    catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
+                    {
+                    }
+                }
+                else if (x is IEnumerable xEnumerable  && y is IEnumerable yEnumerable) // General collection comparison support
                 {
                     return CompareEnumerables(xEnumerable, yEnumerable);
                 }
             }
 
             // Anything else to differentiate between objects.
-            var stringComp = string.CompareOrdinal(x?.ToString(), y?.ToString());
+            return string.CompareOrdinal(x?.ToString(), y?.ToString());
+        }
 
-            if (stringComp != 0) return stringComp;
+        private int StructuralComparisonWithFallback(IStructuralComparable x, IStructuralComparable y)
+        {
+            try
+            {
+                return StructuralComparisons.StructuralComparer.Compare(x, y);
+            }
+            // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
+            // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
+            // For now, catch and ignore the exception, and fallback to string comparison below.
+            catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
+            {
+                var ITuple = Type.GetType("System.Runtime.CompilerServices.ITuple");
 
-            return x?.GetHashCode().CompareTo(y?.GetHashCode() ?? 0) ?? 0;
+                if (ITuple.IsAssignableFrom(x.GetType()))
+                {
+                    var lengthProperty = ITuple.GetProperty("Length");
+
+                    var xLength = (int) lengthProperty.GetValue(x);
+                    var yLength = (int) lengthProperty.GetValue(y);
+
+                    if (xLength != yLength) return xLength.CompareTo(yLength);
+
+                    var indexerProperty = ITuple.GetProperty("Item");
+
+                    object ItemGetter(IStructuralComparable tup, int i) => indexerProperty.GetValue(tup, [i]);
+
+                    var xFlatTransformed = Enumerable.Range(0, xLength).Select(i => ItemGetter(x, i).ToString());
+                    var yFlatTransformed = Enumerable.Range(0, xLength).Select(i => ItemGetter(y, i).ToString());
+
+                    return CompareEnumerables(xFlatTransformed, yFlatTransformed);
+                }
+                else
+                {
+                    return string.CompareOrdinal(x?.ToString(), y?.ToString());
+                }
+            }
         }
 
         private int StructuralComparisonWithFallback(Array x, Array y)
@@ -102,28 +137,34 @@ namespace BenchmarkDotNet.Parameters
             {
                 return StructuralComparisons.StructuralComparer.Compare(x, y);
             }
-            // Inner element type does not support comparison, hash elements to compare collections
+            // Inner element type does not support comparison, ToString (GetHashCode not preferred) elements to compare collections
             catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
             {
-                var xFlatHashed = x.OfType<object>().Select(elem => elem.GetHashCode());
-                var yFlatHashed = y.OfType<object>().Select(elem => elem.GetHashCode());
-                return CompareEnumerables(xFlatHashed, yFlatHashed);
+                var xFlatTransformed = x.OfType<object>().Select(elem => elem.ToString());
+                var yFlatTransformed = y.OfType<object>().Select(elem => elem.ToString());
+                return CompareEnumerables(xFlatTransformed, yFlatTransformed);
             }
         }
 
-        private int CompareEnumerables(IEnumerable nonGenericX, IEnumerable nonGenericY)
+        private int CompareEnumerables(IEnumerable x, IEnumerable y)
         {
             // Use this instead of StructuralComparisons.StructuralComparer to avoid resolving the whole enumerable to object[]
 
-            var x = nonGenericX.OfType<object>();
-            var y = nonGenericY.OfType<object>();
+            var xEnumer = x.GetEnumerator();
+            var yEnumer = y.GetEnumerator();
 
-            foreach (var (xElem, yElem) in x.Zip(y, (x, y) => (x, y)))
+            bool xHasElement, yHasElement;
+
+            // Use bitwise AND to avoid short-circuiting, which destroys this function's length checking logic
+            while ((xHasElement = xEnumer.MoveNext()) & (yHasElement = yEnumer.MoveNext()))
             {
-                int res = CompareValues(xElem, yElem);
+                int res = CompareValues(xEnumer.Current, yEnumer.Current);
 
                 if (res != 0) return res;
             }
+
+            if (xHasElement) return 1;
+            if (yHasElement) return -1;
 
             return 0;
         }

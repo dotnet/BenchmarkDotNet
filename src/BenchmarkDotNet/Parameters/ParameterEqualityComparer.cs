@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (x != null && y != null && x.GetType() == y.GetType())
             {
-                if (x is IStructuralEquatable)
+                if (x is IStructuralEquatable xStructuralEquatable)
                 {
                     if (x is Array xArr && y is Array yArr)
                     {
@@ -43,9 +44,10 @@ namespace BenchmarkDotNet.Parameters
                             if (xArr.GetLength(dim) != yArr.GetLength(dim)) return false;
                         }
 
-                        if (xArr.Rank == 1) return StructuralEqualityWithFallback(xArr, yArr);
+                        //  1D, 2D, and 3D array comparison is optimized with dedicated methods
+                        if (xArr.Rank == 1) return StructuralEquals(xArr, yArr);
 
-                        if (xArr.Rank == 2)
+                        if (xArr.Rank == 2 && !RuntimeInformation.IsAot)
                         {
                             return (bool) GetType()
                                 .GetMethod(nameof(TwoDimensionalArrayEquals), BindingFlags.NonPublic | BindingFlags.Instance)
@@ -53,7 +55,7 @@ namespace BenchmarkDotNet.Parameters
                                 .Invoke(this, [xArr, yArr]);
                         }
 
-                        if (xArr.Rank == 3)
+                        if (xArr.Rank == 3 && !RuntimeInformation.IsAot)
                         {
                             return (bool) GetType()
                                 .GetMethod(nameof(ThreeDimensionalArrayEquals), BindingFlags.NonPublic | BindingFlags.Instance)
@@ -63,18 +65,17 @@ namespace BenchmarkDotNet.Parameters
 
                         return EnumerablesEqual(xArr, yArr);
                     }
-                    else // Probably a user-defined IStructuralComparable, as tuples would be handled by the IComparable case
+                    else // Probably a user-defined IStructuralEquatable or tuple
                     {
-                        return StructuralComparisons.StructuralEqualityComparer.Equals(x, y);
+                        return StructuralEquals(xStructuralEquatable, (IStructuralEquatable) y);
                     }
                 }
-                else if (x is IEnumerable xEnumerable  && y is IEnumerable yEnumerable) // General collection equality support
+                else if (x is IEnumerable xEnumerable && y is IEnumerable yEnumerable) // General collection equality support
                 {
                     return EnumerablesEqual(xEnumerable, yEnumerable);
                 }
                 else
                 {
-                    // The user should define a value-based Equals check
                     return x.Equals(y);
                 }
             }
@@ -83,39 +84,31 @@ namespace BenchmarkDotNet.Parameters
             return false;
         }
 
-        private bool StructuralEqualityWithFallback(Array x, Array y)
+        private bool StructuralEquals(IStructuralEquatable x, IStructuralEquatable y)
         {
-            try
-            {
-                return StructuralComparisons.StructuralEqualityComparer.Equals(x, y);
-            }
-            // Inner element type does not support comparison, hash elements to compare collections
-            catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
-            {
-                return EnumerablesEqual(x.OfType<object>().Select(elem => elem.GetHashCode()), y.OfType<object>().Select(elem => elem.GetHashCode()));
-            }
+           return StructuralComparisons.StructuralEqualityComparer.Equals(x, y);
         }
 
-        private bool EnumerablesEqual(IEnumerable nonGenericX, IEnumerable nonGenericY)
+        private bool EnumerablesEqual(IEnumerable x, IEnumerable y)
         {
-            // Use this instead of StructuralComparisons.StructuralEqualityComparer to avoid resolving the whole enumerable to object[]
+            // Use this instead of StructuralComparisons.StructuralComparer to avoid resolving the whole enumerable to object[]
 
-            var x = nonGenericX.OfType<object>();
-            var y = nonGenericY.OfType<object>();
+            var xEnumer = x.GetEnumerator();
+            var yEnumer = y.GetEnumerator();
 
-            foreach (var (xElem, yElem) in x.Zip(y, (x, y) => (x, y)))
+            bool xHasElement, yHasElement;
+
+            // Use bitwise AND to avoid short-circuiting, which destroys this function's length checking logic
+            while ((xHasElement = xEnumer.MoveNext()) & (yHasElement = yEnumer.MoveNext()))
             {
-                bool res = ValuesEqual(xElem, yElem);
+                bool res = ValuesEqual(xEnumer.Current, yEnumer.Current);
 
                 if (!res) return false;
             }
 
-            return true;
-        }
+            if (xHasElement || yHasElement) return false;
 
-        public int GetHashCode(ParameterInstances obj)
-        {
-            return obj?.ValueInfo.GetHashCode() ?? 0;
+            return true;
         }
 
         private bool TwoDimensionalArrayEquals<T1, T2>(T1[,] arrOne, T2[,] arrTwo)
@@ -129,7 +122,7 @@ namespace BenchmarkDotNet.Parameters
                     var x = arrOne[i, j];
                     var y = arrTwo[i, j];
 
-                    var res = ValuesEqual(x, y);
+                    bool res = ValuesEqual(x, y);
 
                     if (!res) return false;
                 }
@@ -151,7 +144,7 @@ namespace BenchmarkDotNet.Parameters
                         var x = arrOne[i, j, k];
                         var y = arrTwo[i, j, k];
 
-                        var res = ValuesEqual(x, y);
+                        bool res = ValuesEqual(x, y);
 
                         if (!res) return false;
                     }
@@ -159,6 +152,11 @@ namespace BenchmarkDotNet.Parameters
             }
 
             return true;
+        }
+
+        public int GetHashCode(ParameterInstances obj)
+        {
+            return obj?.ValueInfo.GetHashCode() ?? 0;
         }
     }
 }
