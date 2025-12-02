@@ -17,11 +17,11 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
  Foo    | Job2 | 2     |   714.5 ns | 5.88 ns | 8.80 ns |    5 | DistinctParamSet0 | No       |
  Bar    | Job2 | 2     |   814.5 ns | 5.88 ns | 8.80 ns |    6 | DistinctParamSet0 | No       |
         |      |       |            |         |         |      |                   |          |
- Base   | Job1 | 10    |   314.5 ns | 5.88 ns | 8.80 ns |    1 | DistinctParamSet1 | No       | ^
- Base   | Job2 | 10    |   414.5 ns | 5.88 ns | 8.80 ns |    2 | DistinctParamSet1 | No       |
- Foo    | Job1 | 10    |   914.5 ns | 5.88 ns | 8.80 ns |    3 | DistinctParamSet1 | No       |
- Bar    | Job1 | 10    | 1,014.5 ns | 5.88 ns | 8.80 ns |    4 | DistinctParamSet1 | No       |
- Foo    | Job2 | 10    | 1,114.5 ns | 5.88 ns | 8.80 ns |    5 | DistinctParamSet1 | No       |
- Bar    | Job2 | 10    | 1,214.5 ns | 5.88 ns | 8.80 ns |    6 | DistinctParamSet1 | No       |
+ Base   | Job1 | 10    |   314.5 ns | 5.88 ns | 8.80 ns |    1 | DistinctParamSet6 | No       | ^
+ Base   | Job2 | 10    |   414.5 ns | 5.88 ns | 8.80 ns |    2 | DistinctParamSet6 | No       |
+ Foo    | Job1 | 10    |   914.5 ns | 5.88 ns | 8.80 ns |    3 | DistinctParamSet6 | No       |
+ Bar    | Job1 | 10    | 1,014.5 ns | 5.88 ns | 8.80 ns |    4 | DistinctParamSet6 | No       |
+ Foo    | Job2 | 10    | 1,114.5 ns | 5.88 ns | 8.80 ns |    5 | DistinctParamSet6 | No       |
+ Bar    | Job2 | 10    | 1,214.5 ns | 5.88 ns | 8.80 ns |    6 | DistinctParamSet6 | No       |
 
 Errors: 0
