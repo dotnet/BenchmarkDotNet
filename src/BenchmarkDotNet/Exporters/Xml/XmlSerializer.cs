@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters.Xml
 {
     internal class XmlSerializer : IXmlSerializer
@@ -15,7 +17,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         private readonly IReadOnlyDictionary<string, string> collectionItemNameMap;
         private readonly IReadOnlyCollection<string> excludedPropertyNames;
 
-        private IXmlWriter writer;
+        private IXmlWriter writer = default!;
 
         public const string DefaultItemName = "Item";
 
@@ -58,7 +60,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             writer.WriteEndElement();
         }
 
-        private void WriteProperty(object source, PropertyInfo property)
+        private void WriteProperty(object? source, PropertyInfo property)
         {
             if (source == null || excludedPropertyNames.Contains(property.Name))
                 return;
@@ -88,7 +90,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             }
         }
 
-        private void WriteComplexProperty(object source, PropertyInfo propertyInfo)
+        private void WriteComplexProperty(object? source, PropertyInfo propertyInfo)
         {
             writer.WriteStartElement(propertyInfo.Name);
 
@@ -103,9 +105,9 @@ namespace BenchmarkDotNet.Exporters.Xml
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
-            var collection = (IEnumerable)property.GetValue(source);
+            var collection = (IEnumerable?)property.GetValue(source);
 
-            if (!IsCollectionWritable(collection))
+            if (collection == null || !IsCollectionWritable(collection))
                 return;
 
             writer.WriteStartElement(property.Name);
@@ -157,7 +159,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             => typeof(IEnumerable).IsAssignableFrom(property.PropertyType);
 
         private static bool IsCollectionWritable(IEnumerable collection)
-            => collection?.Cast<object>().FirstOrDefault() != null;
+            => collection.Cast<object>().FirstOrDefault() != null;
 
         internal class XmlSerializerBuilder
         {
