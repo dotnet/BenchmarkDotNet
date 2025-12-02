@@ -89,6 +89,8 @@ namespace BenchmarkDotNet.Order
 
         public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
+            // TODO: GetLogicalGroupKey is called for every benchmarkCase, so as the number of cases grows, this can get very expensive to recompute for each call.
+            // We should somehow amortize the cost by computing it only once per summary.
             var paramSets = allBenchmarksCases.Select(benchmarkCase => benchmarkCase.Parameters).Distinct(ParameterEqualityComparer.Instance).ToArray();
 
             var explicitRules = benchmarkCase.Config.GetLogicalGroupRules().ToList();
