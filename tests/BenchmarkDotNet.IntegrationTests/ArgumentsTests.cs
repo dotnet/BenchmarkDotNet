@@ -683,17 +683,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new int[,] { { 1, 2, 3 }, { 4, 5, 6 } };
             }
 
-            [Benchmark(Baseline = true)]
-            [ArgumentsSource(nameof(GetArrays))]
-            public void AcceptsArrays(int[,] arr)
-            {
-                if (arr.Length == 0)
-                    throw new ArgumentException("Incorrect length");
-            }
-
             [Benchmark]
             [ArgumentsSource(nameof(GetArrays))]
-            public void AcceptsArrays2(int[,] arr)
+            public void AcceptsMultidimensionalArray(int[,] arr)
             {
                 if (arr.Length == 0)
                     throw new ArgumentException("Incorrect length");
