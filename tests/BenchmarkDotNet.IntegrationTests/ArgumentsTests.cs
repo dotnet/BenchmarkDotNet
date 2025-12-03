@@ -670,9 +670,6 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var summary = CanExecute<WithMultidimensionalArrayArgument>(toolchain);
 
-            // There should be two logical groups, one for the first argument and one for the second argument
-            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
-
             Assert.Equal(
                 "Int32[2, 3]",
                 summary.Table.Columns.Where(col => col.Header == "arr").First().Content[0]
