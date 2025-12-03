@@ -76,7 +76,9 @@ namespace BenchmarkDotNet.Tests
 
         [GenericTypeArguments(typeof(int), typeof(char))]
         [GenericTypeArguments(typeof(char), typeof(string))]
+#pragma warning disable BDN1102
         [GenericTypeArguments(typeof(char))]
+#pragma warning restore BDN1102
         public class GenericBenchmarkWithWrongAttribute<T1, T2>
         {
             [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();

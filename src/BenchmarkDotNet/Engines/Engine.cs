@@ -50,7 +50,8 @@ namespace BenchmarkDotNet.Engines
                 MeasureExtraStats = engineParameters.MeasureExtraStats,
                 Host = engineParameters.Host,
                 OperationsPerInvoke = engineParameters.OperationsPerInvoke,
-                Resolver = engineParameters.Resolver
+                Resolver = engineParameters.Resolver,
+                InProcessDiagnoserHandler = engineParameters.InProcessDiagnoserHandler ?? throw new ArgumentNullException(nameof(EngineParameters.InProcessDiagnoserHandler)),
             };
 
             Clock = TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
@@ -94,6 +95,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.BeforeMainRun();
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
@@ -111,6 +113,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.AfterMainRun();
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
                 }
             }
 

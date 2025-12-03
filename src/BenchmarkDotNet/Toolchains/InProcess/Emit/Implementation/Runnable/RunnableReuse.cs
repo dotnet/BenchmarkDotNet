@@ -1,9 +1,11 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
@@ -12,11 +14,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     public static class RunnableReuse
     {
-        public static (Job, EngineParameters, IEngineFactory) PrepareForRun<T>(
-            T instance,
-            BenchmarkCase benchmarkCase,
-            IHost host)
+        public static (Job, EngineParameters, IEngineFactory) PrepareForRun<T>(T instance, IHost host, ExecuteParameters parameters)
         {
+            var benchmarkCase = parameters.BenchmarkCase;
             FillObjectMembers(instance, benchmarkCase);
 
             DumpEnvironment(host);
@@ -26,9 +26,25 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             var errors = BenchmarkEnvironmentInfo.Validate(job);
             if (ValidationErrorReporter.ReportIfAny(errors, host))
-                return (null, null, null);
+                return default;
 
-            var engineParameters = CreateEngineParameters(instance, benchmarkCase, host);
+            var compositeInProcessDiagnoserHandler = new CompositeInProcessDiagnoserHandler(
+                parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
+                    .Select((d, i) => InProcessDiagnoserRouter.Create(d, benchmarkCase, i))
+                    .Where(r => r.handler != null)
+                    .ToArray(),
+                host,
+                parameters.DiagnoserRunMode,
+                new InProcessDiagnoserActionArgs(instance)
+            );
+            if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
+            {
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+                return default;
+            }
+            compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
+
+            var engineParameters = CreateEngineParameters(instance, benchmarkCase, host, compositeInProcessDiagnoserHandler);
             var engineFactory = GetEngineFactory(benchmarkCase);
 
             return (job, engineParameters, engineFactory);
@@ -80,12 +96,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 InfrastructureResolver.Instance);
         }
 
-        private static EngineParameters CreateEngineParameters<T>(
-            T instance,
-            BenchmarkCase benchmarkCase,
-            IHost host)
-        {
-            var engineParameters = new EngineParameters
+        private static EngineParameters CreateEngineParameters<T>(T instance, BenchmarkCase benchmarkCase, IHost host, CompositeInProcessDiagnoserHandler inProcessDiagnoserHandler)
+            => new()
             {
                 Host = host,
                 WorkloadActionUnroll = LoopCallbackFromMethod(instance, WorkloadActionUnrollMethodName),
@@ -99,9 +111,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 TargetJob = benchmarkCase.Job,
                 OperationsPerInvoke = benchmarkCase.Descriptor.OperationsPerInvoke,
                 MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
-                BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
+                BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase),
+                InProcessDiagnoserHandler = inProcessDiagnoserHandler
             };
-            return engineParameters;
-        }
     }
 }

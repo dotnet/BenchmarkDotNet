@@ -85,9 +85,7 @@ public class WakeLockTests : BenchmarkTestExecutor
         [Benchmark] public void Sleep() { }
     }
 
-#if !NET462
     [SupportedOSPlatform("windows")]
-#endif
     [TheoryEnvSpecific(EnvRequirement.WindowsOnly, EnvRequirement.NeedsPrivilegedProcess)]
     [InlineData(typeof(Default), "SYSTEM")]
     [InlineData(typeof(None), "")]
@@ -124,9 +122,7 @@ public class WakeLockTests : BenchmarkTestExecutor
     public class Base
     {
         [Benchmark]
-#if !NET462
         [SupportedOSPlatform("windows")]
-#endif
         public void SignalBenchmarkRunningAndWaitForGetPowerRequests()
         {
             using EventWaitHandle

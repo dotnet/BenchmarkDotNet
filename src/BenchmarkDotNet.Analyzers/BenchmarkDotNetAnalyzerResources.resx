@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Description" xml:space="preserve">
+    <value>The referenced benchmark class (or any of its inherited classes) must have at least one method annotated with the [Benchmark] attribute</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_MessageFormat" xml:space="preserve">
+    <value>Intended benchmark class '{0}' (or any of its ancestors) has no method(s) annotated with the [Benchmark] attribute</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_MessageFormat" xml:space="preserve">
+    <value>Referenced benchmark class '{0}' cannot be abstract</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMissingBenchmarkMethods_Title" xml:space="preserve">
+    <value>Benchmark class (or any of its ancestors) has no annotated method(s)</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Title" xml:space="preserve">
+    <value>Benchmark classes must be non-abstract</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassMustBeNonStatic_Description" xml:space="preserve">
+    <value>A benchmark class must be an instance class</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description" xml:space="preserve">
+    <value>A benchmark class annotated with a [GenericTypeArguments] attribute must be non-abstract</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat" xml:space="preserve">
+    <value>Benchmark class '{0}' cannot be static</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat" xml:space="preserve">
+    <value>Attribute [GenericTypeArguments] can only be applied to a non-abstract class</value>
+  </data>
+  <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat" xml:space="preserve">
+    <value>Referenced generic benchmark class '{0}' has no [GenericTypeArguments] attribute(s)</value>
+  </data>
+  <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Description" xml:space="preserve">
+    <value>A generic benchmark class referenced in the BenchmarkRunner.Run method must be annotated with at least one [GenericTypeArguments] attribute</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassMustBeNonStatic_Title" xml:space="preserve">
+    <value>Benchmark classes must be non-static</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title" xml:space="preserve">
+    <value>Benchmark classes annotated with the [GenericTypeArguments] attribute must be non-abstract</value>
+  </data>
+  <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Title" xml:space="preserve">
+    <value>Generic benchmark classes must be annotated with at least one [GenericTypeArguments] attribute</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBePublic_Title" xml:space="preserve">
+    <value>Benchmark classes must be public</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Description" xml:space="preserve">
+    <value>A benchmark class referenced in the BenchmarkRunner.Run method must be unsealed</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_MessageFormat" xml:space="preserve">
+    <value>Referenced benchmark class '{0}' is sealed</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed_Title" xml:space="preserve">
+    <value>Benchmark classes must be unsealed</value>
+  </data>
+  <data name="General_BenchmarkClass_MethodMustBePublic_Description" xml:space="preserve">
+    <value>A method annotated with the [Benchmark] attribute must be public</value>
+  </data>
+  <data name="General_BenchmarkClass_MethodMustBeNonGeneric_Description" xml:space="preserve">
+    <value>A method annotated with the [Benchmark] attribute must be non-generic</value>
+  </data>
+  <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Description" xml:space="preserve">
+    <value>The number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Description" xml:space="preserve">
+    <value>A benchmark class annotated with a [GenericTypeArguments] attribute must be generic, having between one to three type parameters</value>
+  </data>
+  <data name="General_BenchmarkClass_MethodMustBePublic_MessageFormat" xml:space="preserve">
+    <value>The benchmark method '{0}' must be public</value>
+  </data>
+  <data name="General_BenchmarkClass_MethodMustBeNonGeneric_MessageFormat" xml:space="preserve">
+    <value>The benchmark method '{0}' must be non-generic</value>
+  </data>
+  <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_MessageFormat" xml:space="preserve">
+    <value>Expected {0} type argument{1} as declared on the benchmark class '{2}', but found {3}. Update the attribute usage or the type parameter list of the class declaration to match.</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_MessageFormat" xml:space="preserve">
+    <value>Attribute [GenericTypeArguments] can only be applied to a generic class</value>
+  </data>
+  <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_MessageFormat" xml:space="preserve">
+    <value>Only one benchmark method can be marked as baseline per class</value>
+  </data>
+  <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_MessageFormat" xml:space="preserve">
+    <value>Only one benchmark method can be marked as baseline per class and category</value>
+  </data>
+  <data name="General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_MessageFormat" xml:space="preserve">
+    <value>Passing a single null argument creates a null params array. Use multiple arguments (e.g., null, "SomeCategory", ...) or a non-null value instead.</value>
+  </data>
+  <data name="General_BenchmarkClass_MethodMustBePublic_Title" xml:space="preserve">
+    <value>Benchmark methods must be public</value>
+  </data>
+  <data name="General_BenchmarkClass_MethodMustBeNonGeneric_Title" xml:space="preserve">
+    <value>Benchmark methods must be non-generic</value>
+  </data>
+  <data name="General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount_Title" xml:space="preserve">
+    <value>Number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class</value>
+  </data>
+  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title" xml:space="preserve">
+    <value>Benchmark classes annotated with a [GenericTypeArguments] attribute must be generic</value>
+  </data>
+  <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaseline_Title" xml:space="preserve">
+    <value>Only one benchmark method can be baseline per class</value>
+  </data>
+  <data name="General_BenchmarkClass_OnlyOneMethodCanBeBaselinePerCategory_Title" xml:space="preserve">
+    <value>Only one benchmark method can be baseline per class and category</value>
+  </data>
+  <data name="General_BenchmarkClass_SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed_Title" xml:space="preserve">
+    <value>Single null argument to the [BenchmarkCategory] attribute results in unintended null array</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField_Description" xml:space="preserve">
+    <value>Parameter attributes are mutually exclusive; only one of the attributes [Params], [ParamsSource] or [ParamsAllValues] can be applied to a field at any one time</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_FieldMustBePublic_Description" xml:space="preserve">
+    <value>A field annotated with a parameter attribute must be public</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyMustBePublic_Description" xml:space="preserve">
+    <value>A property annotated with a parameter attribute must be public</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter_Description" xml:space="preserve">
+    <value>A property annotated with a parameter attribute must have a public setter; make sure that the access modifier of the setter is empty and that the property is not an auto-property or an expression-bodied property.</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_MustHaveMatchingValueType_Description" xml:space="preserve">
+    <value>The type of each value provided to the [Params] attribute must match the type of (or be implicitly convertible to) the field or property it is applied to</value>
+  </data>
+  <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Description" xml:space="preserve">
+    <value>The [ParamsAllValues] attribute cannot be applied to a field or property of an enum type marked with the [Flags] attribute. Use this attribute only with non-flags enum types, as [Flags] enums support bitwise combinations that cannot be exhaustively enumerated.</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Description" xml:space="preserve">
+    <value>A property annotated with a parameter attribute must have a public, assignable setter i.e. { set; }</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty_Description" xml:space="preserve">
+    <value>Parameter attributes are mutually exclusive; only one of the attributes [Params], [ParamsSource] or [ParamsAllValues] can be applied to a property at any one time</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField_MessageFormat" xml:space="preserve">
+    <value>Duplicate parameter attribute on field '{0}'</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_FieldMustBePublic_MessageFormat" xml:space="preserve">
+    <value>Field '{0}' annotated with [{1}] must be public</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_MessageFormat" xml:space="preserve">
+    <value>Expected {0} value{1} as declared by the benchmark method '{2}', but found {3}. Update the attribute usage or method to match.</value>
+  </data>
+  <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_MessageFormat" xml:space="preserve">
+    <value>Benchmark method '{0}' without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_MessageFormat" xml:space="preserve">
+    <value>Unexpected type for argument value '{0}'. Expected '{1}' but found '{2}'.</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyMustBePublic_MessageFormat" xml:space="preserve">
+    <value>Property '{0}' annotated with [{1}] must be public</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter_MessageFormat" xml:space="preserve">
+    <value>Property '{0}' annotated with [{1}] must have a public setter</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_MustHaveValues_MessageFormat" xml:space="preserve">
+    <value>The [Params] attribute requires at least one value. No values were provided, or an empty array was specified.</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_MessageFormat" xml:space="preserve">
+    <value>Providing a single value to the [Params] attribute is unnecessary. This attribute is only useful when provided two or more values.</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_MustHaveMatchingValueType_MessageFormat" xml:space="preserve">
+    <value>Unexpected type for parameter value '{0}'. Expected '{1}' but found '{2}'.</value>
+  </data>
+  <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_MessageFormat" xml:space="preserve">
+    <value>Field or property enum type '{0}' is marked with [Flags] and cannot be used with this attribute</value>
+  </data>
+  <data name="Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool_MessageFormat" xml:space="preserve">
+    <value>The [ParamsAllValues] attribute can only be applied to a field or property of enum or bool type (or nullable of these types)</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_MessageFormat" xml:space="preserve">
+    <value>Property '{0}' annotated with [{1}] cannot be init-only</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty_MessageFormat" xml:space="preserve">
+    <value>Duplicate parameter attribute on property '{0}'</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnField_Title" xml:space="preserve">
+    <value>Only one parameter attribute can be applied to a field</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_FieldMustBePublic_Title" xml:space="preserve">
+    <value>Fields annotated with a parameter attribute must be public</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Title" xml:space="preserve">
+    <value>Number of values passed to an [Arguments] attribute must match the number of parameters declared in the targeted benchmark method</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Title" xml:space="preserve">
+    <value>Values passed to an [Arguments] attribute must match exactly the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyMustBePublic_Title" xml:space="preserve">
+    <value>Properties annotated with a parameter attribute must be public</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter_Title" xml:space="preserve">
+    <value>Properties annotated with a parameter attribute must have a public setter</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_MustHaveValues_Title" xml:space="preserve">
+    <value>The [Params] attribute must include at least one value</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute_Title" xml:space="preserve">
+    <value>Unnecessary single value passed to [Params] attribute</value>
+  </data>
+  <data name="Attributes_ParamsAttribute_MustHaveMatchingValueType_Title" xml:space="preserve">
+    <value>Type of all value(s) passed to the [Params] attribute must match the type of (or be implicitly convertible to) the annotated field or property</value>
+  </data>
+  <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Title" xml:space="preserve">
+    <value>The [ParamsAllValues] attribute cannot be applied to fields or properties of enum types marked with [Flags]</value>
+  </data>
+  <data name="Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool_Title" xml:space="preserve">
+    <value>The [ParamsAllValues] attribute is only valid on fields or properties of enum or bool type and nullable type for another allowed type</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Title" xml:space="preserve">
+    <value>Properties annotated with a parameter attribute cannot have an init-only setter</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty_Title" xml:space="preserve">
+    <value>Only one parameter attribute can be applied to a property</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_NotValidOnReadonlyField_Description" xml:space="preserve">
+    <value>Parameter attributes are not valid on fields with a readonly modifier</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_NotValidOnReadonlyField_Title" xml:space="preserve">
+    <value>Fields annotated with a parameter attribute cannot be read-only</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_NotValidOnConstantField_Title" xml:space="preserve">
+    <value>Parameter attributes are not valid on constant field declarations</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_NotValidOnReadonlyField_MessageFormat" xml:space="preserve">
+    <value>Modifier 'readonly' is not valid on field '{0}' annotated with parameter attribute [{1}]</value>
+  </data>
+  <data name="Attributes_GeneralParameterAttributes_NotValidOnConstantField_MessageFormat" xml:space="preserve">
+    <value>Parameter attribute [{0}] is not valid on constants. It is only valid on non-constant field declarations.</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueCount_Description" xml:space="preserve">
+    <value>The number of values passed to an [Arguments] attribute must match the number of parameters declared in the targeted benchmark method</value>
+  </data>
+  <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Description" xml:space="preserve">
+    <value>This method declares one or more parameters but is not annotated with either an [ArgumentsSource] attribute or one or more [Arguments] attributes. To ensure correct argument binding, methods with parameters must explicitly be annotated with an [ArgumentsSource] attribute or one or more [Arguments] attributes.
+Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the parameters.</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description" xml:space="preserve">
+    <value>The values passed to an [Arguments] attribute must match the parameters declared in the targeted benchmark method in both type (or be implicitly convertible to) and order</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_Title" xml:space="preserve">
+    <value>[Arguments(Source)] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute_MessageFormat" xml:space="preserve">
+    <value>The [Arguments(Source)] attribute can only be used on methods annotated with the [Benchmark] attribute</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract_Description" xml:space="preserve">
+    <value>A benchmark class referenced in the BenchmarkRunner.Run method must be non-abstract</value>
+  </data>
+  <data name="BenchmarkRunner_Run_TypeArgumentClassMustBePublic_MessageFormat" xml:space="preserve">
+    <value>Referenced benchmark class '{0}' must be public</value>
+  </data>
+  <data name="Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters_Title" xml:space="preserve">
+    <value>Benchmark methods without an [ArgumentsSource] or [Arguments] attribute(s) cannot declare parameters</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresParameters_Title" xml:space="preserve">
+    <value>[Arguments(Source)] attribute requires at least 1 parameter</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat" xml:space="preserve">
+    <value>Method {0} has no parameters</value>
+  </data>
+</root>

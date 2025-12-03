@@ -9,7 +9,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -235,12 +234,14 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             /* Invalid */
 
+#pragma warning disable BDN1107
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             public class Invalid_TwoMethodBaselines
             {
                 [Benchmark(Baseline = true)] public void Foo() {}
                 [Benchmark(Baseline = true)] public void Bar() {}
             }
+#pragma warning restore BDN1107
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2", baseline: true)]

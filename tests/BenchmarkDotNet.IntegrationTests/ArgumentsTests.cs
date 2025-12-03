@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -87,19 +89,84 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArgumentsSourceInAnotherClass
         {
             [Benchmark]
-            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.ArgumentsProvider))]
-            public void Simple(bool boolean, int number)
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveType))]
+            public void OnePrimitiveType(int number)
+            {
+                if (number % 2 != 1)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoPrimitiveTypes))]
+            public void TwoPrimitiveTypes(bool boolean, int number)
             {
                 if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OneNonPrimitiveType))]
+            public void OneNonPrimitiveType(Version version)
+            {
+                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                if (versionNumbers.Distinct().Count() != 4)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoNonPrimitiveTypes))]
+            public void TwoNonPrimitiveTypes(Version version, DateTime dateTime)
+            {
+                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                if (versionNumbers.Distinct().Count() != 4)
+                    throw new InvalidOperationException("Incorrect values were passed");
+
+                if (dateTime.Month != dateTime.Day)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveAndOneNonPrimitive))]
+            public void OnePrimitiveAndOneNonPrimitive(Version version, int number)
+            {
+                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                if (versionNumbers.Distinct().Count() != 4)
+                    throw new InvalidOperationException("Incorrect values were passed");
+
+                if (number != version.Major)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
         }
         public static class ExternalClassWithArgumentsSource
         {
-            public static IEnumerable<object[]> ArgumentsProvider()
+            public static IEnumerable<int> OnePrimitiveType()
+            {
+                yield return 3;
+                yield return 5;
+            }
+
+            public static IEnumerable<object[]> TwoPrimitiveTypes()
             {
                 yield return new object[] { true, 1 };
                 yield return new object[] { false, 2 };
+            }
+
+            public static IEnumerable<Version> OneNonPrimitiveType()
+            {
+                yield return new Version(1, 2, 3, 4);
+                yield return new Version(5, 6, 7, 8);
+            }
+
+            public static IEnumerable<object[]> TwoNonPrimitiveTypes()
+            {
+                yield return new object[] { new Version(1, 2, 3, 4), new DateTime(2011, 11, 11) };
+                yield return new object[] { new Version(5, 6, 7, 8), new DateTime(2002, 02, 02) };
+            }
+
+            public static IEnumerable<object[]> OnePrimitiveAndOneNonPrimitive()
+            {
+                yield return new object[] { new Version(1, 2, 3, 4), 1 };
+                yield return new object[] { new Version(5, 6, 7, 8), 5 };
             }
         }
 
@@ -234,6 +301,86 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void IEnumerableArgumentsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<EnumerableOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class EnumerableOnDifferentMethods
+        {
+            public IEnumerable<IEnumerable<int>> GetEnumerables()
+            {
+                yield return Enumerable.Range(1, 10);
+                yield return Enumerable.Range(2, 10);
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables2(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void IEnumerableArgumentsOfDifferentLengthsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<EnumerableOfDiffLengthOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class EnumerableOfDiffLengthOnDifferentMethods
+        {
+            public IEnumerable<IEnumerable<int>> GetEnumerables()
+            {
+                yield return Enumerable.Range(1, 10);
+                yield return Enumerable.Range(1, 11);
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables2(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void JaggedArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithJaggedArray>(toolchain);
 
         public class WithJaggedArray
@@ -246,9 +393,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentNullException(nameof(array));
 
                 for (int i = 0; i < 10; i++)
-                for (int j = 0; j < i; j++)
-                    if (array[i][j] != i)
-                        throw new ArgumentException("Invalid value");
+                    for (int j = 0; j < i; j++)
+                        if (array[i][j] != i)
+                            throw new ArgumentException("Invalid value");
             }
 
             public IEnumerable<object> CreateMatrix()
@@ -340,8 +487,32 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
-            EnvRequirement.DotNetCoreOnly)]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AnArrayFromArgumentsSourceCanBePassedToBenchmarkAsSpan(IToolchain toolchain) => CanExecute<WithArrayFromArgumentsSourceToSpan>(toolchain);
+
+        public class WithArrayFromArgumentsSourceToSpan
+        {
+            public IEnumerable<object[]> GetArray()
+            {
+                yield return new object[] { new[] { 0, 1, 2 } };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArray))]
+            public void AcceptsSpanFromArgumentsSource(Span<int> span)
+            {
+                if (span.Length != 3)
+                    throw new ArgumentException("Invalid length");
+
+                for (int i = 0; i < 3; i++)
+                    if (span[i] != i)
+                        throw new ArgumentException("Invalid value");
+            }
+        }
+
+        // The string -> ReadOnlySpan<char> implicit cast operator is available only in .NET Core 2.1+ (https://github.com/dotnet/corefx/issues/30121)
+#if NETCOREAPP2_1_OR_GREATER
+        [Theory]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
 
@@ -359,6 +530,31 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("Invalid value");
             }
         }
+
+        [Theory]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void StringFromArgumentsSourceCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringFromArgumentsSourceToReadOnlySpan>(toolchain);
+
+        public class WithStringFromArgumentsSourceToReadOnlySpan
+        {
+            private const string expectedString = "very nice string";
+
+            public IEnumerable<object[]> GetString()
+            {
+                yield return new object[] { expectedString };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetString))]
+            public void AcceptsReadOnlySpanFromArgumentsSource(ReadOnlySpan<char> notString)
+            {
+                string aString = notString.ToString();
+
+                if (aString != expectedString)
+                    throw new ArgumentException("Invalid value");
+            }
+        }
+#endif
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnArrayOfStringsCanBeUsedAsArgument(IToolchain toolchain) =>
@@ -426,6 +622,46 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void ArrayArgumentsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<ArrayOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class ArrayOnDifferentMethods
+        {
+            public IEnumerable<int[]> GetArrays()
+            {
+                yield return new int[] { 1, 2, 3 };
+                yield return new int[] { 2, 3, 4 };
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays(int[] arr)
+            {
+                if (arr.Length != 3)
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays2(int[] arr)
+            {
+                if (arr.Length != 3)
+                    throw new ArgumentException("Incorrect length");
             }
         }
 
@@ -775,11 +1011,17 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class ParamsSourcePointingToAnotherClass
         {
-            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Method))]
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.PrimitiveTypeMethod))]
             public int ParamOne { get; set; }
 
-            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.Property))]
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.PrimitiveTypeProperty))]
             public int ParamTwo { get; set; }
+
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeMethod))]
+            public Version ParamThree { get; set; }
+
+            [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeProperty))]
+            public Version ParamFour { get; set; }
 
             [Benchmark]
             public void Test()
@@ -788,19 +1030,34 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("The ParamOne value is incorrect!");
                 if (ParamTwo != 456)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
+                if (ParamThree != new Version(1, 2, 3, 4))
+                    throw new ArgumentException("The ParamThree value is incorrect!");
+                if (ParamFour != new Version(5, 6, 7, 8))
+                    throw new ArgumentException("The ParamFour value is incorrect!");
             }
         }
         public static class ExternalClassWithParamsSource
         {
-            public static IEnumerable<int> Method()
+            public static IEnumerable<int> PrimitiveTypeMethod()
             {
                 yield return 123;
             }
-            public static IEnumerable<int> Property
+            public static IEnumerable<int> PrimitiveTypeProperty
             {
                 get
                 {
                     yield return 456;
+                }
+            }
+            public static IEnumerable<Version> NonPrimitiveTypeMethod()
+            {
+                yield return new Version(1, 2, 3, 4);
+            }
+            public static IEnumerable<Version> NonPrimitiveTypeProperty
+            {
+                get
+                {
+                    yield return new Version(5, 6, 7, 8);
                 }
             }
         }
@@ -891,6 +1148,16 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
+        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig> furtherConfigure = null)
+        {
+            var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
+
+            if (furtherConfigure is not null)
+            {
+                config = furtherConfigure(config);
+            }
+
+            return CanExecute<T>(config);
+        }
     }
 }

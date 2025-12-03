@@ -23,9 +23,10 @@ namespace BenchmarkDotNet.IntegrationTests
         public void WhenUsingEventProcessorAndNoBenchmarks()
         {
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassEmpty) });
-            Assert.Equal(2, events.Count);
+            Assert.Equal(3, events.Count);
             Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
             Assert.Equal(nameof(EventProcessor.OnValidationError), events[1].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[2].EventType);
         }
 
         [Fact]
@@ -135,12 +136,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var toolchain = new AllUnsupportedToolchain();
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassA) }, toolchain: toolchain);
 
-            Assert.Equal(3, events.Count);
+            Assert.Equal(4, events.Count);
             Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
             Assert.Equal(nameof(EventProcessor.OnValidationError), events[1].EventType);
             Assert.Equal(typeof(ClassA).GetMethod(nameof(ClassA.Method1)), (events[1].Args[0] as ValidationError).BenchmarkCase.Descriptor.WorkloadMethod);
             Assert.Equal(nameof(EventProcessor.OnValidationError), events[2].EventType);
             Assert.Equal(typeof(ClassA).GetMethod(nameof(ClassA.Method2)), (events[2].Args[0] as ValidationError).BenchmarkCase.Descriptor.WorkloadMethod);
+            Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[3].EventType);
         }
 
         [Fact]

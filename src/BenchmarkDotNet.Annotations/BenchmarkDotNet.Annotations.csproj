@@ -11,7 +11,23 @@
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <!-- Settings for PolySharp -->
+  <PropertyGroup>
+    <PolySharpIncludeGeneratedTypes>
+      System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute,
+      System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes
+    </PolySharpIncludeGeneratedTypes>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="Attributes\CodeAnnotations.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\BenchmarkDotNet.Analyzers\bin\$(Configuration)\**\*.dll" Pack="true" PackagePath="analyzers/dotnet/" Visible="false" />
   </ItemGroup>
 </Project>

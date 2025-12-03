@@ -244,11 +244,14 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
+            int warmupCount = OsDetector.IsMacOS()
+                ? 5  // Workaround setting for macos. https://github.com/dotnet/BenchmarkDotNet/issues/2779
+                : 0; // Other OS don't need warmup
 
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
                 { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
-            }, warmupCount: 2);
+            }, warmupCount: warmupCount);
         }
 
         public class MultiThreadedAllocation
@@ -383,6 +386,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         new EnvironmentVariable("COMPlus_TieredCompilation", "0")
                     )
                     : job)
+                .WithBuildTimeout(TimeSpan.FromSeconds(240)) // Increase timeout for `MemoryDiagnoserSupportsModernMono` test on macos(x64)
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)
                 .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread

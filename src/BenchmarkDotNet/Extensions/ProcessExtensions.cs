@@ -1,19 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using JetBrains.Annotations;
-
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -216,27 +216,36 @@ namespace BenchmarkDotNet.Extensions
 
         private static (int exitCode, string output) RunProcessAndReadOutput(string fileName, string arguments, TimeSpan timeout)
         {
-            var startInfo = new ProcessStartInfo
+            using var process = new Process
             {
-                FileName = fileName,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                UseShellExecute = false
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                },
+                EnableRaisingEvents = true
             };
+            using var processOutputReader = new AsyncProcessOutputReader(process, readStandardError: false);
+            using var consoleExitHandler = new ConsoleExitHandler(process, NullLogger.Instance);
 
-            using (var process = Process.Start(startInfo))
+            process.Start();
+            processOutputReader.BeginRead();
+
+            bool isSuccess = process.WaitForExit((int)timeout.TotalMilliseconds);
+            if (!isSuccess)
             {
-                if (process.WaitForExit((int)timeout.TotalMilliseconds))
-                {
-                    return (process.ExitCode, process.StandardOutput.ReadToEnd());
-                }
-                else
-                {
-                    process.Kill();
-                }
+                processOutputReader.CancelRead();
+                consoleExitHandler.KillProcessTree();
 
-                return (process.ExitCode, default);
+                return (process.HasExited ? process.ExitCode : -1, default);
             }
+
+            processOutputReader.StopRead();
+            return (process.ExitCode, processOutputReader.GetOutputText());
         }
 
         private static int RunProcessAndIgnoreOutput(string fileName, string arguments, TimeSpan timeout)

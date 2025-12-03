@@ -6,6 +6,7 @@ using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 using Perfolizer;
 using Perfolizer.Mathematics.QuantileEstimators;
+using Pragmastat;
 
 namespace BenchmarkDotNet.Mathematics
 {

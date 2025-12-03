@@ -54,6 +54,9 @@ src/BenchmarkDotNet/Disassemblers/BenchmarkDotNet.Disassembler.*.nupkg
 # Visual Studio 2015 cache/options directory
 .vs/
 
+# VSCode directory
+.vscode/
+
 # Cake
 tools/**
 .dotnet
@@ -63,3 +66,13 @@ Resource.designer.cs
 
 # Tests
 TestResults
+
+## Mac OS
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*

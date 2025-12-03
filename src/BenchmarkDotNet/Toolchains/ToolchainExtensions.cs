@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -19,28 +18,37 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal static class ToolchainExtensions
     {
-        internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
+        internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase)
+            => benchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain)
+                ? toolchain
+                : GetToolchain(
+                    benchmarkCase.GetRuntime(),
+                    benchmarkCase.Descriptor,
+                    benchmarkCase.Job.HasDynamicBuildCharacteristic(),
+                    benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                );
 
-        internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
-
-        private static IToolchain GetToolchain(Job job, Descriptor descriptor)
+        internal static IToolchain GetToolchain(this Job job)
             => job.Infrastructure.TryGetToolchain(out var toolchain)
                 ? toolchain
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
-                    descriptor,
-                    job.HasDynamicBuildCharacteristic());
+                    null,
+                    job.HasDynamicBuildCharacteristic(),
+                    job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                );
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false, bool isRuntimeExplicit = false)
         {
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework
-                        && RuntimeInformation.GetCurrentRuntime().MsBuildMoniker == runtime.MsBuildMoniker)
-                    {
+                    bool UseRoslyn()
+                        => !isRuntimeExplicit
+                        || runtime.MsBuildMoniker == ClrRuntime.GetTargetOrCurrentVersion(descriptor?.WorkloadMethod.DeclaringType.Assembly).MsBuildMoniker;
+
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework && UseRoslyn())
                         return RoslynToolchain.Instance;
-                    }
 
                     return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                         ? GetToolchain(clrRuntime.RuntimeMoniker)

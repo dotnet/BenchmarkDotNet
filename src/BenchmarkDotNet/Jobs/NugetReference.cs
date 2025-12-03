@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Jobs
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This type will soon be removed")]
     public class NuGetReference : IEquatable<NuGetReference>
     {
         public NuGetReference(string packageName, string packageVersion, Uri? source = null, bool prerelease = false)

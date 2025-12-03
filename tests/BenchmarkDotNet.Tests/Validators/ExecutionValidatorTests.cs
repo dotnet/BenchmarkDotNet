@@ -281,11 +281,11 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class NonPublicFieldWithParams
         {
-#pragma warning disable CS0649
+#pragma warning disable CS0649, BDN1202
             [Params(1)]
             [UsedImplicitly]
             internal int Field;
-#pragma warning restore CS0649
+#pragma warning restore CS0649, BDN1202
 
             [Benchmark]
             public void NonThrowing() { }
@@ -299,7 +299,9 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class FieldsWithoutParamsValues
         {
+#pragma warning disable BDN1300
             [Params]
+#pragma warning restore BDN1300
             [UsedImplicitly]
             public int FieldWithoutValuesSpecified;
 

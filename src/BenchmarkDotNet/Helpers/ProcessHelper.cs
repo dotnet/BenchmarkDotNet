@@ -23,7 +23,6 @@ namespace BenchmarkDotNet.Helpers
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true
             };
             if (environmentVariables != null)
                 foreach (var variable in environmentVariables)

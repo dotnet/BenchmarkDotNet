@@ -13,13 +13,18 @@
     <NoWarn>$(NoWarn);CA1018;CA5351;CA1825</NoWarn>
     <!-- Disable entry point generation as this project has it's own entry point -->
     <GenerateProgramFile>false</GenerateProgramFile>
+    <!-- Disable parallel tests between TargetFrameworks -->
+    <TestTfmsInParallel>false</TestTfmsInParallel>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Reflection" />
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Use 9.0.0 as baseline package for IntroNuGet -->
+    <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+  </PropertyGroup>
   <ItemGroup>
-    <!-- Use v9.0.0 as baseline package for WithNuGet tests -->
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
@@ -34,5 +39,9 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Enables analyzers for this project (this is required since ProjectReference is not transitive). -->
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
   </ItemGroup>
 </Project>

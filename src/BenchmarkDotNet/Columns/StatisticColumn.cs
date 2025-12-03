@@ -10,6 +10,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.Multimodality;
 using Perfolizer.Metrology;
+using Pragmastat.Metrology;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -153,12 +154,11 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                ? TimeInterval.FromNanoseconds(value)
-                    .ToString(
-                        style.TimeUnit,
-                        format,
-                        style.CultureInfo,
-                        new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true))
+                ? PerfolizerMeasurementFormatter.Instance.Format(
+                    TimeInterval.FromNanoseconds(value).ToMeasurement(style.TimeUnit),
+                    format,
+                    style.CultureInfo,
+                    new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true))
                 : value.ToString(format, style.CultureInfo);
         }
 

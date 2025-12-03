@@ -8,30 +8,30 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   Job2   : extra output line
 
 
- Method | Job  | Param | Mean       | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup         | Baseline |
-------- |----- |------ |-----------:|--------:|--------:|------:|--------:|-----:|--------------------- |--------- |
- A1     | Job1 | 2     |   114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | CatA-[Param=2]-Job1  | Yes      | ^
- A2     | Job1 | 2     |   214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | CatA-[Param=2]-Job1  | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- A1     | Job2 | 2     |   314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.04 |    1 | CatA-[Param=2]-Job2  | Yes      |
- A2     | Job2 | 2     |   414.5 ns | 5.88 ns | 8.80 ns |  1.32 |    0.05 |    2 | CatA-[Param=2]-Job2  | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- A1     | Job1 | 10    |   514.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | CatA-[Param=10]-Job1 | Yes      | ^
- A2     | Job1 | 10    |   614.5 ns | 5.88 ns | 8.80 ns |  1.19 |    0.03 |    2 | CatA-[Param=10]-Job1 | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- A1     | Job2 | 10    |   714.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | CatA-[Param=10]-Job2 | Yes      |
- A2     | Job2 | 10    |   814.5 ns | 5.88 ns | 8.80 ns |  1.14 |    0.02 |    2 | CatA-[Param=10]-Job2 | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- B1     | Job1 | 2     |   914.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-[Param=2]-Job1  | Yes      | ^
- B2     | Job1 | 2     | 1,014.5 ns | 5.88 ns | 8.80 ns |  1.11 |    0.01 |    2 | CatB-[Param=2]-Job1  | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- B1     | Job2 | 2     | 1,114.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-[Param=2]-Job2  | Yes      |
- B2     | Job2 | 2     | 1,214.5 ns | 5.88 ns | 8.80 ns |  1.09 |    0.01 |    2 | CatB-[Param=2]-Job2  | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- B1     | Job1 | 10    | 1,314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-[Param=10]-Job1 | Yes      | ^
- B2     | Job1 | 10    | 1,414.5 ns | 5.88 ns | 8.80 ns |  1.08 |    0.01 |    2 | CatB-[Param=10]-Job1 | No       |
-        |      |       |            |         |         |       |         |      |                      |          |
- B1     | Job2 | 10    | 1,514.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-[Param=10]-Job2 | Yes      |
- B2     | Job2 | 10    | 1,614.5 ns | 5.88 ns | 8.80 ns |  1.07 |    0.01 |    2 | CatB-[Param=10]-Job2 | No       |
+ Method | Job  | Param | Mean       | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                | Baseline |
+------- |----- |------ |-----------:|--------:|--------:|------:|--------:|-----:|---------------------------- |--------- |
+ A1     | Job1 | 2     |   114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | CatA-DistinctParamSet0-Job1 | Yes      | ^
+ A2     | Job1 | 2     |   214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | CatA-DistinctParamSet0-Job1 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ A1     | Job2 | 2     |   314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.04 |    1 | CatA-DistinctParamSet0-Job2 | Yes      |
+ A2     | Job2 | 2     |   414.5 ns | 5.88 ns | 8.80 ns |  1.32 |    0.05 |    2 | CatA-DistinctParamSet0-Job2 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ A1     | Job1 | 10    |   514.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | CatA-DistinctParamSet4-Job1 | Yes      | ^
+ A2     | Job1 | 10    |   614.5 ns | 5.88 ns | 8.80 ns |  1.19 |    0.03 |    2 | CatA-DistinctParamSet4-Job1 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ A1     | Job2 | 10    |   714.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | CatA-DistinctParamSet4-Job2 | Yes      |
+ A2     | Job2 | 10    |   814.5 ns | 5.88 ns | 8.80 ns |  1.14 |    0.02 |    2 | CatA-DistinctParamSet4-Job2 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ B1     | Job1 | 2     |   914.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-DistinctParamSet0-Job1 | Yes      | ^
+ B2     | Job1 | 2     | 1,014.5 ns | 5.88 ns | 8.80 ns |  1.11 |    0.01 |    2 | CatB-DistinctParamSet0-Job1 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ B1     | Job2 | 2     | 1,114.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-DistinctParamSet0-Job2 | Yes      |
+ B2     | Job2 | 2     | 1,214.5 ns | 5.88 ns | 8.80 ns |  1.09 |    0.01 |    2 | CatB-DistinctParamSet0-Job2 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ B1     | Job1 | 10    | 1,314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-DistinctParamSet4-Job1 | Yes      | ^
+ B2     | Job1 | 10    | 1,414.5 ns | 5.88 ns | 8.80 ns |  1.08 |    0.01 |    2 | CatB-DistinctParamSet4-Job1 | No       |
+        |      |       |            |         |         |       |         |      |                             |          |
+ B1     | Job2 | 10    | 1,514.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | CatB-DistinctParamSet4-Job2 | Yes      |
+ B2     | Job2 | 10    | 1,614.5 ns | 5.88 ns | 8.80 ns |  1.07 |    0.01 |    2 | CatB-DistinctParamSet4-Job2 | No       |
 
 Errors: 0

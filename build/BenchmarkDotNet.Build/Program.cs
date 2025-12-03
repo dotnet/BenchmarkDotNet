@@ -99,6 +99,28 @@ public class UnitTestsTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Run analyzer tests")]
+[IsDependentOn(typeof(BuildTask))]
+public class AnalyzerTestsTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "analyzer-tests";
+    public override void Run(BuildContext context) => context.UnitTestRunner.RunAnalyzerTests();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples =
+            [
+                new Example(Name)
+                    .WithArgument(KnownOptions.Exclusive)
+                    .WithArgument(KnownOptions.Verbosity, "Diagnostic")
+            ]
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Run integration tests using .NET Framework 4.6.2+ (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
@@ -123,8 +145,9 @@ public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
-[TaskDescription("Run all unit and integration tests (slow)")]
+[TaskDescription("Run all unit, analyzer, and integration tests (slow)")]
 [IsDependentOn(typeof(UnitTestsTask))]
+[IsDependentOn(typeof(AnalyzerTestsTask))]
 [IsDependentOn(typeof(InTestsFullTask))]
 [IsDependentOn(typeof(InTestsCoreTask))]
 public class AllTestsTask : FrostingTask<BuildContext>, IHelpProvider
@@ -134,8 +157,47 @@ public class AllTestsTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Build BenchmarkDotNet.Analyzers")]
+public class BuildAnalyzersTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "build-analyzers";
+    public override void Run(BuildContext context) => context.BuildRunner.BuildAnalyzers();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples =
+            [
+                new Example(Name)
+            ]
+        };
+    }
+}
+
+[TaskName(Name)]
+[TaskDescription("Move updated analyzer rules from unshipped to shipped file")]
+public class MoveAnalyzerRulesTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "move-analyzer-rules";
+    public override void Run(BuildContext context) => context.DocumentationRunner.MoveAnalyzerRules();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Examples =
+            [
+                new Example(Name)
+            ]
+        };
+    }
+}
+
+[TaskName(Name)]
 [TaskDescription("Pack Nupkg packages")]
 [IsDependentOn(typeof(BuildTask))]
+[IsDependentOn(typeof(BuildAnalyzersTask))]
 public class PackTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "pack";
@@ -168,7 +230,7 @@ public class DocsFetchTask : FrostingTask<BuildContext>, IHelpProvider
         return new HelpInfo
         {
             Description = $"This task updates the following files:\n" +
-                          $"* Clones branch 'docs-changelog' to docs/_changelog\n" +
+                          $"* Clones or fetches branch 'docs-changelog' to docs/_changelog\n" +
                           $"* Last changelog footer (if {KnownOptions.Stable.CommandLineName} is specified)\n" +
                           $"* All changelog details in docs/_changelog\n" +
                           $"  (This dir is a cloned version of this repo from branch {Repo.ChangelogBranch})",
@@ -196,10 +258,11 @@ public class DocsGenerateTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Options = [KnownOptions.DocsPreview],
+            Options = [KnownOptions.DocsPreview, KnownOptions.Stable],
             Examples =
             [
-                new Example(Name).WithArgument(KnownOptions.DocsPreview)
+                new Example(Name).WithArgument(KnownOptions.DocsPreview),
+                new Example(Name).WithArgument(KnownOptions.Stable)
             ]
         };
     }
@@ -220,6 +283,25 @@ public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
         Examples =
         [
             new Example(Name).WithArgument(KnownOptions.DocsPreview)
+        ]
+    };
+}
+
+[TaskName(Name)]
+[TaskDescription("Increments the current version")]
+public class VersionIncrementTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "version-increment";
+    public override void Run(BuildContext context) => context.ReleaseRunner.VersionIncrement();
+
+    public HelpInfo GetHelp() => new()
+    {
+        Options = [KnownOptions.NextVersion],
+        Examples =
+        [
+            new Example(Name),
+            new Example(Name)
+                .WithArgument(KnownOptions.NextVersion, "0.1.1729")
         ]
     };
 }

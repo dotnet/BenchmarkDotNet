@@ -16,9 +16,7 @@ internal class PowerShellLocator
         $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}" +
         $"v1.0{Path.DirectorySeparatorChar}powershell.exe";
 
-#if NET6_0_OR_GREATER
         [SupportedOSPlatform("windows")]
-#endif
     internal static string? LocateOnWindows()
     {
         if (OsDetector.IsWindows() == false)

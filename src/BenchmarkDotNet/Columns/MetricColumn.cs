@@ -4,6 +4,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
+using Pragmastat.Metrology;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -48,14 +49,21 @@ namespace BenchmarkDotNet.Columns
             string numberFormat = descriptor.NumberFormat;
 
             if (printUnits && descriptor.UnitType == UnitType.CodeSize)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.CodeSizeUnit, numberFormat, cultureInfo, unitPresentation);
+            {
+                var measurement = SizeValue.FromBytes((long)metric.Value).ToMeasurement(style.CodeSizeUnit);
+                return PerfolizerMeasurementFormatter.Instance.Format(measurement, numberFormat, cultureInfo, unitPresentation);
+            }
             if (printUnits && descriptor.UnitType == UnitType.Size)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, numberFormat, cultureInfo, unitPresentation);
+            {
+                var measurement = SizeValue.FromBytes((long)metric.Value).ToMeasurement(style.SizeUnit);
+                return PerfolizerMeasurementFormatter.Instance.Format(measurement, numberFormat, cultureInfo, unitPresentation);
+            }
             if (printUnits && descriptor.UnitType == UnitType.Time)
             {
                 if (numberFormat.IsBlank())
                     numberFormat = "N4";
-                return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, numberFormat, cultureInfo, unitPresentation);
+                var measurement = TimeInterval.FromNanoseconds(metric.Value).ToMeasurement(style.TimeUnit);
+                return PerfolizerMeasurementFormatter.Instance.Format(measurement, numberFormat, cultureInfo, unitPresentation);
             }
 
             return metric.Value.ToString(numberFormat, cultureInfo);

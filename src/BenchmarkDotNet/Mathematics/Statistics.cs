@@ -8,6 +8,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.QuantileEstimators;
+using Pragmastat;
 
 namespace BenchmarkDotNet.Mathematics
 {

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
@@ -13,27 +11,25 @@ namespace BenchmarkDotNet.Running
     {
         public static BuildPartition[] CreateForBuild(BenchmarkRunInfo[] supportedBenchmarks, IResolver resolver)
             => supportedBenchmarks
-                .SelectMany(info => info.BenchmarksCases.Select(benchmark => (benchmark, benchmark.Config)))
+                .SelectMany(info => info.BenchmarksCases.Select(benchmark => (benchmark, benchmark.Config, info.CompositeInProcessDiagnoser)))
                 .GroupBy(tuple => tuple.benchmark, BenchmarkRuntimePropertiesComparer.Instance)
-                .Select(group => new BuildPartition(group.Select((item, index) => new BenchmarkBuildInfo(item.benchmark, item.Config, index)).ToArray(), resolver))
+                .Select(group => new BuildPartition([.. group.Select((item, index) => new BenchmarkBuildInfo(item.benchmark, item.Config, index, item.CompositeInProcessDiagnoser))], resolver))
                 .ToArray();
 
         internal class BenchmarkRuntimePropertiesComparer : IEqualityComparer<BenchmarkCase>
         {
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkRuntimePropertiesComparer();
 
-            private static readonly Runtime Current = RuntimeInformation.GetCurrentRuntime();
-
             public bool Equals(BenchmarkCase x, BenchmarkCase y)
             {
-                if (x == null && y == null)
+                if (x == y)
                     return true;
                 if (x == null || y == null)
                     return false;
                 var jobX = x.Job;
                 var jobY = y.Job;
 
-                if (AreDifferent(GetRuntime(jobX), GetRuntime(jobY))) // Mono vs .NET vs Core
+                if (AreDifferent(x.GetRuntime(), y.GetRuntime())) // Mono vs .NET vs Core
                     return false;
                 if (AreDifferent(x.GetToolchain(), y.GetToolchain())) // Mono vs .NET vs Core vs InProcess
                     return false;
@@ -47,8 +43,10 @@ namespace BenchmarkDotNet.Running
                     return false;
                 if (AreDifferent(jobX.Infrastructure.Arguments, jobY.Infrastructure.Arguments)) // arguments can be anything (Mono runtime settings or MsBuild parameters)
                     return false;
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (AreDifferent(jobX.Infrastructure.NuGetReferences, jobY.Infrastructure.NuGetReferences))
                     return false;
+#pragma warning restore CS0618 // Type or member is obsolete
                 if (!jobX.Environment.Gc.Equals(jobY.Environment.Gc)) // GC settings are per .config/.csproj
                     return false;
 
@@ -81,25 +79,15 @@ namespace BenchmarkDotNet.Running
                 hashCode.Add(job.Infrastructure.BuildConfiguration);
                 foreach (var arg in job.Infrastructure.Arguments ?? Array.Empty<Argument>())
                     hashCode.Add(arg);
+#pragma warning disable CS0618 // Type or member is obsolete
                 foreach (var reference in job.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
                     hashCode.Add(reference);
+#pragma warning restore CS0618 // Type or member is obsolete
                 return hashCode.ToHashCode();
             }
 
-            private static Runtime GetRuntime(Job job)
-                => job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                    ? job.Environment.Runtime
-                    : Current;
-
             private static bool AreDifferent(object x, object y)
-            {
-                if (x == null && y == null)
-                    return false;
-                if (x == null || y == null)
-                    return true;
-
-                return !x.Equals(y);
-            }
+                => !Equals(x, y);
 
             private static bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
             {

@@ -8,24 +8,24 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
   Job2   : extra output line
 
 
- Method | Job  | Param | Mean       | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                                  | Baseline |
-------- |----- |------ |-----------:|--------:|--------:|------:|--------:|-----:|---------------------------------------------- |--------- |
- Base   | Job1 | 2     |   114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | [Param=2]-JobBaseline_MethodsParamsJobs.Base  | Yes      | ^
- Base   | Job2 | 2     |   414.5 ns | 5.88 ns | 8.80 ns |  3.64 |    0.29 |    2 | [Param=2]-JobBaseline_MethodsParamsJobs.Base  | No       |
-        |      |       |            |         |         |       |         |      |                                               |          |
- Foo    | Job1 | 2     |   214.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.06 |    1 | [Param=2]-JobBaseline_MethodsParamsJobs.Foo   | Yes      |
- Foo    | Job2 | 2     |   514.5 ns | 5.88 ns | 8.80 ns |  2.40 |    0.11 |    2 | [Param=2]-JobBaseline_MethodsParamsJobs.Foo   | No       |
-        |      |       |            |         |         |       |         |      |                                               |          |
- Bar    | Job1 | 2     |   314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.04 |    1 | [Param=2]-JobBaseline_MethodsParamsJobs.Bar   | Yes      |
- Bar    | Job2 | 2     |   614.5 ns | 5.88 ns | 8.80 ns |  1.96 |    0.06 |    2 | [Param=2]-JobBaseline_MethodsParamsJobs.Bar   | No       |
-        |      |       |            |         |         |       |         |      |                                               |          |
- Base   | Job1 | 10    |   714.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | [Param=10]-JobBaseline_MethodsParamsJobs.Base | Yes      | ^
- Base   | Job2 | 10    | 1,014.5 ns | 5.88 ns | 8.80 ns |  1.42 |    0.02 |    2 | [Param=10]-JobBaseline_MethodsParamsJobs.Base | No       |
-        |      |       |            |         |         |       |         |      |                                               |          |
- Foo    | Job1 | 10    |   814.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | [Param=10]-JobBaseline_MethodsParamsJobs.Foo  | Yes      |
- Foo    | Job2 | 10    | 1,114.5 ns | 5.88 ns | 8.80 ns |  1.37 |    0.02 |    2 | [Param=10]-JobBaseline_MethodsParamsJobs.Foo  | No       |
-        |      |       |            |         |         |       |         |      |                                               |          |
- Bar    | Job1 | 10    |   914.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | [Param=10]-JobBaseline_MethodsParamsJobs.Bar  | Yes      |
- Bar    | Job2 | 10    | 1,214.5 ns | 5.88 ns | 8.80 ns |  1.33 |    0.02 |    2 | [Param=10]-JobBaseline_MethodsParamsJobs.Bar  | No       |
+ Method | Job  | Param | Mean       | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup                                         | Baseline |
+------- |----- |------ |-----------:|--------:|--------:|------:|--------:|-----:|----------------------------------------------------- |--------- |
+ Base   | Job1 | 2     |   114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DistinctParamSet0-JobBaseline_MethodsParamsJobs.Base | Yes      | ^
+ Base   | Job2 | 2     |   414.5 ns | 5.88 ns | 8.80 ns |  3.64 |    0.29 |    2 | DistinctParamSet0-JobBaseline_MethodsParamsJobs.Base | No       |
+        |      |       |            |         |         |       |         |      |                                                      |          |
+ Foo    | Job1 | 2     |   214.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.06 |    1 | DistinctParamSet0-JobBaseline_MethodsParamsJobs.Foo  | Yes      |
+ Foo    | Job2 | 2     |   514.5 ns | 5.88 ns | 8.80 ns |  2.40 |    0.11 |    2 | DistinctParamSet0-JobBaseline_MethodsParamsJobs.Foo  | No       |
+        |      |       |            |         |         |       |         |      |                                                      |          |
+ Bar    | Job1 | 2     |   314.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.04 |    1 | DistinctParamSet0-JobBaseline_MethodsParamsJobs.Bar  | Yes      |
+ Bar    | Job2 | 2     |   614.5 ns | 5.88 ns | 8.80 ns |  1.96 |    0.06 |    2 | DistinctParamSet0-JobBaseline_MethodsParamsJobs.Bar  | No       |
+        |      |       |            |         |         |       |         |      |                                                      |          |
+ Base   | Job1 | 10    |   714.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | DistinctParamSet6-JobBaseline_MethodsParamsJobs.Base | Yes      | ^
+ Base   | Job2 | 10    | 1,014.5 ns | 5.88 ns | 8.80 ns |  1.42 |    0.02 |    2 | DistinctParamSet6-JobBaseline_MethodsParamsJobs.Base | No       |
+        |      |       |            |         |         |       |         |      |                                                      |          |
+ Foo    | Job1 | 10    |   814.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.02 |    1 | DistinctParamSet6-JobBaseline_MethodsParamsJobs.Foo  | Yes      |
+ Foo    | Job2 | 10    | 1,114.5 ns | 5.88 ns | 8.80 ns |  1.37 |    0.02 |    2 | DistinctParamSet6-JobBaseline_MethodsParamsJobs.Foo  | No       |
+        |      |       |            |         |         |       |         |      |                                                      |          |
+ Bar    | Job1 | 10    |   914.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.01 |    1 | DistinctParamSet6-JobBaseline_MethodsParamsJobs.Bar  | Yes      |
+ Bar    | Job2 | 10    | 1,214.5 ns | 5.88 ns | 8.80 ns |  1.33 |    0.02 |    2 | DistinctParamSet6-JobBaseline_MethodsParamsJobs.Bar  | No       |
 
 Errors: 0
