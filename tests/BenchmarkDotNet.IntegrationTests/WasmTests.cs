@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
@@ -28,6 +29,12 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private ManualConfig GetConfig()
         {
+            // Test fails on Linux non-x64.
+            if (OsDetector.IsLinux() && RuntimeInformation.GetCurrentPlatform() != Platform.X64)
+            {
+                return;
+            }
+
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm");
