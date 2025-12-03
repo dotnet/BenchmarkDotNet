@@ -40,9 +40,14 @@ namespace BenchmarkDotNet.Extensions
         {
             var typeName = GetCorrectCSharpTypeNameUnprefixed(type, includeNamespace, includeGenericArgumentsNamespace);
 
-            if (typeName == "void" || typeName.StartsWith("global::")) return typeName;
+            if (IsVoidType(typeName) || typeName.StartsWith("global::") || type.GetTypeInfo().IsGenericParameter) return typeName;
 
             return $"global::{typeName}";
+        }
+
+        private static bool IsVoidType(string typeName)
+        {
+            return typeName.StartsWith("void") && typeName[4..].Distinct().DefaultIfEmpty('*').First() == '*';
         }
 
         private static string GetCorrectCSharpTypeNameUnprefixed(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
