@@ -666,6 +666,44 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void MultidimensionalArraysAreProperlyDisplayed(IToolchain toolchain)
+        {
+            var summary = CanExecute<WithMultidimensionalArrayArgument>(toolchain);
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            Assert.Equal(
+                "Int32[2, 3]",
+                summary.Table.Columns.Where(col => col.Header == "arr").First().Content[0]
+            );
+        }
+
+        public class WithMultidimensionalArrayArgument
+        {
+            public IEnumerable<int[,]> GetArrays()
+            {
+                yield return new int[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays(int[,] arr)
+            {
+                if (arr.Length == 0)
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays2(int[,] arr)
+            {
+                if (arr.Length == 0)
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void VeryBigIntegersAreSupported(IToolchain toolchain) => CanExecute<WithVeryBigInteger>(toolchain);
 
         public class WithVeryBigInteger
