@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Helpers
         // we can't simply use type.FullName, because for generics it's too long
         // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
         public static string ToFolderName(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = false)
-            => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace)));
+            => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace, prefixWithGlobal: false)));
 
         private static string Escape(StringBuilder builder)
         {

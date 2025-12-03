@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
+        public abstract string GetWorkloadMethodCall(string passArguments);
+
+        protected string WorkloadMethodPrefix => Descriptor.WorkloadMethod.IsStatic ? Descriptor.WorkloadMethod.DeclaringType.GetCorrectCSharpTypeName() : "base";
 
         private string GetMethodName(MethodInfo method)
         {
@@ -48,15 +50,15 @@ namespace BenchmarkDotNet.Code
         }
     }
 
-    internal class SyncDeclarationsProvider : DeclarationsProvider
+    internal class SyncDeclarationsProvider(Descriptor descriptor) : DeclarationsProvider(descriptor)
     {
-        public SyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public override string GetWorkloadMethodCall(string passArguments)
+             => $"{WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments})";
     }
 
-    internal class AsyncDeclarationsProvider : DeclarationsProvider
+    internal class AsyncDeclarationsProvider(Descriptor descriptor) : DeclarationsProvider(descriptor)
     {
-        public AsyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
+        public override string GetWorkloadMethodCall(string passArguments)
+            => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments}))";
     }
 }
