@@ -215,18 +215,22 @@ namespace BenchmarkDotNet.Tests.Engine
         }
 
         private EngineParameters CreateEngineParameters(Job job)
-            => new()
+        {
+            var host = new NoAcknowledgementConsoleHost();
+            return new()
             {
                 GlobalSetupAction = GlobalSetup,
                 GlobalCleanupAction = GlobalCleanup,
-                Host = new NoAcknowledgementConsoleHost(),
+                Host = host,
                 OverheadActionUnroll = _ => { },
                 OverheadActionNoUnroll = _ => { },
                 IterationCleanupAction = IterationCleanup,
                 IterationSetupAction = IterationSetup,
                 WorkloadActionUnroll = _ => { },
                 WorkloadActionNoUnroll = _ => { },
-                TargetJob = job
+                TargetJob = job,
+                InProcessDiagnoserHandler = new([], host, Diagnosers.RunMode.None, null)
             };
+        }
     }
 }
