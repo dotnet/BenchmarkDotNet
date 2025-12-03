@@ -18,6 +18,10 @@ namespace BenchmarkDotNet.Diagnosers
         /// <param name="exportHtml">Exports to HTML with clickable links. False by default.</param>
         /// <param name="exportCombinedDisassemblyReport">Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</param>
         /// <param name="exportDiff">Exports a diff of the assembly code to the Github markdown format. False by default.</param>
+        /// <param name="runInHost">
+        /// If <see langword="true"/>, disassembly will be ran in the host process; otherwise it will be ran in the benchmark process.
+        /// Requires host and benchmark processes to target the same platform (must have the same bit-ness).
+        /// </param>
         [PublicAPI]
         public DisassemblyDiagnoserConfig(
             int maxDepth = 1,
@@ -29,7 +33,8 @@ namespace BenchmarkDotNet.Diagnosers
             bool exportGithubMarkdown = true,
             bool exportHtml = false,
             bool exportCombinedDisassemblyReport = false,
-            bool exportDiff = false)
+            bool exportDiff = false,
+            bool runInHost = false)
         {
             if (!(syntax is DisassemblySyntax.Masm or DisassemblySyntax.Intel or DisassemblySyntax.Att))
             {
@@ -37,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             MaxDepth = maxDepth;
-            Filters = filters ?? Array.Empty<string>();
+            Filters = filters ?? [];
             Syntax = syntax;
             Formatting = formatterOptions ?? GetDefaults(syntax);
             PrintSource = printSource;
@@ -46,6 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
             ExportHtml = exportHtml;
             ExportCombinedDisassemblyReport = exportCombinedDisassemblyReport;
             ExportDiff = exportDiff;
+            RunInHost = runInHost;
         }
 
         public bool PrintSource { get; }
@@ -58,6 +64,7 @@ namespace BenchmarkDotNet.Diagnosers
         public bool ExportHtml { get; }
         public bool ExportCombinedDisassemblyReport { get; }
         public bool ExportDiff { get; }
+        public bool RunInHost { get; }
 
         // user can specify a formatter without symbol solver
         // so we need to clone the formatter with settings and provide our symbols solver

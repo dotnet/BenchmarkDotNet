@@ -48,8 +48,10 @@ namespace BenchmarkDotNet.Tests.Engine
                 Infrastructure = { Clock = new MockClock(clockFrequency) },
                 Accuracy = { MaxRelativeError = maxRelativeError }
             }.Freeze();
-            var engine = new MockEngine(output, job, data => data.InvokeCount * operationTime);
-            var (invokeCount, _) = engine.Run(EnginePilotStage.GetStage(engine));
+            var engine = new MockEngine(output, job, data => data.invokeCount * operationTime);
+            var pilotStage = EnginePilotStage.GetStage(1, 1, 1, engine.Parameters);
+            engine.Run(pilotStage);
+            var invokeCount = pilotStage.invokeCount;
             output.WriteLine($"InvokeCount = {invokeCount} (Min= {minInvokeCount}, Max = {MaxPossibleInvokeCount})");
             Assert.InRange(invokeCount, minInvokeCount, MaxPossibleInvokeCount);
         }
@@ -61,8 +63,10 @@ namespace BenchmarkDotNet.Tests.Engine
                 Infrastructure = { Clock = new MockClock(Frequency.MHz) },
                 Run = { IterationTime = iterationTime }
             }.Freeze();
-            var engine = new MockEngine(output, job, data => data.InvokeCount * operationTime);
-            var (invokeCount, _) = engine.Run(EnginePilotStage.GetStage(engine));
+            var engine = new MockEngine(output, job, data => data.invokeCount * operationTime);
+            var pilotStage = EnginePilotStage.GetStage(1, 1, 1, engine.Parameters);
+            engine.Run(pilotStage);
+            var invokeCount = pilotStage.invokeCount;
             output.WriteLine($"InvokeCount = {invokeCount} (Min= {minInvokeCount}, Max = {maxInvokeCount})");
             Assert.InRange(invokeCount, minInvokeCount, maxInvokeCount);
         }

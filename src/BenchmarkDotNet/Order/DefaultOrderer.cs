@@ -89,10 +89,6 @@ namespace BenchmarkDotNet.Order
 
         public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
-            // TODO: GetLogicalGroupKey is called for every benchmarkCase, so as the number of cases grows, this can get very expensive to recompute for each call.
-            // We should somehow amortize the cost by computing it only once per summary.
-            var paramSets = allBenchmarksCases.Select(benchmarkCase => benchmarkCase.Parameters).Distinct(ParameterEqualityComparer.Instance).ToArray();
-
             var explicitRules = benchmarkCase.Config.GetLogicalGroupRules().ToList();
             var implicitRules = new List<BenchmarkLogicalGroupRule>();
             bool hasJobBaselines = allBenchmarksCases.Any(b => b.Job.Meta.Baseline);
@@ -129,7 +125,7 @@ namespace BenchmarkDotNet.Order
                         keys.Add(benchmarkCase.Job.DisplayInfo);
                         break;
                     case BenchmarkLogicalGroupRule.ByParams:
-                        keys.Add($"DistinctParamSet{Array.FindIndex(paramSets, (paramSet) => ParameterEqualityComparer.Instance.Equals(paramSet, benchmarkCase.Parameters))}");
+                        keys.Add($"DistinctParamSet{allBenchmarksCases.IndexOf(benchmarkCase, BenchmarkParamsEqualityComparer.Instance)}");
                         break;
                     case BenchmarkLogicalGroupRule.ByCategory:
                         keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
@@ -211,6 +207,17 @@ namespace BenchmarkDotNet.Order
                 }
                 return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
             }
+        }
+
+        private sealed class BenchmarkParamsEqualityComparer : IEqualityComparer<BenchmarkCase>
+        {
+            internal static readonly BenchmarkParamsEqualityComparer Instance = new();
+
+            bool IEqualityComparer<BenchmarkCase>.Equals(BenchmarkCase x, BenchmarkCase y)
+                => ParameterEqualityComparer.Instance.Equals(x.Parameters, y.Parameters);
+
+            int IEqualityComparer<BenchmarkCase>.GetHashCode(BenchmarkCase obj)
+                => ParameterEqualityComparer.Instance.GetHashCode(obj.Parameters);
         }
 
         private class LogicalGroupComparer : IComparer<IGrouping<string, BenchmarkCase>>

@@ -109,11 +109,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return GetFieldValueCore<T, Action>(instance, memberName);
         }
 
-        public static Action CallbackFromMethod<T>(T instance, string memberName)
-        {
-            return GetDelegateCore<T, Action>(instance, memberName);
-        }
-
         public static Action<long> LoopCallbackFromMethod<T>(T instance, string memberName)
         {
             return GetDelegateCore<T, Action<long>>(instance, memberName);

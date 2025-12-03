@@ -244,7 +244,7 @@ namespace BenchmarkDotNet.Running
                             artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
                         eventProcessor.OnStartRunBenchmark(benchmark);
-                        var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
+                        var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult, benchmarkRunInfo.CompositeInProcessDiagnoser);
                         eventProcessor.OnEndRunBenchmark(benchmark, report);
 
                         if (report.AllMeasurements.Any(m => m.Operations == 0))
@@ -476,20 +476,22 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, BuildResult buildResult)
+        private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, BuildResult buildResult,
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser)
         {
             var toolchain = benchmarkCase.GetToolchain();
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
 
-            var (success, executeResults, metrics) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver);
+            var (success, executeResults, metrics) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver, compositeInProcessDiagnoser);
 
             return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, metrics);
         }
 
         private static (bool success, List<ExecuteResult> executeResults, List<Metric> metrics) Execute(
-            ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain, BuildResult buildResult, IResolver resolver)
+            ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain, BuildResult buildResult, IResolver resolver,
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser)
         {
             var executeResults = new List<ExecuteResult>();
             var metrics = new List<Metric>();
@@ -522,7 +524,9 @@ namespace BenchmarkDotNet.Running
                     buildResult,
                     resolver,
                     useDiagnoser ? noOverheadCompositeDiagnoser : null,
-                    launchIndex);
+                    compositeInProcessDiagnoser,
+                    launchIndex,
+                    useDiagnoser ? Diagnosers.RunMode.NoOverhead : Diagnosers.RunMode.None);
 
                 executeResults.Add(executeResult);
 
@@ -563,7 +567,9 @@ namespace BenchmarkDotNet.Running
                     buildResult,
                     resolver,
                     extraRunCompositeDiagnoser,
-                    launchCount + 1);
+                    compositeInProcessDiagnoser,
+                    ++launchCount,
+                    Diagnosers.RunMode.ExtraRun);
 
                 if (executeResult.IsSuccess)
                 {
@@ -579,13 +585,35 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
                 separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
+
+                if (compositeInProcessDiagnoser.InProcessDiagnosers.Any(d => d.GetRunMode(benchmarkCase) == Diagnosers.RunMode.SeparateLogic))
+                {
+                    var executeResult = RunExecute(
+                        logger,
+                        benchmarkCase,
+                        benchmarkId,
+                        toolchain,
+                        buildResult,
+                        resolver,
+                        separateLogicCompositeDiagnoser,
+                        compositeInProcessDiagnoser,
+                        ++launchCount,
+                        Diagnosers.RunMode.SeparateLogic);
+
+                    if (executeResult.IsSuccess)
+                    {
+                        metrics.AddRange(separateLogicCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
+                    }
+
+                    logger.WriteLine();
+                }
             }
 
             return (true, executeResults, metrics);
         }
 
         private static ExecuteResult RunExecute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
-            BuildResult buildResult, IResolver resolver, IDiagnoser diagnoser, int launchIndex)
+            BuildResult buildResult, IResolver resolver, IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, int launchIndex, Diagnosers.RunMode diagnoserRunMode)
         {
             var executeResult = toolchain.Executor.Execute(
                 new ExecuteParameters(
@@ -595,7 +623,9 @@ namespace BenchmarkDotNet.Running
                     logger,
                     resolver,
                     launchIndex,
-                    diagnoser));
+                    compositeInProcessDiagnoser,
+                    diagnoser,
+                    diagnoserRunMode));
 
             if (!executeResult.IsSuccess)
             {
@@ -657,8 +687,8 @@ namespace BenchmarkDotNet.Running
                     new BenchmarkRunInfo(
                         validBenchmarks,
                         benchmarkRunInfo.Type,
-                        benchmarkRunInfo.Config
-
+                        benchmarkRunInfo.Config,
+                        benchmarkRunInfo.CompositeInProcessDiagnoser
                     ));
 
 

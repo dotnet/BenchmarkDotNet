@@ -25,10 +25,10 @@ namespace BenchmarkDotNet.Tests.Engine
         public void AutoTest_SteadyState() => AutoTest(data => TimeInterval.Second, MinIterationCount);
 
         [Fact]
-        public void AutoTest_InfiniteIncrease() => AutoTest(data => TimeInterval.Second * data.Index, MaxIterationCount);
+        public void AutoTest_InfiniteIncrease() => AutoTest(data => TimeInterval.Second * data.index, MaxIterationCount);
 
         [Fact]
-        public void AutoTest_InfiniteIncreaseOverhead() => AutoTest(data => TimeInterval.Second * data.Index, MaxOverheadIterationCount,
+        public void AutoTest_InfiniteIncreaseOverhead() => AutoTest(data => TimeInterval.Second * data.index, MaxOverheadIterationCount,
             iterationMode: IterationMode.Overhead);
 
         private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode iterationMode = IterationMode.Workload)
@@ -38,9 +38,9 @@ namespace BenchmarkDotNet.Tests.Engine
             var job = Job.Default;
             var engine = new MockEngine(output, job, measure);
             var stage = iterationMode == IterationMode.Overhead
-                ? EngineActualStage.GetOverhead(engine)
-                : EngineActualStage.GetWorkload(engine, RunStrategy.Throughput);
-            var (_, measurements) = engine.Run(stage);
+                ? EngineActualStage.GetOverhead(1, 1, engine.Parameters)
+                : EngineActualStage.GetWorkload(RunStrategy.Throughput, 1, 1, engine.Parameters);
+            var measurements = engine.Run(stage);
             int count = measurements.Count;
             output.WriteLine($"MeasurementCount = {count} (Min= {min}, Max = {max})");
             Assert.InRange(count, min, max);

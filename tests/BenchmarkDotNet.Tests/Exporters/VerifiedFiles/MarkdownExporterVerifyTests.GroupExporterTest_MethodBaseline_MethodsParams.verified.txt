@@ -13,8 +13,8 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
  Foo    | 2     | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DistinctParamSet0-DefaultJob | No       |
  Bar    | 2     | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | DistinctParamSet0-DefaultJob | No       |
         |       |          |         |         |       |         |      |                              |          |
- Base   | 10    | 414.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.03 |    1 | DistinctParamSet1-DefaultJob | Yes      | ^
- Foo    | 10    | 514.5 ns | 5.88 ns | 8.80 ns |  1.24 |    0.03 |    2 | DistinctParamSet1-DefaultJob | No       |
- Bar    | 10    | 614.5 ns | 5.88 ns | 8.80 ns |  1.48 |    0.04 |    3 | DistinctParamSet1-DefaultJob | No       |
+ Base   | 10    | 414.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.03 |    1 | DistinctParamSet3-DefaultJob | Yes      | ^
+ Foo    | 10    | 514.5 ns | 5.88 ns | 8.80 ns |  1.24 |    0.03 |    2 | DistinctParamSet3-DefaultJob | No       |
+ Bar    | 10    | 614.5 ns | 5.88 ns | 8.80 ns |  1.48 |    0.04 |    3 | DistinctParamSet3-DefaultJob | No       |
 
 Errors: 0

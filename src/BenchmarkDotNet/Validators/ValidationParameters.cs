@@ -2,15 +2,17 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class ValidationParameters
     {
         public IReadOnlyList<BenchmarkCase> Benchmarks { get; }
 
-        public ImmutableConfig Config { get; }
+        public ImmutableConfig? Config { get; }
 
-        public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, ImmutableConfig config)
+        public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, ImmutableConfig? config)
         {
             Benchmarks = benchmarks;
             Config = config;

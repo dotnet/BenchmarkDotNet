@@ -10,23 +10,23 @@ using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {
-    public struct RunResults
+    public readonly struct RunResults
     {
         private readonly OutlierMode outlierMode;
 
         [PublicAPI]
-        public IReadOnlyList<Measurement> EngineMeasurements { get; }
+        public IReadOnlyList<Measurement>? EngineMeasurements { get; }
 
         [PublicAPI]
         public IReadOnlyList<Measurement>? Overhead
             => EngineMeasurements
-                .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
+                ?.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
                 .ToArray();
 
         [PublicAPI]
-        public IReadOnlyList<Measurement> Workload
+        public IReadOnlyList<Measurement>? Workload
             => EngineMeasurements
-                .Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
+                ?.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
                 .ToArray();
 
         public GcStats GCStats { get; }
@@ -50,8 +50,8 @@ namespace BenchmarkDotNet.Engines
 
         public IEnumerable<Measurement> GetWorkloadResultMeasurements()
         {
-            var overheadActualMeasurements = Overhead ?? Array.Empty<Measurement>();
-            var workloadActualMeasurements = Workload;
+            var overheadActualMeasurements = Overhead ?? [];
+            var workloadActualMeasurements = Workload ?? [];
             if (workloadActualMeasurements.IsEmpty())
                 yield break;
 
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Engines
 
         public IEnumerable<Measurement> GetAllMeasurements()
         {
-            foreach (var measurement in EngineMeasurements)
+            foreach (var measurement in EngineMeasurements ?? [])
                 yield return measurement;
             foreach (var measurement in GetWorkloadResultMeasurements())
                 yield return measurement;

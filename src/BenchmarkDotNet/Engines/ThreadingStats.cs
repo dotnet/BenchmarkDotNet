@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Threading;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Engines
 {
     public struct ThreadingStats : IEquatable<ThreadingStats>
     {
         internal const string ResultsLinePrefix = "// Threading: ";
 
+#if NETSTANDARD2_0
         // BDN targets .NET Standard 2.0, these properties are not part of .NET Standard 2.0, were added in .NET Core 3.0
         private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), nameof(CompletedWorkItemCount));
         private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), nameof(LockContentionCount));
-
+#endif
         public static ThreadingStats Empty => new ThreadingStats(0, 0, 0);
 
         public long CompletedWorkItemCount { get; }
@@ -26,16 +29,26 @@ namespace BenchmarkDotNet.Engines
 
         public static ThreadingStats ReadInitial()
         {
+#if NETSTANDARD2_0
             long lockContentionCount = GetLockContentionCountDelegate(); // Monitor.LockContentionCount can schedule a work item and needs to be called before ThreadPool.CompletedWorkItemCount
             long completedWorkItemCount = GetCompletedWorkItemCountDelegate();
+#else
+            long lockContentionCount = Monitor.LockContentionCount;
+            long completedWorkItemCount = ThreadPool.CompletedWorkItemCount;
+#endif
 
             return new ThreadingStats(completedWorkItemCount, lockContentionCount, 0);
         }
 
         public static ThreadingStats ReadFinal()
         {
+#if NETSTANDARD2_0
+            long lockContentionCount = GetLockContentionCountDelegate(); // Monitor.LockContentionCount can schedule a work item and needs to be called before ThreadPool.CompletedWorkItemCount
             long completedWorkItemCount = GetCompletedWorkItemCountDelegate();
-            long lockContentionCount = GetLockContentionCountDelegate(); // Monitor.LockContentionCount can schedule a work item and needs to be called after ThreadPool.CompletedWorkItemCount
+#else
+            long lockContentionCount = Monitor.LockContentionCount;
+            long completedWorkItemCount = ThreadPool.CompletedWorkItemCount;
+#endif
 
             return new ThreadingStats(completedWorkItemCount, lockContentionCount, 0);
         }
@@ -74,17 +87,20 @@ namespace BenchmarkDotNet.Engines
 
         public override string ToString() => ToOutputLine();
 
+#if NETSTANDARD2_0
         private static Func<long> CreateGetterDelegate(Type type, string propertyName)
         {
             var property = type.GetProperty(propertyName);
 
             // we create delegate to avoid boxing, IMPORTANT!
-            return property != null ? (Func<long>)property.GetGetMethod().CreateDelegate(typeof(Func<long>)) : () => 0;
+            return property != null
+                       ? (Func<long>)property.GetGetMethod()!.CreateDelegate(typeof(Func<long>))
+                       : () => 0;
         }
-
+#endif
         public bool Equals(ThreadingStats other) => CompletedWorkItemCount == other.CompletedWorkItemCount && LockContentionCount == other.LockContentionCount && TotalOperations == other.TotalOperations;
 
-        public override bool Equals(object obj) => obj is ThreadingStats other && Equals(other);
+        public override bool Equals(object? obj) => obj is ThreadingStats other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(CompletedWorkItemCount, LockContentionCount, TotalOperations);
     }

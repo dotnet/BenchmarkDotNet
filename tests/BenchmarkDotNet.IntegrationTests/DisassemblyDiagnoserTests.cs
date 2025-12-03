@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
@@ -14,6 +13,9 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -25,30 +27,25 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetAllJits()
         {
+            yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Instance]; // InProcess
+
             if (RuntimeInformation.IsFullFramework)
             {
-                yield return new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net462 }; // 32bit LegacyJit for desktop .NET
-                yield return new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net462 }; // 64bit LegacyJit for desktop .NET
-                yield return new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }; // RyuJit for desktop .NET
+                yield return [Jit.LegacyJit, Platform.X86, CsProjClassicNetToolchain.Net462]; // 32bit LegacyJit for desktop .NET
+                yield return [Jit.LegacyJit, Platform.X64, CsProjClassicNetToolchain.Net462]; // 64bit LegacyJit for desktop .NET
+                yield return [Jit.RyuJit, Platform.X64, CsProjClassicNetToolchain.Net462]; // RyuJit for desktop .NET
             }
             else if (RuntimeInformation.IsNetCore)
             {
                 if (RuntimeInformation.GetCurrentPlatform() is Platform.X86 or Platform.X64)
                 {
-                    yield return new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core80 }; // .NET Core x64
+                    yield return [Jit.RyuJit, Platform.X64, CsProjCoreToolchain.NetCoreApp80]; // .NET Core x64
+                    // We could add Platform.X86 here, but it would make our CI more complicated.
                 }
-                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64 && OsDetector.IsLinux())
+                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64)
                 {
-                    yield return new object[] { Jit.RyuJit, Platform.Arm64, CoreRuntime.Core80 }; // .NET Core arm64
+                    yield return [Jit.RyuJit, Platform.Arm64, CsProjCoreToolchain.NetCoreApp80]; // .NET Core arm64
                 }
-            }
-            if (OsDetector.IsMacOS())
-            {
-                // This scope of tests is not supported on macOS
-                // However, when the MemberData method provides no data, xUnit throws an "No data found" InvalidOperationException
-                // In order to fix the problem, we should provide at least one input data set
-                // All the tests check the OS on the first line and stop the test if it's macOS
-                yield return new object[] { Jit.Default, Platform.AnyCpu, CoreRuntime.Latest };
             }
 
             // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
@@ -90,15 +87,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
+        public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
-            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
-            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
+            CanExecute<WithCalls>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.ColdStart));
 
             DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
 
@@ -113,15 +107,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, Runtime runtime)
+        public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
-            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 1, filters: new[] { "*WithCalls*" }));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
 
-            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
+            CanExecute<WithCalls>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.ColdStart));
 
             DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
 
@@ -142,15 +133,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
+        public void CanDisassembleGenericTypes(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
-            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
-            CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
+            CanExecute<Generic<int>>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var result = disassemblyDiagnoser.Results.Values.Single();
 
@@ -166,15 +154,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
-        public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
+        public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS()) return; // currently not supported
-
-            var printSource = IsPrintSourceSupported(platform);
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: printSource, maxDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
-            CanExecute<WithInlineable>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
+            CanExecute<WithInlineable>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
@@ -182,11 +167,11 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.ToString().Contains("ret"))));
         }
 
-        private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
+        private IConfig CreateConfig(Jit jit, Platform platform, IToolchain toolchain, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry.WithJit(jit)
                     .WithPlatform(platform)
-                    .WithRuntime(runtime)
+                    .WithToolchain(toolchain)
                     .WithStrategy(runStrategy))
                 .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
                 .AddColumnProvider(DefaultColumnProviders.Instance)
@@ -198,8 +183,5 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains(methodSignature, result.Methods.Select(m => m.Name.Split('.').Last()).ToArray());
             Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Any());
         }
-
-        private static bool IsPrintSourceSupported(Platform platform)
-            => platform != Platform.X86; // Workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2789
     }
 }

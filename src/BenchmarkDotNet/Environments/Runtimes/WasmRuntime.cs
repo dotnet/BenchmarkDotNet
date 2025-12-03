@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.IO;
 using BenchmarkDotNet.Jobs;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Environments
 {
     public class WasmRuntime : Runtime, IEquatable<WasmRuntime>
@@ -16,7 +18,7 @@ namespace BenchmarkDotNet.Environments
 
         public bool Aot { get;  }
 
-        public string WasmDataDir { get; }
+        public string? WasmDataDir { get; }
 
         /// <summary>
         /// creates new instance of WasmRuntime
@@ -42,7 +44,7 @@ namespace BenchmarkDotNet.Environments
         public override bool Equals(object obj)
             => obj is WasmRuntime other && Equals(other);
 
-        public bool Equals(WasmRuntime other)
+        public bool Equals(WasmRuntime? other)
             => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot;
 
         public override int GetHashCode()

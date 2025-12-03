@@ -9,6 +9,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -100,12 +101,6 @@ namespace BenchmarkDotNet.IntegrationTests
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true, null);
-
-            // Dummy (just in case something may broke)
-            action = BenchmarkActionFactory.CreateDummy();
-            TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateDummy();
             TestInvoke(action, unrollFactor, true, null);
         }
 

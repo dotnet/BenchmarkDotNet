@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Running
                         b.Config);
                 });
                 resultBenchmarks.Add(
-                    new BenchmarkRunInfo(benchmarks.ToArray(), runInfo.Type, runInfo.Config));
+                    new BenchmarkRunInfo(benchmarks.ToArray(), runInfo.Type, runInfo.Config, runInfo.CompositeInProcessDiagnoser));
             }
 
             return resultBenchmarks.ToArray();

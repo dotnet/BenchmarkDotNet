@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -19,64 +17,46 @@ namespace BenchmarkDotNet.Engines
     [UsedImplicitly]
     public class Engine : IEngine
     {
-        [PublicAPI] public IHost Host { get; }
-        [PublicAPI] public Action<long> WorkloadAction { get; }
-        [PublicAPI] public Action Dummy1Action { get; }
-        [PublicAPI] public Action Dummy2Action { get; }
-        [PublicAPI] public Action Dummy3Action { get; }
-        [PublicAPI] public Action<long> OverheadAction { get; }
-        [PublicAPI] public Job TargetJob { get; }
-        [PublicAPI] public long OperationsPerInvoke { get; }
-        [PublicAPI] public Action GlobalSetupAction { get; }
-        [PublicAPI] public Action GlobalCleanupAction { get; }
-        [PublicAPI] public Action IterationSetupAction { get; }
-        [PublicAPI] public Action IterationCleanupAction { get; }
-        [PublicAPI] public IResolver Resolver { get; }
-        [PublicAPI] public CultureInfo CultureInfo { get; }
-        [PublicAPI] public string BenchmarkName { get; }
+        internal EngineParameters Parameters { get; }
 
         private IClock Clock { get; }
         private bool ForceGcCleanups { get; }
-        private int UnrollFactor { get; }
-        private RunStrategy Strategy { get; }
-        private bool EvaluateOverhead { get; }
         private bool MemoryRandomization { get; }
 
-        private readonly List<Measurement> jittingMeasurements = new(10);
-        private readonly bool includeExtraStats;
         private readonly Random random;
 
-        internal Engine(
-            IHost host,
-            IResolver resolver,
-            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
-            Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, string benchmarkName)
+        private IHost Host => Parameters.Host;
+        private Job TargetJob => Parameters.TargetJob;
+        private IResolver Resolver => Parameters.Resolver;
+
+        internal Engine(EngineParameters engineParameters)
         {
+            if (engineParameters == null) throw new ArgumentNullException(nameof(engineParameters));
 
-            Host = host;
-            OverheadAction = overheadAction;
-            Dummy1Action = dummy1Action;
-            Dummy2Action = dummy2Action;
-            Dummy3Action = dummy3Action;
-            WorkloadAction = workloadAction;
-            TargetJob = targetJob;
-            GlobalSetupAction = globalSetupAction;
-            GlobalCleanupAction = globalCleanupAction;
-            IterationSetupAction = iterationSetupAction;
-            IterationCleanupAction = iterationCleanupAction;
-            OperationsPerInvoke = operationsPerInvoke;
-            this.includeExtraStats = includeExtraStats;
-            BenchmarkName = benchmarkName;
+            // EngineParameters properties are mutable, so we copy/freeze them all.
+            var job = engineParameters.TargetJob ?? throw new ArgumentNullException(nameof(EngineParameters.TargetJob));
+            Parameters = new()
+            {
+                WorkloadActionNoUnroll = engineParameters.WorkloadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionNoUnroll)),
+                WorkloadActionUnroll = engineParameters.WorkloadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionUnroll)),
+                OverheadActionNoUnroll = engineParameters.OverheadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionNoUnroll)),
+                OverheadActionUnroll = engineParameters.OverheadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionUnroll)),
+                GlobalSetupAction = engineParameters.GlobalSetupAction ?? throw new ArgumentNullException(nameof(EngineParameters.GlobalSetupAction)),
+                GlobalCleanupAction = engineParameters.GlobalCleanupAction ?? throw new ArgumentNullException(nameof(EngineParameters.GlobalCleanupAction)),
+                IterationSetupAction = engineParameters.IterationSetupAction ?? throw new ArgumentNullException(nameof(EngineParameters.IterationSetupAction)),
+                IterationCleanupAction = engineParameters.IterationCleanupAction ?? throw new ArgumentNullException(nameof(EngineParameters.IterationCleanupAction)),
+                TargetJob = new Job(job).Freeze(),
+                BenchmarkName = engineParameters.BenchmarkName,
+                MeasureExtraStats = engineParameters.MeasureExtraStats,
+                Host = engineParameters.Host,
+                OperationsPerInvoke = engineParameters.OperationsPerInvoke,
+                Resolver = engineParameters.Resolver,
+                InProcessDiagnoserHandler = engineParameters.InProcessDiagnoserHandler ?? throw new ArgumentNullException(nameof(EngineParameters.InProcessDiagnoserHandler)),
+            };
 
-            Resolver = resolver;
-
-            Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
-            ForceGcCleanups = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
-            UnrollFactor = targetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, Resolver);
-            Strategy = targetJob.ResolveValue(RunMode.RunStrategyCharacteristic, Resolver);
-            EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
-            MemoryRandomization = targetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
+            Clock = TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
+            ForceGcCleanups = TargetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
+            MemoryRandomization = TargetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
             random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
@@ -85,7 +65,7 @@ namespace BenchmarkDotNet.Engines
         {
             try
             {
-                GlobalCleanupAction?.Invoke();
+                Parameters.GlobalCleanupAction.Invoke();
             }
             catch (Exception e)
             {
@@ -103,47 +83,46 @@ namespace BenchmarkDotNet.Engines
         public RunResults Run()
         {
             var measurements = new List<Measurement>();
-            measurements.AddRange(jittingMeasurements);
-
-            long invokeCount = TargetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver, 1);
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.BenchmarkStart(BenchmarkName);
+                EngineEventSource.Log.BenchmarkStart(Parameters.BenchmarkName);
 
+            IterationData extraStatsIterationData = default;
             // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size.
             // #1120
-            foreach (var stage in EngineStage.EnumerateStages(this, Strategy, EvaluateOverhead))
+            foreach (var stage in EngineStage.EnumerateStages(Parameters))
             {
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.BeforeMainRun();
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
-                // 1-based iterationIndex
-                int iterationIndex = 1;
-                while (stage.GetShouldRunIteration(stageMeasurements, ref invokeCount))
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
                 {
-                    var measurement = RunIteration(new IterationData(stage.Mode, stage.Stage, iterationIndex, invokeCount, UnrollFactor));
+                    var measurement = RunIteration(iterationData);
                     stageMeasurements.Add(measurement);
-                    ++iterationIndex;
+                    // Actual Workload is always the last stage, so we use the same data to run extra stats.
+                    extraStatsIterationData = iterationData;
                 }
                 measurements.AddRange(stageMeasurements);
 
-                WriteLine();
+                Host.WriteLine();
 
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.AfterMainRun();
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
                 }
             }
 
-            (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = includeExtraStats
-                ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))
-                : (GcStats.Empty, ThreadingStats.Empty, 0);
+            (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = Parameters.MeasureExtraStats
+                ? GetExtraStats(extraStatsIterationData)
+                : default;
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.BenchmarkStop(BenchmarkName);
+                EngineEventSource.Log.BenchmarkStop(Parameters.BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
@@ -151,36 +130,32 @@ namespace BenchmarkDotNet.Engines
         }
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public Measurement RunIteration(IterationData data)
+        private Measurement RunIteration(IterationData data)
         {
             // Initialization
-            long invokeCount = data.InvokeCount;
-            int unrollFactor = data.UnrollFactor;
+            long invokeCount = data.invokeCount;
+            int unrollFactor = data.unrollFactor;
             if (invokeCount % unrollFactor != 0)
                 throw new ArgumentOutOfRangeException(nameof(data), $"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
 
-            long totalOperations = invokeCount * OperationsPerInvoke;
-            bool isOverhead = data.IterationMode == IterationMode.Overhead;
-            bool randomizeMemory = !isOverhead && MemoryRandomization;
-            var action = isOverhead ? OverheadAction : WorkloadAction;
+            long totalOperations = invokeCount * Parameters.OperationsPerInvoke;
+            bool randomizeMemory = data.mode == IterationMode.Workload && MemoryRandomization;
 
-            if (!isOverhead)
-                IterationSetupAction();
+            data.setupAction();
 
             GcCollect();
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
+                EngineEventSource.Log.IterationStart(data.mode, data.stage, totalOperations);
 
             var clockSpan = randomizeMemory
-                ? MeasureWithRandomStack(action, invokeCount / unrollFactor)
-                : Measure(action, invokeCount / unrollFactor);
+                ? MeasureWithRandomStack(data.workloadAction, invokeCount / unrollFactor)
+                : Measure(data.workloadAction, invokeCount / unrollFactor);
 
             if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
+                EngineEventSource.Log.IterationStop(data.mode, data.stage, totalOperations);
 
-            if (!isOverhead)
-                IterationCleanupAction();
+            data.cleanupAction();
 
             if (randomizeMemory)
                 RandomizeManagedHeapMemory();
@@ -188,11 +163,8 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
-            WriteLine(measurement.ToString());
-            if (measurement.IterationStage == IterationStage.Jitting)
-                jittingMeasurements.Add(measurement);
-
+            var measurement = new Measurement(0, data.mode, data.stage, data.index, totalOperations, clockSpan.GetNanoseconds());
+            Host.WriteLine(measurement.ToString());
             return measurement;
         }
 
@@ -208,7 +180,7 @@ namespace BenchmarkDotNet.Engines
             return clockSpan;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
         private unsafe void Consume(byte* _) { }
 
         [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
@@ -219,71 +191,75 @@ namespace BenchmarkDotNet.Engines
             return clock.GetElapsed();
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private (GcStats, ThreadingStats, double) GetExtraStats(IterationData data)
         {
             // Warm up the measurement functions before starting the actual measurement.
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
 
-            IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
+            data.setupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
             var exceptionsStats = new ExceptionsStats(); // allocates
             exceptionsStats.StartListening(); // this method might allocate
 
-#if !NET7_0_OR_GREATER
-            if (RuntimeInformation.IsNetCore && Environment.Version.Major is >= 3 and <= 6 && RuntimeInformation.IsTieredJitEnabled)
-            {
-                // #1542
-                // We put the current thread to sleep so tiered jit can kick in, compile its stuff,
-                // and NOT allocate anything on the background thread when we are measuring allocations.
-                // This is only an issue on netcoreapp3.0 to net6.0. Tiered jit allocations were "fixed" in net7.0
-                // (maybe not completely eliminated forever, but at least reduced to a point where measurements are much more stable),
-                // and netcoreapp2.X uses only GetAllocatedBytesForCurrentThread which doesn't capture the tiered jit allocations.
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
-            }
-#endif
-
             // GC collect before measuring allocations.
             ForceGcCollect();
+
+            // #1542
+            // If the jit is tiered, we put the current thread to sleep so it can kick in, compile its stuff,
+            // and NOT allocate anything on the background thread when we are measuring allocations.
+            SleepIfPositive(JitInfo.BackgroundCompilationDelay);
+
             GcStats gcStats;
             using (FinalizerBlocker.MaybeStart())
             {
-                gcStats = MeasureWithGc(data.InvokeCount / data.UnrollFactor);
+                gcStats = MeasureWithGc(data.workloadAction, data.invokeCount / data.unrollFactor);
             }
 
             exceptionsStats.Stop(); // this method might (de)allocate
             var finalThreadingStats = ThreadingStats.ReadFinal();
 
-            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
+            data.cleanupAction(); // we run iteration cleanup after collecting GC stats
 
-            var totalOperationsCount = data.InvokeCount * OperationsPerInvoke;
+            var totalOperationsCount = data.invokeCount * Parameters.OperationsPerInvoke;
             return (gcStats.WithTotalOperations(totalOperationsCount),
                 (finalThreadingStats - initialThreadingStats).WithTotalOperations(totalOperationsCount),
                 exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
+        internal static void SleepIfPositive(TimeSpan timeSpan)
+        {
+            if (timeSpan > TimeSpan.Zero)
+            {
+                Thread.Sleep(timeSpan);
+            }
+        }
+
         // Isolate the allocation measurement and skip tier0 jit to make sure we don't get any unexpected allocations.
         [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
-        private GcStats MeasureWithGc(long invokeCount)
+        private GcStats MeasureWithGc(Action<long> action, long invokeCount)
         {
             var initialGcStats = GcStats.ReadInitial();
-            WorkloadAction(invokeCount);
+            action(invokeCount);
             var finalGcStats = GcStats.ReadFinal();
             return finalGcStats - initialGcStats;
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void RandomizeManagedHeapMemory()
         {
             // invoke global cleanup before global setup
-            GlobalCleanupAction?.Invoke();
+            Parameters.GlobalCleanupAction.Invoke();
 
             var gen0object = new byte[random.Next(32)];
             var lohObject = new byte[85 * 1024 + random.Next(32)];
 
             // we expect the key allocations to happen in global setup (not ctor)
             // so we call it while keeping the random-size objects alive
-            GlobalSetupAction?.Invoke();
+            Parameters.GlobalSetupAction.Invoke();
 
             GC.KeepAlive(gen0object);
             GC.KeepAlive(lohObject);
@@ -291,6 +267,7 @@ namespace BenchmarkDotNet.Engines
             // we don't enforce GC.Collects here as engine does it later anyway
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void GcCollect()
         {
             if (!ForceGcCleanups)
@@ -299,16 +276,13 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         internal static void ForceGcCollect()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
         }
-
-        public void WriteLine(string text) => Host.WriteLine(text);
-
-        public void WriteLine() => Host.WriteLine();
 
         [UsedImplicitly]
         public static class Signals
@@ -354,6 +328,7 @@ namespace BenchmarkDotNet.Engines
                 private readonly object hangLock = new();
                 private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
 
+                [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
                 ~Impl()
                 {
                     lock (hangLock)
@@ -363,7 +338,7 @@ namespace BenchmarkDotNet.Engines
                     }
                 }
 
-                [MethodImpl(MethodImplOptions.NoInlining)]
+                [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
                 internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
                 {
                     var impl = new Impl();
@@ -371,6 +346,7 @@ namespace BenchmarkDotNet.Engines
                 }
             }
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             internal static FinalizerBlocker MaybeStart()
             {
                 if (Environment.GetEnvironmentVariable(UnitTestBlockFinalizerEnvKey) != UnitTestBlockFinalizerEnvValue)
@@ -387,6 +363,7 @@ namespace BenchmarkDotNet.Engines
                 return new FinalizerBlocker(hangLock);
             }
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public void Dispose()
             {
                 if (hangLock is not null)

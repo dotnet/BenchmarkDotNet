@@ -12,6 +12,8 @@ using Perfolizer.Mathematics.Multimodality;
 using Perfolizer.Metrology;
 using Pragmastat.Metrology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Columns
 {
     public interface IStatisticColumn : IColumn
@@ -105,7 +107,7 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
-        private readonly IStatisticColumn parentColumn;
+        private readonly IStatisticColumn? parentColumn;
 
         private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time,
             IStatisticColumn? parentColumn = null)
@@ -137,7 +139,7 @@ namespace BenchmarkDotNet.Columns
         {
             return summary.Reports
                 .Where(r => r.ResultStatistics != null)
-                .Select(r => calc(r.ResultStatistics))
+                .Select(r => calc(r.ResultStatistics!))
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
                 .Select(v => UnitType == UnitType.Time && style.TimeUnit != null ? v / style.TimeUnit.BaseUnits : v)
                 .ToList();
