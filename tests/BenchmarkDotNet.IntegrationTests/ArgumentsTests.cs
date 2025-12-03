@@ -684,7 +684,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
-            [ArgumentsSource(nameof(GetArrays))]            
+            [ArgumentsSource(nameof(GetArrays))]
             public void AcceptsMultidimensionalArray(int[,] arr)
             {
                 if (arr.Length == 0)
