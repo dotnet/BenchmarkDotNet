@@ -11,6 +11,8 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Diagnosers
 {
     public class ThreadingDiagnoser : IDiagnoser
@@ -56,8 +58,8 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
 
-            private ThreadingDiagnoserConfig Config { get; }
-            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
+            private ThreadingDiagnoserConfig? Config { get; }
+            public CompletedWorkItemCountMetricDescriptor(ThreadingDiagnoserConfig? config = null)
             {
                 Config = config;
             }
@@ -82,9 +84,9 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
 
-            private ThreadingDiagnoserConfig Config { get; }
+            private ThreadingDiagnoserConfig? Config { get; }
 
-            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig config = null)
+            public LockContentionCountMetricDescriptor(ThreadingDiagnoserConfig? config = null)
             {
                 Config = config;
             }

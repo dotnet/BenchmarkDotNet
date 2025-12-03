@@ -7,6 +7,8 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryTable
@@ -36,8 +38,10 @@ namespace BenchmarkDotNet.Reports
                 FullHeader = Array.Empty<string>();
                 FullContent = Array.Empty<string[]>();
                 FullContentStartOfHighlightGroup = Array.Empty<bool>();
+                FullContentStartOfLogicalGroup = Array.Empty<bool>();
                 FullContentWithHeader = Array.Empty<string[]>();
                 IsDefault = Array.Empty<bool>();
+                EffectiveSummaryStyle = summary.Style ?? SummaryStyle.Default;
                 return;
             }
 
@@ -45,7 +49,7 @@ namespace BenchmarkDotNet.Reports
             style = style ?? summary.Style ?? SummaryStyle.Default;
             if (style.TimeUnit == null)
             {
-                style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean)
+                style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics!.Mean)
                     .ToArray()));
             }
 
@@ -53,7 +57,7 @@ namespace BenchmarkDotNet.Reports
             {
                 style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports
                     .Where(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase).HasValue)
-                    .Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase).Value)
+                    .Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)!.Value)
                     .ToArray()));
             }
             EffectiveSummaryStyle = style;

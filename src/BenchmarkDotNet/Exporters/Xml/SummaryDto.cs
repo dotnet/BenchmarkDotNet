@@ -9,6 +9,8 @@ using Perfolizer.Horology;
 
 // ReSharper disable UnusedMember.Global
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters.Xml
 {
     internal class SummaryDto
@@ -37,9 +39,9 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string BenchmarkDotNetVersion => hei.BenchmarkDotNetVersion;
         public string OsVersion => hei.Os.Value.ToBrandString();
         public string ProcessorName => hei.Cpu.Value.ToShortBrandName();
-        public string PhysicalProcessorCount => hei.Cpu.Value?.PhysicalProcessorCount?.ToString();
-        public string PhysicalCoreCount => hei.Cpu.Value?.PhysicalCoreCount?.ToString();
-        public string LogicalCoreCount => hei.Cpu.Value?.LogicalCoreCount?.ToString();
+        public string PhysicalProcessorCount => hei.Cpu.Value?.PhysicalProcessorCount?.ToString() ?? "";
+        public string PhysicalCoreCount => hei.Cpu.Value?.PhysicalCoreCount?.ToString() ?? "";
+        public string LogicalCoreCount => hei.Cpu.Value?.LogicalCoreCount?.ToString() ?? "";
         public string RuntimeVersion => hei.RuntimeVersion;
         public string Architecture => hei.Architecture;
         public bool HasAttachedDebugger => hei.HasAttachedDebugger;
@@ -66,12 +68,12 @@ namespace BenchmarkDotNet.Exporters.Xml
     internal class BenchmarkReportDto
     {
         public string DisplayInfo => report.BenchmarkCase.DisplayInfo;
-        public string Namespace => report.BenchmarkCase.Descriptor.Type.Namespace;
+        public string Namespace => report.BenchmarkCase.Descriptor.Type.Namespace ?? "";
         public string Type => report.BenchmarkCase.Descriptor.Type.Name;
         public string Method => report.BenchmarkCase.Descriptor.WorkloadMethod.Name;
         public string MethodTitle => report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
         public string Parameters => report.BenchmarkCase.Parameters.PrintInfo;
-        public Statistics Statistics => report.ResultStatistics;
+        public Statistics? Statistics => report.ResultStatistics;
         public IEnumerable<Metric> Metrics => report.Metrics.Values;
 
         public GcStats Memory => new GcStats()
@@ -90,7 +92,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         public BenchmarkReportDto(BenchmarkReport report, bool excludeMeasurements = false)
         {
             this.report = report;
-            Measurements = excludeMeasurements ? null : report.AllMeasurements;
+            Measurements = excludeMeasurements ? [] : report.AllMeasurements;
         }
     }
 
