@@ -666,6 +666,33 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void MultidimensionalArraysAreProperlyDisplayed(IToolchain toolchain)
+        {
+            var summary = CanExecute<WithMultidimensionalArrayArgument>(toolchain);
+
+            Assert.Equal(
+                "Int32[2, 3]",
+                summary.Table.Columns.Where(col => col.Header == "arr").First().Content[0]
+            );
+        }
+
+        public class WithMultidimensionalArrayArgument
+        {
+            public IEnumerable<int[,]> GetArrays()
+            {
+                yield return new int[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsMultidimensionalArray(int[,] arr)
+            {
+                if (arr.Length == 0)
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void VeryBigIntegersAreSupported(IToolchain toolchain) => CanExecute<WithVeryBigInteger>(toolchain);
 
         public class WithVeryBigInteger
