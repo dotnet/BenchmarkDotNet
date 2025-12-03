@@ -40,7 +40,12 @@ namespace BenchmarkDotNet.Code
 
         public virtual string WorkloadMethodReturnTypeModifiers => null;
 
-        public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
+        public virtual string GetWorkloadMethodCall(string passArguments)
+        {
+            var prefix = Descriptor.WorkloadMethod.IsStatic ? Descriptor.WorkloadMethod.DeclaringType.GetCorrectCSharpTypeName() : "base";
+
+            return $"{prefix}.{Descriptor.WorkloadMethod.Name}({passArguments})";
+        }
 
         public virtual string ConsumeField => null;
 

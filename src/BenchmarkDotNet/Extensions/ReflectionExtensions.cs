@@ -38,6 +38,15 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
         {
+            var typeName = GetCorrectCSharpTypeNameUnprefixed(type, includeNamespace, includeGenericArgumentsNamespace);
+
+            if (typeName == "void" || typeName.StartsWith("global::")) return typeName;
+
+            return $"global::{typeName}";
+        }
+
+        private static string GetCorrectCSharpTypeNameUnprefixed(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
+        {
             while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
                 type = type.BaseType;
 
@@ -58,7 +67,7 @@ namespace BenchmarkDotNet.Extensions
 
             if (type.IsArray)
             {
-                var typeName = GetCorrectCSharpTypeName(type.GetElementType());
+                var typeName = GetCorrectCSharpTypeNameUnprefixed(type.GetElementType());
                 var parts = typeName.Split(['['], count: 2);
 
                 string repr = parts[0] + '[' + new string(',', type.GetArrayRank() - 1) + ']';
