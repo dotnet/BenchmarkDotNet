@@ -568,7 +568,7 @@ namespace BenchmarkDotNet.Running
                     resolver,
                     extraRunCompositeDiagnoser,
                     compositeInProcessDiagnoser,
-                    launchCount + 1,
+                    ++launchCount,
                     Diagnosers.RunMode.ExtraRun);
 
                 if (executeResult.IsSuccess)
@@ -597,7 +597,7 @@ namespace BenchmarkDotNet.Running
                         resolver,
                         separateLogicCompositeDiagnoser,
                         compositeInProcessDiagnoser,
-                        launchCount + 1,
+                        ++launchCount,
                         Diagnosers.RunMode.SeparateLogic);
 
                     if (executeResult.IsSuccess)
