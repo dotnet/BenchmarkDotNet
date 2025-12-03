@@ -2,18 +2,15 @@
 using System.Reflection;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Parameters;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
-    public class RunnableProgram
+    internal class RunnableProgram
     {
-        public static int Run(
-            BenchmarkId benchmarkId,
-            Assembly partitionAssembly,
-            BenchmarkCase benchmarkCase,
-            IHost host)
+        internal static int Run(Assembly partitionAssembly, IHost host, ExecuteParameters parameters)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -25,9 +22,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 // which could cause the jitting/assembly loading to happen before we do anything
                 // we have some jitting diagnosers and we want them to catch all the informations!!
 
-                var runCallback = GetRunCallback(benchmarkId, partitionAssembly);
+                var runCallback = GetRunCallback(parameters.BenchmarkId, partitionAssembly);
 
-                runCallback.Invoke(null, new object[] { benchmarkCase, host });
+                runCallback.Invoke(null, [host, parameters]);
                 return 0;
             }
             catch (Exception oom) when (
