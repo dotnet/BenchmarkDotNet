@@ -102,12 +102,6 @@ namespace BenchmarkDotNet.IntegrationTests
             TestInvoke(action, unrollFactor, true, null);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
             TestInvoke(action, unrollFactor, true, null);
-
-            // Dummy (just in case something may broke)
-            action = BenchmarkActionFactory.CreateDummy();
-            TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateDummy();
-            TestInvoke(action, unrollFactor, true, null);
         }
 
         [AssertionMethod]
