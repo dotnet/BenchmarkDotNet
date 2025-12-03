@@ -9,11 +9,29 @@ namespace BenchmarkDotNet.Code
 {
     internal static class ArrayParam
     {
+        private static (string BaseElementTypeRepr, string InnerDimensions) GetDisplayString(Type arrayType)
+        {
+            var elemType = arrayType.GetElementType();
+
+            if (elemType.IsArray)
+            {
+                var (baseElementTypeRepr, innerDimensions) = GetDisplayString(elemType);
+
+                return (baseElementTypeRepr, $"[{new string(',', arrayType.GetArrayRank() - 1)}]{innerDimensions}");
+            }
+
+            return (elemType.GetDisplayName(), $"[{new string(',', arrayType.GetArrayRank() - 1)}]");
+        }
+
         public static string GetDisplayString(Array array)
         {
             string dimensionRepr = string.Join(", ", Enumerable.Range(0, array.Rank).Select(array.GetLength));
 
-            return $"{array.GetType().GetElementType()?.GetDisplayName()}[{dimensionRepr}]";
+            var (baseElementTypeRepr, innerDimensions) = GetDisplayString(array.GetType());
+
+            innerDimensions = string.Join("", innerDimensions.Split([']'], count: 2).Skip(1));
+
+            return $"{baseElementTypeRepr}[{dimensionRepr}]{innerDimensions}";
         }
     }
 

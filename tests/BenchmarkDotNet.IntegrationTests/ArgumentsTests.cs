@@ -693,6 +693,33 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void MultidimensionalAndJaggedArraysCanBeMixed(IToolchain toolchain)
+        {
+            var summary = CanExecute<WithMixedJaggedAndMultidimensionalArrays>(toolchain);
+
+            Assert.Equal(
+                "Int32[0, 0][][,][]",
+                summary.Table.Columns.Where(col => col.Header == "arr").First().Content[0]
+            );
+        }
+
+        public class WithMixedJaggedAndMultidimensionalArrays
+        {
+            public IEnumerable<int[,][][,][]> GetArrays()
+            {
+                yield return new int[,][][,][] { };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsMixedArray(int[,][][,][] arr)
+            {
+                if (arr.Length > 0)
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void VeryBigIntegersAreSupported(IToolchain toolchain) => CanExecute<WithVeryBigInteger>(toolchain);
 
         public class WithVeryBigInteger
