@@ -595,14 +595,14 @@ namespace BenchmarkDotNet.Running
                         toolchain,
                         buildResult,
                         resolver,
-                        extraRunCompositeDiagnoser,
+                        separateLogicCompositeDiagnoser,
                         compositeInProcessDiagnoser,
                         launchCount + 1,
                         Diagnosers.RunMode.SeparateLogic);
 
                     if (executeResult.IsSuccess)
                     {
-                        metrics.AddRange(extraRunCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
+                        metrics.AddRange(separateLogicCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
                     }
 
                     logger.WriteLine();
