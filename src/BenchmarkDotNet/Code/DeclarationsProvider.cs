@@ -36,16 +36,15 @@ namespace BenchmarkDotNet.Code
 
         public virtual string WorkloadMethodReturnTypeName => WorkloadMethodReturnType.GetCorrectCSharpTypeName();
 
-        public virtual string WorkloadMethodDelegate(string passArguments) => Descriptor.WorkloadMethod.Name;
+        public string WorkloadMethodPrefix => Descriptor.WorkloadMethod.IsStatic ? Descriptor.WorkloadMethod.DeclaringType.GetCorrectCSharpTypeName() : "base";
+
+        public virtual string WorkloadMethodDelegate(string passArguments)
+            => $"{WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}";
 
         public virtual string WorkloadMethodReturnTypeModifiers => null;
 
         public virtual string GetWorkloadMethodCall(string passArguments)
-        {
-            var prefix = Descriptor.WorkloadMethod.IsStatic ? Descriptor.WorkloadMethod.DeclaringType.GetCorrectCSharpTypeName() : "base";
-
-            return $"{prefix}.{Descriptor.WorkloadMethod.Name}({passArguments})";
-        }
+            => $"{WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments})";
 
         public virtual string ConsumeField => null;
 
@@ -155,9 +154,10 @@ namespace BenchmarkDotNet.Code
         public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
+            => $"({passArguments}) => {{ BenchmarkDotNet.Helpers.AwaitHelper.GetResult({WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments})); }}";
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
+        public override string GetWorkloadMethodCall(string passArguments)
+            => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments}))";
 
         protected override Type WorkloadMethodReturnType => typeof(void);
     }
@@ -172,8 +172,9 @@ namespace BenchmarkDotNet.Code
         protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
         public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ return BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
+            => $"({passArguments}) => {{ return BenchmarkDotNet.Helpers.AwaitHelper.GetResult({WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments})); }}";
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
+        public override string GetWorkloadMethodCall(string passArguments)
+            => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments}))";
     }
 }
