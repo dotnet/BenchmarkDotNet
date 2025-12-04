@@ -86,15 +86,15 @@ namespace BenchmarkDotNet.Code
         public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string ConsumeField
-            => !Consumer.IsConsumable(WorkloadMethodReturnType) && Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
-                ? $".{field.Name}"
+            => !Consumer.IsConsumable(WorkloadMethodReturnType) && Consumer.HasConsumableField(WorkloadMethodReturnType, out var fieldInfo)
+                ? $".{fieldInfo.Name}"
                 : null;
 
         protected override Type OverheadMethodReturnType
             => Consumer.IsConsumable(WorkloadMethodReturnType)
                 ? WorkloadMethodReturnType
-                : (Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
-                    ? field.FieldType
+                : (Consumer.HasConsumableField(WorkloadMethodReturnType, out var fieldInfo)
+                    ? fieldInfo.FieldType
                     : typeof(int)); // we return this simple type because creating bigger ValueType could take longer than benchmarked method itself
 
         public override string OverheadImplementation
