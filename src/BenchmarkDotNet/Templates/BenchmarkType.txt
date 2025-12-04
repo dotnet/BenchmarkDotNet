@@ -252,7 +252,7 @@
             global::BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
-        private $WorkloadMethodReturnType$ this.workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
+        private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(global::System.Int64 invokeCount)
