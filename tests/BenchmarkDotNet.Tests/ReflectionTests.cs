@@ -14,18 +14,18 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetCorrectCSharpTypeNameReturnsCSharpFriendlyTypeName()
         {
-            CheckCorrectTypeName("System.Int32", typeof(int));
-            CheckCorrectTypeName("System.Int32[]", typeof(int[]));
-            CheckCorrectTypeName("System.Int32[][]", typeof(int[][]));
-            CheckCorrectTypeName("System.Int32[,]", typeof(int[,]));
-            CheckCorrectTypeName("System.Tuple<System.Int16, System.Int32>[]", typeof(Tuple<short, int>[]));
-            CheckCorrectTypeName("System.ValueTuple<System.Int16, System.Int32>[]", typeof(ValueTuple<short, int>[]));
+            CheckCorrectTypeName("global::System.Int32", typeof(int));
+            CheckCorrectTypeName("global::System.Int32[]", typeof(int[]));
+            CheckCorrectTypeName("global::System.Int32[][]", typeof(int[][]));
+            CheckCorrectTypeName("global::System.Int32[,]", typeof(int[,]));
+            CheckCorrectTypeName("global::System.Tuple<global::System.Int16, global::System.Int32>[]", typeof(Tuple<short, int>[]));
+            CheckCorrectTypeName("global::System.ValueTuple<global::System.Int16, global::System.Int32>[]", typeof(ValueTuple<short, int>[]));
             CheckCorrectTypeName("void", typeof(void));
             CheckCorrectTypeName("void*", typeof(void*));
-            CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
-            CheckCorrectTypeName("System.Type", typeof(Type));
+            CheckCorrectTypeName("global::System.IEquatable<T>", typeof(IEquatable<>));
+            CheckCorrectTypeName("global::System.Type", typeof(Type));
             // ReSharper disable once PossibleMistakenCallToGetType.2
-            CheckCorrectTypeName("System.Reflection.TypeInfo", typeof(string).GetType()); // typeof(string).GetType() == System.RuntimeType which is not public
+            CheckCorrectTypeName("global::System.Reflection.TypeInfo", typeof(string).GetType()); // typeof(string).GetType() == System.RuntimeType which is not public
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests
         {
             var byRefGenericType = typeof(GenericByRef).GetMethod(nameof(GenericByRef.TheMethod)).GetParameters().Single().ParameterType;
 
-            CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int16>", byRefGenericType);
+            CheckCorrectTypeName("global::System.ValueTuple<global::System.Int32, global::System.Int16>", byRefGenericType);
         }
 
         public class GenericByRef
@@ -44,32 +44,32 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetCorrectCSharpTypeNameSupportsNestedTypes()
         {
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", typeof(Nested));
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.Nested", typeof(Nested));
 
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2",
                 typeof(NestedNonGeneric1.NestedNonGeneric2));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<global::System.Int16, global::System.Boolean, global::System.Decimal>",
                 typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
 
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>.NestedNonGeneric3",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<global::System.Int16, global::System.Boolean, global::System.Decimal>.NestedNonGeneric3",
                 typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>.NestedNonGeneric3));
 
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<global::System.Byte, global::System.SByte>",
                 typeof(NestedGeneric1<byte, sbyte>));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<global::System.Byte, global::System.SByte>.NonGeneric2",
                 typeof(NestedGeneric1<byte, sbyte>.NonGeneric2));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2.Generic3<System.Int16, System.Int32, System.Int64>",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<global::System.Byte, global::System.SByte>.NonGeneric2.Generic3<global::System.Int16, global::System.Int32, global::System.Int64>",
                 typeof(NestedGeneric1<byte, sbyte>.NonGeneric2.Generic3<short, int, long>));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2.Generic3<System.Int16, System.Int32, System.Int64>.NonGeneric4",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<global::System.Byte, global::System.SByte>.NonGeneric2.Generic3<global::System.Int16, global::System.Int32, global::System.Int64>.NonGeneric4",
                 typeof(NestedGeneric1<byte, sbyte>.NonGeneric2.Generic3<short, int, long>.NonGeneric4));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2.Generic3<System.Int16, System.Int32, System.Int64>.Generic4<System.Single, System.Double>",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<global::System.Byte, global::System.SByte>.NonGeneric2.Generic3<global::System.Int16, global::System.Int32, global::System.Int64>.Generic4<global::System.Single, global::System.Double>",
                 typeof(NestedGeneric1<byte, sbyte>.NonGeneric2.Generic3<short, int, long>.Generic4<float, double>));
 
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>",
                 typeof(NestedGeneric1<,>));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>.NonGeneric2.Generic3<V1, V2, V3>.NonGeneric4",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>.NonGeneric2.Generic3<V1, V2, V3>.NonGeneric4",
                 typeof(NestedGeneric1<,>.NonGeneric2.Generic3<,,>.NonGeneric4));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>.NonGeneric2.Generic3<V1, V2, V3>.Generic4<W1, W2>",
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>.NonGeneric2.Generic3<V1, V2, V3>.Generic4<W1, W2>",
                 typeof(NestedGeneric1<,>.NonGeneric2.Generic3<,,>.Generic4<,>));
         }
 
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Tests
         {
             var byRefNestedType = typeof(Nested).GetMethod(nameof(Nested.TheMethod)).GetParameters().Single().ParameterType;
 
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", byRefNestedType);
+            CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.Nested", byRefNestedType);
         }
 
         public class Nested
