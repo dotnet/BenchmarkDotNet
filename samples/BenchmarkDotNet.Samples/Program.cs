@@ -1,10 +1,11 @@
-﻿using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,12 +27,7 @@ public class Program
             ConsoleLogger.Default.WriteLine();
         }
 
-        IConfig config;
-#if DEBUG
-        config = GetDebugConfig();
-#else
-        config = null; // `DefaultConfig.Instance` is used.
-#endif
+        IConfig? config = GetConfig(ref args);
 
         var summaries = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
                                          .Run(args, config)
@@ -43,17 +39,29 @@ public class Program
         return 0;
     }
 
-    private static ManualConfig GetDebugConfig()
+    private static IConfig? GetConfig(ref string[] args)
     {
-        return DefaultConfig.Instance
-                            .WithOptions(ConfigOptions.DisableOptimizationsValidator)
-                            .WithOptions(ConfigOptions.StopOnFirstError)
-                            .AddJob(
-                                Job.Default
-                                   .WithId("WithDebugConfiguration")
-                                   .WithToolchain(InProcessEmitToolchain.Instance)
-                                   .WithStrategy(RunStrategy.Monitoring)
-                             );
+#if !DEBUG
+        return null; // `DefaultConfig.Instance` is used.
+#else
+        bool isInProcess = args.Contains("--inProcess");
+        if (isInProcess)
+            args = args.Where(x => x != "--inProcess").ToArray();
+
+        DebugConfig config = isInProcess
+                            ? new DebugInProcessConfig()
+                            : new DebugBuildConfig();
+
+        return config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
+                     .AddDiagnoser(
+                         MemoryDiagnoser.Default,
+                         new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false)),
+                         new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false))
+                      )
+                      .AddExporter(MarkdownExporter.Default)
+                      .AddValidator(DefaultConfig.Instance.GetValidators().ToArray())
+                      .WithArtifactsPath(DefaultConfig.Instance.ArtifactsPath);
+#endif
     }
 }
 
