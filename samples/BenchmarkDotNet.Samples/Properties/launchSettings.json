@@ -10,6 +10,7 @@
     "Run IntroBasic Benchmarks": {
       "commandName": "Project",
       "commandLineArgs": "--filter *IntroBasic*",
+      // "commandLineArgs": "--filter *IntroBasic* --inProcess --strategy Monitoring", // Use this setting for in-process debug
       "workingDirectory": ".",
       "environmentVariables": {
       }
