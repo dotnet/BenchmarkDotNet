@@ -6,6 +6,8 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Models;
 using Perfolizer.Horology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -64,7 +66,7 @@ namespace BenchmarkDotNet.Jobs
         }.Freeze();
 
 
-        public RunMode() : this(null) { }
+        public RunMode() : this("") { }
 
         private RunMode(string id) : base(id) { }
 

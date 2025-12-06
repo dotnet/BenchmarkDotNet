@@ -8,6 +8,8 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Perfolizer.Horology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -35,13 +37,13 @@ namespace BenchmarkDotNet.Jobs
             Toolchain = toolchain;
         }
 
-        public IToolchain Toolchain
+        public IToolchain? Toolchain
         {
             get { return ToolchainCharacteristic[this]; }
             set { ToolchainCharacteristic[this] = value; }
         }
 
-        public IClock Clock
+        public IClock? Clock
         {
             get { return ClockCharacteristic[this]; }
             set { ClockCharacteristic[this] = value; }
@@ -51,19 +53,19 @@ namespace BenchmarkDotNet.Jobs
         /// this type will be used in the auto-generated program to create engine in separate process
         /// <remarks>it must have parameterless constructor</remarks>
         /// </summary>
-        public IEngineFactory EngineFactory
+        public IEngineFactory? EngineFactory
         {
             get { return EngineFactoryCharacteristic[this]; }
             set { EngineFactoryCharacteristic[this] = value; }
         }
 
-        public string BuildConfiguration
+        public string? BuildConfiguration
         {
             get => BuildConfigurationCharacteristic[this];
             set => BuildConfigurationCharacteristic[this] = value;
         }
 
-        public IReadOnlyList<Argument> Arguments
+        public IReadOnlyList<Argument>? Arguments
         {
             get => ArgumentsCharacteristic[this];
             set => ArgumentsCharacteristic[this] = value;
@@ -71,13 +73,13 @@ namespace BenchmarkDotNet.Jobs
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This will soon be removed")]
-        public IReadOnlyCollection<NuGetReference> NuGetReferences
+        public IReadOnlyCollection<NuGetReference>? NuGetReferences
         {
             get => NuGetReferencesCharacteristic[this];
             set => NuGetReferencesCharacteristic[this] = value;
         }
 
-        public bool TryGetToolchain(out IToolchain toolchain)
+        public bool TryGetToolchain([NotNullWhen(true)]out IToolchain? toolchain)
         {
             toolchain = HasValue(ToolchainCharacteristic) ? Toolchain : default;
             return toolchain != default;

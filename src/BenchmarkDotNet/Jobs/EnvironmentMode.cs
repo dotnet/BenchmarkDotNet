@@ -7,6 +7,8 @@ using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class EnvironmentMode : JobMode<EnvironmentMode>
@@ -29,7 +31,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly EnvironmentMode RyuJitX86 = new EnvironmentMode(nameof(RyuJitX86), Jit.RyuJit, Platform.X86).Freeze();
 
         [PublicAPI]
-        public EnvironmentMode() : this(id: null) { }
+        public EnvironmentMode() : this(id: "") { }
 
         [PublicAPI]
         public EnvironmentMode(Runtime runtime) : this(runtime.ToString()) => Runtime = runtime;
@@ -42,7 +44,10 @@ namespace BenchmarkDotNet.Jobs
         }
 
         [PublicAPI]
-        public EnvironmentMode(string id) : base(id) => GcCharacteristic[this] = new GcMode();
+        public EnvironmentMode(string id) : base(id)
+        {
+            GcCharacteristic[this] = new GcMode();
+        }
 
         /// <summary>
         /// Platform (x86 or x64)
@@ -84,9 +89,9 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// GcMode
         /// </summary>
-        public GcMode Gc => GcCharacteristic[this];
+        public GcMode Gc => GcCharacteristic[this]!;
 
-        public IReadOnlyList<EnvironmentVariable> EnvironmentVariables
+        public IReadOnlyList<EnvironmentVariable>? EnvironmentVariables
         {
             get => EnvironmentVariablesCharacteristic[this];
             set => EnvironmentVariablesCharacteristic[this] = value;
@@ -137,7 +142,12 @@ namespace BenchmarkDotNet.Jobs
             EnvironmentVariables = newVariables;
         }
 
-        internal Runtime GetRuntime() => HasValue(RuntimeCharacteristic) ? Runtime : RuntimeInformation.GetCurrentRuntime();
+        internal Runtime GetRuntime()
+        {
+            return HasValue(RuntimeCharacteristic) && Runtime != null
+                ? Runtime
+                : RuntimeInformation.GetCurrentRuntime();
+        }
 
         internal BdnEnvironment ToPerfonar() => new()
         {

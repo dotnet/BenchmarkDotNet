@@ -10,9 +10,11 @@ namespace BenchmarkDotNet.Helpers
 {
     public static class FolderNameHelper
     {
-        public static string ToFolderName(object value)
+        public static string ToFolderName(object? value)
         {
             switch (value) {
+                case null:
+                    return "null";
                 case bool b:
                     return b.ToLowerCase();
                 case string s:

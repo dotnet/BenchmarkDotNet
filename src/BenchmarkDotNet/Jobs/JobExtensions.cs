@@ -12,6 +12,8 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
@@ -345,7 +347,7 @@ namespace BenchmarkDotNet.Jobs
             job.WithCore(j => j.Infrastructure.NuGetReferences =
                 new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
                     {
-                        new NuGetReference(packageName, packageVersion, source, prerelease)
+                        new NuGetReference(packageName, packageVersion ?? "", source, prerelease)
                     });
 
         /// <summary>

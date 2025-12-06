@@ -2,6 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Characteristics
 {
     public abstract class Characteristic
@@ -24,7 +26,7 @@ namespace BenchmarkDotNet.Characteristics
                 null, fallbackValue,
                 false);
 
-        public static Characteristic<T> Create<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName, Func<CharacteristicObject, T, T> resolver, T fallbackValue, bool ignoreOnApply)
+        public static Characteristic<T> Create<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName, Func<CharacteristicObject, T?, T> resolver, T fallbackValue, bool ignoreOnApply)
             where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
@@ -52,7 +54,7 @@ namespace BenchmarkDotNet.Characteristics
             string id,
             [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicType,
             Type declaringType,
-            object fallbackValue,
+            object? fallbackValue,
             bool ignoreOnApply,
             bool dontShowInSummary = false)
         {
@@ -84,7 +86,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public Type DeclaringType { get; }
 
-        private object FallbackValue { get; }
+        private object? FallbackValue { get; }
 
         public object? this[CharacteristicObject obj]
         {
@@ -94,7 +96,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public bool HasChildCharacteristics => IsCharacteristicObjectSubclass(CharacteristicType);
 
-        internal virtual object ResolveValueCore(CharacteristicObject obj, object currentValue) =>
+        internal virtual object? ResolveValueCore(CharacteristicObject obj, object currentValue) =>
             ReferenceEquals(currentValue, EmptyValue) ? FallbackValue : currentValue;
 
         public override string ToString() => Id;
