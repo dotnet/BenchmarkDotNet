@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -26,9 +28,9 @@ namespace BenchmarkDotNet.Jobs
         public string PackageName { get; }
         public string PackageVersion { get; }
         public bool Prerelease { get; }
-        public Uri PackageSource { get; }
+        public Uri? PackageSource { get; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as NuGetReference);
         }
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(NuGetReference other)
+        public bool Equals(NuGetReference? other)
         {
             return other != null &&
                    PackageName == other.PackageName &&

@@ -2,6 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -112,7 +114,7 @@ namespace BenchmarkDotNet.Jobs
             set { HeapCountCharacteristic[this] = value; }
         }
 
-        public bool Equals(GcMode other)
+        public bool Equals(GcMode? other)
             => other != null
                 && other.AllowVeryLargeObjects == AllowVeryLargeObjects
                 && other.Concurrent == Concurrent

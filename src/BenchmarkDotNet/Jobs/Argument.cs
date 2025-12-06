@@ -1,6 +1,8 @@
 ﻿using System;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     public abstract class Argument: IEquatable<Argument>
@@ -15,14 +17,14 @@ namespace BenchmarkDotNet.Jobs
         // CharacteristicPresenters call ToString(), this is why we need this override
         public override string ToString() => TextRepresentation;
 
-        public bool Equals(Argument other)
+        public bool Equals(Argument? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return TextRepresentation == other.TextRepresentation;
         }
 
-        public override bool Equals(object obj) => Equals(obj as Argument);
+        public override bool Equals(object? obj) => Equals(obj as Argument);
 
         public override int GetHashCode() => HashCode.Combine(TextRepresentation);
     }

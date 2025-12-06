@@ -1,5 +1,7 @@
 ﻿using System;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     public class EnvironmentVariable : IEquatable<EnvironmentVariable>
@@ -17,9 +19,12 @@ namespace BenchmarkDotNet.Jobs
         // CharacteristicPresenters call ToString(), this is why we need this override
         public override string ToString() => $"{Key}={Value}";
 
-        public bool Equals(EnvironmentVariable other) => string.Equals(Key, other.Key) && string.Equals(Value, other.Value);
+        public bool Equals(EnvironmentVariable? other)
+        {
+            return string.Equals(Key, other?.Key) && string.Equals(Value, other?.Value);
+        }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
                 return false;

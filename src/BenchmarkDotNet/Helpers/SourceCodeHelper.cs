@@ -7,11 +7,13 @@ using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
 using SimpleJson.Reflection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     public static class SourceCodeHelper
     {
-        public static string ToSourceCode(object value)
+        public static string ToSourceCode(object? value)
         {
             switch (value) {
                 case null:
@@ -42,7 +44,7 @@ namespace BenchmarkDotNet.Helpers
                     {
                         elementsSourceCode[i] = ToSourceCode(array.GetValue(i));
                     }
-                    return $"new {array.GetType().GetElementType().GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", elementsSourceCode)} }}";
+                    return $"new {array.GetType().GetElementType()!.GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", elementsSourceCode)} }}";
                 }
             }
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
@@ -61,7 +63,7 @@ namespace BenchmarkDotNet.Helpers
                     return formattable.ToString(null, CultureInfo.InvariantCulture);
             }
 
-            return value.ToString();
+            return value.ToString()!;
         }
 
         public static bool IsCompilationTimeConstant(object value)
