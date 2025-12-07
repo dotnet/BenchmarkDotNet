@@ -9,6 +9,8 @@ using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
 using BenchmarkDotNet.Attributes;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class CompilationValidator : IValidator
@@ -121,7 +123,7 @@ namespace BenchmarkDotNet.Validators
         {
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkMethodEqualityComparer();
 
-            public bool Equals(BenchmarkCase x, BenchmarkCase y)
+            public bool Equals(BenchmarkCase? x, BenchmarkCase? y)
             {
                 if (x == null && y == null) return true;
                 if (x == null || y == null) return false;

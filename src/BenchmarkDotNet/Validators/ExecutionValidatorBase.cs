@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Validators
 {
@@ -53,11 +56,11 @@ namespace BenchmarkDotNet.Validators
             return errors;
         }
 
-        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, out object? instance)
+        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, [NotNullWhen(true)] out object? instance)
         {
             try
             {
-                instance = Activator.CreateInstance(type);
+                instance = Activator.CreateInstance(type)!;
 
                 return true;
             }
@@ -124,7 +127,7 @@ namespace BenchmarkDotNet.Validators
 
         private string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
 
-        private void TryToGetTaskResult(object result)
+        private void TryToGetTaskResult(object? result)
         {
             if (result == null)
             {
@@ -241,7 +244,7 @@ namespace BenchmarkDotNet.Validators
         protected static string GetDisplayExceptionMessage(Exception ex)
         {
             if (ex is TargetInvocationException targetInvocationException)
-                ex = targetInvocationException.InnerException;
+                ex = targetInvocationException.InnerException!;
 
             return ex?.Message ?? "Unknown error";
         }

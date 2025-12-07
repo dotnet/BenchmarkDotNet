@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class DeferredExecutionValidator : IValidator
@@ -29,7 +31,7 @@ namespace BenchmarkDotNet.Validators
         private bool IsDeferredExecution(Type returnType)
         {
             if (returnType.IsByRef && !returnType.IsGenericType)
-                return IsDeferredExecution(returnType.GetElementType());
+                return IsDeferredExecution(returnType.GetElementType()!);
 
             if (returnType.IsGenericType && (returnType.GetGenericTypeDefinition() == typeof(Task<>) || returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
                 return IsDeferredExecution(returnType.GetGenericArguments().Single());

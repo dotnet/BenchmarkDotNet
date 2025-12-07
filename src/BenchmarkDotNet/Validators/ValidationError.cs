@@ -2,6 +2,8 @@
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class ValidationError : IEquatable<ValidationError>
@@ -43,6 +45,6 @@ namespace BenchmarkDotNet.Validators
 
         public static bool operator ==(ValidationError left, ValidationError right) => Equals(left, right);
 
-        public static bool operator !=(ValidationError left, ValidationError right) => !Equals(left, right);
+        public static bool operator !=(ValidationError? left, ValidationError? right) => !Equals(left, right);
     }
 }

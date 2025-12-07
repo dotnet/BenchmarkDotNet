@@ -10,16 +10,16 @@ namespace BenchmarkDotNet.Validators
     {
         public IReadOnlyList<BenchmarkCase> Benchmarks { get; }
 
-        public ImmutableConfig? Config { get; }
+        public ImmutableConfig Config { get; }
 
-        public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, ImmutableConfig? config)
+        public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, ImmutableConfig config)
         {
             Benchmarks = benchmarks;
             Config = config;
         }
 
-        // to have backward compatibility for people who implemented IValidator(Benchmark[] benchmarks)
-        public static implicit operator ValidationParameters(BenchmarkCase[] benchmarksCase) => new ValidationParameters(benchmarksCase, null);
-        public static implicit operator ValidationParameters(BenchmarkRunInfo benchmarkRunInfo) => new ValidationParameters(benchmarkRunInfo.BenchmarksCases, null);
+        // Note: Following implicit operators are expected to be used for test projects.
+        public static implicit operator ValidationParameters(BenchmarkCase[] benchmarksCase) => new ValidationParameters(benchmarksCase, config: null!);
+        public static implicit operator ValidationParameters(BenchmarkRunInfo benchmarkRunInfo) => new ValidationParameters(benchmarkRunInfo.BenchmarksCases, config: null!);
     }
 }

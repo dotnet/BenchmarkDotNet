@@ -6,6 +6,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class ConfigValidator : IValidator
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet.Validators
                 yield return pathValidation;
         }
 
-        private static ValidationError ValidateArtifactsPath(string artifactsPath)
+        private static ValidationError? ValidateArtifactsPath(string artifactsPath)
         {
             if (artifactsPath == null) // null is OK, default path will be used
                 return null;

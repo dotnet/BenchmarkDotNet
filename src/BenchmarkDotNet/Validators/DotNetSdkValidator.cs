@@ -6,9 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Validators
 {
@@ -26,15 +29,15 @@ namespace BenchmarkDotNet.Validators
             var requiredSdkVersion = benchmark.GetRuntime().RuntimeMoniker.GetRuntimeVersion();
             if (!GetInstalledDotNetSdks(customDotNetCliPath).Any(sdk => sdk >= requiredSdkVersion))
             {
-                yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime.RuntimeMoniker} is not installed.", benchmark);
+                yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime!.RuntimeMoniker} is not installed.", benchmark);
             }
         }
 
         public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
         {
             var targetRuntime = benchmark.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? benchmark.Job.Environment.Runtime
-                : ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.WorkloadMethod.DeclaringType.Assembly);
+                ? benchmark.Job.Environment.Runtime!
+                : ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.WorkloadMethod.DeclaringType!.Assembly);
             var requiredSdkVersion = targetRuntime.RuntimeMoniker.GetRuntimeVersion();
 
             var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();
@@ -44,7 +47,7 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        public static bool IsCliPathInvalid(string customDotNetCliPath, BenchmarkCase benchmarkCase, out ValidationError? validationError)
+        public static bool IsCliPathInvalid(string? customDotNetCliPath, BenchmarkCase benchmarkCase, [NotNullWhen(true)] out ValidationError? validationError)
         {
             validationError = null;
 
@@ -71,7 +74,7 @@ namespace BenchmarkDotNet.Validators
 
         private static IEnumerable<Version> GetInstalledDotNetSdks(string? customDotNetCliPath)
         {
-            string dotnetExecutable = string.IsNullOrEmpty(customDotNetCliPath) ? "dotnet" : customDotNetCliPath;
+            string dotnetExecutable = string.IsNullOrEmpty(customDotNetCliPath) ? "dotnet" : customDotNetCliPath!;
             var startInfo = new ProcessStartInfo(dotnetExecutable, "--list-sdks")
             {
                 RedirectStandardOutput = true,
@@ -146,13 +149,13 @@ namespace BenchmarkDotNet.Validators
 
                 if (ndpKey.GetValue("Version") != null)
                 {
-                    versions.Add(ndpKey.GetValue("Version").ToString());
+                    versions.Add(ndpKey.GetValue("Version")!.ToString()!);
                 }
                 else
                 {
                     if (ndpKey.GetValue("Release") != null)
                     {
-                        versions.Add(CheckFor45PlusVersion((int)ndpKey.GetValue("Release")));
+                        versions.Add(CheckFor45PlusVersion((int)ndpKey.GetValue("Release")!));
                     }
                 }
             }
