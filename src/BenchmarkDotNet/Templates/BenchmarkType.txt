@@ -17,7 +17,7 @@
             host.WriteLine($"// Job: {job.DisplayInfo}");
             host.WriteLine();
 
-            System.Collections.Generic.IEnumerable<BenchmarkDotNet.Validators.ValidationError> errors = BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.Validate(job);
+            System.Collections.Generic.IEnumerable<BenchmarkDotNet.Validators.ValidationError> errors = BenchmarkDotNet.Validators.BenchmarkProcessValidator.Validate(job, instance);
             if (BenchmarkDotNet.Validators.ValidationErrorReporter.ReportIfAny(errors, host))
                 return;
 
