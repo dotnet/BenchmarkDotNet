@@ -94,7 +94,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         private static void FallbackMethod() { }
         private static readonly MethodInfo FallbackSignature = new Action(FallbackMethod).GetMethodInfo();
-        private static readonly MethodInfo DummyMethod = typeof(DummyInstance).GetMethod(nameof(DummyInstance.Dummy));
 
         /// <summary>Creates run benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
@@ -139,10 +138,5 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         /// <returns>Cleanup benchmark action.</returns>
         public static BenchmarkAction CreateIterationCleanup(Descriptor descriptor, object instance) =>
             CreateCore(instance, descriptor.IterationCleanupMethod, FallbackSignature, 1);
-
-        /// <summary>Creates a dummy benchmark action.</summary>
-        /// <returns>Dummy benchmark action.</returns>
-        public static BenchmarkAction CreateDummy() =>
-            CreateCore(new DummyInstance(), DummyMethod, null, 1);
     }
 }

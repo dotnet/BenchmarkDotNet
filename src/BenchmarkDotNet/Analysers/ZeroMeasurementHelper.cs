@@ -6,12 +6,14 @@ using Perfolizer.Mathematics.GenericEstimators;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
 using Perfolizer.Metrology;
+using Pragmastat;
+using Pragmastat.Estimators;
 
 namespace BenchmarkDotNet.Analysers
 {
     internal static class ZeroMeasurementHelper
     {
-        public static bool IsNegligible(Sample results, double threshold) => HodgesLehmannEstimator.Instance.Median(results) < threshold;
+        public static bool IsNegligible(Sample results, double threshold) => CenterEstimator.Instance.Estimate(results) < threshold;
         public static bool IsNoticeable(Sample results, double threshold) => !IsNegligible(results, threshold);
 
         public static bool AreIndistinguishable(double[] workload, double[] overhead, Threshold? threshold = null)

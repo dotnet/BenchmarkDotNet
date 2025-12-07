@@ -57,7 +57,16 @@ namespace BenchmarkDotNet.Extensions
                 return type.Name;
 
             if (type.IsArray)
-                return GetCorrectCSharpTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
+            {
+                var typeName = GetCorrectCSharpTypeName(type.GetElementType());
+                var parts = typeName.Split(['['], count: 2);
+
+                string repr = parts[0] + '[' + new string(',', type.GetArrayRank() - 1) + ']';
+
+                if (parts.Length == 2) return repr + '[' + parts[1];
+
+                return repr;
+            }
 
             return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace).Reverse());
         }

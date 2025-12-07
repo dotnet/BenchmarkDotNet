@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Versioning;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 
@@ -60,9 +61,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-#if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
-#endif
+        [SupportedOSPlatformGuard("windows")]
         private static bool PlatformSupportsTitleRead() => OsDetector.IsWindows();
 
         /// <summary>

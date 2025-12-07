@@ -8,6 +8,8 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     internal class UserInteraction : IUserInteraction
@@ -39,7 +41,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. `{filterExample}`).");
                 logger.WriteLineHelp($"Enter the asterisk `*` to select all.");
 
-                string userInput = Console.ReadLine();
+                string? userInput = Console.ReadLine();
                 if (userInput == null)
                 {
                     break;

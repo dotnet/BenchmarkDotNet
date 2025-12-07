@@ -79,153 +79,202 @@ namespace BenchmarkDotNet.Tests.Validators
             public static IEnumerable<bool> Source() => new[] { false, true };
         }
 
+#pragma warning disable BDN1205
         public class Const1 : Base
         {
             [Params(false, true)]
             public const bool Input = false;
         }
+#pragma warning restore BDN1205
 
+#pragma warning disable BDN1205
         public class Const2 : Base
         {
             [ParamsAllValues]
             public const bool Input = false;
         }
+#pragma warning restore BDN1205
 
+#pragma warning disable BDN1205
         public class Const3 : Base
         {
             [ParamsSource(nameof(Source))]
             public const bool Input = false;
         }
+#pragma warning restore BDN1205
 
+#pragma warning disable BDN1204
         public class StaticReadonly1 : Base
         {
             [Params(false, true)]
             public static readonly bool Input = false;
         }
+#pragma warning restore BDN1204
 
+#pragma warning disable BDN1204
         public class StaticReadonly2 : Base
         {
             [ParamsAllValues]
             public static readonly bool Input = false;
         }
+#pragma warning restore BDN1204
 
+#pragma warning disable BDN1204
         public class StaticReadonly3 : Base
         {
             [ParamsSource(nameof(Source))]
             public static readonly bool Input = false;
         }
+#pragma warning restore BDN1204
 
+#pragma warning disable BDN1204
         public class NonStaticReadonly1 : Base
         {
             [Params(false, true)]
             public readonly bool Input = false;
         }
+#pragma warning restore BDN1204
 
+#pragma warning disable BDN1204
         public class NonStaticReadonly2 : Base
         {
             [ParamsAllValues]
             public readonly bool Input = false;
         }
+#pragma warning restore BDN1204
 
+#pragma warning disable BDN1204
         public class NonStaticReadonly3 : Base
         {
             [ParamsSource(nameof(Source))]
             public readonly bool Input = false;
         }
+#pragma warning restore BDN1204
 
+#pragma warning disable BDN1207
         public class PrivateSetter1 : Base
         {
             [Params(false, true)]
             public bool Input { get; private set; }
         }
+#pragma warning restore BDN1207
 
+#pragma warning disable BDN1207
         public class PrivateSetter2 : Base
         {
             [ParamsAllValues]
             public bool Input { get; private set; }
         }
+#pragma warning restore BDN1207
 
+#pragma warning disable BDN1207
         public class PrivateSetter3 : Base
         {
             [ParamsSource(nameof(Source))]
             public bool Input { get; private set; }
         }
+#pragma warning restore BDN1207
 
+#pragma warning disable BDN1207
         public class NoSetter1 : Base
         {
             [Params(false, true)]
             public bool Input { get; } = false;
         }
+#pragma warning restore BDN1207
 
+#pragma warning disable BDN1207
         public class NoSetter2 : Base
         {
             [ParamsAllValues]
             public bool Input { get; } = false;
         }
+#pragma warning restore BDN1207
 
+#pragma warning disable BDN1207
         public class NoSetter3 : Base
         {
             [ParamsSource(nameof(Source))]
             public bool Input { get; } = false;
         }
+#pragma warning restore BDN1207
 
+#pragma warning disable BDN1202
         public class InternalField1 : Base
         {
             [Params(false, true)]
             internal bool Input = false;
         }
+#pragma warning restore BDN1202
 
+#pragma warning disable BDN1202
         public class InternalField2 : Base
         {
             [ParamsAllValues]
             internal bool Input = false;
         }
+#pragma warning restore BDN1202
 
+#pragma warning disable BDN1202
         public class InternalField3 : Base
         {
             [ParamsSource(nameof(Source))]
             internal bool Input = false;
         }
+#pragma warning restore BDN1202
 
+#pragma warning disable BDN1203
         public class InternalProp1 : Base
         {
             [Params(false, true)]
             internal bool Input { get; set; }
         }
+#pragma warning restore BDN1203
 
+#pragma warning disable BDN1203
         public class InternalProp2 : Base
         {
             [ParamsAllValues]
             internal bool Input { get; set; }
         }
+#pragma warning restore BDN1203
 
+#pragma warning disable BDN1203
         public class InternalProp3 : Base
         {
             [ParamsSource(nameof(Source))]
             internal bool Input { get; set; }
         }
+#pragma warning restore BDN1203
 
+#pragma warning disable BDN1200
         public class FieldMultiple1 : Base
         {
             [Params(false, true)]
             [ParamsAllValues]
             public bool Input = false;
         }
+#pragma warning restore BDN1200
 
+#pragma warning disable BDN1200
         public class FieldMultiple2 : Base
         {
             [Params(false, true)]
             [ParamsSource(nameof(Source))]
             public bool Input = false;
         }
+#pragma warning restore BDN1200
 
+#pragma warning disable BDN1200
         public class FieldMultiple3 : Base
         {
             [ParamsAllValues]
             [ParamsSource(nameof(Source))]
             public bool Input = false;
         }
+#pragma warning restore BDN1200
 
+#pragma warning disable BDN1200
         public class FieldMultiple4 : Base
         {
             [Params(false, true)]
@@ -233,28 +282,36 @@ namespace BenchmarkDotNet.Tests.Validators
             [ParamsSource(nameof(Source))]
             public bool Input = false;
         }
+#pragma warning restore BDN1200
 
+#pragma warning disable BDN1201
         public class PropMultiple1 : Base
         {
             [Params(false, true)]
             [ParamsAllValues]
             public bool Input { get; set; }
         }
+#pragma warning restore BDN1201
 
+#pragma warning disable BDN1201
         public class PropMultiple2 : Base
         {
             [Params(false, true)]
             [ParamsSource(nameof(Source))]
             public bool Input { get; set; }
         }
+#pragma warning restore BDN1201
 
+#pragma warning disable BDN1201
         public class PropMultiple3 : Base
         {
             [ParamsAllValues]
             [ParamsSource(nameof(Source))]
             public bool Input { get; set; }
         }
+#pragma warning restore BDN1201
 
+#pragma warning disable BDN1201
         public class PropMultiple4 : Base
         {
             [Params(false, true)]
@@ -262,6 +319,7 @@ namespace BenchmarkDotNet.Tests.Validators
             [ParamsSource(nameof(Source))]
             public bool Input { get; set; }
         }
+#pragma warning restore BDN1201
 
 #if NET5_0_OR_GREATER
 
@@ -269,23 +327,29 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact] public void InitOnly2Test() => Check<InitOnly2>(nameof(InitOnly2.Input), "init-only", Pa);
         [Fact] public void InitOnly3Test() => Check<InitOnly3>(nameof(InitOnly3.Input), "init-only", Ps);
 
+#pragma warning disable BDN1206
         public class InitOnly1 : Base
         {
             [Params(false, true)]
             public bool Input { get; init; }
         }
+#pragma warning restore BDN1206
 
+#pragma warning disable BDN1206
         public class InitOnly2 : Base
         {
             [ParamsAllValues]
             public bool Input { get; init; }
         }
+#pragma warning restore BDN1206
 
+#pragma warning disable BDN1206
         public class InitOnly3 : Base
         {
             [ParamsSource(nameof(Source))]
             public bool Input { get; init; }
         }
+#pragma warning restore BDN1206
 
 #endif
     }

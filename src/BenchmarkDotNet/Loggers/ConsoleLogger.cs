@@ -15,8 +15,13 @@ namespace BenchmarkDotNet.Loggers
         public static readonly ILogger Default = new ConsoleLogger();
         public static readonly ILogger Ascii = new ConsoleLogger(false);
         public static readonly ILogger Unicode = new ConsoleLogger(true);
-        private static readonly bool ConsoleSupportsColors
-            = !(OsDetector.IsAndroid() || OsDetector.IsIOS() || RuntimeInformation.IsWasm || OsDetector.IsTvOS());
+        private static readonly Lazy<bool> ConsoleSupportsColors = new(() =>
+        {
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
+                return false;
+
+            return !(OsDetector.IsAndroid() || OsDetector.IsIOS() || RuntimeInformation.IsWasm || OsDetector.IsTvOS());
+        });
 
         private readonly bool unicodeSupport;
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
@@ -45,7 +50,7 @@ namespace BenchmarkDotNet.Loggers
             if (!unicodeSupport)
                 text = text.ToAscii();
 
-            if (!ConsoleSupportsColors)
+            if (!ConsoleSupportsColors.Value)
             {
                 write(text);
                 return;

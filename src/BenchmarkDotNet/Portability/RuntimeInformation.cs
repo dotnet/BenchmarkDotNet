@@ -6,6 +6,7 @@ using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
@@ -42,8 +43,8 @@ namespace BenchmarkDotNet.Portability
             FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
+        [SupportedOSPlatformGuard("browser")]
 #if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
         public static readonly bool IsWasm = OperatingSystem.IsBrowser();
 #else
         public static readonly bool IsWasm = IsOSPlatform(OSPlatform.Create("BROWSER"));
@@ -79,19 +80,6 @@ namespace BenchmarkDotNet.Portability
             => Environment.Version.Major >= 5
                && IsAot
                && !IsWasm && !IsMono; // Wasm and MonoAOTLLVM are also AOT
-
-
-        public static readonly bool IsTieredJitEnabled =
-            IsNetCore
-            && (Environment.Version.Major < 3
-                // Disabled by default in netcoreapp2.X, check if it's enabled.
-                ? Environment.GetEnvironmentVariable("COMPlus_TieredCompilation") == "1"
-                || Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") == "1"
-                || (AppContext.TryGetSwitch("System.Runtime.TieredCompilation", out bool isEnabled) && isEnabled)
-                // Enabled by default in netcoreapp3.0+, check if it's disabled.
-                : Environment.GetEnvironmentVariable("COMPlus_TieredCompilation") != "0"
-                && Environment.GetEnvironmentVariable("DOTNET_TieredCompilation") != "0"
-                && (!AppContext.TryGetSwitch("System.Runtime.TieredCompilation", out isEnabled) || isEnabled));
 
         public static readonly bool IsRunningInContainer = string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
@@ -182,6 +170,11 @@ namespace BenchmarkDotNet.Portability
             }
         }
 
+        internal static Runtime GetTargetOrCurrentRuntime(Assembly? assembly)
+            => !IsMono && !IsWasm && IsFullFramework // Match order of checks in GetCurrentRuntime().
+                ? ClrRuntime.GetTargetOrCurrentVersion(assembly)
+                : GetCurrentRuntime();
+
         internal static Runtime GetCurrentRuntime()
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
@@ -243,36 +236,6 @@ namespace BenchmarkDotNet.Portability
 
         public static bool Is64BitPlatform() => IntPtr.Size == 8;
 
-        internal static bool HasRyuJit()
-        {
-            if (IsMono)
-                return false;
-            if (IsNetCore)
-                return true;
-
-            return Is64BitPlatform()
-                   && GetConfiguration() != DebugConfigurationName
-                   && !new JitHelper().IsMsX64();
-        }
-
-        internal static Jit GetCurrentJit() => HasRyuJit() ? Jit.RyuJit : Jit.LegacyJit;
-
-        internal static string GetJitInfo()
-        {
-            if (IsNativeAOT)
-                return "NativeAOT";
-            if (IsAot)
-                return "AOT";
-            if (IsMono || IsWasm)
-                return ""; // There is no helpful information about JIT on Mono
-            if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
-                return "RyuJIT";
-            if (IsFullFramework)
-                return "LegacyJIT";
-
-            return Unknown;
-        }
-
         internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;
 
         internal static string GetConfiguration()
@@ -283,39 +246,6 @@ namespace BenchmarkDotNet.Portability
                 return Unknown;
             }
             return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
-        }
-
-        // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
-        private class JitHelper
-        {
-            [SuppressMessage("IDE0052", "IDE0052")]
-            [SuppressMessage("IDE0079", "IDE0079")]
-            [SuppressMessage("ReSharper", "NotAccessedField.Local")]
-            private int bar;
-
-            public bool IsMsX64(int step = 1)
-            {
-                int value = 0;
-                for (int i = 0; i < step; i++)
-                {
-                    bar = i + 10;
-                    for (int j = 0; j < 2 * step; j += step)
-                        value = j + 10;
-                }
-                return value == 20 + step;
-            }
-        }
-
-        private class JitModule
-        {
-            public string Name { get; }
-            public string Version { get; }
-
-            public JitModule(string name, string version)
-            {
-                Name = name;
-                Version = version;
-            }
         }
 
         internal static ICollection<Antivirus> GetAntivirusProducts()

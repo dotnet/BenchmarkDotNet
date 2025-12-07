@@ -1,12 +1,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-
+using BenchmarkDotNet.Toolchains.Parameters;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -16,10 +17,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     /// </summary>
     internal class InProcessNoEmitRunner
     {
-#if NET6_0_OR_GREATER
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Runnable))]
-#endif
-        public static int Run(IHost host, BenchmarkCase benchmarkCase)
+        public static int Run(IHost host, ExecuteParameters parameters)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -37,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                methodInfo.Invoke(null, new object[] { host, benchmarkCase });
+                methodInfo.Invoke(null, [host, parameters]);
 
                 return 0;
             }
@@ -104,8 +103,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         [UsedImplicitly]
         private static class Runnable
         {
-            public static void RunCore(IHost host, BenchmarkCase benchmarkCase)
+            public static void RunCore(IHost host, ExecuteParameters parameters)
             {
+                var benchmarkCase = parameters.BenchmarkCase;
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
                 int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
@@ -118,9 +118,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
                 var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
                 var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance);
-                var dummy1 = BenchmarkActionFactory.CreateDummy();
-                var dummy2 = BenchmarkActionFactory.CreateDummy();
-                var dummy3 = BenchmarkActionFactory.CreateDummy();
 
                 FillMembers(instance, benchmarkCase);
 
@@ -130,14 +127,27 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 host.WriteLine("// Job: {0}", job.DisplayInfo);
                 host.WriteLine();
 
+                var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
+                    parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
+                        .Select((d, i) => Diagnosers.InProcessDiagnoserRouter.Create(d, benchmarkCase, i))
+                        .Where(r => r.handler != null)
+                        .ToArray(),
+                    host,
+                    parameters.DiagnoserRunMode,
+                    new Diagnosers.InProcessDiagnoserActionArgs(instance)
+                );
+                if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
+                {
+                    compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+                    return;
+                }
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
+
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
                     WorkloadActionNoUnroll = workloadAction.InvokeNoUnroll,
                     WorkloadActionUnroll = workloadAction.InvokeUnroll,
-                    Dummy1Action = dummy1.InvokeSingle,
-                    Dummy2Action = dummy2.InvokeSingle,
-                    Dummy3Action = dummy3.InvokeSingle,
                     OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,
                     OverheadActionUnroll = overheadAction.InvokeUnroll,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
@@ -147,7 +157,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
                     MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
-                    BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
+                    BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase),
+                    InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
                 };
 
                 using (var engine = job
@@ -158,6 +169,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                     host.ReportResults(results); // printing costs memory, do this after runs
                 }
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
             }
         }
     }

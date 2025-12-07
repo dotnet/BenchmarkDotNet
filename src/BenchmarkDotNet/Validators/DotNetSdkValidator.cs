@@ -32,7 +32,11 @@ namespace BenchmarkDotNet.Validators
 
         public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
         {
-            var requiredSdkVersion = benchmark.GetRuntime().RuntimeMoniker.GetRuntimeVersion();
+            var targetRuntime = benchmark.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                ? benchmark.Job.Environment.Runtime
+                : ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.WorkloadMethod.DeclaringType.Assembly);
+            var requiredSdkVersion = targetRuntime.RuntimeMoniker.GetRuntimeVersion();
+
             var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();
             if (installedVersionString == null || Version.TryParse(installedVersionString, out var installedVersion) && installedVersion < requiredSdkVersion)
             {
@@ -84,11 +88,11 @@ namespace BenchmarkDotNet.Validators
                         return Enumerable.Empty<Version>();
                     }
 
+                    var output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
 
                     if (process.ExitCode == 0)
                     {
-                        var output = process.StandardOutput.ReadToEnd();
                         var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                         var versions = new List<Version>(lines.Count());

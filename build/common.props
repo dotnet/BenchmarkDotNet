@@ -21,7 +21,7 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
+    <WarningsNotAsErrors>NU1900</WarningsNotAsErrors>
     <Nullable>annotations</Nullable>
     <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
@@ -46,7 +46,7 @@
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
     <!-- When this is changed, optionally reset WeaverVersionSuffix, then run `build.cmd pack-weaver`. -->
-    <VersionPrefix>0.15.3</VersionPrefix>
+    <VersionPrefix>0.16.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">

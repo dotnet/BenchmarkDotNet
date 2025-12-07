@@ -247,13 +247,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             var memoryLeakPerOperation = nativeLeakSize / totalOperation;
 
             logger.WriteLine(
-                $"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, null, benchmarkCase.Config.CultureInfo)}");
+                $"Native memory allocated per single operation: " +
+                $"{PerfolizerMeasurementFormatter.Instance.Format(
+                    SizeValue.FromBytes(memoryAllocatedPerOperation).ToMeasurement(SizeUnit.B),
+                    formatProvider: benchmarkCase.Config.CultureInfo)}");
             logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
 
             if (nativeLeakSize != 0)
             {
                 logger.WriteLine(
-                    $"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, null, benchmarkCase.Config.CultureInfo)}");
+                    $"Native memory leak per single operation: " +
+                    $"{PerfolizerMeasurementFormatter.Instance.Format(
+                        SizeValue.FromBytes(memoryLeakPerOperation).ToMeasurement(SizeUnit.B),
+                        formatProvider: benchmarkCase.Config.CultureInfo)}");
             }
 
             var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });

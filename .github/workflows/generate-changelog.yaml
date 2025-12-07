@@ -15,21 +15,26 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:
         ref: master
 
+    - name: Checkout changelog
+      uses: actions/checkout@v5
+      with:
+        ref: docs-changelog
+        path: docs/_changelog
+
     - name: Fetch changelog
-      run: ./build.cmd docs-fetch --depth 1 --preview --force-clone
+      run: ./build.cmd docs-fetch --depth 1 --preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push changelog
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: docs-changelog
-        FOLDER: docs/_changelog
-        GIT_CONFIG_NAME: Andrey Akinshin
-        GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
-        CLEAN: true
+        branch: docs-changelog
+        folder: docs/_changelog
+        git-config-name: Andrey Akinshin
+        git-config-email: andrey.akinshin@gmail.com
+        clean: true

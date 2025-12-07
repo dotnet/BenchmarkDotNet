@@ -77,6 +77,9 @@ public class ChangelogBuilder
                 history.CurrentVersion,
                 history.StableVersions.Last(),
                 "HEAD");
+        
+        context.GitRunner.AddAll(SrcDirectory);
+        context.GitRunner.Commit("Update changelog", SrcDirectory);
     }
 
     private void FetchDetails(string version, string versionPrevious, string lastCommit = "")
@@ -89,6 +92,7 @@ public class ChangelogBuilder
 
     public void Generate()
     {
+        GenerateLastHeader();
         GenerateLastFooter();
 
         foreach (var version in context.VersionHistory.StableVersions)
@@ -99,6 +103,18 @@ public class ChangelogBuilder
         GenerateIndex();
         GenerateFull();
         GenerateToc();
+    }
+
+    public void GenerateLastHeader()
+    {
+        var fileName = "v" + context.VersionHistory.CurrentVersion + ".md";
+        var filePath = SrcDirectory.Combine("header").CombineWithFilePath(fileName);
+        if (!context.FileExists(filePath))
+        {
+            var relativePath = context.RootDirectory.GetRelativePath(filePath);
+            context.FileWriteText(filePath, "");
+            context.Information("[Created] " + relativePath);
+        }
     }
 
     public void GenerateLastFooter()
@@ -230,8 +246,6 @@ public class ChangelogBuilder
     {
         void Log(string message) => context.Information($"[Changelog] {message}");
 
-        Log($"Preparing git sub-repository for changelog branch '{Repo.ChangelogBranch}'. " +
-            $"Target directory: '{SrcDirectory}'.");
         if (context.DirectoryExists(SrcDirectory) && forceClone)
         {
             Log($"Directory '{SrcDirectory}' already exists and forceClean is specified. " +
@@ -244,13 +258,15 @@ public class ChangelogBuilder
 
         if (!context.DirectoryExists(SrcDirectory))
         {
-            Log($"Cloning branch '{Repo.ChangelogBranch}' from '{Repo.HttpsGitUrl}' to '{SrcDirectory}'.");
-            context.GitRunner.Clone(SrcDirectory, Repo.HttpsGitUrl, Repo.ChangelogBranch);
+            Log($"Cloning branch '{Repo.ChangelogBranch}' from '{Repo.SshGitUrl}' to '{SrcDirectory}'.");
+            context.GitRunner.Clone(SrcDirectory, Repo.SshGitUrl, Repo.ChangelogBranch);
             Log($"Clone completed: '{Repo.ChangelogBranch}' -> '{SrcDirectory}'.");
         }
-        else
+        else if (forceClone)
         {
-            Log($"Directory '{SrcDirectory}' already exists. Skipping clone.");
+            Log($"Fetching branch '{Repo.ChangelogBranch}' from '{Repo.SshGitUrl}' to '{SrcDirectory}'.");
+            context.GitRunner.Pull(SrcDirectory);
+            Log($"Fetch completed: '{Repo.ChangelogBranch}' -> '{SrcDirectory}'.");
         }
     }
 }

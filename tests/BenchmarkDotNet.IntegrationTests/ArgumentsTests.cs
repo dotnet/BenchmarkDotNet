@@ -1,4 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
@@ -299,6 +301,86 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void IEnumerableArgumentsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<EnumerableOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class EnumerableOnDifferentMethods
+        {
+            public IEnumerable<IEnumerable<int>> GetEnumerables()
+            {
+                yield return Enumerable.Range(1, 10);
+                yield return Enumerable.Range(2, 10);
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables2(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void IEnumerableArgumentsOfDifferentLengthsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<EnumerableOfDiffLengthOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class EnumerableOfDiffLengthOnDifferentMethods
+        {
+            public IEnumerable<IEnumerable<int>> GetEnumerables()
+            {
+                yield return Enumerable.Range(1, 10);
+                yield return Enumerable.Range(1, 11);
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetEnumerables))]
+            public void AcceptsEnumerables2(IEnumerable<int> arg)
+            {
+                if (arg.IsEmpty())
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void JaggedArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithJaggedArray>(toolchain);
 
         public class WithJaggedArray
@@ -311,9 +393,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentNullException(nameof(array));
 
                 for (int i = 0; i < 10; i++)
-                for (int j = 0; j < i; j++)
-                    if (array[i][j] != i)
-                        throw new ArgumentException("Invalid value");
+                    for (int j = 0; j < i; j++)
+                        if (array[i][j] != i)
+                            throw new ArgumentException("Invalid value");
             }
 
             public IEnumerable<object> CreateMatrix()
@@ -405,8 +487,32 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
-            EnvRequirement.DotNetCoreOnly)]
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AnArrayFromArgumentsSourceCanBePassedToBenchmarkAsSpan(IToolchain toolchain) => CanExecute<WithArrayFromArgumentsSourceToSpan>(toolchain);
+
+        public class WithArrayFromArgumentsSourceToSpan
+        {
+            public IEnumerable<object[]> GetArray()
+            {
+                yield return new object[] { new[] { 0, 1, 2 } };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArray))]
+            public void AcceptsSpanFromArgumentsSource(Span<int> span)
+            {
+                if (span.Length != 3)
+                    throw new ArgumentException("Invalid length");
+
+                for (int i = 0; i < 3; i++)
+                    if (span[i] != i)
+                        throw new ArgumentException("Invalid value");
+            }
+        }
+
+        // The string -> ReadOnlySpan<char> implicit cast operator is available only in .NET Core 2.1+ (https://github.com/dotnet/corefx/issues/30121)
+#if NETCOREAPP2_1_OR_GREATER
+        [Theory]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
 
@@ -424,6 +530,31 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("Invalid value");
             }
         }
+
+        [Theory]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void StringFromArgumentsSourceCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringFromArgumentsSourceToReadOnlySpan>(toolchain);
+
+        public class WithStringFromArgumentsSourceToReadOnlySpan
+        {
+            private const string expectedString = "very nice string";
+
+            public IEnumerable<object[]> GetString()
+            {
+                yield return new object[] { expectedString };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetString))]
+            public void AcceptsReadOnlySpanFromArgumentsSource(ReadOnlySpan<char> notString)
+            {
+                string aString = notString.ToString();
+
+                if (aString != expectedString)
+                    throw new ArgumentException("Invalid value");
+            }
+        }
+#endif
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnArrayOfStringsCanBeUsedAsArgument(IToolchain toolchain) =>
@@ -491,6 +622,100 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void ArrayArgumentsCanBeGrouped(IToolchain toolchain)
+        {
+            var summary = CanExecute<ArrayOnDifferentMethods>(toolchain, (config) => config.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByParams)); // We must group by params to test array argument grouping
+
+            // There should be two logical groups, one for the first argument and one for the second argument
+            // Thus there should be two pairs per descriptor, and each pair should be distinct because it belongs to a different group
+
+            var descriptorGroupPairs = summary.BenchmarksCases.Select(benchmarkCase => (benchmarkCase.Descriptor, summary.GetLogicalGroupKey(benchmarkCase))).GroupBy(benchmarkCase => benchmarkCase.Descriptor);
+
+            Assert.True(
+                descriptorGroupPairs.All(group => group.Select(pair => pair.Item2).Distinct().Count() == 2)
+            );
+        }
+
+        public class ArrayOnDifferentMethods
+        {
+            public IEnumerable<int[]> GetArrays()
+            {
+                yield return new int[] { 1, 2, 3 };
+                yield return new int[] { 2, 3, 4 };
+            }
+
+            [Benchmark(Baseline = true)]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays(int[] arr)
+            {
+                if (arr.Length != 3)
+                    throw new ArgumentException("Incorrect length");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsArrays2(int[] arr)
+            {
+                if (arr.Length != 3)
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void MultidimensionalArraysAreProperlyDisplayed(IToolchain toolchain)
+        {
+            var summary = CanExecute<WithMultidimensionalArrayArgument>(toolchain);
+
+            Assert.Equal(
+                "Int32[2, 3]",
+                summary.Table.Columns.Where(col => col.Header == "arr").First().Content[0]
+            );
+        }
+
+        public class WithMultidimensionalArrayArgument
+        {
+            public IEnumerable<int[,]> GetArrays()
+            {
+                yield return new int[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsMultidimensionalArray(int[,] arr)
+            {
+                if (arr.Length == 0)
+                    throw new ArgumentException("Incorrect length");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void MultidimensionalAndJaggedArraysCanBeMixed(IToolchain toolchain)
+        {
+            var summary = CanExecute<WithMixedJaggedAndMultidimensionalArrays>(toolchain);
+
+            Assert.Equal(
+                "Int32[0, 0][][,][]",
+                summary.Table.Columns.Where(col => col.Header == "arr").First().Content[0]
+            );
+        }
+
+        public class WithMixedJaggedAndMultidimensionalArrays
+        {
+            public IEnumerable<int[,][][,][]> GetArrays()
+            {
+                yield return new int[,][][,][] { };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArrays))]
+            public void AcceptsMixedArray(int[,][][,][] arr)
+            {
+                if (arr.Length > 0)
+                    throw new ArgumentException("Incorrect length");
             }
         }
 
@@ -977,6 +1202,16 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
+        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig> furtherConfigure = null)
+        {
+            var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
+
+            if (furtherConfigure is not null)
+            {
+                config = furtherConfigure(config);
+            }
+
+            return CanExecute<T>(config);
+        }
     }
 }

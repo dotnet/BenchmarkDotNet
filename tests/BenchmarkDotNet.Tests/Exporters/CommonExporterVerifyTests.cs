@@ -8,13 +8,14 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.OpenMetrics;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [UsedImplicitly]
         public static TheoryData<string> CultureInfoNames => TheoryDataHelper.Create(CultureInfos.Keys);
 
-        [Theory]
+        [TheoryEnvSpecific(".NET SDK is skipped in Framework, so the exported result does not match the verified file.", EnvRequirement.DotNetCoreOnly)]
         [MemberData(nameof(CultureInfoNames))]
         public Task Exporters(string cultureInfoName)
         {
@@ -95,6 +96,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             yield return MarkdownExporter.Console;
             yield return MarkdownExporter.GitHub;
             yield return MarkdownExporter.StackOverflow;
+            yield return OpenMetricsExporter.Default;
             yield return PlainExporter.Default;
             yield return XmlExporter.Brief;
             yield return XmlExporter.BriefCompressed;

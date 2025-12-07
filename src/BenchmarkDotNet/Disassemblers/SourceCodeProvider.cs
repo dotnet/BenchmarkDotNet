@@ -5,13 +5,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
     internal class SourceCodeProvider : IDisposable
     {
         private readonly Dictionary<SourceFile, string[]> sourceFileCache = new Dictionary<SourceFile, string[]>();
         private readonly Dictionary<SourceFile, string> sourceFilePathsCache = new Dictionary<SourceFile, string>();
-        private readonly Dictionary<PdbInfo, ManagedSymbolModule> pdbReaders = new Dictionary<PdbInfo, ManagedSymbolModule>();
+        private readonly Dictionary<PdbInfo, ManagedSymbolModule?> pdbReaders = new Dictionary<PdbInfo, ManagedSymbolModule?>();
         private readonly SymbolReader symbolReader = new SymbolReader(TextWriter.Null) { SymbolPath = SymbolPath.MicrosoftSymbolServerPath };
 
         public void Dispose()
@@ -22,7 +24,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
         {
             var sourceLocation = GetSourceLocation(method, map.ILOffset);
-            if (sourceLocation == null)
+            if (sourceLocation is not { LineNumber: > 0 })
                 yield break;
 
             for (int line = sourceLocation.LineNumber; line <= sourceLocation.LineNumberEnd; ++line)
@@ -47,11 +49,11 @@ namespace BenchmarkDotNet.Disassemblers
         }
 
         private string GetFilePath(SourceFile sourceFile)
-            => sourceFilePathsCache.TryGetValue(sourceFile, out string filePath) ? filePath : sourceFile.Url;
+            => sourceFilePathsCache.TryGetValue(sourceFile, out var filePath) ? filePath : sourceFile.Url;
 
-        private string ReadSourceLine(SourceFile file, int line)
+        private string? ReadSourceLine(SourceFile file, int line)
         {
-            if (!sourceFileCache.TryGetValue(file, out string[] contents))
+            if (!sourceFileCache.TryGetValue(file, out var contents))
             {
                 // GetSourceFile method returns path when file is stored on the same machine
                 // otherwise it downloads it from the Symbol Server and returns the source code ;)
@@ -107,7 +109,7 @@ namespace BenchmarkDotNet.Disassemblers
             return new string(prefix);
         }
 
-        internal SourceLocation GetSourceLocation(ClrMethod method, int ilOffset)
+        internal SourceLocation? GetSourceLocation(ClrMethod method, int ilOffset)
         {
             var reader = GetReaderForMethod(method);
             if (reader == null)
@@ -116,37 +118,10 @@ namespace BenchmarkDotNet.Disassemblers
             return reader.SourceLocationForManagedCode((uint)method.MetadataToken, ilOffset);
         }
 
-        internal SourceLocation GetSourceLocation(ClrStackFrame frame)
+        private ManagedSymbolModule? GetReaderForMethod(ClrMethod? method)
         {
-            var reader = GetReaderForMethod(frame.Method);
-            if (reader == null)
-                return null;
-
-            return reader.SourceLocationForManagedCode((uint)frame.Method.MetadataToken, FindIlOffset(frame));
-        }
-
-        private static int FindIlOffset(ClrStackFrame frame)
-        {
-            ulong ip = frame.InstructionPointer;
-            int last = -1;
-            foreach (ILToNativeMap item in frame.Method.ILOffsetMap)
-            {
-                if (item.StartAddress > ip)
-                    return last;
-
-                if (ip <= item.EndAddress)
-                    return item.ILOffset;
-
-                last = item.ILOffset;
-            }
-
-            return last;
-        }
-
-        private ManagedSymbolModule GetReaderForMethod(ClrMethod method)
-        {
-            ClrModule module = method?.Type?.Module;
-            PdbInfo info = module?.Pdb;
+            ClrModule? module = method?.Type?.Module;
+            PdbInfo? info = module?.Pdb;
 
             ManagedSymbolModule? reader = null;
             if (info != null)

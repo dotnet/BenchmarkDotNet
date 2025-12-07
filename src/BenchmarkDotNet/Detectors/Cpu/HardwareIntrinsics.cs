@@ -11,38 +11,40 @@ using System.Runtime.Intrinsics.Arm;
 
 namespace BenchmarkDotNet.Detectors.Cpu
 {
+    // based on https://github.com/dotnet/runtime/tree/v10.0.0-rc.1.25451.107/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
     internal static class HardwareIntrinsics
     {
         internal static string GetVectorSize() => Vector.IsHardwareAccelerated ? $"VectorSize={Vector<byte>.Count * 8}" : string.Empty;
 
         internal static string GetShortInfo()
         {
-            if (IsX86Avx512FSupported)
-                return GetShortAvx512Representation();
-            if (IsX86Avx2Supported)
-                return "AVX2";
-            else if (IsX86AvxSupported)
-                return "AVX";
-            else if (IsX86Sse42Supported)
-                return "SSE4.2";
-            else if (IsX86Sse41Supported)
-                return "SSE4.1";
-            else if (IsX86Ssse3Supported)
-                return "SSSE3";
-            else if (IsX86Sse3Supported)
-                return "SSE3";
-            else if (IsX86Sse2Supported)
-                return "SSE2";
-            else if (IsX86SseSupported)
-                return "SSE";
-            else if (IsX86BaseSupported)
-                return "X86Base";
-            else if (IsArmAdvSimdSupported)
-                return "AdvSIMD";
+            if (IsX86BaseSupported)
+            {
+                if (IsX86Avx512Supported)
+                {
+                    return "x86-64-v4";
+                }
+                else if (IsX86Avx2Supported)
+                {
+                    return "x86-64-v3";
+                }
+                else if (IsX86Sse42Supported)
+                {
+                    return "x86-64-v2";
+                }
+                else
+                {
+                    return "x86-64-v1";
+                }
+            }
             else if (IsArmBaseSupported)
-                return "ArmBase";
+            {
+                return "armv8.0-a";
+            }
             else
+            {
                 return GetVectorSize(); // Runtimes prior to .NET Core 3.0 (APIs did not exist so we print non-exact Vector info)
+            }
         }
 
         internal static string GetFullInfo(Platform platform)
@@ -55,32 +57,31 @@ namespace BenchmarkDotNet.Detectors.Cpu
                 {
                     case Platform.X86:
                     case Platform.X64:
-
-                        if (IsX86Avx512FSupported) yield return GetShortAvx512Representation();
-                        else if (IsX86Avx2Supported) yield return "AVX2";
-                        else if (IsX86AvxSupported) yield return "AVX";
-                        else if (IsX86Sse42Supported) yield return "SSE4.2";
-                        else if (IsX86Sse41Supported) yield return "SSE4.1";
-                        else if (IsX86Ssse3Supported) yield return "SSSE3";
-                        else if (IsX86Sse3Supported) yield return "SSE3";
-                        else if (IsX86Sse2Supported) yield return "SSE2";
-                        else if (IsX86SseSupported) yield return "SSE";
-                        else if (IsX86BaseSupported) yield return "X86Base";
-
-                        if (IsX86AesSupported) yield return "AES";
-                        if (IsX86Bmi1Supported) yield return "BMI1";
-                        if (IsX86Bmi2Supported) yield return "BMI2";
-                        if (IsX86FmaSupported) yield return "FMA";
-                        if (IsX86LzcntSupported) yield return "LZCNT";
-                        if (IsX86PclmulqdqSupported) yield return "PCLMUL";
-                        if (IsX86PopcntSupported) yield return "POPCNT";
+                    {
+                        if (IsX86Avx10v2Supported) yield return "AVX10v2";
+                        if (IsX86Avx10v1Supported)
+                        {
+                            yield return "AVX10v1";
+                            yield return "AVX512 BF16+FP16";
+                        }
+                        if (IsX86Avx512v3Supported) yield return "AVX512 BITALG+VBMI2+VNNI+VPOPCNTDQ";
+                        if (IsX86Avx512v2Supported) yield return "AVX512 IFMA+VBMI";
+                        if (IsX86Avx512Supported) yield return "AVX512 F+BW+CD+DQ+VL";
+                        if (IsX86Avx2Supported) yield return "AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE";
+                        if (IsX86AvxSupported) yield return "AVX";
+                        if (IsX86Sse42Supported) yield return "SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT";
+                        if (IsX86BaseSupported) yield return "X86Base+SSE+SSE2";
+                        if (IsX86AesSupported) yield return "AES+PCLMUL";
                         if (IsX86AvxVnniSupported) yield return "AvxVnni";
                         if (IsX86SerializeSupported) yield return "SERIALIZE";
-                        // TODO: Add MOVBE when API is added.
                         break;
+                    }
                     case Platform.Arm64:
-                        if (IsArmAdvSimdSupported) yield return "AdvSIMD";
-                        else if (IsArmBaseSupported) yield return "ArmBase";
+                    {
+                        if (IsArmBaseSupported)
+                        {
+                            yield return "ArmBase+AdvSimd";
+                        }
 
                         if (IsArmAesSupported) yield return "AES";
                         if (IsArmCrc32Supported) yield return "CRC32";
@@ -89,71 +90,39 @@ namespace BenchmarkDotNet.Detectors.Cpu
                         if (IsArmSha1Supported) yield return "SHA1";
                         if (IsArmSha256Supported) yield return "SHA256";
                         break;
+                    }
+
                     default:
                         yield break;
                 }
             }
         }
 
-        private static string GetShortAvx512Representation()
-        {
-            StringBuilder avx512 = new("AVX-512F");
-            if (IsX86Avx512CDSupported) avx512.Append("+CD");
-            if (IsX86Avx512BWSupported) avx512.Append("+BW");
-            if (IsX86Avx512DQSupported) avx512.Append("+DQ");
-            if (IsX86Avx512FVLSupported) avx512.Append("+VL");
-            if (IsX86Avx512VbmiSupported) avx512.Append("+VBMI");
-
-            return avx512.ToString();
-        }
-
+#pragma warning disable CA2252 // Some APIs require opting into preview features
         internal static bool IsX86BaseSupported =>
 #if NET6_0_OR_GREATER
-            X86Base.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.X86Base");
-#endif
-
-        internal static bool IsX86SseSupported =>
-#if NET6_0_OR_GREATER
-            Sse.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Sse");
-#endif
-
-        internal static bool IsX86Sse2Supported =>
-#if NET6_0_OR_GREATER
+            X86Base.IsSupported &&
+            Sse.IsSupported &&
             Sse2.IsSupported;
 #elif NETSTANDARD
+            GetIsSupported("System.Runtime.Intrinsics.X86.X86Base") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Sse") &&
             GetIsSupported("System.Runtime.Intrinsics.X86.Sse2");
-#endif
-
-        internal static bool IsX86Sse3Supported =>
-#if NET6_0_OR_GREATER
-            Sse3.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Sse3");
-#endif
-
-        internal static bool IsX86Ssse3Supported =>
-#if NET6_0_OR_GREATER
-            Ssse3.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Ssse3");
-#endif
-
-        internal static bool IsX86Sse41Supported =>
-#if NET6_0_OR_GREATER
-            Sse41.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Sse41");
 #endif
 
         internal static bool IsX86Sse42Supported =>
 #if NET6_0_OR_GREATER
-            Sse42.IsSupported;
+            Sse3.IsSupported &&
+            Ssse3.IsSupported &&
+            Sse41.IsSupported &&
+            Sse42.IsSupported &&
+            Popcnt.IsSupported;
 #elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Sse42");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Sse3") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Ssse3") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Sse41") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Sse42") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Popcnt");
 #endif
 
         internal static bool IsX86AvxSupported =>
@@ -165,107 +134,88 @@ namespace BenchmarkDotNet.Detectors.Cpu
 
         internal static bool IsX86Avx2Supported =>
 #if NET6_0_OR_GREATER
-            Avx2.IsSupported;
+            Avx2.IsSupported &&
+            Bmi1.IsSupported &&
+            Bmi2.IsSupported &&
+            Fma.IsSupported &&
+            Lzcnt.IsSupported;
 #elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx2");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx2") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Bmi1") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Bmi2") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Fma") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Lzcnt");
 #endif
 
-        internal static bool IsX86Avx512FSupported =>
+        internal static bool IsX86Avx512Supported =>
 #if NET8_0_OR_GREATER
-            Avx512F.IsSupported;
+            Avx512F.IsSupported &&
+            Avx512F.VL.IsSupported &&
+            Avx512BW.IsSupported &&
+            Avx512BW.VL.IsSupported &&
+            Avx512CD.IsSupported &&
+            Avx512CD.VL.IsSupported &&
+            Avx512DQ.IsSupported &&
+            Avx512DQ.VL.IsSupported;
 #else
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512F");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512F") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512F+VL") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512BW") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512BW+VL") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512CD") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512CD+VL") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512DQ") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512DQ+VL");
 #endif
 
-        internal static bool IsX86Avx512FVLSupported =>
+        internal static bool IsX86Avx512v2Supported =>
 #if NET8_0_OR_GREATER
-            Avx512F.VL.IsSupported;
+            Avx512Vbmi.IsSupported &&
+            Avx512Vbmi.VL.IsSupported;
 #else
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512F+VL");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512Vbmi") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512Vbmi+VL");
 #endif
 
-        internal static bool IsX86Avx512BWSupported =>
-#if NET8_0_OR_GREATER
-            Avx512BW.IsSupported;
+        internal static bool IsX86Avx512v3Supported =>
+#if NET10_0_OR_GREATER
+            Avx512Vbmi2.IsSupported &&
+            Avx512Vbmi2.VL.IsSupported;
 #else
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512BW");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512Vbmi2") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512Vbmi2+VL");
 #endif
 
-        internal static bool IsX86Avx512CDSupported =>
-#if NET8_0_OR_GREATER
-            Avx512CD.IsSupported;
+        internal static bool IsX86Avx10v1Supported =>
+#if NET9_0_OR_GREATER
+            Avx10v1.IsSupported &&
+            Avx10v1.V512.IsSupported;
 #else
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512CD");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx10v1") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx10v1+V512");
 #endif
 
-        internal static bool IsX86Avx512DQSupported =>
-#if NET8_0_OR_GREATER
-            Avx512DQ.IsSupported;
+        internal static bool IsX86Avx10v2Supported =>
+#if NET10_0_OR_GREATER
+            Avx10v2.IsSupported &&
+            Avx10v2.V512.IsSupported;
 #else
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512DQ");
-#endif
-
-        internal static bool IsX86Avx512VbmiSupported =>
-#if NET8_0_OR_GREATER
-            Avx512Vbmi.IsSupported;
-#else
-            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512Vbmi");
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx10v2") &&
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx10v2+V512");
 #endif
 
         internal static bool IsX86AesSupported =>
 #if NET6_0_OR_GREATER
-            System.Runtime.Intrinsics.X86.Aes.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Aes");
-#endif
-
-        internal static bool IsX86Bmi1Supported =>
-#if NET6_0_OR_GREATER
-            Bmi1.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Bmi1");
-#endif
-
-        internal static bool IsX86Bmi2Supported =>
-#if NET6_0_OR_GREATER
-            Bmi2.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Bmi2");
-#endif
-
-        internal static bool IsX86FmaSupported =>
-#if NET6_0_OR_GREATER
-            Fma.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Fma");
-#endif
-
-        internal static bool IsX86LzcntSupported =>
-#if NET6_0_OR_GREATER
-            Lzcnt.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Lzcnt");
-#endif
-
-        internal static bool IsX86PclmulqdqSupported =>
-#if NET6_0_OR_GREATER
+            System.Runtime.Intrinsics.X86.Aes.IsSupported &&
             Pclmulqdq.IsSupported;
 #elif NETSTANDARD
+            GetIsSupported("System.Runtime.Intrinsics.X86.Aes") &&
             GetIsSupported("System.Runtime.Intrinsics.X86.Pclmulqdq");
-#endif
-
-        internal static bool IsX86PopcntSupported =>
-#if NET6_0_OR_GREATER
-            Popcnt.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.X86.Popcnt");
 #endif
 
         internal static bool IsX86AvxVnniSupported =>
 #if NET6_0_OR_GREATER
-#pragma warning disable CA2252 // This API requires opting into preview features
             AvxVnni.IsSupported;
-#pragma warning restore CA2252 // This API requires opting into preview features
 #elif NETSTANDARD
             GetIsSupported("System.Runtime.Intrinsics.X86.AvxVnni");
 #endif
@@ -279,15 +229,10 @@ namespace BenchmarkDotNet.Detectors.Cpu
 
         internal static bool IsArmBaseSupported =>
 #if NET6_0_OR_GREATER
-            ArmBase.IsSupported;
-#elif NETSTANDARD
-            GetIsSupported("System.Runtime.Intrinsics.Arm.ArmBase");
-#endif
-
-        internal static bool IsArmAdvSimdSupported =>
-#if NET6_0_OR_GREATER
+            ArmBase.IsSupported &&
             AdvSimd.IsSupported;
 #elif NETSTANDARD
+            GetIsSupported("System.Runtime.Intrinsics.Arm.ArmBase") &&
             GetIsSupported("System.Runtime.Intrinsics.Arm.AdvSimd");
 #endif
 
@@ -332,6 +277,7 @@ namespace BenchmarkDotNet.Detectors.Cpu
 #elif NETSTANDARD
             GetIsSupported("System.Runtime.Intrinsics.Arm.Sha256");
 #endif
+#pragma warning restore CA2252 // Some APIs require opting into preview features
 
         private static bool GetIsSupported([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] string typeName)
         {

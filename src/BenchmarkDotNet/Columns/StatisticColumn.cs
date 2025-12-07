@@ -10,6 +10,9 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.Multimodality;
 using Perfolizer.Metrology;
+using Pragmastat.Metrology;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Columns
 {
@@ -104,7 +107,7 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
-        private readonly IStatisticColumn parentColumn;
+        private readonly IStatisticColumn? parentColumn;
 
         private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time,
             IStatisticColumn? parentColumn = null)
@@ -136,7 +139,7 @@ namespace BenchmarkDotNet.Columns
         {
             return summary.Reports
                 .Where(r => r.ResultStatistics != null)
-                .Select(r => calc(r.ResultStatistics))
+                .Select(r => calc(r.ResultStatistics!))
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
                 .Select(v => UnitType == UnitType.Time && style.TimeUnit != null ? v / style.TimeUnit.BaseUnits : v)
                 .ToList();
@@ -153,12 +156,11 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                ? TimeInterval.FromNanoseconds(value)
-                    .ToString(
-                        style.TimeUnit,
-                        format,
-                        style.CultureInfo,
-                        new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true))
+                ? PerfolizerMeasurementFormatter.Instance.Format(
+                    TimeInterval.FromNanoseconds(value).ToMeasurement(style.TimeUnit),
+                    format,
+                    style.CultureInfo,
+                    new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true))
                 : value.ToString(format, style.CultureInfo);
         }
 

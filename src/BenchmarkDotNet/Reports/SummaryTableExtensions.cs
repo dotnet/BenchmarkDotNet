@@ -6,12 +6,14 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Reports
 {
     public static class SummaryTableExtensions
     {
         [ThreadStatic]
-        private static StringBuilder sharedBuffer;
+        private static StringBuilder? sharedBuffer;
 
         public static void PrintCommonColumns(this SummaryTable table, ILogger logger)
         {

@@ -59,6 +59,8 @@ namespace BenchmarkDotNet.Running
 
             var benchmarks = new List<BenchmarkCase>();
 
+            bool containsBenchmarkDeclarations = false;
+
             foreach (var target in targets)
             {
                 var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, configPerType.SummaryStyle).ToArray();
@@ -75,12 +77,15 @@ namespace BenchmarkDotNet.Running
                     from parameterInstance in parameterInstances
                     select BenchmarkCase.Create(target, job, parameterInstance, configPerMethod);
 
+                if (benchmarksForTarget.Any() && !containsBenchmarkDeclarations) containsBenchmarkDeclarations = true;
+
                 benchmarks.AddRange(GetFilteredBenchmarks(benchmarksForTarget, configPerMethod.GetFilters()));
             }
 
             var orderedBenchmarks = configPerType.Orderer.GetExecutionOrder(benchmarks.ToImmutableArray()).ToArray();
+            var compositeInProcessDiagnoser = new Diagnosers.CompositeInProcessDiagnoser([.. configPerType.GetDiagnosers().OfType<Diagnosers.IInProcessDiagnoser>()]);
 
-            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType);
+            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType, containsBenchmarkDeclarations, compositeInProcessDiagnoser);
         }
 
         private static ImmutableConfig GetFullTypeConfig(Type type, IConfig? config)
@@ -308,7 +313,7 @@ namespace BenchmarkDotNet.Running
 
         private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type sourceType, string sourceName)
         {
-            var paramsSourceMethod = sourceType.GetAllMethods().SingleOrDefault(method => method.Name == sourceName && method.IsPublic);
+            var paramsSourceMethod = sourceType.GetAllMethods().FirstOrDefault(method => method.Name == sourceName && method.IsPublic);
 
             if (paramsSourceMethod != default)
                 return (paramsSourceMethod, ToArray(
@@ -316,7 +321,7 @@ namespace BenchmarkDotNet.Running
                     paramsSourceMethod,
                     sourceType));
 
-            var paramsSourceProperty = sourceType.GetAllProperties().SingleOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
+            var paramsSourceProperty = sourceType.GetAllProperties().FirstOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
 
             if (paramsSourceProperty != default)
                 return (paramsSourceProperty, ToArray(

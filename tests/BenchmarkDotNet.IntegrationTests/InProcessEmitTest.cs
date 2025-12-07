@@ -6,6 +6,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.IntegrationTests.InProcess.EmitTests;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;

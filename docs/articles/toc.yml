@@ -16,3 +16,5 @@
   href: team.md
 - name: License
   href: license.md
+- name: Analyzers
+  href: analyzers.md

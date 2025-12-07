@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Order
                         keys.Add(benchmarkCase.Job.DisplayInfo);
                         break;
                     case BenchmarkLogicalGroupRule.ByParams:
-                        keys.Add(benchmarkCase.Parameters.ValueInfo);
+                        keys.Add($"DistinctParamSet{allBenchmarksCases.IndexOf(benchmarkCase, BenchmarkParamsEqualityComparer.Instance)}");
                         break;
                     case BenchmarkLogicalGroupRule.ByCategory:
                         keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
@@ -207,6 +207,17 @@ namespace BenchmarkDotNet.Order
                 }
                 return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
             }
+        }
+
+        private sealed class BenchmarkParamsEqualityComparer : IEqualityComparer<BenchmarkCase>
+        {
+            internal static readonly BenchmarkParamsEqualityComparer Instance = new();
+
+            bool IEqualityComparer<BenchmarkCase>.Equals(BenchmarkCase x, BenchmarkCase y)
+                => ParameterEqualityComparer.Instance.Equals(x.Parameters, y.Parameters);
+
+            int IEqualityComparer<BenchmarkCase>.GetHashCode(BenchmarkCase obj)
+                => ParameterEqualityComparer.Instance.GetHashCode(obj.Parameters);
         }
 
         private class LogicalGroupComparer : IComparer<IGrouping<string, BenchmarkCase>>

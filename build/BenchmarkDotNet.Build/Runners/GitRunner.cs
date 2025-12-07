@@ -1,4 +1,5 @@
 using System;
+using BenchmarkDotNet.Build.Meta;
 using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Core.IO;
@@ -32,6 +33,16 @@ public class GitRunner
             $"clone -b {branchName} {sourceUrl} {workDirectoryPath}");
     }
 
+    public void Pull(DirectoryPath workDirectoryPath)
+    {
+        context.Information($"[GitPull]");
+        context.Information($"  Path: {workDirectoryPath}");
+
+        RunCommand(
+            () => context.GitPull(workDirectoryPath, null, null),
+            $"-C {workDirectoryPath} pull");
+    }
+
     public void Tag(string tagName)
     {
         context.Information("[GitTag]");
@@ -51,14 +62,28 @@ public class GitRunner
         RunCommand($"branch -f {branchName} {target}");
     }
 
-    public void Commit(string message)
+    public void AddAll(DirectoryPath? repoDirectory = null)
+    {
+        var repoFlag = repoDirectory != null ? $"-C {repoDirectory}" : "";
+        context.Information("[GitAddAll]");
+        RunCommand($"{repoFlag} add -A");
+    }
+
+    public void Commit(string message, DirectoryPath? repoDirectory = null)
     {
         context.Information("[GitCommit]");
         context.Information($"  Message: {message}");
-        RunCommand($"commit --all --message \"{message}\"");
+        var repoFlag = repoDirectory != null ? $"-C {repoDirectory}" : "";
+        RunCommand($"{repoFlag} " +
+                   $"-c user.name=\"{Repo.MaintainerAuthorName}\" " +
+                   $"-c user.email=\"{Repo.MaintainerAuthorEmail}\" " +
+                   $"commit " +
+                   $"--author=\"{Repo.MaintainerAuthorName} <{Repo.MaintainerAuthorEmail}>\" " +
+                   $"--all " +
+                   $"--message \"{message}\"".Trim());
     }
 
-    public void Push(string target, bool force = false)
+    public void Push(string target, bool force = false, DirectoryPath? repoDirectory = null)
     {
         context.Information("[GitPush]");
         context.Information($"  Target: {target}");
@@ -66,7 +91,8 @@ public class GitRunner
         context.RunOnlyInPushMode(() =>
         {
             var forceFlag = force ? " --force" : "";
-            RunCommand($"push origin {target}{forceFlag}");
+            var repoFlag = repoDirectory != null ? $"-C {repoDirectory}" : "";
+            RunCommand($"{repoFlag} push origin {target}{forceFlag}".Trim());
         });
     }
 
@@ -84,7 +110,7 @@ public class GitRunner
         catch (Exception e)
         {
             if (e is not NotImplementedException)
-                context.Information($"  Failed to perform operation via API ({e.Message})");
+                context.Warning($"  Failed to perform operation via API ({e.Message})");
             try
             {
                 context.Information($"  Run command in terminal: 'git {commandLineArgs}'");

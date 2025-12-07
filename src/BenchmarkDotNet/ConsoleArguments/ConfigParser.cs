@@ -468,7 +468,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
             else if (!string.IsNullOrEmpty(options.ClrVersion))
             {
-                yield return baseJob.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion)); // local builds of .NET Runtime
+                var runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion);
+                yield return baseJob.WithRuntime(runtime).WithId(runtime.Name); // local builds of .NET Runtime
             }
             else if (options.CliPath != null && options.Runtimes.IsEmpty() && options.CoreRunPaths.IsEmpty())
             {
@@ -518,9 +519,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net472:
                 case RuntimeMoniker.Net48:
                 case RuntimeMoniker.Net481:
-                    return baseJob
-                        .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
+                    {
+                        var runtime = runtimeMoniker.GetRuntime();
+                        return baseJob
+                            .WithRuntime(runtime)
+                            .WithId(runtime.Name)
+                            .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
+                    }
 
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
@@ -536,12 +541,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net80:
                 case RuntimeMoniker.Net90:
                 case RuntimeMoniker.Net10_0:
-                    return baseJob
-                        .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
+                    {
+                        var runtime = runtimeMoniker.GetRuntime();
+                        return baseJob
+                            .WithRuntime(runtime)
+                            .WithId(runtime.Name)
+                            .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
+                    }
 
                 case RuntimeMoniker.Mono:
-                    return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
+                    {
+                        var runtime = new MonoRuntime("Mono", options.MonoPath?.FullName);
+                        return baseJob.WithRuntime(runtime).WithId(runtime.Name);
+                    }
 
                 case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
@@ -636,7 +648,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             var runtime = runtimeMoniker.GetRuntime();
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
-            return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+            return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain()).WithId(runtime.Name);
         }
 
         private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
@@ -667,7 +679,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 aotCompilerPath: options.AOTCompilerPath.ToString(),
                 aotCompilerMode: options.AOTCompilerMode));
 
-            return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
+            return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain).WithId(monoAotLLVMRuntime.Name);
         }
 
         private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
@@ -691,7 +703,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 customRuntimePack: options.CustomRuntimePack,
                 aotCompilerMode: options.AOTCompilerMode));
 
-            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
+            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain).WithId(wasmRuntime.Name);
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)

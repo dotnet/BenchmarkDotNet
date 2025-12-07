@@ -132,13 +132,13 @@ internal class TestCaseFilter
             }
             catch (TargetInvocationException e)
             {
-                if (e?.InnerException is TestPlatformException ex)
+                if (e.InnerException is TestPlatformException ex)
                 {
-                    logger.LogWarning("Exception filtering tests: {0}", ex.InnerException.Message ?? "");
+                    logger.LogWarning("Exception filtering tests: {0}", ex.Message);
                     return false;
                 }
 
-                throw e!.InnerException;
+                throw e.InnerException ?? e;
             }
         }
     }

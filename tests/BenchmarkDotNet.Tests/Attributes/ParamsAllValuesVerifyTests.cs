@@ -112,6 +112,7 @@ namespace BenchmarkDotNet.Tests.Attributes
                 public void Benchmark() { }
             }
 
+#pragma warning disable BDN1304
             public class WithNotAllowedTypeError
             {
                 [ParamsAllValues]
@@ -120,7 +121,9 @@ namespace BenchmarkDotNet.Tests.Attributes
                 [Benchmark]
                 public void Benchmark() { }
             }
+#pragma warning restore BDN1304
 
+#pragma warning disable BDN1304
             public class WithNotAllowedNullableTypeError
             {
                 [ParamsAllValues]
@@ -129,7 +132,9 @@ namespace BenchmarkDotNet.Tests.Attributes
                 [Benchmark]
                 public void Benchmark() { }
             }
+#pragma warning restore BDN1304
 
+#pragma warning disable BDN1303
             public class WithNotAllowedFlagsEnumError
             {
                 [ParamsAllValues]
@@ -138,6 +143,7 @@ namespace BenchmarkDotNet.Tests.Attributes
                 [Benchmark]
                 public void Benchmark() { }
             }
+#pragma warning restore BDN1303
         }
     }
 }

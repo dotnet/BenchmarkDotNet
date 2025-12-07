@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -13,10 +12,8 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal class MonoDisassembler
+    internal sealed class MonoDisassembler
     {
-        internal MonoDisassembler(DisassemblyDiagnoserConfig _) { }
-
         internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
         {
             Debug.Assert(mono == null || !RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");

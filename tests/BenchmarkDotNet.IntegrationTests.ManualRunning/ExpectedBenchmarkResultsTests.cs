@@ -19,6 +19,7 @@ using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
 using Perfolizer.Metrology;
+using Pragmastat.Metrology;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -6,6 +6,8 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.macOS;
 
+#nullable enable
+
 internal static class SysctlCpuInfoParser
 {
     private static class Sysctl
@@ -23,7 +25,7 @@ internal static class SysctlCpuInfoParser
     internal static CpuInfo Parse(string sysctlOutput)
     {
         var sysctl = SectionsHelper.ParseSection(sysctlOutput, ':');
-        string processorName = sysctl.GetValueOrDefault(Sysctl.ProcessorName);
+        string? processorName = sysctl.GetValueOrDefault(Sysctl.ProcessorName);
         int? physicalProcessorCount = PositiveIntValue(sysctl, Sysctl.PhysicalProcessorCount);
         int? physicalCoreCount = PositiveIntValue(sysctl, Sysctl.PhysicalCoreCount);
         int? logicalCoreCount = PositiveIntValue(sysctl, Sysctl.LogicalCoreCount);
@@ -42,7 +44,7 @@ internal static class SysctlCpuInfoParser
 
     private static int? PositiveIntValue(Dictionary<string, string> sysctl, string keyName)
     {
-        if (sysctl.TryGetValue(keyName, out string value) &&
+        if (sysctl.TryGetValue(keyName, out var value) &&
             int.TryParse(value, out int result) &&
             result > 0)
             return result;
@@ -51,7 +53,7 @@ internal static class SysctlCpuInfoParser
 
     private static long? PositiveLongValue(Dictionary<string, string> sysctl, string keyName)
     {
-        if (sysctl.TryGetValue(keyName, out string value) &&
+        if (sysctl.TryGetValue(keyName, out var value) &&
             long.TryParse(value, out long result) &&
             result > 0)
             return result;
