@@ -55,8 +55,10 @@ public class Program
         return config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
                      .AddDiagnoser(
                          MemoryDiagnoser.Default,
-                         new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false)),
-                         new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false))
+#if NET30_OR_GREATER
+                         new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false)),
+#endif
+                         new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false))
                       )
                       .AddExporter(MarkdownExporter.Default)
                       .AddValidator(DefaultConfig.Instance.GetValidators().ToArray())
