@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Code
@@ -30,25 +26,7 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public abstract string ReturnsDefinition { get; }
-
-        protected virtual Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType;
-
-        public virtual string WorkloadMethodReturnTypeName => WorkloadMethodReturnType.GetCorrectCSharpTypeName();
-
-        public virtual string WorkloadMethodDelegate(string passArguments) => Descriptor.WorkloadMethod.Name;
-
-        public virtual string WorkloadMethodReturnTypeModifiers => null;
-
         public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
-
-        public virtual string ConsumeField => null;
-
-        protected abstract Type OverheadMethodReturnType { get; }
-
-        public string OverheadMethodReturnTypeName => OverheadMethodReturnType.GetCorrectCSharpTypeName();
-
-        public abstract string OverheadImplementation { get; }
 
         private string GetMethodName(MethodInfo method)
         {
@@ -70,104 +48,14 @@ namespace BenchmarkDotNet.Code
         }
     }
 
-    internal class VoidDeclarationsProvider : DeclarationsProvider
+    internal class SyncDeclarationsProvider : DeclarationsProvider
     {
-        public VoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string ReturnsDefinition => "RETURNS_VOID";
-
-        protected override Type OverheadMethodReturnType => typeof(void);
-
-        public override string OverheadImplementation => string.Empty;
+        public SyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
     }
 
-    internal class NonVoidDeclarationsProvider : DeclarationsProvider
+    internal class AsyncDeclarationsProvider : DeclarationsProvider
     {
-        public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string ConsumeField
-            => !Consumer.IsConsumable(WorkloadMethodReturnType) && Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
-                ? $".{field.Name}"
-                : null;
-
-        protected override Type OverheadMethodReturnType
-            => Consumer.IsConsumable(WorkloadMethodReturnType)
-                ? WorkloadMethodReturnType
-                : (Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
-                    ? field.FieldType
-                    : typeof(int)); // we return this simple type because creating bigger ValueType could take longer than benchmarked method itself
-
-        public override string OverheadImplementation
-        {
-            get
-            {
-                string value;
-                var type = OverheadMethodReturnType;
-                if (type.GetTypeInfo().IsPrimitive)
-                    value = $"default({type.GetCorrectCSharpTypeName()})";
-                else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
-                    value = "null";
-                else
-                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";
-                return $"return {value};";
-            }
-        }
-
-        public override string ReturnsDefinition
-            => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out _)
-                ? "RETURNS_CONSUMABLE"
-                : "RETURNS_NON_CONSUMABLE_STRUCT";
-    }
-
-    internal class ByRefDeclarationsProvider : NonVoidDeclarationsProvider
-    {
-        public ByRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        protected override Type OverheadMethodReturnType => typeof(IntPtr);
-
-        public override string WorkloadMethodReturnTypeName => base.WorkloadMethodReturnTypeName.Replace("&", string.Empty);
-
-        public override string ConsumeField => null;
-
-        public override string OverheadImplementation => $"return default(System.{nameof(IntPtr)});";
-
-        public override string ReturnsDefinition => "RETURNS_BYREF";
-
-        public override string WorkloadMethodReturnTypeModifiers => "ref";
-    }
-
-    internal class ByReadOnlyRefDeclarationsProvider : ByRefDeclarationsProvider
-    {
-        public ByReadOnlyRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string ReturnsDefinition => "RETURNS_BYREF_READONLY";
-
-        public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
-    }
-
-    internal class TaskDeclarationsProvider : VoidDeclarationsProvider
-    {
-        public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
-
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
-
-        protected override Type WorkloadMethodReturnType => typeof(void);
-    }
-
-    /// <summary>
-    /// declarations provider for <see cref="Task{TResult}" /> and <see cref="ValueTask{TResult}" />
-    /// </summary>
-    internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
-    {
-        public GenericTaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
-
-        public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ return BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
+        public AsyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
         public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
     }

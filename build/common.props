@@ -45,6 +45,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
+    <!-- When this is changed, optionally reset WeaverVersionSuffix, then run `build.cmd pack-weaver`. -->
     <VersionPrefix>0.16.0</VersionPrefix>
   </PropertyGroup>
 
@@ -58,6 +59,11 @@
     <AssemblyFileVersion>$(VersionPrefix)</AssemblyFileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
     <PackageVersion>$(Version)</PackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Increment this when the BenchmarkDotNet.Weaver package needs to be re-packed. -->
+    <WeaverVersionSuffix>-1</WeaverVersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>

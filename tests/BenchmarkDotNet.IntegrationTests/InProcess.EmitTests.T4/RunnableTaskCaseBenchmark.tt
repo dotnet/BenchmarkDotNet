@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
     int counter = 1;
     EmitTaskCaseBenchmark(ref counter, "Task", "Task.CompletedTask");
     EmitTaskCaseBenchmark(ref counter, "Task<int>", "Task.FromResult(123)");
+    EmitTaskCaseBenchmark(ref counter, "ValueTask", "new ValueTask()");
     EmitTaskCaseBenchmark(ref counter, "ValueTask<string>", "new ValueTask<string>(\"\")");
 
     // BDN do not support custom awaitables

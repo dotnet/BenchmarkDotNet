@@ -34,13 +34,21 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         [Benchmark, Arguments(2, "2", 0.2)]
         public Task<int> TaskCase2(int x, string y, double? z) => Task.FromResult(123);
 
+        // ---- Begin TaskCase(ValueTask) ----
+
+        [Benchmark]
+        public ValueTask TaskCase3() => new ValueTask();
+
+        [Benchmark, Arguments(3, "3", 0.3)]
+        public ValueTask TaskCase3(int x, string y, double? z) => new ValueTask();
+
         // ---- Begin TaskCase(ValueTask<string>) ----
 
         [Benchmark]
-        public ValueTask<string> TaskCase3() => new ValueTask<string>("");
+        public ValueTask<string> TaskCase4() => new ValueTask<string>("");
 
-        [Benchmark, Arguments(3, "3", 0.3)]
-        public ValueTask<string> TaskCase3(int x, string y, double? z) => new ValueTask<string>("");
+        [Benchmark, Arguments(4, "4", 0.4)]
+        public ValueTask<string> TaskCase4(int x, string y, double? z) => new ValueTask<string>("");
 
     }
 }

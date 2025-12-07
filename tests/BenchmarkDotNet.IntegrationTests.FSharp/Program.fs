@@ -34,3 +34,10 @@ type EnumParamsTest() =
     [<Benchmark>]
     member this.Benchmark() =
         if not (this.EnumParamValue = TestEnum.B) then failwith "Invalid Params value assigned"
+
+type AnonymousRecordTest() =
+
+    [<Benchmark>]
+    member _.AnonymousRecord() =
+        let array = Array.init 5 id
+        array |> Array.countBy (fun n -> {| Field = n |})

@@ -9,6 +9,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Filters;
 
 namespace BenchmarkDotNet.Tests.Running
@@ -303,12 +304,13 @@ namespace BenchmarkDotNet.Tests.Running
             var ilGenerator = benchmarkMethod.GetILGenerator();
             ilGenerator.Emit(OpCodes.Ret); // Just return from the method
 
-            var benchmarkAttributeCtor = typeof(BenchmarkAttribute).GetConstructor(new[] { typeof(int), typeof(string) });
-            if (benchmarkAttributeCtor == null)
-                throw new InvalidOperationException("Could not find BenchmarkAttribute constructor");
             benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
-                benchmarkAttributeCtor,
-                new object[] { 0, "" }));
+                typeof(BenchmarkAttribute).GetConstructor([typeof(int), typeof(string)]),
+                [0, ""]));
+            // Assembly weaver does not run on assemblies created with AssemblyBuilder, so we need to apply NoInlining manually.
+            benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
+                typeof(MethodImplAttribute).GetConstructor([typeof(MethodImplOptions)]),
+                [MethodImplOptions.NoInlining]));
             benchmarkTypeBuilder.CreateType();
 
             Summary[] summaries = null;

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
@@ -41,6 +42,27 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             Thread.Sleep(100);
             return ref refValueHolder;
+        }
+
+        [Benchmark]
+        public unsafe int* ReturnsIntPointer()
+        {
+            Thread.Sleep(100);
+            return default;
+        }
+
+        [Benchmark]
+        public unsafe void* ReturnsVoidPointer()
+        {
+            Thread.Sleep(100);
+            return default;
+        }
+
+        [Benchmark]
+        public unsafe CustomStructNonConsumable* ReturnsStructPointer()
+        {
+            Thread.Sleep(100);
+            return default;
         }
 
         [Benchmark, Arguments(12)]

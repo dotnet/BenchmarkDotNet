@@ -38,24 +38,16 @@ namespace BenchmarkDotNet.Code
 
                 string passArguments = GetPassArguments(benchmark);
 
-                string compilationId = $"{provider.ReturnsDefinition}_{buildInfo.Id}";
-
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
-                    .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
-                    .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
-                    .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
                     .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
-                    .Replace("$OverheadImplementation$", provider.OverheadImplementation)
-                    .Replace("$ConsumeField$", provider.ConsumeField)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsInitializer$", GetParamsInitializer(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
@@ -68,7 +60,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
                     .Replace("$InProcessDiagnoserRouters$", GetInProcessDiagnoserRouters(buildInfo))
-                    .RemoveRedundantIfDefines(compilationId);
+                    .ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
@@ -150,36 +142,21 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
-                return new TaskDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(descriptor);
             }
             if (method.ReturnType.GetTypeInfo().IsGenericType
                 && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
-                return new GenericTaskDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(descriptor);
             }
 
-            if (method.ReturnType == typeof(void))
+            if (method.ReturnType == typeof(void) && method.HasAttribute<AsyncStateMachineAttribute>())
             {
-                bool isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
-                if (isUsingAsyncKeyword)
-                {
-                    throw new NotSupportedException("async void is not supported by design");
-                }
-
-                return new VoidDeclarationsProvider(descriptor);
+                throw new NotSupportedException("async void is not supported by design");
             }
 
-            if (method.ReturnType.IsByRef)
-            {
-                // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
-                if (method.ReturnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
-                    return new ByReadOnlyRefDeclarationsProvider(descriptor);
-                else
-                    return new ByRefDeclarationsProvider(descriptor);
-            }
-
-            return new NonVoidDeclarationsProvider(descriptor);
+            return new SyncDeclarationsProvider(descriptor);
         }
 
         private static string GetParamsInitializer(BenchmarkCase benchmarkCase)
@@ -332,31 +309,6 @@ namespace BenchmarkDotNet.Code
                 else
                     builder.Append($"\n// '{oldValue}' not found");
                 return this;
-            }
-
-            public string RemoveRedundantIfDefines(string id)
-            {
-                var oldLines = builder.ToString().Split('\n');
-                var newLines = new List<string>();
-                bool keepAdding = true;
-
-                foreach (string line in oldLines)
-                {
-                    if (line.StartsWith("#if RETURNS") || line.StartsWith("#elif RETURNS"))
-                    {
-                        keepAdding = line.Contains(id);
-                    }
-                    else if (line.StartsWith("#endif // RETURNS"))
-                    {
-                        keepAdding = true;
-                    }
-                    else if (keepAdding)
-                    {
-                        newLines.Add(line);
-                    }
-                }
-
-                return string.Join("\n", newLines);
             }
 
             public override string ToString() => builder.ToString();

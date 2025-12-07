@@ -24,6 +24,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private bool _refResultHolder1;
 
         [Benchmark]
+        public ref readonly bool RefReadonlyReturnStructCase1() => ref _refResultHolder1;
+
+        [Benchmark]
         public ref bool RefReturnStructCase1() => ref _refResultHolder1;
 
         [Benchmark, Arguments(false, "1", 0.1)]
@@ -32,6 +35,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(byte) ----
 
         private byte _refResultHolder2;
+
+        [Benchmark]
+        public ref readonly byte RefReadonlyReturnStructCase2() => ref _refResultHolder2;
 
         [Benchmark]
         public ref byte RefReturnStructCase2() => ref _refResultHolder2;
@@ -44,6 +50,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private sbyte _refResultHolder3;
 
         [Benchmark]
+        public ref readonly sbyte RefReadonlyReturnStructCase3() => ref _refResultHolder3;
+
+        [Benchmark]
         public ref sbyte RefReturnStructCase3() => ref _refResultHolder3;
 
         [Benchmark, Arguments(0, "3", 0.3)]
@@ -52,6 +61,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(short) ----
 
         private short _refResultHolder4;
+
+        [Benchmark]
+        public ref readonly short RefReadonlyReturnStructCase4() => ref _refResultHolder4;
 
         [Benchmark]
         public ref short RefReturnStructCase4() => ref _refResultHolder4;
@@ -64,6 +76,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private ushort _refResultHolder5;
 
         [Benchmark]
+        public ref readonly ushort RefReadonlyReturnStructCase5() => ref _refResultHolder5;
+
+        [Benchmark]
         public ref ushort RefReturnStructCase5() => ref _refResultHolder5;
 
         [Benchmark, Arguments(0, "5", 0.5)]
@@ -72,6 +87,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(int) ----
 
         private int _refResultHolder6;
+
+        [Benchmark]
+        public ref readonly int RefReadonlyReturnStructCase6() => ref _refResultHolder6;
 
         [Benchmark]
         public ref int RefReturnStructCase6() => ref _refResultHolder6;
@@ -84,6 +102,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private uint _refResultHolder7;
 
         [Benchmark]
+        public ref readonly uint RefReadonlyReturnStructCase7() => ref _refResultHolder7;
+
+        [Benchmark]
         public ref uint RefReturnStructCase7() => ref _refResultHolder7;
 
         [Benchmark, Arguments(0, "7", 0.7)]
@@ -92,6 +113,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(long) ----
 
         private long _refResultHolder8;
+
+        [Benchmark]
+        public ref readonly long RefReadonlyReturnStructCase8() => ref _refResultHolder8;
 
         [Benchmark]
         public ref long RefReturnStructCase8() => ref _refResultHolder8;
@@ -104,6 +128,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private ulong _refResultHolder9;
 
         [Benchmark]
+        public ref readonly ulong RefReadonlyReturnStructCase9() => ref _refResultHolder9;
+
+        [Benchmark]
         public ref ulong RefReturnStructCase9() => ref _refResultHolder9;
 
         [Benchmark, Arguments(0, "9", 0.9)]
@@ -112,6 +139,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(IntPtr) ----
 
         private IntPtr _refResultHolder10;
+
+        [Benchmark]
+        public ref readonly IntPtr RefReadonlyReturnStructCase10() => ref _refResultHolder10;
 
         [Benchmark]
         public ref IntPtr RefReturnStructCase10() => ref _refResultHolder10;
@@ -124,6 +154,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private UIntPtr _refResultHolder11;
 
         [Benchmark]
+        public ref readonly UIntPtr RefReadonlyReturnStructCase11() => ref _refResultHolder11;
+
+        [Benchmark]
         public ref UIntPtr RefReturnStructCase11() => ref _refResultHolder11;
 
         [Benchmark, Arguments(11, "11", 0.11)]
@@ -132,6 +165,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(char) ----
 
         private char _refResultHolder12;
+
+        [Benchmark]
+        public ref readonly char RefReadonlyReturnStructCase12() => ref _refResultHolder12;
 
         [Benchmark]
         public ref char RefReturnStructCase12() => ref _refResultHolder12;
@@ -144,6 +180,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private double _refResultHolder13;
 
         [Benchmark]
+        public ref readonly double RefReadonlyReturnStructCase13() => ref _refResultHolder13;
+
+        [Benchmark]
         public ref double RefReturnStructCase13() => ref _refResultHolder13;
 
         [Benchmark, Arguments(0, "13", 0.13)]
@@ -152,6 +191,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(float) ----
 
         private float _refResultHolder14;
+
+        [Benchmark]
+        public ref readonly float RefReadonlyReturnStructCase14() => ref _refResultHolder14;
 
         [Benchmark]
         public ref float RefReturnStructCase14() => ref _refResultHolder14;
@@ -164,6 +206,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private decimal _refResultHolder15;
 
         [Benchmark]
+        public ref readonly decimal RefReadonlyReturnStructCase15() => ref _refResultHolder15;
+
+        [Benchmark]
         public ref decimal RefReturnStructCase15() => ref _refResultHolder15;
 
         [Benchmark, Arguments(0, "15", 0.15)]
@@ -172,6 +217,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(int?) ----
 
         private int? _refResultHolder16;
+
+        [Benchmark]
+        public ref readonly int? RefReadonlyReturnStructCase16() => ref _refResultHolder16;
 
         [Benchmark]
         public ref int? RefReturnStructCase16() => ref _refResultHolder16;
@@ -184,6 +232,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private (int, int) _refResultHolder17;
 
         [Benchmark]
+        public ref readonly (int, int) RefReadonlyReturnStructCase17() => ref _refResultHolder17;
+
+        [Benchmark]
         public ref (int, int) RefReturnStructCase17() => ref _refResultHolder17;
 
         [Benchmark, Arguments(17, "17", 0.17)]
@@ -192,6 +243,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(DateTime) ----
 
         private DateTime _refResultHolder18;
+
+        [Benchmark]
+        public ref readonly DateTime RefReadonlyReturnStructCase18() => ref _refResultHolder18;
 
         [Benchmark]
         public ref DateTime RefReturnStructCase18() => ref _refResultHolder18;
@@ -204,6 +258,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private TimeSpan? _refResultHolder19;
 
         [Benchmark]
+        public ref readonly TimeSpan? RefReadonlyReturnStructCase19() => ref _refResultHolder19;
+
+        [Benchmark]
         public ref TimeSpan? RefReturnStructCase19() => ref _refResultHolder19;
 
         [Benchmark, Arguments(null, "19", 0.19)]
@@ -212,6 +269,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(CustomEnumNonConsumable) ----
 
         private CustomEnumNonConsumable _refResultHolder20;
+
+        [Benchmark]
+        public ref readonly CustomEnumNonConsumable RefReadonlyReturnStructCase20() => ref _refResultHolder20;
 
         [Benchmark]
         public ref CustomEnumNonConsumable RefReturnStructCase20() => ref _refResultHolder20;
@@ -224,6 +284,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private CustomEnumConsumable _refResultHolder21;
 
         [Benchmark]
+        public ref readonly CustomEnumConsumable RefReadonlyReturnStructCase21() => ref _refResultHolder21;
+
+        [Benchmark]
         public ref CustomEnumConsumable RefReturnStructCase21() => ref _refResultHolder21;
 
         [Benchmark, Arguments(21, "21", 0.21)]
@@ -232,6 +295,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(CustomStructNonConsumable) ----
 
         private CustomStructNonConsumable _refResultHolder22;
+
+        [Benchmark]
+        public ref readonly CustomStructNonConsumable RefReadonlyReturnStructCase22() => ref _refResultHolder22;
 
         [Benchmark]
         public ref CustomStructNonConsumable RefReturnStructCase22() => ref _refResultHolder22;
@@ -244,6 +310,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private CustomStructConsumable _refResultHolder23;
 
         [Benchmark]
+        public ref readonly CustomStructConsumable RefReadonlyReturnStructCase23() => ref _refResultHolder23;
+
+        [Benchmark]
         public ref CustomStructConsumable RefReturnStructCase23() => ref _refResultHolder23;
 
         [Benchmark, Arguments(23, "23", 0.23)]
@@ -254,6 +323,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private CustomStructConsumable<int> _refResultHolder24;
 
         [Benchmark]
+        public ref readonly CustomStructConsumable<int> RefReadonlyReturnStructCase24() => ref _refResultHolder24;
+
+        [Benchmark]
         public ref CustomStructConsumable<int> RefReturnStructCase24() => ref _refResultHolder24;
 
         [Benchmark, Arguments(24, "24", 0.24)]
@@ -262,6 +334,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         // ---- Begin StructCase(CustomStructConsumable<string>) ----
 
         private CustomStructConsumable<string> _refResultHolder25;
+
+        [Benchmark]
+        public ref readonly CustomStructConsumable<string> RefReadonlyReturnStructCase25() => ref _refResultHolder25;
 
         [Benchmark]
         public ref CustomStructConsumable<string> RefReturnStructCase25() => ref _refResultHolder25;

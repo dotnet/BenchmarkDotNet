@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var job = CreateJob(benchmarkCase);
             DumpJob(host, job);
 
-            var errors = BenchmarkEnvironmentInfo.Validate(job);
+            var errors = BenchmarkProcessValidator.Validate(job, instance);
             if (ValidationErrorReporter.ReportIfAny(errors, host))
                 return default;
 
