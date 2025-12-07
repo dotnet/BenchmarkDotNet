@@ -2,12 +2,14 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Validators
 {
+    [UsedImplicitly]
     public static class BenchmarkProcessValidator
     {
         public static IEnumerable<ValidationError> Validate(Job job, object benchmarkInstance)
