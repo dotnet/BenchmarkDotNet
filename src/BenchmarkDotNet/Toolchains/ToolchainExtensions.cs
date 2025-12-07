@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains
             => job.Infrastructure.TryGetToolchain(out var toolchain)
                 ? toolchain
                 : GetToolchain(
-                    job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
+                    job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance)!,
                     null,
                     job.HasDynamicBuildCharacteristic(),
                     job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)

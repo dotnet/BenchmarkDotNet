@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Characteristics
 {
     // TODO: better naming.
@@ -17,10 +19,10 @@ namespace BenchmarkDotNet.Characteristics
             DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties
             | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields;
 
-        protected static string ResolveId(CharacteristicObject obj, string actual)
+        protected static string ResolveId(CharacteristicObject obj, string? actual)
         {
             if (!string.IsNullOrEmpty(actual) && actual != IdCharacteristic.FallbackValue)
-                return actual;
+                return actual!;
 
             string result = CharacteristicSetPresenter.Display.ToPresentation(obj);
 
@@ -160,22 +162,22 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Resolve
-        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver)
+        public T? ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver)
         {
             return resolver.Resolve(this, characteristic);
         }
 
-        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
+        public T? ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
         {
             return resolver.Resolve(this, characteristic, defaultValue);
         }
 
-        public object ResolveValue(Characteristic characteristic, IResolver resolver)
+        public object? ResolveValue(Characteristic characteristic, IResolver resolver)
         {
             return resolver.Resolve(this, characteristic);
         }
 
-        public object ResolveValue(Characteristic characteristic, IResolver resolver, object defaultValue)
+        public object? ResolveValue(Characteristic characteristic, IResolver resolver, object defaultValue)
         {
             return resolver.Resolve(this, characteristic, defaultValue);
         }
