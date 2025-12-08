@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Order;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BenchmarkDotNet.Jobs;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Validators
 {
@@ -16,14 +19,14 @@ namespace BenchmarkDotNet.Validators
         public IEnumerable<ValidationError> Validate(ValidationParameters input)
         {
             var allBenchmarks = input.Benchmarks.ToImmutableArray();
-            var orderProvider = input.Config.Orderer;
+            var orderProvider = input.Config.Orderer ?? DefaultOrderer.Instance;
 
             var benchmarkLogicalGroups = allBenchmarks
                 .Select(benchmark => orderProvider.GetLogicalGroupKey(allBenchmarks, benchmark))
                 .ToArray();
 
             var logicalGroups = benchmarkLogicalGroups.Distinct().ToArray();
-            foreach (string logicalGroup in logicalGroups)
+            foreach (string? logicalGroup in logicalGroups)
             {
                 var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
                 int methodBaselineCount = benchmarks.Select(b => b.Descriptor).Distinct().Count(it => it.Baseline);
@@ -38,7 +41,7 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        private ValidationError CreateError(string subject, string property, string groupName, string className, string actual) =>
+        private ValidationError CreateError(string subject, string property, string? groupName, string className, string actual) =>
             new ValidationError(
                 TreatsWarningsAsErrors,
                 $"Only 1 {subject} in a group can have \"{property}\" applied to it, group {groupName} in class {className} has {actual}");

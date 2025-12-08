@@ -10,6 +10,8 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class ReturnValueValidator : ExecutionValidatorBase
@@ -32,7 +34,7 @@ namespace BenchmarkDotNet.Validators
                     try
                     {
                         InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark);
-                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
+                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null)!;
 
                         if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
                             results.Add((benchmark, result));
@@ -64,7 +66,7 @@ namespace BenchmarkDotNet.Validators
         {
             public static ParameterInstancesEqualityComparer Instance { get; } = new ParameterInstancesEqualityComparer();
 
-            public bool Equals(ParameterInstances x, ParameterInstances y)
+            public bool Equals(ParameterInstances? x, ParameterInstances? y)
             {
                 if (ReferenceEquals(x, y))
                     return true;
@@ -98,7 +100,7 @@ namespace BenchmarkDotNet.Validators
             public static InDepthEqualityComparer Instance { get; } = new InDepthEqualityComparer();
 
             [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
-            public new bool Equals(object x, object y)
+            public new bool Equals(object? x, object? y)
             {
                 if (ReferenceEquals(x, y) || object.Equals(x, y))
                     return true;
@@ -137,7 +139,7 @@ namespace BenchmarkDotNet.Validators
 
                 return false;
 
-                Array ToStructuralEquatable(object obj)
+                Array? ToStructuralEquatable(object obj)
                 {
                     switch (obj)
                     {
