@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Filters;
 
-namespace BenchmarkDotNet.Tests.Running
+namespace BenchmarkDotNet.IntegrationTests
 {
     public class RunningEmptyBenchmarkTests
     {
