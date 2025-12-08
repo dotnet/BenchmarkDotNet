@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Validators
                 .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(ReflectionFlags))
                 .Distinct()
                 .Select(member => GetErrorOrDefault(member.ParameterType))
-                .OfType<ValidationError>();
+                .WhereNotNull();
 
         private bool IsBool(Type paramType) => paramType == typeof(bool);
         private bool IsEnum(Type paramType) => paramType.GetTypeInfo().IsEnum;
