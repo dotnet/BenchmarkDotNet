@@ -157,12 +157,12 @@ namespace BenchmarkDotNet.Parameters
         {
             string cast = $"({parameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
-            string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "base";
+            string callPrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "base";
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
             // we so something like enumerable.ElementAt(index);
-            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({instancePrefix}.{source.Name}{callPostfix}, {index});";
+            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({callPrefix}.{source.Name}{callPostfix}, {index});";
         }
     }
 
