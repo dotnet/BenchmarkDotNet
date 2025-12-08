@@ -221,7 +221,7 @@ public class MoveAnalyzerRulesTask : FrostingTask<BuildContext>, IHelpProvider
 [IsDependentOn(typeof(BuildAnalyzersTask))]
 public class PackTask : FrostingTask<BuildContext>, IHelpProvider
 {
-    private const string Name = "pack";
+    public const string Name = "pack";
     public override void Run(BuildContext context) => context.BuildRunner.Pack();
 
     public HelpInfo GetHelp()
@@ -340,7 +340,7 @@ public class VersionIncrementTask : FrostingTask<BuildContext>, IHelpProvider
 [IsDependentOn(typeof(DocsBuildTask))]
 public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
 {
-    private const string Name = "release";
+    public const string Name = "release";
     public override void Run(BuildContext context) => context.ReleaseRunner.Run();
 
     public HelpInfo GetHelp() => new()

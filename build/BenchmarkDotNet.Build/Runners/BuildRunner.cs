@@ -8,6 +8,7 @@ using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Workload.Install;
 using Cake.Core;
 using Cake.Core.IO;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -16,10 +17,20 @@ namespace BenchmarkDotNet.Build.Runners;
 public class BuildRunner
 {
     private readonly BuildContext context;
+    private readonly bool isFullPack;
 
     public BuildRunner(BuildContext context)
     {
         this.context = context;
+        isFullPack = context.Arguments.GetArgument("target") is PackTask.Name or ReleaseTask.Name;
+    }
+
+    private void MaybeAppendArgument(DotNetSettings settings)
+    {
+        if (isFullPack)
+        {
+            settings.ArgumentCustomization = args => args.Append("-p:IsFullPack=true");
+        }
     }
 
     public void PackWeaver()
@@ -27,43 +38,52 @@ public class BuildRunner
         var weaverPath = context.AllPackableSrcProjects.Single(p => p.GetFilename() == "BenchmarkDotNet.Weaver.csproj");
         var outputPackageDir = weaverPath.GetDirectory().Combine("packages");
 
-        // Delete old package.
-        foreach (var file in Directory.EnumerateFiles(outputPackageDir.FullPath))
+        if (!isFullPack)
         {
-            File.Delete(file);
+            // Delete old package.
+            foreach (var file in Directory.EnumerateFiles(outputPackageDir.FullPath))
+            {
+                File.Delete(file);
+            }
         }
 
-        context.DotNetRestore(weaverPath.GetDirectory().FullPath,
-            new DotNetRestoreSettings
-            {
-                MSBuildSettings = context.MsBuildSettingsRestore
-            });
+        var restoreSettings = new DotNetRestoreSettings
+        {
+            MSBuildSettings = context.MsBuildSettingsRestore,
+        };
+        MaybeAppendArgument(restoreSettings);
+        context.DotNetRestore(weaverPath.GetDirectory().FullPath, restoreSettings);
 
         context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
-        context.DotNetBuild(weaverPath.FullPath, new DotNetBuildSettings
+        var buildSettings = new DotNetBuildSettings
         {
             NoRestore = true,
             DiagnosticOutput = true,
             MSBuildSettings = context.MsBuildSettingsBuild,
             Configuration = context.BuildConfiguration,
             Verbosity = context.BuildVerbosity
-        });
+        };
+        MaybeAppendArgument(buildSettings);
+        context.DotNetBuild(weaverPath.FullPath, buildSettings);
 
-        context.DotNetPack(weaverPath.FullPath, new DotNetPackSettings
+        var packSettings = new DotNetPackSettings
         {
             OutputDirectory = outputPackageDir,
             MSBuildSettings = context.MsBuildSettingsPack,
             Configuration = context.BuildConfiguration
-        });
+        };
+        MaybeAppendArgument(packSettings);
+        context.DotNetPack(weaverPath.FullPath, packSettings);
     }
 
     public void Restore()
     {
-        context.DotNetRestore(context.SolutionFile.FullPath,
-            new DotNetRestoreSettings
-            {
-                MSBuildSettings = context.MsBuildSettingsRestore
-            });
+        var restoreSettings = new DotNetRestoreSettings
+        {
+            MSBuildSettings = context.MsBuildSettingsRestore,
+        };
+        MaybeAppendArgument(restoreSettings);
+        context.DotNetRestore(context.SolutionFile.FullPath, restoreSettings);
     }
 
     public void InstallWorkload(string workloadId)
@@ -79,26 +99,30 @@ public class BuildRunner
     public void Build()
     {
         context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
-        context.DotNetBuild(context.SolutionFile.FullPath, new DotNetBuildSettings
+        var buildSettings = new DotNetBuildSettings
         {
             NoRestore = true,
             DiagnosticOutput = true,
             MSBuildSettings = context.MsBuildSettingsBuild,
             Configuration = context.BuildConfiguration,
             Verbosity = context.BuildVerbosity
-        });
+        };
+        MaybeAppendArgument(buildSettings);
+        context.DotNetBuild(context.SolutionFile.FullPath, buildSettings);
     }
 
     public void BuildProjectSilent(FilePath projectFile)
     {
-        context.DotNetBuild(projectFile.FullPath, new DotNetBuildSettings
+        var buildSettings = new DotNetBuildSettings
         {
             NoRestore = false,
             DiagnosticOutput = false,
             MSBuildSettings = context.MsBuildSettingsBuild,
             Configuration = context.BuildConfiguration,
             Verbosity = DotNetVerbosity.Quiet
-        });
+        };
+        MaybeAppendArgument(buildSettings);
+        context.DotNetBuild(projectFile.FullPath, buildSettings);
     }
 
     public void BuildAnalyzers()
