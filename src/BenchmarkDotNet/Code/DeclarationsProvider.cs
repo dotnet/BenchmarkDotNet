@@ -28,7 +28,8 @@ namespace BenchmarkDotNet.Code
 
         public abstract string GetWorkloadMethodCall(string passArguments);
 
-        protected string WorkloadMethodPrefix => Descriptor.WorkloadMethod.IsStatic ? Descriptor.WorkloadMethod.DeclaringType.GetCorrectCSharpTypeName() : "base";
+        protected static string GetMethodPrefix(MethodInfo method)
+            => method.IsStatic ? method.DeclaringType.GetCorrectCSharpTypeName() : "base";
 
         private string GetMethodName(MethodInfo method)
         {
@@ -43,22 +44,22 @@ namespace BenchmarkDotNet.Code
                     (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
                      method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
             {
-                return $"() => BenchmarkDotNet.Helpers.AwaitHelper.GetResult({method.Name}())";
+                return $"() => global::BenchmarkDotNet.Helpers.AwaitHelper.GetResult({GetMethodPrefix(Descriptor.WorkloadMethod)}.{method.Name}())";
             }
 
-            return method.Name;
+            return $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{method.Name}";
         }
     }
 
     internal class SyncDeclarationsProvider(Descriptor descriptor) : DeclarationsProvider(descriptor)
     {
         public override string GetWorkloadMethodCall(string passArguments)
-             => $"{WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments})";
+             => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments})";
     }
 
     internal class AsyncDeclarationsProvider(Descriptor descriptor) : DeclarationsProvider(descriptor)
     {
         public override string GetWorkloadMethodCall(string passArguments)
-            => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({WorkloadMethodPrefix}.{Descriptor.WorkloadMethod.Name}({passArguments}))";
+            => $"global::BenchmarkDotNet.Helpers.AwaitHelper.GetResult({GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments}))";
     }
 }

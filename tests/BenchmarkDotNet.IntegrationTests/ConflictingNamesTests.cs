@@ -2,28 +2,42 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.IntegrationTests;
+
+public class ConflictingNamesTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public class ConflictingNamesTests : BenchmarkTestExecutor
+    [Fact]
+    public void BenchmarkMethodsCanUseTemplateNames() => CanExecute<WithNamesUsedByTemplate>();
+
+    public class WithNamesUsedByTemplate
     {
-        public ConflictingNamesTests(ITestOutputHelper output) : base(output) { }
+        [Params(1)]
+        public int OverheadActionUnroll { get; set; }
 
-        [Fact]
-        public void BenchmarkMethodsCanUseTemplateNames() => CanExecute<WithNamesUsedByTemplate>();
-
-        public class WithNamesUsedByTemplate
+        [Benchmark]
+        [Arguments(2)]
+        public void System(int OverheadActionNoUnroll)
         {
-            [Benchmark]
-            public void System()
-            {
 
-            }
+        }
 
-            [Benchmark]
-            public void BenchmarkDotNet()
-            {
+        [Benchmark]
+        public void BenchmarkDotNet()
+        {
 
-            }
+        }
+
+        [Benchmark]
+        public void __Overhead()
+        {
+
+        }
+
+        [Benchmark]
+        [Arguments(3)]
+        public void WorkloadActionUnroll(int WorkloadActionNoUnroll)
+        {
+
         }
     }
 }

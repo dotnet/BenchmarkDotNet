@@ -49,11 +49,11 @@ namespace BenchmarkDotNet.Code
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
                     .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
-                    .Replace("$ParamsInitializer$", GetParamsInitializer(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
-                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
+                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
+                    .Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
@@ -159,13 +159,6 @@ namespace BenchmarkDotNet.Code
             return new SyncDeclarationsProvider(descriptor);
         }
 
-        private static string GetParamsInitializer(BenchmarkCase benchmarkCase)
-            => string.Join(
-                ", ",
-                benchmarkCase.Parameters.Items
-                    .Where(parameter => !parameter.IsArgument && !parameter.IsStatic)
-                    .Select(parameter => $"{parameter.Name} = default"));
-
         // internal for tests
 
         internal static string GetParamsContent(BenchmarkCase benchmarkCase)
@@ -173,7 +166,7 @@ namespace BenchmarkDotNet.Code
                 string.Empty,
                 benchmarkCase.Parameters.Items
                     .Where(parameter => !parameter.IsArgument)
-                    .Select(parameter => $"{(parameter.IsStatic ? "" : "instance.")}{parameter.Name} = {parameter.ToSourceCode()};"));
+                    .Select(parameter => $"{(parameter.IsStatic ? parameter.Definition.ParameterType.GetCorrectCSharpTypeName() : "base")}.{parameter.Name} = {parameter.ToSourceCode()};"));
 
         private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
@@ -191,13 +184,13 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                         .Select((parameter, index) => $"__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
+                    .Select((parameter, index) => $"this.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetLoadArguments(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                         .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} __argField{index};"));
+                    .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} this.__argField{index};"));
 
         private static string GetPassArguments(BenchmarkCase benchmarkCase)
             => string.Join(
