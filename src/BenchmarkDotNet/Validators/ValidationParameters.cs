@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Validators
         }
 
         // Note: Following implicit operators are expected to be used for test projects.
-        public static implicit operator ValidationParameters(BenchmarkCase[] benchmarksCase) => new ValidationParameters(benchmarksCase, config: null!);
-        public static implicit operator ValidationParameters(BenchmarkRunInfo benchmarkRunInfo) => new ValidationParameters(benchmarkRunInfo.BenchmarksCases, config: null!);
+        public static implicit operator ValidationParameters(BenchmarkCase[] benchmarksCase) => new ValidationParameters(benchmarksCase, DefaultConfig.Instance.CreateImmutableConfig());
+        public static implicit operator ValidationParameters(BenchmarkRunInfo benchmarkRunInfo) => new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config);
     }
 }
