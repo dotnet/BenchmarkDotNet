@@ -5,6 +5,8 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Characteristics
 {
     public abstract class CharacteristicPresenter
@@ -16,7 +18,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public abstract string ToPresentation(CharacteristicObject obj, Characteristic characteristic);
 
-        public abstract string ToPresentation(object characteristicValue, Characteristic characteristic);
+        public abstract string ToPresentation(object? characteristicValue, Characteristic characteristic);
 
         private class DefaultCharacteristicPresenter : CharacteristicPresenter
         {
@@ -26,11 +28,11 @@ namespace BenchmarkDotNet.Characteristics
                     return job.ResolvedId;
 
                 return obj.HasValue(characteristic)
-                    ? ToPresentation(characteristic[obj], characteristic)
+                    ? ToPresentation(characteristic[obj]!, characteristic)
                     : "Default";
             }
 
-            public override string ToPresentation(object value, Characteristic characteristic)
+            public override string ToPresentation(object? value, Characteristic characteristic)
             {
                 if (!(value is string) && value is IEnumerable collection)
                     return ToPresentation(collection);
@@ -64,7 +66,7 @@ namespace BenchmarkDotNet.Characteristics
                 return buffer.ToString();
             }
 
-            private static string ToPresentation(object value)
+            private static string ToPresentation(object? value)
                 => (value as IFormattable)?.ToString(null, DefaultCultureInfo.Instance)
                       ?? value?.ToString()
                       ?? "";
@@ -77,11 +79,11 @@ namespace BenchmarkDotNet.Characteristics
             public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
                 => ToPresentation(characteristic[obj], characteristic);
 
-            public override string ToPresentation(object characteristicValue, Characteristic characteristic)
+            public override string ToPresentation(object? characteristicValue, Characteristic characteristic)
             {
                 // TODO: DO NOT hardcode Characteristic suffix
                 string id = characteristic.Id;
-                string type = characteristic.DeclaringType.FullName;
+                string type = characteristic.DeclaringType.FullName!;
                 string value = SourceCodeHelper.ToSourceCode(characteristicValue);
                 return $"{type}.{id}Characteristic[job] = {value}";
             }
@@ -94,7 +96,7 @@ namespace BenchmarkDotNet.Characteristics
                     ? ToPresentation(characteristic[obj], characteristic)
                     : "Default";
 
-            public override string ToPresentation(object characteristicValue, Characteristic characteristic)
+            public override string ToPresentation(object? characteristicValue, Characteristic characteristic)
                 => FolderNameHelper.ToFolderName(characteristicValue);
         }
     }

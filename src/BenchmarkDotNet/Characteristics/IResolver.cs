@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Characteristics
 {
     /// <summary>
@@ -9,12 +11,12 @@ namespace BenchmarkDotNet.Characteristics
     {
         bool CanResolve(Characteristic characteristic);
 
-        object Resolve(CharacteristicObject obj, Characteristic characteristic);
+        object? Resolve(CharacteristicObject obj, Characteristic characteristic);
 
-        T Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic);
+        T? Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic);
 
-        object Resolve(CharacteristicObject obj, Characteristic characteristic, object defaultValue);
+        object? Resolve(CharacteristicObject obj, Characteristic characteristic, object defaultValue);
 
-        T Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue);
+        T? Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue);
     }
 }

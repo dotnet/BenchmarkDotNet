@@ -3,6 +3,8 @@ using BenchmarkDotNet.Order;
 using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     internal class JobComparer : IComparer<Job>, IEqualityComparer<Job>
@@ -19,7 +21,7 @@ namespace BenchmarkDotNet.Jobs
                 : new NumericStringComparer();  // TODO: Use `StringComparer.Create(CultureInfo.InvariantCulture, CompareOptions.NumericOrdering)` for .NET10 or greater.
         }
 
-        public int Compare(Job x, Job y)
+        public int Compare(Job? x, Job? y)
         {
             if (ReferenceEquals(x, y))
                 return 0;
@@ -60,7 +62,7 @@ namespace BenchmarkDotNet.Jobs
             return 0;
         }
 
-        public bool Equals(Job x, Job y) => Compare(x, y) == 0;
+        public bool Equals(Job? x, Job? y) => Compare(x, y) == 0;
 
         public int GetHashCode(Job obj) => obj.Id.GetHashCode();
 

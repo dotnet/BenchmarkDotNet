@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Characteristics
 {
     public static class CharacteristicHelper
@@ -17,7 +19,7 @@ namespace BenchmarkDotNet.Characteristics
         private static bool IsCharacteristicSubclass(Type type) =>
             type.GetTypeInfo().IsSubclassOf(typeof(Characteristic));
 
-        private static Characteristic AssertHasValue(MemberInfo member, Characteristic value)
+        private static Characteristic AssertHasValue(MemberInfo member, Characteristic? value)
         {
             if (member?.DeclaringType == null)
                 throw new NullReferenceException($"{nameof(member.DeclaringType)}");
@@ -54,12 +56,12 @@ namespace BenchmarkDotNet.Characteristics
             var fieldValues = characteristicObjectType.GetTypeInfo()
                 .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(f => IsCharacteristicSubclass(f.FieldType))
-                .Select(f => AssertHasValue(f, (Characteristic)f.GetValue(null)));
+                .Select(f => AssertHasValue(f, (Characteristic?)f.GetValue(null)));
 
             var propertyValues = characteristicObjectType.GetTypeInfo()
                 .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
-                .Select(p => AssertHasValue(p, (Characteristic)p.GetValue(null)));
+                .Select(p => AssertHasValue(p, (Characteristic?)p.GetValue(null)));
 
             // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
             return fieldValues

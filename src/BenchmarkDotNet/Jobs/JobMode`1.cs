@@ -1,6 +1,8 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Jobs
 {
     public abstract class JobMode<T> : CharacteristicObject<T> where T : JobMode<T>, new()
@@ -9,8 +11,8 @@ namespace BenchmarkDotNet.Jobs
 
         protected JobMode() { }
 
-        protected JobMode(string? id) : base(id) { }
+        protected JobMode(string id) : base(id) { }
 
-        [PublicAPI] public Job Job => OwnerOrSelf as Job;
+        [PublicAPI] public Job Job => (Job)OwnerOrSelf;
     }
 }

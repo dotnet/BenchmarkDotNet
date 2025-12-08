@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Characteristics
 {
     // TODO: better naming.
@@ -17,15 +19,15 @@ namespace BenchmarkDotNet.Characteristics
             DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties
             | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields;
 
-        protected static string ResolveId(CharacteristicObject obj, string actual)
+        protected static string ResolveId(CharacteristicObject obj, string? actual)
         {
             if (!string.IsNullOrEmpty(actual) && actual != IdCharacteristic.FallbackValue)
-                return actual;
+                return actual!;
 
             string result = CharacteristicSetPresenter.Display.ToPresentation(obj);
 
             if (result.Length == 0)
-                result = IdCharacteristic.FallbackValue;
+                result = IdCharacteristic.FallbackValue!;
 
             return result;
         }
@@ -44,7 +46,7 @@ namespace BenchmarkDotNet.Characteristics
             sharedValues = new Dictionary<Characteristic, object>();
         }
 
-        protected CharacteristicObject(string? id) : this()
+        protected CharacteristicObject(string id) : this()
         {
             if (!string.IsNullOrEmpty(id))
             {
@@ -79,7 +81,7 @@ namespace BenchmarkDotNet.Characteristics
             AssertIsRoot();
         }
 
-        private static void AssertIsAssignable(Characteristic characteristic, object value)
+        private static void AssertIsAssignable(Characteristic characteristic, object? value)
         {
             if (ReferenceEquals(value, Characteristic.EmptyValue) || ReferenceEquals(value, null))
             {
@@ -140,12 +142,12 @@ namespace BenchmarkDotNet.Characteristics
             return false;
         }
 
-        internal T GetValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic)
+        internal T? GetValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic)
         {
-            return (T)GetValue((Characteristic)characteristic);
+            return (T?)GetValue((Characteristic)characteristic);
         }
 
-        internal object GetValue(Characteristic characteristic)
+        internal object? GetValue(Characteristic characteristic)
         {
             if (!sharedValues.TryGetValue(characteristic, out var result))
                 result = Characteristic.EmptyValue;
@@ -153,40 +155,40 @@ namespace BenchmarkDotNet.Characteristics
             return ResolveCore(characteristic, result);
         }
 
-        private object ResolveCore(Characteristic characteristic, object result)
+        private object? ResolveCore(Characteristic characteristic, object result)
         {
             return characteristic.ResolveValueCore(this, result);
         }
         #endregion
 
         #region Resolve
-        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver)
+        public T? ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver)
         {
             return resolver.Resolve(this, characteristic);
         }
 
-        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
+        public T? ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
         {
             return resolver.Resolve(this, characteristic, defaultValue);
         }
 
-        public object ResolveValue(Characteristic characteristic, IResolver resolver)
+        public object? ResolveValue(Characteristic characteristic, IResolver resolver)
         {
             return resolver.Resolve(this, characteristic);
         }
 
-        public object ResolveValue(Characteristic characteristic, IResolver resolver, object defaultValue)
+        public object? ResolveValue(Characteristic characteristic, IResolver resolver, object defaultValue)
         {
             return resolver.Resolve(this, characteristic, defaultValue);
         }
 
-        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, T defaultValue)
+        public T? ResolveValue<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, T defaultValue)
         {
-            return HasValue(characteristic) ? GetValue(characteristic) : (T)characteristic.ResolveValueCore(this, defaultValue);
+            return HasValue(characteristic) ? GetValue(characteristic) : (T?)characteristic.ResolveValueCore(this, defaultValue!);
         }
 
         [PublicAPI]
-        public object ResolveValue(Characteristic characteristic, object defaultValue)
+        public object? ResolveValue(Characteristic characteristic, object defaultValue)
         {
             return HasValue(characteristic) ? GetValue(characteristic) : characteristic.ResolveValueCore(this, defaultValue);
         }
@@ -203,7 +205,7 @@ namespace BenchmarkDotNet.Characteristics
             SetValue((Characteristic)characteristic, value);
         }
 
-        internal void SetValue(Characteristic characteristic, object value)
+        internal void SetValue(Characteristic characteristic, object? value)
         {
             AssertNotFrozen();
 
@@ -211,8 +213,8 @@ namespace BenchmarkDotNet.Characteristics
             {
                 AssertIsAssignable(characteristic, value);
 
-                var oldObjectValue = (CharacteristicObject)GetValue(characteristic);
-                var newObjectValue = (CharacteristicObject)ResolveCore(characteristic, value);
+                var oldObjectValue = (CharacteristicObject?)GetValue(characteristic);
+                var newObjectValue = (CharacteristicObject?)ResolveCore(characteristic, value!);
 
                 if (!ReferenceEquals(oldObjectValue, newObjectValue))
                 {
@@ -226,7 +228,7 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        private void SetValueCore(Characteristic characteristic, object value)
+        private void SetValueCore(Characteristic characteristic, object? value)
         {
             AssertIsAssignable(characteristic, value);
 
@@ -243,7 +245,7 @@ namespace BenchmarkDotNet.Characteristics
                             $"The current node {this} has value for {characteristic} already.",
                             nameof(characteristic));
 
-                    var characteristicObject = (CharacteristicObject)ResolveCore(characteristic, value);
+                    var characteristicObject = (CharacteristicObject)ResolveCore(characteristic, value!)!;
                     characteristicObject.SetOwnerCore(OwnerOrSelf);
 
                     sharedValues[characteristic] = characteristicObject;
@@ -321,7 +323,7 @@ namespace BenchmarkDotNet.Characteristics
             if (characteristic.HasChildCharacteristics)
             {
                 // DONTTOUCH: workaround on case there were no parent characteristic.
-                var characteristicObject = (CharacteristicObject)GetValue(characteristic);
+                var characteristicObject = (CharacteristicObject?)GetValue(characteristic);
                 characteristicObject?.DetachFromOwner(characteristic);
             }
 
@@ -358,13 +360,13 @@ namespace BenchmarkDotNet.Characteristics
                 {
                     if (!HasValue(characteristic))
                     {
-                        var characteristicObject = (CharacteristicObject)ResolveCore(characteristic, value);
+                        var characteristicObject = (CharacteristicObject?)ResolveCore(characteristic, value);
                         if (characteristicObject != null)
                         {
                             value = Activator.CreateInstance(characteristicObject.GetType());
                         }
 
-                        SetValueCore(characteristic, value);
+                        SetValueCore(characteristic, value!);
                     }
                 }
                 else
@@ -399,20 +401,20 @@ namespace BenchmarkDotNet.Characteristics
         {
             AssertIsRoot();
 
-            var newRoot = (CharacteristicObject)Activator.CreateInstance(GetType());
+            var newRoot = (CharacteristicObject)Activator.CreateInstance(GetType())!;
             newRoot.ApplyCore(this);
 
             // Preserve the IdCharacteristic of the original object
             if (this.HasValue(IdCharacteristic))
             {
-                newRoot.SetValue(IdCharacteristic, this.GetValue(IdCharacteristic));
+                newRoot.SetValue(IdCharacteristic, this.GetValue(IdCharacteristic)!);
             }
 
             return newRoot;
         }
         #endregion
 
-        public string Id => IdCharacteristic[this];
+        public string Id => IdCharacteristic[this]!;
 
         public override string ToString() => Id;
     }
