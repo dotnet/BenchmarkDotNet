@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Characteristics
             {
                 // TODO: DO NOT hardcode Characteristic suffix
                 string id = characteristic.Id;
-                string type = characteristic.DeclaringType.FullName!;
+                string type = characteristic.DeclaringType.GetCorrectCSharpTypeName();
                 string value = SourceCodeHelper.ToSourceCode(characteristicValue);
                 return $"{type}.{id}Characteristic[job] = {value}";
             }

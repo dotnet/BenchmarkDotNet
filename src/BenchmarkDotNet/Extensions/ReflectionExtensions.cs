@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Extensions
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Extensions
         /// <summary>
         /// returns type name which can be used in generated C# code
         /// </summary>
-        internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
+        internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true, bool prefixWithGlobal = true)
         {
             while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
                 type = type.BaseType;
@@ -49,16 +50,23 @@ namespace BenchmarkDotNet.Extensions
                 return "void";
             if (type == typeof(void*))
                 return "void*";
+
             string prefix = "";
+
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
+            {
                 prefix += type.Namespace + ".";
+
+                if (prefixWithGlobal)
+                    prefix = $"global::{prefix}";
+            }
 
             if (type.GetTypeInfo().IsGenericParameter)
                 return type.Name;
 
             if (type.IsArray)
             {
-                var typeName = GetCorrectCSharpTypeName(type.GetElementType());
+                var typeName = GetCorrectCSharpTypeName(type.GetElementType(), includeNamespace, includeGenericArgumentsNamespace, prefixWithGlobal);
                 var parts = typeName.Split(['['], count: 2);
 
                 string repr = parts[0] + '[' + new string(',', type.GetArrayRank() - 1) + ']';
@@ -68,11 +76,11 @@ namespace BenchmarkDotNet.Extensions
                 return repr;
             }
 
-            return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace).Reverse());
+            return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace, prefixWithGlobal).Reverse());
         }
 
         // from most nested to least
-        private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace)
+        private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace, bool prefixWithGlobal)
         {
             var allTypeParameters = new Stack<Type>(type.GetGenericArguments());
 
@@ -92,7 +100,7 @@ namespace BenchmarkDotNet.Extensions
                         .Select(_ => allTypeParameters.Pop())
                         .Reverse();
 
-                    var args = string.Join(", ", typeParameters.Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)));
+                    var args = string.Join(", ", typeParameters.Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace, prefixWithGlobal)));
                     name = $"{mainName}<{args}>";
                 }
 

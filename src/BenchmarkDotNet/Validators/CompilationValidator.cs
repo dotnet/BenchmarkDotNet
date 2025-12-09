@@ -27,7 +27,6 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
-                    .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
                     .Union(ValidateClassModifiers((validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
                     .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
@@ -73,16 +72,6 @@ namespace BenchmarkDotNet.Validators
                         benchmark
                     ));
 
-        private static IEnumerable<ValidationError> ValidateNamingConflicts(IEnumerable<BenchmarkCase> benchmarks)
-            => benchmarks
-                .Select(benchmark => benchmark.Descriptor.Type)
-                .Distinct()
-                .Where(type => type.GetAllMethods().Any(method => IsUsingNameUsedInternallyByOurTemplate(method.Name)))
-                .Select(benchmark
-                    => new ValidationError(
-                        true,
-                        "Using \"__Overhead\" for method name is prohibited. We are using it internally in our templates. Please rename your method"));
-
         private static IEnumerable<ValidationError> ValidateAccessModifiers(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks.Where(x => x.Descriptor.Type.IsGenericType
                                      && HasPrivateGenericArguments(x.Descriptor.Type))
@@ -114,9 +103,6 @@ namespace BenchmarkDotNet.Validators
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
                && identifier.Skip(1).All(character => char.IsLetterOrDigit(character) || character == Underscore)
                && !CsharpKeywords.Contains(identifier);
-
-        private static bool IsUsingNameUsedInternallyByOurTemplate(string identifier)
-            => identifier == "__Overhead";
 
         private static bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic || a.IsNestedPublic));
 

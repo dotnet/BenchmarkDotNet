@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Running
                             var benchmarkWithHighestIdForGivenType = benchmarkRunInfo.BenchmarksCases.Last();
                             if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value <= idToResume)
                             {
-                                compositeLogger.WriteLineInfo($"Skipping {benchmarkRunInfo.BenchmarksCases.Length} benchmark(s) defined by {benchmarkRunInfo.Type.GetCorrectCSharpTypeName()}.");
+                                compositeLogger.WriteLineInfo($"Skipping {benchmarkRunInfo.BenchmarksCases.Length} benchmark(s) defined by {benchmarkRunInfo.Type.GetCorrectCSharpTypeName(prefixWithGlobal: false)}.");
                                 continue;
                             }
                         }

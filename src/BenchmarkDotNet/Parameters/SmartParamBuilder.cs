@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Parameters
             else
             {
                 // If the source member is non-static, we mustn't include the type name, as this would be a compiler error when accessing a non-static source member in the base class of this generated type.
-                methodCall = source.Name;
+                methodCall = $"base.{source.Name}";
             }
 
             // we do something like enumerable.ElementAt(sourceIndex)[argumentIndex];
@@ -157,12 +157,12 @@ namespace BenchmarkDotNet.Parameters
         {
             string cast = $"({parameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
-            string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
+            string callPrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "base";
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
             // we so something like enumerable.ElementAt(index);
-            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({instancePrefix}.{source.Name}{callPostfix}, {index});";
+            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({callPrefix}.{source.Name}{callPostfix}, {index});";
         }
     }
 

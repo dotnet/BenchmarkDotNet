@@ -26,7 +26,10 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
+        public abstract string GetWorkloadMethodCall(string passArguments);
+
+        protected static string GetMethodPrefix(MethodInfo method)
+            => method.IsStatic ? method.DeclaringType.GetCorrectCSharpTypeName() : "base";
 
         private string GetMethodName(MethodInfo method)
         {
@@ -41,22 +44,22 @@ namespace BenchmarkDotNet.Code
                     (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
                      method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
             {
-                return $"() => BenchmarkDotNet.Helpers.AwaitHelper.GetResult({method.Name}())";
+                return $"() => global::BenchmarkDotNet.Helpers.AwaitHelper.GetResult({GetMethodPrefix(Descriptor.WorkloadMethod)}.{method.Name}())";
             }
 
-            return method.Name;
+            return $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{method.Name}";
         }
     }
 
-    internal class SyncDeclarationsProvider : DeclarationsProvider
+    internal class SyncDeclarationsProvider(Descriptor descriptor) : DeclarationsProvider(descriptor)
     {
-        public SyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public override string GetWorkloadMethodCall(string passArguments)
+             => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments})";
     }
 
-    internal class AsyncDeclarationsProvider : DeclarationsProvider
+    internal class AsyncDeclarationsProvider(Descriptor descriptor) : DeclarationsProvider(descriptor)
     {
-        public AsyncDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
+        public override string GetWorkloadMethodCall(string passArguments)
+            => $"global::BenchmarkDotNet.Helpers.AwaitHelper.GetResult({GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments}))";
     }
 }
