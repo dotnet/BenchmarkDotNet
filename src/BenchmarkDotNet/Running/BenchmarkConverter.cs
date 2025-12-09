@@ -14,7 +14,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
 {
-    public static partial class BenchmarkConverter
+    public static class BenchmarkConverter
     {
         private const BindingFlags AllMethodsFlags =  BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 

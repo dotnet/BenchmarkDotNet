@@ -23,10 +23,6 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This will soon be removed")]
-        public static readonly Characteristic<IReadOnlyCollection<NuGetReference>> NuGetReferencesCharacteristic = CreateCharacteristic<IReadOnlyCollection<NuGetReference>>(nameof(NuGetReferences));
-
         public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessEmitToolchain.Instance);
         public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessEmitToolchain.DontLogOutput);
 
@@ -69,14 +65,6 @@ namespace BenchmarkDotNet.Jobs
         {
             get => ArgumentsCharacteristic[this];
             set => ArgumentsCharacteristic[this] = value;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This will soon be removed")]
-        public IReadOnlyCollection<NuGetReference>? NuGetReferences
-        {
-            get => NuGetReferencesCharacteristic[this];
-            set => NuGetReferencesCharacteristic[this] = value;
         }
 
         public bool TryGetToolchain([NotNullWhen(true)]out IToolchain? toolchain)

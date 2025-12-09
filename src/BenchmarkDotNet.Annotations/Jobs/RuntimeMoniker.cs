@@ -80,12 +80,6 @@ namespace BenchmarkDotNet.Jobs
         NetCoreApp31,
 
         /// <summary>
-        /// .NET Core 5.0 aka ".NET 5"
-        /// </summary>
-        [Obsolete("Please switch to the 'RuntimeMoniker.Net50'")]
-        NetCoreApp50,
-
-        /// <summary>
         /// .NET 5.0
         /// </summary>
         Net50, // it's after NetCoreApp50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators

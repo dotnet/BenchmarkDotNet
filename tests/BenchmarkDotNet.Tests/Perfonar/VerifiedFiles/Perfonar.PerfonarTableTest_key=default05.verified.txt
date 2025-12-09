@@ -18,11 +18,11 @@ Type = Bench, Jit = RyuJit
 @Skate:                Runtime = NetCoreApp22, Affinity = 12
 @Perch:                Runtime = NetCoreApp30, Affinity = 13
 @Roach:                Runtime = NetCoreApp31, Affinity = 14
-@Roe:                  Runtime = NetCoreApp50, Affinity = 15
-@Net50Affinity16:      Runtime = Net50, Affinity = 16
-@Net60Affinity17:      Runtime = Net60, Affinity = 17
-@Net70Affinity18:      Runtime = Net70, Affinity = 18
-@Net80Affinity19:      Runtime = Net80, Affinity = 19
+@Net50Affinity15:      Runtime = Net50, Affinity = 15
+@Net60Affinity16:      Runtime = Net60, Affinity = 16
+@Net70Affinity17:      Runtime = Net70, Affinity = 17
+@Net80Affinity18:      Runtime = Net80, Affinity = 18
+@Net90Affinity19:      Runtime = Net90, Affinity = 19
 
 | Method | Job                  |    Center |  Spread |
 |:-------|:---------------------|----------:|--------:|
@@ -56,16 +56,16 @@ Type = Bench, Jit = RyuJit
 | Bar    | Perch                | 137.00 ns | 0.81 ns |
 | Foo    | Roach                | 142.00 ns | 0.81 ns |
 | Bar    | Roach                | 147.00 ns | 0.81 ns |
-| Foo    | Roe                  | 152.00 ns | 0.81 ns |
-| Bar    | Roe                  | 157.00 ns | 0.81 ns |
-| Foo    | Net50Affinity16      | 162.00 ns | 0.81 ns |
-| Bar    | Net50Affinity16      | 167.00 ns | 0.81 ns |
-| Foo    | Net60Affinity17      | 172.00 ns | 0.81 ns |
-| Bar    | Net60Affinity17      | 177.00 ns | 0.81 ns |
-| Foo    | Net70Affinity18      | 182.00 ns | 0.81 ns |
-| Bar    | Net70Affinity18      | 187.00 ns | 0.81 ns |
-| Foo    | Net80Affinity19      | 192.00 ns | 0.81 ns |
-| Bar    | Net80Affinity19      | 197.00 ns | 0.81 ns |
+| Foo    | Net50Affinity15      | 152.00 ns | 0.81 ns |
+| Bar    | Net50Affinity15      | 157.00 ns | 0.81 ns |
+| Foo    | Net60Affinity16      | 162.00 ns | 0.81 ns |
+| Bar    | Net60Affinity16      | 167.00 ns | 0.81 ns |
+| Foo    | Net70Affinity17      | 172.00 ns | 0.81 ns |
+| Bar    | Net70Affinity17      | 177.00 ns | 0.81 ns |
+| Foo    | Net80Affinity18      | 182.00 ns | 0.81 ns |
+| Bar    | Net80Affinity18      | 187.00 ns | 0.81 ns |
+| Foo    | Net90Affinity19      | 192.00 ns | 0.81 ns |
+| Bar    | Net90Affinity19      | 197.00 ns | 0.81 ns |
 
 {
   "engine": {
@@ -951,7 +951,7 @@ Type = Bench, Jit = RyuJit
     {
       "job": {
         "environment": {
-          "runtime": "netCoreApp50",
+          "runtime": "net50",
           "jit": "ryuJit",
           "affinity": 15
         }
@@ -1008,7 +1008,7 @@ Type = Bench, Jit = RyuJit
     {
       "job": {
         "environment": {
-          "runtime": "net50",
+          "runtime": "net60",
           "jit": "ryuJit",
           "affinity": 16
         }
@@ -1065,7 +1065,7 @@ Type = Bench, Jit = RyuJit
     {
       "job": {
         "environment": {
-          "runtime": "net60",
+          "runtime": "net70",
           "jit": "ryuJit",
           "affinity": 17
         }
@@ -1122,7 +1122,7 @@ Type = Bench, Jit = RyuJit
     {
       "job": {
         "environment": {
-          "runtime": "net70",
+          "runtime": "net80",
           "jit": "ryuJit",
           "affinity": 18
         }
@@ -1179,7 +1179,7 @@ Type = Bench, Jit = RyuJit
     {
       "job": {
         "environment": {
-          "runtime": "net80",
+          "runtime": "net90",
           "jit": "ryuJit",
           "affinity": 19
         }

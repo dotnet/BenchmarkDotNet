@@ -9,7 +9,6 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -19,7 +18,6 @@ using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 
-#pragma warning disable CS0618
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -66,9 +64,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 : Platform.X64;
 
             var otherPlatformConfig = new ManualConfig()
-                .With(Job.Dry.With(InProcessNoEmitToolchain.Instance).With(otherPlatform))
-                .With(new OutputLogger(Output))
-                .With(DefaultColumnProviders.Instance);
+                .AddJob(Job.Dry.WithToolchain(InProcessNoEmitToolchain.Instance).WithPlatform(otherPlatform))
+                .AddLogger(new OutputLogger(Output))
+                .AddColumnProvider(DefaultColumnProviders.Instance);
 
             var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkAllCases), otherPlatformConfig);
             var summary = BenchmarkRunner.Run(runInfo);

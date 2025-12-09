@@ -2940,7 +2940,7 @@
   .job.environment = <object>
   .job.environment.affinity = 15
   .job.environment.jit = RyuJit
-  .job.environment.runtime = NetCoreApp50
+  .job.environment.runtime = Net50
   .unit = ns
   .value = 151
 [Entry91]
@@ -2972,7 +2972,7 @@
   .job.environment = <object>
   .job.environment.affinity = 15
   .job.environment.jit = RyuJit
-  .job.environment.runtime = NetCoreApp50
+  .job.environment.runtime = Net50
   .unit = ns
   .value = 152
 [Entry92]
@@ -3004,7 +3004,7 @@
   .job.environment = <object>
   .job.environment.affinity = 15
   .job.environment.jit = RyuJit
-  .job.environment.runtime = NetCoreApp50
+  .job.environment.runtime = Net50
   .unit = ns
   .value = 153
 [Entry93]
@@ -3036,7 +3036,7 @@
   .job.environment = <object>
   .job.environment.affinity = 15
   .job.environment.jit = RyuJit
-  .job.environment.runtime = NetCoreApp50
+  .job.environment.runtime = Net50
   .unit = ns
   .value = 156
 [Entry94]
@@ -3068,7 +3068,7 @@
   .job.environment = <object>
   .job.environment.affinity = 15
   .job.environment.jit = RyuJit
-  .job.environment.runtime = NetCoreApp50
+  .job.environment.runtime = Net50
   .unit = ns
   .value = 157
 [Entry95]
@@ -3100,7 +3100,7 @@
   .job.environment = <object>
   .job.environment.affinity = 15
   .job.environment.jit = RyuJit
-  .job.environment.runtime = NetCoreApp50
+  .job.environment.runtime = Net50
   .unit = ns
   .value = 158
 [Entry96]
@@ -3132,7 +3132,7 @@
   .job.environment = <object>
   .job.environment.affinity = 16
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net50
+  .job.environment.runtime = Net60
   .unit = ns
   .value = 161
 [Entry97]
@@ -3164,7 +3164,7 @@
   .job.environment = <object>
   .job.environment.affinity = 16
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net50
+  .job.environment.runtime = Net60
   .unit = ns
   .value = 162
 [Entry98]
@@ -3196,7 +3196,7 @@
   .job.environment = <object>
   .job.environment.affinity = 16
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net50
+  .job.environment.runtime = Net60
   .unit = ns
   .value = 163
 [Entry99]
@@ -3228,7 +3228,7 @@
   .job.environment = <object>
   .job.environment.affinity = 16
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net50
+  .job.environment.runtime = Net60
   .unit = ns
   .value = 166
 [Entry100]
@@ -3260,7 +3260,7 @@
   .job.environment = <object>
   .job.environment.affinity = 16
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net50
+  .job.environment.runtime = Net60
   .unit = ns
   .value = 167
 [Entry101]
@@ -3292,7 +3292,7 @@
   .job.environment = <object>
   .job.environment.affinity = 16
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net50
+  .job.environment.runtime = Net60
   .unit = ns
   .value = 168
 [Entry102]
@@ -3324,7 +3324,7 @@
   .job.environment = <object>
   .job.environment.affinity = 17
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net60
+  .job.environment.runtime = Net70
   .unit = ns
   .value = 171
 [Entry103]
@@ -3356,7 +3356,7 @@
   .job.environment = <object>
   .job.environment.affinity = 17
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net60
+  .job.environment.runtime = Net70
   .unit = ns
   .value = 172
 [Entry104]
@@ -3388,7 +3388,7 @@
   .job.environment = <object>
   .job.environment.affinity = 17
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net60
+  .job.environment.runtime = Net70
   .unit = ns
   .value = 173
 [Entry105]
@@ -3420,7 +3420,7 @@
   .job.environment = <object>
   .job.environment.affinity = 17
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net60
+  .job.environment.runtime = Net70
   .unit = ns
   .value = 176
 [Entry106]
@@ -3452,7 +3452,7 @@
   .job.environment = <object>
   .job.environment.affinity = 17
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net60
+  .job.environment.runtime = Net70
   .unit = ns
   .value = 177
 [Entry107]
@@ -3484,7 +3484,7 @@
   .job.environment = <object>
   .job.environment.affinity = 17
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net60
+  .job.environment.runtime = Net70
   .unit = ns
   .value = 178
 [Entry108]
@@ -3516,7 +3516,7 @@
   .job.environment = <object>
   .job.environment.affinity = 18
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net70
+  .job.environment.runtime = Net80
   .unit = ns
   .value = 181
 [Entry109]
@@ -3548,7 +3548,7 @@
   .job.environment = <object>
   .job.environment.affinity = 18
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net70
+  .job.environment.runtime = Net80
   .unit = ns
   .value = 182
 [Entry110]
@@ -3580,7 +3580,7 @@
   .job.environment = <object>
   .job.environment.affinity = 18
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net70
+  .job.environment.runtime = Net80
   .unit = ns
   .value = 183
 [Entry111]
@@ -3612,7 +3612,7 @@
   .job.environment = <object>
   .job.environment.affinity = 18
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net70
+  .job.environment.runtime = Net80
   .unit = ns
   .value = 186
 [Entry112]
@@ -3644,7 +3644,7 @@
   .job.environment = <object>
   .job.environment.affinity = 18
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net70
+  .job.environment.runtime = Net80
   .unit = ns
   .value = 187
 [Entry113]
@@ -3676,7 +3676,7 @@
   .job.environment = <object>
   .job.environment.affinity = 18
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net70
+  .job.environment.runtime = Net80
   .unit = ns
   .value = 188
 [Entry114]
@@ -3708,7 +3708,7 @@
   .job.environment = <object>
   .job.environment.affinity = 19
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net80
+  .job.environment.runtime = Net90
   .unit = ns
   .value = 191
 [Entry115]
@@ -3740,7 +3740,7 @@
   .job.environment = <object>
   .job.environment.affinity = 19
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net80
+  .job.environment.runtime = Net90
   .unit = ns
   .value = 192
 [Entry116]
@@ -3772,7 +3772,7 @@
   .job.environment = <object>
   .job.environment.affinity = 19
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net80
+  .job.environment.runtime = Net90
   .unit = ns
   .value = 193
 [Entry117]
@@ -3804,7 +3804,7 @@
   .job.environment = <object>
   .job.environment.affinity = 19
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net80
+  .job.environment.runtime = Net90
   .unit = ns
   .value = 196
 [Entry118]
@@ -3836,7 +3836,7 @@
   .job.environment = <object>
   .job.environment.affinity = 19
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net80
+  .job.environment.runtime = Net90
   .unit = ns
   .value = 197
 [Entry119]
@@ -3868,6 +3868,6 @@
   .job.environment = <object>
   .job.environment.affinity = 19
   .job.environment.jit = RyuJit
-  .job.environment.runtime = Net80
+  .job.environment.runtime = Net90
   .unit = ns
   .value = 198
