@@ -6,8 +6,6 @@
     <TargetFrameworks>net461;net48;netcoreapp2.0;net8.0</TargetFrameworks>
     <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
     <NoWarn>$(NoWarn);NETSDK1138;NU1903</NoWarn>
-    <!-- Suppress warning NU1510: PackageReference Microsoft.NETCore.App will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.-->
-    <NoWarn>$(NoWarn);NU1510</NoWarn>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyName>

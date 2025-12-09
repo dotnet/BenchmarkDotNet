@@ -20,11 +20,11 @@
     <Reference Include="System.Reflection" />
   </ItemGroup>
   <PropertyGroup>
-    <!-- Use 9.0.0 as baseline package for IntroNuGet -->
-    <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+    <!-- Use 8.0.0 as baseline package for IntroNuGet -->
+    <SihVersion Condition="'$(SihVersion)' == ''">8.0.0</SihVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
+    <PackageReference Include="System.IO.Hashing" Version="$(SihVersion)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />

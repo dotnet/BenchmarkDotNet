@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.IO.Hashing;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.Samples
         // Setup your csproj like this:
         /*
         <PropertyGroup>
-          <!-- Use 9.0.0 as default package version if not specified -->
-          <SciVersion Condition="'$(SciVersion)' == ''">9.0.0</SciVersion>
+          <!-- Use 8.0.0 as default package version if not specified -->
+          <SihVersion Condition="'$(SihVersion)' == ''">8.0.0</SciVersion>
         </PropertyGroup>
         <ItemGroup>
-          <PackageReference Include="System.Collections.Immutable" Version="$(SciVersion)" />
+          <PackageReference Include="System.IO.Hashing" Version="$(SihVersion)" />
         </ItemGroup>
         */
         // All versions of the package must be source-compatible with your benchmark code.
@@ -32,28 +32,34 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 string[] targetVersions = [
+                    "8.0.0",
                     "9.0.0",
-                    "9.0.3",
-                    "9.0.5",
+                    "10.0.0",
                 ];
 
                 foreach (var version in targetVersions)
                 {
                     AddJob(Job.MediumRun
-                        .WithMsBuildArguments($"/p:SciVersion={version}")
+                        .WithMsBuildArguments($"/p:SihVersion={version}")
                         .WithId($"v{version}")
                     );
                 }
             }
         }
 
-        private static readonly Random rand = new Random(Seed: 0);
-        private static readonly double[] values = Enumerable.Range(1, 10_000).Select(x => rand.NextDouble()).ToArray();
+        private static readonly byte[] values;
+
+        static IntroNuGet()
+        {
+            var rand = new Random(Seed: 0);
+            values = new byte[10_000];
+            rand.NextBytes(values);
+        }
 
         [Benchmark]
-        public void ToImmutableArrayBenchmark()
+        public void XxHash3Benchmark()
         {
-            var results = values.ToImmutableArray();
+            var results = XxHash3.Hash(values);
         }
     }
 }
