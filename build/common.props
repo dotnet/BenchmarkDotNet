@@ -41,7 +41,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' AND '$(IsFsharp)' != 'true' ">
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>14.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
