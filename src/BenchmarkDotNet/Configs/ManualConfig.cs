@@ -116,19 +116,11 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddColumn() instead.")]
-        public void Add(params IColumn[] newColumns) => AddColumn(newColumns);
-
         public ManualConfig AddColumn(params IColumn[] newColumns)
         {
             columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
             return this;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddColumnProvider() instead.")]
-        public void Add(params IColumnProvider[] newColumnProviders) => AddColumnProvider(newColumnProviders);
 
         public ManualConfig AddColumnProvider(params IColumnProvider[] newColumnProviders)
         {
@@ -136,19 +128,11 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddExporter() instead.")]
-        public void Add(params IExporter[] newExporters) => AddExporter(newExporters);
-
         public ManualConfig AddExporter(params IExporter[] newExporters)
         {
             exporters.AddRange(newExporters);
             return this;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddLogger() instead.")]
-        public void Add(params ILogger[] newLoggers) => AddLogger(newLoggers);
 
         public ManualConfig AddLogger(params ILogger[] newLoggers)
         {
@@ -156,19 +140,11 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddDiagnoser() instead.")]
-        public void Add(params IDiagnoser[] newDiagnosers) => AddDiagnoser(newDiagnosers);
-
         public ManualConfig AddDiagnoser(params IDiagnoser[] newDiagnosers)
         {
             diagnosers.AddRange(newDiagnosers);
             return this;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddAnalyser() instead.")]
-        public void Add(params IAnalyser[] newAnalysers) => AddAnalyser(newAnalysers);
 
         public ManualConfig AddAnalyser(params IAnalyser[] newAnalysers)
         {
@@ -176,19 +152,11 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddValidator() instead.")]
-        public void Add(params IValidator[] newValidators) => AddValidator(newValidators);
-
         public ManualConfig AddValidator(params IValidator[] newValidators)
         {
             validators.AddRange(newValidators);
             return this;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddJob() instead.")]
-        public void Add(params Job[] newJobs) => AddJob(newJobs);
 
         public ManualConfig AddJob(params Job[] newJobs)
         {
@@ -196,29 +164,17 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using ..AddHardwareCounters()() instead.")]
-        public void Add(params HardwareCounter[] newHardwareCounters) => AddHardwareCounters(newHardwareCounters);
-
         public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)
         {
             hardwareCounters.AddRange(newHardwareCounters);
             return this;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddFilter() instead.")]
-        public void Add(params IFilter[] newFilters) => AddFilter(newFilters);
-
         public ManualConfig AddFilter(params IFilter[] newFilters)
         {
             filters.AddRange(newFilters);
             return this;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .AddLogicalGroupRules() instead.")]
-        public void Add(params BenchmarkLogicalGroupRule[] rules) => AddLogicalGroupRules(rules);
 
         public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
         {

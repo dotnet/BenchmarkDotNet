@@ -18,22 +18,13 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithPlatform instead")]
-        public static Job With(this Job job, Platform platform) => job.WithPlatform(platform);
         public static Job WithPlatform(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
 
         public static Job WithId(this Job job, string id) => new Job(id, job);
 
         // Env
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithJit instead")]
-        public static Job With(this Job job, Jit jit) => job.WithJit(jit);
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithRuntime instead")]
-        public static Job With(this Job job, Runtime runtime) => job.WithRuntime(runtime);
         public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
 
         /// <summary>
@@ -111,23 +102,8 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithHeapAffinitizeMask(this Job job, int heapAffinitizeMask) =>
             job.WithCore(j => j.Environment.Gc.HeapAffinitizeMask = heapAffinitizeMask);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithGcMode instead")]
-        public static Job With(this Job job, GcMode gc) => job.WithGcMode(gc);
-
         [PublicAPI]
         public static Job WithGcMode(this Job job, GcMode gc) => job.WithCore(j => EnvironmentMode.GcCharacteristic[j] = gc);
-
-        // Run
-        /// <summary>
-        /// Available values: Throughput, ColdStart and Monitoring.
-        ///     Throughput: default strategy which allows to get good precision level.
-        ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
-        ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithStrategy instead")]
-        public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);        // Run
 
         /// <summary>
         /// Available values: Throughput, ColdStart and Monitoring.
@@ -230,37 +206,14 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithMemoryRandomization(this Job job, bool enable = true) => job.WithCore(j => j.Run.MemoryRandomization = enable);
 
         // Infrastructure
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithToolchain instead")]
-        public static Job With(this Job job, IToolchain toolchain) => job.WithToolchain(toolchain);
         public static Job WithToolchain(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithClock instead")]
-        public static Job With(this Job job, IClock clock) => job.WithClock(clock);
         [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithEngineFactory instead")]
-        public static Job With(this Job job, IEngineFactory engineFactory) => job.WithEngineFactory(engineFactory);
         [PublicAPI] public static Job WithEngineFactory(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
 
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) =>
             job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguration);
-
-        /// <summary>
-        /// Creates a new job based on the given job with specified environment variables.
-        /// It overrides the whole list of environment variables which were defined in the original job.
-        /// </summary>
-        /// <param name="job">The original job</param>
-        /// <param name="environmentVariables">The environment variables for the new job</param>
-        /// <exception cref="InvalidOperationException">
-        /// Throws an exception if <paramref name="environmentVariables"/> contains two variables with the same key.
-        /// </exception>
-        /// <returns>The new job with overriden environment variables</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithEnvironmentVariables instead")]
-        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithEnvironmentVariables(environmentVariables.ToArray());
 
         /// <summary>
         /// Creates a new job based on the given job with specified environment variables.
@@ -292,19 +245,6 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
         /// <returns>The new job with additional environment variable</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithEnvironmentVariable instead")]
-        public static Job With(this Job job, EnvironmentVariable environmentVariable)
-            => job.WithEnvironmentVariable(environmentVariable);
-
-        /// <summary>
-        /// Creates a new job based on the given job with additional environment variable.
-        /// All existed environment variables of the original job will be copied to the new one.
-        /// If the original job already contains an environment variable with the same key, it will be overriden.
-        /// </summary>
-        /// <param name="job">The original job</param>
-        /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
-        /// <returns>The new job with additional environment variable</returns>
         public static Job WithEnvironmentVariable(this Job job, EnvironmentVariable environmentVariable)
             => job.WithCore(j => j.Environment.SetEnvironmentVariable(environmentVariable));
 
@@ -327,39 +267,7 @@ namespace BenchmarkDotNet.Jobs
         /// <returns>The new job which doesn't have any environment variables</returns>
         public static Job WithoutEnvironmentVariables(this Job job) => job.WithEnvironmentVariables(Array.Empty<EnvironmentVariable>());
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using ..WithArguments() instead")]
-        public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithArguments(arguments);
         public static Job WithArguments(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
-
-        /// <summary>
-        /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
-        /// </summary>
-        /// <param name="job"></param>
-        /// <param name="packageName">The NuGet package name</param>
-        /// <param name="packageVersion">(optional)The NuGet package version</param>
-        /// <param name="source">(optional)Indicate the URI of the NuGet package source to use during the restore operation.</param>
-        /// <param name="prerelease">(optional)Allows prerelease packages to be installed.</param>
-        /// <returns></returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithMsBuildArguments() instead.")]
-        public static Job WithNuGet(this Job job, string packageName, string? packageVersion = null, Uri? source = null, bool prerelease = false) =>
-            job.WithCore(j => j.Infrastructure.NuGetReferences =
-                new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
-                    {
-                        new NuGetReference(packageName, packageVersion ?? "", source, prerelease)
-                    });
-
-        /// <summary>
-        /// Runs the job with a specific NuGet dependencies which will be resolved during the Job build process
-        /// </summary>
-        /// <param name="job"></param>
-        /// <param name="nuGetReferences">A collection of NuGet dependencies</param>
-        /// <returns></returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed, please start using .WithMsBuildArguments() instead.")]
-        public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) =>
-            job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
 
         public static Job WithMsBuildArguments(this Job job, params string[] msBuildArguments)
             => job.WithArguments([.. msBuildArguments.Select(a => new MsBuildArgument(a))]);
@@ -447,10 +355,7 @@ namespace BenchmarkDotNet.Jobs
         }
 
         internal static bool HasDynamicBuildCharacteristic(this Job job)
-#pragma warning disable CS0618 // Type or member is obsolete
-            => job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
-#pragma warning restore CS0618 // Type or member is obsolete
-            || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
+            => job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
             || job.HasValue(InfrastructureMode.ArgumentsCharacteristic);
     }
 }

@@ -17,10 +17,6 @@ namespace BenchmarkDotNet.Environments
             Register(InfrastructureMode.BuildConfigurationCharacteristic, () => InfrastructureMode.ReleaseConfigurationName);
 
             Register(InfrastructureMode.ArgumentsCharacteristic, Array.Empty<Argument>);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            Register(InfrastructureMode.NuGetReferencesCharacteristic, Array.Empty<NuGetReference>);
-#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

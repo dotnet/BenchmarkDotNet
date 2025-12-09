@@ -58,12 +58,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            var packagesResult = AddPackages();
-#pragma warning restore CS0618 // Type or member is obsolete
-            if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
-
             // there is no way to do tell dotnet restore which configuration to use (https://github.com/NuGet/Home/issues/5119)
             // so when users go with custom build configuration, we must perform full build
             // which will internally restore for the right configuration
@@ -100,12 +94,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            var packagesResult = AddPackages();
-#pragma warning restore CS0618 // Type or member is obsolete
-            if (!packagesResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
-
             // there is no way to do tell dotnet restore which configuration to use (https://github.com/NuGet/Home/issues/5119)
             // so when users go with custom build configuration, we must perform full publish
             // which will internally restore and build for the right configuration
@@ -118,22 +106,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // We use the implicit build in the publish command. We stopped doing a separate build step because we set the --output.
             return PublishNoRestore().ToBuildResult(GenerateResult);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method will soon be removed")]
-        public DotNetCliCommandResult AddPackages()
-        {
-            var executionTime = new TimeSpan(0);
-            var stdOutput = new StringBuilder();
-            foreach (var cmd in GetAddPackagesCommands(BuildPartition))
-            {
-                var result = DotNetCliCommandExecutor.Execute(WithArguments(cmd));
-                if (!result.IsSuccess) return result;
-                executionTime += result.ExecutionTime;
-                stdOutput.Append(result.StandardOutput);
-            }
-            return DotNetCliCommandResult.Success(executionTime, stdOutput.ToString());
         }
 
         public DotNetCliCommandResult Restore()
@@ -156,10 +128,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommandResult PublishNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
                 GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore", "publish-no-restore")));
-
-        [Obsolete]
-        internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
-            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
@@ -212,17 +180,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }
 
-        [Obsolete]
-        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
-        {
-            if (!benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
-                return Enumerable.Empty<string>();
-
-            var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
-
-            return nuGetRefs.Select(BuildAddPackageCommand);
-        }
-
         private static string GetMandatoryMsBuildSettings(string buildConfiguration)
         {
             // we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
@@ -236,29 +193,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
-        }
-
-        [Obsolete]
-        private static string BuildAddPackageCommand(NuGetReference reference)
-        {
-            var commandBuilder = new StringBuilder();
-            commandBuilder.AppendArgument("add package");
-            commandBuilder.AppendArgument(reference.PackageName);
-            if (!string.IsNullOrWhiteSpace(reference.PackageVersion))
-            {
-                commandBuilder.AppendArgument("-v");
-                commandBuilder.AppendArgument(reference.PackageVersion);
-            }
-            if (reference.PackageSource != null)
-            {
-                commandBuilder.AppendArgument("-s");
-                commandBuilder.AppendArgument(reference.PackageSource);
-            }
-            if (reference.Prerelease)
-            {
-                commandBuilder.AppendArgument("--prerelease");
-            }
-            return commandBuilder.ToString();
         }
     }
 
