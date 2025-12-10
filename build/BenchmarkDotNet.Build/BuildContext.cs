@@ -64,7 +64,7 @@ public class BuildContext : FrostingContext
         var toolFilePath = RootDirectory.Combine(".dotnet").CombineWithFilePath(toolFileName);
         context.Tools.RegisterFile(toolFilePath);
 
-        SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
+        SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.slnx");
         AnalyzersProjectFile = RootDirectory.Combine("src").Combine("BenchmarkDotNet.Analyzers").CombineWithFilePath("BenchmarkDotNet.Analyzers.csproj");
 
         TemplatesTestsProjectFile = RootDirectory.Combine("templates")
