@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData(".NETCoreApp,Version=v7.0", RuntimeMoniker.Net70, "net7.0")]
         [InlineData(".NETCoreApp,Version=v8.0", RuntimeMoniker.Net80, "net8.0")]
         [InlineData(".NETCoreApp,Version=v9.0", RuntimeMoniker.Net90, "net9.0")]
+        [InlineData(".NETCoreApp,Version=v10.0", RuntimeMoniker.Net10_0, "net10.0")]
+        [InlineData(".NETCoreApp,Version=v11.0", RuntimeMoniker.Net11_0, "net11.0")]
         [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "net123.0")]
         public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
         {

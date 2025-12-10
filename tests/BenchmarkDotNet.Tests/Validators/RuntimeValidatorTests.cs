@@ -44,7 +44,7 @@ public class RuntimeValidatorTests
             Assert.Contains(expectedMessage, errors);
         }
         {
-            var expectedMessage = "Job(Toolchain=.NET 10.0) doesn't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
+            var expectedMessage = "Job(Toolchain=.NET 11.0) doesn't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
             Assert.Contains(expectedMessage, errors);
         }
     }
@@ -102,7 +102,7 @@ public class RuntimeValidatorTests
                           .WithRuntime(CoreRuntime.Core90));
 
             // Validate error message for auto generated jobid.
-            AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0));
+            AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp11_0));
         }
     }
 
