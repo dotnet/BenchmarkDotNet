@@ -120,8 +120,8 @@ namespace BenchmarkDotNet.Tests
             else
                 Assert.True(runtime is MonoRuntime, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
 #else
-            if (DotNetRuntimeHelper.GetExpectedDotNetCoreRuntimeName() == ".NET 10.0")
-                Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net10_0, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
+            if (DotNetRuntimeHelper.GetExpectedDotNetCoreRuntimeName() == ".NET 11.0")
+                Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net11_0, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
             else
                 Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net80, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
 #endif

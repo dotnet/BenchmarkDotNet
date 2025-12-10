@@ -93,6 +93,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     return "net9.0";
                 case ".NETCoreApp,Version=v10.0":
                     return "net10.0";
+                case ".NETCoreApp,Version=v11.0":
+                    return "net11.0";
                 default:
                     return capture.Value; // we don't want to throw for future versions of .NET
             }

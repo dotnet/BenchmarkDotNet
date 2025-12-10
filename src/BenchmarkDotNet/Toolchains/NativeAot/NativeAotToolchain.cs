@@ -48,6 +48,14 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             .TargetFrameworkMoniker("net10.0")
             .ToToolchain();
 
+        /// <summary>
+        /// compiled as net11.0, targets latest NativeAOT build from the .NET 11 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json
+        /// </summary>
+        public static readonly IToolchain Net11_0 = CreateBuilder()
+            .UseNuGet("", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json")
+            .TargetFrameworkMoniker("net11.0")
+            .ToToolchain();
+
         internal NativeAotToolchain(string displayName,
             string ilCompilerVersion,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
