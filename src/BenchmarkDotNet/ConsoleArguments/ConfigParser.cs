@@ -232,7 +232,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
-            if (options.BaseJob.IsNotBlank() && !AvailableJobs.ContainsKey(options.BaseJob))
+            if (options.BaseJob.IsBlank() || !AvailableJobs.ContainsKey(options.BaseJob))
             {
                 logger.WriteLineError($"The provided base job \"{options.BaseJob}\" is invalid. Available options are: {string.Join(", ", AvailableJobs.Keys)}.");
                 return false;
@@ -548,7 +548,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.Mono:
                     {
-                        var runtime = new MonoRuntime("Mono", options.MonoPath?.FullName!);
+                        var runtime = new MonoRuntime("Mono", options.MonoPath?.FullName);
                         return baseJob.WithRuntime(runtime).WithId(runtime.Name);
                     }
 
