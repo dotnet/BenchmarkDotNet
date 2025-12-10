@@ -8,11 +8,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli;
 
 public class DotNetCliPublisher(string tfm, string? customDotNetCliPath = null, string? extraArguments = null, IReadOnlyList<EnvironmentVariable>? environmentVariables = null) : IBuilder
 {
+    public string TargetFrameworkMoniker { get; } = tfm;
+    public string CustomDotNetCliPath { get; } = customDotNetCliPath;
+
     public virtual BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         => new DotNetCliCommand(
-            customDotNetCliPath,
+            CustomDotNetCliPath,
             generateResult.ArtifactsPaths.ProjectFilePath,
-            tfm,
+            TargetFrameworkMoniker,
             extraArguments,
             generateResult,
             logger,
