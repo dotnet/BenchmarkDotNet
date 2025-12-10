@@ -229,13 +229,14 @@ namespace BenchmarkDotNet.Diagnosers
             // We install the tool in a dedicated directory in order to always use latest version and avoid issues with broken existing configs.
             string toolPath = Path.Combine(Path.GetTempPath(), "BenchmarkDotNet", "symbols");
             DotNetCliCommand cliCommand = new(
-                projPath: string.Empty,
                 cliPath: cliPath,
+                filePath: string.Empty,
+                tfm: string.Empty,
                 arguments: $"tool install dotnet-symbol --tool-path \"{toolPath}\"",
                 generateResult: null,
                 logger: logger,
                 buildPartition: null,
-                environmentVariables: Array.Empty<EnvironmentVariable>(),
+                environmentVariables: [],
                 timeout: TimeSpan.FromMinutes(3),
                 logOutput: true); // the following commands might take a while and fail, let's log them
 

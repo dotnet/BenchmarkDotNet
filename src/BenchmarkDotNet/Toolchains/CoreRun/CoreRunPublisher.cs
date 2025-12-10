@@ -9,21 +9,11 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
-    public class CoreRunPublisher : IBuilder
+    public class CoreRunPublisher(string tfm, FileInfo coreRun, FileInfo? customDotNetCliPath = null) : DotNetCliPublisher(tfm, customDotNetCliPath?.FullName)
     {
-        public CoreRunPublisher(FileInfo coreRun, FileInfo? customDotNetCliPath = null)
+        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            CoreRun = coreRun;
-            DotNetCliPublisher = new DotNetCliPublisher(customDotNetCliPath?.FullName);
-        }
-
-        private FileInfo CoreRun { get; }
-
-        private DotNetCliPublisher DotNetCliPublisher { get; }
-
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-        {
-            var buildResult = DotNetCliPublisher.Build(generateResult, buildPartition, logger);
+            var buildResult = base.Build(generateResult, buildPartition, logger);
 
             if (buildResult.IsBuildSuccess)
                 UpdateDuplicatedDependencies(buildResult.ArtifactsPaths, logger);
@@ -37,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         private void UpdateDuplicatedDependencies(ArtifactsPaths artifactsPaths, ILogger logger)
         {
             var publishedDirectory = new DirectoryInfo(artifactsPaths.BinariesDirectoryPath);
-            var coreRunDirectory =  CoreRun.Directory;
+            var coreRunDirectory =  coreRun.Directory;
 
             foreach (var publishedDependency in publishedDirectory
                 .EnumerateFileSystemInfos()

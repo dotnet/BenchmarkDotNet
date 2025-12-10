@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
-        [PublicAPI] public string Arguments { get; }
+        [PublicAPI] public string? Arguments { get; }
 
         [PublicAPI] public GenerateResult GenerateResult { get; }
 
@@ -30,14 +30,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public BuildPartition BuildPartition { get; }
 
-        [PublicAPI] public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
+        [PublicAPI] public IReadOnlyList<EnvironmentVariable>? EnvironmentVariables { get; }
 
         [PublicAPI] public TimeSpan Timeout { get; }
 
         [PublicAPI] public bool LogOutput { get; }
 
-        public DotNetCliCommand(string cliPath, string filePath, string tfm, string arguments, GenerateResult generateResult, ILogger logger,
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
+        public DotNetCliCommand(string cliPath, string filePath, string tfm, string? arguments, GenerateResult generateResult, ILogger logger,
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable>? environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
             CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             Arguments = arguments;
@@ -52,13 +52,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public DotNetCliCommand WithArguments(string arguments)
-            => new(CliPath, arguments, FilePath, TargetFrameworkMoniker, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
+            => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         public DotNetCliCommand WithFilePath(string filePath)
-            => new(CliPath, Arguments, filePath, TargetFrameworkMoniker, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
+            => new(CliPath, filePath, TargetFrameworkMoniker, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         public DotNetCliCommand WithCliPath(string cliPath)
-            => new(cliPath, Arguments, FilePath, TargetFrameworkMoniker, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
+            => new(cliPath, FilePath, TargetFrameworkMoniker, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
                 return DotNetCliCommandExecutor.Execute(WithArguments(
-                    GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)))
+                    GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)))
                     .ToBuildResult(GenerateResult);
             }
             else
@@ -121,26 +121,26 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public DotNetCliCommandResult Build()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, Arguments, "build")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "build")));
 
         public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-restore", "build-no-restore")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "build-no-restore")));
 
         public DotNetCliCommandResult Publish()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, Arguments, "publish")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "publish")));
 
         // PublishNoBuildAndNoRestore was removed because we set --output in the build step. We use the implicit build included in the publish command.
         public DotNetCliCommandResult PublishNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-restore", "publish-no-restore")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "publish-no-restore")));
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
             => new StringBuilder()
                 .AppendArgument("restore")
-                .AppendArgument($"-f {tfm}")
                 .AppendArgument($"\"{filePath}\"")
+                // restore doesn't support -f argument.
                 .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)

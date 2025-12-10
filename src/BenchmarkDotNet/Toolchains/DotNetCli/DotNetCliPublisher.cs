@@ -4,48 +4,20 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
-namespace BenchmarkDotNet.Toolchains.DotNetCli
+namespace BenchmarkDotNet.Toolchains.DotNetCli;
+
+public class DotNetCliPublisher(string tfm, string? customDotNetCliPath = null, string? extraArguments = null, IReadOnlyList<EnvironmentVariable>? environmentVariables = null) : IBuilder
 {
-    public class DotNetCliPublisher : IBuilder
-    {
-        public DotNetCliPublisher(
-            string? customDotNetCliPath = null,
-            string? extraArguments = null,
-            IReadOnlyList<EnvironmentVariable>? environmentVariables = null)
-        {
-            CustomDotNetCliPath = customDotNetCliPath;
-            ExtraArguments = extraArguments;
-            EnvironmentVariables = environmentVariables;
-        }
-
-        private string? CustomDotNetCliPath { get; }
-
-        private string? ExtraArguments { get; }
-
-        private IReadOnlyList<EnvironmentVariable>? EnvironmentVariables { get; }
-
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-        {
-            var cliCommand = new DotNetCliCommand(
-                generateResult.ArtifactsPaths.BuildForReferencesProjectFilePath,
-                CustomDotNetCliPath,
-                ExtraArguments,
-                generateResult,
-                logger,
-                buildPartition,
-                EnvironmentVariables,
-                buildPartition.Timeout);
-
-            // We build the original project first to obtain all dlls.
-            var buildResult = cliCommand.RestoreThenBuild();
-
-            if (!buildResult.IsBuildSuccess)
-                return buildResult;
-
-            // After the dlls are built, we gather the assembly references, then build the benchmark project.
-            DotNetCliBuilder.GatherReferences(generateResult.ArtifactsPaths);
-            return cliCommand.WithProjPath(generateResult.ArtifactsPaths.ProjectFilePath)
-                .RestoreThenBuildThenPublish();
-        }
-    }
+    public virtual BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        => new DotNetCliCommand(
+            customDotNetCliPath,
+            generateResult.ArtifactsPaths.ProjectFilePath,
+            tfm,
+            extraArguments,
+            generateResult,
+            logger,
+            buildPartition,
+            environmentVariables,
+            buildPartition.Timeout
+        ).RestoreThenBuildThenPublish();
 }

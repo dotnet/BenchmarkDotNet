@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                     runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath,
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData,
                     ilcOptimizationPreference, ilcInstructionSet),
-                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
+                new DotNetCliPublisher(targetFrameworkMoniker, customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
                 new Executor())
         {
             CustomDotNetCliPath = customDotNetCliPath;

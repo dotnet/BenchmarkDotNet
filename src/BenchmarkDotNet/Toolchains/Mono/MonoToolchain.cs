@@ -21,12 +21,17 @@ namespace BenchmarkDotNet.Toolchains.Mono
 
         [PublicAPI]
         public static new IToolchain From(NetCoreAppSettings settings)
+            => new MonoToolchain(settings.Name,
+                new MonoGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
+                new DotNetCliPublisher(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, GetExtraArguments()),
+                new DotNetCliExecutor(settings.CustomDotNetCliPath),
+                settings.CustomDotNetCliPath);
+
+        private static string GetExtraArguments()
         {
-            return new MonoToolchain(settings.Name,
-                        new MonoGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
-                        new MonoPublisher(settings.CustomDotNetCliPath),
-                        new DotNetCliExecutor(settings.CustomDotNetCliPath),
-                        settings.CustomDotNetCliPath);
+            var runtimeIdentifier = CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier();
+            // /p:RuntimeIdentifiers is set explicitly here because --self-contained requires it, see https://github.com/dotnet/sdk/issues/10566
+            return $"--self-contained -r {runtimeIdentifier} /p:UseMonoRuntime=true /p:RuntimeIdentifiers={runtimeIdentifier}";
         }
 
         public override bool Equals(object obj) => obj is MonoToolchain typed && Equals(typed);
