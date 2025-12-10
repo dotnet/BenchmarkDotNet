@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(
-                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
+                    $"Unable to find .sln .slnx or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
                 rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             }
 

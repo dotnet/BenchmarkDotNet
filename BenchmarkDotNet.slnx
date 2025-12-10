@@ -1,0 +1,37 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/BenchmarkDotNet.Samples.FSharp/BenchmarkDotNet.Samples.FSharp.fsproj" />
+    <Project Path="samples/BenchmarkDotNet.Samples/BenchmarkDotNet.Samples.csproj" DefaultStartup="true" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/BenchmarkDotNet.Analyzers/BenchmarkDotNet.Analyzers.csproj" />
+    <Project Path="src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj" />
+    <Project Path="src/BenchmarkDotNet.Diagnostics.dotMemory/BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
+    <Project Path="src/BenchmarkDotNet.Diagnostics.dotTrace/BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
+    <Project Path="src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj" />
+    <Project Path="src/BenchmarkDotNet.Disassembler/BenchmarkDotNet.Disassembler.csproj" />
+    <Project Path="src/BenchmarkDotNet.Exporters.Plotting/BenchmarkDotNet.Exporters.Plotting.csproj" />
+    <Project Path="src/BenchmarkDotNet.TestAdapter/BenchmarkDotNet.TestAdapter.csproj" />
+    <Project Path="src/BenchmarkDotNet.Weaver/BenchmarkDotNet.Weaver.csproj" />
+    <Project Path="src/BenchmarkDotNet/BenchmarkDotNet.csproj" />
+  </Folder>
+  <Folder Name="/templates/">
+    <Project Path="templates/BenchmarkDotNet.Templates.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BenchmarkDotNet.Analyzers.Tests/BenchmarkDotNet.Analyzers.Tests.csproj" />
+    <Project Path="tests/BenchmarkDotNet.Exporters.Plotting.Tests/BenchmarkDotNet.Exporters.Plotting.Tests.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.ConfigPerAssembly/BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.CustomPaths/BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.DisabledOptimizations/BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.EnabledOptimizations/BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.FSharp/BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning/BenchmarkDotNet.IntegrationTests.ManualRunning.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.Static/BenchmarkDotNet.IntegrationTests.Static.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.VisualBasic/BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj" />
+    <Project Path="tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj" />
+  </Folder>
+</Solution>
+
