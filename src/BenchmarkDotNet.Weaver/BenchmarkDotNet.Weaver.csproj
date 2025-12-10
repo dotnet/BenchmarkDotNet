@@ -11,7 +11,7 @@ then run `build.cmd pack-weaver`.
     <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
+    <NoWarn>$(NoWarn);NU5100;NU5127;NU5128</NoWarn>
     <!-- AsmResolver is not signed. -->
     <SignAssembly>false</SignAssembly>
     <DelaySign>false</DelaySign>
