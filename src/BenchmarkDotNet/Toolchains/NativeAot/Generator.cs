@@ -129,7 +129,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
     <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
     <OutputType>Exe</OutputType>
-    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
+    <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
     <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
     <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
     <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>

@@ -13,7 +13,7 @@
     <OutputType>Exe</OutputType>
     <RuntimeConfig>Release</RuntimeConfig>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <TargetFramework>$TFM$</TargetFramework>
+    <TargetFrameworks>$TFM$</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AppDir>$(PublishDir)</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
