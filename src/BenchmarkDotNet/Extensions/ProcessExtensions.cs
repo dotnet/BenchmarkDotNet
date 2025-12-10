@@ -124,10 +124,10 @@ namespace BenchmarkDotNet.Extensions
 
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
+            if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.Version.IsNotBlank())
                 SetClrEnvironmentVariables(start, "Version", clrRuntime.Version);
 
-            if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
+            if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && monoRuntime.MonoBclPath.IsNotBlank())
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
 
             if (benchmarkCase.Config.HasPerfCollectProfiler())

@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         internal (string customProperties, string sdkName) GetSettingsThatNeedToBeCopied(XmlDocument xmlDoc, FileInfo projectFile)
         {
-            if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
+            if (RuntimeFrameworkVersion.IsNotBlank()) // some power users knows what to configure, just do it and copy nothing more
             {
                 return (@$"<PropertyGroup>
   <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
@@ -127,36 +127,36 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 foreach (XmlElement importElement in projectElement.GetElementsByTagName("Import"))
                 {
                     sdkName = importElement.GetAttribute("Sdk");
-                    if (!string.IsNullOrEmpty(sdkName))
+                    if (sdkName.IsNotBlank())
                     {
                         break;
                     }
                 }
             }
-            if (string.IsNullOrEmpty(sdkName))
+            if (sdkName.IsBlank())
             {
                 sdkName = projectElement.GetAttribute("Sdk");
             }
             // If Sdk isn't an attribute on the Project element, it could be a child element.
-            if (string.IsNullOrEmpty(sdkName))
+            if (sdkName.IsBlank())
             {
                 foreach (XmlElement sdkElement in projectElement.GetElementsByTagName("Sdk"))
                 {
                     sdkName = sdkElement.GetAttribute("Name");
-                    if (string.IsNullOrEmpty(sdkName))
+                    if (sdkName.IsBlank())
                     {
                         continue;
                     }
                     string version = sdkElement.GetAttribute("Version");
                     // Version is optional
-                    if (!string.IsNullOrEmpty(version))
+                    if (version.IsNotBlank())
                     {
                         sdkName += $"/{version}";
                     }
                     break;
                 }
             }
-            if (string.IsNullOrEmpty(sdkName))
+            if (sdkName.IsBlank())
             {
                 sdkName = DefaultSdkName;
             }

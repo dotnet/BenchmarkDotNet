@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 
@@ -34,7 +35,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
         string output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
             "Get-CimInstance Win32_Processor -Property " + argList);
 
-        if (string.IsNullOrEmpty(output))
+        if (output.IsBlank())
             return null;
 
         return PowershellWmiCpuInfoParser.Parse(output);

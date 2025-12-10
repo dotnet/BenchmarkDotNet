@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Exporters
         {
             var model = new List<MethodWithCounters>(disassemblyResult.Methods.Length);
 
-            foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+            foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
             {
                 var groups = new List<List<CodeWithCounters>>();
 
@@ -220,7 +220,7 @@ namespace BenchmarkDotNet.Exporters
                                 : "<td>-</td>");
                         }
 
-                        if (instruction.Code is Sharp sharp && !string.IsNullOrEmpty(sharp.FilePath))
+                        if (instruction.Code is Sharp sharp && sharp.FilePath.IsNotBlank())
                             logger.Write($"<td title=\"{sharp.FilePath} line {sharp.LineNumber}\">");
                         else
                             logger.Write("<td>");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -111,7 +112,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 if (ValidationRules.TryGetValue(characteristic, out var validationRule))
                 {
                     string message = validationRule(job, characteristic);
-                    if (!string.IsNullOrEmpty(message))
+                    if (message.IsNotBlank())
                         yield return new ValidationError(
                                 isCritical,
                                 $"Job {job}, {characteristic.FullId} {message}");
@@ -144,7 +145,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
             foreach (var target in validationParameters.Benchmarks
-                .Where(benchmark => !string.IsNullOrEmpty(benchmark.Descriptor.AdditionalLogic))
+                .Where(benchmark => benchmark.Descriptor.AdditionalLogic.IsNotBlank())
                 .Select(b => b.Descriptor)
                 .Distinct())
             {

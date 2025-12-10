@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 
@@ -101,7 +102,7 @@ namespace BenchmarkDotNet.Environments
 
             string coreclrLocation = typeof(object).Assembly.Location;
             // Single-file publish has empty assembly location.
-            if (!string.IsNullOrEmpty(coreclrLocation))
+            if (coreclrLocation.IsNotBlank())
             {
                 var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(coreclrLocation);
                 // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
@@ -153,7 +154,7 @@ namespace BenchmarkDotNet.Environments
         // for dotnet publish: C:\Users\adsitnik\source\repos\ConsoleApp25\ConsoleApp25\bin\Release\netcoreapp2.0\win-x64\publish\
         internal static bool TryGetVersionFromRuntimeDirectory(string runtimeDirectory, out Version? version)
         {
-            if (!string.IsNullOrEmpty(runtimeDirectory) && Version.TryParse(GetParsableVersionPart(new DirectoryInfo(runtimeDirectory).Name), out version))
+            if (runtimeDirectory.IsNotBlank() && Version.TryParse(GetParsableVersionPart(new DirectoryInfo(runtimeDirectory).Name), out version))
             {
                 return true;
             }
@@ -170,7 +171,7 @@ namespace BenchmarkDotNet.Environments
         // 5.0: 5.0.0-alpha1.19413.7+0ecefa44c9d66adb8a997d5778dc6c246ad393a7, Microsoft .NET Core
         internal static bool TryGetVersionFromProductInfo(string productVersion, string productName, out Version? version)
         {
-            if (!string.IsNullOrEmpty(productVersion) && !string.IsNullOrEmpty(productName))
+            if (productVersion.IsNotBlank() && productName.IsNotBlank())
             {
                 if (productName.IndexOf(".NET Core", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
@@ -205,7 +206,7 @@ namespace BenchmarkDotNet.Environments
         internal static bool TryGetVersionFromFrameworkName(string frameworkName, out Version? version)
         {
             const string versionPrefix = ".NETCoreApp,Version=v";
-            if (!string.IsNullOrEmpty(frameworkName) && frameworkName.StartsWith(versionPrefix))
+            if (frameworkName.IsNotBlank() && frameworkName.StartsWith(versionPrefix))
             {
                 string frameworkVersion = GetParsableVersionPart(frameworkName.Substring(versionPrefix.Length));
 

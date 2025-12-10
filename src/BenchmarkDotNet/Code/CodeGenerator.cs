@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Code
 
         private static void AddNonEmptyUnique(HashSet<string> items, string value)
         {
-            if (!string.IsNullOrEmpty(value))
+            if (value.IsNotBlank())
                 items.Add(value);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -56,7 +57,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             logger.WriteLine("<table><tbody>");
 
             int methodIndex = 0;
-            foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+            foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
             {
                 referenceIndex++;
                 logger.WriteLine($"<tr><th colspan=\"2\" style=\"text-align: left;\">{method.Name}</th><th></th></tr>");
@@ -92,7 +93,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
 
             foreach (var withProblems in disassemblyResult.Methods
-                .Where(method => !string.IsNullOrEmpty(method.Problem))
+                .Where(method => method.Problem.IsNotBlank())
                 .GroupBy(method => method.Problem))
             {
                 logger.WriteLine($"<tr><td colspan=\"{2}\"><b>{withProblems.Key}</b></td></tr>");

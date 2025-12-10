@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
                 return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
-                    .FirstOrDefault(line => !string.IsNullOrEmpty(line));
+                    .FirstOrDefault(line => line.IsNotBlank());
             }
         }
 
@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var environmentVariable in environmentVariables)
                     startInfo.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
 
-            if (!string.IsNullOrEmpty(customDotNetCliPath) && (environmentVariables == null || environmentVariables.All(envVar => envVar.Key != dotnetMultiLevelLookupEnvVarName)))
+            if (customDotNetCliPath.IsNotBlank() && (environmentVariables == null || environmentVariables.All(envVar => envVar.Key != dotnetMultiLevelLookupEnvVarName)))
                 startInfo.EnvironmentVariables[dotnetMultiLevelLookupEnvVarName] = "0";
 
             return startInfo;

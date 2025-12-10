@@ -174,7 +174,7 @@ public class OpenMetricsExporter : ExporterBase
             {
                 logger.WriteLine($"# HELP {metric.Name} {metric.Help}");
                 logger.WriteLine($"# TYPE {metric.Name} {metric.Type}");
-                if (!string.IsNullOrEmpty(metric.Unit))
+                if (metric.Unit.IsNotBlank())
                 {
                     logger.WriteLine($"# UNIT {metric.Name} {metric.Unit}");
                 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 
 #nullable enable
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="moniker">Runtime moniker</param>
         public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, string? wasmDataDir = null, RuntimeMoniker moniker = RuntimeMoniker.Wasm) : base(moniker, msBuildMoniker, displayName)
         {
-            if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
+            if (javaScriptEngine.IsNotBlank() && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
 
             JavaScriptEngine = javaScriptEngine;
