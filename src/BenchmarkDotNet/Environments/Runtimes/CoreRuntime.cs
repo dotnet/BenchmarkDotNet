@@ -70,25 +70,21 @@ namespace BenchmarkDotNet.Environments
             return FromVersion(version, null);
         }
 
-        internal static CoreRuntime FromVersion(Version version, Assembly? assembly)
+        internal static CoreRuntime FromVersion(Version version, Assembly? assembly = null) => version switch
         {
-            switch (version)
-            {
-                case Version v when v.Major == 2 && v.Minor == 0: return Core20;
-                case Version v when v.Major == 2 && v.Minor == 1: return Core21;
-                case Version v when v.Major == 2 && v.Minor == 2: return Core22;
-                case Version v when v.Major == 3 && v.Minor == 0: return Core30;
-                case Version v when v.Major == 3 && v.Minor == 1: return Core31;
-                case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50, assembly);
-                case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60, assembly);
-                case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70, assembly);
-                case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80, assembly);
-                case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90, assembly);
-                case Version v when v.Major == 10 && v.Minor == 0: return GetPlatformSpecific(Core10_0, assembly);
-                default:
-                    return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
-            }
-        }
+            { Major: 2, Minor: 0 } => Core20,
+            { Major: 2, Minor: 1 } => Core21,
+            { Major: 2, Minor: 2 } => Core22,
+            { Major: 3, Minor: 0 } => Core30,
+            { Major: 3, Minor: 1 } => Core31,
+            { Major: 5 } => GetPlatformSpecific(Core50, assembly),
+            { Major: 6 } => GetPlatformSpecific(Core60, assembly),
+            { Major: 7 } => GetPlatformSpecific(Core70, assembly),
+            { Major: 8 } => GetPlatformSpecific(Core80, assembly),
+            { Major: 9 } => GetPlatformSpecific(Core90, assembly),
+            { Major: 10 } => GetPlatformSpecific(Core10_0, assembly),
+            _ => CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}"),
+        };
 
         internal static bool TryGetVersion(out Version? version)
         {
