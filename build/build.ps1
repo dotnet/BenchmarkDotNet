@@ -26,7 +26,6 @@ if ($PSVersionTable.PSEdition -ne 'Core') {
 
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
-$env:DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX=2
 
 Function Remove-PathVariable([string]$VariableToRemove)
 {
@@ -58,6 +57,9 @@ if (!(Test-Path $InstallPath)) {
     $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
     (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
     & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath;
+
+    # Install .NET 8 SDK
+    & $ScriptPath -Channel 8.0 -InstallDir $InstallPath -NoPath;
 }
 
 Remove-PathVariable "$InstallPath"
