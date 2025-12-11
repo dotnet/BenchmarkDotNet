@@ -112,18 +112,16 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected void GatherReferences(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             // Build the original project then reference all of the built dlls.
-            var buildResult = new DotNetCliCommand(
-                CliPath,
-                projectFilePath,
-                TargetFrameworkMoniker,
-                null,
-                GenerateResult.Success(artifactsPaths, []),
-                logger,
-                buildPartition,
-                [],
-                buildPartition.Timeout
-            )
-            .RestoreThenBuild();
+            BuildResult buildResult = BuildProject(TargetFrameworkMoniker);
+
+            // The build could fail because the project doesn't have a tfm that matches the runtime, e.g. netstandard2.0 vs net10.0,
+            // So we try to get the actual tfm of the assembly and build again.
+            if (!buildResult.IsBuildSuccess
+                && FrameworkVersionHelper.GetTfm(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly) is { } actualTfm
+                && actualTfm != TargetFrameworkMoniker)
+            {
+                buildResult = BuildProject(actualTfm);
+            }
 
             if (!buildResult.IsBuildSuccess)
             {
@@ -153,6 +151,20 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             xmlDoc.Save(artifactsPaths.ProjectFilePath);
+
+            BuildResult BuildProject(string tfm)
+                => new DotNetCliCommand(
+                    CliPath,
+                    projectFilePath,
+                    tfm,
+                    null,
+                    GenerateResult.Success(artifactsPaths, []),
+                    logger,
+                    buildPartition,
+                    [],
+                    buildPartition.Timeout
+                )
+                .RestoreThenBuild();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -37,6 +38,26 @@ namespace BenchmarkDotNet.Helpers
                 // or the assembly targeted a non-framework tfm (like netstandard2.0).
                 _ => null,
             };
+
+        internal static Version? GetTargetCoreVersion(Assembly? assembly)
+        {
+            //.NETCoreApp,Version=vX.Y
+            const string FrameworkPrefix = ".NETCoreApp,Version=v";
+
+            // Look for a TargetFrameworkAttribute with a supported Framework version.
+            string? framework = assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            if (framework?.StartsWith(FrameworkPrefix) == true
+                && Version.TryParse(framework[FrameworkPrefix.Length..], out var version)
+                // We don't support netcoreapp1.X
+                && version.Major >= 2)
+            {
+                return version;
+            }
+
+            // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
+            // or the assembly targeted a non-core tfm (like netstandard2.0).
+            return null;
+        }
 
         internal static string GetFrameworkDescription()
         {
@@ -102,5 +123,42 @@ namespace BenchmarkDotNet.Helpers
             Environment.Is64BitOperatingSystem
                 ? Environment.SpecialFolder.ProgramFilesX86
                 : Environment.SpecialFolder.ProgramFiles);
+
+        internal static string? GetTfm(Assembly assembly)
+        {
+            // We don't support exotic frameworks like Silverlight, WindowsPhone, Xamarin.Mac, etc.
+            const string CorePrefix = ".NETCoreApp,Version=v";
+            const string FrameworkPrefix = ".NETFramework,Version=v";
+            const string StandardPrefix = ".NETStandard,Version=v";
+
+            // Look for a TargetFrameworkAttribute with a supported Framework version.
+            string? framework = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            if (TryParseVersion(CorePrefix, out var version))
+            {
+                return version.Major < 5
+                    ? $"netcoreapp{version.Major}.{version.Minor}"
+                    : $"net{version.Major}.{version.Minor}";
+            }
+            if (TryParseVersion(FrameworkPrefix, out version))
+            {
+                return version.Build > 0
+                    ? $"net{version.Major}{version.Minor}{version.Build}"
+                    : $"net{version.Major}{version.Minor}";
+            }
+            if (!TryParseVersion(StandardPrefix, out version))
+            {
+                return $"netstandard{version.Major}.{version.Minor}";
+            }
+
+            // TargetFrameworkAttribute not found, or the assembly targeted a framework we don't support,
+            return null;
+
+            bool TryParseVersion(string prefix, [NotNullWhen(true)] out Version? version)
+            {
+                version = null;
+                return framework?.StartsWith(prefix) == true
+                    && Version.TryParse(framework[prefix.Length..], out version);
+            }
+        }
     }
 }

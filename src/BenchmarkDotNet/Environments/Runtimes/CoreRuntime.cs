@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 
@@ -47,10 +48,11 @@ namespace BenchmarkDotNet.Environments
         }
 
         internal static CoreRuntime GetTargetOrCurrentVersion(Assembly? assembly)
-            // Try to determine the Framework version that the assembly was compiled for.
-            => GetTargetFrameworkVersion(assembly)
+            // Try to determine the version that the assembly was compiled for.
+            => FrameworkVersionHelper.GetTargetCoreVersion(assembly) is { } version
+                ? FromVersion(version)
                 // Fallback to the current running version.
-                ?? GetCurrentVersion();
+                : GetCurrentVersion();
 
         internal static CoreRuntime GetCurrentVersion()
         {
@@ -248,25 +250,6 @@ namespace BenchmarkDotNet.Environments
                 return fallback;
 
             return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
-        }
-
-        private static CoreRuntime? GetTargetFrameworkVersion(Assembly? assembly)
-        {
-            //.NETCoreApp,Version=vX.Y
-            const string FrameworkPrefix = ".NETCoreApp,Version=v";
-            // Look for a TargetFrameworkAttribute with a supported Framework version.
-            string? framework = assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
-            if (framework?.StartsWith(FrameworkPrefix) == true
-                && Version.TryParse(framework[FrameworkPrefix.Length..], out var version)
-                // We don't support netcoreapp1.X
-                && version.Major >= 2)
-            {
-                return FromVersion(version);
-            }
-
-            // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
-            // or the assembly targeted a non-core tfm (like netstandard2.0).
-            return null;
         }
     }
 }
