@@ -242,6 +242,10 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
+            // TODO: Skip test on macos. Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2779
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+                return;
+
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
             int warmupCount = OsDetector.IsMacOS()
