@@ -137,6 +137,7 @@ namespace BenchmarkDotNet.Helpers
             {
                 return version.Major < 5
                     ? $"netcoreapp{version.Major}.{version.Minor}"
+                    // TODO: Support os-specific tfms (e.g. net10.0-windows)
                     : $"net{version.Major}.{version.Minor}";
             }
             if (TryParseVersion(FrameworkPrefix, out version))
