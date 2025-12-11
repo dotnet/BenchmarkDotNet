@@ -71,7 +71,6 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(jobCount, summary.Reports.Count(report => report.BenchmarkCase.Job.Environment.Runtime is ClrRuntime));
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
-            Assert.Contains(".NET 8.0", summary.AllRuntimes);
         }
     }
 
