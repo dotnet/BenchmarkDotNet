@@ -2,6 +2,7 @@
 using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Roslyn;
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
                     benchmarkCase);
             }
 
-            if ((benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime) && !string.IsNullOrEmpty(monoRuntime.MonoBclPath) && !Directory.Exists(monoRuntime.MonoBclPath))
+            if ((benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime) && monoRuntime.MonoBclPath.IsNotBlank() && !Directory.Exists(monoRuntime.MonoBclPath))
             {
                 yield return new ValidationError(true,
                     $"The MonoBclPath provided for MonoAOT toolchain: {monoRuntime.MonoBclPath} does NOT exist.",

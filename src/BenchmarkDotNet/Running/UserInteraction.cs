@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Running
             var unknownFilters = filterToNames.Where(u => u.suggestedBenchmarkNames.IsEmpty()).Select(u => u.userFilter).ToArray();
             string unknownBenchmarks = string.Join("', '", unknownFilters);
 
-            if (!string.IsNullOrEmpty(unknownBenchmarks))
+            if (unknownBenchmarks.IsNotBlank())
             {
                 logger.WriteLineError($"{(unknownFilters.Length == 1 ? "The filter" : "Filters")} '{unknownBenchmarks}' that you have provided returned 0 benchmarks.");
                 logger.WriteLineInfo("Please remember that the filter is applied to full benchmark name: `namespace.typeName.methodName`.");

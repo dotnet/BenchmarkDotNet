@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Extensions
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Extensions
 
             string prefix = "";
 
-            if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
+            if (type.Namespace.IsNotBlank() && includeNamespace)
             {
                 prefix += type.Namespace + ".";
 

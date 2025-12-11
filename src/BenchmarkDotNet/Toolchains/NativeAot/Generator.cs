@@ -172,7 +172,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
 
         private string GetILCompilerPackageReference()
-            => string.IsNullOrEmpty(ilCompilerVersion) ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
+            => ilCompilerVersion.IsBlank() ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
 
         private string GetTrimmingSettings()
             => rootAllApplicationAssemblies
@@ -184,7 +184,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         private string GetInstructionSetSettings(BuildPartition buildPartition)
         {
             string instructionSet = ilcInstructionSet ?? GetCurrentInstructionSet(buildPartition.Platform);
-            return !string.IsNullOrEmpty(instructionSet) ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>" : "";
+            return instructionSet.IsNotBlank() ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>" : "";
         }
 
         public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)

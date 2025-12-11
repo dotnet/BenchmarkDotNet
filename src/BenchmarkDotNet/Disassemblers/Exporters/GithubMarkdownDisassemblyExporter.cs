@@ -2,6 +2,7 @@
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         internal static void Export(ILogger logger, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, bool quotingCode = true)
         {
             int methodIndex = 0;
-            foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+            foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
             {
                 if (quotingCode)
                 {
@@ -81,7 +82,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
 
             foreach (var withProblems in disassemblyResult.Methods
-                .Where(method => !string.IsNullOrEmpty(method.Problem))
+                .Where(method => method.Problem.IsNotBlank())
                 .GroupBy(method => method.Problem))
             {
                 logger.WriteLine($"**{withProblems.Key}**");

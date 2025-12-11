@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -73,7 +74,7 @@ namespace BenchmarkDotNet.Disassemblers
                 var listing = input
                     .Where(line => line != null)
                     .SkipWhile(line => !line.Contains(macOSXHeader) && !line.Contains(windowsHeader))
-                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Where(line => line.IsNotBlank())
                     .Skip(2);
 
                 foreach (string line in listing)
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.Disassemblers
                             Maps = new[] { new Map
                             {
                                 SourceCodes = input
-                                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                                    .Where(line => line.IsNotBlank())
                                     .Select(line => new MonoCode { Text = line })
                                     .ToArray()
                             } },

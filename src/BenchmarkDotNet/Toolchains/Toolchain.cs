@@ -2,6 +2,7 @@
 using System.IO;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -41,14 +42,14 @@ namespace BenchmarkDotNet.Toolchains
 
             if (runtime is MonoRuntime mono && !mono.IsDotNetBuiltIn && !benchmarkCase.GetToolchain().IsInProcess)
             {
-                if (string.IsNullOrEmpty(mono.CustomPath) && !HostEnvironmentInfo.GetCurrent().IsMonoInstalled.Value)
+                if (mono.CustomPath.IsBlank() && !HostEnvironmentInfo.GetCurrent().IsMonoInstalled.Value)
                 {
                     yield return new ValidationError(true,
                         $"Mono is not installed or added to PATH, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
                         benchmarkCase);
                 }
 
-                if (!string.IsNullOrEmpty(mono.CustomPath) && !File.Exists(mono.CustomPath))
+                if (mono.CustomPath.IsNotBlank() && !File.Exists(mono.CustomPath))
                 {
                     yield return new ValidationError(true,
                         $"We could not find Mono in provided path ({mono.CustomPath}), benchmark '{benchmarkCase.DisplayInfo}' will not be executed",

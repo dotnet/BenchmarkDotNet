@@ -232,7 +232,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
-            if (!AvailableJobs.ContainsKey(options.BaseJob))
+            if (options.BaseJob.IsBlank() || !AvailableJobs.ContainsKey(options.BaseJob))
             {
                 logger.WriteLineError($"The provided base job \"{options.BaseJob}\" is invalid. Available options are: {string.Join(", ", AvailableJobs.Keys)}.");
                 return false;
@@ -310,7 +310,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
-            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
+            if (options.StatisticalTestThreshold.IsNotBlank() && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
             {
                 logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
                 return false;
@@ -325,7 +325,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig, string[] args)
+        private static IConfig CreateConfig(CommandLineOptions options, IConfig? globalConfig, string[] args)
         {
             var config = new ManualConfig();
 
@@ -354,12 +354,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                     maxDepth: options.DisassemblerRecursiveDepth,
                     filters: options.DisassemblerFilters.ToArray(),
                     exportDiff: options.DisassemblerDiff)));
-            if (!string.IsNullOrEmpty(options.Profiler))
+            if (options.Profiler.IsNotBlank())
                 config.AddDiagnoser(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
             if (options.DisplayAllStatistics)
                 config.AddColumn(StatisticColumn.AllStatistics);
-            if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
+            if (options.StatisticalTestThreshold.IsNotBlank() && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
                 config.AddColumn(new StatisticalTestColumn(threshold));
 
             if (options.ArtifactsDirectory != null)
@@ -398,7 +398,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return config;
         }
 
-        private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)
+        private static Job GetBaseJob(CommandLineOptions options, IConfig? globalConfig)
         {
             var baseJob =
                 globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault) // global config might define single custom Default job
@@ -466,7 +466,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 yield return baseJob.WithToolchain(InProcessEmitToolchain.Instance);
             }
-            else if (!string.IsNullOrEmpty(options.ClrVersion))
+            else if (options.ClrVersion.IsNotBlank())
             {
                 var runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion);
                 yield return baseJob.WithRuntime(runtime).WithId(runtime.Name); // local builds of .NET Runtime
@@ -637,7 +637,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.IlcPackages != null)
                 builder.UseLocalBuild(options.IlcPackages);
-            else if (!string.IsNullOrEmpty(options.ILCompilerVersion))
+            else if (options.ILCompilerVersion.IsNotBlank())
                 builder.UseNuGet(options.ILCompilerVersion, nuGetFeedUrl);
             else
                 builder.UseNuGet(ilCompilerVersion, nuGetFeedUrl);

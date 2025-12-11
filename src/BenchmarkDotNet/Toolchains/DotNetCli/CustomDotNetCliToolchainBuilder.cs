@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 #if NETSTANDARD
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected string GetTargetFrameworkMoniker()
         {
-            if (!string.IsNullOrEmpty(targetFrameworkMoniker))
+            if (targetFrameworkMoniker.IsNotBlank())
                 return targetFrameworkMoniker;
             if (!RuntimeInformation.IsNetCore)
                 throw new NotSupportedException("You must specify the target framework moniker in explicit way using builder.TargetFrameworkMoniker(tfm) method");
@@ -74,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public CustomDotNetCliToolchainBuilder DotNetCli(string newCustomDotNetCliPath)
         {
-            if (!string.IsNullOrEmpty(newCustomDotNetCliPath) && !File.Exists(newCustomDotNetCliPath))
+            if (newCustomDotNetCliPath.IsNotBlank() && !File.Exists(newCustomDotNetCliPath))
                 throw new FileNotFoundException("Given file does not exist", newCustomDotNetCliPath);
 
             customDotNetCliPath = newCustomDotNetCliPath;

@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 using Microsoft.Diagnostics.NETCore.Client;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -286,7 +287,7 @@ namespace BenchmarkDotNet.Disassemblers
             var runtime = state.Runtime;
 
             var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
-            if (!string.IsNullOrEmpty(jitHelperFunctionName))
+            if (jitHelperFunctionName.IsNotBlank())
             {
                 state.AddressToNameMapping.Add(address, jitHelperFunctionName);
                 return;
@@ -316,7 +317,7 @@ namespace BenchmarkDotNet.Disassemblers
                 }
 
                 var methodTableName = runtime.GetTypeByMethodTable(address)?.Name;
-                if (!string.IsNullOrEmpty(methodTableName))
+                if (methodTableName.IsNotBlank())
                 {
                     state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
                 }
