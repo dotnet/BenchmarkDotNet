@@ -119,7 +119,13 @@ namespace BenchmarkDotNet.Diagnosers
             var currentPlatform = RuntimeInformation.GetCurrentPlatform();
             if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64))
             {
-                yield return new ValidationError(true, $"{currentPlatform} is not supported");
+                yield return new ValidationError(true, $"DisassemblyDiagnoser does not support {currentPlatform}");
+                yield break;
+            }
+
+            if (currentPlatform == Platform.Arm64 && OsDetector.IsWindows())
+            {
+                yield return new ValidationError(true, $"DisassemblyDiagnoser does not support Arm on Windows");
                 yield break;
             }
 

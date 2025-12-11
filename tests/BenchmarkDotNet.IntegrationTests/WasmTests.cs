@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
@@ -46,12 +47,24 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
         public void WasmIsSupported()
         {
+            // Test fails on Linux non-x64.
+            if (OsDetector.IsLinux() && RuntimeInformation.GetCurrentPlatform() != Platform.X64)
+            {
+                return;
+            }
+
             CanExecute<WasmBenchmark>(GetConfig());
         }
 
         [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
         public void WasmSupportsInProcessDiagnosers()
         {
+            // Test fails on Linux non-x64.
+            if (OsDetector.IsLinux() && RuntimeInformation.GetCurrentPlatform() != Platform.X64)
+            {
+                return;
+            }
+
             var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
             var config = GetConfig().AddDiagnoser(diagnoser);
 

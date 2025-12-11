@@ -1,9 +1,8 @@
+using BenchmarkDotNet.Environments;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using BenchmarkDotNet.Jobs;
-using JetBrains.Annotations;
 using BdnRuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Tests.XUnit;
@@ -16,6 +15,7 @@ public static class EnvRequirementChecker
     {
         EnvRequirement.WindowsOnly => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? null : "Windows-only test",
         EnvRequirement.NonWindows => !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? null : "Non-Windows test",
+        EnvRequirement.NonWindowsArm => !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || !IsArm() ? null : "Non-Windows+Arm test",
         EnvRequirement.NonLinux => !RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? null : "Non-Linux test",
         EnvRequirement.FullFrameworkOnly => BdnRuntimeInformation.IsFullFramework ? null : "Full .NET Framework-only test",
         EnvRequirement.NonFullFramework => !BdnRuntimeInformation.IsFullFramework ? null : "Non-Full .NET Framework test",
@@ -34,5 +34,6 @@ public static class EnvRequirementChecker
 #endif
     }
 
-    private static bool IsRuntime(RuntimeMoniker moniker) => BdnRuntimeInformation.GetCurrentRuntime().RuntimeMoniker == moniker;
+    private static bool IsArm()
+        => BdnRuntimeInformation.GetCurrentPlatform() is Platform.Arm64 or Platform.Arm or Platform.Armv6;
 }

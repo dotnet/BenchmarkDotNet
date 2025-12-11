@@ -4,6 +4,7 @@ public enum EnvRequirement
 {
     WindowsOnly,
     NonWindows,
+    NonWindowsArm,
     NonLinux,
     FullFrameworkOnly,
     NonFullFramework,
