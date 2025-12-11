@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Environments
             { Major: 8 } => GetPlatformSpecific(Core80, assembly),
             { Major: 9 } => GetPlatformSpecific(Core90, assembly),
             { Major: 10 } => GetPlatformSpecific(Core10_0, assembly),
-            { Major: 11 } => GetPlatformSpecific(Core11_0, assembly)
+            { Major: 11 } => GetPlatformSpecific(Core11_0, assembly),
             _ => CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}"),
         };
 
