@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
 
@@ -119,7 +120,7 @@ namespace BenchmarkDotNet.Reports
         // ReSharper disable once UnusedParameter.Global
         public static Measurement Parse(string line, int processIndex)
         {
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith(GcStats.ResultsLinePrefix))
+            if (line.IsBlank() || line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error();
 
             try

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Columns;
@@ -32,7 +33,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
+        public static bool IsNullOrEmpty<T>([MaybeNullWhen(true)] this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
         public static bool IsEmpty<T>(this IEnumerable<T> value) => !value.Any();
 

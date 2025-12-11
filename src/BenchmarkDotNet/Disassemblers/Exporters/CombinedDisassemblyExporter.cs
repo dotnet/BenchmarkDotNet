@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -91,7 +92,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             {
                 var disassemblyResult = results[benchmark];
                 logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
-                foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+                foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
                 {
                     logger.WriteLine(method.Name);
 
@@ -105,7 +106,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 }
 
                 foreach (var withProblems in results[benchmark].Methods
-                    .Where(method => !string.IsNullOrEmpty(method.Problem))
+                    .Where(method => method.Problem.IsNotBlank())
                     .GroupBy(method => method.Problem))
                 {
                     logger.WriteLine(withProblems.Key);

@@ -34,7 +34,7 @@ internal class MosCpuDetector : ICpuDetector
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
             {
                 string name = moProcessor[WmicCpuInfoKeyNames.Name]?.ToString();
-                if (!string.IsNullOrEmpty(name))
+                if (name.IsNotBlank())
                 {
                     processorModelNames.Add(name);
                     processorsCount++;

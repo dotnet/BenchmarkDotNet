@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Toolchains.Results;
+﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Toolchains.Results;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -34,12 +35,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             reason = null;
 
-            if (buildResult.IsBuildSuccess || string.IsNullOrEmpty(buildResult.ErrorMessage))
+            if (buildResult.IsBuildSuccess || buildResult.ErrorMessage.IsBlank())
             {
                 return false;
             }
 
-            foreach (var errorLine in buildResult.ErrorMessage.Split('\r', '\n').Where(line => !string.IsNullOrEmpty(line)))
+            foreach (var errorLine in buildResult.ErrorMessage.Split('\r', '\n').Where(line => line.IsNotBlank()))
             foreach (var rule in Rules)
             {
                 var match = rule.regex.Match(errorLine);

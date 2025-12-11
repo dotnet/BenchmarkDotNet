@@ -62,6 +62,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             .ToString();
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+
+            GatherReferences(projectFile.FullName, buildPartition, artifactsPaths, logger);
         }
 
         protected void GenerateLinkerDescriptionFile(ArtifactsPaths artifactsPaths)

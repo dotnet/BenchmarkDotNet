@@ -91,7 +91,7 @@ internal static class LinuxCpuInfoParser
         }
 
         int? coresPerSocket = null;
-        if (string.IsNullOrEmpty(lscpu) == false)
+        if (lscpu.IsNotBlank())
         {
             var lscpuParts = lscpu.Split('\n')
                 .Where(line => line.Contains(':'))

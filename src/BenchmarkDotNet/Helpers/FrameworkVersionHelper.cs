@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
+using BenchmarkDotNet.Environments;
 using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
@@ -23,28 +25,38 @@ namespace BenchmarkDotNet.Helpers
         ];
 
         internal static string? GetTargetFrameworkVersion(Assembly? assembly)
-        {
-            if (assembly is null)
+            // Look for a TargetFrameworkAttribute with a supported Framework version.
+            => assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName switch
             {
-                return null;
-            }
+                ".NETFramework,Version=v4.6.1" => "4.6.1",
+                ".NETFramework,Version=v4.6.2" => "4.6.2",
+                ".NETFramework,Version=v4.7" => "4.7",
+                ".NETFramework,Version=v4.7.1" => "4.7.1",
+                ".NETFramework,Version=v4.7.2" => "4.7.2",
+                ".NETFramework,Version=v4.8" => "4.8",
+                ".NETFramework,Version=v4.8.1" => "4.8.1",
+                // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
+                // or the assembly targeted a non-framework tfm (like netstandard2.0).
+                _ => null,
+            };
+
+        internal static Version? GetTargetCoreVersion(Assembly? assembly)
+        {
+            //.NETCoreApp,Version=vX.Y
+            const string FrameworkPrefix = ".NETCoreApp,Version=v";
 
             // Look for a TargetFrameworkAttribute with a supported Framework version.
-            foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
+            string? framework = assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            if (framework?.StartsWith(FrameworkPrefix) == true
+                && Version.TryParse(framework[FrameworkPrefix.Length..], out var version)
+                // We don't support netcoreapp1.X
+                && version.Major >= 2)
             {
-                switch (attribute.FrameworkName)
-                {
-                    case ".NETFramework,Version=v4.6.1": return "4.6.1";
-                    case ".NETFramework,Version=v4.6.2": return "4.6.2";
-                    case ".NETFramework,Version=v4.7": return "4.7";
-                    case ".NETFramework,Version=v4.7.1": return "4.7.1";
-                    case ".NETFramework,Version=v4.7.2": return "4.7.2";
-                    case ".NETFramework,Version=v4.8": return "4.8";
-                    case ".NETFramework,Version=v4.8.1": return "4.8.1";
-                }
+                return version;
             }
 
-            // TargetFrameworkAttribute not found, or the assembly targeted a version older than we support.
+            // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
+            // or the assembly targeted a non-core tfm (like netstandard2.0).
             return null;
         }
 
@@ -112,5 +124,44 @@ namespace BenchmarkDotNet.Helpers
             Environment.Is64BitOperatingSystem
                 ? Environment.SpecialFolder.ProgramFilesX86
                 : Environment.SpecialFolder.ProgramFiles);
+
+        internal static string? GetTfm(Assembly assembly)
+        {
+            // We don't support exotic frameworks like Silverlight, WindowsPhone, Xamarin.Mac, etc.
+            const string CorePrefix = ".NETCoreApp,Version=v";
+            const string FrameworkPrefix = ".NETFramework,Version=v";
+            const string StandardPrefix = ".NETStandard,Version=v";
+
+            // Look for a TargetFrameworkAttribute with a supported Framework version.
+            string? framework = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            if (TryParseVersion(CorePrefix, out var version))
+            {
+                return version.Major < 5
+                    ? $"netcoreapp{version.Major}.{version.Minor}"
+                    : CoreRuntime.TryGetTargetPlatform(assembly, out var platform)
+                        ? $"net{version.Major}.{version.Minor}-{platform}"
+                        : $"net{version.Major}.{version.Minor}";
+            }
+            if (TryParseVersion(FrameworkPrefix, out version))
+            {
+                return version.Build > 0
+                    ? $"net{version.Major}{version.Minor}{version.Build}"
+                    : $"net{version.Major}{version.Minor}";
+            }
+            if (!TryParseVersion(StandardPrefix, out version))
+            {
+                return $"netstandard{version.Major}.{version.Minor}";
+            }
+
+            // TargetFrameworkAttribute not found, or the assembly targeted a framework we don't support.
+            return null;
+
+            bool TryParseVersion(string prefix, [NotNullWhen(true)] out Version? version)
+            {
+                version = null;
+                return framework?.StartsWith(prefix) == true
+                    && Version.TryParse(framework[prefix.Length..], out version);
+            }
+        }
     }
 }

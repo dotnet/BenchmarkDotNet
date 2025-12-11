@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 
@@ -47,6 +50,13 @@ namespace BenchmarkDotNet.Environments
             return new CoreRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
         }
 
+        internal static CoreRuntime GetTargetOrCurrentVersion(Assembly? assembly)
+            // Try to determine the version that the assembly was compiled for.
+            => FrameworkVersionHelper.GetTargetCoreVersion(assembly) is { } version
+                ? FromVersion(version, assembly)
+                // Fallback to the current running version.
+                : GetCurrentVersion();
+
         internal static CoreRuntime GetCurrentVersion()
         {
             if (!RuntimeInformation.IsNetCore)
@@ -59,29 +69,25 @@ namespace BenchmarkDotNet.Environments
                 throw new NotSupportedException("Unable to recognize .NET Core version, please report a bug at https://github.com/dotnet/BenchmarkDotNet");
             }
 
-            return FromVersion(version);
+            return FromVersion(version, null);
         }
 
-        internal static CoreRuntime FromVersion(Version version)
+        internal static CoreRuntime FromVersion(Version version, Assembly? assembly = null) => version switch
         {
-            switch (version)
-            {
-                case Version v when v.Major == 2 && v.Minor == 0: return Core20;
-                case Version v when v.Major == 2 && v.Minor == 1: return Core21;
-                case Version v when v.Major == 2 && v.Minor == 2: return Core22;
-                case Version v when v.Major == 3 && v.Minor == 0: return Core30;
-                case Version v when v.Major == 3 && v.Minor == 1: return Core31;
-                case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50);
-                case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
-                case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
-                case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80);
-                case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90);
-                case Version v when v.Major == 10 && v.Minor == 0: return GetPlatformSpecific(Core10_0);
-                case Version v when v.Major == 11 && v.Minor == 0: return GetPlatformSpecific(Core11_0);
-                default:
-                    return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
-            }
-        }
+            { Major: 2, Minor: 0 } => Core20,
+            { Major: 2, Minor: 1 } => Core21,
+            { Major: 2, Minor: 2 } => Core22,
+            { Major: 3, Minor: 0 } => Core30,
+            { Major: 3, Minor: 1 } => Core31,
+            { Major: 5 } => GetPlatformSpecific(Core50, assembly),
+            { Major: 6 } => GetPlatformSpecific(Core60, assembly),
+            { Major: 7 } => GetPlatformSpecific(Core70, assembly),
+            { Major: 8 } => GetPlatformSpecific(Core80, assembly),
+            { Major: 9 } => GetPlatformSpecific(Core90, assembly),
+            { Major: 10 } => GetPlatformSpecific(Core10_0, assembly),
+            { Major: 11 } => GetPlatformSpecific(Core11_0, assembly)
+            _ => CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}"),
+        };
 
         internal static bool TryGetVersion(out Version? version)
         {
@@ -103,7 +109,7 @@ namespace BenchmarkDotNet.Environments
 
             string coreclrLocation = typeof(object).Assembly.Location;
             // Single-file publish has empty assembly location.
-            if (!string.IsNullOrEmpty(coreclrLocation))
+            if (coreclrLocation.IsNotBlank())
             {
                 var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(coreclrLocation);
                 // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
@@ -155,7 +161,7 @@ namespace BenchmarkDotNet.Environments
         // for dotnet publish: C:\Users\adsitnik\source\repos\ConsoleApp25\ConsoleApp25\bin\Release\netcoreapp2.0\win-x64\publish\
         internal static bool TryGetVersionFromRuntimeDirectory(string runtimeDirectory, out Version? version)
         {
-            if (!string.IsNullOrEmpty(runtimeDirectory) && Version.TryParse(GetParsableVersionPart(new DirectoryInfo(runtimeDirectory).Name), out version))
+            if (runtimeDirectory.IsNotBlank() && Version.TryParse(GetParsableVersionPart(new DirectoryInfo(runtimeDirectory).Name), out version))
             {
                 return true;
             }
@@ -172,7 +178,7 @@ namespace BenchmarkDotNet.Environments
         // 5.0: 5.0.0-alpha1.19413.7+0ecefa44c9d66adb8a997d5778dc6c246ad393a7, Microsoft .NET Core
         internal static bool TryGetVersionFromProductInfo(string productVersion, string productName, out Version? version)
         {
-            if (!string.IsNullOrEmpty(productVersion) && !string.IsNullOrEmpty(productName))
+            if (productVersion.IsNotBlank() && productName.IsNotBlank())
             {
                 if (productName.IndexOf(".NET Core", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
@@ -207,7 +213,7 @@ namespace BenchmarkDotNet.Environments
         internal static bool TryGetVersionFromFrameworkName(string frameworkName, out Version? version)
         {
             const string versionPrefix = ".NETCoreApp,Version=v";
-            if (!string.IsNullOrEmpty(frameworkName) && frameworkName.StartsWith(versionPrefix))
+            if (frameworkName.IsNotBlank() && frameworkName.StartsWith(versionPrefix))
             {
                 string frameworkVersion = GetParsableVersionPart(frameworkName.Substring(versionPrefix.Length));
 
@@ -221,29 +227,36 @@ namespace BenchmarkDotNet.Environments
         // Version.TryParse does not handle thing like 3.0.0-WORD
         internal static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
 
-        private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback)
+        private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback, Assembly? assembly)
+            => TryGetTargetPlatform(assembly ?? Assembly.GetEntryAssembly(), out var platform)
+                ? new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platform}", fallback.Name)
+                : fallback;
+
+        internal static bool TryGetTargetPlatform(Assembly? assembly, [NotNullWhen(true)] out string? platform)
         {
-            // TargetPlatformAttribute is not part of .NET Standard 2.0 so as usuall we have to use some reflection hacks...
+            platform = null;
+
+            if (assembly is null)
+                return false;
+
+            // TargetPlatformAttribute is not part of .NET Standard 2.0 so as usual we have to use some reflection hacks.
             var targetPlatformAttributeType = typeof(object).Assembly.GetType("System.Runtime.Versioning.TargetPlatformAttribute", throwOnError: false);
             if (targetPlatformAttributeType is null) // an old preview version of .NET 5
-                return fallback;
+                return false;
 
-            var exe = Assembly.GetEntryAssembly();
-            if (exe is null)
-                return fallback;
-
-            var attributeInstance = exe.GetCustomAttribute(targetPlatformAttributeType);
+            var attributeInstance = assembly.GetCustomAttribute(targetPlatformAttributeType);
             if (attributeInstance is null)
-                return fallback;
+                return false;
 
             var platformNameProperty = targetPlatformAttributeType.GetProperty("PlatformName");
             if (platformNameProperty is null)
-                return fallback;
+                return false;
 
-            if (!(platformNameProperty.GetValue(attributeInstance) is string platformName))
-                return fallback;
+            if (platformNameProperty.GetValue(attributeInstance) is not string platformName)
+                return false;
 
-            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
+            platform = platformName;
+            return true;
         }
     }
 }

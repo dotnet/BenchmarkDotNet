@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
 #nullable enable
@@ -21,8 +22,8 @@ namespace BenchmarkDotNet.Characteristics
 
         protected static string ResolveId(CharacteristicObject obj, string? actual)
         {
-            if (!string.IsNullOrEmpty(actual) && actual != IdCharacteristic.FallbackValue)
-                return actual!;
+            if (actual.IsNotBlank() && actual != IdCharacteristic.FallbackValue)
+                return actual;
 
             string result = CharacteristicSetPresenter.Display.ToPresentation(obj);
 
@@ -48,7 +49,7 @@ namespace BenchmarkDotNet.Characteristics
 
         protected CharacteristicObject(string id) : this()
         {
-            if (!string.IsNullOrEmpty(id))
+            if (id.IsNotBlank())
             {
                 IdCharacteristic[this] = id;
             }

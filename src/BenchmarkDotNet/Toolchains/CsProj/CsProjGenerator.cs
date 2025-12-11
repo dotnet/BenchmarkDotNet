@@ -14,6 +14,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
@@ -64,6 +65,20 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker);
 
+        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        {
+            string projectFilePath = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, NullLogger.Instance).FullName;
+
+            var content = new StringBuilder(300)
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
+                .ToString();
+
+            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
+        }
+
         [SuppressMessage("ReSharper", "StringLiteralTypo")] // R# complains about $variables$
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
@@ -86,6 +101,70 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .ToString();
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+
+            // Integration tests are built without dependencies, so we skip gathering dlls.
+            if (!buildPartition.ForcedNoDependenciesForIntegrationTests)
+            {
+                GatherReferences(projectFile.FullName, buildPartition, artifactsPaths, logger);
+            }
+        }
+
+        protected void GatherReferences(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        {
+            // Build the original project then reference all of the built dlls.
+            BuildResult buildResult = BuildProject(TargetFrameworkMoniker);
+
+            // The build could fail because the project doesn't have a tfm that matches the runtime, e.g. netstandard2.0 vs net10.0,
+            // So we try to get the actual tfm of the assembly and build again.
+            if (!buildResult.IsBuildSuccess
+                && FrameworkVersionHelper.GetTfm(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly) is { } actualTfm
+                && actualTfm != TargetFrameworkMoniker)
+            {
+                buildResult = BuildProject(actualTfm);
+            }
+
+            if (!buildResult.IsBuildSuccess)
+            {
+                if (!buildResult.TryToExplainFailureReason(out string reason))
+                {
+                    reason = buildResult.ErrorMessage;
+                }
+                logger.WriteLineWarning($"Failed to build source project to obtain dll references. Moving forward without it. Reason: {reason}");
+                return;
+            }
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(artifactsPaths.ProjectFilePath);
+            XmlElement projectElement = xmlDoc.DocumentElement;
+            var itemGroup = xmlDoc.CreateElement("ItemGroup");
+            projectElement.AppendChild(itemGroup);
+            foreach (var assemblyFile in Directory.GetFiles(artifactsPaths.BinariesDirectoryPath, "*.dll"))
+            {
+                var referenceElement = xmlDoc.CreateElement("Reference");
+                itemGroup.AppendChild(referenceElement);
+                referenceElement.SetAttribute("Include", Path.GetFileNameWithoutExtension(assemblyFile));
+                var hintPath = xmlDoc.CreateElement("HintPath");
+                referenceElement.AppendChild(hintPath);
+                var locationNode = xmlDoc.CreateTextNode(assemblyFile);
+                hintPath.AppendChild(locationNode);
+                // TODO: Add Aliases here for extern alias #2289
+            }
+
+            xmlDoc.Save(artifactsPaths.ProjectFilePath);
+
+            BuildResult BuildProject(string tfm)
+                => new DotNetCliCommand(
+                    CliPath,
+                    projectFilePath,
+                    tfm,
+                    null,
+                    GenerateResult.Success(artifactsPaths, []),
+                    logger,
+                    buildPartition,
+                    [],
+                    buildPartition.Timeout
+                )
+                .RestoreThenBuild();
         }
 
         /// <summary>
@@ -110,7 +189,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         internal (string customProperties, string sdkName) GetSettingsThatNeedToBeCopied(XmlDocument xmlDoc, FileInfo projectFile)
         {
-            if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
+            if (RuntimeFrameworkVersion.IsNotBlank()) // some power users knows what to configure, just do it and copy nothing more
             {
                 return (@$"<PropertyGroup>
   <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
@@ -127,36 +206,36 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 foreach (XmlElement importElement in projectElement.GetElementsByTagName("Import"))
                 {
                     sdkName = importElement.GetAttribute("Sdk");
-                    if (!string.IsNullOrEmpty(sdkName))
+                    if (sdkName.IsNotBlank())
                     {
                         break;
                     }
                 }
             }
-            if (string.IsNullOrEmpty(sdkName))
+            if (sdkName.IsBlank())
             {
                 sdkName = projectElement.GetAttribute("Sdk");
             }
             // If Sdk isn't an attribute on the Project element, it could be a child element.
-            if (string.IsNullOrEmpty(sdkName))
+            if (sdkName.IsBlank())
             {
                 foreach (XmlElement sdkElement in projectElement.GetElementsByTagName("Sdk"))
                 {
                     sdkName = sdkElement.GetAttribute("Name");
-                    if (string.IsNullOrEmpty(sdkName))
+                    if (sdkName.IsBlank())
                     {
                         continue;
                     }
                     string version = sdkElement.GetAttribute("Version");
                     // Version is optional
-                    if (!string.IsNullOrEmpty(version))
+                    if (version.IsNotBlank())
                     {
                         sdkName += $"/{version}";
                     }
                     break;
                 }
             }
-            if (string.IsNullOrEmpty(sdkName))
+            if (sdkName.IsBlank())
             {
                 sdkName = DefaultSdkName;
             }

@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains
                         return InProcessEmitToolchain.Instance;
                     if (OsDetector.IsIOS())
                         return InProcessNoEmitToolchain.Instance;
-                    if (!string.IsNullOrEmpty(mono.AotArgs))
+                    if (mono.AotArgs.IsNotBlank())
                         return MonoAotToolchain.Instance;
                     if (mono.IsDotNetBuiltIn)
                         if (RuntimeInformation.IsNewMono)

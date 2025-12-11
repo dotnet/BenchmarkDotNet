@@ -25,16 +25,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            BuildResult buildResult = new DotNetCliCommand(
-                    CustomDotNetCliPath,
-                    string.Empty,
-                    generateResult,
-                    logger,
-                    buildPartition,
-                    Array.Empty<EnvironmentVariable>(),
-                    buildPartition.Timeout,
-                    logOutput: LogOutput)
-                .RestoreThenBuild();
+            var buildResult = new DotNetCliCommand(
+                CustomDotNetCliPath,
+                generateResult.ArtifactsPaths.ProjectFilePath,
+                TargetFrameworkMoniker,
+                string.Empty,
+                generateResult,
+                logger,
+                buildPartition,
+                [],
+                buildPartition.Timeout,
+                logOutput: LogOutput
+            ).RestoreThenBuild();
             if (buildResult.IsBuildSuccess &&
                 buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
             {

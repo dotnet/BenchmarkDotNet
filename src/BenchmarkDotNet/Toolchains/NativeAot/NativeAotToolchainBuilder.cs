@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
             Feeds[Generator.NativeAotNuGetFeed] = nuGetFeedUrl ?? throw new ArgumentNullException(nameof(nuGetFeedUrl));
 
-            DisplayName(string.IsNullOrEmpty(ilCompilerVersion) ? "Latest ILCompiler" : $"ILCompiler {ilCompilerVersion}");
+            DisplayName(ilCompilerVersion.IsBlank() ? "Latest ILCompiler" : $"ILCompiler {ilCompilerVersion}");
 
             isIlCompilerConfigured = true;
 

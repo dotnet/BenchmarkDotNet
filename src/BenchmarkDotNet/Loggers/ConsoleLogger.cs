@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Loggers
         public static readonly ILogger Unicode = new ConsoleLogger(true);
         private static readonly Lazy<bool> ConsoleSupportsColors = new(() =>
         {
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR")))
+            if (Environment.GetEnvironmentVariable("NO_COLOR").IsNotBlank())
                 return false;
 
             return !(OsDetector.IsAndroid() || OsDetector.IsIOS() || RuntimeInformation.IsWasm || OsDetector.IsTvOS());

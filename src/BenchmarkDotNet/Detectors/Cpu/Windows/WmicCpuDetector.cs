@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Models;
@@ -28,7 +29,7 @@ internal class WmicCpuDetector : ICpuDetector
         string wmicPath = File.Exists(DefaultWmicPath) ? DefaultWmicPath : "wmic";
         string? wmicOutput = ProcessHelper.RunAndReadOutput(wmicPath, $"cpu get {argList} /Format:List");
 
-        if (string.IsNullOrEmpty(wmicOutput))
+        if (wmicOutput.IsBlank())
             return null;
 
         return WmicCpuInfoParser.Parse(wmicOutput);
