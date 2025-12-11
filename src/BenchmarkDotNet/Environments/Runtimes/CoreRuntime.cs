@@ -46,6 +46,12 @@ namespace BenchmarkDotNet.Environments
             return new CoreRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
         }
 
+        internal static CoreRuntime GetTargetOrCurrentVersion(Assembly? assembly)
+            // Try to determine the Framework version that the assembly was compiled for.
+            => GetTargetFrameworkVersion(assembly)
+                // Fallback to the current running version.
+                ?? GetCurrentVersion();
+
         internal static CoreRuntime GetCurrentVersion()
         {
             if (!RuntimeInformation.IsNetCore)
@@ -242,6 +248,33 @@ namespace BenchmarkDotNet.Environments
                 return fallback;
 
             return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
+        }
+
+        private static CoreRuntime? GetTargetFrameworkVersion(Assembly? assembly)
+        {
+            if (assembly is null)
+            {
+                return null;
+            }
+
+            // Look for a TargetFrameworkAttribute with a supported Framework version.
+            foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
+            {
+                //.NETCoreApp,Version=vX.Y
+                const string FrameworkPrefix = ".NETCoreApp,Version=v";
+                var framework = attribute.FrameworkName;
+                if (framework?.StartsWith(FrameworkPrefix) == true
+                    && Version.TryParse(framework[FrameworkPrefix.Length..], out var version)
+                    // We don't support netcoreapp1.X
+                    && version.Major >= 2)
+                {
+                    return FromVersion(version);
+                }
+            }
+
+            // TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
+            // or the assembly targeted a non-core framework (like netstandard2.0).
+            return null;
         }
     }
 }

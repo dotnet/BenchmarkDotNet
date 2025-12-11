@@ -171,9 +171,18 @@ namespace BenchmarkDotNet.Portability
         }
 
         internal static Runtime GetTargetOrCurrentRuntime(Assembly? assembly)
-            => !IsMono && !IsWasm && IsFullFramework // Match order of checks in GetCurrentRuntime().
-                ? ClrRuntime.GetTargetOrCurrentVersion(assembly)
-                : GetCurrentRuntime();
+        {
+            // Match order of checks in GetCurrentRuntime().
+            if (!IsMono && !IsWasm)
+            {
+                if (IsFullFramework)
+                    return ClrRuntime.GetTargetOrCurrentVersion(assembly);
+                // 99% of the time the core runtime is the same as the target framework, but the runtime could roll forward if it's not self-contained.
+                if (IsNetCore)
+                    return CoreRuntime.GetTargetOrCurrentVersion(assembly);
+            }
+            return GetCurrentRuntime();
+        }
 
         internal static Runtime GetCurrentRuntime()
         {
