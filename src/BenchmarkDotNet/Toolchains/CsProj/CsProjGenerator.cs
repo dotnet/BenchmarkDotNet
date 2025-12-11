@@ -127,9 +127,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!buildResult.IsBuildSuccess)
             {
-                throw buildResult.TryToExplainFailureReason(out string reason)
-                    ? new Exception(reason)
-                    : new Exception(buildResult.ErrorMessage);
+                if (!buildResult.TryToExplainFailureReason(out string reason))
+                {
+                    reason = buildResult.ErrorMessage;
+                }
+                logger.WriteLineWarning($"Failed to build source project to obtain dll references. Moving forward without it. Reason: {reason}");
+                return;
             }
 
             var xmlDoc = new XmlDocument();
