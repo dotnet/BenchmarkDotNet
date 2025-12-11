@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -148,7 +149,7 @@ namespace BenchmarkDotNet.Extensions
         internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, object argument)
             => argument == null ? stringBuilder : AppendArgument(stringBuilder, argument.ToString()!);
 
-        public static bool IsBlank(this string? value) => string.IsNullOrWhiteSpace(value);
-        public static bool IsNotBlank(this string? value) => !value.IsBlank();
+        public static bool IsBlank([NotNullWhen(false)] this string? value) => string.IsNullOrWhiteSpace(value);
+        public static bool IsNotBlank([NotNullWhen(true)] this string? value) => !value.IsBlank();
     }
 }

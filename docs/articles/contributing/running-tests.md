@@ -3,13 +3,13 @@
 To run all tests just run the following command in the repo root:
 
 ```cmd
-dotnet test -c Release BenchmarkDotNet.sln
+dotnet test -c Release BenchmarkDotNet.slnx
 ```
 
-Most of the tests projects target `net461` and `net5.0`. If the change that you want to test is not specific to any particular runtime, you can run the tests for one of them.
+Most of the tests projects target `net462` and `net8.0`. If the change that you want to test is not specific to any particular runtime, you can run the tests for one of them.
 
 ```cmd
-dotnet test -c Release -f net5.0 BenchmarkDotNet.sln
+dotnet test -c Release -f net8.0 BenchmarkDotNet.slnx
 ```
 
 You should be able to run all of tests from your IDE as well.

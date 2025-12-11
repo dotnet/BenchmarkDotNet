@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument("restore")
                 .AppendArgument($"\"{filePath}\"")
                 // restore doesn't support -f argument.
-                .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -158,7 +158,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
                 .MaybeAppendOutputPaths(artifactsPaths, excludeOutput: excludeOutput)
                 .ToString();
@@ -172,14 +172,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
                 .MaybeAppendOutputPaths(artifactsPaths)
                 .ToString();
 
         private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string suffix)
         {
-            if (!buildPartition.GenerateMSBuildBinLog || string.IsNullOrEmpty(suffix))
+            if (!buildPartition.GenerateMSBuildBinLog || suffix.IsBlank())
                 return string.Empty;
 
             return $"-bl:{buildPartition.ProgramName}-{suffix}.binlog";

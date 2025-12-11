@@ -15,6 +15,7 @@ using Perfolizer.Helpers;
 using Perfolizer.Horology;
 using Perfolizer.Models;
 using Perfolizer.Metrology;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -74,7 +75,7 @@ namespace BenchmarkDotNet.Environments
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
-            IsMonoInstalled = new Lazy<bool>(() => !string.IsNullOrEmpty(ProcessHelper.RunAndReadOutput("mono", "--version")));
+            IsMonoInstalled = new Lazy<bool>(() => ProcessHelper.RunAndReadOutput("mono", "--version").IsNotBlank());
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
             Os = new Lazy<OsInfo>(OsDetector.GetOs);
@@ -87,7 +88,7 @@ namespace BenchmarkDotNet.Environments
         {
             string? vmName = VirtualMachineHypervisor.Value?.Name;
 
-            if (!string.IsNullOrEmpty(vmName))
+            if (vmName.IsNotBlank())
                 yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()} ({vmName})";
             else if (RuntimeInformation.IsRunningInContainer)
                 yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()} (container)";
@@ -119,7 +120,7 @@ namespace BenchmarkDotNet.Environments
         }
 
         [PublicAPI]
-        public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
+        public bool IsDotNetCliInstalled() => DotNetSdkVersion.Value.IsNotBlank();
 
         /// <summary>
         /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version

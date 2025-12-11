@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
 
             var exePath = generateResult.ArtifactsPaths.ExecutablePath;
             var monoRuntime = (MonoRuntime)buildPartition.Runtime;
-            var environmentVariables = string.IsNullOrEmpty(monoRuntime.MonoBclPath)
+            var environmentVariables = monoRuntime.MonoBclPath.IsBlank()
                 ? null
                 : new Dictionary<string, string> { { "MONO_PATH", monoRuntime.MonoBclPath } };
 

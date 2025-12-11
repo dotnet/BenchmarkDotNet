@@ -341,7 +341,7 @@ namespace BenchmarkDotNet.Running
             }
 
             // TODO: move to conclusions
-            var columnWithLegends = summary.Table.Columns.Where(c => c.NeedToShow && !string.IsNullOrEmpty(c.OriginalColumn.Legend)).Select(c => c.OriginalColumn).ToArray();
+            var columnWithLegends = summary.Table.Columns.Where(c => c.NeedToShow && c.OriginalColumn.Legend.IsNotBlank()).Select(c => c.OriginalColumn).ToArray();
 
             bool needToShowTimeLegend = summary.Table.Columns.Any(c => c.NeedToShow && c.OriginalColumn.UnitType == UnitType.Time);
             var effectiveTimeUnit = needToShowTimeLegend ? summary.Table.EffectiveSummaryStyle.TimeUnit : null;
@@ -701,7 +701,7 @@ namespace BenchmarkDotNet.Running
             var defaultPath = DefaultConfig.Instance.ArtifactsPath;
 
             var customPath = benchmarkRunInfos
-                .Where(benchmark => !string.IsNullOrEmpty(benchmark.Config.ArtifactsPath) && benchmark.Config.ArtifactsPath != defaultPath)
+                .Where(benchmark => benchmark.Config.ArtifactsPath.IsNotBlank() && benchmark.Config.ArtifactsPath != defaultPath)
                 .Select(benchmark => benchmark.Config.ArtifactsPath)
                 .Distinct()
                 .SingleOrDefault();

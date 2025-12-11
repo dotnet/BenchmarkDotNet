@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Exporters
             // we can't just use type.FullName because we need sth different for generics (it reports SimpleGeneric`1[[System.Int32, mscorlib, Version=4.0.0.0)
             var name = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(type.Namespace))
+            if (type.Namespace.IsNotBlank())
                 name.Append(type.Namespace).Append('.');
 
             name.Append(GetNestedTypes(type));
@@ -191,7 +191,7 @@ namespace BenchmarkDotNet.Exporters
             if (type.IsNullable())
                 return $"{GetTypeArgumentName(Nullable.GetUnderlyingType(type))}?";
 
-            if (!string.IsNullOrEmpty(type.Namespace))
+            if (type.Namespace.IsNotBlank())
                 return $"{type.Namespace}.{GetTypeName(type)}";
 
             return GetTypeName(type);

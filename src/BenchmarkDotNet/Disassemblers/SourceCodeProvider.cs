@@ -1,4 +1,5 @@
-﻿using Microsoft.Diagnostics.Runtime;
+﻿using BenchmarkDotNet.Extensions;
+using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Symbols;
 using System;
 using System.Collections.Generic;
@@ -59,7 +60,7 @@ namespace BenchmarkDotNet.Disassemblers
                 // otherwise it downloads it from the Symbol Server and returns the source code ;)
                 string wholeFileOrJustPath = file.GetSourceFile();
 
-                if (string.IsNullOrEmpty(wholeFileOrJustPath))
+                if (wholeFileOrJustPath.IsBlank())
                     return null;
 
                 if (File.Exists(wholeFileOrJustPath))

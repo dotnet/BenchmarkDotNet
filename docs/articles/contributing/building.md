@@ -6,9 +6,9 @@ There are two recommended options to build BenchmarkDotNet from source:
 
 - [Visual Studio](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise) with .NET 4.6.2 SDK and F# support.
 
-- [.NET 7 SDK](https://dotnet.microsoft.com/download).
+- [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
-Once all the necessary tools are in place, building is trivial. Simply open solution file **BenchmarkDotNet.sln** that lives at the base of the repository and run Build action.
+Once all the necessary tools are in place, building is trivial. Simply open solution file **BenchmarkDotNet.slnx** that lives at the base of the repository and run Build action.
 
 ## Command-line
 

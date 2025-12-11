@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private static void ClearStartupSettingsForCustomClr(XmlNode configurationElement, Runtime? runtime)
         {
-            if (!(runtime is ClrRuntime clrRuntime) || string.IsNullOrEmpty(clrRuntime.Version))
+            if (!(runtime is ClrRuntime clrRuntime) || clrRuntime.Version.IsBlank())
                 return;
 
             foreach (XmlNode configurationChild in configurationElement.ChildNodes)

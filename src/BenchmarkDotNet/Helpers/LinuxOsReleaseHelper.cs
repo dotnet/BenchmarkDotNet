@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Helpers
                 string? version = values.GetValueOrDefault("VERSION");
 
                 string[] idsWithExtendedVersion = { "ubuntu", "linuxmint", "solus", "kali" };
-                if (idsWithExtendedVersion.Contains(id) && !string.IsNullOrEmpty(version) && !string.IsNullOrEmpty(name))
+                if (idsWithExtendedVersion.Contains(id) && version.IsNotBlank() && name.IsNotBlank())
                     return name + " " + version;
 
                 string? prettyName = values.GetValueOrDefault("PRETTY_NAME");
