@@ -54,9 +54,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommand WithArguments(string arguments)
             => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
-        public DotNetCliCommand WithFilePath(string filePath)
-            => new(CliPath, filePath, TargetFrameworkMoniker, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
-
         public DotNetCliCommand WithCliPath(string cliPath)
             => new(cliPath, FilePath, TargetFrameworkMoniker, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 

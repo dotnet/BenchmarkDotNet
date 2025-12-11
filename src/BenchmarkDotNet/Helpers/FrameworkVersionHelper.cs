@@ -153,7 +153,7 @@ namespace BenchmarkDotNet.Helpers
                 return $"netstandard{version.Major}.{version.Minor}";
             }
 
-            // TargetFrameworkAttribute not found, or the assembly targeted a framework we don't support,
+            // TargetFrameworkAttribute not found, or the assembly targeted a framework we don't support.
             return null;
 
             bool TryParseVersion(string prefix, [NotNullWhen(true)] out Version? version)
