@@ -269,7 +269,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86BaseSupported) yield return "base";
                     if (HardwareIntrinsics.IsX86Sse42Supported)
                     {
-                        if (runtimeMoniker <= RuntimeMoniker.NativeAot11_0) yield return "sse4.2";
+                        if (runtimeMoniker <= RuntimeMoniker.NativeAot10_0) yield return "sse4.2";
                         if (runtimeMoniker <= RuntimeMoniker.NativeAot90) yield return "popcnt";
                     }
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
