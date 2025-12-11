@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public MonoTests(ITestOutputHelper output) : base(output) { }
 
-        [FactEnvSpecific("UseMonoRuntime option is available in .NET Core only starting from .NET 6", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("UseMonoRuntime option is available in .NET Core only starting from .NET 6, and it's not supported on Windows+Arm", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm])]
         public void Mono80IsSupported()
         {
             var logger = new OutputLogger(Output);
