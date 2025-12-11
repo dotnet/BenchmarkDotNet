@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
+using BenchmarkDotNet.Environments;
 using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
@@ -137,8 +138,9 @@ namespace BenchmarkDotNet.Helpers
             {
                 return version.Major < 5
                     ? $"netcoreapp{version.Major}.{version.Minor}"
-                    // TODO: Support os-specific tfms (e.g. net10.0-windows)
-                    : $"net{version.Major}.{version.Minor}";
+                    : CoreRuntime.TryGetTargetPlatform(assembly, out var platform)
+                        ? $"net{version.Major}.{version.Minor}-{platform}"
+                        : $"net{version.Major}.{version.Minor}";
             }
             if (TryParseVersion(FrameworkPrefix, out version))
             {

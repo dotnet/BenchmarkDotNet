@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -50,7 +51,7 @@ namespace BenchmarkDotNet.Environments
         internal static CoreRuntime GetTargetOrCurrentVersion(Assembly? assembly)
             // Try to determine the version that the assembly was compiled for.
             => FrameworkVersionHelper.GetTargetCoreVersion(assembly) is { } version
-                ? FromVersion(version)
+                ? FromVersion(version, assembly)
                 // Fallback to the current running version.
                 : GetCurrentVersion();
 
@@ -66,10 +67,10 @@ namespace BenchmarkDotNet.Environments
                 throw new NotSupportedException("Unable to recognize .NET Core version, please report a bug at https://github.com/dotnet/BenchmarkDotNet");
             }
 
-            return FromVersion(version);
+            return FromVersion(version, null);
         }
 
-        internal static CoreRuntime FromVersion(Version version)
+        internal static CoreRuntime FromVersion(Version version, Assembly? assembly)
         {
             switch (version)
             {
@@ -78,12 +79,12 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 2 && v.Minor == 2: return Core22;
                 case Version v when v.Major == 3 && v.Minor == 0: return Core30;
                 case Version v when v.Major == 3 && v.Minor == 1: return Core31;
-                case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50);
-                case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
-                case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
-                case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80);
-                case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90);
-                case Version v when v.Major == 10 && v.Minor == 0: return GetPlatformSpecific(Core10_0);
+                case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50, assembly);
+                case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60, assembly);
+                case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70, assembly);
+                case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80, assembly);
+                case Version v when v.Major == 9 && v.Minor == 0: return GetPlatformSpecific(Core90, assembly);
+                case Version v when v.Major == 10 && v.Minor == 0: return GetPlatformSpecific(Core10_0, assembly);
                 default:
                     return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
             }
@@ -227,29 +228,36 @@ namespace BenchmarkDotNet.Environments
         // Version.TryParse does not handle thing like 3.0.0-WORD
         internal static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
 
-        private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback)
+        private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback, Assembly? assembly)
+            => TryGetTargetPlatform(assembly ?? Assembly.GetEntryAssembly(), out var platform)
+                ? new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platform}", fallback.Name)
+                : fallback;
+
+        internal static bool TryGetTargetPlatform(Assembly? assembly, [NotNullWhen(true)] out string? platform)
         {
-            // TargetPlatformAttribute is not part of .NET Standard 2.0 so as usuall we have to use some reflection hacks...
+            platform = null;
+
+            if (assembly is null)
+                return false;
+
+            // TargetPlatformAttribute is not part of .NET Standard 2.0 so as usual we have to use some reflection hacks.
             var targetPlatformAttributeType = typeof(object).Assembly.GetType("System.Runtime.Versioning.TargetPlatformAttribute", throwOnError: false);
             if (targetPlatformAttributeType is null) // an old preview version of .NET 5
-                return fallback;
+                return false;
 
-            var exe = Assembly.GetEntryAssembly();
-            if (exe is null)
-                return fallback;
-
-            var attributeInstance = exe.GetCustomAttribute(targetPlatformAttributeType);
+            var attributeInstance = assembly.GetCustomAttribute(targetPlatformAttributeType);
             if (attributeInstance is null)
-                return fallback;
+                return false;
 
             var platformNameProperty = targetPlatformAttributeType.GetProperty("PlatformName");
             if (platformNameProperty is null)
-                return fallback;
+                return false;
 
-            if (!(platformNameProperty.GetValue(attributeInstance) is string platformName))
-                return fallback;
+            if (platformNameProperty.GetValue(attributeInstance) is not string platformName)
+                return false;
 
-            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
+            platform = platformName;
+            return true;
         }
     }
 }
