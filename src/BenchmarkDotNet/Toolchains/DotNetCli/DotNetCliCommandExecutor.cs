@@ -159,11 +159,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             DotNetCliCommand cliCommand = new(
                 cliPath: cliPath,
+                filePath: string.Empty,
+                tfm: string.Empty,
                 arguments: "--info",
                 generateResult: null,
                 logger: NullLogger.Instance,
                 buildPartition: null,
-                environmentVariables: Array.Empty<EnvironmentVariable>(),
+                environmentVariables: [],
                 timeout: TimeSpan.FromMinutes(1),
                 logOutput: false);
 

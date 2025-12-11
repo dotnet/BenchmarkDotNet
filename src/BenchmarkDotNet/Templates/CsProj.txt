@@ -4,7 +4,7 @@
     <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
     <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
     <AssemblyTitle>$PROGRAMNAME$</AssemblyTitle>
-    <TargetFramework>$TFM$</TargetFramework>
+    <TargetFrameworks>$TFM$</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>$PLATFORM$</PlatformTarget>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>

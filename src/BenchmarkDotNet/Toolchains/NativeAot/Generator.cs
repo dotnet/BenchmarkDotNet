@@ -71,11 +71,14 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
+            string projectFilePath = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, NullLogger.Instance).FullName;
             string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, extraArguments)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker, extraArguments)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -112,17 +115,21 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-            File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger));
+            var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName;
+
+            File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger));
+
+            GatherReferences(projectFile, buildPartition, artifactsPaths, logger);
             GenerateReflectionFile(artifactsPaths);
         }
 
-        private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
+        private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
     <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
     <OutputType>Exe</OutputType>
-    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
+    <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
     <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
     <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
     <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
@@ -152,7 +159,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     {GetILCompilerPackageReference()}
-    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
+    <ProjectReference Include=""{projectFilePath}"" />
   </ItemGroup>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}

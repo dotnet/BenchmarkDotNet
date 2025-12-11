@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>$TFM$</TargetFramework>
+    <TargetFrameworks>$TFM$</TargetFrameworks>
     <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
     <RuntimeIdentifier>$RUNTIMEIDENTIFIER$</RuntimeIdentifier>
     <EnableTargetingPackDownload>false</EnableTargetingPackDownload>
