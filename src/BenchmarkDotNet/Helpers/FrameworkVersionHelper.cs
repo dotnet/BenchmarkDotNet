@@ -23,30 +23,20 @@ namespace BenchmarkDotNet.Helpers
         ];
 
         internal static string? GetTargetFrameworkVersion(Assembly? assembly)
-        {
-            if (assembly is null)
-            {
-                return null;
-            }
-
             // Look for a TargetFrameworkAttribute with a supported Framework version.
-            foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
+            => assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName switch
             {
-                switch (attribute.FrameworkName)
-                {
-                    case ".NETFramework,Version=v4.6.1": return "4.6.1";
-                    case ".NETFramework,Version=v4.6.2": return "4.6.2";
-                    case ".NETFramework,Version=v4.7": return "4.7";
-                    case ".NETFramework,Version=v4.7.1": return "4.7.1";
-                    case ".NETFramework,Version=v4.7.2": return "4.7.2";
-                    case ".NETFramework,Version=v4.8": return "4.8";
-                    case ".NETFramework,Version=v4.8.1": return "4.8.1";
-                }
-            }
-
-            // TargetFrameworkAttribute not found, or the assembly targeted a version older than we support.
-            return null;
-        }
+                ".NETFramework,Version=v4.6.1" => "4.6.1",
+                ".NETFramework,Version=v4.6.2" => "4.6.2",
+                ".NETFramework,Version=v4.7" => "4.7",
+                ".NETFramework,Version=v4.7.1" => "4.7.1",
+                ".NETFramework,Version=v4.7.2" => "4.7.2",
+                ".NETFramework,Version=v4.8" => "4.8",
+                ".NETFramework,Version=v4.8.1" => "4.8.1",
+                // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
+                // or the assembly targeted a non-framework tfm (like netstandard2.0).
+                _ => null,
+            };
 
         internal static string GetFrameworkDescription()
         {

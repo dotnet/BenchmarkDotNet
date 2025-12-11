@@ -252,28 +252,20 @@ namespace BenchmarkDotNet.Environments
 
         private static CoreRuntime? GetTargetFrameworkVersion(Assembly? assembly)
         {
-            if (assembly is null)
-            {
-                return null;
-            }
-
+            //.NETCoreApp,Version=vX.Y
+            const string FrameworkPrefix = ".NETCoreApp,Version=v";
             // Look for a TargetFrameworkAttribute with a supported Framework version.
-            foreach (var attribute in assembly.GetCustomAttributes<TargetFrameworkAttribute>())
+            string? framework = assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            if (framework?.StartsWith(FrameworkPrefix) == true
+                && Version.TryParse(framework[FrameworkPrefix.Length..], out var version)
+                // We don't support netcoreapp1.X
+                && version.Major >= 2)
             {
-                //.NETCoreApp,Version=vX.Y
-                const string FrameworkPrefix = ".NETCoreApp,Version=v";
-                var framework = attribute.FrameworkName;
-                if (framework?.StartsWith(FrameworkPrefix) == true
-                    && Version.TryParse(framework[FrameworkPrefix.Length..], out var version)
-                    // We don't support netcoreapp1.X
-                    && version.Major >= 2)
-                {
-                    return FromVersion(version);
-                }
+                return FromVersion(version);
             }
 
-            // TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
-            // or the assembly targeted a non-core framework (like netstandard2.0).
+            // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
+            // or the assembly targeted a non-core tfm (like netstandard2.0).
             return null;
         }
     }
