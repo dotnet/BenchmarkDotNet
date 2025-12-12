@@ -1,0 +1,35 @@
+{
+  "profiles": {
+    "Default": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": ".",
+      "environmentVariables": {
+      }
+    },
+    "Run IntroBasic Benchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *IntroBasic*",
+      // "commandLineArgs": "--filter *IntroBasic* --inProcess --strategy Monitoring", // Use this setting for in-process debug
+      "workingDirectory": ".",
+      "environmentVariables": {
+      }
+    },
+    "--list": {
+      "commandName": "Project",
+      "commandLineArgs": "--list"
+    },
+    "--info": {
+      "commandName": "Project",
+      "commandLineArgs": "--info"
+    },
+    "--help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "--version": {
+      "commandName": "Project",
+      "commandLineArgs": "--version"
+    }
+  }
+}
