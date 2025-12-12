@@ -77,6 +77,7 @@ namespace BenchmarkDotNet.Toolchains
                                 RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
                                 RuntimeMoniker.Mono90 => GetToolchain(RuntimeMoniker.Net90),
                                 RuntimeMoniker.Mono10_0 => GetToolchain(RuntimeMoniker.Net10_0),
+                                RuntimeMoniker.Mono11_0 => GetToolchain(RuntimeMoniker.Net11_0),
                                 _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
                             };
                         }
@@ -166,6 +167,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net10_0:
                     return CsProjCoreToolchain.NetCoreApp10_0;
 
+                case RuntimeMoniker.Net11_0:
+                    return CsProjCoreToolchain.NetCoreApp11_0;
+
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
 
@@ -181,6 +185,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.NativeAot10_0:
                     return NativeAotToolchain.Net10_0;
 
+                case RuntimeMoniker.NativeAot11_0:
+                    return NativeAotToolchain.Net11_0;
+
                 case RuntimeMoniker.Mono60:
                     return MonoToolchain.Mono60;
 
@@ -195,6 +202,9 @@ namespace BenchmarkDotNet.Toolchains
 
                 case RuntimeMoniker.Mono10_0:
                     return MonoToolchain.Mono10_0;
+
+                case RuntimeMoniker.Mono11_0:
+                    return MonoToolchain.Mono11_0;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");

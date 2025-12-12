@@ -26,6 +26,10 @@ namespace BenchmarkDotNet.Environments
         /// NativeAOT compiled as net10.0
         /// </summary>
         public static readonly NativeAotRuntime Net10_0 = new NativeAotRuntime(RuntimeMoniker.NativeAot10_0, "net10.0", "NativeAOT 10.0");
+        /// <summary>
+        /// NativeAOT compiled as net11.0
+        /// </summary>
+        public static readonly NativeAotRuntime Net11_0 = new NativeAotRuntime(RuntimeMoniker.NativeAot11_0, "net11.0", "NativeAOT 11.0");
 
         public override bool IsAOT => true;
 
@@ -53,6 +57,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 8 && v.Minor == 0: return Net80;
                 case Version v when v.Major == 9 && v.Minor == 0: return Net90;
                 case Version v when v.Major == 10 && v.Minor == 0: return Net10_0;
+                case Version v when v.Major == 11 && v.Minor == 0: return Net11_0;
                 default:
                     return new NativeAotRuntime(RuntimeMoniker.NotRecognized, $"net{version.Major}.{version.Minor}", $"NativeAOT {version.Major}.{version.Minor}");
             }

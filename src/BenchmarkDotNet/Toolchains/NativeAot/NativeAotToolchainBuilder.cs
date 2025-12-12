@@ -54,8 +54,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             if (!ilcPackages.Exists) throw new DirectoryNotFoundException($"{ilcPackages} provided as {nameof(ilcPackages)} does NOT exist");
 
             Feeds["local"] = ilcPackages.FullName;
-            ilCompilerVersion = "10.0.0-dev";
-            Feeds["dotnet10"] = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json";
+            ilCompilerVersion = "11.0.0-dev";
+            Feeds["dotnet11"] = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json";
             useTempFolderForRestore = true;
             DisplayName("local ILCompiler build");
 

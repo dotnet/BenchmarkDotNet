@@ -85,6 +85,7 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
             case RuntimeMoniker.Net80:
             case RuntimeMoniker.Net90:
             case RuntimeMoniker.Net10_0:
+            case RuntimeMoniker.Net11_0:
                 return true;
             case RuntimeMoniker.NotRecognized:
             case RuntimeMoniker.Mono:
@@ -93,6 +94,7 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
             case RuntimeMoniker.NativeAot80:
             case RuntimeMoniker.NativeAot90:
             case RuntimeMoniker.NativeAot10_0:
+            case RuntimeMoniker.NativeAot11_0:
             case RuntimeMoniker.Wasm:
             case RuntimeMoniker.WasmNet50:
             case RuntimeMoniker.WasmNet60:
@@ -100,17 +102,20 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
             case RuntimeMoniker.WasmNet80:
             case RuntimeMoniker.WasmNet90:
             case RuntimeMoniker.WasmNet10_0:
+            case RuntimeMoniker.WasmNet11_0:
             case RuntimeMoniker.MonoAOTLLVM:
             case RuntimeMoniker.MonoAOTLLVMNet60:
             case RuntimeMoniker.MonoAOTLLVMNet70:
             case RuntimeMoniker.MonoAOTLLVMNet80:
             case RuntimeMoniker.MonoAOTLLVMNet90:
             case RuntimeMoniker.MonoAOTLLVMNet10_0:
+            case RuntimeMoniker.MonoAOTLLVMNet11_0:
             case RuntimeMoniker.Mono60:
             case RuntimeMoniker.Mono70:
             case RuntimeMoniker.Mono80:
             case RuntimeMoniker.Mono90:
             case RuntimeMoniker.Mono10_0:
+            case RuntimeMoniker.Mono11_0:
                 return false;
             case RuntimeMoniker.NetCoreApp20:
             case RuntimeMoniker.NetCoreApp21:

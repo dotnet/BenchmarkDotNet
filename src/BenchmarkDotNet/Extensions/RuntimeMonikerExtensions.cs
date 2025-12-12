@@ -46,6 +46,8 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core90;
                 case RuntimeMoniker.Net10_0:
                     return CoreRuntime.Core10_0;
+                case RuntimeMoniker.Net11_0:
+                    return CoreRuntime.Core11_0;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
                 case RuntimeMoniker.NativeAot60:
@@ -58,6 +60,8 @@ namespace BenchmarkDotNet.Extensions
                     return NativeAotRuntime.Net90;
                 case RuntimeMoniker.NativeAot10_0:
                     return NativeAotRuntime.Net10_0;
+                case RuntimeMoniker.NativeAot11_0:
+                    return NativeAotRuntime.Net11_0;
                 case RuntimeMoniker.Mono60:
                     return MonoRuntime.Mono60;
                 case RuntimeMoniker.Mono70:
@@ -68,6 +72,8 @@ namespace BenchmarkDotNet.Extensions
                     return MonoRuntime.Mono90;
                 case RuntimeMoniker.Mono10_0:
                     return MonoRuntime.Mono10_0;
+                case RuntimeMoniker.Mono11_0:
+                    return MonoRuntime.Mono11_0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }
@@ -93,16 +99,19 @@ namespace BenchmarkDotNet.Extensions
             RuntimeMoniker.Net80 => new Version(8, 0),
             RuntimeMoniker.Net90 => new Version(9, 0),
             RuntimeMoniker.Net10_0 => new Version(10, 0),
+            RuntimeMoniker.Net11_0 => new Version(11, 0),
             RuntimeMoniker.NativeAot60 => new Version(6, 0),
             RuntimeMoniker.NativeAot70 => new Version(7, 0),
             RuntimeMoniker.NativeAot80 => new Version(8, 0),
             RuntimeMoniker.NativeAot90 => new Version(9, 0),
             RuntimeMoniker.NativeAot10_0 => new Version(10, 0),
+            RuntimeMoniker.NativeAot11_0 => new Version(11, 0),
             RuntimeMoniker.Mono60 => new Version(6, 0),
             RuntimeMoniker.Mono70 => new Version(7, 0),
             RuntimeMoniker.Mono80 => new Version(8, 0),
             RuntimeMoniker.Mono90 => new Version(9, 0),
             RuntimeMoniker.Mono10_0 => new Version(10, 0),
+            RuntimeMoniker.Mono11_0 => new Version(11, 0),
             RuntimeMoniker.Wasm => Portability.RuntimeInformation.IsNetCore && CoreRuntime.TryGetVersion(out var version) ? version : new Version(5, 0),
             RuntimeMoniker.WasmNet50 => new Version(5, 0),
             RuntimeMoniker.WasmNet60 => new Version(6, 0),
@@ -110,12 +119,14 @@ namespace BenchmarkDotNet.Extensions
             RuntimeMoniker.WasmNet80 => new Version(8, 0),
             RuntimeMoniker.WasmNet90 => new Version(9, 0),
             RuntimeMoniker.WasmNet10_0 => new Version(10, 0),
+            RuntimeMoniker.WasmNet11_0 => new Version(11, 0),
             RuntimeMoniker.MonoAOTLLVM => Portability.RuntimeInformation.IsNetCore && CoreRuntime.TryGetVersion(out var version) ? version : new Version(6, 0),
             RuntimeMoniker.MonoAOTLLVMNet60 => new Version(6, 0),
             RuntimeMoniker.MonoAOTLLVMNet70 => new Version(7, 0),
             RuntimeMoniker.MonoAOTLLVMNet80 => new Version(8, 0),
             RuntimeMoniker.MonoAOTLLVMNet90 => new Version(9, 0),
             RuntimeMoniker.MonoAOTLLVMNet10_0 => new Version(10, 0),
+            RuntimeMoniker.MonoAOTLLVMNet11_0 => new Version(11, 0),
             _ => throw new NotImplementedException($"{nameof(GetRuntimeVersion)} not implemented for {runtimeMoniker}")
         };
     }

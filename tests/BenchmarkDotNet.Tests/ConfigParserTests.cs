@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Tests
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net10.0", generator.TargetFrameworkMoniker);
+            Assert.Equal("net11.0", generator.TargetFrameworkMoniker);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -417,6 +417,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net9.0")]
         [InlineData("net10_0")]
         [InlineData("net10.0")]
+        [InlineData("net11_0")]
+        [InlineData("net11.0")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
