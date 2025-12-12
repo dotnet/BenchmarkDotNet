@@ -29,6 +29,14 @@ jobs:
       - name: Run task 'in-tests-core'
         shell: cmd
         run: ./build.cmd in-tests-core -e
+      # Report test results with unique name
+      - name: Report tests results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: test-windows-core-${{ matrix.os }}
+          path: "**/*.trx"
+          reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -60,6 +68,14 @@ jobs:
       - name: Run task 'in-tests-full'
         shell: cmd
         run: ./build.cmd in-tests-full -e
+      # Report test results with unique name
+      - name: Report tests results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: test-windows-full-${{ matrix.os }}
+          path: "**/*.trx"
+          reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -100,6 +116,14 @@ jobs:
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
         run: ./build.cmd in-tests-core -e
+      # Report test results with unique name
+      - name: Report tests results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: test-linux-${{ matrix.os }}
+          path: "**/*.trx"
+          reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -139,6 +163,14 @@ jobs:
         run: ./build.cmd unit-tests -e
       - name: Run task 'in-tests-core'
         run: ./build.cmd in-tests-core -e
+      # Report test results with unique name
+      - name: Report tests results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: test-macos(${{ matrix.os.arch }})
+          path: "**/*.trx"
+          reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
         uses: actions/upload-artifact@v4
