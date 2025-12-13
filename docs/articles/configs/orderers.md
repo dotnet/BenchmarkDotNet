@@ -12,7 +12,7 @@ The following built-in order policies are available.
 - <xref:BenchmarkDotNet.Order.MethodOrderPolicy>
 - <xref:BenchmarkDotNet.Order.JobOrderPolicy>
 
-It can also use custom orderer by implemented <xref:BenchmarkDotNet.Order.IOrderer> interface.
+You can also use a custom orderer by implementing the <xref:BenchmarkDotNet.Order.IOrderer> interface.
 
 ---
 
