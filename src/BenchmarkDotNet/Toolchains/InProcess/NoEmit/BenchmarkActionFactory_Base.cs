@@ -20,9 +20,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
     // DONTTOUCH: Be VERY CAREFUL when changing the code.
     // Please, ensure that the implementation is in sync with content of BenchmarkProgram.txt
-
-    /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
-    public static partial class BenchmarkActionFactory
+    internal static partial class BenchmarkActionFactory
     {
         /// <summary>Base class that provides reusable API for final implementations.</summary>
         internal abstract class BenchmarkActionBase : BenchmarkAction
@@ -35,19 +33,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate), targetInstance);
             }
 
-            protected static TDelegate CreateWorkloadOrOverhead<TDelegate>(
-                object? targetInstance,
-                MethodInfo? workloadMethod,
-                TDelegate overheadStaticCallback,
-                TDelegate overheadInstanceCallback) where TDelegate : notnull
+            protected Action CreateWorkloadOrOverhead(object? instance, MethodInfo? method)
             {
-                if (workloadMethod == null)
-                    return targetInstance == null ? overheadStaticCallback : overheadInstanceCallback;
-
-                if (workloadMethod.IsStatic)
-                    return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate));
-
-                return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate), targetInstance);
+                if (method == null)
+                {
+                    return instance == null ? OverheadStatic : OverheadInstance;
+                }
+                return method.IsStatic
+                    ? (Action) method.CreateDelegate(typeof(Action))
+                    : (Action) method.CreateDelegate(typeof(Action), instance);
             }
 
             protected static TDelegate Unroll<TDelegate>(TDelegate callback, int unrollFactor)
@@ -61,6 +55,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 return (TDelegate)(object)Delegate.Combine(
                     Enumerable.Repeat((Delegate)(object)callback, unrollFactor).ToArray());
             }
+
+            // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
+            private static void OverheadStatic() { }
+
+            private void OverheadInstance() { }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -9,26 +10,46 @@ using BenchmarkDotNet.Running;
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
-    public static partial class BenchmarkActionFactory
+    internal static partial class BenchmarkActionFactory
     {
         /// <summary>
         /// Dispatch method that creates <see cref="BenchmarkAction"/> using
         /// <paramref name="targetMethod"/> or <paramref name="fallbackIdleSignature"/> to find correct implementation.
         /// Either <paramref name="targetMethod"/> or <paramref name="fallbackIdleSignature"/> should be not <c>null</c>.
         /// </summary>
-        private static BenchmarkAction CreateCore(
-            object instance,
-            MethodInfo? targetMethod,
-            MethodInfo? fallbackIdleSignature,
-            int unrollFactor)
+        private static BenchmarkAction CreateCore(object instance, MethodInfo? targetMethod, MethodInfo? fallbackIdleSignature, int unrollFactor)
         {
             PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out var resultInstance, out var resultType);
 
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, unrollFactor);
 
+            if (resultType == typeof(void*))
+                return new BenchmarkActionVoidPointer(resultInstance, targetMethod, unrollFactor);
+
+            if (resultType.IsByRef)
+            {
+                var returnParameter = targetMethod?.ReturnParameter ?? fallbackIdleSignature.ReturnParameter;
+                // IsReadOnlyAttribute is not part of netstandard2.0, so we need to check the attribute name as usual.
+                if (returnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
+                    return Create(
+                        typeof(BenchmarkActionByRefReadonly<>).MakeGenericType(resultType.GetElementType()),
+                        resultInstance,
+                        targetMethod,
+                        unrollFactor);
+
+                return Create(
+                    typeof(BenchmarkActionByRef<>).MakeGenericType(resultType.GetElementType()),
+                    resultInstance,
+                    targetMethod,
+                    unrollFactor);
+            }
+
             if (resultType == typeof(Task))
                 return new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
+
+            if (resultType == typeof(ValueTask))
+                return new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
 
             if (resultType.GetTypeInfo().IsGenericType)
             {
@@ -48,10 +69,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                         targetMethod,
                         unrollFactor);
             }
-
-            if (targetMethod == null && resultType.GetTypeInfo().IsValueType)
-                // for Idle: we return int because creating bigger ValueType could take longer than benchmarked method itself.
-                resultType = typeof(int);
 
             return Create(
                 typeof(BenchmarkAction<>).MakeGenericType(resultType),
@@ -86,6 +103,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 if (isUsingAsyncKeyword)
                     throw new NotSupportedException("Async void is not supported by design.");
             }
+            else if (resultType.IsPointer && resultType != typeof(void*))
+            {
+                throw new NotSupportedException("InProcessNoEmitToolchain only supports void* return, not T*");
+            }
         }
 
         /// <summary>Helper to enforce .ctor signature.</summary>
@@ -109,7 +130,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         /// <param name="unrollFactor">Unroll factor.</param>
         /// <returns>Idle benchmark action.</returns>
         public static BenchmarkAction CreateOverhead(Descriptor descriptor, object instance, int unrollFactor) =>
-            CreateCore(instance, null, descriptor.WorkloadMethod, unrollFactor);
+            CreateCore(instance, null, FallbackSignature, unrollFactor);
 
         /// <summary>Creates global setup benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
