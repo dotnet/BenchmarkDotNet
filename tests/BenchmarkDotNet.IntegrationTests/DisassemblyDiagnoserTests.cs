@@ -173,7 +173,14 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddJob(Job.Dry.WithJit(jit)
                     .WithPlatform(platform)
                     .WithToolchain(toolchain)
-                    .WithStrategy(runStrategy))
+                    .WithStrategy(runStrategy)
+                    // Ensure the build goes through the full process and doesn't build without dependencies like most of the integration tests do.
+#if RELEASE
+                    .WithCustomBuildConfiguration("Release")
+#else
+                    .WithCustomBuildConfiguration("Debug")
+#endif
+                )
                 .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(disassemblyDiagnoser)

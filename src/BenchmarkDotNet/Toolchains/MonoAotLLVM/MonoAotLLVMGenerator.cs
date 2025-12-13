@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
-            GatherReferences(projectFile.FullName, buildPartition, artifactsPaths, logger);
+            GatherReferences(buildPartition, artifactsPaths, logger);
         }
 
         protected override string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)

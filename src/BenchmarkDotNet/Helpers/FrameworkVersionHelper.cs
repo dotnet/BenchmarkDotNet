@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
-using BenchmarkDotNet.Environments;
 using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
@@ -124,44 +122,5 @@ namespace BenchmarkDotNet.Helpers
             Environment.Is64BitOperatingSystem
                 ? Environment.SpecialFolder.ProgramFilesX86
                 : Environment.SpecialFolder.ProgramFiles);
-
-        internal static string? GetTfm(Assembly assembly)
-        {
-            // We don't support exotic frameworks like Silverlight, WindowsPhone, Xamarin.Mac, etc.
-            const string CorePrefix = ".NETCoreApp,Version=v";
-            const string FrameworkPrefix = ".NETFramework,Version=v";
-            const string StandardPrefix = ".NETStandard,Version=v";
-
-            // Look for a TargetFrameworkAttribute with a supported Framework version.
-            string? framework = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
-            if (TryParseVersion(CorePrefix, out var version))
-            {
-                return version.Major < 5
-                    ? $"netcoreapp{version.Major}.{version.Minor}"
-                    : CoreRuntime.TryGetTargetPlatform(assembly, out var platform)
-                        ? $"net{version.Major}.{version.Minor}-{platform}"
-                        : $"net{version.Major}.{version.Minor}";
-            }
-            if (TryParseVersion(FrameworkPrefix, out version))
-            {
-                return version.Build > 0
-                    ? $"net{version.Major}{version.Minor}{version.Build}"
-                    : $"net{version.Major}{version.Minor}";
-            }
-            if (!TryParseVersion(StandardPrefix, out version))
-            {
-                return $"netstandard{version.Major}.{version.Minor}";
-            }
-
-            // TargetFrameworkAttribute not found, or the assembly targeted a framework we don't support.
-            return null;
-
-            bool TryParseVersion(string prefix, [NotNullWhen(true)] out Version? version)
-            {
-                version = null;
-                return framework?.StartsWith(prefix) == true
-                    && Version.TryParse(framework[prefix.Length..], out version);
-            }
-        }
     }
 }
