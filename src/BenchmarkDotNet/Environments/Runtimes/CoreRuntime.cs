@@ -232,7 +232,7 @@ namespace BenchmarkDotNet.Environments
                 ? new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platform}", fallback.Name)
                 : fallback;
 
-        internal static bool TryGetTargetPlatform(Assembly? assembly, [NotNullWhen(true)] out string? platform)
+        private static bool TryGetTargetPlatform(Assembly? assembly, [NotNullWhen(true)] out string? platform)
         {
             platform = null;
 
@@ -252,11 +252,8 @@ namespace BenchmarkDotNet.Environments
             if (platformNameProperty is null)
                 return false;
 
-            if (platformNameProperty.GetValue(attributeInstance) is not string platformName)
-                return false;
-
-            platform = platformName;
-            return true;
+            platform = platformNameProperty.GetValue(attributeInstance) as string;
+            return platform.IsNotBlank();
         }
     }
 }
