@@ -143,10 +143,10 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             foreach (var report in summary.Reports)
             {
                 var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().Sample;
-                var overheadMeasurements = new Sample(report.AllMeasurements
+                var overheadMeasurements = report.AllMeasurements
                     .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
-                    .GetStatistics().OriginalValues
-                    .Select(x => x - overheadSubtraction).ToArray());
+                    .Select(x => new Reports.Measurement(x.LaunchIndex, x.IterationMode, x.IterationStage, x.IterationIndex, x.Operations, x.Nanoseconds - overheadSubtraction))
+                    .GetStatistics().Sample;
 
                 var comparisonResult = new SimpleEquivalenceTest(MannWhitneyTest.Instance).Perform(workloadMeasurements, overheadMeasurements, threshold, SignificanceLevel.P1E5);
                 Assert.True(comparisonResult == ComparisonResult.Greater, "Workload measurements are not greater than overhead.");
