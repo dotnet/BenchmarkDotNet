@@ -119,7 +119,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger));
 
-            GatherReferences(projectFile, buildPartition, artifactsPaths, logger);
+            GatherReferences(buildPartition, artifactsPaths, logger);
             GenerateReflectionFile(artifactsPaths);
         }
 

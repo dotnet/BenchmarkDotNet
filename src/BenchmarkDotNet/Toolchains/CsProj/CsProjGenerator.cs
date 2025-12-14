@@ -14,6 +14,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
@@ -71,9 +72,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker)}")
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -82,6 +83,19 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [SuppressMessage("ReSharper", "StringLiteralTypo")] // R# complains about $variables$
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
+            File.WriteAllText(artifactsPaths.ProjectFilePath,
+                GenerateBuildProject(buildPartition, artifactsPaths, logger)
+            );
+
+            // Integration tests are built without dependencies, so we skip gathering dlls.
+            if (!buildPartition.ForcedNoDependenciesForIntegrationTests)
+            {
+                GatherReferences(buildPartition, artifactsPaths, logger);
+            }
+        }
+
+        private string GenerateBuildProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        {
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
@@ -89,7 +103,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-            var content = new StringBuilder(ResourceHelper.LoadTemplate("CsProj.txt"))
+            return new StringBuilder(ResourceHelper.LoadTemplate("CsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)
@@ -99,43 +113,62 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .Replace("$COPIEDSETTINGS$", customProperties)
                 .Replace("$SDKNAME$", sdkName)
                 .ToString();
-
-            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
-
-            // Integration tests are built without dependencies, so we skip gathering dlls.
-            if (!buildPartition.ForcedNoDependenciesForIntegrationTests)
-            {
-                GatherReferences(projectFile.FullName, buildPartition, artifactsPaths, logger);
-            }
         }
 
-        protected void GatherReferences(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
-        {
-            // Build the original project then reference all of the built dlls.
-            BuildResult buildResult = BuildProject(TargetFrameworkMoniker);
+        private static string GetDllGathererPath(string filePath)
+            => Path.Combine(Path.GetDirectoryName(filePath), $"DllGatherer{Path.GetExtension(filePath)}");
 
-            // The build could fail because the project doesn't have a tfm that matches the runtime, e.g. netstandard2.0 vs net10.0,
-            // So we try to get the actual tfm of the assembly and build again.
-            if (!buildResult.IsBuildSuccess
-                && FrameworkVersionHelper.GetTfm(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly) is { } actualTfm
-                && actualTfm != TargetFrameworkMoniker)
-            {
-                buildResult = BuildProject(actualTfm);
-            }
+        protected void GatherReferences(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        {
+            // Create a project using the default template to build the original project for all necessary runtime dlls.
+            // We can't just build the original project directly because it could be a library project, so we need an exe project to reference it.
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(GenerateBuildProject(buildPartition, artifactsPaths, logger));
+            var projectElement = xmlDoc.DocumentElement;
+
+            // Replace the default C# file with an empty Main method to satisfy the exe build.
+            var compileNode = projectElement.SelectSingleNode("ItemGroup/Compile");
+            string emptyMainFile = GetDllGathererPath(artifactsPaths.ProgramCodePath);
+            compileNode.Attributes["Include"].Value = emptyMainFile;
+            string gathererProject = GetDllGathererPath(artifactsPaths.ProjectFilePath);
+            xmlDoc.Save(gathererProject);
+
+            File.WriteAllText(emptyMainFile, """
+                namespace BenchmarkDotNet.Autogenerated
+                {
+                    public class UniqueProgramName
+                    {
+                        public static int Main(string[] args)
+                        {
+                            return 0;
+                        }
+                    }
+                }
+                """);
+
+            // Build the original project then reference all of the built dlls.
+            BuildResult buildResult = new DotNetCliCommand(
+                CliPath,
+                gathererProject,
+                TargetFrameworkMoniker,
+                null,
+                GenerateResult.Success(artifactsPaths, []),
+                logger,
+                buildPartition,
+                [],
+                buildPartition.Timeout
+            ).RestoreThenBuild();
 
             if (!buildResult.IsBuildSuccess)
             {
-                if (!buildResult.TryToExplainFailureReason(out string reason))
-                {
-                    reason = buildResult.ErrorMessage;
-                }
-                logger.WriteLineWarning($"Failed to build source project to obtain dll references. Moving forward without it. Reason: {reason}");
-                return;
+                throw buildResult.TryToExplainFailureReason(out string reason)
+                    ? new Exception(reason)
+                    : new Exception(buildResult.ErrorMessage);
             }
 
-            var xmlDoc = new XmlDocument();
+            xmlDoc = new XmlDocument();
             xmlDoc.Load(artifactsPaths.ProjectFilePath);
-            XmlElement projectElement = xmlDoc.DocumentElement;
+            projectElement = xmlDoc.DocumentElement;
             var itemGroup = xmlDoc.CreateElement("ItemGroup");
             projectElement.AppendChild(itemGroup);
             foreach (var assemblyFile in Directory.GetFiles(artifactsPaths.BinariesDirectoryPath, "*.dll"))
@@ -151,26 +184,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             // Mono80IsSupported test fails when BenchmarkDotNet is restored for net9.0 if we don't remove the ProjectReference.
-            if (XUnitHelper.IsIntegrationTest.Value)
+            // We still need to preserve the ProjectReference in every other case for disassembly, though.
+            if (XUnitHelper.IsIntegrationTest.Value && this is MonoGenerator)
             {
                 projectElement.RemoveChild(projectElement.SelectSingleNode("ItemGroup/ProjectReference").ParentNode);
             }
 
             xmlDoc.Save(artifactsPaths.ProjectFilePath);
-
-            BuildResult BuildProject(string tfm)
-                => new DotNetCliCommand(
-                    CliPath,
-                    projectFilePath,
-                    tfm,
-                    null,
-                    GenerateResult.Success(artifactsPaths, []),
-                    logger,
-                    buildPartition,
-                    [],
-                    buildPartition.Timeout
-                )
-                .RestoreThenBuild();
         }
 
         /// <summary>
