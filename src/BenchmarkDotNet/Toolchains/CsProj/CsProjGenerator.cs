@@ -14,6 +14,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
@@ -183,7 +184,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             // Mono80IsSupported test fails when BenchmarkDotNet is restored for net9.0 if we don't remove the ProjectReference.
-            if (XUnitHelper.IsIntegrationTest.Value)
+            // We still need to preserve the ProjectReference in every other case for disassembly, though.
+            if (XUnitHelper.IsIntegrationTest.Value && this is MonoGenerator)
             {
                 projectElement.RemoveChild(projectElement.SelectSingleNode("ItemGroup/ProjectReference").ParentNode);
             }
