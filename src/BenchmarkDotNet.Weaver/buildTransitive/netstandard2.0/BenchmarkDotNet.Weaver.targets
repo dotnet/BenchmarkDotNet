@@ -2,13 +2,27 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
 
-  <Target Name="MarkShouldRunWeaveAssemblyTask" AfterTargets="Build">
-    <PropertyGroup>
-      <ShouldRunWeaveAssemblyTask>true</ShouldRunWeaveAssemblyTask>
-    </PropertyGroup>
-  </Target>
+  <PropertyGroup>
+    <ShouldWeaveAssemblies Condition="'$(ShouldWeaveAssemblies)' == ''">true</ShouldWeaveAssemblies>
+    <WeaveAssembliesAfterTargets Condition="'$(WeaveAssembliesAfterTargets)' == ''">CoreCompile</WeaveAssembliesAfterTargets>
+    <WeaveAssembliesBeforeTargets Condition="'$(WeaveAssembliesBeforeTargets)' == ''">CopyFilesToOutputDirectory</WeaveAssembliesBeforeTargets>
+    <WeaveAssemblyPath Condition="'$(WeaveAssemblyPath)' == ''">$(IntermediateOutputPath)$(TargetName)$(TargetExt)</WeaveAssemblyPath>
+    <WeaveAssembliesStampFile Condition="'$(WeaveAssembliesStampFile)' == ''">$(IntermediateOutputPath)BenchmarkDotNetWeaver.stamp</WeaveAssembliesStampFile>
+  </PropertyGroup>
+  
+  <Target Name="WeaveAssemblies"
+      AfterTargets="$(WeaveAssembliesAfterTargets)"
+      BeforeTargets="$(WeaveAssembliesBeforeTargets)"
+      Condition="'$(ShouldWeaveAssemblies)' == 'true'"
+      Inputs="$(WeaveAssemblyPath)"
+      Outputs="$(WeaveAssembliesStampFile)">
 
-  <Target Name="WeaveAssemblies" AfterTargets="MarkShouldRunWeaveAssemblyTask" BeforeTargets="Publish" >
-    <WeaveAssemblyTask TargetAssembly="$(TargetDir)$(TargetFileName)" Condition="'$(ShouldRunWeaveAssemblyTask)' == 'true'" />
+    <WeaveAssemblyTask TargetAssembly="$(WeaveAssemblyPath)" />
+
+    <!-- Create stamp file for incrementality -->
+    <Touch Files="$(WeaveAssembliesStampFile)" AlwaysCreate="true" />
+    <ItemGroup>
+      <FileWrites Include="$(WeaveAssembliesStampFile)" />
+    </ItemGroup>
   </Target>
 </Project>
