@@ -55,7 +55,7 @@ public class Program
         return config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
                      .AddDiagnoser(
                          MemoryDiagnoser.Default,
-#if NET30_OR_GREATER
+#if NETCOREAPP3_0_OR_GREATER
                          new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false)),
 #endif
                          new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false))
