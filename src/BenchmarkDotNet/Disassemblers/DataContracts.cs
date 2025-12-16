@@ -381,12 +381,12 @@ public sealed class DisassemblyResult
         }
 
         var addressToNameMapping = (JsonObject) json[nameof(AddressToNameMapping)];
-        var serializedAddressToNameMapping = new MutablePair[addressToNameMapping.Count];
+        SerializedAddressToNameMapping = new MutablePair[addressToNameMapping.Count];
         int addressIndex = 0;
         foreach (var kvp in addressToNameMapping)
         {
-            serializedAddressToNameMapping[addressIndex].Key = ulong.Parse(kvp.Key);
-            serializedAddressToNameMapping[addressIndex].Value = (string) kvp.Value;
+            SerializedAddressToNameMapping[addressIndex].Key = ulong.Parse(kvp.Key);
+            SerializedAddressToNameMapping[addressIndex].Value = (string) kvp.Value;
             ++addressIndex;
         }
 
