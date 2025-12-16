@@ -94,9 +94,17 @@ namespace BenchmarkDotNet.Configs
         {
             get
             {
-                var root = OsDetector.IsAndroid() ?
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
-                    Directory.GetCurrentDirectory();
+                string root;
+                if (OsDetector.IsAndroid() || OsDetector.IsIOS())
+                {
+                    // On mobile platforms (Android, iOS, and Mac Catalyst), use a writable location
+                    // because the app bundle and current directory are read-only due to sandboxing
+                    root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                }
+                else
+                {
+                    root = Directory.GetCurrentDirectory();
+                }
                 return Path.Combine(root, "BenchmarkDotNet.Artifacts");
             }
         }
