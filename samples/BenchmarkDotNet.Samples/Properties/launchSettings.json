@@ -1,0 +1,38 @@
+{
+  "profiles": {
+    "Default": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "environmentVariables": {
+      }
+    },
+    "Run IntroBasic Benchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *IntroBasic*",
+      "environmentVariables": {
+      }
+    },
+    "Run IntroBasic Benchmarks with --inProcess": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *IntroBasic* --inProcess",
+      "environmentVariables": {
+      }
+    },
+    "--list": {
+      "commandName": "Project",
+      "commandLineArgs": "--list"
+    },
+    "--info": {
+      "commandName": "Project",
+      "commandLineArgs": "--info"
+    },
+    "--help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "--version": {
+      "commandName": "Project",
+      "commandLineArgs": "--version"
+    }
+  }
+}
