@@ -1,13 +1,10 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace BenchmarkDotNet.Samples;
@@ -49,37 +46,13 @@ public class Program
             args = args.Where(x => x != "--inProcess").ToArray();
 
         DebugConfig config = isInProcess
-                            ? new DebugInProcessConfig()
-                            : new DebugBuildConfig();
+            ? new DebugInProcessConfig()
+            : new DebugBuildConfig();
 
         return config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
-                     .AddDiagnoser(
-                         MemoryDiagnoser.Default,
-#if NETCOREAPP3_0_OR_GREATER
-                         new ThreadingDiagnoser(new ThreadingDiagnoserConfig(displayCompletedWorkItemCountWhenZero: false, displayLockContentionWhenZero: false)),
+                     .AddExporter(MarkdownExporter.Default)
+                     .AddValidator(DefaultConfig.Instance.GetValidators().ToArray())
+                     .WithArtifactsPath(DefaultConfig.Instance.ArtifactsPath);
 #endif
-                         new ExceptionDiagnoser(new ExceptionDiagnoserConfig(displayExceptionsIfZeroValue: false))
-                      )
-                      .AddExporter(MarkdownExporter.Default)
-                      .AddValidator(DefaultConfig.Instance.GetValidators().ToArray())
-                      .WithArtifactsPath(DefaultConfig.Instance.ArtifactsPath);
-#endif
-    }
-}
-
-file static class ExtensionMethods
-{
-    public static bool HasError(this Summary[] summaries)
-    {
-        if (summaries.Length == 0)
-        {
-            var hashSet = new HashSet<string>(["--help", "--list", "--info", "--version"]);
-            return !Environment.GetCommandLineArgs().Any(hashSet.Contains);
-        }
-
-        if (summaries.Any(x => x.HasCriticalValidationErrors))
-            return true;
-
-        return summaries.Any(x => x.Reports.Any(r => !r.Success));
     }
 }
