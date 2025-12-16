@@ -3,6 +3,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
+using System.Globalization;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -18,13 +19,15 @@ namespace BenchmarkDotNet.IntegrationTests
         public void TestSettingAndRevertingBackGuid()
         {
             var userPlan = PowerManagementHelper.CurrentPlan;
-            var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
+
+            using var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
 
             powerManagementApplier.ApplyPerformancePlan(PowerManagementApplier.Map(PowerPlan.HighPerformance));
 
             Assert.Equal(HighPerformancePlanGuid, PowerManagementHelper.CurrentPlan.ToString());
-            Assert.Equal("High performance", PowerManagementHelper.CurrentPlanFriendlyName);
-            powerManagementApplier.Dispose();
+
+            if (CultureInfo.CurrentUICulture.Name == "en-us")
+                Assert.Equal("High performance", PowerManagementHelper.CurrentPlanFriendlyName);
 
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
@@ -33,12 +36,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public void TestPowerPlanShouldNotChange()
         {
             var userPlan = PowerManagementHelper.CurrentPlan;
-            var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
+            using var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
 
             powerManagementApplier.ApplyPerformancePlan(PowerManagementApplier.Map(PowerPlan.UserPowerPlan));
 
             Assert.Equal(userPlan.ToString(), PowerManagementHelper.CurrentPlan.ToString());
-            powerManagementApplier.Dispose();
 
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
