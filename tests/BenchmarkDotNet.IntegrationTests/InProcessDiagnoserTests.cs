@@ -132,9 +132,10 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
                 .OrderBy(d => d.RunMode switch
                 {
                     RunMode.NoOverhead => 0,
-                    RunMode.ExtraRun => 1,
-                    RunMode.SeparateLogic => 2,
-                    _ => 3
+                    RunMode.ExtraIteration => 1,
+                    RunMode.ExtraRun => 2,
+                    RunMode.SeparateLogic => 3,
+                    _ => 4
                 })
                 .Select(d => d.ExpectedResult),
             BaseMockInProcessDiagnoser.s_completedResults

@@ -114,19 +114,15 @@ namespace BenchmarkDotNet.Configs
 
         public bool HasMemoryDiagnoser() => diagnosers.OfType<MemoryDiagnoser>().Any();
 
-        public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
-
-        public bool HasExceptionDiagnoser() => diagnosers.Contains(ExceptionDiagnoser.Default);
-
         internal bool HasPerfCollectProfiler() => diagnosers.OfType<PerfCollectProfiler>().Any();
 
         internal bool HasDisassemblyDiagnoser() => diagnosers.OfType<DisassemblyDiagnoser>().Any();
 
-        public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser() || HasExceptionDiagnoser();
+        public bool HasExtraIterationDiagnoser(BenchmarkCase benchmarkCase) => HasMemoryDiagnoser() || diagnosers.Any(d => d.GetRunMode(benchmarkCase) == RunMode.ExtraIteration);
 
-        public IDiagnoser? GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
+        public IDiagnoser? GetCompositeDiagnoser(BenchmarkCase benchmarkCase, Func<RunMode, bool> runModeComparer)
         {
-            var diagnosersForGivenMode = diagnosers.Where(diagnoser => diagnoser.GetRunMode(benchmarkCase) == runMode).ToImmutableHashSet();
+            var diagnosersForGivenMode = diagnosers.Where(diagnoser => runModeComparer(diagnoser.GetRunMode(benchmarkCase))).ToImmutableHashSet();
 
             return diagnosersForGivenMode.Any() ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
         }

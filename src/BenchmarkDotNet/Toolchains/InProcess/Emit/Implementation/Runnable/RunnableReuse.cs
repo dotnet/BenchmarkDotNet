@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IterationCleanupAction = CallbackFromField(instance, IterationCleanupActionFieldName),
                 TargetJob = benchmarkCase.Job,
                 OperationsPerInvoke = benchmarkCase.Descriptor.OperationsPerInvoke,
-                MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
+                RunExtraIteration = benchmarkCase.Config.HasExtraIterationDiagnoser(benchmarkCase),
                 BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase),
                 InProcessDiagnoserHandler = inProcessDiagnoserHandler
             };

@@ -7,31 +7,16 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    public class DiagnoserResults
+    public class DiagnoserResults(BenchmarkCase benchmarkCase, ExecuteResult executeResult, BuildResult buildResult)
     {
-        public DiagnoserResults(BenchmarkCase benchmarkCase, ExecuteResult executeResult, BuildResult buildResult)
-        {
-            BenchmarkCase = benchmarkCase;
-            TotalOperations = executeResult.Measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations);
-            GcStats = executeResult.GcStats;
-            ThreadingStats = executeResult.ThreadingStats;
-            BuildResult = buildResult;
-            ExceptionFrequency = executeResult.ExceptionFrequency;
-            Measurements = executeResult.Measurements;
-        }
+        public BenchmarkCase BenchmarkCase { get; } = benchmarkCase;
 
-        public BenchmarkCase BenchmarkCase { get; }
+        public long TotalOperations { get; } = executeResult.Measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations);
 
-        public long TotalOperations { get; }
+        public GcStats GcStats { get; } = executeResult.GcStats;
 
-        public GcStats GcStats { get; }
+        public BuildResult BuildResult { get; } = buildResult;
 
-        public ThreadingStats ThreadingStats { get; }
-
-        public double ExceptionFrequency { get; }
-
-        public BuildResult BuildResult { get; }
-
-        public IReadOnlyList<Measurement> Measurements { get; }
+        public IReadOnlyList<Measurement> Measurements { get; } = executeResult.Measurements;
     }
 }

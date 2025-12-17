@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
-            var executeResult = new ExecuteResult(measurements, default, default, 0);
+            var executeResult = new ExecuteResult(measurements, default);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
         }
 
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 9, 1, max),    // 10
                                }
                                select m;
-            var executeResult = new ExecuteResult(measurements.Take(n).ToList(), default, default, 0);
+            var executeResult = new ExecuteResult(measurements.Take(n).ToList(), default);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
         }
 

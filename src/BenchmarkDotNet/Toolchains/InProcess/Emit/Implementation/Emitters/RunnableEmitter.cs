@@ -1040,7 +1040,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             */
             ilBuilder.EmitLdloc(engineParametersLocal);
             ilBuilder.Emit(OpCodes.Callvirt, typeof(EngineParameters).GetProperty(nameof(EngineParameters.InProcessDiagnoserHandler)).GetGetMethod());
-            ilBuilder.Emit(OpCodes.Ldc_I4_3);
+            ilBuilder.Emit(OpCodes.Ldc_I4_5);
             ilBuilder.Emit(OpCodes.Callvirt, typeof(Diagnosers.CompositeInProcessDiagnoserHandler).GetMethod(nameof(Diagnosers.CompositeInProcessDiagnoserHandler.Handle)));
 
             ilBuilder.EmitVoidReturn(methodBuilder);

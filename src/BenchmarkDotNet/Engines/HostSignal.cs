@@ -28,6 +28,16 @@
         AfterActualRun,
 
         /// <summary>
+        /// after actual run, before extra iteration
+        /// </summary>
+        BeforeExtraIteration,
+
+        /// <summary>
+        /// after extra iteration
+        /// </summary>
+        AfterExtraIteration,
+
+        /// <summary>
         /// after all (the last thing the benchmarking engine does is to fire this signal)
         /// </summary>
         AfterAll,

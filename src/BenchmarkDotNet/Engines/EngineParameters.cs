@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Engines
         public Action GlobalCleanupAction { get; set; }
         public Action IterationSetupAction { get; set; }
         public Action IterationCleanupAction { get; set; }
-        public bool MeasureExtraStats { get; set; }
+        public bool RunExtraIteration { get; set; }
         public string BenchmarkName { get;  set; }
         public Diagnosers.CompositeInProcessDiagnoserHandler InProcessDiagnoserHandler { get; set; }
     }

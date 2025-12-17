@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             foreach (var router in routers)
             {
-                if (router.runMode == runMode)
+                if (router.ShouldHandle(runMode))
                 {
                     router.handler.Handle(signal, parameters);
                 }
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             foreach (var router in routers)
             {
-                if (router.runMode != runMode)
+                if (!router.ShouldHandle(runMode))
                 {
                     continue;
                 }

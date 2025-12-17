@@ -33,4 +33,9 @@ public struct InProcessDiagnoserRouter
             runMode = diagnoser.GetRunMode(benchmarkCase)
         };
     }
+
+    internal readonly bool ShouldHandle(RunMode runMode)
+        => this.runMode == runMode
+        // ExtraIteration is merged with NoOverhead, so we need to check it explicitly.
+        || (runMode == RunMode.NoOverhead && this.runMode == RunMode.ExtraIteration);
 }

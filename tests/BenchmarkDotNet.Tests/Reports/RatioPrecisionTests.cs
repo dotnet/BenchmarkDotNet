@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Tests.Reports
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, measurementValue),
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, measurementValue),
                 };
-            var executeResult = new ExecuteResult(measurements, default, default, 0);
+            var executeResult = new ExecuteResult(measurements, default);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, Array.Empty<Metric>());
         }
 

@@ -77,9 +77,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         new(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1)
                     },
                     OutlierMode.DontRemove,
-                    default,
-                    default,
-                    0);
+                    default);
             }
 
             public void Dispose() => GlobalCleanupAction?.Invoke();
