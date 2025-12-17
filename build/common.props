@@ -37,7 +37,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(MSBuildProjectExtension)' != '.fsproj' ">
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' ">
     <LangVersion>14.0</LangVersion>
   </PropertyGroup>
 
