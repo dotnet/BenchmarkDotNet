@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Attributes
         public OrdererAttribute(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared,
-            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
+            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Numeric)
         {
             Config = ManualConfig.CreateEmpty().WithOrderer(new DefaultOrderer(summaryOrderPolicy, methodOrderPolicy, jobOrderPolicy));
         }

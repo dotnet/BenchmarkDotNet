@@ -3,11 +3,6 @@
 public enum JobOrderPolicy
 {
     /// <summary>
-    /// Compare job characteristics in default order.
-    /// </summary>
-    Default,
-
-    /// <summary>
     /// Compare job characteristics in numeric order.
     /// </summary>
     Numeric,

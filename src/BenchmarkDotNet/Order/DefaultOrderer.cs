@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Order
         public DefaultOrderer(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared,
-            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
+            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Numeric)
         {
             SummaryOrderPolicy = summaryOrderPolicy;
             MethodOrderPolicy = methodOrderPolicy;

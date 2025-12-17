@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly JobComparer Default = new(JobOrderPolicy.Numeric);
         public static readonly JobComparer Ordinal = new(JobOrderPolicy.Ordinal);
 
-        public JobComparer(JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
+        private JobComparer(JobOrderPolicy jobOrderPolicy)
         {
             switch (jobOrderPolicy)
             {
@@ -28,8 +28,6 @@ namespace BenchmarkDotNet.Jobs
                     Comparer = StringComparer.Ordinal;
                     break;
 
-                case JobOrderPolicy.Numeric:
-                case JobOrderPolicy.Default:
                 default:
                     Comparer = NumericComparer;
                     break;
