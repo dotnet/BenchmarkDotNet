@@ -1,13 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Environments
 {
     public class WasmRuntime : Runtime, IEquatable<WasmRuntime>
     {
+        public delegate string ArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args);
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         internal static readonly WasmRuntime Default = new WasmRuntime();
 
@@ -15,9 +19,9 @@ namespace BenchmarkDotNet.Environments
 
         public string JavaScriptEngineArguments { get; }
 
-        public bool Aot { get; }
+        public ArgumentFormatter JavaScriptEngineArgumentFormatter { get; }
 
-        public string WasmDataDir { get; }
+        public override bool IsAOT { get; }
 
         /// <summary>
         /// When true (default), the generated project uses Microsoft.NET.Sdk.WebAssembly which sets UseMonoRuntime=true
@@ -29,42 +33,55 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
-        /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
-        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. "--expose_wasm" by default</param>
-        /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
-        /// <param name="displayName">default: "Wasm"</param>
-        /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>
-        /// <param name="wasmDataDir">Specifies a wasm data directory surfaced as $(WasmDataDir) for the project</param>
+        /// <param name="msBuildMoniker">moniker</param>
         /// <param name="moniker">Runtime moniker</param>
+        /// <param name="displayName">display name</param>
+        /// <param name="aot">Specifies whether AOT or Interpreter project should be generated.</param>
+        /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks.</param>
         /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
+        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine.</param>
+        /// <param name="javaScriptEngineArgumentFormatter">Allows to format or customize the arguments passed to the javascript engine.</param>
         public WasmRuntime(
-            string msBuildMoniker = "net8.0",
-            string displayName = "Wasm",
-            string javaScriptEngine = "v8",
-            string javaScriptEngineArguments = "--expose_wasm",
-            bool aot = false,
-            string wasmDataDir = "",
-            RuntimeMoniker moniker = RuntimeMoniker.WasmNet80,
-            bool isMonoRuntime = true)
-            : base(moniker, msBuildMoniker, displayName)
+            string msBuildMoniker,
+            RuntimeMoniker moniker,
+            string displayName,
+            bool aot,
+            string? javaScriptEngine,
+            bool isMonoRuntime = true,
+            string? javaScriptEngineArguments = "",
+            ArgumentFormatter? javaScriptEngineArgumentFormatter = null) : base(moniker, msBuildMoniker, displayName)
         {
-            if (javaScriptEngine.IsNotBlank() && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
-                throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
+            // Resolve path for windows because we can't use ProcessStartInfo.UseShellExecute while redirecting std out in the executor.
+            if (!ProcessHelper.TryResolveExecutableInPath(javaScriptEngine, out javaScriptEngine))
+                throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" does NOT exist");
 
             JavaScriptEngine = javaScriptEngine;
-            JavaScriptEngineArguments = javaScriptEngineArguments;
-            Aot = aot;
-            WasmDataDir = wasmDataDir;
+            JavaScriptEngineArguments = javaScriptEngineArguments ?? "";
+            JavaScriptEngineArgumentFormatter = javaScriptEngineArgumentFormatter ?? DefaultArgumentFormatter;
             IsMonoRuntime = isMonoRuntime;
+            IsAOT = aot;
+        }
+
+        private WasmRuntime() : base(RuntimeMoniker.WasmNet80, "Wasm", "Wasm")
+        {
+            IsAOT = RuntimeInformation.IsAot;
+            JavaScriptEngine = "";
+            JavaScriptEngineArguments = "";
+            JavaScriptEngineArgumentFormatter = DefaultArgumentFormatter;
         }
 
         public override bool Equals(object? obj)
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime? other)
-            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.IsMonoRuntime == IsMonoRuntime;
+            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.IsAOT == IsAOT && other.IsMonoRuntime == IsMonoRuntime;
 
         public override int GetHashCode()
-            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, Aot, IsMonoRuntime);
+            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, IsAOT, IsMonoRuntime);
+
+        private static string DefaultArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args)
+        {
+            return $"{runtime.JavaScriptEngineArguments} --module {artifactsPaths.ExecutablePath} -- --run {artifactsPaths.ProgramName}.dll {args}";
+        }
     }
 }

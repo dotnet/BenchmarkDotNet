@@ -201,11 +201,14 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("memoryRandomization", Required = false, HelpText = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.")]
         public bool MemoryRandomization { get; set; }
 
-        [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
-        public FileInfo? WasmJavascriptEngine { get; set; }
+        [Option("wasmEngine", Required = false, HelpText = "Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.", Default = "v8")]
+        public string? WasmJavaScriptEngine { get; set; } = "v8";
 
-        [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
+        [Option("wasmArgs", Required = false, HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
         public string? WasmJavaScriptEngineArguments { get; set; }
+
+        [Option("wasmMainJsTemplate", Required = false, HelpText = "Path to main.js template.")]
+        public FileInfo? WasmMainJsTemplate { get; set; }
 
         [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
         public string? CustomRuntimePack { get; set; }
@@ -215,9 +218,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
-
-        [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
-        public DirectoryInfo? WasmDataDirectory { get; set; }
 
         [Option("wasmCoreCLR", Required = false, Default = false, HelpText = "Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.")]
         public bool WasmCoreCLR { get; set; }

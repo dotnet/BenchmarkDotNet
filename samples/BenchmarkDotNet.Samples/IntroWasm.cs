@@ -34,9 +34,9 @@ namespace BenchmarkDotNet.Samples
             // the Wasm Toolchain requires two mandatory arguments:
             const string cliPath = @"/home/adam/projects/runtime/dotnet.sh";
 
-            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net5.0");
+            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net8.0", RuntimeMoniker.WasmNet80, "Wasm .net8.0", false, "v8");
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
-                targetFrameworkMoniker: "net5.0", runtimeFrameworkVersion: "", name: "Wasm",
+                targetFrameworkMoniker: "net8.0", runtimeFrameworkVersion: "", name: "Wasm",
                 customDotNetCliPath: cliPath);
             IToolchain toolChain = WasmToolchain.From(netCoreAppSettings);
 

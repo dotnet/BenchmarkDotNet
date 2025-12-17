@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Loggers;
 
@@ -118,6 +120,54 @@ namespace BenchmarkDotNet.Helpers
             {
                 return false;
             }
+        }
+
+        internal static bool TryResolveExecutableInPath(string? value, [NotNullWhen(true)] out string? result)
+        {
+            result = value!;
+
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            if (File.Exists(value))
+                return true;
+
+            // Typed to char[] because it could be a string or char[] with newer .net versions
+            var directories = Environment.GetEnvironmentVariable("PATH")!
+                .Split((char[])[Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries);
+
+            if (OsDetector.IsWindows())
+            {
+                var extensions = Environment.GetEnvironmentVariable("PATHEXT")!
+                    .Split((char[])[Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var directory in directories)
+                {
+                    foreach (var ext in extensions)
+                    {
+                        var candidate = Path.Combine(directory, value + ext);
+                        if (File.Exists(candidate))
+                        {
+                            result = candidate;
+                            return true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var directory in directories)
+                {
+                    var candidate = Path.Combine(directory, value);
+                    if (File.Exists(Path.Combine(directory, value)))
+                    {
+                        result = candidate;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

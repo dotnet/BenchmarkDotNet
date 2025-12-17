@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
@@ -14,10 +13,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     {
         private string CustomDotNetCliPath { get; }
 
-        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
+        internal string? MainJsTemplatePath { get; }
+
+
+        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath, string? mainJsTemplatePath)
             : base(name, generator, builder, executor)
         {
             CustomDotNetCliPath = customDotNetCliPath;
+            MainJsTemplatePath = mainJsTemplatePath;
         }
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -41,18 +44,22 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings netCoreAppSettings)
-            => new WasmToolchain(netCoreAppSettings.Name,
-                    new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
-                        netCoreAppSettings.CustomDotNetCliPath,
-                        netCoreAppSettings.PackagesPath,
-                        netCoreAppSettings.CustomRuntimePack,
-                        netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
-                    new DotNetCliPublisher(netCoreAppSettings.TargetFrameworkMoniker,
-                        netCoreAppSettings.CustomDotNetCliPath,
-                        // aot builds can be very slow
-                        logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
-                    new WasmExecutor(),
-                    netCoreAppSettings.CustomDotNetCliPath);
+        public static IToolchain From(NetCoreAppSettings netCoreAppSettings, string? mainJsTemplatePath = null)
+        {
+            var generator = new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
+                                netCoreAppSettings.CustomDotNetCliPath,
+                                netCoreAppSettings.PackagesPath,
+                                netCoreAppSettings.CustomRuntimePack,
+                                netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm,
+                                mainJsTemplatePath);
+
+            var cliBuilder = new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
+                                 netCoreAppSettings.CustomDotNetCliPath,
+                                 logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm);
+
+            var executor = new WasmExecutor();
+
+            return new WasmToolchain(netCoreAppSettings.Name, generator, cliBuilder, executor, netCoreAppSettings.CustomDotNetCliPath, mainJsTemplatePath);
+        }
     }
 }
