@@ -32,9 +32,9 @@ namespace BenchmarkDotNet.Order
         {
             SummaryOrderPolicy = summaryOrderPolicy;
             MethodOrderPolicy = methodOrderPolicy;
-            jobComparer = jobOrderPolicy == JobOrderPolicy.Default
-                ? JobComparer.Instance
-                : JobComparer.Numeric;
+            jobComparer = jobOrderPolicy == JobOrderPolicy.Ordinal
+                ? JobComparer.Ordinal
+                : JobComparer.Default;
             targetComparer = new DescriptorComparer(methodOrderPolicy);
         }
 

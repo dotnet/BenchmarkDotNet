@@ -10,15 +10,30 @@ namespace BenchmarkDotNet.Jobs
     internal class JobComparer : IComparer<Job>, IEqualityComparer<Job>
     {
         private readonly IComparer<string> Comparer;
+        private static IComparer<string> NumericComparer =>
+#if NET10_0_OR_GREATER
+            StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, System.Globalization.CompareOptions.NumericOrdering);
+#else
+            new NumericStringComparer();
+#endif
 
-        public static readonly JobComparer Instance = new JobComparer(JobOrderPolicy.Default);
-        public static readonly JobComparer Numeric = new JobComparer(JobOrderPolicy.Numeric);
+        public static readonly JobComparer Default = new(JobOrderPolicy.Numeric);
+        public static readonly JobComparer Ordinal = new(JobOrderPolicy.Ordinal);
 
         public JobComparer(JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
         {
-            Comparer = jobOrderPolicy == JobOrderPolicy.Default
-                ? StringComparer.Ordinal
-                : new NumericStringComparer();  // TODO: Use `StringComparer.Create(CultureInfo.InvariantCulture, CompareOptions.NumericOrdering)` for .NET10 or greater.
+            switch (jobOrderPolicy)
+            {
+                case JobOrderPolicy.Ordinal:
+                    Comparer = StringComparer.Ordinal;
+                    break;
+
+                case JobOrderPolicy.Numeric:
+                case JobOrderPolicy.Default:
+                default:
+                    Comparer = NumericComparer;
+                    break;
+            }
         }
 
         public int Compare(Job? x, Job? y)
@@ -66,6 +81,7 @@ namespace BenchmarkDotNet.Jobs
 
         public int GetHashCode(Job obj) => obj.Id.GetHashCode();
 
+#if !NET10_0_OR_GREATER
         internal class NumericStringComparer : IComparer<string>
         {
             public int Compare(string? x, string? y)
@@ -139,5 +155,6 @@ namespace BenchmarkDotNet.Jobs
                 return (spanX.Length - i).CompareTo(spanY.Length - j);
             }
         }
+#endif
     }
 }
