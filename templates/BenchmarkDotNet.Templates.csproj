@@ -45,4 +45,5 @@
             MatchExpression='("defaultValue": )"([\d+\.?]+)"'
             ReplacementText='${1}"$(VersionPrefix)"' />
   </Target>
+  <Import Project="..\build\common.targets" />
 </Project>

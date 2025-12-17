@@ -27,4 +27,5 @@
     <None Include="entrypoints\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
     <None Include="build\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

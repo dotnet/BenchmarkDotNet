@@ -53,4 +53,5 @@
     <Folder Include="Detectors\" />
     <Folder Include="Perfonar\VerifiedFiles\" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

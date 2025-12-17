@@ -1,8 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- MSBuild was complaing about some settings from common.props file, so I excluded them in conditional way -->
-    <IsVisualBasic>true</IsVisualBasic>
-  </PropertyGroup>
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
@@ -10,4 +6,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

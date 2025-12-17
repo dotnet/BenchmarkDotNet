@@ -16,4 +16,5 @@
   <ItemGroup>
     <PackageReference Include="ScottPlot" Version="5.0.55" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

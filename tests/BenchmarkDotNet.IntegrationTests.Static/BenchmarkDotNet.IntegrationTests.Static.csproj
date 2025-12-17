@@ -17,4 +17,5 @@
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
     <Reference Include="System.Runtime" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

@@ -1,8 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- MSBuild was complaing about InformationalVersion from common.props file, so I excluded them in conditional way -->
-    <IsFsharp>true</IsFsharp>
-  </PropertyGroup>
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
@@ -18,4 +14,5 @@
     <PackageReference Update="FSharp.Core" Version="9.0.300" />
     <PackageReference Update="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>
