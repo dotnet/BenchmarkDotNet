@@ -225,7 +225,7 @@ namespace BenchmarkDotNet.Engines
             Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
             Host.SendSignal(HostSignal.AfterExtraIteration);
 
-            data.cleanupAction(); // we run iteration cleanup after collecting GC stats
+            data.cleanupAction(); // we run iteration cleanup after diagnosers are complete.
 
             var totalOperations = data.invokeCount * Parameters.OperationsPerInvoke;
             var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());

@@ -28,12 +28,12 @@
         AfterActualRun,
 
         /// <summary>
-        /// after actual run, before extra iteration
+        /// after actual run, after extra IterationSetup, before extra iteration
         /// </summary>
         BeforeExtraIteration,
 
         /// <summary>
-        /// after extra iteration
+        /// after extra iteration, before extra IterationCleanup
         /// </summary>
         AfterExtraIteration,
 
