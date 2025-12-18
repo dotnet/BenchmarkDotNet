@@ -103,44 +103,85 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
     [MemberData(nameof(GetTestCombinations))]
     public void MultipleInProcessDiagnosersWork(RunMode[] runModes, ToolchainType toolchain)
     {
-        var diagnosers = runModes.Select(CreateDiagnoser).ToArray();
-        var config = CreateConfig(toolchain);
-
-        foreach (var diagnoser in diagnosers)
+        try
         {
-            config = config.AddDiagnoser(diagnoser);
-        }
+            var diagnosers = runModes.Select(CreateDiagnoser).ToArray();
+            var config = CreateConfig(toolchain);
 
-        var summary = CanExecute<SimpleBenchmark>(config);
+            foreach (var diagnoser in diagnosers)
+            {
+                config = config.AddDiagnoser(diagnoser);
+            }
 
-        foreach (var diagnoser in diagnosers)
-        {
-            if (diagnoser.RunMode == RunMode.None)
+            var summary = CanExecute<SimpleBenchmark>(config);
+
+            foreach (var diagnoser in diagnosers)
             {
-                Assert.Empty(diagnoser.Results);
-            }
-            else
-            {
-                Assert.NotEmpty(diagnoser.Results);
-                Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
-                Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
-            }
-        }
-        Assert.Equal(
-            diagnosers
-                .Where(d => d.RunMode != RunMode.None)
-                .OrderBy(d => d.RunMode switch
+                if (diagnoser.RunMode == RunMode.None)
                 {
-                    RunMode.NoOverhead => 0,
-                    RunMode.ExtraIteration => 1,
-                    RunMode.ExtraRun => 2,
-                    RunMode.SeparateLogic => 3,
-                    _ => 4
-                })
-                .Select(d => d.ExpectedResult),
-            BaseMockInProcessDiagnoser.s_completedResults
-        );
-        BaseMockInProcessDiagnoser.s_completedResults.Clear();
+                    Assert.Empty(diagnoser.Results);
+                }
+                else
+                {
+                    Assert.NotEmpty(diagnoser.Results);
+                    Assert.Equal(summary.BenchmarksCases.Length, diagnoser.Results.Count);
+                    Assert.All(diagnoser.Results.Values, result => Assert.Equal(diagnoser.ExpectedResult, result));
+                }
+            }
+            Assert.Equal(
+                diagnosers
+                    .Where(d => d.RunMode != RunMode.None)
+                    .OrderBy(d => d.RunMode switch
+                    {
+                        RunMode.NoOverhead => 0,
+                        RunMode.ExtraIteration => 1,
+                        RunMode.ExtraRun => 2,
+                        RunMode.SeparateLogic => 3,
+                        _ => 4
+                    })
+                    .Select(d => d.ExpectedResult),
+                GetOrderedResults()
+            );
+        }
+        finally
+        {
+            BaseMockInProcessDiagnoser.s_completedResults.Clear();
+        }
+    }
+
+    private static IEnumerable<string> GetOrderedResults()
+    {
+        // RunMode.NoOverhead and RunMode.ExtraIteration run in the same benchmark run,
+        // so we need to re-order the completed results according to the order that they received their signal,
+        // while leaving the other run modes in the same spot.
+        var unorderedResults = new Queue<(int order, string result)>();
+
+        bool wasLastOrdered = true;
+        foreach (var (runMode, order, result) in BaseMockInProcessDiagnoser.s_completedResults)
+        {
+            if (runMode is RunMode.NoOverhead or RunMode.ExtraIteration)
+            {
+                wasLastOrdered = false;
+                unorderedResults.Enqueue((order, result));
+                continue;
+            }
+
+            if (!wasLastOrdered)
+            {
+                wasLastOrdered = true;
+                foreach (var (_, r) in unorderedResults.OrderBy(t => t.order))
+                {
+                    yield return r;
+                }
+                unorderedResults.Clear();
+            }
+            yield return result;
+        }
+
+        foreach (var (_, result) in unorderedResults.OrderBy(t => t.order))
+        {
+            yield return result;
+        }
     }
 
     public class SimpleBenchmark
