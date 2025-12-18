@@ -63,17 +63,33 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
             {
                 foreach (var runModes in GetRunModeCombinations(count))
                 {
-                    // Default toolchain is much slower than in-process toolchains, so to prevent CI from taking too much time, we skip combinations with duplicate run modes.
-                    if (toolchain == ToolchainType.Default && runModes.Length == 3
-                        && (runModes[0] == runModes[1] || runModes[0] == runModes[2] || runModes[1] == runModes[2]))
+                    if (ShouldSkip())
                     {
                         continue;
                     }
                     yield return [runModes, toolchain];
+
+                    bool ShouldSkip()
+                    {
+                        // Default toolchain is much slower than in-process toolchains, so to prevent CI from taking too much time, we skip combinations with duplicate run modes.
+                        if (toolchain != ToolchainType.Default || runModes.Length != 3)
+                            return false;
+                        if (runModes[0] == runModes[1] || runModes[0] == runModes[2] || runModes[1] == runModes[2])
+                            return true;
+                        // We still want to test some combination of NoOverhead + ExtraIteration, but not excessively.
+                        if (RunsDuringSameLaunch(runModes[0]) && RunsDuringSameLaunch(runModes[2]))
+                            return true;
+                        if (RunsDuringSameLaunch(runModes[1]) && RunsDuringSameLaunch(runModes[2]))
+                            return true;
+                        return false;
+                    }
                 }
             }
         }
     }
+
+    private static bool RunsDuringSameLaunch(RunMode runMode)
+        => runMode is RunMode.NoOverhead or RunMode.ExtraIteration;
 
     private static BaseMockInProcessDiagnoser CreateDiagnoser(RunMode runMode, int index)
         => index switch
@@ -159,7 +175,7 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
         bool wasLastOrdered = true;
         foreach (var (runMode, order, result) in BaseMockInProcessDiagnoser.s_completedResults)
         {
-            if (runMode is RunMode.NoOverhead or RunMode.ExtraIteration)
+            if (RunsDuringSameLaunch(runMode))
             {
                 wasLastOrdered = false;
                 unorderedResults.Enqueue((order, result));
