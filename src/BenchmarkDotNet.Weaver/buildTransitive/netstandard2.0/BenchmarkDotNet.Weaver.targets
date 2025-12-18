@@ -24,7 +24,7 @@
     <ItemGroup>
       <FileWrites Include="$(BenchmarkDotNetWeaveAssembliesStampFile)" />
       <!-- Fix NETSDK1152 https://github.com/dotnet/BenchmarkDotNet/pull/2931#issuecomment-3671856363-->
-      <IntermediateAssembly Include="$(BenchmarkDotNetWeaveAssemblyPath)" ExcludeFromPublish="true" />
+      <IntermediateAssembly Update="$(BenchmarkDotNetWeaveAssemblyPath)" ExcludeFromPublish="true" />
     </ItemGroup>
   </Target>
 </Project>
