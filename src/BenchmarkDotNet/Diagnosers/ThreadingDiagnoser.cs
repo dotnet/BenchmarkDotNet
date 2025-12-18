@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -10,6 +11,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -37,6 +39,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraIteration;
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
@@ -114,6 +117,7 @@ namespace BenchmarkDotNet.Diagnosers
         public long CompletedWorkItemCount { get; set; }
         public long LockContentionCount { get; set; }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
         {
             switch (signal)
@@ -131,6 +135,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         string IInProcessDiagnoserHandler.SerializeResults() => $"{CompletedWorkItemCount} {LockContentionCount}";
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void ReadInitial()
         {
 #if NETSTANDARD2_0
@@ -142,6 +147,7 @@ namespace BenchmarkDotNet.Diagnosers
 #endif
         }
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void ReadFinal()
         {
 #if NETSTANDARD2_0

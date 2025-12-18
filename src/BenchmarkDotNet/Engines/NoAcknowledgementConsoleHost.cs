@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Engines
@@ -15,8 +17,10 @@ namespace BenchmarkDotNet.Engines
 
         public void WriteLine() => outWriter.WriteLine();
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void WriteLine(string message) => outWriter.WriteLine(message);
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void SendSignal(HostSignal hostSignal) => WriteLine(Engine.Signals.ToMessage(hostSignal));
 
         public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");

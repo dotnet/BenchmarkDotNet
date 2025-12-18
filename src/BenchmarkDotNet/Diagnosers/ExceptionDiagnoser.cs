@@ -4,6 +4,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 
@@ -35,6 +37,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraIteration;
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
@@ -75,6 +78,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private long exceptionsCount;
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
         {
             switch (signal)
@@ -93,6 +97,7 @@ namespace BenchmarkDotNet.Diagnosers
         string IInProcessDiagnoserHandler.SerializeResults()
             => exceptionsCount.ToString();
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)
         {
             Interlocked.Increment(ref exceptionsCount);

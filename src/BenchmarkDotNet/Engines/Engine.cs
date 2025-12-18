@@ -306,8 +306,10 @@ namespace BenchmarkDotNet.Engines
             private static readonly Dictionary<string, HostSignal> MessagesToSignals
                 = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
         }

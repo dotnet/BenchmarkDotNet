@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -33,6 +35,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers
             => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             foreach (var diagnoser in diagnosers)
@@ -71,6 +74,7 @@ namespace BenchmarkDotNet.Diagnosers
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class CompositeInProcessDiagnoserHandler(IReadOnlyList<InProcessDiagnoserRouter> routers, IHost host, RunMode runMode, InProcessDiagnoserActionArgs parameters)
     {
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void Handle(BenchmarkSignal signal)
         {
             if (runMode == RunMode.None)
