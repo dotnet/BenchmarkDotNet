@@ -3,15 +3,12 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserResults(BenchmarkCase benchmarkCase, ExecuteResult executeResult, BuildResult buildResult)
     {
         public BenchmarkCase BenchmarkCase { get; } = benchmarkCase;
-
-        public long TotalOperations { get; } = executeResult.Measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations);
 
         public GcStats GcStats { get; } = executeResult.GcStats;
 
