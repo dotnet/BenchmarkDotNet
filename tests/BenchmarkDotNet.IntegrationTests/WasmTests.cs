@@ -65,14 +65,20 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
             }
 
-            var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
-            var config = GetConfig().AddDiagnoser(diagnoser);
+            try
+            {
+                var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
+                var config = GetConfig().AddDiagnoser(diagnoser);
 
-            CanExecute<WasmBenchmark>(config);
+                CanExecute<WasmBenchmark>(config);
 
-            Assert.Equal([diagnoser.ExpectedResult], diagnoser.Results.Values);
-            Assert.Equal([diagnoser.ExpectedResult], BaseMockInProcessDiagnoser.s_completedResults);
-            BaseMockInProcessDiagnoser.s_completedResults.Clear();
+                Assert.Equal([diagnoser.ExpectedResult], diagnoser.Results.Values);
+                Assert.Equal([diagnoser.ExpectedResult], BaseMockInProcessDiagnoser.s_completedResults.Select(t => t.result));
+            }
+            finally
+            {
+                BaseMockInProcessDiagnoser.s_completedResults.Clear();
+            }
         }
 
         public class WasmBenchmark

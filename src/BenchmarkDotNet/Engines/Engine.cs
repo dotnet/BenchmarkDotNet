@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -47,7 +48,7 @@ namespace BenchmarkDotNet.Engines
                 IterationCleanupAction = engineParameters.IterationCleanupAction ?? throw new ArgumentNullException(nameof(EngineParameters.IterationCleanupAction)),
                 TargetJob = new Job(job).Freeze(),
                 BenchmarkName = engineParameters.BenchmarkName,
-                MeasureExtraStats = engineParameters.MeasureExtraStats,
+                RunExtraIteration = engineParameters.RunExtraIteration,
                 Host = engineParameters.Host,
                 OperationsPerInvoke = engineParameters.OperationsPerInvoke,
                 Resolver = engineParameters.Resolver,
@@ -117,16 +118,19 @@ namespace BenchmarkDotNet.Engines
                 }
             }
 
-            (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = Parameters.MeasureExtraStats
-                ? GetExtraStats(extraStatsIterationData)
-                : default;
+            GcStats workGcHasDone = default;
+            if (Parameters.RunExtraIteration)
+            {
+                (workGcHasDone, var extraMeasurement) = RunExtraIteration(extraStatsIterationData);
+                measurements.Add(extraMeasurement);
+            }
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStop(Parameters.BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(measurements, outlierMode, workGcHasDone, threadingStats, exceptionFrequency);
+            return new RunResults(measurements, outlierMode, workGcHasDone);
         }
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
@@ -192,17 +196,16 @@ namespace BenchmarkDotNet.Engines
         }
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        private (GcStats, ThreadingStats, double) GetExtraStats(IterationData data)
+        private (GcStats, Measurement) RunExtraIteration(IterationData data)
         {
-            // Warm up the measurement functions before starting the actual measurement.
+            // Warm up the GC measurement functions before starting the actual measurement.
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
 
             data.setupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
-            var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
-            var exceptionsStats = new ExceptionsStats(); // allocates
-            exceptionsStats.StartListening(); // this method might allocate
+            Host.SendSignal(HostSignal.BeforeExtraIteration);
+            Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeExtraIteration);
 
             // GC collect before measuring allocations.
             ForceGcCollect();
@@ -213,20 +216,21 @@ namespace BenchmarkDotNet.Engines
             SleepIfPositive(JitInfo.BackgroundCompilationDelay);
 
             GcStats gcStats;
+            ClockSpan clockSpan;
             using (FinalizerBlocker.MaybeStart())
             {
-                gcStats = MeasureWithGc(data.workloadAction, data.invokeCount / data.unrollFactor);
+                (gcStats, clockSpan) = MeasureWithGc(data.workloadAction, data.invokeCount / data.unrollFactor);
             }
 
-            exceptionsStats.Stop(); // this method might (de)allocate
-            var finalThreadingStats = ThreadingStats.ReadFinal();
+            Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
+            Host.SendSignal(HostSignal.AfterExtraIteration);
 
-            data.cleanupAction(); // we run iteration cleanup after collecting GC stats
+            data.cleanupAction(); // we run iteration cleanup after diagnosers are complete.
 
-            var totalOperationsCount = data.invokeCount * Parameters.OperationsPerInvoke;
-            return (gcStats.WithTotalOperations(totalOperationsCount),
-                (finalThreadingStats - initialThreadingStats).WithTotalOperations(totalOperationsCount),
-                exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
+            var totalOperations = data.invokeCount * Parameters.OperationsPerInvoke;
+            var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());
+            Host.WriteLine(measurement.ToString());
+            return (gcStats.WithTotalOperations(totalOperations), measurement);
         }
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
@@ -240,12 +244,12 @@ namespace BenchmarkDotNet.Engines
 
         // Isolate the allocation measurement and skip tier0 jit to make sure we don't get any unexpected allocations.
         [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
-        private GcStats MeasureWithGc(Action<long> action, long invokeCount)
+        private (GcStats, ClockSpan) MeasureWithGc(Action<long> action, long invokeCount)
         {
             var initialGcStats = GcStats.ReadInitial();
-            action(invokeCount);
+            var clockSpan = Measure(action, invokeCount);
             var finalGcStats = GcStats.ReadFinal();
-            return finalGcStats - initialGcStats;
+            return (finalGcStats - initialGcStats, clockSpan);
         }
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
@@ -289,20 +293,23 @@ namespace BenchmarkDotNet.Engines
         {
             public const string Acknowledgment = "Acknowledgment";
 
-            private static readonly Dictionary<HostSignal, string> SignalsToMessages
-                = new Dictionary<HostSignal, string>
-                {
-                    { HostSignal.BeforeAnythingElse, "// BeforeAnythingElse" },
-                    { HostSignal.BeforeActualRun, "// BeforeActualRun" },
-                    { HostSignal.AfterActualRun, "// AfterActualRun" },
-                    { HostSignal.AfterAll, "// AfterAll" }
-                };
+            private static readonly Dictionary<HostSignal, string> SignalsToMessages = new()
+            {
+                [HostSignal.BeforeAnythingElse] = "// BeforeAnythingElse",
+                [HostSignal.BeforeActualRun] = "// BeforeActualRun",
+                [HostSignal.AfterActualRun] = "// AfterActualRun",
+                [HostSignal.AfterAll] = "// AfterAll",
+                [HostSignal.BeforeExtraIteration] = "// BeforeExtraIteration",
+                [HostSignal.AfterExtraIteration] = "// AfterExtraIteration"
+            };
 
             private static readonly Dictionary<string, HostSignal> MessagesToSignals
                 = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
 
+            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
         }

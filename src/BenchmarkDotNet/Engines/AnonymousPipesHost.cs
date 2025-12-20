@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 using JetBrains.Annotations;
+using BenchmarkDotNet.Portability;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -36,8 +38,10 @@ namespace BenchmarkDotNet.Engines
 
         public void WriteLine() => outWriter.WriteLine();
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void WriteLine(string message) => outWriter.WriteLine(message);
 
+        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void SendSignal(HostSignal hostSignal)
         {
             if (hostSignal == HostSignal.AfterAll)

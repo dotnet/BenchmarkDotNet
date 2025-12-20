@@ -10,12 +10,12 @@ using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {
-    public readonly struct RunResults
+    public readonly struct RunResults(IReadOnlyList<Measurement> engineMeasurements, OutlierMode outlierMode, GcStats gcStats)
     {
-        private readonly OutlierMode outlierMode;
+        private readonly OutlierMode outlierMode = outlierMode;
 
         [PublicAPI]
-        public IReadOnlyList<Measurement>? EngineMeasurements { get; }
+        public IReadOnlyList<Measurement>? EngineMeasurements { get; } = engineMeasurements;
 
         [PublicAPI]
         public IReadOnlyList<Measurement>? Overhead
@@ -29,24 +29,7 @@ namespace BenchmarkDotNet.Engines
                 ?.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
                 .ToArray();
 
-        public GcStats GCStats { get; }
-
-        public ThreadingStats ThreadingStats { get; }
-
-        public double ExceptionFrequency { get; }
-
-        public RunResults(IReadOnlyList<Measurement> engineMeasurements,
-            OutlierMode outlierMode,
-            GcStats gcStats,
-            ThreadingStats threadingStats,
-            double exceptionFrequency)
-        {
-            this.outlierMode = outlierMode;
-            EngineMeasurements = engineMeasurements;
-            GCStats = gcStats;
-            ThreadingStats = threadingStats;
-            ExceptionFrequency = exceptionFrequency;
-        }
+        public GcStats GCStats { get; } = gcStats;
 
         public IEnumerable<Measurement> GetWorkloadResultMeasurements()
         {
@@ -91,10 +74,6 @@ namespace BenchmarkDotNet.Engines
 
             if (!GCStats.Equals(GcStats.Empty))
                 outWriter.WriteLine(GCStats.ToOutputLine());
-            if (!ThreadingStats.Equals(ThreadingStats.Empty))
-                outWriter.WriteLine(ThreadingStats.ToOutputLine());
-            if (ExceptionFrequency > 0)
-                outWriter.WriteLine(ExceptionsStats.ToOutputLine(ExceptionFrequency));
 
             outWriter.WriteLine();
         }

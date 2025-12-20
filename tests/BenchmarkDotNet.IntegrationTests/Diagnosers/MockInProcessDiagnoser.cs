@@ -6,13 +6,15 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
 public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDiagnoser
 {
-    public static Queue<string> s_completedResults = new();
+    public static Queue<(RunMode runMode, int order, string result)> s_completedResults = new();
 
     public Dictionary<BenchmarkCase, string> Results { get; } = [];
 
@@ -38,25 +40,47 @@ public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDi
     InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         => RunMode == RunMode.None
             ? default
-            : new(typeof(MockInProcessDiagnoserHandler), ExpectedResult);
+            : new(typeof(MockInProcessDiagnoserHandler), $"{GetSignal()} {ExpectedResult}");
+
+    private BenchmarkSignal GetSignal() => RunMode switch
+    {
+        RunMode.NoOverhead => BenchmarkSignal.AfterActualRun,
+        RunMode.ExtraIteration => BenchmarkSignal.AfterExtraIteration,
+        RunMode.ExtraRun => BenchmarkSignal.AfterActualRun,
+        _ => BenchmarkSignal.SeparateLogic
+    };
 
     public void DeserializeResults(BenchmarkCase benchmarkCase, string results)
     {
-        Results.Add(benchmarkCase, results);
-        s_completedResults.Enqueue(results);
+        var split = results.Split(' ');
+        int order = int.Parse(split[0]);
+        string result = split[1];
+        Results.Add(benchmarkCase, result);
+        s_completedResults.Enqueue((RunMode, order, result));
     }
 }
 
 public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
 {
+    private static int s_order;
+
+    private BenchmarkSignal _signal;
     private string _result;
 
     public void Initialize(string? serializedConfig)
     {
-        _result = serializedConfig ?? string.Empty;
+        var split = serializedConfig!.Split(' ');
+        _signal = (BenchmarkSignal) Enum.Parse(typeof(BenchmarkSignal), split[0]);
+        _result = split[1];
     }
 
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args) { }
+    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
+    {
+        if (signal == _signal)
+        {
+            _result = $"{Interlocked.Increment(ref s_order)} {_result}";
+        }
+    }
 
     public string SerializeResults() => _result;
 }

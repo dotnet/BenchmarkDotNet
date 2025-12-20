@@ -14,6 +14,10 @@ namespace BenchmarkDotNet.Diagnosers
         /// </summary>
         ExtraRun,
         /// <summary>
+        /// needs a single extra iteration of the benchmark
+        /// </summary>
+        ExtraIteration,
+        /// <summary>
         /// no overhead, can be executed without extra run
         /// </summary>
         NoOverhead,

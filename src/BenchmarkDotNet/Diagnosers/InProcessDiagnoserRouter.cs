@@ -1,7 +1,9 @@
-﻿using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Diagnosers;
 
@@ -33,4 +35,10 @@ public struct InProcessDiagnoserRouter
             runMode = diagnoser.GetRunMode(benchmarkCase)
         };
     }
+
+    [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
+    internal readonly bool ShouldHandle(RunMode runMode)
+        => this.runMode == runMode
+        // ExtraIteration is merged with NoOverhead, so we need to check it explicitly.
+        || (runMode == RunMode.NoOverhead && this.runMode == RunMode.ExtraIteration);
 }

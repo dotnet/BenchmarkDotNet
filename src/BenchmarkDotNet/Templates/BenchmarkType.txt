@@ -48,7 +48,7 @@
                 IterationCleanupAction = instance.iterationCleanupAction,
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
-                MeasureExtraStats = $MeasureExtraStats$,
+                RunExtraIteration = $RunExtraIteration$,
                 BenchmarkName = benchmarkName,
                 InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
             };

@@ -16,6 +16,12 @@ public enum BenchmarkSignal
     /// <inheritdoc cref="HostSignal.AfterActualRun"/>
     AfterActualRun,
 
+    /// <inheritdoc cref="HostSignal.BeforeExtraIteration"/>
+    BeforeExtraIteration,
+
+    /// <inheritdoc cref="HostSignal.AfterExtraIteration"/>
+    AfterExtraIteration,
+
     /// <summary>
     /// after the engine has completed the run
     /// </summary>

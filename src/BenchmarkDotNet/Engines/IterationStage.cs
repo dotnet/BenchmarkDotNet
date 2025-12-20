@@ -2,6 +2,8 @@
 {
     public enum IterationStage
     {
+        Unknown,
+
         Jitting,
 
         /// <summary>
@@ -15,6 +17,6 @@
 
         Result,
 
-        Unknown
+        Extra,
     }
 }
