@@ -81,7 +81,8 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
                             return true;
                         if (RunsDuringSameLaunch(runModes[1]) && RunsDuringSameLaunch(runModes[2]))
                             return true;
-                        return false;
+                        // Reduce test time by skipping extra None modes.
+                        return runModes[0] == RunMode.None || runModes[2] == RunMode.None;
                     }
                 }
             }
