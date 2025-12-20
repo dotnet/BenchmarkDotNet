@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Jobs
         public int GetHashCode(Job obj) => obj.Id.GetHashCode();
 
 #if !NET10_0_OR_GREATER
-        internal class NumericStringComparer : IComparer<string>
+        private class NumericStringComparer : IComparer<string>
         {
             public int Compare(string? x, string? y)
             {
