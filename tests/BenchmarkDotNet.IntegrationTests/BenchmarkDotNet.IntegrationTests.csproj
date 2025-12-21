@@ -125,4 +125,5 @@
       <LastGenOutput>RunnableVoidCaseBenchmark.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

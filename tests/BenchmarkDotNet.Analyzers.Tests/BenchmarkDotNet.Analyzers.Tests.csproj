@@ -30,4 +30,5 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

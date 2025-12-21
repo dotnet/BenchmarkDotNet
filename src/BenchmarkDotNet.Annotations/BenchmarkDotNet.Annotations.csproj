@@ -47,4 +47,5 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
+  <Import Project="..\..\build\common.targets" />
 </Project>

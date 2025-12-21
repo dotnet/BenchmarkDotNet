@@ -7,7 +7,6 @@
     <AssemblyName>BenchmarkDotNet.Samples</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>BenchmarkDotNet.Samples</PackageId>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>$(NoWarn);CA1018;CA5351;CA1825</NoWarn>
@@ -44,4 +43,5 @@
     <!-- Enables analyzers for this project (this is required since ProjectReference is not transitive). -->
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

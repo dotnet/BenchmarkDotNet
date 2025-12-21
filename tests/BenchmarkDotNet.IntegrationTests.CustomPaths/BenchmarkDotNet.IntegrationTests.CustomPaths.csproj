@@ -29,4 +29,5 @@
       <HintPath>customPath\VerySimple.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

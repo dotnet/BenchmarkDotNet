@@ -14,4 +14,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.21" PrivateAssets="contentfiles;analyzers" />
   </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
 </Project>

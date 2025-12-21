@@ -31,4 +31,6 @@ then run `build.cmd pack-weaver`.
     <Content Include="$(OutputPath)**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
     <None Remove="packages\**" />
   </ItemGroup>
+
+  <Import Project="..\..\build\common.targets" />
 </Project>

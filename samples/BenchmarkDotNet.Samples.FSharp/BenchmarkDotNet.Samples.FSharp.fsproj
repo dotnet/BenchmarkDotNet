@@ -1,8 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- MSBuild was complaing about InformationalVersion from common.props file, so I excluded them in conditional way -->
-    <IsFsharp>true</IsFsharp>
-  </PropertyGroup>
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -28,4 +24,6 @@
     <PackageReference Update="System.ValueTuple" Version="4.6.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
   </ItemGroup>
+
+  <Import Project="..\..\build\common.targets" />
 </Project>

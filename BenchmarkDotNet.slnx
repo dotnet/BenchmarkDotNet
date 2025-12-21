@@ -1,5 +1,10 @@
 <Solution>
+  <Folder Name="/build/">
+    <File Path="build/common.props" />
+    <File Path="build/common.targets" />
+  </Folder>
   <Folder Name="/samples/">
+    <File Path="samples/Directory.Build.props" />
     <Project Path="samples/BenchmarkDotNet.Samples.FSharp/BenchmarkDotNet.Samples.FSharp.fsproj" />
     <Project Path="samples/BenchmarkDotNet.Samples/BenchmarkDotNet.Samples.csproj" DefaultStartup="true" />
   </Folder>
@@ -19,6 +24,7 @@
     <Project Path="templates/BenchmarkDotNet.Templates.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <File Path="tests/Directory.Build.props" />
     <Project Path="tests/BenchmarkDotNet.Analyzers.Tests/BenchmarkDotNet.Analyzers.Tests.csproj" />
     <Project Path="tests/BenchmarkDotNet.Exporters.Plotting.Tests/BenchmarkDotNet.Exporters.Plotting.Tests.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ConfigPerAssembly/BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj" />
