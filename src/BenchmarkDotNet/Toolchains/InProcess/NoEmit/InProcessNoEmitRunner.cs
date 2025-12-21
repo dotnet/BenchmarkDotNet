@@ -166,14 +166,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
                 };
 
-                using (var engine = job
+                var results = job
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
-                    .CreateReadyToRun(engineParameters))
-                {
-                    var results = engine.Run();
+                    .Create(engineParameters)
+                    .Run();
+                host.ReportResults(results); // printing costs memory, do this after runs
 
-                    host.ReportResults(results); // printing costs memory, do this after runs
-                }
                 compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
             }
         }

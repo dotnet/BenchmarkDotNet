@@ -2,6 +2,6 @@ namespace BenchmarkDotNet.Engines
 {
     public interface IEngineFactory
     {
-        IEngine CreateReadyToRun(EngineParameters engineParameters);
+        IEngine Create(EngineParameters engineParameters);
     }
 }

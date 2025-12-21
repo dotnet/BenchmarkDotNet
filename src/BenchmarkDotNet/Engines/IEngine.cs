@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace BenchmarkDotNet.Engines;
 
-namespace BenchmarkDotNet.Engines
+public interface IEngine
 {
-    public interface IEngine : IDisposable
-    {
-        RunResults Run();
-    }
+    RunResults Run();
 }
