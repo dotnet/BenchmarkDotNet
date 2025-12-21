@@ -28,13 +28,13 @@ namespace BenchmarkDotNet.Order
         public DefaultOrderer(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared,
-            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Default)
+            JobOrderPolicy jobOrderPolicy = JobOrderPolicy.Numeric)
         {
             SummaryOrderPolicy = summaryOrderPolicy;
             MethodOrderPolicy = methodOrderPolicy;
-            jobComparer = jobOrderPolicy == JobOrderPolicy.Default
-                ? JobComparer.Instance
-                : JobComparer.Numeric;
+            jobComparer = jobOrderPolicy == JobOrderPolicy.Ordinal
+                ? JobComparer.Ordinal
+                : JobComparer.Default;
             targetComparer = new DescriptorComparer(methodOrderPolicy);
         }
 

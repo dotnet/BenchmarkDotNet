@@ -26,27 +26,27 @@ public class JobOrderTests
                    .WithId("v1.4.2"),
         ];
 
-        // Verify jobs are sorted by JobId's ordinal order.
+        // Verify jobs are sorted by JobId's default order (numeric order).
         {
             // Act
-            var comparer = JobComparer.Instance;
+            var comparer = JobComparer.Default;
             var results = jobs.OrderBy(x => x, comparer)
                               .Select(x => x.Job.Id)
                               .ToArray();
 
             // Assert
-            Assert.Equal(["v1.4.1", "v1.4.10", "v1.4.2"], results);
+            Assert.Equal(["v1.4.1", "v1.4.2", "v1.4.10"], results);
         }
 
-        // Verify jobs are sorted by JobId's numeric order.
+        // Verify jobs are sorted by JobId's ordinal order.
         {
             // Act
-            var comparer = JobComparer.Numeric;
+            var comparer = JobComparer.Ordinal;
             var results = jobs.OrderBy(d => d, comparer)
                               .Select(x => x.Job.Id)
                               .ToArray();
             // Assert
-            Assert.Equal(["v1.4.1", "v1.4.2", "v1.4.10"], results);
+            Assert.Equal(["v1.4.1", "v1.4.10", "v1.4.2"], results);
         }
     }
 
@@ -65,8 +65,8 @@ public class JobOrderTests
         ];
 
         // Act
-        // Verify jobs are sorted by Runtime's numeric order.
-        var results = jobs.OrderBy(d => d, JobComparer.Numeric)
+        // Verify jobs are sorted by Runtime name order.
+        var results = jobs.OrderBy(d => d, JobComparer.Default)
                           .Select(x => x.Job.Environment.GetRuntime().Name)
                           .ToArray();
 
@@ -92,8 +92,8 @@ public class JobOrderTests
         ];
 
         // Act
-        // Verify jobs are sorted by Toolchain's numeric order.
-        var results = jobs.OrderBy(d => d, JobComparer.Numeric)
+        // Verify jobs are sorted by Toolchain name order.
+        var results = jobs.OrderBy(d => d, JobComparer.Default)
                           .Select(x => x.Job.GetToolchain().Name)
                           .ToArray();
 
@@ -132,12 +132,15 @@ public class JobOrderTests
     [InlineData(".NET 08", ".NET 10", -1)]
     [InlineData(".NET 10", ".NET 08", 1)]
     // Arguments that contains null
-    [InlineData(null, "a", -1)]
-    [InlineData("a", null, 1)]
-    [InlineData(null, null, 0)]
-    public void TestNumericComparer(string? a, string? b, int expectedSign)
+    [InlineData("", "a", -1)]
+    [InlineData("a", "", 1)]
+    [InlineData("", "", 0)]
+    public void TestNumericComparer(string a, string b, int expectedSign)
     {
-        int result = new JobComparer.NumericStringComparer().Compare(a, b);
+        var jobA = new Job(a);
+        var jobB = new Job(b);
+
+        int result = JobComparer.Default.Compare(jobA, jobB);
         Assert.Equal(expectedSign, NormalizeSign(result));
 
         static int NormalizeSign(int value)
