@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -62,26 +59,37 @@ namespace BenchmarkDotNet.Engines
             random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
-        public void Dispose()
+        public RunResults Run()
         {
+            Parameters.GlobalSetupAction.Invoke();
+            bool didThrow = false;
             try
             {
-                Parameters.GlobalCleanupAction.Invoke();
+                return RunCore();
             }
-            catch (Exception e)
+            catch
             {
-                Host.SendError("Exception during GlobalCleanup!");
-                Host.SendError(e.Message);
-
-                // we don't rethrow because this code is executed in a finally block
-                // and it could possibly overwrite current exception #1045
+                didThrow = true;
+                throw;
+            }
+            finally
+            {
+                try
+                {
+                    Parameters.GlobalCleanupAction.Invoke();
+                }
+                // We only catch if the benchmark threw to not overwrite the exception. #1045
+                catch (Exception e) when (didThrow)
+                {
+                    Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
+                }
             }
         }
 
         // AggressiveOptimization forces the method to go straight to tier1 JIT, and will never be re-jitted,
         // eliminating tiered JIT as a potential variable in measurements.
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public RunResults Run()
+        private RunResults RunCore()
         {
             var measurements = new List<Measurement>();
 

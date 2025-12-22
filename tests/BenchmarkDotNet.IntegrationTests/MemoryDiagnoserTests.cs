@@ -289,6 +289,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [GlobalCleanup]
             public void Cleanup()
             {
+                countdownEvent.Reset(ThreadsCount);
                 keepRunning = false;
                 barrier.SignalAndWait();
                 foreach (var thread in threads)

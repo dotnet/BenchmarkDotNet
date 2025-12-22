@@ -50,40 +50,32 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CustomFactory : IEngineFactory
         {
-            public IEngine CreateReadyToRun(EngineParameters engineParameters)
-            {
-                var engine = new CustomEngine
-                {
-                    GlobalCleanupAction = engineParameters.GlobalCleanupAction,
-                    GlobalSetupAction = engineParameters.GlobalSetupAction
-                };
-
-                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change)
-
-                return engine;
-            }
+            public IEngine Create(EngineParameters engineParameters)
+                => new CustomEngine(engineParameters);
         }
 
-        public class CustomEngine : IEngine
+        public class CustomEngine(EngineParameters engineParameters) : IEngine
         {
             public RunResults Run()
             {
+                engineParameters.GlobalSetupAction.Invoke();
                 Console.WriteLine(EngineRunMessage);
-
-                return new RunResults(
-                    new List<Measurement>
-                    {
-                        new(1, IterationMode.Overhead, IterationStage.Actual, 1, 1, 1),
-                        new(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1)
-                    },
-                    OutlierMode.DontRemove,
-                    default);
+                try
+                {
+                    return new RunResults(
+                        [
+                            new(1, IterationMode.Overhead, IterationStage.Actual, 1, 1, 1),
+                            new(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1)
+                        ],
+                        OutlierMode.DontRemove,
+                        default
+                    );
+                }
+                finally
+                {
+                    engineParameters.GlobalCleanupAction.Invoke();
+                }
             }
-
-            public void Dispose() => GlobalCleanupAction?.Invoke();
-
-            public Action GlobalSetupAction { get; set; }
-            public Action GlobalCleanupAction { get; set; }
         }
     }
 }

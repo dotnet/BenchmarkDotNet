@@ -9,17 +9,10 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
 {
-    public class EngineFactoryTests
+    public class EnumerateStagesTests
     {
-        private int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
-
         private static TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
         private static TimeInterval IterationTimeInternal => TimeInterval.FromMilliseconds(IterationTime.Milliseconds);
-
-        private void GlobalSetup() => timesGlobalSetupCalled++;
-        private void IterationSetup() => timesIterationSetupCalled++;
-        private void IterationCleanup() => timesIterationCleanupCalled++;
-        private void GlobalCleanup() => timesGlobalCleanupCalled++;
 
         private static readonly Dictionary<string, Job> JobsWhichDontRequireJitting = new Dictionary<string, Job>
         {
@@ -33,14 +26,13 @@ namespace BenchmarkDotNet.Tests.Engine
 
         [Theory]
         [MemberData(nameof(JobsWhichDontRequireJittingNames))]
-        public void ForJobsThatDontRequireJittingOnlyGlobalSetupIsCalled(string jobName)
+        public void JobsThatDontRequireJittingSkipJitStage(string jobName)
         {
             var job = JobsWhichDontRequireJitting[jobName];
             var engineParameters = CreateEngineParameters(job);
 
-            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
             bool didRunStages = false;
-            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
             {
                 Assert.True(stage is not EngineJitStage);
                 didRunStages = true;
@@ -48,24 +40,15 @@ namespace BenchmarkDotNet.Tests.Engine
             }
 
             Assert.True(didRunStages);
-            Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(0, timesIterationSetupCalled);
-            Assert.Equal(0, timesIterationCleanupCalled);
-            Assert.Equal(0, timesGlobalCleanupCalled);
-
-            engine.Dispose();
-
-            Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
         [Fact]
-        public void ForDefaultSettingsVeryTimeConsumingBenchmarksAreExecutedOncePerIterationWithoutOverheadDeduction()
+        public void DefaultSettingsVeryTimeConsumingBenchmarksAreExecutedOncePerIterationWithoutOverheadDeduction()
         {
             var engineParameters = CreateEngineParameters(Job.Default);
 
-            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
             bool didRunActualStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
             {
                 Assert.NotEqual(IterationMode.Overhead, stage.Mode);
 
@@ -86,12 +69,6 @@ namespace BenchmarkDotNet.Tests.Engine
             }
 
             Assert.True(didRunActualStage);
-            Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
-
-            engine.Dispose(); // cleanup is called as part of dispose
-
-            Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
         [Theory]
@@ -99,14 +76,13 @@ namespace BenchmarkDotNet.Tests.Engine
         [InlineData(250, 250)] // 250 ms as configured in dotnet/performance repo
         [InlineData(EngineResolver.DefaultIterationTime, EngineResolver.DefaultIterationTime)] // 500 ms - the default BDN setting
         [InlineData(EngineResolver.DefaultIterationTime, 20000)] // 20 seconds - twice the cutoff threshold of the old jit stage heuristic #2004
-        public void BenchmarksThatRunLongerThanIterationTimeOnlyDuringFirstInvocationAreNotInvokedOncePerIteration(int iterationTime, int callTime)
+        public void BenchmarksThatRunLongerThanIterationTimeOnlyDuringFirstInvocationAreInvokedMoreThanOncePerIteration(int iterationTime, int callTime)
         {
             var callTimeInterval = TimeInterval.FromMilliseconds(callTime);
             var engineParameters = CreateEngineParameters(Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(iterationTime)));
 
-            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
             bool didRunActualStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -118,40 +94,33 @@ namespace BenchmarkDotNet.Tests.Engine
 
                 if (stage is EngineActualStage { Mode: IterationMode.Workload } actualStage)
                 {
-                    Assert.NotEqual(1, actualStage.invokeCount * actualStage.unrollFactor);
+                    Assert.True(actualStage.invokeCount > 1);
                     didRunActualStage = true;
                     break;
                 }
             }
 
             Assert.True(didRunActualStage);
-            Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
-
-            engine.Dispose(); // cleanup is called as part of dispose
-
-            Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
         [Fact]
-        public void ForJobsWithExplicitUnrollFactorTheGlobalSetupAndUnrollAreCalled()
-            => AssertGlobalSetupWasCalledAndUnrollWasRan(Job.Default.WithUnrollFactor(16));
+        public void JobWithExplicitUnrollFactorUnrolls()
+            => AssertUnroll(Job.Default.WithUnrollFactor(16));
 
         [Fact]
-        public void ForJobsThatDontRequirePilotTheGlobalSetupAndUnrollAreCalled()
-            => AssertGlobalSetupWasCalledAndUnrollWasRan(Job.Default.WithInvocationCount(100));
+        public void JobWithExplicitInvocationCountUnrolls()
+            => AssertUnroll(Job.Default.WithInvocationCount(100));
 
         [Fact]
-        public void NonVeryTimeConsumingBenchmarksAreExecutedMoreThanOncePerIterationWithUnrollFactorForDefaultSettings()
-            => AssertGlobalSetupWasCalledAndUnrollWasRan(Job.Default);
+        public void DefaultJobUnrolls()
+            => AssertUnroll(Job.Default);
 
-        private void AssertGlobalSetupWasCalledAndUnrollWasRan(Job job)
+        private void AssertUnroll(Job job)
         {
             var engineParameters = CreateEngineParameters(job);
 
-            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
             bool didRunUnroll = false;
-            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -163,17 +132,10 @@ namespace BenchmarkDotNet.Tests.Engine
             }
 
             Assert.True(didRunUnroll);
-
-            Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(0, timesGlobalCleanupCalled);
-
-            engine.Dispose();
-
-            Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
         [Fact]
-        public void MediumTimeConsumingBenchmarksShouldStartPilotFrom2AndIncrementItWithEveryStep()
+        public void MediumTimeConsumingBenchmarksStartPilotFrom2AndIncrementItWithEveryStep()
         {
             const int times = 5; // how many times we should invoke the benchmark per iteration
 
@@ -181,9 +143,8 @@ namespace BenchmarkDotNet.Tests.Engine
 
             var engineParameters = CreateEngineParameters(Job.Default);
 
-            var engine = (Engines.Engine) new EngineFactory().CreateReadyToRun(engineParameters);
             bool didRunPilotStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engine.Parameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -206,12 +167,6 @@ namespace BenchmarkDotNet.Tests.Engine
             }
 
             Assert.True(didRunPilotStage);
-            Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(0, timesGlobalCleanupCalled);
-
-            engine.Dispose();
-
-            Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
         private EngineParameters CreateEngineParameters(Job job)
@@ -219,13 +174,13 @@ namespace BenchmarkDotNet.Tests.Engine
             var host = new NoAcknowledgementConsoleHost();
             return new()
             {
-                GlobalSetupAction = GlobalSetup,
-                GlobalCleanupAction = GlobalCleanup,
+                GlobalSetupAction = () => { },
+                GlobalCleanupAction = () => { },
                 Host = host,
                 OverheadActionUnroll = _ => { },
                 OverheadActionNoUnroll = _ => { },
-                IterationCleanupAction = IterationCleanup,
-                IterationSetupAction = IterationSetup,
+                IterationCleanupAction = () => { },
+                IterationSetupAction = () => { },
                 WorkloadActionUnroll = _ => { },
                 WorkloadActionNoUnroll = _ => { },
                 TargetJob = job,

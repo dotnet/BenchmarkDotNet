@@ -53,14 +53,10 @@
                 InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
             };
 
-            using (global::BenchmarkDotNet.Engines.IEngine engine = new $EngineFactoryType$().CreateReadyToRun(engineParameters))
-            {
-                global::BenchmarkDotNet.Engines.RunResults results = engine.Run();
+            global::BenchmarkDotNet.Engines.RunResults results = new $EngineFactoryType$().Create(engineParameters).Run();
+            host.ReportResults(results); // printing costs memory, do this after runs
 
-                host.ReportResults(results); // printing costs memory, do this after runs
-
-                instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
-            }
+            instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
             compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.AfterEngine);
         }
 

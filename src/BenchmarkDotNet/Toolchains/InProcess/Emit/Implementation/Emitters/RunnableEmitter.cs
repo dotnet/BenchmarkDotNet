@@ -873,7 +873,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var argsExceptInstance = prepareForRunMethodTemplate
                 .GetParameters()
                 .Skip(1)
-                .Select(p => (ParameterInfo)new EmitParameterInfo(p.Position - 1, p.Name, p.ParameterType, p.Attributes, null))
+                .Select(p => (ParameterInfo) new EmitParameterInfo(p.Position - 1, p.Name, p.ParameterType, p.Attributes, null))
                 .ToArray();
             var methodBuilder = runnableBuilder.DefineStaticMethod(
                 RunMethodName,
@@ -892,15 +892,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     [1] class [BenchmarkDotNet]BenchmarkDotNet.Jobs.Job,
                     [2] class [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters,
                     [3] class [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngineFactory,
-                    [4] class [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine,
-                    [5] valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults
+                    [4] valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults
                 )
              */
             var instanceLocal = ilBuilder.DeclareLocal(runnableBuilder);
             var jobLocal = ilBuilder.DeclareLocal(typeof(Job));
             var engineParametersLocal = ilBuilder.DeclareLocal(typeof(EngineParameters));
             var engineFactoryLocal = ilBuilder.DeclareLocal(typeof(IEngineFactory));
-            var engineLocal = ilBuilder.DeclareLocal(typeof(IEngine));
             var runResultsLocal = ilBuilder.DeclareLocal(typeof(RunResults));
 
             /*
@@ -961,82 +959,48 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.EmitVoidReturn(methodBuilder);
 
             /*
-                // using (IEngine engine = engineFactory.CreateReadyToRun(engineParameters))
+                // RunResults results = engineFactory.Create(engineParameters).Run();
                 IL_0026: ldloc.3
                 IL_0027: ldloc.2
-                IL_0028: callvirt instance class [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngineFactory::CreateReadyToRun(class [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters)
-                IL_002d: stloc.s 4
+                IL_0028: callvirt instance class [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngineFactory::Create(class [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters)
+                IL_002d: callvirt instance valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine::Run()
+                IL_0032: stloc.s 4
              */
-            var createReadyToRunMethod = typeof(IEngineFactory).GetMethod(nameof(IEngineFactory.CreateReadyToRun))
-                ?? throw new MissingMemberException(nameof(IEngineFactory.CreateReadyToRun));
+            var createReadyToRunMethod = typeof(IEngineFactory).GetMethod(nameof(IEngineFactory.Create))
+                ?? throw new MissingMemberException(nameof(IEngineFactory.Create));
+            var runMethodImpl = typeof(IEngine).GetMethod(nameof(IEngine.Run))
+                ?? throw new MissingMemberException(nameof(IEngine.Run));
             ilBuilder.MarkLabel(notNullLabel);
             ilBuilder.EmitLdloc(engineFactoryLocal);
             ilBuilder.EmitLdloc(engineParametersLocal);
             ilBuilder.Emit(OpCodes.Callvirt, createReadyToRunMethod);
-            ilBuilder.EmitStloc(engineLocal);
+            ilBuilder.Emit(OpCodes.Callvirt, runMethodImpl);
+            ilBuilder.EmitStloc(runResultsLocal);
+            /*
+                // host.ReportResults(runResults);
+                IL_0034: ldarg.0
+                IL_0035: ldloc.s 4
+                IL_0037: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.IHost::ReportResults(valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults)
+            */
 
-            // .try
-            // {
-            ilBuilder.BeginExceptionBlock();
-            {
-                /*
-                    // RunResults results = engine.Run();
-                    IL_002f: ldloc.s 4
-                    IL_0031: callvirt instance valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngine::Run()
-                    IL_0036: stloc.s 5
-                 */
-                var runMethodImpl = typeof(IEngine).GetMethod(nameof(IEngine.Run))
-                    ?? throw new MissingMemberException(nameof(IEngine.Run));
-                ilBuilder.EmitLdloc(engineLocal);
-                ilBuilder.Emit(OpCodes.Callvirt, runMethodImpl);
-                ilBuilder.EmitStloc(runResultsLocal);
-                /*
-                    // host.ReportResults(results);
-                    IL_0038: ldarg.1
-                    IL_0039: ldloc.s 5
-                    IL_003b: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.IHost::ReportResults(valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.RunResults)
-                 */
-                var reportResultsMethod = typeof(IHost).GetMethod(nameof(IHost.ReportResults))
-                    ?? throw new MissingMemberException(nameof(IHost.ReportResults));
-                ilBuilder.EmitLdarg(hostArg);
-                ilBuilder.EmitLdloc(runResultsLocal);
-                ilBuilder.Emit(OpCodes.Callvirt, reportResultsMethod);
-                /*
-                    // instance.__TrickTheJIT__();
-                    IL_0040: ldloc.0
-                    IL_0041: callvirt instance void BenchmarkDotNet.Autogenerated.ReplaceMe.Runnable0::__TrickTheJIT__()
-                 */
-                ilBuilder.Emit(OpCodes.Ldloc_0);
-                ilBuilder.Emit(OpCodes.Callvirt, trickTheJitMethod);
-            }
-            // finally
-            // {
-            ilBuilder.BeginFinallyBlock();
-            {
-                /*
-                    IL_0048: ldloc.s 4
-                    IL_004a: brfalse.s IL_0053
-                    IL_004c: ldloc.s 4
-                    IL_004e: callvirt instance void [mscorlib]System.IDisposable::Dispose()
-                 */
-                var disposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose))
-                    ?? throw new MissingMemberException(nameof(IDisposable.Dispose));
-                var disposeNullLabel = ilBuilder.DefineLabel();
-                ilBuilder.EmitLdloc(engineLocal);
-                ilBuilder.Emit(OpCodes.Brfalse_S, disposeNullLabel);
-                ilBuilder.EmitLdloc(engineLocal);
-                ilBuilder.Emit(OpCodes.Callvirt, disposeMethod);
-
-                ilBuilder.MarkLabel(disposeNullLabel);
-                ilBuilder.EndExceptionBlock();
-            }
-
+            var reportResultsMethod = typeof(IHost).GetMethod(nameof(IHost.ReportResults))
+                ?? throw new MissingMemberException(nameof(IHost.ReportResults));
+            ilBuilder.EmitLdarg(hostArg);
+            ilBuilder.EmitLdloc(runResultsLocal);
+            ilBuilder.Emit(OpCodes.Callvirt, reportResultsMethod);
+            /*
+                // runnable_.__TrickTheJIT__();
+                IL_003c: ldloc.0
+                IL_003d: callvirt instance void BenchmarkDotNet.Autogenerated.ReplaceMe.Runnable_0::__TrickTheJIT__()
+             */
+            ilBuilder.Emit(OpCodes.Ldloc_0);
+            ilBuilder.Emit(OpCodes.Callvirt, trickTheJitMethod);
             /*
                 // engineParameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
-                IL_0054: ldloc.2
-                IL_0055: callvirt instance class [BenchmarkDotNet]BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters::get_InProcessDiagnoserHandler()
-                IL_005a: ldc.i4.3
-                IL_005b: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler::Handle(valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.BenchmarkSignal)
+                IL_0042: ldloc.2
+                IL_0043: callvirt instance class [BenchmarkDotNet]BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters::get_InProcessDiagnoserHandler()
+                IL_0048: ldc.i4.5
+                IL_0049: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler::Handle(valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.BenchmarkSignal)
             */
             ilBuilder.EmitLdloc(engineParametersLocal);
             ilBuilder.Emit(OpCodes.Callvirt, typeof(EngineParameters).GetProperty(nameof(EngineParameters.InProcessDiagnoserHandler)).GetGetMethod());
