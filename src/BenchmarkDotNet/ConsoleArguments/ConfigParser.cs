@@ -18,6 +18,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains.CompositeR2R;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -641,6 +642,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Mono11_0:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono11_0);
 
+                case RuntimeMoniker.CompositeR2R10_0:
+                case RuntimeMoniker.CompositeR2R11_0:
+                    return CreateCompositeR2RJob(baseJob, options, runtimeMoniker.GetRuntime());
+
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
@@ -701,6 +706,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                 aotCompilerMode: options.AOTCompilerMode));
 
             return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain).WithId(monoAotLLVMRuntime.Name);
+        }
+
+        private static Job CreateCompositeR2RJob(Job baseJob, CommandLineOptions options, Runtime runtime)
+        {
+            var toolChain = CompositeR2RToolchain.From(
+            new NetCoreAppSettings(
+                targetFrameworkMoniker: runtime.MsBuildMoniker,
+                runtimeFrameworkVersion: null,
+                name: $"CompositeR2R {runtime.Name}",
+                customDotNetCliPath: options.CliPath?.FullName,
+                packagesPath: options.RestorePath?.FullName,
+                customRuntimePack: options.CustomRuntimePack,
+                aotCompilerPath: options.AOTCompilerPath != null ? options.AOTCompilerPath.ToString() : null));
+
+            return baseJob.WithRuntime(runtime).WithToolchain(toolChain).WithId("CompositeR2R");
         }
 
         private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
