@@ -29,6 +29,7 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly bool performExtraBenchmarksRun;
 
         private Task collectingTask;
+        private EventPipeSession currentSession = null;
 
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
         // we use performExtraBenchmarksRun = false for better first user experience
@@ -71,17 +72,21 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (signal != HostSignal.BeforeAnythingElse)
-                return;
+            if (signal == HostSignal.BeforeAnythingElse)
+            {
+                var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
 
-            var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
+                currentSession = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
 
-            EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
+                var fileName = ArtifactFileNameHelper.GetTraceFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
+                benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
-            var fileName = ArtifactFileNameHelper.GetTraceFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
-            benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
-
-            collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, parameters.Config.GetCompositeLogger()));
+                collectingTask = Task.Run(() => CopyEventStreamToFile(currentSession, fileName, parameters.Config.GetCompositeLogger()));
+            }
+            else if (signal == HostSignal.AfterAll)
+            {
+                currentSession?.Stop();
+            }
         }
 
         private static void CopyEventStreamToFile(EventPipeSession session, string fileName, ILogger logger)
