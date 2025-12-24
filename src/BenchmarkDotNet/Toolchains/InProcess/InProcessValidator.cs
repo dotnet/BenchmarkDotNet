@@ -144,16 +144,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <returns>Enumerable of validation errors.</returns>
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            foreach (var target in validationParameters.Benchmarks
-                .Where(benchmark => benchmark.Descriptor.AdditionalLogic.IsNotBlank())
-                .Select(b => b.Descriptor)
-                .Distinct())
-            {
-                yield return new ValidationError(
-                    false,
-                    $"Target {target} has {nameof(target.AdditionalLogic)} filled. AdditionalLogic is not supported by in-process toolchain.");
-            }
-
             foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments && benchmark.GetToolchain() is InProcessNoEmitToolchain))
                 yield return new ValidationError(true, "Arguments are not supported by the InProcessNoEmitToolchain, see #687 for more details", benchmarkWithArguments);
 

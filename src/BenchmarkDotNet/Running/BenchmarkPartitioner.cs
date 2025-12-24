@@ -49,9 +49,6 @@ namespace BenchmarkDotNet.Running
                 if (x.Descriptor.Type.Assembly.Location != y.Descriptor.Type.Assembly.Location) // some toolchains produce the exe in the same folder as .dll (to get some scenarios like native dependencies work)
                     return false;
 
-                if (x.Descriptor.AdditionalLogic != y.Descriptor.AdditionalLogic) // it can be anything
-                    return false;
-
                 if (x.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count() !=
                     y.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Count()) // STA vs STA
                     return false;
@@ -65,7 +62,6 @@ namespace BenchmarkDotNet.Running
                 hashCode.Add(obj.GetToolchain());
                 hashCode.Add(obj.GetRuntime());
                 hashCode.Add(obj.Descriptor.Type.Assembly.Location);
-                hashCode.Add(obj.Descriptor.AdditionalLogic);
                 hashCode.Add(obj.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any());
                 var job = obj.Job;
                 hashCode.Add(job.Environment.Jit);
