@@ -28,7 +28,6 @@ namespace BenchmarkDotNet.Code
             var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
 
             var extraDefines = new List<string>();
-            var additionalLogic = new HashSet<string>();
 
             foreach (var buildInfo in buildPartition.Benchmarks)
             {
@@ -37,8 +36,6 @@ namespace BenchmarkDotNet.Code
                 var provider = GetDeclarationsProvider(benchmark.Descriptor);
 
                 string passArguments = GetPassArguments(benchmark);
-
-                AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
                 string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
                     .Replace("$ID$", buildInfo.Id.ToString())
@@ -77,7 +74,6 @@ namespace BenchmarkDotNet.Code
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
                 .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
-                .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
                 .Replace("$NativeAotSwitch$", GetNativeAotSwitch(buildPartition))
