@@ -1,5 +1,7 @@
 ﻿using Iced.Intel;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
     internal static class IntelInstructionFormatter

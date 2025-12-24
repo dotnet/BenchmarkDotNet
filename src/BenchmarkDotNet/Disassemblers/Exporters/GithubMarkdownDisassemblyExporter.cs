@@ -7,6 +7,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal class GithubMarkdownDisassemblyExporter : ExporterBase
@@ -27,7 +29,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         {
             foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
-                logger.WriteLine($"## {summary[benchmarkCase].GetRuntimeInfo()} (Job: {benchmarkCase.Job.DisplayInfo})");
+                logger.WriteLine($"## {summary[benchmarkCase]!.GetRuntimeInfo()} (Job: {benchmarkCase.Job.DisplayInfo})");
                 logger.WriteLine();
 
                 Export(logger, results[benchmarkCase], config);

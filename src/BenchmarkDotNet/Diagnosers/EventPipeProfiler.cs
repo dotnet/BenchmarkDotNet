@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (signal != HostSignal.BeforeAnythingElse)
                 return;
 
-            var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
+            var diagnosticsClient = new DiagnosticsClient(parameters.ProcessId);
 
             EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
 

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal static class DisassemblyPrettifier
@@ -9,9 +11,9 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         internal class Element
         {
             internal string TextRepresentation { get; }
-            internal SourceCode Source { get; }
+            internal SourceCode? Source { get; }
 
-            public Element(string textRepresentation, SourceCode source)
+            public Element(string textRepresentation, SourceCode? source)
             {
                 TextRepresentation = textRepresentation;
                 Source = source;
@@ -69,7 +71,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     else if (instruction is Asm asm)
                     {
                         // this IP is referenced by some jump|call, so we add a label
-                        if (addressesToLabels.TryGetValue(asm.InstructionPointer, out string label))
+                        if (addressesToLabels.TryGetValue(asm.InstructionPointer, out var label))
                         {
                             prettified.Add(new Label(label));
                         }
@@ -78,7 +80,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                         {
                             ulong referencedAddress = asm.ReferencedAddress.Value;
                             // jump or a call within same method
-                            if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
+                            if (addressesToLabels.TryGetValue(referencedAddress, out var translated))
                             {
                                 prettified.Add(new Reference(CodeFormatter.Format(asm, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
                                 continue;

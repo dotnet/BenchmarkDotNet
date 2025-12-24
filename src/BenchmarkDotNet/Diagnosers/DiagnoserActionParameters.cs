@@ -1,6 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -13,7 +16,9 @@ namespace BenchmarkDotNet.Diagnosers
             BenchmarkId = benchmarkId;
         }
 
-        public Process Process { get; }
+        public Process? Process { get; }
+
+        public int ProcessId => Process?.Id ?? throw new InvalidOperationException("The process instance is not set.");
 
         public BenchmarkCase BenchmarkCase { get; }
 

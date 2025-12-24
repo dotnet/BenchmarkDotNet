@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
     internal struct RegisterValueAccumulator
@@ -193,7 +195,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
-            if (!runtimeSpecificData.TryGetValue(state.RuntimeVersion, out RuntimeSpecificData data))
+            if (!runtimeSpecificData.TryGetValue(state.RuntimeVersion, out var data))
             {
                 runtimeSpecificData.Add(state.RuntimeVersion, data = new RuntimeSpecificData(state));
             }

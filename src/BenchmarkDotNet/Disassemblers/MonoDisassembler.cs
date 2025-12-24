@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -11,13 +12,15 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
     internal sealed class MonoDisassembler
     {
         internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
         {
-            Debug.Assert(mono == null || !RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
+            Debug.Assert(!RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
 
             var benchmarkTarget = benchmarkCase.Descriptor;
             string fqnMethod = GetMethodName(benchmarkTarget);
@@ -25,7 +28,7 @@ namespace BenchmarkDotNet.Disassemblers
             string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
 
             var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
-            string monoPath = mono?.CustomPath ?? "mono";
+            string monoPath = mono.CustomPath.IsNotBlank() ? mono.CustomPath : "mono";
             string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
 
             var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
@@ -47,7 +50,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         internal static class OutputParser
         {
-            internal static DisassemblyResult Parse(IReadOnlyList<string?> input, string methodName, string commandLine)
+            internal static DisassemblyResult Parse(IReadOnlyList<string> input, string methodName, string commandLine)
             {
                 var instructions = new List<MonoCode>();
 
@@ -56,11 +59,10 @@ namespace BenchmarkDotNet.Disassemblers
                 const string windowsWarning = "is not recognized as an internal or external command";
 
                 var warningLines = input
-                    .Where(line => line != null)
                     .Where(line => line.Contains(windowsWarning))
                     .Select(line => line.Trim(' ', '.', ','))
                     .ToList();
-                if (warningLines.Any())
+                if (warningLines.Count > 0)
                 {
                     string message = "It's impossible to get Mono disasm because you don't have some required tools:"
                                      + Environment.NewLine
@@ -68,11 +70,10 @@ namespace BenchmarkDotNet.Disassemblers
                     return CreateErrorResult(input, methodName, commandLine, message);
                 }
 
-                if (!input.Any(line => line != null && (line.Contains(windowsHeader) || line.Contains(macOSXHeader))))
+                if (!input.Any(line => line.Contains(windowsHeader) || line.Contains(macOSXHeader)))
                     return CreateErrorResult(input, methodName, commandLine, "It's impossible to find assembly instructions in the mono output");
 
                 var listing = input
-                    .Where(line => line != null)
                     .SkipWhile(line => !line.Contains(macOSXHeader) && !line.Contains(windowsHeader))
                     .Where(line => line.IsNotBlank())
                     .Skip(2);
@@ -86,39 +87,42 @@ namespace BenchmarkDotNet.Disassemblers
 
                 return new DisassemblyResult
                 {
-                    Methods = new[]
-                    {
+                    Methods =
+                    [
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new[] { new Map { SourceCodes = instructions.ToArray() } },
-                            CommandLine = commandLine
-                        }
-                    }
+                            Maps = [new Map { SourceCodes = instructions.ToArray() }],
+                            CommandLine = commandLine,
+                        },
+                    ]
                 };
             }
 
-            private static DisassemblyResult CreateErrorResult(IReadOnlyList<string?> input,
+            private static DisassemblyResult CreateErrorResult(IReadOnlyList<string> input,
                 string methodName, string commandLine, string message)
             {
                 return new DisassemblyResult
                 {
-                    Methods = new[]
-                    {
+                    Methods =
+                    [
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new[] { new Map
-                            {
-                                SourceCodes = input
-                                    .Where(line => line.IsNotBlank())
-                                    .Select(line => new MonoCode { Text = line })
-                                    .ToArray()
-                            } },
+                            Maps =
+                            [
+                                new Map
+                                {
+                                    SourceCodes = input
+                                        .Where(line => line.IsNotBlank())
+                                        .Select(line => new MonoCode { Text = line })
+                                        .ToArray()
+                                }
+                            ],
                             CommandLine = commandLine
                         }
-                    },
-                    Errors = new[] { message }
+                    ],
+                    Errors = [message],
                 };
             }
 
@@ -126,7 +130,7 @@ namespace BenchmarkDotNet.Disassemblers
             //line example 2: 0000000000000000  subq    $0x28, %rsp
             private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*", RegexOptions.Compiled);
 
-            private static bool TryParseInstruction(string line, out MonoCode? instruction)
+            private static bool TryParseInstruction(string line, [NotNullWhen(true)] out MonoCode? instruction)
             {
                 instruction = null;
                 var match = InstructionRegex.Match(line);
