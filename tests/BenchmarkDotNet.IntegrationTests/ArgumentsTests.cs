@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
             => new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessEmitToolchain.Instance },
+                    new object[] { InProcessEmitToolchain.Default },
                 };
 
         public ArgumentsTests(ITestOutputHelper output) : base(output) { }

@@ -105,8 +105,8 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
     {
         var job = toolchain switch
         {
-            ToolchainType.InProcessEmit => Job.Dry.WithToolchain(InProcessEmitToolchain.Instance),
-            ToolchainType.InProcessNoEmit => Job.Dry.WithToolchain(InProcessNoEmitToolchain.Instance),
+            ToolchainType.InProcessEmit => Job.Dry.WithToolchain(InProcessEmitToolchain.Default),
+            ToolchainType.InProcessNoEmit => Job.Dry.WithToolchain(InProcessNoEmitToolchain.Default),
             _ => Job.Dry
         };
 

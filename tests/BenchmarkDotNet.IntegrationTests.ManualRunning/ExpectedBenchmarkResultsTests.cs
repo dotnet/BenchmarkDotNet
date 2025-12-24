@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             => toolchain switch
             {
                 ToolchainType.Default => Job.Default.GetToolchain(),
-                ToolchainType.InProcess => InProcessEmitToolchain.Instance,
+                ToolchainType.InProcess => InProcessEmitToolchain.Default,
                 _ => throw new ArgumentOutOfRangeException()
             };
 

@@ -25,15 +25,11 @@ namespace BenchmarkDotNet.Configs
     [PublicAPI]
     public class DebugInProcessConfig : DebugConfig
     {
-        public override IEnumerable<Job> GetJobs()
-            => new[]
-            {
-                Job.Default
-                    .WithToolchain(
-                        new InProcessEmitToolchain(
-                            TimeSpan.FromHours(1), // 1h should be enough to debug the benchmark
-                            true))
-            };
+        public override IEnumerable<Job> GetJobs() =>
+        [
+            Job.Default
+                .WithToolchain(InProcessEmitToolchain.Default)
+        ];
     }
 
     /// <summary>
@@ -42,29 +38,28 @@ namespace BenchmarkDotNet.Configs
     [PublicAPI]
     public class DebugBuildConfig : DebugConfig
     {
-        public override IEnumerable<Job> GetJobs()
-            => new[]
-            {
-                Job.Default
-                    .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere`
-            };
+        public override IEnumerable<Job> GetJobs() =>
+        [
+            Job.Default
+                .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere`
+        ];
     }
 
     public abstract class DebugConfig : IConfig
     {
-        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+        private readonly static Conclusion[] emptyConclusion = [];
         public abstract IEnumerable<Job> GetJobs();
 
-        public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
+        public IEnumerable<IValidator> GetValidators() => [];
         public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
-        public IEnumerable<IExporter> GetExporters() => Array.Empty<IExporter>();
-        public IEnumerable<ILogger> GetLoggers() => new[] { ConsoleLogger.Default };
-        public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
-        public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
-        public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
-        public IEnumerable<EventProcessor> GetEventProcessors() => Array.Empty<EventProcessor>();
-        public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
-        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+        public IEnumerable<IExporter> GetExporters() => [];
+        public IEnumerable<ILogger> GetLoggers() => [ConsoleLogger.Default];
+        public IEnumerable<IDiagnoser> GetDiagnosers() => [];
+        public IEnumerable<IAnalyser> GetAnalysers() => [];
+        public IEnumerable<HardwareCounter> GetHardwareCounters() => [];
+        public IEnumerable<EventProcessor> GetEventProcessors() => [];
+        public IEnumerable<IFilter> GetFilters() => [];
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => [];
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public ICategoryDiscoverer? CategoryDiscoverer => DefaultCategoryDiscoverer.Instance;
@@ -76,7 +71,7 @@ namespace BenchmarkDotNet.Configs
         public string ArtifactsPath => null; // DefaultConfig.ArtifactsPath will be used if the user does not specify it in explicit way
 
         public CultureInfo CultureInfo => null;
-        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
+        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => [];
 
         public ConfigOptions Options => ConfigOptions.KeepBenchmarkFiles | ConfigOptions.DisableOptimizationsValidator;
 

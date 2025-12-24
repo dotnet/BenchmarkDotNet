@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
             => new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessEmitToolchain.Instance },
+                    new object[] { InProcessEmitToolchain.Default },
                 };
 
         [Fact]
@@ -202,7 +202,7 @@ namespace BenchmarkDotNet.IntegrationTests
             // If that changes, this test and the one above should be merged into:
             //   [Theory, MemberData(nameof(GetToolchains))]
             //   public void SourceWithExplicitCastToTarget_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), toolchain);
-            Assert.ThrowsAny<Exception>(() => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), InProcessEmitToolchain.Instance));
+            Assert.ThrowsAny<Exception>(() => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), InProcessEmitToolchain.Default));
         }
 
         public abstract class OverridePropertyBase

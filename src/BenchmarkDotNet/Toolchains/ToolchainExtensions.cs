@@ -58,9 +58,9 @@ namespace BenchmarkDotNet.Toolchains
 
                 case MonoRuntime mono:
                     if (OsDetector.IsAndroid())
-                        return InProcessEmitToolchain.Instance;
+                        return InProcessEmitToolchain.Default;
                     if (OsDetector.IsIOS())
-                        return InProcessNoEmitToolchain.Instance;
+                        return InProcessNoEmitToolchain.Default;
                     if (mono.AotArgs.IsNotBlank())
                         return MonoAotToolchain.Instance;
                     if (mono.IsDotNetBuiltIn)
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 case CoreRuntime coreRuntime:
                     if (descriptor != null && descriptor.Type.Assembly.IsLinqPad())
-                        return InProcessEmitToolchain.Instance;
+                        return InProcessEmitToolchain.Default;
                     if (coreRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized && !coreRuntime.IsPlatformSpecific)
                         return GetToolchain(coreRuntime.RuntimeMoniker);
 

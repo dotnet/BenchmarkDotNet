@@ -8,34 +8,21 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>
-    ///     A toolchain to run the benchmarks in-process (no emit).
+    /// An <see cref="IToolchain"/> to run the benchmarks in-process by reflection.
     /// </summary>
-    /// <seealso cref="IToolchain" />
     [PublicAPI]
     public sealed class InProcessNoEmitToolchain : IToolchain
     {
-        /// <summary>The default toolchain instance.</summary>
-        public static readonly IToolchain Instance = new InProcessNoEmitToolchain(true);
-
-        /// <summary>The toolchain instance without output logging.</summary>
-        public static readonly IToolchain DontLogOutput = new InProcessNoEmitToolchain(false);
+        /// <summary>A toolchain instance with default settings.</summary>
+        public static readonly IToolchain Default = new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true });
 
         /// <summary>Initializes a new instance of the <see cref="InProcessNoEmitToolchain" /> class.</summary>
-        /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
-        public InProcessNoEmitToolchain(bool logOutput) : this(
-            InProcessNoEmitExecutor.DefaultTimeout,
-            logOutput)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="InProcessNoEmitToolchain" /> class.</summary>
-        /// <param name="timeout">Timeout for the run.</param>
-        /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
-        public InProcessNoEmitToolchain(TimeSpan timeout, bool logOutput)
+        /// <param name="settings">The settings to use for the toolchain.</param>
+        public InProcessNoEmitToolchain(InProcessNoEmitSettings settings)
         {
             Generator = new InProcessNoEmitGenerator();
             Builder = new InProcessNoEmitBuilder();
-            Executor = new InProcessNoEmitExecutor(timeout, logOutput);
+            Executor = new InProcessNoEmitExecutor(settings.ExecuteOnSeparateThread);
         }
 
         public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) =>
