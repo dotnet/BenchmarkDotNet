@@ -14,8 +14,10 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -34,41 +36,43 @@ namespace BenchmarkDotNet.IntegrationTests
         private const int UnrollFactor = 16;
 
         [Fact]
-        public void BenchmarkActionGlobalSetupSupported() => TestInvoke(x => BenchmarkAllCases.GlobalSetup(), UnrollFactor);
+        public async Task BenchmarkActionGlobalSetupSupported() => await TestInvoke(x => BenchmarkAllCases.GlobalSetup(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionGlobalCleanupSupported() => TestInvoke(x => x.GlobalCleanup(), UnrollFactor);
+        public async Task BenchmarkActionGlobalCleanupSupported() => await TestInvoke(x => x.GlobalCleanup(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionVoidSupported() => TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
+        public async Task BenchmarkActionVoidSupported() => await TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionTaskSupported() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor);
+        public async Task BenchmarkActionTaskSupported() => await TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionValueTaskSupported() => TestInvoke(x => x.InvokeOnceValueTaskAsync(), UnrollFactor);
+        public async Task BenchmarkActionValueTaskSupported() => await TestInvoke(x => x.InvokeOnceValueTaskAsync(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionRefTypeSupported() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor);
+        public async Task BenchmarkActionRefTypeSupported() => await TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionValueTypeSupported() => TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor);
+        public async Task BenchmarkActionValueTypeSupported() => await TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionTaskOfTSupported() => TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor);
+        public async Task BenchmarkActionTaskOfTSupported() => await TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor);
+        public async Task BenchmarkActionValueTaskOfTSupported() => await TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor);
 
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
         [Fact]
-        public unsafe void BenchmarkActionVoidPointerSupported() => TestInvoke(x => x.InvokeOnceVoidPointerType(), UnrollFactor);
+        public unsafe void BenchmarkActionVoidPointerSupported() => TestInvoke(x => x.InvokeOnceVoidPointerType(), UnrollFactor).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
 
         // Can't use ref returns in expression, so pass the MethodInfo directly instead.
         [Fact]
-        public void BenchmarkActionByRefTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefType)), UnrollFactor);
+        public async Task BenchmarkActionByRefTypeSupported() => await TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefType)), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionByRefReadonlyValueTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefReadonlyType)), UnrollFactor);
+        public async Task BenchmarkActionByRefReadonlyValueTypeSupported() => await TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefReadonlyType)), UnrollFactor);
 
         [Fact]
         public void BenchmarkDifferentPlatformReturnsValidationError()
@@ -89,77 +93,79 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [AssertionMethod]
-        private void TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
+        private async Task TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
             var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
             var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, false);
+            await TestInvoke(action, unrollFactor, false);
 
             // Idle mode
             action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, true);
+            await TestInvoke(action, unrollFactor, true);
 
             // GlobalSetup/GlobalCleanup
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, 1, false);
+            await TestInvoke(action, 1, false);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, 1, false);
+            await TestInvoke(action, 1, false);
 
             // GlobalSetup/GlobalCleanup (empty)
             descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true);
+            await TestInvoke(action, unrollFactor, true);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true);
+            await TestInvoke(action, unrollFactor, true);
         }
 
         [AssertionMethod]
-        private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor)
+        private async Task TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor)
         {
             var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
-            TestInvoke(targetMethod, unrollFactor);
+            await TestInvoke(targetMethod, unrollFactor);
         }
 
         [AssertionMethod]
-        private void TestInvoke(MethodInfo targetMethod, int unrollFactor)
+        private async Task TestInvoke(MethodInfo targetMethod, int unrollFactor)
         {
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
             var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, false);
+            await TestInvoke(action, unrollFactor, false);
 
             // Idle mode
             action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, true);
+            await TestInvoke(action, unrollFactor, true);
         }
 
         [AssertionMethod]
-        private void TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle)
+        private async Task TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle)
         {
             try
             {
                 BenchmarkAllCases.Counter = 0;
 
+                IClock clock = new MockClock(Frequency.MHz);
+
                 if (isIdle)
                 {
-                    benchmarkAction.InvokeSingle();
+                    await benchmarkAction.InvokeSingle();
                     Assert.Equal(0, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeUnroll(0);
+                    await benchmarkAction.InvokeUnroll(0, clock);
                     Assert.Equal(0, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeUnroll(11);
+                    await benchmarkAction.InvokeUnroll(11, clock);
                     Assert.Equal(0, BenchmarkAllCases.Counter);
                 }
                 else
                 {
-                    benchmarkAction.InvokeSingle();
+                    await benchmarkAction.InvokeSingle();
                     Assert.Equal(1, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeUnroll(0);
+                    await benchmarkAction.InvokeUnroll(0, clock);
                     Assert.Equal(1, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeUnroll(11);
+                    await benchmarkAction.InvokeUnroll(11, clock);
                     Assert.Equal(BenchmarkAllCases.Counter, 1 + unrollFactor * 11);
                 }
             }

@@ -139,7 +139,7 @@ internal sealed class EngineFirstJitStage : EngineJitStage
     }
 
     private IterationData GetOverheadIterationData(long invokeCount)
-        => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, invokeCount, 1, () => { }, () => { }, parameters.OverheadActionNoUnroll);
+        => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, invokeCount, 1, () => new(), () => new(), parameters.OverheadActionNoUnroll);
 
     private IterationData GetWorkloadIterationData(long invokeCount)
         => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, invokeCount, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
@@ -164,9 +164,9 @@ internal sealed class EngineSecondJitStage : EngineJitStage
     {
         iterationData = ++iterationIndex switch
         {
-            1 => new(IterationMode.Overhead, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.OverheadActionUnroll),
+            1 => new(IterationMode.Overhead, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => new(), () => new(), parameters.OverheadActionUnroll),
             // IterationSetup/Cleanup are only used for *NoUnroll benchmarks
-            2 => new(IterationMode.Workload, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.WorkloadActionUnroll),
+            2 => new(IterationMode.Workload, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => new(), () => new(), parameters.WorkloadActionUnroll),
             _ => default
         };
         return iterationIndex <= 2;

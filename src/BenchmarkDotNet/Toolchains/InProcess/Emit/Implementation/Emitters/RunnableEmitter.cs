@@ -968,8 +968,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
              */
             var createReadyToRunMethod = typeof(IEngineFactory).GetMethod(nameof(IEngineFactory.Create))
                 ?? throw new MissingMemberException(nameof(IEngineFactory.Create));
-            var runMethodImpl = typeof(IEngine).GetMethod(nameof(IEngine.Run))
-                ?? throw new MissingMemberException(nameof(IEngine.Run));
+            var runMethodImpl = typeof(IEngine).GetMethod(nameof(IEngine.RunAsync))
+                ?? throw new MissingMemberException(nameof(IEngine.RunAsync));
             ilBuilder.MarkLabel(notNullLabel);
             ilBuilder.EmitLdloc(engineFactoryLocal);
             ilBuilder.EmitLdloc(engineParametersLocal);

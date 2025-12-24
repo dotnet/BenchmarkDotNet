@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -10,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal class RunnableProgram
     {
-        internal static int Run(Assembly partitionAssembly, IHost host, ExecuteParameters parameters)
+        internal static async ValueTask<int> Run(Assembly partitionAssembly, IHost host, ExecuteParameters parameters)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
                 var runCallback = GetRunCallback(parameters.BenchmarkId, partitionAssembly);
 
-                runCallback.Invoke(null, [host, parameters]);
+                await (ValueTask) runCallback.Invoke(null, [host, parameters]);
                 return 0;
             }
             catch (Exception oom) when (
@@ -45,8 +46,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
         }
 
-        private static MethodInfo GetRunCallback(
-            BenchmarkId benchmarkId, Assembly partitionAssembly)
+        private static MethodInfo GetRunCallback(BenchmarkId benchmarkId, Assembly partitionAssembly)
         {
             var runnableType = partitionAssembly.GetType(GetRunnableTypeName(benchmarkId));
 

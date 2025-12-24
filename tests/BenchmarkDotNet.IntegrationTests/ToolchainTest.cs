@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 logger.WriteLine("Generating");
                 Done = true;
-                return new GenerateResult(null, true, null, Array.Empty<string>());
+                return new GenerateResult(null, true, null, []);
             }
         }
 
@@ -45,11 +46,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public ExecuteResult Execute(ExecuteParameters executeParameters)
+            public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
             {
                 executeParameters.Logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), executeParameters.LaunchIndex);
+                return new(new ExecuteResult(true, 0, default, [], [], [], executeParameters.LaunchIndex));
             }
         }
 

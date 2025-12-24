@@ -1,10 +1,6 @@
 ﻿namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
-    /// <summary>
-    /// A helper type that emits code that matches BenchmarkType.txt template.
-    /// IMPORTANT: this type IS NOT thread safe.
-    /// </summary>
-    public class RunnableConstants
+    internal class RunnableConstants
     {
         public const string IsByRefLikeAttributeTypeName = "System.Runtime.CompilerServices.IsByRefLikeAttribute";
         public const string OpImplicitMethodName = "op_Implicit";
