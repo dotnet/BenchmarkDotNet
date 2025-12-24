@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.IntegrationTests
             // InProcessEmit reports flaky allocations in current .Net 8.
             if (!RuntimeInformation.IsNetCore)
             {
-                yield return new object[] { InProcessEmitToolchain.Instance };
+                yield return new object[] { InProcessEmitToolchain.Default };
             }
         }
 

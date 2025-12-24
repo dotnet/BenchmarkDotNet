@@ -464,7 +464,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (options.RunInProcess)
             {
-                yield return baseJob.WithToolchain(InProcessEmitToolchain.Instance);
+                yield return Attributes.InProcessAttribute.GetJob(Attributes.InProcessToolchainType.Auto, true);
             }
             else if (options.ClrVersion.IsNotBlank())
             {

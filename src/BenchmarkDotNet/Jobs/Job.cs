@@ -28,7 +28,6 @@ namespace BenchmarkDotNet.Jobs
 
         // Infrastructure
         public static readonly Job InProcess = new Job(nameof(InProcess), InfrastructureMode.InProcess);
-        public static readonly Job InProcessDontLogOutput = new Job(nameof(InProcessDontLogOutput), InfrastructureMode.InProcessDontLogOutput);
 
         public Job() : this("") { }
 

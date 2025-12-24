@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
@@ -23,8 +21,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
 
-        public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessEmitToolchain.Instance);
-        public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessEmitToolchain.DontLogOutput);
+        public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessEmitToolchain.Default);
 
         public InfrastructureMode() { }
 

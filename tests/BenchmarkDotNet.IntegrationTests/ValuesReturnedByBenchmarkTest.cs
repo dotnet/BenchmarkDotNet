@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetToolchains() => new[]
         {
             new object[] { Job.Default.GetToolchain() },
-            new object[] { InProcessEmitToolchain.Instance },
+            new object[] { InProcessEmitToolchain.Default },
         };
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]

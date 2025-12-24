@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 : Platform.X64;
 
             var otherPlatformConfig = new ManualConfig()
-                .AddJob(Job.Dry.WithToolchain(InProcessNoEmitToolchain.Instance).WithPlatform(otherPlatform))
+                .AddJob(Job.Dry.WithToolchain(InProcessNoEmitToolchain.Default).WithPlatform(otherPlatform))
                 .AddLogger(new OutputLogger(Output))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
 
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateInProcessConfig(OutputLogger? logger = null)
         {
             return new ManualConfig()
-                .AddJob(Job.Dry.WithToolchain(new InProcessNoEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .AddJob(Job.Dry.WithToolchain(InProcessNoEmitToolchain.Default).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
                 .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
         }
