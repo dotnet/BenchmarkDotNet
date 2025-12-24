@@ -8,6 +8,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal class CombinedDisassemblyExporter : ExporterBase
@@ -57,16 +59,16 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                         targetingSameMethod.ToArray(),
                         logger,
                         targetingSameMethod.First().Descriptor.DisplayInfo,
-                        benchmark => summary[benchmark].GetRuntimeInfo());
+                        benchmark => summary[benchmark]?.GetRuntimeInfo() ?? "");
                 }
             }
             else // different methods, same JIT
             {
                 PrintTable(
-                    summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(),
+                    summary.BenchmarksCases.Where(results.ContainsKey).ToArray(),
                     logger,
                     summary.Title,
-                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {summary[benchmark].GetRuntimeInfo()}");
+                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {summary[benchmark]?.GetRuntimeInfo()}".TrimEnd());
             }
 
             logger.WriteLine("</body>");

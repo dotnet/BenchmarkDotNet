@@ -13,6 +13,8 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Diagnosers;
 
 public abstract class SnapshotProfilerBase : IProfiler
@@ -162,7 +164,7 @@ public abstract class SnapshotProfilerBase : IProfiler
 
     private void Attach(DiagnoserActionParameters parameters, string snapshotFile)
     {
-        int pid = parameters.Process.Id;
+        int pid = parameters.ProcessId;
         int currentPid = Process.GetCurrentProcess().Id;
         if (pid != currentPid)
             AttachToProcessByPid(pid, snapshotFile);

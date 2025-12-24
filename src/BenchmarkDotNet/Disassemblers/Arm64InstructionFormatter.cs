@@ -3,6 +3,8 @@ using Iced.Intel;
 using System.Collections.Generic;
 using System.Text;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
     internal static class Arm64InstructionFormatter
@@ -12,8 +14,11 @@ namespace BenchmarkDotNet.Disassemblers
         internal static string Format(Arm64Asm asm, FormatterOptions formatterOptions,
             bool printInstructionAddresses, uint pointerSize, IReadOnlyDictionary<ulong, string> symbols)
         {
+            var instruction = asm.Instruction;
+            if (instruction == null)
+                return "";
+
             StringBuilder output = new();
-            Arm64Instruction instruction = asm.Instruction;
 
             if (printInstructionAddresses)
             {
@@ -22,7 +27,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             output.Append(instruction.Mnemonic.ToString().PadRight(formatterOptions.FirstOperandCharIndex));
 
-            if (asm.ReferencedAddress.HasValue && !asm.IsReferencedAddressIndirect && symbols.TryGetValue(asm.ReferencedAddress.Value, out string name))
+            if (asm.ReferencedAddress.HasValue && !asm.IsReferencedAddressIndirect && symbols.TryGetValue(asm.ReferencedAddress.Value, out var name))
             {
                 string partToReplace = $"#0x{asm.ReferencedAddress.Value:x}";
                 output.Append(instruction.Operand.Replace(partToReplace, name));

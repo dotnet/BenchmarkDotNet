@@ -11,6 +11,8 @@ using BenchmarkDotNet.Portability;
 using Microsoft.Diagnostics.NETCore.Client;
 using BenchmarkDotNet.Extensions;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
     internal abstract class ClrMdDisassembler
@@ -100,7 +102,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
             else
             {
-                ClrType typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).First(type => type != null);
+                var typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
 
                 state.Todo.Enqueue(
                     new MethodInfo(
@@ -135,14 +137,14 @@ namespace BenchmarkDotNet.Disassemblers
             Regex[] filters = GlobFilter.ToRegex(args.Filters);
 
             foreach (ClrModule module in state.Runtime.EnumerateModules())
-                foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).Where(type => type is not null))
-                    foreach (ClrMethod method in type.Methods.Where(method => method.Signature != null))
+                foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).WhereNotNull())
+                    foreach (ClrMethod method in type.Methods.Where(method => method.Signature.IsNotBlank()))
                     {
                         if (method.NativeCode > 0)
                         {
                             if (!state.AddressToNameMapping.TryGetValue(method.NativeCode, out _))
                             {
-                                state.AddressToNameMapping.Add(method.NativeCode, method.Signature);
+                                state.AddressToNameMapping.Add(method.NativeCode, method.Signature!);
                             }
                         }
 
@@ -150,7 +152,7 @@ namespace BenchmarkDotNet.Disassemblers
                         {
                             foreach (Regex filter in filters)
                             {
-                                if (filter.IsMatch(method.Signature))
+                                if (filter.IsMatch(method.Signature!))
                                 {
                                     state.Todo.Enqueue(new MethodInfo(method,
                                         depth: args.MaxDepth)); // don't allow for recursive disassembling
@@ -225,7 +227,7 @@ namespace BenchmarkDotNet.Disassemblers
             return new DisassembledMethod
             {
                 Maps = maps,
-                Name = method.Signature,
+                Name = method.Signature ?? "",
                 NativeCode = method.NativeCode
             };
         }
@@ -277,7 +279,7 @@ namespace BenchmarkDotNet.Disassemblers
         }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
-            => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
+            => DisassembledMethod.Empty(method.Signature ?? "", method.NativeCode, reason);
 
         protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, ClrMethod currentMethod)
         {
@@ -289,7 +291,7 @@ namespace BenchmarkDotNet.Disassemblers
             var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
             if (jitHelperFunctionName.IsNotBlank())
             {
-                state.AddressToNameMapping.Add(address, jitHelperFunctionName);
+                state.AddressToNameMapping.Add(address, jitHelperFunctionName!);
                 return;
             }
 
@@ -330,7 +332,7 @@ namespace BenchmarkDotNet.Disassemblers
             if (!state.HandledMethods.Contains(method))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
 
-            var methodName = method.Signature;
+            var methodName = method.Signature!;
             if (!methodName.Any(c => c == '.')) // the method name does not contain namespace and type name
                 methodName = $"{method.Type.Name}.{method.Signature}";
             state.AddressToNameMapping.Add(address, methodName);
@@ -354,8 +356,13 @@ namespace BenchmarkDotNet.Disassemblers
 
         private class SharpComparer : IEqualityComparer<Sharp>
         {
-            public bool Equals(Sharp x, Sharp y)
+            public bool Equals(Sharp? x, Sharp? y)
             {
+                if (ReferenceEquals(x, y))
+                    return true;
+                if (x is null || y is null)
+                    return false;
+
                 // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
                 // we don't want to confuse the users, so this must also be removed
                 return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;

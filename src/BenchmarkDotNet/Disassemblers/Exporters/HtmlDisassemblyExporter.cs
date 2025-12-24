@@ -9,6 +9,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal class HtmlDisassemblyExporter : ExporterBase
@@ -52,7 +54,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 
         private void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, ref int referenceIndex)
         {
-            logger.WriteLine($"<h2>{summary[benchmarkCase].GetRuntimeInfo()}</h2>");
+            logger.WriteLine($"<h2>{summary[benchmarkCase]!.GetRuntimeInfo()}</h2>");
             logger.WriteLine($"<h3>Job: {benchmarkCase.Job.DisplayInfo}</h3>");
             logger.WriteLine("<table><tbody>");
 

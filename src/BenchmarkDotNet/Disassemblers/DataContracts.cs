@@ -5,9 +5,14 @@ using Microsoft.Diagnostics.Runtime;
 using SimpleJson;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml.Serialization;
+
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
+#nullable enable
 
 namespace BenchmarkDotNet.Disassemblers;
 
@@ -38,8 +43,8 @@ public abstract class SourceCode
 
 public sealed class Sharp : SourceCode
 {
-    public string Text { get; set; }
-    public string FilePath { get; set; }
+    public string Text { get; set; } = default!;
+    public string FilePath { get; set; } = default!;
     public int LineNumber { get; set; }
 
     private protected override void Serialize(JsonObject json)
@@ -134,7 +139,7 @@ public sealed class IntelAsm() : Asm
         foreach (var kvp in (JsonObject) json[nameof(Instruction)])
         {
             object value = kvp.Value;
-            var property = typeof(Instruction).GetProperty(kvp.Key);
+            var property = typeof(Instruction).GetProperty(kvp.Key)!;
             var propertyType = property.PropertyType;
             if (propertyType == typeof(ulong))
             {
@@ -154,7 +159,7 @@ public sealed class IntelAsm() : Asm
             }
             property.SetValue(instruction, value);
         }
-        Instruction = (Instruction) instruction;
+        Instruction = (Instruction)instruction;
     }
 }
 
@@ -164,10 +169,10 @@ public sealed class Arm64Asm : Asm
     private const string BytesKey = "Arm64Bytes";
     private const string SyntaxKey = "Arm64Syntax";
 
-    public Arm64Instruction Instruction { get; set; }
+    public Arm64Instruction? Instruction { get; set; }
     internal DisassembleSyntax DisassembleSyntax { get; set; }
 
-    public override string ToString() => Instruction.ToString();
+    public override string ToString() => Instruction?.ToString() ?? "";
 
     private protected override void Serialize(JsonObject json)
     {
@@ -178,7 +183,7 @@ public sealed class Arm64Asm : Asm
         {
             json[AddressKey] = Instruction.Address.ToString();
             json[BytesKey] = Convert.ToBase64String(Instruction.Bytes);
-            json[SyntaxKey] = (int) DisassembleSyntax;
+            json[SyntaxKey] = (int)DisassembleSyntax;
         }
     }
 
@@ -191,16 +196,16 @@ public sealed class Arm64Asm : Asm
             // Use the Capstone disassembler to recreate the instruction from the bytes.
             using var disassembler = CapstoneDisassembler.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
             disassembler.EnableInstructionDetails = true;
-            disassembler.DisassembleSyntax = (DisassembleSyntax) Convert.ToInt32(json[SyntaxKey]);
-            byte[] bytes = Convert.FromBase64String((string) bytes64);
-            Instruction = disassembler.Disassemble(bytes, long.Parse((string) json[AddressKey])).Single();
+            disassembler.DisassembleSyntax = (DisassembleSyntax)Convert.ToInt32(json[SyntaxKey]);
+            byte[] bytes = Convert.FromBase64String((string)bytes64);
+            Instruction = disassembler.Disassemble(bytes, long.Parse((string)json[AddressKey])).Single();
         }
     }
 }
 
 public sealed class MonoCode : SourceCode
 {
-    public string Text { get; set; }
+    public string Text { get; set; } = "";
 
     private protected override void Serialize(JsonObject json)
     {
@@ -223,7 +228,7 @@ public sealed class Map
     [XmlArrayItem(nameof(SourceCode), typeof(SourceCode))]
     [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
     [XmlArrayItem(nameof(IntelAsm), typeof(IntelAsm))]
-    public SourceCode[] SourceCodes { get; set; }
+    public SourceCode[] SourceCodes { get; set; } = [];
 
     internal JsonObject Serialize()
     {
@@ -260,15 +265,15 @@ public sealed class Map
 
 public sealed class DisassembledMethod
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
     public ulong NativeCode { get; set; }
 
-    public string Problem { get; set; }
+    public string Problem { get; set; } = "";
 
     public Map[] Maps { get; set; } = [];
 
-    public string CommandLine { get; set; }
+    public string CommandLine { get; set; } = "";
 
     public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
         => new()
@@ -325,7 +330,7 @@ public sealed class DisassemblyResult
         =>  _addressToNameMapping ??= SerializedAddressToNameMapping.ToDictionary(x => x.Key, x => x.Value);
 
     [XmlIgnore]
-    private Dictionary<ulong, string> _addressToNameMapping;
+    private Dictionary<ulong, string>? _addressToNameMapping = null;
 
     // KeyValuePair is not serializable, because it has read-only properties
     // so we need to define our own...
@@ -411,7 +416,6 @@ internal sealed class State
     }
 
     internal ClrRuntime Runtime { get; }
-    internal string TargetFrameworkMoniker { get; }
     internal Queue<MethodInfo> Todo { get; }
     internal HashSet<ClrMethod> HandledMethods { get; }
     internal Dictionary<ulong, string> AddressToNameMapping { get; }
@@ -444,7 +448,16 @@ internal sealed class State
 
     private sealed class ClrMethodComparer : IEqualityComparer<ClrMethod>
     {
-        public bool Equals(ClrMethod x, ClrMethod y) => x.NativeCode == y.NativeCode;
+        public bool Equals(ClrMethod? x, ClrMethod? y)
+        {
+            if (ReferenceEquals(x, y))
+                return true;
+
+            if (x is null || y is null)
+                return false;
+
+            return x.NativeCode == y.NativeCode;
+        }
 
         public int GetHashCode(ClrMethod obj) => (int) obj.NativeCode;
     }

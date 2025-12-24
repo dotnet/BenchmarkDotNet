@@ -2,9 +2,11 @@
 using System.Linq;
 using SimpleJson;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal struct ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = null)
+    internal struct ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = "")
     {
         internal int ProcessId = processId;
         internal string TypeName = typeName;
@@ -50,11 +52,14 @@ namespace BenchmarkDotNet.Disassemblers
             return jsonObject.ToString();
         }
 
-        internal void Deserialize(string json)
+        internal void Deserialize(string? json)
         {
             var jsonObject = SimpleJsonSerializer.DeserializeObject<JsonObject>(json);
-            MethodName = (string) jsonObject[nameof(MethodName)];
-            PrintSource = (bool) jsonObject[nameof(PrintSource)];
+            if (jsonObject == null)
+                return;
+
+            MethodName = (string)jsonObject[nameof(MethodName)];
+            PrintSource = (bool)jsonObject[nameof(PrintSource)];
             MaxDepth = Convert.ToInt32(jsonObject[nameof(MaxDepth)]);
             Syntax = (string) jsonObject[nameof(Syntax)];
             TargetFrameworkMoniker = (string) jsonObject[nameof(TargetFrameworkMoniker)];
