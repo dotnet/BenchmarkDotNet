@@ -4,9 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -21,8 +23,8 @@ namespace BenchmarkDotNet.Running
     public class BenchmarkSwitcher
     {
         private readonly IUserInteraction userInteraction = new UserInteraction();
-        private readonly List<Type> types = new List<Type>();
-        private readonly List<Assembly> assemblies = new List<Assembly>();
+        private readonly List<Type> types = [];
+        private readonly List<Assembly> assemblies = [];
 
         internal BenchmarkSwitcher(IUserInteraction userInteraction) => this.userInteraction = userInteraction;
 
@@ -44,22 +46,19 @@ namespace BenchmarkDotNet.Running
         [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public BenchmarkSwitcher With(Assembly[] assemblies) { this.assemblies.AddRange(assemblies); return this; }
 
-        [PublicAPI] public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
+        [PublicAPI] public static BenchmarkSwitcher FromTypes(Type[] types) => new(types);
 
-        [PublicAPI] public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new BenchmarkSwitcher(assembly);
+        [PublicAPI] public static BenchmarkSwitcher FromAssembly(Assembly assembly) => new(assembly);
 
-        [PublicAPI] public static BenchmarkSwitcher FromAssemblies(Assembly[] assemblies) => new BenchmarkSwitcher(assemblies);
+        [PublicAPI] public static BenchmarkSwitcher FromAssemblies(Assembly[] assemblies) => new(assemblies);
 
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
         [PublicAPI] public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
         {
-            args ??= Array.Empty<string>();
-            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" }))
-                args = updatedArgs;
-
-            return Run(args, config);
+            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+            return context.ExecuteUntilComplete(RunAllAsync(config, args));
         }
 
         /// <summary>
@@ -67,33 +66,71 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
         {
-            args ??= Array.Empty<string>();
-            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => (options.Join, options.Filters) = (true, new[] { "*" })))
-                args = updatedArgs;
-
-            return Run(args, config).Single();
+            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+            return context.ExecuteUntilComplete(RunAllJoinedAsync(config, args));
         }
 
         [PublicAPI]
         public IEnumerable<Summary> Run(string[]? args = null, IConfig? config = null)
         {
+            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+            return context.ExecuteUntilComplete(RunAsync(args, config));
+        }
+
+        /// <summary>
+        /// Run all available benchmarks.
+        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
+        /// </summary>
+        [PublicAPI]
+        public ValueTask<IEnumerable<Summary>> RunAllAsync(IConfig? config = null, string[]? args = null)
+        {
+            args ??= [];
+            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = ["*"]))
+                args = updatedArgs;
+
+            return RunAsync(args, config);
+        }
+
+        /// <summary>
+        /// Run all available benchmarks and join them to a single summary.
+        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
+        /// </summary>
+        [PublicAPI]
+        public async ValueTask<Summary> RunAllJoinedAsync(IConfig? config = null, string[]? args = null)
+        {
+            args ??= [];
+            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => (options.Join, options.Filters) = (true, ["*"])))
+                args = updatedArgs;
+
+            var results = await RunAsync(args, config);
+            return results.Single();
+        }
+
+        /// <summary>
+        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
+        /// </summary>
+        [PublicAPI]
+        public async ValueTask<IEnumerable<Summary>> RunAsync(string[]? args = null, IConfig? config = null)
+        {
             // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
             // so it can ignore the version mismatch ;)
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithDirtyAssemblyResolveHelper(args, config, true);
+            {
+                return await RunWithDirtyAssemblyResolveHelper(args, config, true);
+            }
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[]? args, IConfig? config, bool askUserForInput)
+        internal async ValueTask<IEnumerable<Summary>> RunWithDirtyAssemblyResolveHelper(string[]? args, IConfig? config, bool askUserForInput)
         {
-            var notNullArgs = args ?? Array.Empty<string>();
+            var notNullArgs = args ?? [];
             var notNullConfig = config ?? DefaultConfig.Instance;
 
             var logger = notNullConfig.GetNonNullCompositeLogger();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(notNullArgs, logger, notNullConfig);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
-                return Array.Empty<Summary>();
+                return [];
 
             if (args == null && Environment.GetCommandLineArgs().Length > 1) // The first element is the executable file name
                 logger.WriteLineHint("You haven't passed command line arguments to BenchmarkSwitcher.Run method. Running with default configuration.");
@@ -101,25 +138,25 @@ namespace BenchmarkDotNet.Running
             if (options.PrintInformation)
             {
                 logger.WriteLine(HostEnvironmentInfo.GetInformation());
-                return Array.Empty<Summary>();
+                return [];
             }
 
             var effectiveConfig = ManualConfig.Union(notNullConfig, parsedConfig);
 
             var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
-                return Array.Empty<Summary>();
+                return [];
 
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
                 userInteraction.PrintNoBenchmarksError(logger);
-                return Array.Empty<Summary>();
+                return [];
             }
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
                 PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
-                return Array.Empty<Summary>();
+                return [];
             }
 
             var benchmarksToFilter = options.UserProvidedFilters || !askUserForInput
@@ -128,18 +165,18 @@ namespace BenchmarkDotNet.Running
 
             if (effectiveConfig.Options.HasFlag(ConfigOptions.ApplesToApples))
             {
-                return ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options);
+                return await ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options);
             }
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
 
             if (filteredBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, options.Filters.ToArray());
-                return Array.Empty<Summary>();
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, [.. options.Filters]);
+                return [];
             }
 
-            return BenchmarkRunnerClean.Run(filteredBenchmarks);
+            return await BenchmarkRunnerClean.Run(filteredBenchmarks);
         }
 
         private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
@@ -154,24 +191,24 @@ namespace BenchmarkDotNet.Running
             printer.Print(testNames, nonNullLogger);
         }
 
-        private IEnumerable<Summary> ApplesToApples(ImmutableConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options)
+        private async ValueTask<IEnumerable<Summary>> ApplesToApples(ImmutableConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options)
         {
             var jobs = effectiveConfig.GetJobs().ToArray();
             if (jobs.Length <= 1)
             {
                 logger.WriteError("To use apples-to-apples comparison you must specify at least two Job objects.");
-                return Array.Empty<Summary>();
+                return [];
             }
             var baselineJob = jobs.SingleOrDefault(job => job.Meta.Baseline);
             if (baselineJob == default)
             {
                 logger.WriteError("To use apples-to-apples comparison you must specify exactly ONE baseline Job object.");
-                return Array.Empty<Summary>();
+                return [];
             }
             else if (jobs.Any(job => !job.Run.HasValue(RunMode.IterationCountCharacteristic)))
             {
                 logger.WriteError("To use apples-to-apples comparison you must specify the number of iterations in explicit way.");
-                return Array.Empty<Summary>();
+                return [];
             }
 
             Job invocationCountJob = baselineJob
@@ -187,12 +224,12 @@ namespace BenchmarkDotNet.Running
             var invocationCountBenchmarks = TypeFilter.Filter(invocationCountConfig, benchmarksToFilter);
             if (invocationCountBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, options.Filters.ToArray());
-                return Array.Empty<Summary>();
+                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, [.. options.Filters]);
+                return [];
             }
 
             logger.WriteLineHeader("Each benchmark is going to be executed just once to get invocation counts.");
-            Summary[] invocationCountSummaries = BenchmarkRunnerClean.Run(invocationCountBenchmarks);
+            Summary[] invocationCountSummaries = await BenchmarkRunnerClean.Run(invocationCountBenchmarks);
 
             Dictionary<(Descriptor Descriptor, ParameterInstances Parameters), Measurement> dictionary = invocationCountSummaries
                 .SelectMany(summary => summary.Reports)
@@ -220,7 +257,7 @@ namespace BenchmarkDotNet.Running
                 .ToArray();
 
             logger.WriteLineHeader("Actual benchmarking is going to happen now!");
-            return BenchmarkRunnerClean.Run(benchmarksWithInvocationCount);
+            return await BenchmarkRunnerClean.Run(benchmarksWithInvocationCount);
         }
     }
 }

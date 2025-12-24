@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Xunit.Abstractions;
 
@@ -22,17 +22,18 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             this.output = output;
             this.measure = measure;
+            Func<long, IClock, ValueTask<ClockSpan>> emptyAction = (_, _) => new(default(ClockSpan));
             Parameters = new EngineParameters
             {
                 TargetJob = job,
-                WorkloadActionUnroll = _ => { },
-                WorkloadActionNoUnroll = _ => { },
-                OverheadActionUnroll = _ => { },
-                OverheadActionNoUnroll = _ => { },
-                GlobalSetupAction = () => { },
-                GlobalCleanupAction = () => { },
-                IterationSetupAction = () => { },
-                IterationCleanupAction = () => { },
+                WorkloadActionUnroll = emptyAction,
+                WorkloadActionNoUnroll = emptyAction,
+                OverheadActionUnroll = emptyAction,
+                OverheadActionNoUnroll = emptyAction,
+                GlobalSetupAction = () => new(),
+                GlobalCleanupAction = () => new(),
+                IterationSetupAction = () => new(),
+                IterationCleanupAction = () => new(),
             };
         }
 
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             return measurement;
         }
 
-        public RunResults Run() => default;
+        public ValueTask<RunResults> RunAsync() => new(default(RunResults));
 
         internal List<Measurement> Run(EngineStage stage)
         {

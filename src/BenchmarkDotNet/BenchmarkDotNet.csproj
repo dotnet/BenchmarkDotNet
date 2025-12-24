@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
+  
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
@@ -49,5 +50,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <!-- The transitive weaver reference is stripped during full pack, so we need to reference it directly. -->
+  <ItemGroup Condition="'$(IsFullPack)' == 'true'">
+    <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" PrivateAssets="all" />
+  </ItemGroup>
+  
   <Import Project="..\..\build\common.targets" />
 </Project>

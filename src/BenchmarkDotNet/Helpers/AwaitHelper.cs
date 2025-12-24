@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers
 {
-    public static class AwaitHelper
+    internal static class AwaitHelper
     {
         private class ValueTaskWaiter
         {
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Helpers
         {
             if (!taskType.IsGenericType)
             {
-                return typeof(AwaitHelper).GetMethod(nameof(AwaitHelper.GetResult), BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null);
+                return typeof(AwaitHelper).GetMethod(nameof(GetResult), BindingFlags.Public | BindingFlags.Static, null, [taskType], null);
             }
 
             Type compareType = taskType.GetGenericTypeDefinition() == typeof(ValueTask<>) ? typeof(ValueTask<>)
@@ -98,11 +98,11 @@ namespace BenchmarkDotNet.Helpers
             return typeof(AwaitHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m =>
                 {
-                    if (m.Name != nameof(AwaitHelper.GetResult)) return false;
+                    if (m.Name != nameof(GetResult)) return false;
                     Type paramType = m.GetParameters().First().ParameterType;
                     return paramType.IsGenericType && paramType.GetGenericTypeDefinition() == compareType;
                 })
-                .MakeGenericMethod(new[] { resultType });
+                .MakeGenericMethod([resultType]);
         }
     }
 }

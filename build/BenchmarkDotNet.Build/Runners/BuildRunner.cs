@@ -8,7 +8,6 @@ using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Workload.Install;
 using Cake.Core;
 using Cake.Core.IO;
-using System;
 using System.IO;
 using System.Linq;
 
@@ -51,7 +50,6 @@ public class BuildRunner
         {
             MSBuildSettings = context.MsBuildSettingsRestore,
         };
-        MaybeAppendArgument(restoreSettings);
         context.DotNetRestore(weaverPath.GetDirectory().FullPath, restoreSettings);
 
         context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
@@ -63,7 +61,6 @@ public class BuildRunner
             Configuration = context.BuildConfiguration,
             Verbosity = context.BuildVerbosity
         };
-        MaybeAppendArgument(buildSettings);
         context.DotNetBuild(weaverPath.FullPath, buildSettings);
 
         var packSettings = new DotNetPackSettings
@@ -72,7 +69,6 @@ public class BuildRunner
             MSBuildSettings = context.MsBuildSettingsPack,
             Configuration = context.BuildConfiguration
         };
-        MaybeAppendArgument(packSettings);
         context.DotNetPack(weaverPath.FullPath, packSettings);
     }
 

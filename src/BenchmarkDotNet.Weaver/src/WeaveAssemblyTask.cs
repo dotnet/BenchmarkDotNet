@@ -25,6 +25,11 @@ public sealed class WeaveAssemblyTask : Task
     public string TargetAssembly { get; set; }
 
     /// <summary>
+    /// Whether to treat warnings as errors.
+    /// </summary>
+    public bool TreatWarningsAsErrors { get; set; }
+
+    /// <summary>
     /// Runs the weave assembly task.
     /// </summary>
     /// <returns><see langword="true"/> if successful; <see langword="false"/> otherwise.</returns>
@@ -36,33 +41,59 @@ public sealed class WeaveAssemblyTask : Task
             return false;
         }
 
-
         bool benchmarkMethodsImplAdjusted = false;
         try
         {
             var module = ModuleDefinition.FromFile(TargetAssembly);
 
+            bool anyAdjustments = false;
             foreach (var type in module.GetAllTypes())
             {
-                // We can skip non-public types as they are not valid for benchmarks.
-                if (type.IsNotPublic)
+                if (type.CustomAttributes.Any(attr => attr.Constructor.DeclaringType.FullName == "BenchmarkDotNet.Attributes.CompilerServices.AggressivelyOptimizeMethodsAttribute"))
                 {
-                    continue;
+                    ApplyAggressiveOptimizationToMethods(type);
+
+                    void ApplyAggressiveOptimizationToMethods(TypeDefinition type)
+                    {
+                        // Apply AggressiveOptimization to all methods in the type and nested types that
+                        // aren't annotated with NoOptimization (this includes compiler-generated state machines).
+                        foreach (var method in type.Methods)
+                        {
+                            if ((method.ImplAttributes & MethodImplAttributes.NoOptimization) == 0)
+                            {
+                                var oldImpl = method.ImplAttributes;
+                                method.ImplAttributes |= MethodImplAttributes.AggressiveOptimization;
+                                anyAdjustments |= (oldImpl & MethodImplAttributes.AggressiveOptimization) == 0;
+                            }
+                        }
+
+                        // Recurse into nested types
+                        foreach (var nested in type.NestedTypes)
+                        {
+                            ApplyAggressiveOptimizationToMethods(nested);
+                        }
+                    }
                 }
 
-                foreach (var method in type.Methods)
+                // We can skip non-public types as they are not valid for benchmarks.
+                // !type.IsNotPublic handles nested types, while type.IsPublic does not.
+                if (!type.IsNotPublic)
                 {
-                    if (method.CustomAttributes.Any(IsBenchmarkAttribute))
+                    foreach (var method in type.Methods)
                     {
-                        var oldImpl = method.ImplAttributes;
-                        // Remove AggressiveInlining and add NoInlining.
-                        method.ImplAttributes = (oldImpl & ~MethodImplAttributes.AggressiveInlining) | MethodImplAttributes.NoInlining;
-                        benchmarkMethodsImplAdjusted |= (oldImpl & MethodImplAttributes.NoInlining) == 0;
+                        if (method.CustomAttributes.Any(IsBenchmarkAttribute))
+                        {
+                            var oldImpl = method.ImplAttributes;
+                            // Remove AggressiveInlining and add NoInlining.
+                            method.ImplAttributes = (oldImpl & ~MethodImplAttributes.AggressiveInlining) | MethodImplAttributes.NoInlining;
+                            benchmarkMethodsImplAdjusted |= (oldImpl & MethodImplAttributes.NoInlining) == 0;
+                            anyAdjustments |= benchmarkMethodsImplAdjusted;
+                        }
                     }
                 }
             }
 
-            if (benchmarkMethodsImplAdjusted)
+            if (anyAdjustments)
             {
                 // Write to a memory stream before overwriting the original file in case an exception occurs during the write (like unsupported platform).
                 // https://github.com/Washi1337/AsmResolver/issues/640
@@ -90,9 +121,17 @@ public sealed class WeaveAssemblyTask : Task
         }
         catch (Exception e)
         {
-            Log.LogWarning($"Assembly weaving failed. Benchmark methods found requiring NoInlining: {benchmarkMethodsImplAdjusted}. Error:{Environment.NewLine}{e}");
+            if (TreatWarningsAsErrors)
+            {
+                Log.LogError($"Assembly weaving failed. Benchmark methods found requiring NoInlining: {benchmarkMethodsImplAdjusted}.");
+                Log.LogErrorFromException(e, true, true, null);
+            }
+            else
+            {
+                Log.LogWarning($"Assembly weaving failed. Benchmark methods found requiring NoInlining: {benchmarkMethodsImplAdjusted}. Error:{Environment.NewLine}{e}");
+            }
         }
-        return true;
+        return !Log.HasLoggedErrors;
     }
 
     private static bool IsBenchmarkAttribute(CustomAttribute attribute)

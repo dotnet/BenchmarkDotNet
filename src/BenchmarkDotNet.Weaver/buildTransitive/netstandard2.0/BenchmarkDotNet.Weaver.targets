@@ -17,7 +17,7 @@
       Inputs="$(BenchmarkDotNetWeaveAssemblyPath)"
       Outputs="$(BenchmarkDotNetWeaveAssembliesStampFile)">
 
-    <WeaveAssemblyTask TargetAssembly="$(BenchmarkDotNetWeaveAssemblyPath)" />
+    <WeaveAssemblyTask TargetAssembly="$(BenchmarkDotNetWeaveAssemblyPath)" TreatWarningsAsErrors="$(TreatWarningsAsErrors)" />
 
     <!-- Create stamp file for incrementality -->
     <Touch Files="$(BenchmarkDotNetWeaveAssembliesStampFile)" AlwaysCreate="true" />
