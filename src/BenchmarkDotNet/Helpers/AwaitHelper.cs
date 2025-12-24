@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -7,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers
 {
+    [UsedImplicitly]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class AwaitHelper
     {
         private class ValueTaskWaiter

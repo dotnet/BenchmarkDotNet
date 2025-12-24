@@ -94,10 +94,11 @@ namespace BenchmarkDotNet.Parameters
         public string ToSourceCode()
         {
             Type paramType = parameterDefinitions[argumentIndex].ParameterType;
-            bool isParamRefLike = RunnableReflectionHelpers.IsRefLikeType(paramType);
 
-            string cast = isParamRefLike ? $"({Value.GetType().GetCorrectCSharpTypeName()})"
-                : $"({paramType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
+            // it's an object so we need to cast it to the right type
+            string cast = paramType.IsByRefLike()
+                ? $"({Value.GetType().GetCorrectCSharpTypeName()})"
+                : $"({paramType.GetCorrectCSharpTypeName()})";
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
