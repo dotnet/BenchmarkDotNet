@@ -12,7 +12,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
@@ -56,9 +55,6 @@ namespace BenchmarkDotNet.Running
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
         public bool IsNativeAot => RepresentativeBenchmarkCase.Job.IsNativeAOT();
-
-        public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolchain);
 
         public bool IsNetFramework => Runtime is ClrRuntime
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));

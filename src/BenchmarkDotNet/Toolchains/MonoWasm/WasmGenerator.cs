@@ -29,9 +29,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             if (((WasmRuntime)buildPartition.Runtime).Aot)
             {
                 GenerateProjectFile(buildPartition, artifactsPaths, aot: true, logger);
-                GenerateLinkerDescriptionFile(artifactsPaths);
-            }
-            else
+
+                var linkDescriptionFileName = "WasmLinkerDescription.xml";
+                File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), linkDescriptionFileName), ResourceHelper.LoadTemplate(linkDescriptionFileName));
+            } else
             {
                 GenerateProjectFile(buildPartition, artifactsPaths, aot: false, logger);
             }
@@ -64,16 +65,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
             GatherReferences(buildPartition, artifactsPaths, logger);
-        }
-
-        protected void GenerateLinkerDescriptionFile(ArtifactsPaths artifactsPaths)
-        {
-            const string linkDescriptionFileName = "WasmLinkerDescription.xml";
-
-            var content = ResourceHelper.LoadTemplate(linkDescriptionFileName)
-                .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName);
-
-            File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, linkDescriptionFileName), content);
         }
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "AppBundle", MainJS);
