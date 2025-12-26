@@ -83,6 +83,16 @@ For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
     }
     ```
 
+* **Q** I'm running benchmarks on Linux and I see: `// ! Failed to set up priority Highest for thread ... Make sure you have the right permissions.` What can I do?
+
+    **A** This message can appear when using in-process toolchains (for example via `[InProcess]`) because BenchmarkDotNet tries to set `ThreadPriority.Highest`. On Linux, raising scheduling priority requires additional permissions. Instead of running the whole benchmark as root (which can create root-owned build artifacts), you can grant the benchmark executable the `CAP_SYS_NICE` capability:
+
+    ```bash
+    sudo setcap cap_sys_nice=eip /path/to/YourBenchmarksExecutable
+    ```
+
+    If you don't need high thread priority, you can ignore the message or avoid in-process toolchains.
+
 * **Q** I have failed to run my benchmarks from LINQPad. How can I fix this problem?  
 
     ```
