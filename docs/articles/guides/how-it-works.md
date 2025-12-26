@@ -36,7 +36,7 @@ IEnumerable<Results> Run(Benchmark benchmark)
 Result ActualRun(Method method, Job job)
 {
     GlobalSetup();
-    // JittingStage(method) // triggers JIT compilation (and tiering if enabled) before Pilot/Warmup
+    JittingStage(method); // triggers JIT compilation (and tiering if enabled) before Pilot/Warmup
 
     int unrollFactor = job.Run.UnrollFactor; // 16 by default
 
@@ -54,6 +54,11 @@ Result ActualRun(Method method, Job job)
     GlobalCleanup(); 
 
     return (result - Median(overhead), gcStats);
+}
+
+void JittingStage(Method method)
+{
+    RunIteration(method, invokeCount: 1, unrollFactor: 1);
 }
 
 long Pilot(Method method, int unrollFactor)
