@@ -6,6 +6,7 @@ BenchmarkDotNet follows the following steps to run your benchmarks:
 2. Next, we take each method/job/params combination and try to measure its performance by launching benchmark process several times (`LaunchCount`).
 3. An invocation of the workload method is an *operation*. A bunch of operation is an *iteration*. If you have an `IterationSetup` method, it will be invoked before each iteration, 
 but not between operations. We have the following type of iterations:
+    * `Jitting`: The overhead/workload methods are invoked to ensure they are JIT-compiled (and on tiered runtimes, to promote them when possible). These iterations are not used for measurements.
     * `Pilot`: The best operation count will be chosen.
     * `OverheadWarmup`, `OverheadWorkload`: BenchmarkDotNet overhead will be evaluated.
     * `ActualWarmup`: Warmup of the workload method.
@@ -35,6 +36,7 @@ IEnumerable<Results> Run(Benchmark benchmark)
 Result ActualRun(Method method, Job job)
 {
     GlobalSetup();
+    // JittingStage(method) // triggers JIT compilation (and tiering if enabled) before Pilot/Warmup
 
     int unrollFactor = job.Run.UnrollFactor; // 16 by default
 
