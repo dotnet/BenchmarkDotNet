@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Columns;
@@ -13,9 +14,9 @@ using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Models;
-using Perfolizer.Perfonar;
-using Perfolizer.Perfonar.Base;
 using Perfolizer.Perfonar.Tables;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Reports
 {
@@ -147,7 +148,7 @@ namespace BenchmarkDotNet.Reports
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .FirstOrDefault(IsBaseline);
 
-        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey)
+        public IEnumerable<BenchmarkCase> GetNonBaselines(string? logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .Where(b => !IsBaseline(b));

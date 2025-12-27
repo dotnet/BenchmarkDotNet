@@ -10,13 +10,17 @@ using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Configs
 {
@@ -52,11 +56,11 @@ namespace BenchmarkDotNet.Configs
 
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
-        [PublicAPI] public string ArtifactsPath { get; set; }
-        [PublicAPI] public CultureInfo CultureInfo { get; set; }
-        [PublicAPI] public IOrderer Orderer { get; set; }
-        [PublicAPI] public ICategoryDiscoverer CategoryDiscoverer { get; set; }
-        [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
+        [PublicAPI] public string? ArtifactsPath { get; set; }
+        [PublicAPI] public CultureInfo? CultureInfo { get; set; }
+        [PublicAPI] public IOrderer? Orderer { get; set; }
+        [PublicAPI] public ICategoryDiscoverer? CategoryDiscoverer { get; set; }
+        [PublicAPI] public SummaryStyle? SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
         [PublicAPI] public WakeLockType WakeLock { get; set; } = DefaultConfig.Instance.WakeLock;
 

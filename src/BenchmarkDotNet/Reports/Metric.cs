@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Reports
 {
@@ -42,7 +45,16 @@ namespace BenchmarkDotNet.Reports
     {
         public static readonly EqualityComparer<IMetricDescriptor> Instance = new MetricDescriptorEqualityComparer();
 
-        public override bool Equals(IMetricDescriptor x, IMetricDescriptor y) => x.Id.Equals(y.Id);
+        public override bool Equals(IMetricDescriptor? x, IMetricDescriptor? y)
+        {
+            if (ReferenceEquals(x, y))
+                return true;
+
+            if (x is null || y is null)
+                return false;
+
+            return string.Equals(x.Id, y.Id, StringComparison.Ordinal);
+        }
 
         public override int GetHashCode(IMetricDescriptor obj) => obj.Id.GetHashCode();
     }

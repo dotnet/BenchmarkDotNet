@@ -17,6 +17,8 @@ using BenchmarkDotNet.Validators;
 
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Configs
 {
     /// <summary>
@@ -68,9 +70,9 @@ namespace BenchmarkDotNet.Configs
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
         public WakeLockType WakeLock => WakeLockType.None;
 
-        public string ArtifactsPath => null; // DefaultConfig.ArtifactsPath will be used if the user does not specify it in explicit way
+        public string? ArtifactsPath => null; // DefaultConfig.ArtifactsPath will be used if the user does not specify it in explicit way
 
-        public CultureInfo CultureInfo => null;
+        public CultureInfo? CultureInfo => null;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => [];
 
         public ConfigOptions Options => ConfigOptions.KeepBenchmarkFiles | ConfigOptions.DisableOptimizationsValidator;

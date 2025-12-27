@@ -1,9 +1,12 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using System;
 using System.ComponentModel;
 using System.IO;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Environments
 {
@@ -20,7 +23,7 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// creates new instance of MonoAotLLVMRuntime
         /// </summary>
-        public MonoAotLLVMRuntime(FileInfo aotCompilerPath, MonoAotCompilerMode aotCompilerMode, string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM", RuntimeMoniker moniker = RuntimeMoniker.MonoAOTLLVM) : base(moniker, msBuildMoniker, displayName)
+        public MonoAotLLVMRuntime(FileInfo? aotCompilerPath, MonoAotCompilerMode aotCompilerMode, string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM", RuntimeMoniker moniker = RuntimeMoniker.MonoAOTLLVM) : base(moniker, msBuildMoniker, displayName)
         {
             if (aotCompilerPath == null)
                 throw new ArgumentNullException(paramName: nameof(aotCompilerPath));
@@ -37,10 +40,10 @@ namespace BenchmarkDotNet.Environments
             AOTCompilerPath = new FileInfo("fake");
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is MonoAotLLVMRuntime other && Equals(other);
 
-        public bool Equals(MonoAotLLVMRuntime other)
+        public bool Equals(MonoAotLLVMRuntime? other)
             => other != null && base.Equals(other) && other.AOTCompilerPath == AOTCompilerPath;
 
         public override int GetHashCode()
