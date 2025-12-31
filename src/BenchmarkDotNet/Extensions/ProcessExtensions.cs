@@ -27,10 +27,6 @@ namespace BenchmarkDotNet.Extensions
 
         public static void EnsureHighPriority(this Process process, ILogger logger)
         {
-            // Process.set_PriorityClass requires root on Unix
-            if (!OsDetector.IsWindows())
-                return;
-
             try
             {
                 process.PriorityClass = ProcessPriorityClass.High;
@@ -66,10 +62,6 @@ namespace BenchmarkDotNet.Extensions
                 throw new ArgumentNullException(nameof(process));
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
-
-            // Process.set_PriorityClass requires root on Unix
-            if (!OsDetector.IsWindows())
-                return false;
 
             try
             {
