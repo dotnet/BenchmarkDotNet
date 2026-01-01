@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             CustomRuntimePack = customRuntimePack;
             AotCompilerPath = aotCompilerPath;
             AotCompilerMode = aotCompilerMode;
+            BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)

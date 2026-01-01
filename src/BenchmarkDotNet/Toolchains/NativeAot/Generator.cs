@@ -46,6 +46,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
             this.ilcOptimizationPreference = ilcOptimizationPreference;
             this.ilcInstructionSet = ilcInstructionSet;
+            BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
         internal readonly IReadOnlyDictionary<string, string> Feeds;
