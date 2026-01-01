@@ -11,6 +11,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,11 +28,11 @@ namespace BenchmarkDotNet.IntegrationTests
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        private ManualConfig GetConfig()
+        private ManualConfig GetConfig(MonoAotCompilerMode aotCompilerMode)
         {
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
-            var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm");
+            var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm", aotCompilerMode: aotCompilerMode);
             var mainJsPath = Path.Combine(AppContext.BaseDirectory, "AppBundle", "test-main.js");
 
             return ManualConfig.CreateEmpty()
@@ -44,8 +45,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);
         }
 
-        [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
-        public void WasmIsSupported()
+        [TheoryEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
+        [InlineData(MonoAotCompilerMode.mini)]
+        [InlineData(MonoAotCompilerMode.wasm)]
+        public void WasmIsSupported(MonoAotCompilerMode aotCompilerMode)
         {
             // Test fails on Linux non-x64.
             if (OsDetector.IsLinux() && RuntimeInformation.GetCurrentPlatform() != Platform.X64)
@@ -53,11 +56,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
             }
 
-            CanExecute<WasmBenchmark>(GetConfig());
+            CanExecute<WasmBenchmark>(GetConfig(aotCompilerMode));
         }
 
-        [FactEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
-        public void WasmSupportsInProcessDiagnosers()
+        [TheoryEnvSpecific("WASM is only supported on Unix", EnvRequirement.NonWindows)]
+        [InlineData(MonoAotCompilerMode.mini)]
+        [InlineData(MonoAotCompilerMode.wasm)]
+        public void WasmSupportsInProcessDiagnosers(MonoAotCompilerMode aotCompilerMode)
         {
             // Test fails on Linux non-x64.
             if (OsDetector.IsLinux() && RuntimeInformation.GetCurrentPlatform() != Platform.X64)
@@ -68,7 +73,7 @@ namespace BenchmarkDotNet.IntegrationTests
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
-                var config = GetConfig().AddDiagnoser(diagnoser);
+                var config = GetConfig(aotCompilerMode).AddDiagnoser(diagnoser);
 
                 CanExecute<WasmBenchmark>(config);
 
