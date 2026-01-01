@@ -20,10 +20,10 @@ jobs:
     # --- Init ---
 
     - name: Checkout sources
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Checkout changelog
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: docs-changelog
         path: docs/_changelog
@@ -68,7 +68,7 @@ jobs:
       run: ./build.cmd version-increment
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@v9
+      uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
       with:
         message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }} and update released analyzer rules"
         author_name: GitHub Actions
@@ -83,14 +83,14 @@ jobs:
     # --- Release ---
 
     - name: Push git changes
-      uses: ad-m/github-push-action@v1
+      uses: ad-m/github-push-action@77c5b412c50b723d2a4fbc6d71fb5723bcd439aa # v1.0.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: master
         tags: true
 
     - name: Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
       with:
         name: BenchmarkDotNet v${{ steps.version.outputs.VERSION }}
         tag_name: v${{ steps.version.outputs.VERSION }}
@@ -106,7 +106,7 @@ jobs:
         milestone_name: v${{ steps.version.outputs.VERSION }}
 
     - name: Create new milestone
-      uses: WyriHaximus/github-action-create-milestone@v1
+      uses: WyriHaximus/github-action-create-milestone@bcd9e15439836d6098d353a5bcf82de46591a35d # v1.1.2
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
@@ -140,7 +140,7 @@ jobs:
       run: ./build.cmd docs-build
 
     - name: Deploy documentation
-      uses: JamesIves/github-pages-deploy-action@v4
+      uses: JamesIves/github-pages-deploy-action@9d877eea73427180ae43cf98e8914934fe157a1a # v4.7.6
       with:
         branch: gh-pages
         folder: docs/_site

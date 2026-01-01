@@ -22,11 +22,11 @@
   <ItemGroup>
     <!-- We multi-target for different compiler versions. https://github.com/dotnet/roslyn/discussions/81256#discussioncomment-14975130, https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md#versioning -->
     <!-- C# 7.3 (min version we support) -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" Condition="'$(MccVersion)' == '2.8'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[2.8.0]" Condition="'$(MccVersion)' == '2.8'" />
     <!-- C# 9 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" Condition="'$(MccVersion)' == '3.8'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[3.8.0]" Condition="'$(MccVersion)' == '3.8'" />
     <!-- C# 12 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" Condition="'$(MccVersion)' == '4.8'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.8.0,)" Condition="'$(MccVersion)' == '4.8'" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />

@@ -15,12 +15,12 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: docs-stable
 
     - name: Checkout changelog
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: docs-changelog
         path: docs/_changelog
@@ -37,7 +37,7 @@ jobs:
       run: ./build.cmd docs-build
 
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: site
         path: docs/_site
@@ -49,12 +49,12 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: docs-stable
 
     - name: Download Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: site
         path: site
@@ -63,7 +63,7 @@ jobs:
       run: tree $GITHUB_WORKSPACE
 
     - name: Deploy documentation
-      uses: JamesIves/github-pages-deploy-action@v4
+      uses: JamesIves/github-pages-deploy-action@9d877eea73427180ae43cf98e8914934fe157a1a # v4.7.6
       with:
         branch: gh-pages
         folder: site
