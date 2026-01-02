@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
     <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
-    <TargetFrameworks>net461;net48;netcoreapp2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net461;net48;net7.0;net8.0</TargetFrameworks>
     <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
     <NoWarn>$(NoWarn);NETSDK1138;NU1903</NoWarn>
     <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
