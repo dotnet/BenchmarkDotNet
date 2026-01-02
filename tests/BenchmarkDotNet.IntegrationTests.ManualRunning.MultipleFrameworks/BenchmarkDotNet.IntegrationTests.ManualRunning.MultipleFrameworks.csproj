@@ -2,8 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
-    <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
-    <TargetFrameworks>net461;net48;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net461;net48;net8.0;net9.0</TargetFrameworks>
     <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
     <NoWarn>$(NoWarn);NETSDK1138;NU1903</NoWarn>
     <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
@@ -41,10 +40,9 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Microsoft.NET.Test.Sdk breaks netcoreapp2.0 -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" Condition=" '$(TargetFramework)' != 'netcoreapp2.0' " />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <!-- We use older version 2.4.1 for combatibility with netcoreapp2.0. -->
+    <!-- We use older version 2.4.1 for combatibility with net461 -->
     <PackageReference Include="xunit.runner.visualstudio" Version="[2.4.1]">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
