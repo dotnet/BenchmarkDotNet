@@ -1,6 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Jobs;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Environments
 {
     public class MonoRuntime : Runtime, IEquatable<MonoRuntime>
@@ -13,13 +15,13 @@ namespace BenchmarkDotNet.Environments
         public static readonly MonoRuntime Mono10_0 = new("Mono with .NET 10.0", RuntimeMoniker.Mono10_0, "net10.0", isDotNetBuiltIn: true);
         public static readonly MonoRuntime Mono11_0 = new("Mono with .NET 11.0", RuntimeMoniker.Mono11_0, "net11.0", isDotNetBuiltIn: true);
 
-        public string CustomPath { get; }
+        public string CustomPath { get; } = "";
 
-        public string AotArgs { get; }
+        public string AotArgs { get; } = "";
 
         public override bool IsAOT => !string.IsNullOrEmpty(AotArgs);
 
-        public string MonoBclPath { get; }
+        public string MonoBclPath { get; } = "";
 
         internal bool IsDotNetBuiltIn { get; }
 
@@ -39,10 +41,22 @@ namespace BenchmarkDotNet.Environments
             MonoBclPath = monoBclPath;
         }
 
-        public override bool Equals(object obj) => obj is MonoRuntime other && Equals(other);
+        public override bool Equals(object? obj)
+            => obj is MonoRuntime runtime && Equals(runtime);
 
-        public bool Equals(MonoRuntime other)
-            => base.Equals(other) && Name == other?.Name && CustomPath == other?.CustomPath && AotArgs == other?.AotArgs && MonoBclPath == other?.MonoBclPath;
+        public bool Equals(MonoRuntime? other)
+        {
+            if (other is null)
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return base.Equals(other)
+                && Name == other.Name
+                && CustomPath == other.CustomPath
+                && AotArgs == other.AotArgs
+                && MonoBclPath == other.MonoBclPath;
+        }
 
         public override int GetHashCode()
             => HashCode.Combine(base.GetHashCode(), Name, CustomPath, AotArgs, MonoBclPath);

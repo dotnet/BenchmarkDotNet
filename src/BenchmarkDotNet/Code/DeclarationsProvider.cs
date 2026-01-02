@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider
@@ -29,9 +31,9 @@ namespace BenchmarkDotNet.Code
         public abstract string GetWorkloadMethodCall(string passArguments);
 
         protected static string GetMethodPrefix(MethodInfo method)
-            => method.IsStatic ? method.DeclaringType.GetCorrectCSharpTypeName() : "base";
+            => method.IsStatic ? method.DeclaringType!.GetCorrectCSharpTypeName() : "base";
 
-        private string GetMethodName(MethodInfo method)
+        private string GetMethodName(MethodInfo? method)
         {
             if (method == null)
             {

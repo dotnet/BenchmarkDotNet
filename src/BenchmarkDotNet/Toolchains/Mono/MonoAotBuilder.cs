@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
                 : new Dictionary<string, string> { { "MONO_PATH", monoRuntime.MonoBclPath } };
 
             var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(
-                fileName: monoRuntime.CustomPath ?? "mono",
+                fileName: monoRuntime.CustomPath.IsNotBlank() ? monoRuntime.CustomPath : "mono",
                 arguments: $"{monoRuntime.AotArgs} \"{Path.GetFullPath(exePath)}\"",
                 workingDirectory: Path.GetDirectoryName(exePath),
                 environmentVariables: environmentVariables,

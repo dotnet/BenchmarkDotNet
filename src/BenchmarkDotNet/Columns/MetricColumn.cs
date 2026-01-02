@@ -6,6 +6,8 @@ using Perfolizer.Horology;
 using Perfolizer.Metrology;
 using Pragmastat.Metrology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Columns
 {
     public class MetricColumn : IColumn
@@ -35,7 +37,7 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric))
+            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase]!.Metrics.TryGetValue(descriptor.Id, out var metric))
                 return "NA";
             if (double.IsNaN(metric.Value))
                 return UnknownRepresentation;

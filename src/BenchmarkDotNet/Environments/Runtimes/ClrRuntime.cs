@@ -4,6 +4,8 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Environments
 {
     public class ClrRuntime : Runtime, IEquatable<ClrRuntime>
@@ -18,7 +20,7 @@ namespace BenchmarkDotNet.Environments
 
         public string Version { get; }
 
-        private ClrRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName, string? version = null)
+        private ClrRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName, string version = "")
             : base(runtimeMoniker, msBuildMoniker, displayName)
         {
             Version = version;
@@ -37,9 +39,9 @@ namespace BenchmarkDotNet.Environments
             return new ClrRuntime(current.RuntimeMoniker, current.MsBuildMoniker, version, version);
         }
 
-        public override bool Equals(object obj) => obj is ClrRuntime other && Equals(other);
+        public override bool Equals(object? obj) => obj is ClrRuntime other && Equals(other);
 
-        public bool Equals(ClrRuntime other) => other != null && base.Equals(other) && Version == other.Version;
+        public bool Equals(ClrRuntime? other) => other != null && base.Equals(other) && Version == other.Version;
 
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Version);
 

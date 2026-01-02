@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Columns
 {
@@ -24,13 +27,14 @@ namespace BenchmarkDotNet.Columns
         {
             var logicalGroup = summary
                 .GetLogicalGroupForBenchmark(benchmarkCase)
-                .Where(b => summary[b].ResultStatistics != null)
+                .Where(b => summary[b]?.ResultStatistics != null)
+                .WhereNotNull()
                 .ToArray();
             int index = Array.IndexOf(logicalGroup, benchmarkCase);
             if (index == -1)
                 return MetricColumn.UnknownRepresentation;
 
-            var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b].ResultStatistics).ToArray());
+            var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b]!.ResultStatistics!).ToArray());
             int rank = ranks[index];
             return numeralSystem.ToPresentation(rank);
         }
@@ -42,7 +46,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsNumeric => true;
         public UnitType UnitType => UnitType.Dimensionless;
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
-        public int PriorityInCategory => (int) numeralSystem;
+        public int PriorityInCategory => (int)numeralSystem;
         public override string ToString() => ColumnName;
         public string Legend => $"Relative position of current benchmark mean among all benchmarks ({numeralSystem} style)";
     }

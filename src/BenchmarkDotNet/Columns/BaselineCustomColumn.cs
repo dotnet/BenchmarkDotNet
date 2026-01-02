@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Columns
 {
@@ -13,17 +16,20 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
-            string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+            var logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             var baseline = summary.GetBaseline(logicalGroupKey);
             bool isBaseline = summary.IsBaseline(benchmarkCase);
 
             if (ResultsAreInvalid(summary, benchmarkCase, baseline))
                 return MetricColumn.UnknownRepresentation;
 
-            var baselineStat = summary[baseline].ResultStatistics;
-            var baselineMetrics = summary[baseline].Metrics;
-            var currentStat = summary[benchmarkCase].ResultStatistics;
-            var currentMetrics = summary[benchmarkCase].Metrics;
+            var baselineReport = summary[baseline]!;
+            var baselineStat = baselineReport.ResultStatistics!;
+            var baselineMetrics = baselineReport.Metrics;
+
+            var benchmarkCaseReport = summary[benchmarkCase]!;
+            var currentStat = benchmarkCaseReport.ResultStatistics!;
+            var currentMetrics = benchmarkCaseReport.Metrics;
 
             return GetValue(summary, benchmarkCase, baselineStat, baselineMetrics, currentStat, currentMetrics, isBaseline);
         }
@@ -43,14 +49,12 @@ namespace BenchmarkDotNet.Columns
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        internal static bool ResultsAreInvalid(Summary summary, BenchmarkCase benchmarkCase, BenchmarkCase? baseline)
+        internal static bool ResultsAreInvalid(Summary summary, BenchmarkCase benchmarkCase, [NotNullWhen(false)] BenchmarkCase? baseline)
         {
             return baseline == null ||
-                   summary[baseline] == null ||
-                   summary[baseline].ResultStatistics == null ||
-                   !summary[baseline].ResultStatistics.CanBeInverted() ||
-                   summary[benchmarkCase] == null ||
-                   summary[benchmarkCase].ResultStatistics == null;
+                   summary[baseline]?.ResultStatistics == null ||
+                   !summary[baseline]!.ResultStatistics!.CanBeInverted() ||
+                   summary[benchmarkCase]?.ResultStatistics == null;
         }
     }
 }

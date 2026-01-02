@@ -8,6 +8,8 @@ using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
 
 // ReSharper disable MemberCanBePrivate.Global
 
+#nullable enable
+
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryStyle : IEquatable<SummaryStyle>
@@ -75,9 +77,9 @@ namespace BenchmarkDotNet.Reports
             => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth,
                 ratioStyle, TextColumnJustification, NumericColumnJustification);
 
-        public bool Equals(SummaryStyle other)
+        public bool Equals(SummaryStyle? other)
         {
-            if (ReferenceEquals(null, other))
+            if (other is null)
                 return false;
             if (ReferenceEquals(this, other))
                 return true;
@@ -94,7 +96,7 @@ namespace BenchmarkDotNet.Reports
                    && NumericColumnJustification == other.NumericColumnJustification;
         }
 
-        public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
+        public override bool Equals(object? obj) => obj is SummaryStyle summary && Equals(summary);
 
         public override int GetHashCode() =>
             HashCode.Combine(
@@ -109,8 +111,8 @@ namespace BenchmarkDotNet.Reports
                 TextColumnJustification,
                 NumericColumnJustification);
 
-        public static bool operator ==(SummaryStyle left, SummaryStyle right) => Equals(left, right);
+        public static bool operator ==(SummaryStyle? left, SummaryStyle? right) => Equals(left, right);
 
-        public static bool operator !=(SummaryStyle left, SummaryStyle right) => !Equals(left, right);
+        public static bool operator !=(SummaryStyle? left, SummaryStyle? right) => !Equals(left, right);
     }
 }

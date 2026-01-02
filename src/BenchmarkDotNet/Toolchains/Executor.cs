@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Toolchains
                     start.Arguments = args;
                     break;
                 case MonoRuntime mono:
-                    start.FileName = mono.CustomPath ?? "mono";
+                    start.FileName = mono.CustomPath.IsNotBlank() ? mono.CustomPath : "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
                     break;
                 case MonoAotLLVMRuntime _:

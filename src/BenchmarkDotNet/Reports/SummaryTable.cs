@@ -41,12 +41,12 @@ namespace BenchmarkDotNet.Reports
                 FullContentStartOfLogicalGroup = Array.Empty<bool>();
                 FullContentWithHeader = Array.Empty<string[]>();
                 IsDefault = Array.Empty<bool>();
-                EffectiveSummaryStyle = summary.Style ?? SummaryStyle.Default;
+                EffectiveSummaryStyle = summary.Style;
                 return;
             }
 
             // Ensure we have all required data for styling
-            style = style ?? summary.Style ?? SummaryStyle.Default;
+            style = style ?? summary.Style;
             if (style.TimeUnit == null)
             {
                 style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics!.Mean)
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Reports
                     .Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)!.Value)
                     .ToArray()));
             }
-            EffectiveSummaryStyle = style;
+            EffectiveSummaryStyle = style!;
 
             var columns = summary.GetColumns();
             ColumnCount = columns.Length;

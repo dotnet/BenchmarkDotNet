@@ -5,6 +5,8 @@ using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Columns
 {
     public class BaselineRatioColumn : BaselineCustomColumn
@@ -52,7 +54,7 @@ namespace BenchmarkDotNet.Columns
             var invertedRatio = GetRatioStatistics(baseline, current);
 
             var cultureInfo = summary.GetCultureInfo();
-            var ratioStyle = summary?.Style?.RatioStyle ?? RatioStyle.Value;
+            var ratioStyle = summary.Style.RatioStyle;
 
             switch (Metric)
             {
@@ -112,9 +114,9 @@ namespace BenchmarkDotNet.Columns
 
         private static bool IsNonBaselinesPrecise(Summary summary, Statistics baselineStat, BenchmarkCase benchmarkCase)
         {
-            string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
+            var logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             var nonBaselines = summary.GetNonBaselines(logicalGroupKey);
-            return nonBaselines.Any(x => GetRatioStatistics(summary[x].ResultStatistics, baselineStat)?.Mean < 0.01);
+            return nonBaselines.Any(x => GetRatioStatistics(summary[x]?.ResultStatistics, baselineStat)?.Mean < 0.01);
         }
 
         private static Statistics? GetRatioStatistics(Statistics? current, Statistics? baseline)

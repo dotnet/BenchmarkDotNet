@@ -2,6 +2,8 @@
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Environments
 {
     public abstract class Runtime : IEquatable<Runtime>
@@ -36,10 +38,10 @@ namespace BenchmarkDotNet.Environments
 
         public override string ToString() => Name;
 
-        public bool Equals(Runtime other)
+        public bool Equals(Runtime? other)
             => other != null && other.Name == Name && other.MsBuildMoniker == MsBuildMoniker && other.RuntimeMoniker == RuntimeMoniker;
 
-        public override bool Equals(object obj) => obj is Runtime other && Equals(other);
+        public override bool Equals(object? obj) => obj is Runtime other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(Name, MsBuildMoniker, RuntimeMoniker);
     }

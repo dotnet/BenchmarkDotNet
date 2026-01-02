@@ -14,6 +14,8 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Configs
 {
     public interface IConfig
@@ -34,14 +36,14 @@ namespace BenchmarkDotNet.Configs
         IOrderer? Orderer { get; }
         ICategoryDiscoverer? CategoryDiscoverer { get; }
 
-        SummaryStyle SummaryStyle { get; }
+        SummaryStyle? SummaryStyle { get; }
 
         ConfigUnionRule UnionRule { get; }
 
         /// <summary>
         /// the default value is "./BenchmarkDotNet.Artifacts"
         /// </summary>
-        string ArtifactsPath { get; }
+        string? ArtifactsPath { get; }
 
         CultureInfo? CultureInfo { get; }
 

@@ -5,13 +5,15 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Code
 {
     internal static class ArrayParam
     {
         private static (string BaseElementTypeRepr, string InnerDimensions) GetDisplayString(Type arrayType)
         {
-            var elemType = arrayType.GetElementType();
+            var elemType = arrayType.GetElementType()!;
 
             if (elemType.IsArray)
             {
