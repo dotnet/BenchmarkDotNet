@@ -161,9 +161,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!buildResult.IsBuildSuccess)
             {
-                throw buildResult.TryToExplainFailureReason(out string reason)
-                    ? new Exception(reason)
-                    : new Exception(buildResult.ErrorMessage);
+                if (!buildResult.TryToExplainFailureReason(out string reason))
+                {
+                    reason = buildResult.ErrorMessage;
+                }
+                logger.WriteLineWarning($"Failed to gather assembly references, reason:{Environment.NewLine}{reason}");
             }
 
             xmlDoc = new XmlDocument();
