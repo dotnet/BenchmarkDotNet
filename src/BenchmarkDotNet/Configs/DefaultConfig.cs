@@ -119,6 +119,8 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
+        public IEnumerable<CustomCounter> GetCustomCounters() => Array.Empty<CustomCounter>();
+
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
 
         public IEnumerable<EventProcessor> GetEventProcessors() => Array.Empty<EventProcessor>();

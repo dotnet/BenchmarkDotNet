@@ -38,7 +38,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 yield break;
             }
 
-            if (!validationParameters.Config.GetHardwareCounters().Any() && mandatory)
+            var hasHardwareCounters = validationParameters.Config.GetHardwareCounters().Any();
+            var hasCustomCounters = validationParameters.Config.GetCustomCounters().Any();
+
+            if (!hasHardwareCounters && !hasCustomCounters && mandatory)
             {
                 yield return new ValidationError(true, "No Hardware Counters defined, probably a bug");
                 yield break;
@@ -64,6 +67,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V");
             }
 
+            // Validate custom counters
+            foreach (var customCounter in validationParameters.Config.GetCustomCounters())
+            {
+                if (!availableCpuCounters.ContainsKey(customCounter.ProfileSourceName))
+                {
+                    yield return new ValidationError(true,
+                        $"Custom counter '{customCounter.ProfileSourceName}' is not available on this machine. " +
+                        $"Available counters: {string.Join(", ", availableCpuCounters.Keys.Take(20))}...");
+                }
+            }
+
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is InProcessEmitToolchain)
@@ -78,6 +92,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var profileSource = TraceEventProfileSources.GetInfo()[EtwTranslations[counter]]; // it can't fail, diagnoser validates that first
 
             return new PreciseMachineCounter(profileSource.ID, profileSource.Name, counter, intervalSelector(profileSource));
+        }
+
+        internal static PreciseMachineCounter FromCustomCounter(CustomCounter customCounter, Func<ProfileSourceInfo, int> intervalSelector)
+        {
+            var profileSource = TraceEventProfileSources.GetInfo()[customCounter.ProfileSourceName];
+            // Use the custom counter's interval if specified, otherwise use the intervalSelector
+            var interval = customCounter.Interval != CustomCounter.DefaultInterval 
+                ? customCounter.Interval 
+                : intervalSelector(profileSource);
+
+            return new PreciseMachineCounter(profileSource.ID, profileSource.Name, customCounter, interval);
         }
 
         internal static void Enable(IEnumerable<PreciseMachineCounter> counters)

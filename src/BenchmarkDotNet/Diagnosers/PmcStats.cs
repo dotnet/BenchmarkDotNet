@@ -8,20 +8,30 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public long TotalOperations { get; set; }
         public IReadOnlyDictionary<HardwareCounter, PreciseMachineCounter> Counters { get; }
+        public IReadOnlyCollection<PreciseMachineCounter> CustomCounters { get; }
         private IReadOnlyDictionary<int, PreciseMachineCounter> CountersByProfileSourceId { get; }
 
         public PmcStats() { throw new InvalidOperationException("should never be used"); }
 
         public PmcStats(IReadOnlyCollection<HardwareCounter> hardwareCounters, Func<HardwareCounter, PreciseMachineCounter> factory)
+            : this(hardwareCounters, Array.Empty<PreciseMachineCounter>(), factory)
         {
-            CountersByProfileSourceId = hardwareCounters
+        }
+
+        public PmcStats(IReadOnlyCollection<HardwareCounter> hardwareCounters, IReadOnlyCollection<PreciseMachineCounter> customCounters, Func<HardwareCounter, PreciseMachineCounter> factory)
+        {
+            var hwCounters = hardwareCounters
                 .Select(factory)
-                .ToDictionary
-                (
-                    counter => counter.ProfileSourceId,
-                    counter => counter
-                );
-            Counters = CountersByProfileSourceId.ToDictionary(c => c.Value.Counter, c => c.Value);
+                .ToDictionary(counter => counter.ProfileSourceId, counter => counter);
+
+            var customCountersDict = customCounters.ToDictionary(counter => counter.ProfileSourceId, counter => counter);
+
+            CountersByProfileSourceId = hwCounters
+                .Concat(customCountersDict.Where(kv => !hwCounters.ContainsKey(kv.Key)))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            Counters = hwCounters.ToDictionary(c => c.Value.Counter, c => c.Value);
+            CustomCounters = customCounters;
         }
 
         internal void Handle(int profileSourceId, ulong instructionPointer)

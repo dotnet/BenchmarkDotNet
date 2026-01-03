@@ -92,10 +92,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void Start(DiagnoserActionParameters parameters)
         {
-            var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
+            // Collect both built-in hardware counters and custom counters
+            var hardwareCountersList = parameters.Config
                 .GetHardwareCounters()
                 .Select(counter => HardwareCounters.FromCounter(counter, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
-                .ToArray();
+                .ToList();
+
+            var customCountersList = parameters.Config
+                .GetCustomCounters()
+                .Select(customCounter => HardwareCounters.FromCustomCounter(customCounter, GetInterval))
+                .ToList();
+
+            var counters = benchmarkToCounters[parameters.BenchmarkCase] = hardwareCountersList.Concat(customCountersList).ToArray();
 
             if (counters.Any()) // we need to enable the counters before starting the kernel session
                 HardwareCounters.Enable(counters);
@@ -145,11 +153,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var benchmarkToCounter in benchmarkToCounters)
             {
-                var uniqueCounters = benchmarkToCounter.Value.Select(x => x.Counter).Distinct().ToImmutableArray();
+                var allCounters = benchmarkToCounter.Value;
+                var builtInCounters = allCounters.Where(x => x.Counter != HardwareCounter.NotSet).ToList();
+                var customCounters = allCounters.Where(x => x.CustomCounter != null).ToList();
+
+                var uniqueHwCounters = builtInCounters.Select(x => x.Counter).Distinct().ToImmutableArray();
 
                 var pmcStats = new PmcStats(
-                    uniqueCounters,
-                    counter => benchmarkToCounter.Value.Single(pmc => pmc.Counter == counter)
+                    uniqueHwCounters,
+                    customCounters,
+                    counter => builtInCounters.Single(pmc => pmc.Counter == counter)
                 );
 
                 builder.Add(benchmarkToCounter.Key, pmcStats);

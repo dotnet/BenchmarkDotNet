@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Diagnosers
         internal PmcMetricDescriptor(PreciseMachineCounter counter)
         {
             Id = counter.Name;
-            DisplayName = $"{counter.Name}/Op";
+            DisplayName = $"{counter.ShortName}/Op";
             Legend = $"Hardware counter '{counter.Name}' per single operation";
-            TheGreaterTheBetter = counter.Counter.TheGreaterTheBetter();
+            TheGreaterTheBetter = counter.HigherIsBetter;
         }
 
         public string Id { get; }

@@ -32,6 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IValidator> validators = new List<IValidator>();
         private readonly List<Job> jobs = new List<Job>();
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
+        private readonly HashSet<CustomCounter> customCounters = new HashSet<CustomCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
         private readonly List<EventProcessor> eventProcessors = new List<EventProcessor>();
@@ -45,6 +46,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
+        public IEnumerable<CustomCounter> GetCustomCounters() => customCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
         public IEnumerable<EventProcessor> GetEventProcessors() => eventProcessors;
@@ -170,6 +172,12 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
+        public ManualConfig AddCustomCounters(params CustomCounter[] newCustomCounters)
+        {
+            customCounters.AddRange(newCustomCounters);
+            return this;
+        }
+
         public ManualConfig AddFilter(params IFilter[] newFilters)
         {
             filters.AddRange(newFilters);
@@ -225,6 +233,7 @@ namespace BenchmarkDotNet.Configs
             jobs.AddRange(config.GetJobs());
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
+            customCounters.AddRange(config.GetCustomCounters());
             filters.AddRange(config.GetFilters());
             eventProcessors.AddRange(config.GetEventProcessors());
             Orderer = config.Orderer ?? Orderer;

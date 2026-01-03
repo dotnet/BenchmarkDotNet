@@ -42,7 +42,8 @@ namespace BenchmarkDotNet.Configs
             var configAnalyse = new List<Conclusion>();
 
             var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
-            var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
+            var uniqueCustomCounters = source.GetCustomCounters().ToImmutableHashSet();
+            var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters, uniqueCustomCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
@@ -59,6 +60,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueColumnProviders,
                 uniqueLoggers,
                 uniqueHardwareCounters,
+                uniqueCustomCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
                 uniqueAnalyzers,
@@ -81,7 +83,7 @@ namespace BenchmarkDotNet.Configs
             );
         }
 
-        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCounters)
+        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCounters, ImmutableHashSet<CustomCounter> uniqueCustomCounters)
         {
             var builder = ImmutableHashSet.CreateBuilder(new TypeComparer<IDiagnoser>());
 
@@ -89,7 +91,7 @@ namespace BenchmarkDotNet.Configs
                 if (!builder.Contains(diagnoser))
                     builder.Add(diagnoser);
 
-            if (!uniqueHardwareCounters.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
+            if ((!uniqueHardwareCounters.IsEmpty || !uniqueCustomCounters.IsEmpty) && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
             {
                 // if users define hardware counters via [HardwareCounters] we need to dynamically load the right diagnoser
                 var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
