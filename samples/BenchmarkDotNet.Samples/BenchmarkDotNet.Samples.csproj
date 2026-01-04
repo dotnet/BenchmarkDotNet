@@ -26,11 +26,11 @@
     <PackageReference Include="System.IO.Hashing" Version="$(SihVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.1" />
     <!-- The Test SDK is required only for the VSTest Adapter to work -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <!-- This package enables the Visual Studio Profiler integration IntroVisualStudioProfiler.cs -->
-    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.0.36302.1" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.3.36812.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />

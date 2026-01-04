@@ -15,12 +15,12 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: master
 
     - name: Checkout changelog
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         ref: docs-changelog
         path: docs/_changelog
@@ -31,7 +31,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push changelog
-      uses: JamesIves/github-pages-deploy-action@v4
+      uses: JamesIves/github-pages-deploy-action@9d877eea73427180ae43cf98e8914934fe157a1a # v4.7.6
       with:
         branch: docs-changelog
         folder: docs/_changelog

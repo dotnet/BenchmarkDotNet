@@ -21,7 +21,7 @@ jobs:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -31,7 +31,7 @@ jobs:
         run: ./build.cmd in-tests-core -e
       # Report test results with unique name
       - name: Report tests results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
         if: always()
         with:
           name: test-windows-core-${{ matrix.os }}
@@ -39,7 +39,7 @@ jobs:
           reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-windows-core-trx-${{ github.run_id }}-${{ matrix.os }}
@@ -54,7 +54,7 @@ jobs:
       - name: Disable Windows Defender
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -70,7 +70,7 @@ jobs:
         run: ./build.cmd in-tests-full -e
       # Report test results with unique name
       - name: Report tests results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
         if: always()
         with:
           name: test-windows-full-${{ matrix.os }}
@@ -78,7 +78,7 @@ jobs:
           reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-windows-full-trx-${{ github.run_id }}-${{ matrix.os }}
@@ -90,7 +90,7 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # Set up the environment
       - name: Set up Clang
         uses: egor-tensin/setup-clang@ef434b41eb33a70396fb336b1bae39c76d740c3d # v1.4
@@ -100,9 +100,9 @@ jobs:
       - name: Set up zlib-static
         run: sudo apt-get install -y libkrb5-dev
       - name: Set up node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - name: Set up v8
         run: npm install jsvu -g && jsvu --os=linux64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
@@ -118,7 +118,7 @@ jobs:
         run: ./build.cmd in-tests-core -e
       # Report test results with unique name
       - name: Report tests results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
         if: always()
         with:
           name: test-linux-${{ matrix.os }}
@@ -126,7 +126,7 @@ jobs:
           reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-linux-trx-${{ github.run_id }}-${{ matrix.os }}
@@ -145,11 +145,11 @@ jobs:
             jsvu-os: 'mac64'
             arch: 'x64'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - name: Set up v8
         run: npm install jsvu -g && jsvu --os=${{ matrix.os.jsvu-os }} --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
@@ -165,7 +165,7 @@ jobs:
         run: ./build.cmd in-tests-core -e
       # Report test results with unique name
       - name: Report tests results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@fe45e9537387dac839af0d33ba56eed8e24189e8 # v2.3.0
         if: always()
         with:
           name: test-macos(${{ matrix.os.arch }})
@@ -173,7 +173,7 @@ jobs:
           reporter: dotnet-trx
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-macos(${{ matrix.os.arch }})-trx-${{ github.run_id }}
@@ -182,7 +182,7 @@ jobs:
   test-pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Clang
         uses: egor-tensin/setup-clang@v1
         with:
@@ -196,11 +196,11 @@ jobs:
   spellcheck-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         name: Setup node
         with:
-          node-version: "22"
+          node-version: "24"
       - name: Install cSpell
         run: npm install -g cspell@9.0.2
       - name: Copy cSpell config
