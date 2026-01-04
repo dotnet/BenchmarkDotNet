@@ -5,16 +5,15 @@ $ExtraDefines$
 // we should use full names everywhere to avoid any potential naming conflicts, example: #1007, #778
 
 #if !NET7_0_OR_GREATER
+// User code could poly-fill the type and leave it public, so we disable the warning just in case.
+#pragma warning disable CS0436 // Type conflicts with imported type
 namespace System.Diagnostics.CodeAnalysis
 {
-// User code could poly-fill this type and leave it public, so we disable the warning just in case.
-#pragma warning disable CS0436 // Type conflicts with imported type
     [global::System.AttributeUsage(global::System.AttributeTargets.Constructor, AllowMultiple = false, Inherited = false)]
     [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal sealed class SetsRequiredMembersAttribute : global::System.Attribute
     {
     }
-#pragma warning restore CS0436 // Type conflicts with imported type
 }
 #endif
 
