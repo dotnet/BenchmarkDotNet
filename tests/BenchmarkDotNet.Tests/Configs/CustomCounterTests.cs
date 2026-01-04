@@ -115,12 +115,15 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [Fact]
-        public void ZeroIntervalIsAccepted()
+        public void ZeroIntervalThrows()
         {
-            // Zero interval might be invalid for actual profiling but should be accepted by the class
-            var counter = new CustomCounter("DCMiss", interval: 0);
+            Assert.Throws<ArgumentOutOfRangeException>(() => new CustomCounter("DCMiss", interval: 0));
+        }
 
-            Assert.Equal(0, counter.Interval);
+        [Fact]
+        public void NegativeIntervalThrows()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => new CustomCounter("DCMiss", interval: -1));
         }
 
         #endregion

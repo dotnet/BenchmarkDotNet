@@ -52,6 +52,9 @@ namespace BenchmarkDotNet.Diagnosers
         {
             if (string.IsNullOrWhiteSpace(profileSourceName))
                 throw new ArgumentException("Profile source name cannot be null, empty or whitespace.", nameof(profileSourceName));
+            
+            if (interval <= 0)
+                throw new ArgumentOutOfRangeException(nameof(interval), interval, "Interval must be positive.");
 
             ProfileSourceName = profileSourceName;
             ShortName = shortName ?? profileSourceName;
