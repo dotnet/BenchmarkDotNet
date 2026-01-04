@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Configs
 
             if ((!uniqueHardwareCounters.IsEmpty || !uniqueCustomCounters.IsEmpty) && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
             {
-                // if users define hardware counters via [HardwareCounters] we need to dynamically load the right diagnoser
+                // if users define hardware counters or custom counters (e.g. via [HardwareCounters] or [CustomCounters]), we need to dynamically load the right diagnoser
                 var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
 
                 if (hardwareCountersDiagnoser != default(IDiagnoser) && !builder.Contains(hardwareCountersDiagnoser))
