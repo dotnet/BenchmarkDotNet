@@ -97,12 +97,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         internal static PreciseMachineCounter FromCustomCounter(CustomCounter customCounter, Func<ProfileSourceInfo, int> intervalSelector)
         {
             var profileSource = TraceEventProfileSources.GetInfo()[customCounter.ProfileSourceName];
-            // Use the custom counter's interval if specified, otherwise use the intervalSelector
-            var interval = customCounter.Interval != CustomCounter.DefaultInterval 
-                ? customCounter.Interval 
-                : intervalSelector(profileSource);
 
-            return new PreciseMachineCounter(profileSource.ID, profileSource.Name, customCounter, interval);
+            return new PreciseMachineCounter(profileSource.ID, profileSource.Name, customCounter, customCounter.Interval);
         }
 
         internal static void Enable(IEnumerable<PreciseMachineCounter> counters)
