@@ -26,8 +26,23 @@ namespace BenchmarkDotNet.Diagnosers
 
             var customCountersDict = customCounters.ToDictionary(counter => counter.ProfileSourceId, counter => counter);
 
+            // Validate no ProfileSourceId collisions between hardware and custom counters
+            var overlappingIds = customCountersDict.Keys
+                .Where(hwCounters.ContainsKey)
+                .ToArray();
+            if (overlappingIds.Length > 0)
+            {
+                var collisions = overlappingIds
+                    .Select(id => $"{id} ({hwCounters[id].Counter} / {customCountersDict[id].ShortName})")
+                    .ToArray();
+                throw new InvalidOperationException(
+                    $"ProfileSourceId collision detected between hardware and custom counters. " +
+                    $"Colliding counters: {string.Join(", ", collisions)}. " +
+                    $"Remove either the hardware counter or the custom counter with the same profile source.");
+            }
+
             CountersByProfileSourceId = hwCounters
-                .Concat(customCountersDict.Where(kv => !hwCounters.ContainsKey(kv.Key)))
+                .Concat(customCountersDict)
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
 
             Counters = hwCounters.ToDictionary(c => c.Value.Counter, c => c.Value);
