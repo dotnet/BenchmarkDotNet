@@ -57,6 +57,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IDiagnoser> GetDiagnosers() => [];
         public IEnumerable<IAnalyser> GetAnalysers() => [];
         public IEnumerable<HardwareCounter> GetHardwareCounters() => [];
+        public IEnumerable<CustomCounter> GetCustomCounters() => [];
         public IEnumerable<EventProcessor> GetEventProcessors() => [];
         public IEnumerable<IFilter> GetFilters() => [];
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => [];

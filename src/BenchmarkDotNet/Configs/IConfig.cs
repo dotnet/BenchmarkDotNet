@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
         IEnumerable<HardwareCounter> GetHardwareCounters();
+        IEnumerable<CustomCounter> GetCustomCounters();
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
         IEnumerable<EventProcessor> GetEventProcessors();

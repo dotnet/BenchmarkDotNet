@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT!
                 | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
-            if (Details.Config.GetHardwareCounters().Any())
+            if (Details.Config.GetHardwareCounters().Any() || Details.Config.GetCustomCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
 
             TraceEventSession.StackCompression = true;
