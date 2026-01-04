@@ -72,9 +72,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             {
                 if (!availableCpuCounters.ContainsKey(customCounter.ProfileSourceName))
                 {
+                    var availableCounterNames = availableCpuCounters.Keys.ToList();
+                    var displayedCounterNames = string.Join(", ", availableCounterNames.Take(20));
+                    var suffix = availableCounterNames.Count > 20 ? $" (and {availableCounterNames.Count - 20} more)" : string.Empty;
                     yield return new ValidationError(true,
                         $"Custom counter '{customCounter.ProfileSourceName}' is not available on this machine. " +
-                        $"Available counters: {string.Join(", ", availableCpuCounters.Keys.Take(20))}...");
+                        $"Available counters: {displayedCounterNames}{suffix}");
                 }
             }
 
