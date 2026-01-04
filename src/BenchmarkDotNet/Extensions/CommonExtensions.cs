@@ -45,6 +45,16 @@ namespace BenchmarkDotNet.Extensions
                 hashSet.Add(item);
         }
 
+        public static void AddRangeDistinct<T>(this List<T> list, IEnumerable<T> items, IEqualityComparer<T>? comparer = null)
+        {
+            var hashSet = new HashSet<T>(list, comparer);
+            foreach (var item in items)
+            {
+                if (hashSet.Add(item))
+                    list.Add(item);
+            }
+        }
+
 #if NETSTANDARD2_0
         public static TValue? GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;

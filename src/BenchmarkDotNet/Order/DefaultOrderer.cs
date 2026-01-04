@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
@@ -110,8 +111,7 @@ namespace BenchmarkDotNet.Order
             }
 
             var rules = new List<BenchmarkLogicalGroupRule>(explicitRules);
-            foreach (var rule in implicitRules.Where(rule => !rules.Contains(rule)))
-                rules.Add(rule);
+            rules.AddRangeDistinct(implicitRules);
 
             var keys = new List<string>();
             foreach (var rule in rules)

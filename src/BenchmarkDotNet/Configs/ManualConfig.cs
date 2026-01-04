@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -118,49 +117,49 @@ namespace BenchmarkDotNet.Configs
 
         public ManualConfig AddColumn(params IColumn[] newColumns)
         {
-            columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
+            columnProviders.AddRangeDistinct(newColumns.Select(c => c.ToProvider()));
             return this;
         }
 
         public ManualConfig AddColumnProvider(params IColumnProvider[] newColumnProviders)
         {
-            columnProviders.AddRange(newColumnProviders);
+            columnProviders.AddRangeDistinct(newColumnProviders);
             return this;
         }
 
         public ManualConfig AddExporter(params IExporter[] newExporters)
         {
-            exporters.AddRange(newExporters);
+            exporters.AddRangeDistinct(newExporters);
             return this;
         }
 
         public ManualConfig AddLogger(params ILogger[] newLoggers)
         {
-            loggers.AddRange(newLoggers);
+            loggers.AddRangeDistinct(newLoggers);
             return this;
         }
 
         public ManualConfig AddDiagnoser(params IDiagnoser[] newDiagnosers)
         {
-            diagnosers.AddRange(newDiagnosers);
+            diagnosers.AddRangeDistinct(newDiagnosers);
             return this;
         }
 
         public ManualConfig AddAnalyser(params IAnalyser[] newAnalysers)
         {
-            analysers.AddRange(newAnalysers);
+            analysers.AddRangeDistinct(newAnalysers);
             return this;
         }
 
         public ManualConfig AddValidator(params IValidator[] newValidators)
         {
-            validators.AddRange(newValidators);
+            validators.AddRangeDistinct(newValidators);
             return this;
         }
 
         public ManualConfig AddJob(params Job[] newJobs)
         {
-            jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
+            jobs.AddRangeDistinct(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
             return this;
         }
 
@@ -172,68 +171,63 @@ namespace BenchmarkDotNet.Configs
 
         public ManualConfig AddFilter(params IFilter[] newFilters)
         {
-            filters.AddRange(newFilters);
+            filters.AddRangeDistinct(newFilters);
             return this;
         }
 
         public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
         {
-            foreach (var rule in rules)
-            {
-                if (logicalGroupRules.Contains(rule))
-                    logicalGroupRules.Remove(rule);
-                logicalGroupRules.Add(rule);
-            }
+            logicalGroupRules.AddRangeDistinct(rules);
             return this;
         }
 
         public ManualConfig AddEventProcessor(params EventProcessor[] newEventProcessors)
         {
-            this.eventProcessors.AddRange(newEventProcessors);
+            eventProcessors.AddRangeDistinct(newEventProcessors);
             return this;
         }
 
         [PublicAPI]
         public ManualConfig HideColumns(params string[] columnNames)
         {
-            columnHidingRules.AddRange(columnNames.Select(c => new ColumnHidingByNameRule(c)));
+            columnHidingRules.AddRangeDistinct(columnNames.Select(c => new ColumnHidingByNameRule(c)));
             return this;
         }
 
         [PublicAPI]
         public ManualConfig HideColumns(params IColumn[] columns)
         {
-            columnHidingRules.AddRange(columns.Select(c => new ColumnHidingByIdRule(c)));
+            columnHidingRules.AddRangeDistinct(columns.Select(c => new ColumnHidingByIdRule(c)));
             return this;
         }
 
         [PublicAPI]
         public ManualConfig HideColumns(params IColumnHidingRule[] rules)
         {
-            columnHidingRules.AddRange(rules);
+            columnHidingRules.AddRangeDistinct(rules);
             return this;
         }
 
         [PublicAPI]
         public void Add(IConfig config)
         {
-            columnProviders.AddRange(config.GetColumnProviders());
-            exporters.AddRange(config.GetExporters());
-            loggers.AddRange(config.GetLoggers());
-            diagnosers.AddRange(config.GetDiagnosers());
-            analysers.AddRange(config.GetAnalysers());
-            jobs.AddRange(config.GetJobs());
-            validators.AddRange(config.GetValidators());
+            columnProviders.AddRangeDistinct(config.GetColumnProviders());
+            exporters.AddRangeDistinct(config.GetExporters());
+            loggers.AddRangeDistinct(config.GetLoggers());
+            diagnosers.AddRangeDistinct(config.GetDiagnosers());
+            analysers.AddRangeDistinct(config.GetAnalysers());
+            jobs.AddRangeDistinct(config.GetJobs());
+            validators.AddRangeDistinct(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
-            filters.AddRange(config.GetFilters());
-            eventProcessors.AddRange(config.GetEventProcessors());
+            filters.AddRangeDistinct(config.GetFilters());
+            eventProcessors.AddRangeDistinct(config.GetEventProcessors());
             Orderer = config.Orderer ?? Orderer;
             CategoryDiscoverer = config.CategoryDiscoverer ?? CategoryDiscoverer;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             CultureInfo = config.CultureInfo ?? CultureInfo;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
-            logicalGroupRules.AddRange(config.GetLogicalGroupRules());
-            columnHidingRules.AddRange(config.GetColumnHidingRules());
+            logicalGroupRules.AddRangeDistinct(config.GetLogicalGroupRules());
+            columnHidingRules.AddRangeDistinct(config.GetColumnHidingRules());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
             WakeLock = GetWakeLock(WakeLock, config.WakeLock);
