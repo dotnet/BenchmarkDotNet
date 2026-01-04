@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public void NullProfileSourceNameThrows()
         {
-            Assert.Throws<ArgumentNullException>(() => new CustomCounter(null!));
+            Assert.Throws<ArgumentException>(() => new CustomCounter(null!));
         }
 
         [Fact]

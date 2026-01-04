@@ -50,10 +50,8 @@ namespace BenchmarkDotNet.Diagnosers
         /// <param name="higherIsBetter">Whether higher values are better for this counter.</param>
         public CustomCounter(string profileSourceName, string? shortName = null, int interval = DefaultInterval, bool higherIsBetter = false)
         {
-            if (profileSourceName == null)
-                throw new ArgumentNullException(nameof(profileSourceName));
             if (string.IsNullOrWhiteSpace(profileSourceName))
-                throw new ArgumentException("Profile source name cannot be empty or whitespace.", nameof(profileSourceName));
+                throw new ArgumentException("Profile source name cannot be null, empty or whitespace.", nameof(profileSourceName));
 
             ProfileSourceName = profileSourceName;
             ShortName = shortName ?? profileSourceName;
