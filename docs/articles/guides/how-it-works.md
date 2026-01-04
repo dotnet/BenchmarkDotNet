@@ -59,6 +59,14 @@ Result ActualRun(Method method, Job job)
 void JittingStage(Method method)
 {
     RunIteration(method, invokeCount: 1, unrollFactor: 1);
+    if (JitInfo.IsTiered)
+    {
+        for (int i = 0; i < JitInfo.MaxTierPromotions; i++)
+        {
+            RunIteration(method, invokeCount: JitInfo.TieredCallCountThreshold, unrollFactor: 1);
+            Thread.Sleep(250);
+        }
+    }
 }
 
 long Pilot(Method method, int unrollFactor)
