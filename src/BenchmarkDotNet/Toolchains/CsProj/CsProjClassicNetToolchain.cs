@@ -38,9 +38,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static IToolchain From(string targetFrameworkMoniker, string? packagesPath = null, string? customDotNetCliPath = null)
             => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath, customDotNetCliPath);
 
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver))
             {
                 yield return validationError;
             }

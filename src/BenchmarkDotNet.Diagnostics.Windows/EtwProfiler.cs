@@ -57,8 +57,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => HardwareCounters.Validate(validationParameters, mandatory: false);
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+            => HardwareCounters.Validate(validationParameters, mandatory: false).ToAsyncEnumerable();
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {

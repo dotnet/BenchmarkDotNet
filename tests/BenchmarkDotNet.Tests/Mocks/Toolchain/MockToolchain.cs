@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
         public IBuilder Builder => new MockBuilder();
         public IExecutor Executor { get; private set; } = new MockExecutor(measurer);
         public bool IsInProcess => false;
-        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) => [];
+        public IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver) => AsyncEnumerable.Empty<ValidationError>();
 
         public override string ToString() => GetType().Name;
 

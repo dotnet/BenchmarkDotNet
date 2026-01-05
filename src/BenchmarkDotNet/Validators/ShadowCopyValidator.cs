@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => false;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => validationParameters
                 .Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type.GetTypeInfo().Assembly)
@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Validators
                 .Select(
                     assembly => new ValidationError(
                         false,
-                        $"Assembly {assembly} is located in temp. If you are running benchmarks from xUnit you need to disable shadow copy. It's not supported by design."));
+                        $"Assembly {assembly} is located in temp. If you are running benchmarks from xUnit you need to disable shadow copy. It's not supported by design.")
+                )
+                .ToAsyncEnumerable();
     }
 }

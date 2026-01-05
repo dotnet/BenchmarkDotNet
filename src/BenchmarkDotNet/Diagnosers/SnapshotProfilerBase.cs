@@ -67,7 +67,7 @@ public abstract class SnapshotProfilerBase : IProfiler
         }
     }
 
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+    public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
     {
         var runtimeMonikers = validationParameters.Benchmarks.Select(b => b.Job.Environment.GetRuntime().RuntimeMoniker).Distinct();
         foreach (var runtimeMoniker in runtimeMonikers)

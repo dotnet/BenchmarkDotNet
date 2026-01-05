@@ -63,9 +63,9 @@ namespace BenchmarkDotNet.Running
 
                 compositeLogger.WriteLineInfo("// Validating benchmarks:");
 
-                var (supportedBenchmarks, validationErrors) = GetSupportedBenchmarks(benchmarkRunInfos, resolver);
+                var (supportedBenchmarks, validationErrors) = await GetSupportedBenchmarks(benchmarkRunInfos, resolver);
 
-                validationErrors.AddRange(Validate(supportedBenchmarks));
+                validationErrors.AddRange(await Validate(supportedBenchmarks));
 
                 foreach (var validationError in validationErrors)
                     eventProcessor.OnValidationError(validationError);
@@ -307,7 +307,7 @@ namespace BenchmarkDotNet.Running
                     logFilePath,
                     runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                     cultureInfo,
-                    Validate(benchmarkRunInfo), // validate them once again, but don't print the output
+                    [.. await Validate(benchmarkRunInfo)], // validate them once again, but don't print the output
                     [.. config.GetColumnHidingRules()]
                 ),
                 benchmarksToRunCount
@@ -380,15 +380,11 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
         }
 
-        private static ImmutableArray<ValidationError> Validate(params BenchmarkRunInfo[] benchmarks)
-        {
-            var validationErrors = new List<ValidationError>();
-
-            foreach (var benchmarkRunInfo in benchmarks)
-                validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
-
-            return validationErrors.ToImmutableArray();
-        }
+        private static async ValueTask<IEnumerable<ValidationError>> Validate(params BenchmarkRunInfo[] benchmarks)
+            => await benchmarks
+                .ToAsyncEnumerable()
+                .SelectMany(benchmark => benchmark.Config.GetCompositeValidator().ValidateAsync(new ValidationParameters(benchmark.BenchmarksCases, benchmark.Config)))
+                .ToArrayAsync();
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
@@ -656,15 +652,15 @@ namespace BenchmarkDotNet.Running
         private static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
             => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime(DefaultCultureInfo.Instance)}, executed benchmarks: {executedBenchmarksCount}");
 
-        private static (BenchmarkRunInfo[], List<ValidationError>) GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, IResolver resolver)
+        private static async ValueTask<(BenchmarkRunInfo[], List<ValidationError>)> GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, IResolver resolver)
         {
-            List<ValidationError> validationErrors = new();
+            List<ValidationError> validationErrors = [];
             List<BenchmarkRunInfo> runInfos = new(benchmarkRunInfos.Length);
 
             if (benchmarkRunInfos.Length == 0)
             {
                 validationErrors.Add(new ValidationError(true, $"No benchmarks were found."));
-                return (Array.Empty<BenchmarkRunInfo>(), validationErrors);
+                return ([], validationErrors);
             }
 
             foreach (var benchmarkRunInfo in benchmarkRunInfos)
@@ -675,19 +671,20 @@ namespace BenchmarkDotNet.Running
                     continue;
                 }
 
-                var validBenchmarks = benchmarkRunInfo.BenchmarksCases
-                    .Where(benchmark =>
+                var validBenchmarks = await benchmarkRunInfo.BenchmarksCases
+                    .ToAsyncEnumerable()
+                    .Where(async (benchmark, _) =>
                     {
 
-                        var errors = benchmark.GetToolchain()
-                            .Validate(benchmark, resolver)
-                            .ToArray();
+                        var errors = await benchmark.GetToolchain()
+                            .ValidateAsync(benchmark, resolver)
+                            .ToArrayAsync();
 
                         validationErrors.AddRange(errors);
 
                         return !errors.Any(error => error.IsCritical);
                     })
-                    .ToArray();
+                    .ToArrayAsync();
 
                 runInfos.Add(
                     new BenchmarkRunInfo(

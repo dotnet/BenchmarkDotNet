@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Diagnosers
                     ? "Disassembled benchmarks got exported to \".\\BenchmarkDotNet.Artifacts\\results\\*asm.md\""
                     : "No benchmarks were disassembled");
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             var currentPlatform = RuntimeInformation.GetCurrentPlatform();
             if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64))

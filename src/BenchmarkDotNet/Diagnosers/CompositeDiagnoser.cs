@@ -55,8 +55,8 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+            => diagnosers.ToAsyncEnumerable().SelectMany(diagnoser => diagnoser.ValidateAsync(validationParameters));
     }
 
     public sealed class CompositeInProcessDiagnoser(IReadOnlyList<IInProcessDiagnoser> inProcessDiagnosers)

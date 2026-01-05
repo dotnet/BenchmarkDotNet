@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => validationParameters.Benchmarks
                 .Where(benchmark => IsDeferredExecution(benchmark.Descriptor.WorkloadMethod.ReturnType))
                 .Select(benchmark =>
@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.Validators
                         TreatsWarningsAsErrors,
                         $"Benchmark {benchmark.Descriptor.Type.Name}.{benchmark.Descriptor.WorkloadMethod.Name} returns a deferred execution result ({benchmark.Descriptor.WorkloadMethod.ReturnType.GetCorrectCSharpTypeName(false, false)}). " +
                         "You need to either change the method declaration to return a materialized result or consume it on your own. You can use .Consume() extension method to do that.",
-                        benchmark));
+                        benchmark)
+                )
+                .ToAsyncEnumerable();
 
         private bool IsDeferredExecution(Type returnType)
         {

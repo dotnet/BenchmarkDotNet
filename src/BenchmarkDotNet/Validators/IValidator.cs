@@ -6,6 +6,6 @@ namespace BenchmarkDotNet.Validators
     {
         bool TreatsWarningsAsErrors { get; }
 
-        IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
+        IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters);
     }
 }

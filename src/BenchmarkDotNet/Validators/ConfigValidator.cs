@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => false;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             if (validationParameters.Config.GetLoggers().IsEmpty())
             {

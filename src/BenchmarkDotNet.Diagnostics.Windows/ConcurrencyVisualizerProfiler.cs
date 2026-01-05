@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => etwProfiler.ProcessResults(results);
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => etwProfiler.ValidateAsync(validationParameters);
 
         private static EtwProfilerConfig CreateDefaultConfig()
         {

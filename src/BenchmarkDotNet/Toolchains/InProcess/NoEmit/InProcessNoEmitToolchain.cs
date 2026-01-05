@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             Executor = new InProcessNoEmitExecutor(settings.ExecuteOnSeparateThread);
         }
 
-        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var error in InProcessValidator.Validate(benchmarkCase))
+            await foreach (var error in InProcessValidator.ValidateAsync(benchmarkCase))
             {
                 yield return error;
             }
