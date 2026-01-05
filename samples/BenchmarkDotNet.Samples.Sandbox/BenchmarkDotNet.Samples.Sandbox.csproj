@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <TargetFrameworks>$(TargetFrameworks);net48</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Disable entry point generation as this project has it's own entry point -->
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <!-- Disable parallel tests between TargetFrameworks -->
+    <TestTfmsInParallel>false</TestTfmsInParallel>
+    <!-- Enable .runsettings to use custom enviroment variable -->
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Enable VS TestAdapter intergration -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\common.targets" />
+</Project>
