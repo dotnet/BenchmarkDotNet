@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,11 +19,19 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
     private readonly CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> _analyzerTest;
     private readonly DiagnosticDescriptor? _ruleUnderTest;
 
+    // TODO: Removed temporary workaround code when Microsoft.CodeAnalysis.CSharp.Analyzer.Testing package is updated. https://github.com/dotnet/roslyn-sdk/issues/1233
+    private static readonly Lazy<ReferenceAssemblies> lazyNet100 = new(() => new(
+        targetFramework: "net10.0",
+        referenceAssemblyPackage: new PackageIdentity("Microsoft.NETCore.App.Ref", "10.0.0"),
+        referenceAssemblyPath: Path.Combine("ref", "net10.0")));
+
     private AnalyzerTestFixture(bool assertUniqueSupportedDiagnostics)
     {
         _analyzerTest = new InternalAnalyzerTest
         {
-#if NET8_0_OR_GREATER
+#if NET10_0_OR_GREATER
+            ReferenceAssemblies = lazyNet100.Value,
+#elif NET8_0_OR_GREATER
             ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
 #elif NET6_0_OR_GREATER
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
