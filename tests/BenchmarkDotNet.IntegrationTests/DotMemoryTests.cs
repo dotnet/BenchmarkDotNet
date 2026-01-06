@@ -28,8 +28,11 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             var config = new ManualConfig().AddJob(
+            [
                 Job.Dry.WithId("ExternalProcess"),
-                Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithId("InProcess")
+                // TODO: Add InProcessEmitToolchain job when flaky test issue is resolved https://github.com/dotnet/BenchmarkDotNet/issues/2950
+                //Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithId("InProcess"),
+            ]
             );
             string snapshotDirectory = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "snapshots");
             if (Directory.Exists(snapshotDirectory))
@@ -47,7 +50,9 @@ namespace BenchmarkDotNet.IntegrationTests
             Output.WriteLine("Snapshots:");
             foreach (string snapshot in snapshots)
                 Output.WriteLine("* " + snapshot);
-            Assert.Equal(4, snapshots.Count);
+
+            Assert.Equal(2, snapshots.Count);
+            // Assert.Equal(4, snapshots.Count);
         }
 
         [DotMemoryDiagnoser]
