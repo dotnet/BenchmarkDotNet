@@ -20,14 +20,15 @@ namespace BenchmarkDotNet.Validators
 
         private const BindingFlags ReflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input) =>
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input) =>
             input.Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
                 .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(ReflectionFlags))
                 .Distinct()
                 .Select(member => GetErrorOrDefault(member.ParameterType))
-                .WhereNotNull();
+                .WhereNotNull()
+                .ToAsyncEnumerable();
 
         private bool IsBool(Type paramType) => paramType == typeof(bool);
         private bool IsEnum(Type paramType) => paramType.GetTypeInfo().IsEnum;

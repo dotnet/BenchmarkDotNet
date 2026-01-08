@@ -195,6 +195,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
+            public CustomAwaitable InvokeOnceCustomAwaitable()
+            {
+                Interlocked.Increment(ref Counter);
+                return new();
+            }
+
+            [Benchmark]
             public static void InvokeOnceStaticVoid()
             {
                 Interlocked.Increment(ref Counter);
@@ -242,6 +249,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
             }
+
+            [Benchmark]
+            public static CustomAwaitable InvokeOnceStaticCustomAwaitable()
+            {
+                Interlocked.Increment(ref Counter);
+                return new();
+            }
         }
 
         [Theory]
@@ -249,6 +263,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(GlobalSetupCleanupTask))]
         [InlineData(typeof(GlobalSetupCleanupValueTask))]
         [InlineData(typeof(GlobalSetupCleanupValueTaskSource))]
+        [InlineData(typeof(GlobalSetupCleanupCustomAwaitable))]
         public void InProcessEmitToolchainSupportsSetupAndCleanup(Type benchmarkType)
         {
             var logger = new OutputLogger(Output);
@@ -356,6 +371,29 @@ namespace BenchmarkDotNet.IntegrationTests
                     valueTaskSource.SetResult(42);
                 });
                 return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counters.BenchmarkCounter);
+            }
+        }
+
+        public class GlobalSetupCleanupCustomAwaitable
+        {
+            [GlobalSetup]
+            public static CustomAwaitable GlobalSetup()
+            {
+                Interlocked.Increment(ref Counters.SetupCounter);
+                return new();
+            }
+
+            [GlobalCleanup]
+            public CustomAwaitable GlobalCleanup()
+            {
+                Interlocked.Increment(ref Counters.CleanupCounter);
+                return new();
             }
 
             [Benchmark]

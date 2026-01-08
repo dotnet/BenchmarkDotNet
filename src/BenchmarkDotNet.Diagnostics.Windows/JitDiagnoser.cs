@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public virtual IEnumerable<Metric> ProcessResults(DiagnoserResults results) => Array.Empty<Metric>();
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             if (!OsDetector.IsWindows())
             {

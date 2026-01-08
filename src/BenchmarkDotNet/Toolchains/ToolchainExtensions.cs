@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains
                 case ClrRuntime clrRuntime:
                     bool UseRoslyn()
                         => !isRuntimeExplicit
-                        || runtime.MsBuildMoniker == ClrRuntime.GetTargetOrCurrentVersion(descriptor?.WorkloadMethod.DeclaringType?.Assembly).MsBuildMoniker;
+                        || runtime.MsBuildMoniker == ClrRuntime.GetTargetOrCurrentVersion(descriptor?.Type.Assembly).MsBuildMoniker;
 
                     if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework && UseRoslyn())
                         return RoslynToolchain.Instance;

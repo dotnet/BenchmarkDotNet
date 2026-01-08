@@ -1,6 +1,8 @@
-﻿namespace BenchmarkDotNet.Engines;
+﻿using System.Threading.Tasks;
+
+namespace BenchmarkDotNet.Engines;
 
 public interface IEngine
 {
-    RunResults Run();
+    ValueTask<RunResults> RunAsync();
 }

@@ -8,13 +8,14 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Validators;
 using Xunit;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Tests.Validators
 {
     public class CompilationValidatorTests
     {
         [Fact]
-        public void BenchmarkedMethodNameMustNotContainWhitespaces()
+        public async Task BenchmarkedMethodNameMustNotContainWhitespaces()
         {
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
 
@@ -30,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Validators
                         )
                 }, config);
 
-            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
+            var errors = await CompilationValidator.FailOnError.ValidateAsync(parameters).Select(e => e.Message).ToArrayAsync();
 
             Assert.Contains(errors,
                 s => s.Equals(
@@ -38,7 +39,7 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void BenchmarkedMethodNameMustNotUseCsharpKeywords()
+        public async Task BenchmarkedMethodNameMustNotUseCsharpKeywords()
         {
             Delegate method = BuildDummyMethod<int>("typeof");
 
@@ -53,7 +54,7 @@ namespace BenchmarkDotNet.Tests.Validators
                         config)
                 }, config);
 
-            var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
+            var errors = await CompilationValidator.FailOnError.ValidateAsync(parameters).Select(e => e.Message).ToArrayAsync();
 
             Assert.Contains(errors,
                 s => s.Equals(
@@ -76,9 +77,9 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(OuterClass.InternalNestedClass), true)]
         [InlineData(typeof(BenchMarkPublicClass.InternalNestedClass), true)]
         /* Generics Remaining */
-        public void Benchmark_Class_Modifers_Must_Be_Public(Type type, bool hasErrors)
+        public async Task Benchmark_Class_Modifers_Must_Be_Public(Type type, bool hasErrors)
         {
-            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+            var validationErrors = await CompilationValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(type)).ToArrayAsync();
 
             Assert.Equal(hasErrors, validationErrors.Any());
         }
@@ -86,9 +87,9 @@ namespace BenchmarkDotNet.Tests.Validators
         [Theory]
         [InlineData(typeof(BenchmarkClassWithStaticMethod), true)]
         [InlineData(typeof(BenchmarkClass<PublicClass>), false)]
-        public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
+        public async Task Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
         {
-            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
+            var validationErrors = await CompilationValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(type)).ToArrayAsync();
 
             Assert.Equal(hasErrors, validationErrors.Any());
         }
@@ -104,14 +105,13 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(PrivateProtectedNestedClass), true)]
         [InlineData(typeof(ProtectedInternalClass), true)]
         [InlineData(typeof(ProtectedInternalClass.ProtectedInternalNestedClass), true)]
-        public void Benchmark_Class_Generic_Argument_Must_Be_Public(Type type, bool hasErrors)
+        public async Task Benchmark_Class_Generic_Argument_Must_Be_Public(Type type, bool hasErrors)
         {
             // Arrange
             var constructed = typeof(BenchmarkClass<>).MakeGenericType(type);
 
             // Act
-            var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
-                                                               .ToList();
+            var validationErrors = await CompilationValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(constructed)).ToArrayAsync();
 
             // Assert
             Assert.Equal(hasErrors, validationErrors.Any());

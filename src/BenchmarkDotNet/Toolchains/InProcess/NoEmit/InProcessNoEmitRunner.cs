@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     internal class InProcessNoEmitRunner
     {
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Runnable))]
-        public static int Run(IHost host, ExecuteParameters parameters)
+        public static async ValueTask<int> Run(IHost host, ExecuteParameters parameters)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -37,7 +38,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                methodInfo.Invoke(null, [host, parameters]);
+                await (ValueTask) methodInfo.Invoke(null, [host, parameters]);
 
                 return 0;
             }
@@ -104,11 +105,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         [UsedImplicitly]
         private static class Runnable
         {
-            public static void RunCore(IHost host, ExecuteParameters parameters)
+            public static async ValueTask RunCore(IHost host, ExecuteParameters parameters)
             {
                 var benchmarkCase = parameters.BenchmarkCase;
                 var target = benchmarkCase.Descriptor;
-                var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
+                var job = new Job().Apply(benchmarkCase.Job).Freeze();
                 int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
@@ -156,7 +157,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,
                     OverheadActionUnroll = overheadAction.InvokeUnroll,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
-                    GlobalCleanupAction = globalCleanupAction.InvokeSingle,
+                    GlobalCleanupAction = () =>
+                    {
+                        workloadAction.Complete();
+                        overheadAction.Complete();
+                        return globalCleanupAction.InvokeSingle();
+                    },
                     IterationSetupAction = iterationSetupAction.InvokeSingle,
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
@@ -166,10 +172,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
                 };
 
-                var results = job
+                var results = await job
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
                     .Create(engineParameters)
-                    .Run();
+                    .RunAsync();
                 host.ReportResults(results); // printing costs memory, do this after runs
 
                 compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);

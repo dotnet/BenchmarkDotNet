@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             var resolver = new CompositeResolver(EnvironmentResolver.Instance, EngineResolver.Instance); // TODO: use specified resolver.
             foreach (var benchmark in validationParameters.Benchmarks)

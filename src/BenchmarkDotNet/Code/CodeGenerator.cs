@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
@@ -33,29 +32,17 @@ namespace BenchmarkDotNet.Code
             {
                 var benchmark = buildInfo.BenchmarkCase;
 
-                var provider = GetDeclarationsProvider(benchmark.Descriptor);
-
-                string passArguments = GetPassArguments(benchmark);
-
-                string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
+                string benchmarkTypeCode = GetDeclarationsProvider(benchmark)
+                    .ReplaceTemplate(new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt")))
                     .Replace("$ID$", buildInfo.Id.ToString())
-                    .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
-                    .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
-                    .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
-                    .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
-                    .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
-                    .Replace("$LoadArguments$", GetLoadArguments(benchmark))
-                    .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$RunExtraIteration$", buildInfo.Config.HasExtraIterationDiagnoser(benchmark) ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
                     .Replace("$InProcessDiagnoserRouters$", GetInProcessDiagnoserRouters(buildInfo))
                     .ToString();
 
@@ -132,19 +119,13 @@ namespace BenchmarkDotNet.Code
                 Replace("; ", ";\n                ");
         }
 
-        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
+        private static DeclarationsProvider GetDeclarationsProvider(BenchmarkCase benchmark)
         {
-            var method = descriptor.WorkloadMethod;
+            var method = benchmark.Descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
+            if (method.ReturnType.IsAwaitable())
             {
-                return new AsyncDeclarationsProvider(descriptor);
-            }
-            if (method.ReturnType.GetTypeInfo().IsGenericType
-                && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
-                    || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
-            {
-                return new AsyncDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(benchmark);
             }
 
             if (method.ReturnType == typeof(void) && method.HasAttribute<AsyncStateMachineAttribute>())
@@ -152,7 +133,7 @@ namespace BenchmarkDotNet.Code
                 throw new NotSupportedException("async void is not supported by design");
             }
 
-            return new SyncDeclarationsProvider(descriptor);
+            return new SyncDeclarationsProvider(benchmark);
         }
 
         // internal for tests
@@ -168,31 +149,19 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
+                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
         private static string GetDeclareArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                         .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
+                    .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"this.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
-
-        private static string GetLoadArguments(BenchmarkCase benchmarkCase)
-            => string.Join(
-                Environment.NewLine,
-                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} this.__argField{index};"));
-
-        private static string GetPassArguments(BenchmarkCase benchmarkCase)
-            => string.Join(
-                ", ",
-                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
+                    .Select((parameter, index) => $"this.__fieldsContainer.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
@@ -235,7 +204,7 @@ namespace BenchmarkDotNet.Code
             }
         }
 
-        private static string GetParameterModifier(ParameterInfo parameterInfo)
+        internal static string GetParameterModifier(ParameterInfo parameterInfo)
         {
             if (!parameterInfo.ParameterType.IsByRef)
                 return string.Empty;
@@ -263,7 +232,7 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("switch (id) {");
 
             foreach (var buildInfo in buildPartition.Benchmarks)
-                @switch.AppendLine($"case {buildInfo.Id.Value}: BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName, diagnoserRunMode); break;");
+                @switch.AppendLine($"case {buildInfo.Id.Value}: runTask = BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName, diagnoserRunMode); break;");
 
             @switch.AppendLine("default: throw new System.NotSupportedException(\"invalid benchmark id\");");
             @switch.AppendLine("}");
@@ -279,28 +248,21 @@ namespace BenchmarkDotNet.Code
 
             return argumentType;
         }
+    }
 
-        private class SmartStringBuilder
+    internal class SmartStringBuilder(string text)
+    {
+        private readonly StringBuilder builder = new(text);
+
+        public SmartStringBuilder Replace(string oldValue, string? newValue)
         {
-            private readonly string originalText;
-            private readonly StringBuilder builder;
-
-            public SmartStringBuilder(string text)
-            {
-                originalText = text;
-                builder = new StringBuilder(text);
-            }
-
-            public SmartStringBuilder Replace(string oldValue, string? newValue)
-            {
-                if (originalText.Contains(oldValue))
-                    builder.Replace(oldValue, newValue);
-                else
-                    builder.Append($"\n// '{oldValue}' not found");
-                return this;
-            }
-
-            public override string ToString() => builder.ToString();
+            if (text.Contains(oldValue))
+                builder.Replace(oldValue, newValue);
+            else
+                builder.Append($"\n// '{oldValue}' not found");
+            return this;
         }
+
+        public override string ToString() => builder.ToString();
     }
 }

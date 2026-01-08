@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>The instance of validator that DOES fail on error.</summary>
         public static readonly IValidator FailOnError = new InProcessValidator(true);
 
-        public static IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase)
+        public static async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase)
         {
             foreach (var validationError in ValidateJob(benchmarkCase.Job, true))
             {
@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Proofs that benchmarks' jobs match the environment.</summary>
         /// <param name="validationParameters">The validation parameters.</param>
         /// <returns>Enumerable of validation errors.</returns>
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments && benchmark.GetToolchain() is InProcessNoEmitToolchain))
                 yield return new ValidationError(true, "Arguments are not supported by the InProcessNoEmitToolchain, see #687 for more details", benchmarkWithArguments);
