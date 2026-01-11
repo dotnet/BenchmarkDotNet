@@ -173,6 +173,7 @@ namespace BenchmarkDotNet.Running
                     var totalTime = globalChronometer.GetElapsed().GetTimeSpan();
                     int totalNumberOfExecutedBenchmarks = results.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
                     LogTotalTime(compositeLogger, totalTime, totalNumberOfExecutedBenchmarks, "Global total time");
+                    compositeLogger.WriteLine();
 
                     return results.ToArray();
                 }
@@ -190,6 +191,20 @@ namespace BenchmarkDotNet.Running
                     Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.WriteLineInfo("Artifacts cleanup is finished");
                     compositeLogger.Flush();
+
+                    // Output additional information to console.
+                    var logFileEnabled = benchmarkRunInfos.All(info => !info.Config.Options.IsSet(ConfigOptions.DisableLogFile));
+                    if (logFileEnabled && compositeLogger.TryGetConsoleLogger(out var consoleLogger))
+                    {
+                        var artifactDirectoryFullPath = Path.GetFullPath(rootArtifactsFolderPath);
+                        var logFileFullPath = Path.GetFullPath(logFilePath);
+                        var logFileRelativePath = PathHelper.GetRelativePath(artifactDirectoryFullPath, logFileFullPath);
+
+                        consoleLogger.WriteLine();
+                        consoleLogger.WriteLineHeader("// * Benchmark LogFile *");
+                        ConsoleHelper.WriteLineAsClickableLink(consoleLogger, artifactDirectoryFullPath);
+                        ConsoleHelper.WriteLineAsClickableLink(consoleLogger, logFileFullPath, linkCaption: logFileRelativePath, prefixText: "  ");
+                    }
 
                     eventProcessor.OnEndRunStage();
                 }
@@ -752,7 +767,7 @@ namespace BenchmarkDotNet.Running
             return new StreamWriter(logFilePath, append: false);
         }
 
-        private static ILogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
+        private static CompositeLogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
         {
             var loggers = new Dictionary<string, ILogger>();
 
