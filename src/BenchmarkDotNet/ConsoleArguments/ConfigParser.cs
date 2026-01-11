@@ -21,7 +21,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
@@ -730,6 +729,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static int GetMaximumDisplayWidth()
         {
+            if (Console.IsOutputRedirected)
+                return MinimumDisplayWidth;
+
             try
             {
                 return Console.WindowWidth;
