@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Environments
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
-            IsMonoInstalled = new Lazy<bool>(() => ProcessHelper.RunAndReadOutput("mono", "--version").IsNotBlank());
+            IsMonoInstalled = new Lazy<bool>(() => ProcessHelper.TestCommandExists("mono"));
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
             Os = new Lazy<OsInfo>(OsDetector.GetOs);

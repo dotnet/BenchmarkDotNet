@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Helpers
@@ -77,6 +78,49 @@ namespace BenchmarkDotNet.Helpers
                 var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
 
                 return (process.ExitCode, output);
+            }
+        }
+
+        internal static bool TestCommandExists(string commandName)
+        {
+            // Check command existence by using where/which command.
+            try
+            {
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = OsDetector.IsWindows() ? "where" : "which",
+                    Arguments = commandName,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                })!;
+                process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                return process.ExitCode == 0;
+            }
+            catch
+            {
+                // On some environment. which command is not installed. (e.g. Alpine Linux)
+            }
+
+            // Check command existence by executing actual command with --version argument.
+            try
+            {
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = commandName,
+                    Arguments = "--version",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                })!;
+                process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                return process.ExitCode == 0; // Return true when command exists and `--version` argument supported.
+            }
+            catch
+            {
+                return false;
             }
         }
     }
