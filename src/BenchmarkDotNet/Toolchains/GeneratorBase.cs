@@ -5,7 +5,6 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -16,6 +15,9 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI]
     public abstract class GeneratorBase : IGenerator
     {
+        /// <inheritdoc cref="CodeGenBenchmarkRunCallType"/>
+        public CodeGenBenchmarkRunCallType BenchmarkRunCallType { get; init; }
+
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
         {
             var artifactsPaths = ArtifactsPaths.Empty;
@@ -119,7 +121,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <remarks>You most probably do NOT need to override this method!!</remarks>
         /// </summary>
         [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
-            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
+            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition, BenchmarkRunCallType));
 
         protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
