@@ -29,12 +29,13 @@ namespace BenchmarkDotNet.Helpers
                     return d.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
             }
 
-            if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
+            var valueType = value.GetType();
+            if (valueType.IsEnum)
                 return value.ToString();
             if (value is Type type)
                 return ToFolderName(type: type);
-            if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
-                return value.GetType().Name; // TODO
+            if (!valueType.IsValueType)
+                return valueType.Name;
             if (value is TimeInterval interval)
                 return interval.Nanoseconds + "ns";
 
