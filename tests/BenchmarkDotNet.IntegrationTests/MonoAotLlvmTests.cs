@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.IntegrationTests.Xunit;
@@ -18,9 +17,19 @@ using Xunit.Abstractions;
 namespace BenchmarkDotNet.IntegrationTests
 {
     /// <summary>
-    /// In order to run MonoAotLlvmTests locally, the following prerequisites are required:
-    /// * Have MonoAOT workload installed
-    /// * Have the Mono AOT compiler available at the path specified by MONOAOTLLVM_COMPILER_PATH environment variable
+    /// Running these tests locally requires building the mono runtime from the dotnet/runtime repository,
+    /// since the AOT compiler isn't distributed as a standalone package.
+    ///
+    /// To set up:
+    /// 1. Clone https://github.com/dotnet/runtime
+    /// 2. Build the mono runtime with libs:
+    ///    Windows:  build.cmd -subset mono+libs -c Release
+    ///    Unix:     ./build.sh -subset mono+libs -c Release
+    /// 3. Set the MONOAOTLLVM_COMPILER_PATH environment variable to the compiler binary:
+    ///    Windows:  artifacts\bin\mono\windows.x64.Release\mono-sgen.exe
+    ///    Unix:     artifacts/bin/mono/[os].x64.Release/mono-sgen
+    ///
+    /// The runtime pack ends up at artifacts/bin/microsoft.netcore.app.runtime.[os]-x64/Release/
     /// </summary>
     public class MonoAotLlvmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
@@ -57,11 +66,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private static bool GetShouldRunTest()
         {
-            // MonoAOTLLVM is only supported on non-Windows platforms with a 64-bit architecture
+            // MonoAOTLLVM requires a 64-bit platform
             if (!RuntimeInformation.Is64BitPlatform())
-                return false;
-
-            if (OsDetector.IsWindows())
                 return false;
 
             if (!IsAotCompilerAvailable())
@@ -70,7 +76,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return true;
         }
 
-        [FactEnvSpecific("MonoAOTLLVM is only supported on Unix", EnvRequirement.NonWindows)]
+        [Fact]
         public void MonoAotLlvmIsSupported()
         {
             if (!GetShouldRunTest())
@@ -92,7 +98,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactEnvSpecific("MonoAOTLLVM is only supported on Unix", EnvRequirement.NonWindows)]
+        [Fact]
         public void MonoAotLlvmSupportsInProcessDiagnosers()
         {
             if (!GetShouldRunTest())
@@ -129,7 +135,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactEnvSpecific("MonoAOTLLVM is only supported on Unix", EnvRequirement.NonWindows)]
+        [Fact]
         public void MonoAotLlvmMiniModeIsSupported()
         {
             if (!GetShouldRunTest())
