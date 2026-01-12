@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Helpers
@@ -77,6 +78,45 @@ namespace BenchmarkDotNet.Helpers
                 var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
 
                 return (process.ExitCode, output);
+            }
+        }
+
+        internal static bool TestCommandExists(string commandName, string arguments = "--version")
+        {
+            // Check command existence by using where/which command.
+            try
+            {
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = OsDetector.IsWindows() ? "where" : "which",
+                    Arguments = commandName,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                })!;
+                process.WaitForExit();
+                return process.ExitCode == 0;
+            }
+            catch
+            {
+                // On some environment. which command is not installed. (e.g. Alpine Linux)
+            }
+
+            // Check command existence by executing actual command with --version argument.
+            try
+            {
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = commandName,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                })!;
+                process.WaitForExit();
+                return process.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
