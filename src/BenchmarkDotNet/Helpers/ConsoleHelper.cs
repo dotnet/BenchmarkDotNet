@@ -18,7 +18,7 @@ internal static class ConsoleHelper
 
     /// <summary>
     /// Write clickable link to console.
-    /// If console doesn't support OSC 8 hyperlinks. It writes plain link with markdown syntax.
+    /// If console doesn't support OSC 8 hyperlinks. It writes plain link.
     /// </summary>
     public static void WriteLineAsClickableLink(ILogger consoleLogger, string link, string? linkCaption = null, LogKind logKind = LogKind.Info, string prefixText = "", string suffixText = "")
     {
@@ -40,7 +40,7 @@ internal static class ConsoleHelper
 
     /// <summary>
     /// Write clickable link to console.
-    /// If console doesn't support OSC 8 hyperlinks. It writes plain link with markdown syntax.
+    /// If console doesn't support OSC 8 hyperlinks. It writes plain link.
     /// </summary>
     public static void WriteAsClickableLink(ILogger consoleLogger, string link, string? linkCaption = null, LogKind logKind = LogKind.Info)
     {
@@ -54,14 +54,7 @@ internal static class ConsoleHelper
             return;
         }
 
-        // If link caption is specified. Write link as plain text with markdown link syntax.
-        if (!string.IsNullOrEmpty(linkCaption))
-        {
-            consoleLogger.Write(logKind, $"[{linkCaption}]({link})");
-            return;
-        }
-
-        // Write link as plain text.
+        // Write link as plain text. (linkCaption is ignored)
         consoleLogger.Write(logKind, link);
     }
 
