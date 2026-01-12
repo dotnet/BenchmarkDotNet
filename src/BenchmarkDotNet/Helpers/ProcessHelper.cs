@@ -90,11 +90,9 @@ namespace BenchmarkDotNet.Helpers
                 {
                     FileName = OsDetector.IsWindows() ? "where" : "which",
                     Arguments = commandName,
-                    RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 })!;
-                process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
                 return process.ExitCode == 0;
             }
@@ -110,11 +108,9 @@ namespace BenchmarkDotNet.Helpers
                 {
                     FileName = commandName,
                     Arguments = arguments,
-                    RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 })!;
-                process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
                 return process.ExitCode == 0;
             }
