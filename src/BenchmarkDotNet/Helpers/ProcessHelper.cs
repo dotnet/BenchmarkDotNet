@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        internal static bool TestCommandExists(string commandName)
+        internal static bool TestCommandExists(string commandName, string arguments = "--version")
         {
             // Check command existence by using where/which command.
             try
@@ -109,14 +109,14 @@ namespace BenchmarkDotNet.Helpers
                 using var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = commandName,
-                    Arguments = "--version",
+                    Arguments = arguments,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 })!;
                 process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
-                return process.ExitCode == 0; // Return true when command exists and `--version` argument supported.
+                return process.ExitCode == 0;
             }
             catch
             {
