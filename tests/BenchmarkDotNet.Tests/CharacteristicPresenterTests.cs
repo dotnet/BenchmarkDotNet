@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests
             Validate("", null);
             Validate("", Guid.Empty);
 
-            // Other value is resoved to guid text representation.
+            // Other value is resolved to guid text representation.
             var guid = Guid.NewGuid();
             Validate(guid.ToString(), guid);
 
