@@ -1,6 +1,6 @@
-﻿using System;
+﻿using BenchmarkDotNet.Serialization;
 using System.Linq;
-using SimpleJson;
+using System.Text.Json.Serialization;
 
 #nullable enable
 
@@ -8,14 +8,31 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal struct ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = "")
     {
+        [JsonIgnore]
         internal int ProcessId = processId;
-        internal string TypeName = typeName;
+
+        [JsonIgnore]
+        internal string TypeName = typeName ?? "";
+
+        [JsonInclude]
         internal string MethodName = methodName;
+
+        [JsonInclude]
         internal bool PrintSource = printSource;
+
+        [JsonInclude]
         internal int MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
+
+        [JsonInclude]
         internal string[] Filters = filters;
+
+        [JsonInclude]
         internal string Syntax = syntax;
+
+        [JsonInclude]
         internal string TargetFrameworkMoniker = tfm;
+
+        [JsonInclude]
         internal string ResultsPath = resultsPath;
 
         internal static ClrMdArgs FromArgs(string[] args)
@@ -30,46 +47,5 @@ namespace BenchmarkDotNet.Disassemblers
                 tfm: args[7],
                 filters: [.. args.Skip(8)]
             );
-
-        internal readonly string Serialize()
-        {
-            SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = false;
-            var jsonObject = new JsonObject()
-            {
-                [nameof(MethodName)] = MethodName,
-                [nameof(PrintSource)] = PrintSource,
-                [nameof(MaxDepth)] = MaxDepth,
-                [nameof(Syntax)] = Syntax,
-                [nameof(TargetFrameworkMoniker)] = TargetFrameworkMoniker,
-                [nameof(ResultsPath)] = ResultsPath,
-            };
-            var filters = new JsonArray(Filters.Length);
-            foreach (var filter in Filters)
-            {
-                filters.Add(filter);
-            }
-            jsonObject[nameof(Filters)] = filters;
-            return jsonObject.ToString();
-        }
-
-        internal void Deserialize(string? json)
-        {
-            var jsonObject = SimpleJsonSerializer.DeserializeObject<JsonObject>(json);
-            if (jsonObject == null)
-                return;
-
-            MethodName = (string)jsonObject[nameof(MethodName)];
-            PrintSource = (bool)jsonObject[nameof(PrintSource)];
-            MaxDepth = Convert.ToInt32(jsonObject[nameof(MaxDepth)]);
-            Syntax = (string) jsonObject[nameof(Syntax)];
-            TargetFrameworkMoniker = (string) jsonObject[nameof(TargetFrameworkMoniker)];
-            ResultsPath = (string) jsonObject[nameof(ResultsPath)];
-            var filters = (JsonArray) jsonObject[nameof(Filters)];
-            Filters = new string[filters.Count];
-            for (int i = 0; i < filters.Count; ++i)
-            {
-                Filters[i] = (string) filters[i];
-            }
-        }
     }
 }

@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Disassemblers
             if (OsDetector.IsWindows())
                 return ushort.MaxValue + 1;
             if (OsDetector.IsLinux())
-                return (ulong) Environment.SystemPageSize;
+                return (ulong)Environment.SystemPageSize;
             if (OsDetector.IsMacOS())
                 return RuntimeInformation.GetCurrentPlatform() switch
                 {
@@ -121,8 +121,8 @@ namespace BenchmarkDotNet.Disassemblers
             return new DisassemblyResult
             {
                 Methods = filteredMethods,
-                SerializedAddressToNameMapping = state.AddressToNameMapping.Select(x => new DisassemblyResult.MutablePair { Key = x.Key, Value = x.Value }).ToArray(),
-                PointerSize = (uint) IntPtr.Size
+                AddressToNameMapping = state.AddressToNameMapping,
+                PointerSize = (uint)IntPtr.Size
             };
         }
 
@@ -296,7 +296,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var method = runtime.GetMethodByInstructionPointer(address);
-            if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0
+            if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0
                 && runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
             {
                 method = runtime.GetMethodByInstructionPointer(newAddress);
