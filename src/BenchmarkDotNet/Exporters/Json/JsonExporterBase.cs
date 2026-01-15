@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Exporters.Json
         private bool IndentJson { get; }
         private bool ExcludeMeasurements { get; }
 
+        private static readonly object lockObject = new();
+
         protected JsonExporterBase(bool indentJson = false, bool excludeMeasurements = false)
         {
             IndentJson = indentJson;
@@ -24,8 +26,11 @@ namespace BenchmarkDotNet.Exporters.Json
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
-            logger.WriteLine(SimpleJsonSerializer.SerializeObject(GetDataToSerialize(summary)));
+            lock (lockObject)
+            {
+                SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
+                logger.WriteLine(SimpleJsonSerializer.SerializeObject(GetDataToSerialize(summary)));
+            }
         }
 
         protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(Summary summary)
