@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.CompositeR2R
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
-            GatherReferences(projectFile.FullName, buildPartition, artifactsPaths, logger);
+            GatherReferences(buildPartition, artifactsPaths, logger);
         }
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
