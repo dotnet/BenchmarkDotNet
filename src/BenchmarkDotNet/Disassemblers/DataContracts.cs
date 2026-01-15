@@ -2,11 +2,14 @@
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
-using SimpleJson;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.ComponentModel;
+
 
 #if NET6_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -16,29 +19,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Disassemblers;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(Sharp), typeDiscriminator: nameof(Sharp))]
+[JsonDerivedType(typeof(IntelAsm), typeDiscriminator: nameof(IntelAsm))]
+[JsonDerivedType(typeof(Arm64Asm), typeDiscriminator: nameof(Arm64Asm))]
+[JsonDerivedType(typeof(MonoCode), typeDiscriminator: nameof(MonoCode))]
 public abstract class SourceCode
 {
     // Closed hierarchy.
     internal SourceCode() { }
 
     public ulong InstructionPointer { get; set; }
-
-    internal JsonObject Serialize()
-    {
-        var json = new JsonObject { ["$type"] = GetType().Name };
-        Serialize(json);
-        return json;
-    }
-
-    private protected virtual void Serialize(JsonObject json)
-    {
-        json[nameof(InstructionPointer)] = InstructionPointer.ToString();
-    }
-
-    internal virtual void Deserialize(JsonObject json)
-    {
-        InstructionPointer = ulong.Parse((string) json[nameof(InstructionPointer)]);
-    }
 }
 
 public sealed class Sharp : SourceCode
@@ -46,24 +37,6 @@ public sealed class Sharp : SourceCode
     public string Text { get; set; } = default!;
     public string FilePath { get; set; } = default!;
     public int LineNumber { get; set; }
-
-    private protected override void Serialize(JsonObject json)
-    {
-        base.Serialize(json);
-
-        json[nameof(Text)] = Text;
-        json[nameof(FilePath)] = FilePath;
-        json[nameof(LineNumber)] = LineNumber;
-    }
-
-    internal override void Deserialize(JsonObject json)
-    {
-        base.Deserialize(json);
-
-        Text = (string) json[nameof(Text)];
-        FilePath = (string) json[nameof(FilePath)];
-        LineNumber = Convert.ToInt32(json[nameof(LineNumber)]);
-    }
 }
 
 public abstract class Asm : SourceCode
@@ -74,29 +47,6 @@ public abstract class Asm : SourceCode
     public int InstructionLength { get; set; }
     public ulong? ReferencedAddress { get; set; }
     public bool IsReferencedAddressIndirect { get; set; }
-
-    private protected override void Serialize(JsonObject json)
-    {
-        base.Serialize(json);
-        json[nameof(InstructionLength)] = InstructionLength;
-        if (ReferencedAddress.HasValue)
-        {
-            json[nameof(ReferencedAddress)] = ReferencedAddress.ToString();
-        }
-        json[nameof(IsReferencedAddressIndirect)] = IsReferencedAddressIndirect;
-    }
-
-    internal override void Deserialize(JsonObject json)
-    {
-        base.Deserialize(json);
-
-        InstructionLength = Convert.ToInt32(json[nameof(InstructionLength)]);
-        if (json.TryGetValue(nameof(ReferencedAddress), out var ra))
-        {
-            ReferencedAddress = ulong.Parse((string) ra);
-        }
-        IsReferencedAddressIndirect = (bool) json[nameof(IsReferencedAddressIndirect)];
-    }
 }
 
 #if NET6_0_OR_GREATER
@@ -109,158 +59,131 @@ public sealed class IntelAsm() : Asm
     public Instruction Instruction { get; set; }
 
     public override string ToString() => Instruction.ToString();
-
-    private protected override void Serialize(JsonObject json)
-    {
-        base.Serialize(json);
-
-        var instructionJson = new JsonObject();
-        foreach (var property in typeof(Instruction).GetProperties())
-        {
-            if (property.GetSetMethod() is not null && property.GetGetMethod() is not null)
-            {
-                instructionJson[property.Name] = property.GetValue(Instruction) switch
-                {
-                    ulong l => l.ToString(),
-                    long l => l.ToString(),
-                    Enum e => e.ToString(),
-                    var propertyValue => propertyValue
-                };
-            }
-        }
-        json[nameof(Instruction)] = instructionJson;
-    }
-
-    internal override void Deserialize(JsonObject json)
-    {
-        base.Deserialize(json);
-
-        object instruction = new Instruction();
-        foreach (var kvp in (JsonObject) json[nameof(Instruction)])
-        {
-            object value = kvp.Value;
-            var property = typeof(Instruction).GetProperty(kvp.Key)!;
-            var propertyType = property.PropertyType;
-            if (propertyType == typeof(ulong))
-            {
-                value = ulong.Parse((string) value);
-            }
-            else if (propertyType == typeof(long))
-            {
-                value = long.Parse((string) value);
-            }
-            else if (typeof(Enum).IsAssignableFrom(propertyType))
-            {
-                value = Enum.Parse(propertyType, (string) value);
-            }
-            else if (propertyType.IsPrimitive)
-            {
-                value = Convert.ChangeType(value, propertyType);
-            }
-            property.SetValue(instruction, value);
-        }
-        Instruction = (Instruction)instruction;
-    }
 }
 
 public sealed class Arm64Asm : Asm
 {
-    private const string AddressKey = "Arm64Address";
-    private const string BytesKey = "Arm64Bytes";
-    private const string SyntaxKey = "Arm64Syntax";
+    [JsonInclude]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal Arm64AsmData Data { get; set; }
 
-    public Arm64Instruction? Instruction { get; set; }
-    internal DisassembleSyntax DisassembleSyntax { get; set; }
+    [JsonIgnore]
+    public Arm64Instruction? Instruction
+    {
+        get => Data.Instruction;
+        set => Data = Data with { Instruction = value };
+    }
+
+    [JsonIgnore]
+    internal DisassembleSyntax DisassembleSyntax
+    {
+        get => Data.DisassembleSyntax;
+        set => Data = Data with { DisassembleSyntax = value };
+    }
 
     public override string ToString() => Instruction?.ToString() ?? "";
 
-    private protected override void Serialize(JsonObject json)
+    // Wrapper class to hold Arm64 instruction and disassemble syntax.
+    [JsonConverter(typeof(Arm64AsmDataConverter))]
+    internal record struct Arm64AsmData
     {
-        base.Serialize(json);
+        internal DisassembleSyntax DisassembleSyntax { get; set; }
 
-        // We only need the address, bytes, and syntax to reconstruct the instruction.
-        if (Instruction?.Bytes?.Length > 0)
-        {
-            json[AddressKey] = Instruction.Address.ToString();
-            json[BytesKey] = Convert.ToBase64String(Instruction.Bytes);
-            json[SyntaxKey] = (int)DisassembleSyntax;
-        }
+        public Arm64Instruction? Instruction { get; set; }
     }
 
-    internal override void Deserialize(JsonObject json)
+    // Custom JsonConverter for Arm64AsmData.
+    internal class Arm64AsmDataConverter : JsonConverter<Arm64AsmData>
     {
-        base.Deserialize(json);
+        private const string Arm64AddressKey = "arm64Address";
+        private const string Arm64BytesKey = "arm64Bytes";
+        private const string Arm64SyntaxKey = "arm64Syntax";
 
-        if (json.TryGetValue(BytesKey, out var bytes64))
+        public override Arm64AsmData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            // Use the Capstone disassembler to recreate the instruction from the bytes.
+            if (reader.TokenType != JsonTokenType.StartObject)
+                throw new JsonException();
+
+            long instructionAddress = default;
+            byte[] instructionBytes = [];
+            DisassembleSyntax syntax = DisassembleSyntax.Masm;
+
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndObject)
+                    break;
+
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                    throw new JsonException();
+
+                string propertyName = reader.GetString()!;
+                reader.Read();
+
+                switch (propertyName)
+                {
+                    case Arm64AddressKey:
+                        instructionAddress = reader.GetInt64();
+                        break;
+
+                    case Arm64BytesKey:
+                        instructionBytes = reader.GetBytesFromBase64();
+                        break;
+
+                    case Arm64SyntaxKey:
+                        var syntaxValue = reader.GetString()!;
+                        syntax = syntaxValue switch
+                        {
+                            "Intel" => DisassembleSyntax.Intel,
+                            "Att" => DisassembleSyntax.Att,
+                            "Masm" => DisassembleSyntax.Masm,
+                            _ => DisassembleSyntax.Masm,
+                        };
+                        break;
+
+                    default:
+                        throw new NotSupportedException($"Unknown property({propertyName}) found.");
+                }
+            }
+
+            if (reader.TokenType != JsonTokenType.EndObject)
+                throw new JsonException("Invalid JSON");
+
             using var disassembler = CapstoneDisassembler.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
             disassembler.EnableInstructionDetails = true;
-            disassembler.DisassembleSyntax = (DisassembleSyntax)Convert.ToInt32(json[SyntaxKey]);
-            byte[] bytes = Convert.FromBase64String((string)bytes64);
-            Instruction = disassembler.Disassemble(bytes, long.Parse((string)json[AddressKey])).Single();
+            disassembler.DisassembleSyntax = syntax;
+            var instruction = disassembler.Disassemble(instructionBytes, instructionAddress).SingleOrDefault();
+
+            return new Arm64AsmData
+            {
+                DisassembleSyntax = syntax,
+                Instruction = instruction,
+            };
+        }
+
+        public override void Write(Utf8JsonWriter writer, Arm64AsmData value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WriteString(Arm64SyntaxKey, value.DisassembleSyntax.ToString());
+            var instruction = value.Instruction;
+            if (instruction != null)
+            {
+                writer.WriteNumber(Arm64AddressKey, instruction.Address);
+                writer.WriteBase64String(Arm64BytesKey, instruction.Bytes);
+            }
+            writer.WriteEndObject();
         }
     }
+
 }
 
 public sealed class MonoCode : SourceCode
 {
     public string Text { get; set; } = "";
-
-    private protected override void Serialize(JsonObject json)
-    {
-        base.Serialize(json);
-
-        json[nameof(Text)] = Text;
-    }
-
-    internal override void Deserialize(JsonObject json)
-    {
-        base.Deserialize(json);
-
-        Text = (string) json[nameof(Text)];
-    }
 }
 
 public sealed class Map
 {
-    [XmlArray("Instructions")]
-    [XmlArrayItem(nameof(SourceCode), typeof(SourceCode))]
-    [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
-    [XmlArrayItem(nameof(IntelAsm), typeof(IntelAsm))]
     public SourceCode[] SourceCodes { get; set; } = [];
-
-    internal JsonObject Serialize()
-    {
-        var sourceCodes = new JsonArray(SourceCodes.Length);
-        foreach (var sourceCode in SourceCodes)
-        {
-            sourceCodes.Add(sourceCode.Serialize());
-        }
-        return new JsonObject
-        {
-            [nameof(SourceCodes)] = sourceCodes,
-        };
-    }
-
-    internal void Deserialize(JsonObject json)
-    {
-        var sourceCodes = (JsonArray) json[nameof(SourceCodes)];
-        SourceCodes = new SourceCode[sourceCodes.Count];
-        for (int i = 0; i < sourceCodes.Count; i++)
-        {
-            var sourceJson = (JsonObject) sourceCodes[i];
-            SourceCodes[i] = sourceJson["$type"] switch
-            {
-                nameof(Sharp) => new Sharp(),
-                nameof(IntelAsm) => new IntelAsm(),
-                nameof(Arm64Asm) => new Arm64Asm(),
-                nameof(MonoCode) => new MonoCode(),
-                var unhandledType => throw new NotSupportedException($"Unexpected type: {unhandledType}")
-            };
-            SourceCodes[i].Deserialize(sourceJson);
-        }
-    }
 }
 
 public sealed class DisassembledMethod
@@ -282,121 +205,16 @@ public sealed class DisassembledMethod
             NativeCode = nativeCode,
             Problem = problem
         };
-
-    internal JsonObject Serialize()
-    {
-        var maps = new JsonArray(Maps.Length);
-        foreach (var map in Maps)
-        {
-            maps.Add(map.Serialize());
-        }
-        return new JsonObject
-        {
-            [nameof(Name)] = Name,
-            [nameof(NativeCode)] = NativeCode.ToString(),
-            [nameof(Problem)] = Problem,
-            [nameof(Maps)] = maps,
-            [nameof(CommandLine)] = CommandLine
-        };
-    }
-
-    internal void Deserialize(JsonObject json)
-    {
-        Name = (string) json[nameof(Name)];
-        NativeCode = ulong.Parse((string) json[nameof(NativeCode)]);
-        Problem = (string) json[nameof(Problem)];
-
-        var maps = (JsonArray) json[nameof(Maps)];
-        Maps = new Map[maps.Count];
-        for (int i = 0; i < maps.Count; i++)
-        {
-            Maps[i] = new Map();
-            Maps[i].Deserialize((JsonObject) maps[i]);
-        }
-
-        CommandLine = (string) json[nameof(CommandLine)];
-    }
 }
 
 public sealed class DisassemblyResult
 {
     public DisassembledMethod[] Methods { get; set; } = [];
     public string[] Errors { get; set; } = [];
-    public MutablePair[] SerializedAddressToNameMapping { get; set; } = [];
+
     public uint PointerSize { get; set; }
 
-    [XmlIgnore] // XmlSerializer does not support dictionaries ;)
-    public Dictionary<ulong, string> AddressToNameMapping
-        =>  _addressToNameMapping ??= SerializedAddressToNameMapping.ToDictionary(x => x.Key, x => x.Value);
-
-    [XmlIgnore]
-    private Dictionary<ulong, string>? _addressToNameMapping = null;
-
-    // KeyValuePair is not serializable, because it has read-only properties
-    // so we need to define our own...
-    [Serializable]
-    [XmlType(TypeName = "Workaround")]
-    public struct MutablePair
-    {
-        public ulong Key { get; set; }
-        public string Value { get; set; }
-    }
-
-    internal JsonObject Serialize()
-    {
-        var methods = new JsonArray(Methods.Length);
-        foreach (var method in Methods)
-        {
-            methods.Add(method.Serialize());
-        }
-        var errors = new JsonArray(Errors.Length);
-        foreach (var error in Errors)
-        {
-            errors.Add(error);
-        }
-        var addressToNameMapping = new JsonObject();
-        foreach (var kvp in SerializedAddressToNameMapping)
-        {
-            addressToNameMapping[kvp.Key.ToString()] = kvp.Value;
-        }
-        return new JsonObject
-        {
-            [nameof(Methods)] = methods,
-            [nameof(Errors)] = errors,
-            [nameof(AddressToNameMapping)] = addressToNameMapping,
-            [nameof(PointerSize)] = PointerSize.ToString()
-        };
-    }
-
-    internal void Deserialize(JsonObject json)
-    {
-        var methods = (JsonArray) json[nameof(Methods)];
-        Methods = new DisassembledMethod[methods.Count];
-        for (int i = 0; i < methods.Count; i++)
-        {
-            Methods[i] = new DisassembledMethod();
-            Methods[i].Deserialize((JsonObject) methods[i]);
-        }
-
-        var errors = (JsonArray) json[nameof(Errors)];
-        Errors = new string[errors.Count];
-        for (int i = 0; i < errors.Count; i++)
-        {
-            Errors[i] = (string) errors[i];
-        }
-
-        var addressToNameMapping = (JsonObject) json[nameof(AddressToNameMapping)];
-        SerializedAddressToNameMapping = new MutablePair[addressToNameMapping.Count];
-        int addressIndex = 0;
-        foreach (var kvp in addressToNameMapping)
-        {
-            SerializedAddressToNameMapping[addressIndex].Key = ulong.Parse(kvp.Key);
-            SerializedAddressToNameMapping[addressIndex].Value = (string) kvp.Value;
-            ++addressIndex;
-        }
-
-        PointerSize = uint.Parse((string) json[nameof(PointerSize)]);
-    }
+    public Dictionary<ulong, string> AddressToNameMapping { get; set; } = [];
 }
 
 public static class DisassemblerConstants
@@ -459,7 +277,7 @@ internal sealed class State
             return x.NativeCode == y.NativeCode;
         }
 
-        public int GetHashCode(ClrMethod obj) => (int) obj.NativeCode;
+        public int GetHashCode(ClrMethod obj) => (int)obj.NativeCode;
     }
 }
 

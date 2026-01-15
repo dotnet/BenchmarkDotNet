@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Disassemblers;
@@ -11,17 +6,23 @@ using BenchmarkDotNet.Disassemblers.Exporters;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Serialization;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Perfolizer.Metrology;
-using SimpleJson;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 
 #nullable enable
 
@@ -234,15 +235,15 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 return default;
             }
-            return new(typeof(DisassemblyDiagnoserInProcessHandler), BuildClrMdArgs(benchmarkCase, "", 0).Serialize());
+
+            var clrMdArgs = BuildClrMdArgs(benchmarkCase, "", 0);
+            return new(typeof(DisassemblyDiagnoserInProcessHandler), BdnJsonSerializer.Serialize(clrMdArgs));
         }
 
         void IInProcessDiagnoser.DeserializeResults(BenchmarkCase benchmarkCase, string results)
         {
-            var json = SimpleJsonSerializer.DeserializeObject<JsonObject>(results);
-            var result = new DisassemblyResult();
-            result.Deserialize(json);
-            this.results.Add(benchmarkCase, result);
+            var disassemblyResult = BdnJsonSerializer.Deserialize<DisassemblyResult>(results);
+            this.results.Add(benchmarkCase, disassemblyResult);
         }
 
         private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
@@ -270,7 +271,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         void IInProcessDiagnoserHandler.Initialize(string? serializedConfig)
         {
-            _clrMdArgs.Deserialize(serializedConfig);
+            _clrMdArgs = BdnJsonSerializer.Deserialize<ClrMdArgs>(serializedConfig!);
         }
 
         void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
@@ -288,8 +289,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         string IInProcessDiagnoserHandler.SerializeResults()
         {
-            SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = false;
-            return _result.Serialize().ToString();
+            return BdnJsonSerializer.Serialize(_result);
         }
     }
 }
