@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
 {
-    public sealed class ConsoleLogger : ILogger
+    public sealed class ConsoleLogger : ILogger, IConsoleLogger
     {
         private const ConsoleColor DefaultColor = ConsoleColor.Gray;
 

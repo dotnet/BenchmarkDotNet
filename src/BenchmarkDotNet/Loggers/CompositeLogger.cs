@@ -62,12 +62,9 @@ namespace BenchmarkDotNet.Loggers
             }
         }
 
-        /// <summary>
-        /// Try to gets logger that has id of ConsoleLogger.
-        /// </summary>
-        public bool TryGetConsoleLogger([NotNullWhen(true)] out ILogger? consoleLogger)
+        public bool TryGetConsoleLogger([NotNullWhen(true)] out IConsoleLogger? consoleLogger)
         {
-            consoleLogger = loggers.FirstOrDefault(x => x.Id == nameof(ConsoleLogger));
+            consoleLogger = loggers.OfType<IConsoleLogger>().SingleOrDefault();
             return consoleLogger != null;
         }
     }
