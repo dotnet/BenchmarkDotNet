@@ -1,4 +1,8 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -56,6 +60,12 @@ namespace BenchmarkDotNet.Loggers
                     logger.Flush();
                 }
             }
+        }
+
+        public bool TryGetConsoleLogger([NotNullWhen(true)] out IConsoleLogger? consoleLogger)
+        {
+            consoleLogger = loggers.OfType<IConsoleLogger>().SingleOrDefault();
+            return consoleLogger != null;
         }
     }
 }
