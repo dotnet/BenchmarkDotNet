@@ -17,51 +17,29 @@ internal static class ConsoleHelper
     private const string ST = ESC + @"\";     // String Terminator
 
     /// <summary>
-    /// Write clickable link to console.
-    /// If console doesn't support OSC 8 hyperlinks. It writes plain link.
+    /// Try to gets clickable link text for console.
+    /// If console doesn't support clickable link, it returns false.
     /// </summary>
-    public static void WriteLineAsClickableLink(ILogger consoleLogger, string link, string? linkCaption = null, LogKind logKind = LogKind.Info, string prefixText = "", string suffixText = "")
+    public static bool TryGetClickableLink(string link, string? linkCaption, out string result)
     {
-        if (prefixText != "")
-            consoleLogger.Write(logKind, prefixText);
-
-        WriteAsClickableLink(consoleLogger, link, linkCaption, logKind);
-
-        // On Windows Terminal environment.
-        // It need to write extra space to avoid link style corrupted issue that occurred when window resized.
-        if (IsWindowsTerminal.Value && IsClickableLinkSupported.Value && suffixText == "")
-            suffixText = " ";
-
-        if (suffixText != "")
-            consoleLogger.Write(logKind, suffixText);
-
-        consoleLogger.WriteLine();
-    }
-
-    /// <summary>
-    /// Write clickable link to console.
-    /// If console doesn't support OSC 8 hyperlinks. It writes plain link.
-    /// </summary>
-    public static void WriteAsClickableLink(ILogger consoleLogger, string link, string? linkCaption = null, LogKind logKind = LogKind.Info)
-    {
-        if (consoleLogger.Id != nameof(ConsoleLogger))
-            throw new NotSupportedException("This method is expected logger that has ConsoleLogger id.");
-
-        // If clickable link supported. Write clickable link with OSC8.
-        if (IsClickableLinkSupported.Value)
+        if (!IsClickableLinkSupported)
         {
-            consoleLogger.Write(logKind, @$"{OSC8}{link}{ST}{linkCaption ?? link}{OSC8}{ST}");
-            return;
+            result = "";
+            return false;
         }
 
-        // Write link as plain text. (linkCaption is ignored)
-        consoleLogger.Write(logKind, link);
+        result = @$"{OSC8}{link}{ST}{linkCaption ?? link}{OSC8}{ST}";
+        return true;
     }
 
-    private static readonly Lazy<bool> IsWindowsTerminal = new(()
+    public static bool IsWindowsTerminal => _isWindowsTerminal.Value;
+
+    public static bool IsClickableLinkSupported => _isClickableLinkSupported.Value;
+
+    private static readonly Lazy<bool> _isWindowsTerminal = new(()
         => Environment.GetEnvironmentVariable("WT_SESSION") != null);
 
-    private static readonly Lazy<bool> IsClickableLinkSupported = new(() =>
+    private static readonly Lazy<bool> _isClickableLinkSupported = new(() =>
     {
         if (Console.IsOutputRedirected)
             return false;
@@ -114,7 +92,6 @@ internal static class ConsoleHelper
     [SupportedOSPlatform("windows")]
     private static bool IsVirtualTerminalProcessingEnabled()
     {
-        // Try to get Virtual Terminal Processing enebled or not.
         const uint STD_OUTPUT_HANDLE = unchecked((uint)-11);
         IntPtr handle = NativeMethods.GetStdHandle(STD_OUTPUT_HANDLE);
         if (handle == IntPtr.Zero)

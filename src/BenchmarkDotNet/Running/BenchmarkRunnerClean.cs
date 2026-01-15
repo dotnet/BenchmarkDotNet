@@ -202,8 +202,9 @@ namespace BenchmarkDotNet.Running
 
                         consoleLogger.WriteLine();
                         consoleLogger.WriteLineHeader("// * Benchmark LogFile *");
-                        ConsoleHelper.WriteLineAsClickableLink(consoleLogger, artifactDirectoryFullPath);
-                        ConsoleHelper.WriteLineAsClickableLink(consoleLogger, logFileFullPath, linkCaption: logFileRelativePath, prefixText: "  ");
+                        consoleLogger.WriteLineLink(artifactDirectoryFullPath);
+                        consoleLogger.WriteLineLink(logFileFullPath, linkCaption: logFileRelativePath, prefixText: "  ");
+                        consoleLogger.Flush();
                     }
 
                     eventProcessor.OnEndRunStage();
