@@ -14,7 +14,7 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
 
     protected override void InitTool(Progress progress)
     {
-        DotTrace.InitAsync(progress, nugetUrl, NuGetApi.V3, downloadTo).Wait();
+        DotTrace.InitAsync(progress, nugetUrl, NuGetApi.V3, downloadTo).GetAwaiter().GetResult();
     }
 
     protected override void AttachToCurrentProcess(string snapshotFile)
@@ -25,7 +25,11 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
 
     protected override void AttachToProcessByPid(int pid, string snapshotFile)
     {
-        DotTrace.Attach(new DotTrace.Config().ProfileExternalProcess(pid).SaveToFile(snapshotFile));
+        var config = new DotTrace.Config()
+                                 .UseCustomResponseTimeout(milliseconds: 60 * 1000)
+                                 .ProfileExternalProcess(pid)
+                                 .SaveToFile(snapshotFile);
+        DotTrace.Attach(config);
         DotTrace.StartCollectingData();
     }
 
