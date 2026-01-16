@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Toolchains.CompositeR2R
         {
             CustomRuntimePack = customRuntimePack;
             Crossgen2Pack = crossgen2Pack;
+            BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
