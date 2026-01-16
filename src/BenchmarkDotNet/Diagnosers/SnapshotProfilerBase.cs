@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -12,6 +6,13 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
 
 #nullable enable
 
@@ -89,17 +90,42 @@ public abstract class SnapshotProfilerBase : IProfiler
 
     private void Init(ILogger logger)
     {
+        logger.WriteLineInfo($"Ensuring that {ShortName} prerequisite is installed...");
+        var progress = new Progress(logger, $"Installing {ShortName}");
+
+        const int MaxRetries = 5;
+        int retryCount = 0;
+
+    Retry:
         try
         {
-            logger.WriteLineInfo($"Ensuring that {ShortName} prerequisite is installed...");
-            var progress = new Progress(logger, $"Installing {ShortName}");
             InitTool(progress);
+
             logger.WriteLineInfo($"{ShortName} prerequisite is installed");
             logger.WriteLineInfo($"{ShortName} runner path: {GetRunnerPath()}");
+            return;
         }
-        catch (Exception e)
+        catch (OperationCanceledException ex)
         {
-            logger.WriteLineError(e.ToString());
+            logger.WriteLineError(ex.ToString());
+            return;
+        }
+        // Following exceptions are expected to be thrown.
+        // https://github.com/JetBrains/profiler-self-api/blob/02f8410d26c184cb50ddaead6fcce89d7f34517c/JetBrains.Profiler.SelfApi/src/Impl/PrerequisiteBase.cs#L188-L202
+        catch (Exception ex)
+        {
+            if (retryCount >= MaxRetries)
+            {
+                logger.WriteLineError(ex.ToString());
+                return;
+            }
+
+            var delaySeconds = retryCount * retryCount;
+            logger.WriteLineWarning($"InitTool failed with exception: {ex.Message}");
+            logger.WriteLineWarning($"Retry {retryCount + 1}/{MaxRetries}  after {delaySeconds} seconds...");  // Retry after seconds (0, 1, 4, 9, 16)
+            Thread.Sleep(TimeSpan.FromSeconds(delaySeconds));
+            ++retryCount;
+            goto Retry;
         }
     }
 
