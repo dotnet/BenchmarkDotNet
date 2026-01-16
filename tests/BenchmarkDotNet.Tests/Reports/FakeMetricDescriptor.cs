@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             Id = id;
             Legend = legend;
-            NumberFormat = numberFormat;
+            NumberFormat = numberFormat ?? "";
         }
 
         public string Id { get; }
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Tests.Reports
         public string Legend { get; }
         public string NumberFormat { get; }
         public UnitType UnitType { get; }
-        public string Unit { get; }
+        public string Unit { get; } = "";
         public bool TheGreaterTheBetter { get; }
         public int PriorityInCategory => 0;
         public bool GetIsAvailable(Metric metric) => true;
