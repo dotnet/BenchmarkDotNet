@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
-using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
