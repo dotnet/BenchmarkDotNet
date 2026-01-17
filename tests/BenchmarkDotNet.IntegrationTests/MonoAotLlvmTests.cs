@@ -4,7 +4,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
@@ -17,19 +16,23 @@ using Xunit.Abstractions;
 namespace BenchmarkDotNet.IntegrationTests
 {
     /// <summary>
-    /// Running these tests locally requires building the mono runtime from the dotnet/runtime repository,
-    /// since the AOT compiler isn't distributed as a standalone package.
+    /// Running these tests requires building the Mono AOT runtime from dotnet/runtime.
+    /// The toolchain isn't available as a standalone workload yet.
     ///
-    /// To set up:
+    /// Setup instructions:
+    ///
     /// 1. Clone https://github.com/dotnet/runtime
-    /// 2. Build the mono runtime with libs:
-    ///    Windows:  build.cmd -subset mono+libs -c Release
-    ///    Unix:     ./build.sh -subset mono+libs -c Release
-    /// 3. Set the MONOAOTLLVM_COMPILER_PATH environment variable to the compiler binary:
-    ///    Windows:  artifacts\bin\mono\windows.x64.Release\mono-sgen.exe
-    ///    Unix:     artifacts/bin/mono/[os].x64.Release/mono-sgen
     ///
-    /// The runtime pack ends up at artifacts/bin/microsoft.netcore.app.runtime.[os]-x64/Release/
+    /// 2. Build the mono runtime with libraries:
+    ///    Windows:  .\build.cmd -subset mono+libs -c Release
+    ///    Linux:    ./build.sh -subset mono+libs -c Release
+    ///    macOS:    ./build.sh -subset mono+libs -c Release
+    ///
+    /// 3. Set MONOAOTLLVM_COMPILER_PATH to the built compiler:
+    ///    Windows:  set MONOAOTLLVM_COMPILER_PATH=C:\path\to\runtime\artifacts\bin\mono\windows.x64.Release\mono-sgen.exe
+    ///    Unix:     export MONOAOTLLVM_COMPILER_PATH=/path/to/runtime/artifacts/bin/mono/linux.x64.Release/mono-sgen
+    ///
+    /// The runtime pack is at: artifacts/bin/microsoft.netcore.app.runtime.[os]-x64/Release/
     /// </summary>
     public class MonoAotLlvmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
@@ -37,9 +40,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private static string GetAotCompilerPath()
             => Environment.GetEnvironmentVariable(AotCompilerPathEnvVar);
-
-        private static bool IsAotCompilerAvailable()
-            => !string.IsNullOrEmpty(GetAotCompilerPath()) && System.IO.File.Exists(GetAotCompilerPath());
 
         private ManualConfig GetConfig(MonoAotCompilerMode mode = MonoAotCompilerMode.llvm)
         {
@@ -64,67 +64,21 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);
         }
 
-        private static bool GetShouldRunTest()
-        {
-            // MonoAOTLLVM requires a 64-bit platform
-            if (!RuntimeInformation.Is64BitPlatform())
-                return false;
-
-            if (!IsAotCompilerAvailable())
-                return false;
-
-            return true;
-        }
-
-        [Fact]
+        [FactEnvSpecific("Requires Mono AOT LLVM toolchain from dotnet/runtime build", EnvRequirement.MonoAotLlvmToolchain)]
         public void MonoAotLlvmIsSupported()
         {
-            if (!GetShouldRunTest())
-            {
-                Output.WriteLine($"Skipping test: AOT compiler not available at {AotCompilerPathEnvVar}");
-                return;
-            }
-
-            try
-            {
-                CanExecute<MonoAotLlvmBenchmark>(GetConfig());
-            }
-            catch (MisconfiguredEnvironmentException e)
-            {
-                if (ContinuousIntegration.IsLocalRun())
-                    Output.WriteLine(e.SkipMessage);
-                else
-                    throw;
-            }
+            CanExecute<MonoAotLlvmBenchmark>(GetConfig());
         }
 
-        [Fact]
+        [FactEnvSpecific("Requires Mono AOT LLVM toolchain from dotnet/runtime build", EnvRequirement.MonoAotLlvmToolchain)]
         public void MonoAotLlvmSupportsInProcessDiagnosers()
         {
-            if (!GetShouldRunTest())
-            {
-                Output.WriteLine($"Skipping test: AOT compiler not available at {AotCompilerPathEnvVar}");
-                return;
-            }
-
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
                 var config = GetConfig().AddDiagnoser(diagnoser);
 
-                try
-                {
-                    CanExecute<MonoAotLlvmBenchmark>(config);
-                }
-                catch (MisconfiguredEnvironmentException e)
-                {
-                    if (ContinuousIntegration.IsLocalRun())
-                    {
-                        Output.WriteLine(e.SkipMessage);
-                        return;
-                    }
-                    throw;
-                }
+                CanExecute<MonoAotLlvmBenchmark>(config);
 
                 Assert.Equal([diagnoser.ExpectedResult], diagnoser.Results.Values);
                 Assert.Equal([diagnoser.ExpectedResult], BaseMockInProcessDiagnoser.s_completedResults.Select(t => t.result));
@@ -135,26 +89,10 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
+        [FactEnvSpecific("Requires Mono AOT LLVM toolchain from dotnet/runtime build", EnvRequirement.MonoAotLlvmToolchain)]
         public void MonoAotLlvmMiniModeIsSupported()
         {
-            if (!GetShouldRunTest())
-            {
-                Output.WriteLine($"Skipping test: AOT compiler not available at {AotCompilerPathEnvVar}");
-                return;
-            }
-
-            try
-            {
-                CanExecute<MonoAotLlvmBenchmark>(GetConfig(MonoAotCompilerMode.mini));
-            }
-            catch (MisconfiguredEnvironmentException e)
-            {
-                if (ContinuousIntegration.IsLocalRun())
-                    Output.WriteLine(e.SkipMessage);
-                else
-                    throw;
-            }
+            CanExecute<MonoAotLlvmBenchmark>(GetConfig(MonoAotCompilerMode.mini));
         }
 
         public class MonoAotLlvmBenchmark
@@ -162,16 +100,11 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void Check()
             {
-                // Verify we're running on Mono AOT
                 if (!RuntimeInformation.IsMono)
-                {
-                    throw new Exception("This is not Mono runtime");
-                }
+                    throw new Exception("Expected Mono runtime");
 
                 if (!RuntimeInformation.IsAot)
-                {
-                    throw new Exception("This is not running in AOT mode");
-                }
+                    throw new Exception("Expected AOT mode");
             }
         }
     }
