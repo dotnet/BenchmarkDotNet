@@ -57,7 +57,9 @@ namespace MyBenchmarks
 }
 ```
 
-The `BenchmarkRunner.Run<Md5VsSha256>()` call runs your benchmarks and prints results to the console.
+The `BenchmarkRunner.Run(typeof(Program).Assembly)` call runs all benchmarks in the current assembly and prints results to the console.
+
+BenchmarkDotNet discovers benchmark types via reflection, so benchmarks can be placed in different files as long as they are in the same project/assembly and the benchmark classes are `public`.
 
 Note that BenchmarkDotNet will only run benchmarks if the application is built in the Release configuration.
 This is to prevent unoptimized code from being benchmarked.
