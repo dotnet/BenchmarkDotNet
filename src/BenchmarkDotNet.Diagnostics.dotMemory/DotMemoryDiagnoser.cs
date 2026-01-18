@@ -14,7 +14,7 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
 
     protected override void InitTool(Progress progress)
     {
-        DotMemory.InitAsync(progress, nugetUrl, NuGetApi.V3, downloadTo).Wait();
+        DotMemory.InitAsync(progress, nugetUrl, NuGetApi.V3, downloadTo).GetAwaiter().GetResult();
     }
 
     protected override void AttachToCurrentProcess(string snapshotFile)
@@ -24,7 +24,11 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
 
     protected override void AttachToProcessByPid(int pid, string snapshotFile)
     {
-        DotMemory.Attach(new DotMemory.Config().ProfileExternalProcess(pid).SaveToFile(snapshotFile));
+        var config = new DotMemory.Config()
+            .UseCustomResponseTimeout(milliseconds:60 * 1000)
+            .ProfileExternalProcess(pid)
+            .SaveToFile(snapshotFile);
+        DotMemory.Attach(config);
     }
 
     protected override void TakeSnapshot()
