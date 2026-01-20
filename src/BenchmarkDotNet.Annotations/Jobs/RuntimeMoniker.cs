@@ -250,13 +250,23 @@ namespace BenchmarkDotNet.Jobs
         Mono11_0,
 
         /// <summary>
+        /// .NET 8 CLR with composite ReadyToRun compilation
+        /// </summary>
+        R2R80,
+
+        /// <summary>
+        /// .NET 9 CLR with composite ReadyToRun compilation
+        /// </summary>
+        R2R90,
+
+        /// <summary>
         /// .NET 10 CLR with composite ReadyToRun compilation
         /// </summary>
-        CompositeR2R10_0,
+        R2R10_0,
 
         /// <summary>
         /// .NET 11 CLR with composite ReadyToRun compilation
         /// </summary>
-        CompositeR2R11_0,
+        R2R11_0,
     }
 }

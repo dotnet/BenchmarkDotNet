@@ -9,14 +9,14 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
-namespace BenchmarkDotNet.Toolchains.CompositeR2R
+namespace BenchmarkDotNet.Toolchains.R2R
 {
-    public class CompositeR2RGenerator : CsProjGenerator
+    public class R2RGenerator : CsProjGenerator
     {
         private readonly string CustomRuntimePack;
         private readonly string Crossgen2Pack;
 
-        public CompositeR2RGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string crossgen2Pack)
+        public R2RGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string crossgen2Pack)
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             CustomRuntimePack = customRuntimePack;
@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.CompositeR2R
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-            string content = new StringBuilder(ResourceHelper.LoadTemplate("CompositeR2RCsProj.txt"))
+            string content = new StringBuilder(ResourceHelper.LoadTemplate("R2RCsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)

@@ -7,13 +7,18 @@ using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 
-namespace BenchmarkDotNet.Toolchains.CompositeR2R
+namespace BenchmarkDotNet.Toolchains.R2R
 {
     [PublicAPI]
-    public class CompositeR2RToolchain : CsProjCoreToolchain, IEquatable<CompositeR2RToolchain>
+    public class R2RToolchain : CsProjCoreToolchain, IEquatable<R2RToolchain>
     {
+        [PublicAPI] public static readonly IToolchain R2R80 = From(new NetCoreAppSettings("net8.0", null, "R2R80"));
+        [PublicAPI] public static readonly IToolchain R2R90 = From(new NetCoreAppSettings("net9.0", null, "R2R90"));
+        [PublicAPI] public static readonly IToolchain R2R10_0 = From(new NetCoreAppSettings("net10.0", null, "R2R10_0"));
+        [PublicAPI] public static readonly IToolchain R2R11_0 = From(new NetCoreAppSettings("net11.0", null, "R2R11_0"));
+
         private readonly string _customDotNetCliPath;
-        private CompositeR2RToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
+        private R2RToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor, customDotNetCliPath)
         {
             _customDotNetCliPath = customDotNetCliPath;
@@ -21,8 +26,8 @@ namespace BenchmarkDotNet.Toolchains.CompositeR2R
 
         [PublicAPI]
         public static new IToolchain From(NetCoreAppSettings settings)
-            => new CompositeR2RToolchain(settings.Name,
-                new CompositeR2RGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.CustomRuntimePack, settings.AOTCompilerPath),
+            => new R2RToolchain(settings.Name,
+                new R2RGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.CustomRuntimePack, settings.AOTCompilerPath),
                 new DotNetCliPublisher(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath),
                 new Executor(),
                 settings.CustomDotNetCliPath);
@@ -35,9 +40,9 @@ namespace BenchmarkDotNet.Toolchains.CompositeR2R
             }
         }
 
-        public override bool Equals(object obj) => obj is CompositeR2RToolchain typed && Equals(typed);
+        public override bool Equals(object obj) => obj is R2RToolchain typed && Equals(typed);
 
-        public bool Equals(CompositeR2RToolchain other) => Generator.Equals(other.Generator);
+        public bool Equals(R2RToolchain other) => Generator.Equals(other.Generator);
 
         public override int GetHashCode() => Generator.GetHashCode();
     }

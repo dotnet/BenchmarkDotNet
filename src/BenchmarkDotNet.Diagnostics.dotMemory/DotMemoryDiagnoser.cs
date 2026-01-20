@@ -87,8 +87,10 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
             case RuntimeMoniker.Net90:
             case RuntimeMoniker.Net10_0:
             case RuntimeMoniker.Net11_0:
-            case RuntimeMoniker.CompositeR2R10_0:
-            case RuntimeMoniker.CompositeR2R11_0:
+            case RuntimeMoniker.R2R80:
+            case RuntimeMoniker.R2R90:
+            case RuntimeMoniker.R2R10_0:
+            case RuntimeMoniker.R2R11_0:
                 return true;
             case RuntimeMoniker.NotRecognized:
             case RuntimeMoniker.Mono:
