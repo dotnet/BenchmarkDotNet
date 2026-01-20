@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class CompositeLogger : ILogger
+    internal class CompositeLogger : ILogger, ILinkLogger
     {
         private readonly ImmutableHashSet<ILogger> loggers;
 
@@ -60,12 +60,6 @@ namespace BenchmarkDotNet.Loggers
                     logger.Flush();
                 }
             }
-        }
-
-        public bool TryGetConsoleLogger([NotNullWhen(true)] out IConsoleLogger? consoleLogger)
-        {
-            consoleLogger = loggers.OfType<IConsoleLogger>().SingleOrDefault();
-            return consoleLogger != null;
         }
     }
 }

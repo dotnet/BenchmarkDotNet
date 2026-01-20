@@ -194,17 +194,17 @@ namespace BenchmarkDotNet.Running
 
                     // Output additional information to console.
                     var logFileEnabled = benchmarkRunInfos.All(info => !info.Config.Options.IsSet(ConfigOptions.DisableLogFile));
-                    if (logFileEnabled && compositeLogger.TryGetConsoleLogger(out var consoleLogger))
+                    if (logFileEnabled)
                     {
                         var artifactDirectoryFullPath = Path.GetFullPath(rootArtifactsFolderPath);
                         var logFileFullPath = Path.GetFullPath(logFilePath);
                         var logFileRelativePath = PathHelper.GetRelativePath(artifactDirectoryFullPath, logFileFullPath);
 
-                        consoleLogger.WriteLine();
-                        consoleLogger.WriteLineHeader("// * Benchmark LogFile *");
-                        consoleLogger.WriteLineLink(artifactDirectoryFullPath);
-                        consoleLogger.WriteLineLink(logFileFullPath, linkCaption: logFileRelativePath, prefixText: "  ");
-                        consoleLogger.Flush();
+                        compositeLogger.WriteLine();
+                        compositeLogger.WriteLineHeader("// * Benchmark LogFile *");
+                        compositeLogger.WriteLineLink(artifactDirectoryFullPath);
+                        compositeLogger.WriteLineLink(logFileFullPath, linkCaption: logFileRelativePath, prefixText: "  ");
+                        compositeLogger.Flush();
                     }
 
                     eventProcessor.OnEndRunStage();
@@ -768,7 +768,7 @@ namespace BenchmarkDotNet.Running
             return new StreamWriter(logFilePath, append: false);
         }
 
-        private static CompositeLogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
+        private static ILogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
         {
             var loggers = new Dictionary<string, ILogger>();
 
