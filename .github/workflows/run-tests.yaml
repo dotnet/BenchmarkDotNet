@@ -18,9 +18,11 @@ jobs:
         os: [windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Disable Windows Defender
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
+      - name: Add Windows Defender Exclusions
         shell: powershell
+        run: |
+          Add-MpPreference -ExclusionPath $env:GITHUB_WORKSPACE
+          Add-MpPreference -ExclusionPath $env:TEMP
       - uses: actions/checkout@v6
       # Build and Test
       - name: Run task 'build'
@@ -51,9 +53,11 @@ jobs:
         os: [windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Disable Windows Defender
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
+      - name: Add Windows Defender Exclusions
         shell: powershell
+        run: |
+          Add-MpPreference -ExclusionPath $env:GITHUB_WORKSPACE
+          Add-MpPreference -ExclusionPath $env:TEMP
       - uses: actions/checkout@v6
       # Build and Test
       - name: Run task 'build'
