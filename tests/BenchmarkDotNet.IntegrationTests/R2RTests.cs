@@ -82,7 +82,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void SimpleMethod()
         {
-            // I don't believe there is a way to verify at runtime that we are actrually running under r2r
+            // I don't believe there is a simple way to verify at runtime that we are actually running under r2r.
+            // Reading PE format for app assemblies doesn't seem worth it.
         }
     }
 }

@@ -12,10 +12,10 @@ namespace BenchmarkDotNet.Toolchains.R2R
     [PublicAPI]
     public class R2RToolchain : CsProjCoreToolchain, IEquatable<R2RToolchain>
     {
-        [PublicAPI] public static readonly IToolchain R2R80 = From(new NetCoreAppSettings("net8.0", null, "R2R80"));
-        [PublicAPI] public static readonly IToolchain R2R90 = From(new NetCoreAppSettings("net9.0", null, "R2R90"));
-        [PublicAPI] public static readonly IToolchain R2R10_0 = From(new NetCoreAppSettings("net10.0", null, "R2R10_0"));
-        [PublicAPI] public static readonly IToolchain R2R11_0 = From(new NetCoreAppSettings("net11.0", null, "R2R11_0"));
+        [PublicAPI] public static readonly IToolchain R2R80 = From(new NetCoreAppSettings("net8.0", null, "R2R 8.0"));
+        [PublicAPI] public static readonly IToolchain R2R90 = From(new NetCoreAppSettings("net9.0", null, "R2R 9.0"));
+        [PublicAPI] public static readonly IToolchain R2R10_0 = From(new NetCoreAppSettings("net10.0", null, "R2R 10.0"));
+        [PublicAPI] public static readonly IToolchain R2R11_0 = From(new NetCoreAppSettings("net11.0", null, "R2R 11.0"));
 
         private readonly string _customDotNetCliPath;
         private R2RToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)

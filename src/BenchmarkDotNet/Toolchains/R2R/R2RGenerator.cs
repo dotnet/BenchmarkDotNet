@@ -51,10 +51,7 @@ namespace BenchmarkDotNet.Toolchains.R2R
             GatherReferences(buildPartition, artifactsPaths, logger);
         }
 
-        protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
-            => OsDetector.IsWindows()
-                ? Path.Combine(binariesDirectoryPath, $"{programName}.exe")
-                : Path.Combine(binariesDirectoryPath, programName);
+        protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier(), "publish");
