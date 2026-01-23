@@ -181,6 +181,32 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("Microsoft.NET.Sdk", sdkName);
         }
 
+        /// <summary>
+        /// Tests that WarningsAsErrors setting is copied from the benchmark project.
+        /// Fixes issue #2581: NuGet restore warnings should fail the build when configured.
+        /// </summary>
+        [Fact]
+        public void WarningsAsErrorsSettingGetsCopied()
+        {
+            const string withWarningsAsErrors = @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
+";
+            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(withWarningsAsErrors);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
+
+            AssertCustomProperties(@"<PropertyGroup>
+  <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
+</PropertyGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+        }
+
         [Fact]
         public void TheDefaultFilePathShouldBeUsedWhenAnAssemblyLocationIsEmpty()
         {
