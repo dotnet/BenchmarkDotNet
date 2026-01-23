@@ -182,6 +182,28 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void WarningsAsErrorsSettingGetsCopied()
+        {
+            const string withWarningsAsErrors = @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
+";
+            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(withWarningsAsErrors);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
+
+            AssertCustomProperties(@"<PropertyGroup>
+  <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
+</PropertyGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+        }
+
+        [Fact]
         public void TheDefaultFilePathShouldBeUsedWhenAnAssemblyLocationIsEmpty()
         {
             const string programName = "testProgram";
