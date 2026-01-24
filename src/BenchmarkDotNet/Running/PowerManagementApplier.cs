@@ -76,6 +76,20 @@ namespace BenchmarkDotNet.Running
                     isInitialized = true;
                 }
 
+                Guid currentActivePlan = (Guid)PowerManagementHelper.CurrentPlan;
+                Guid ultimatePerformanceGuid = PowerPlansDict[PowerPlan.UltimatePerformance];
+                Guid highPerformanceGuid = PowerPlansDict[PowerPlan.HighPerformance];
+
+                if (currentActivePlan == ultimatePerformanceGuid && guid == highPerformanceGuid)
+                {
+                    if (!PowerManagementHelper.PlanExists(highPerformanceGuid))
+                    {
+                        logger.WriteLineInfo("Cannot setup High Performance power plan - plan doesn't exist on this system.");
+                        return;
+                    }
+                    logger.WriteLineInfo("Changing from Ultimate Performance to explicitly configured High Performance plan.");
+                }
+
                 if (PowerManagementHelper.Set(guid))
                 {
                     powerPlanChanged = true;
@@ -83,7 +97,9 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineInfo($"Setup power plan (GUID: {guid} FriendlyName: {powerPlanFriendlyName})");
                 }
                 else
+                {
                     logger.WriteLineError($"Cannot setup power plan (GUID: {guid})");
+                }
             }
             catch (Exception ex)
             {
