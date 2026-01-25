@@ -26,6 +26,8 @@ namespace BenchmarkDotNet.Code
         protected BenchmarkCase Benchmark { get; } = benchmark;
         protected Descriptor Descriptor => Benchmark.Descriptor;
 
+        public abstract string[] GetExtraFields();
+
         public SmartStringBuilder ReplaceTemplate(SmartStringBuilder smartStringBuilder)
         {
             Replace(smartStringBuilder, Descriptor.GlobalSetupMethod, "$GlobalSetupModifiers$", "$GlobalSetupImpl$", false);
@@ -98,6 +100,8 @@ namespace BenchmarkDotNet.Code
 
     internal class SyncDeclarationsProvider(BenchmarkCase benchmark) : DeclarationsProvider(benchmark)
     {
+        public override string[] GetExtraFields() => [];
+
         protected override string PrependExtraGlobalCleanupImpl(string impl) => impl;
 
         protected override SmartStringBuilder ReplaceCore(SmartStringBuilder smartStringBuilder)
@@ -152,7 +156,6 @@ namespace BenchmarkDotNet.Code
             """;
 
             return smartStringBuilder
-                .Replace("$ExtraFields$", string.Empty)
                 .Replace("$CoreImpl$", coreImpl);
         }
 
@@ -177,6 +180,13 @@ namespace BenchmarkDotNet.Code
 
     internal class AsyncDeclarationsProvider(BenchmarkCase benchmark) : DeclarationsProvider(benchmark)
     {
+        public override string[] GetExtraFields() =>
+        [
+            $"public {typeof(WorkloadContinuerAndValueTaskSource).GetCorrectCSharpTypeName()} workloadContinuerAndValueTaskSource;",
+            $"public {typeof(IClock).GetCorrectCSharpTypeName()} clock;",
+            "public long invokeCount;"
+        ];
+
         protected override string PrependExtraGlobalCleanupImpl(string impl)
             => $"""
             this.__fieldsContainer.workloadContinuerAndValueTaskSource?.Complete();
@@ -263,11 +273,6 @@ namespace BenchmarkDotNet.Code
             """;
 
             return smartStringBuilder
-                .Replace("$ExtraFields$", $"""
-                    public {typeof(WorkloadContinuerAndValueTaskSource).GetCorrectCSharpTypeName()} workloadContinuerAndValueTaskSource;
-                                public global::Perfolizer.Horology.IClock clock;
-                                public long invokeCount;
-                    """)
                 .Replace("$CoreImpl$", coreImpl);
         }
 
