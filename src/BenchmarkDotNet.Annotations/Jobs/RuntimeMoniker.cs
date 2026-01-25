@@ -248,5 +248,25 @@ namespace BenchmarkDotNet.Jobs
         /// .NET 11 using MonoVM (not CLR which is the default)
         /// </summary>
         Mono11_0,
+
+        /// <summary>
+        /// .NET 8 CLR with composite ReadyToRun compilation
+        /// </summary>
+        R2R80,
+
+        /// <summary>
+        /// .NET 9 CLR with composite ReadyToRun compilation
+        /// </summary>
+        R2R90,
+
+        /// <summary>
+        /// .NET 10 CLR with composite ReadyToRun compilation
+        /// </summary>
+        R2R10_0,
+
+        /// <summary>
+        /// .NET 11 CLR with composite ReadyToRun compilation
+        /// </summary>
+        R2R11_0,
     }
 }

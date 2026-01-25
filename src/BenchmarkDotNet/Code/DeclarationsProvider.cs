@@ -11,6 +11,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider(BenchmarkCase benchmark)
@@ -81,7 +83,7 @@ namespace BenchmarkDotNet.Code
         protected abstract SmartStringBuilder ReplaceCore(SmartStringBuilder smartStringBuilder);
 
         private static string GetMethodPrefix(MethodInfo method)
-            => method.IsStatic ? method.DeclaringType.GetCorrectCSharpTypeName() : "base";
+            => method.IsStatic ? method.DeclaringType!.GetCorrectCSharpTypeName() : "base";
 
         protected string GetWorkloadMethodCall(string passArguments)
              => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments});";
@@ -309,9 +311,9 @@ namespace BenchmarkDotNet.Code
         private static string GetFinalReturn(Type workloadCoreReturnType)
         {
             var finalReturnType = workloadCoreReturnType
-                .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
-                .ReturnType
-                .GetMethod(nameof(TaskAwaiter.GetResult))
+                .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
+                .ReturnType!
+                .GetMethod(nameof(TaskAwaiter.GetResult))!
                 .ReturnType;
             return finalReturnType == typeof(void)
                 ? "return;"

@@ -16,17 +16,17 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(BuildPartition buildPartition)
+        internal static string Generate(BuildPartition buildPartition, CodeGenBenchmarkRunCallType benchmarkRunCallType)
         {
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
             var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
-
-            var extraDefines = new List<string>();
 
             foreach (var buildInfo in buildPartition.Benchmarks)
             {
@@ -51,19 +51,12 @@ namespace BenchmarkDotNet.Code
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            if (buildPartition.IsNativeAot)
-                extraDefines.Add("#define NATIVEAOT");
-            else if (buildPartition.IsNetFramework)
-                extraDefines.Add("#define NETFRAMEWORK");
-            else if (buildPartition.IsWasm)
-                extraDefines.Add("#define WASM");
-
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
-                .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
+                .Replace("$ExtraDefines$", buildPartition.IsNetFramework ? "#define NETFRAMEWORK" : string.Empty)
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
-                .Replace("$NativeAotSwitch$", GetNativeAotSwitch(buildPartition))
+                .Replace("$BenchmarkRunCall$", GetBenchmarkRunCall(buildPartition, benchmarkRunCallType))
                 .ToString();
 
             return benchmarkProgramContent;
@@ -77,7 +70,7 @@ namespace BenchmarkDotNet.Code
 
         private static (bool, string) GetShadowCopySettings()
         {
-            string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
+            string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location)!;
 
             if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
             {
@@ -155,20 +148,20 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name)).GetCorrectCSharpTypeName()} __argField{index};"));
+                    .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} __argField{index};"));
 
         private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"this.__fieldsContainer.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
+                    .Select((parameter, index) => $"this.__fieldsContainer.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name!).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {
-            var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance);
+            var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!;
             var factoryType = factory.GetType();
 
             if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))
@@ -220,19 +213,27 @@ namespace BenchmarkDotNet.Code
                 return "ref";
         }
 
-        /// <summary>
-        /// for NativeAOT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
-        /// </summary>
-        private static string GetNativeAotSwitch(BuildPartition buildPartition)
+        private static string GetBenchmarkRunCall(BuildPartition buildPartition, CodeGenBenchmarkRunCallType runCallType)
         {
-            if (!buildPartition.IsNativeAot)
-                return default;
+            if (runCallType == CodeGenBenchmarkRunCallType.Reflection)
+            {
+                // Use reflection to call benchmark's Run method indirectly.
+                return """
+                runTask = (global::System.Threading.Tasks.ValueTask) typeof(global::BenchmarkDotNet.Autogenerated.UniqueProgramName).Assembly
+                                        .GetType($"BenchmarkDotNet.Autogenerated.Runnable_{id}")
+                                        .GetMethod("Run", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.Static)
+                                        .Invoke(null, new global::System.Object[] { host, benchmarkName, diagnoserRunMode });
+                """;
+            }
 
+            // Generate a switch to call benchmark's Run method directly.
             var @switch = new StringBuilder(buildPartition.Benchmarks.Length * 30);
             @switch.AppendLine("switch (id) {");
 
             foreach (var buildInfo in buildPartition.Benchmarks)
+            {
                 @switch.AppendLine($"case {buildInfo.Id.Value}: runTask = BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName, diagnoserRunMode); break;");
+            }
 
             @switch.AppendLine("default: throw new System.NotSupportedException(\"invalid benchmark id\");");
             @switch.AppendLine("}");

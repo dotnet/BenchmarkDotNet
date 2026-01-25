@@ -14,7 +14,7 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
 
     protected override void InitTool(Progress progress)
     {
-        DotTrace.InitAsync(progress, nugetUrl, NuGetApi.V3, downloadTo).Wait();
+        DotTrace.InitAsync(progress, nugetUrl, NuGetApi.V3, downloadTo).GetAwaiter().GetResult();
     }
 
     protected override void AttachToCurrentProcess(string snapshotFile)
@@ -25,7 +25,11 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
 
     protected override void AttachToProcessByPid(int pid, string snapshotFile)
     {
-        DotTrace.Attach(new DotTrace.Config().ProfileExternalProcess(pid).SaveToFile(snapshotFile));
+        var config = new DotTrace.Config()
+            .UseCustomResponseTimeout(milliseconds: 60 * 1000)
+            .ProfileExternalProcess(pid)
+            .SaveToFile(snapshotFile);
+        DotTrace.Attach(config);
         DotTrace.StartCollectingData();
     }
 
@@ -86,6 +90,10 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
             case RuntimeMoniker.Net90:
             case RuntimeMoniker.Net10_0:
             case RuntimeMoniker.Net11_0:
+            case RuntimeMoniker.R2R80:
+            case RuntimeMoniker.R2R90:
+            case RuntimeMoniker.R2R10_0:
+            case RuntimeMoniker.R2R11_0:
                 return true;
             case RuntimeMoniker.NotRecognized:
             case RuntimeMoniker.Mono:

@@ -40,6 +40,9 @@ namespace BenchmarkDotNet.Characteristics
                 if (characteristic == EnvironmentMode.AffinityCharacteristic && value is IntPtr intPtr)
                     return intPtr.ToPresentation(Environment.ProcessorCount);
 
+                if (characteristic == EnvironmentMode.PowerPlanModeCharacteristic && value is Guid guid && guid == Guid.Empty)
+                    return ""; // Replace Guid.Empty to empty string.
+
                 return ToPresentation(value);
             }
 
@@ -70,8 +73,6 @@ namespace BenchmarkDotNet.Characteristics
                 => (value as IFormattable)?.ToString(null, DefaultCultureInfo.Instance)
                       ?? value?.ToString()
                       ?? "";
-
-
         }
 
         private class SourceCodeCharacteristicPresenter : CharacteristicPresenter

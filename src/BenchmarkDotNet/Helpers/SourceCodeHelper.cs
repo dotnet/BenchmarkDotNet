@@ -47,12 +47,14 @@ namespace BenchmarkDotNet.Helpers
                     return $"new {array.GetType().GetElementType()!.GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", elementsSourceCode)} }}";
                 }
             }
-            if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
-                return $"({value.GetType().GetCorrectCSharpTypeName()})({ToInvariantCultureString(value)})";
+
+            var valueType = value.GetType();
+            if (valueType.IsEnum)
+                return $"({valueType.GetCorrectCSharpTypeName()})({ToInvariantCultureString(value)})";
             if (value is Type type)
                 return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
-            if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
-                return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
+            if (!valueType.IsValueType)
+                return "System.Activator.CreateInstance<" + valueType.GetCorrectCSharpTypeName() + ">()";
 
             switch (value) {
                 case TimeInterval interval:

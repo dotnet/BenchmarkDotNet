@@ -10,6 +10,7 @@ using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -17,6 +18,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Configs
 {
@@ -75,12 +78,12 @@ namespace BenchmarkDotNet.Configs
             yield return RuntimeValidator.DontFailOnError;
         }
 
-        public IOrderer Orderer => null;
+        public IOrderer? Orderer => null;
         public ICategoryDiscoverer? CategoryDiscoverer => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public CultureInfo CultureInfo => null;
+        public CultureInfo? CultureInfo => null;
 
         public ConfigOptions Options => ConfigOptions.Default;
 

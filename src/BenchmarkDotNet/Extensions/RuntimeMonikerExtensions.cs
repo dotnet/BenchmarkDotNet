@@ -74,6 +74,14 @@ namespace BenchmarkDotNet.Extensions
                     return MonoRuntime.Mono10_0;
                 case RuntimeMoniker.Mono11_0:
                     return MonoRuntime.Mono11_0;
+                case RuntimeMoniker.R2R80:
+                    return R2RRuntime.Net80;
+                case RuntimeMoniker.R2R90:
+                    return R2RRuntime.Net90;
+                case RuntimeMoniker.R2R10_0:
+                    return R2RRuntime.Net10_0;
+                case RuntimeMoniker.R2R11_0:
+                    return R2RRuntime.Net11_0;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }
@@ -127,6 +135,10 @@ namespace BenchmarkDotNet.Extensions
             RuntimeMoniker.MonoAOTLLVMNet90 => new Version(9, 0),
             RuntimeMoniker.MonoAOTLLVMNet10_0 => new Version(10, 0),
             RuntimeMoniker.MonoAOTLLVMNet11_0 => new Version(11, 0),
+            RuntimeMoniker.R2R80 => new Version(8, 0),
+            RuntimeMoniker.R2R90 => new Version(9, 0),
+            RuntimeMoniker.R2R10_0 => new Version(10, 0),
+            RuntimeMoniker.R2R11_0 => new Version(11, 0),
             _ => throw new NotImplementedException($"{nameof(GetRuntimeVersion)} not implemented for {runtimeMoniker}")
         };
     }

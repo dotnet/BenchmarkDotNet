@@ -9,20 +9,18 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
-namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
+namespace BenchmarkDotNet.Toolchains.R2R
 {
-    public class MonoAotLLVMGenerator : CsProjGenerator
+    public class R2RGenerator : CsProjGenerator
     {
         private readonly string CustomRuntimePack;
-        private readonly string AotCompilerPath;
-        private readonly MonoAotCompilerMode AotCompilerMode;
+        private readonly string Crossgen2Pack;
 
-        public MonoAotLLVMGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string aotCompilerPath, MonoAotCompilerMode aotCompilerMode)
+        public R2RGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string crossgen2Pack)
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             CustomRuntimePack = customRuntimePack;
-            AotCompilerPath = aotCompilerPath;
-            AotCompilerMode = aotCompilerMode;
+            Crossgen2Pack = crossgen2Pack;
             BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
@@ -31,13 +29,11 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
-            string useLLVM = AotCompilerMode == MonoAotCompilerMode.llvm ? "true" : "false";
-
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-            string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
+            string content = new StringBuilder(ResourceHelper.LoadTemplate("R2RCsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)
@@ -45,10 +41,9 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
                 .Replace("$COPIEDSETTINGS$", customProperties)
                 .Replace("$SDKNAME$", sdkName)
-                .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
-                .Replace("$COMPILERBINARYPATH$", AotCompilerPath)
+                .Replace("$RUNTIMEPACK$", CustomRuntimePack)
+                .Replace("$CROSSGEN2PACK$", Crossgen2Pack)
                 .Replace("$RUNTIMEIDENTIFIER$", CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
-                .Replace("$USELLVM$", useLLVM)
                 .ToString();
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
@@ -56,15 +51,9 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             GatherReferences(buildPartition, artifactsPaths, logger);
         }
 
-        protected override string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(GetBinariesDirectoryPath(buildArtifactsDirectoryPath, configuration), "publish");
-
-        protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
-            => OsDetector.IsWindows()
-                ? Path.Combine(binariesDirectoryPath, "publish", $"{programName}.exe")
-                : Path.Combine(binariesDirectoryPath, "publish", programName);
+        protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier());
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier(), "publish");
     }
 }

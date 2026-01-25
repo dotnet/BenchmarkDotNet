@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Configs
 {
@@ -69,8 +72,8 @@ namespace BenchmarkDotNet.Configs
                 uniqueRunnableJobs,
                 uniqueEventProcessors,
                 source.UnionRule,
-                source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
-                source.CultureInfo,
+                source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath!,
+                source.CultureInfo ?? DefaultCultureInfo.Instance,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
@@ -251,9 +254,17 @@ namespace BenchmarkDotNet.Configs
         private class TypeComparer<TInterface> : IEqualityComparer<TInterface>
         {
             // different types can implement the same interface, we want to distinct by type
-            public bool Equals(TInterface x, TInterface y) => x.GetType() == y.GetType();
+            public bool Equals(TInterface? x, TInterface? y)
+            {
+                if (ReferenceEquals(x, y))
+                    return true;
+                if (x is null || y is null)
+                    return false;
 
-            public int GetHashCode(TInterface obj) => obj.GetType().GetHashCode();
+                return x.GetType() == y.GetType();
+            }
+
+            public int GetHashCode(TInterface obj) => obj?.GetType().GetHashCode() ?? 0;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void BenchmarkCanAllocateMoreThan2Gb_Core()
         {
             var platform = RuntimeInformation.GetCurrentPlatform();
-            var config = ManualConfig.CreateEmpty();
+            var config = ManualConfig.CreateEmpty().WithBuildTimeout(TimeSpan.FromSeconds(240));
             // Running 32-bit benchmarks with .Net Core requires passing the path to 32-bit SDK,
             // which makes this test more complex than it's worth in CI, so we only test 64-bit.
             config.AddJob(Job.Dry.WithRuntime(CoreRuntime.Core80).WithPlatform(platform).WithId(platform.ToString()));

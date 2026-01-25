@@ -14,6 +14,8 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using static System.Runtime.InteropServices.RuntimeInformation;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Portability
 {
     internal static class RuntimeInformation
@@ -58,7 +60,7 @@ namespace BenchmarkDotNet.Portability
             Type runtimeFeature = Type.GetType("System.Runtime.CompilerServices.RuntimeFeature");
             if (runtimeFeature != null)
             {
-                MethodInfo methodInfo = runtimeFeature.GetProperty("IsDynamicCodeCompiled", BindingFlags.Public | BindingFlags.Static)?.GetMethod;
+                MethodInfo? methodInfo = runtimeFeature.GetProperty("IsDynamicCodeCompiled", BindingFlags.Public | BindingFlags.Static)?.GetMethod;
 
                 if (methodInfo != null)
                 {
@@ -90,7 +92,7 @@ namespace BenchmarkDotNet.Portability
             if (IsWasm)
             {
                 // code copied from https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/RuntimeInformation.cs#L20-L30
-                string versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                string? versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
                 // Strip the git hash if there is one
                 if (versionString != null)
@@ -110,7 +112,7 @@ namespace BenchmarkDotNet.Portability
                 var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 if (monoDisplayName != null)
                 {
-                    string version = monoDisplayName.Invoke(null, null)?.ToString();
+                    string? version = monoDisplayName.Invoke(null, null)?.ToString();
                     if (version != null)
                     {
                         int bracket1 = version.IndexOf('('), bracket2 = version.IndexOf(')');
@@ -166,7 +168,7 @@ namespace BenchmarkDotNet.Portability
                 // .Net Core 2.X has confusing FrameworkDescription like 4.6.X.
                 if (version?.Major >= 3)
                     return $"{CoreRuntime.GetVersionFromFrameworkDescription()}, {FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion}";
-                return FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion;
+                return FileVersionInfo.GetVersionInfo(coreclrLocation).FileVersion!;
             }
         }
 
@@ -271,8 +273,8 @@ namespace BenchmarkDotNet.Portability
                             var av = (ManagementObject)o;
                             if (av != null)
                             {
-                                string name = av["displayName"].ToString();
-                                string path = av["pathToSignedProductExe"].ToString();
+                                string name = av["displayName"].ToString()!;
+                                string path = av["pathToSignedProductExe"].ToString()!;
                                 products.Add(new Antivirus(name, path));
                             }
                         }
@@ -300,8 +302,8 @@ namespace BenchmarkDotNet.Portability
                         {
                             foreach (var item in items)
                             {
-                                string manufacturer = item["Manufacturer"]?.ToString();
-                                string model = item["Model"]?.ToString();
+                                string manufacturer = item["Manufacturer"]?.ToString()!;
+                                string model = item["Model"]?.ToString()!;
                                 return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
                             }
                         }

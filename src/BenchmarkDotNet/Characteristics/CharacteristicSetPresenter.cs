@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Diagnosers;
+﻿using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -58,7 +60,9 @@ namespace BenchmarkDotNet.Characteristics
             public override string ToPresentation(CharacteristicObject obj)
             {
                 var values = GetPresentableCharacteristics(obj)
-                    .Select(c => c.Id + "=" + CharacteristicPresenter.ToPresentation(obj, c));
+                    .Select(c => (c.Id, Value: CharacteristicPresenter.ToPresentation(obj, c)))
+                    .Where(x => x.Value != "")
+                    .Select(x => $"{x.Id}={x.Value}");
                 return string.Join(Separator, values);
             }
         }

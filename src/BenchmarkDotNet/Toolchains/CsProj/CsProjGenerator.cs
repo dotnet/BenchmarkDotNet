@@ -38,6 +38,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             "UserSecretsId",
             "EnablePreviewFeatures",
             "RuntimeHostConfigurationOption",
+            "WarningsAsErrors",
         }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
@@ -161,10 +162,16 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!buildResult.IsBuildSuccess)
             {
-                throw buildResult.TryToExplainFailureReason(out string reason)
-                    ? new Exception(reason)
-                    : new Exception(buildResult.ErrorMessage);
+                if (!buildResult.TryToExplainFailureReason(out string reason))
+                {
+                    reason = buildResult.ErrorMessage;
+                }
+                logger.WriteLineWarning($"Failed to gather assembly references, reason:{Environment.NewLine}{reason}");
+                return;
             }
+
+            // Delete the dll from the gatherer project to prevent duplicate references.
+            File.Delete(Path.Combine(artifactsPaths.BinariesDirectoryPath, $"{artifactsPaths.ProgramName}.dll"));
 
             xmlDoc = new XmlDocument();
             xmlDoc.Load(artifactsPaths.ProjectFilePath);

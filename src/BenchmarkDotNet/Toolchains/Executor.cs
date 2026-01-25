@@ -141,11 +141,12 @@ namespace BenchmarkDotNet.Toolchains
                 case ClrRuntime _:
                 case CoreRuntime _:
                 case NativeAotRuntime _:
+                case R2RRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;
                 case MonoRuntime mono:
-                    start.FileName = mono.CustomPath ?? "mono";
+                    start.FileName = mono.CustomPath.IsNotBlank() ? mono.CustomPath : "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
                     break;
                 case MonoAotLLVMRuntime _:

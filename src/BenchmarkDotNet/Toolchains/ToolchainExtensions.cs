@@ -5,6 +5,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.R2R;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -104,6 +105,12 @@ namespace BenchmarkDotNet.Toolchains
 
                 case WasmRuntime wasmRuntime:
                     return WasmToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker: wasmRuntime.MsBuildMoniker, name: wasmRuntime.Name, runtimeFrameworkVersion: null));
+
+                case R2RRuntime r2rRuntime:
+                    if (r2rRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized)
+                        return GetToolchain(r2rRuntime.RuntimeMoniker);
+
+                    return CsProjCoreToolchain.From(new NetCoreAppSettings(r2rRuntime.MsBuildMoniker, null, r2rRuntime.Name));
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
@@ -205,6 +212,18 @@ namespace BenchmarkDotNet.Toolchains
 
                 case RuntimeMoniker.Mono11_0:
                     return MonoToolchain.Mono11_0;
+
+                case RuntimeMoniker.R2R80:
+                    return R2RToolchain.R2R80;
+
+                case RuntimeMoniker.R2R90:
+                    return R2RToolchain.R2R90;
+
+                case RuntimeMoniker.R2R10_0:
+                    return R2RToolchain.R2R10_0;
+
+                case RuntimeMoniker.R2R11_0:
+                    return R2RToolchain.R2R11_0;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
