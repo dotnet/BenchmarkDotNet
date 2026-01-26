@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommand(string cliPath, string filePath, string tfm, string? arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable>? environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
-            CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
+            CliPath = cliPath.IsBlank() ? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value : cliPath;
             Arguments = arguments;
             FilePath = filePath;
             TargetFrameworkMoniker = tfm;
