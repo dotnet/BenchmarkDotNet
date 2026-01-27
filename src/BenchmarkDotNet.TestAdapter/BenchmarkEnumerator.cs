@@ -38,6 +38,26 @@ namespace BenchmarkDotNet.TestAdapter
                     }
                 }
 
+                if (eventArgs.Name.StartsWith("System.Collections.Immutable, Version="))
+                {
+                    var baseDir = Path.GetDirectoryName(assemblyPath);
+                    var path = Path.Combine(baseDir, "System.Collections.Immutable.dll");
+                    if (File.Exists(path))
+                    {
+                        return Assembly.LoadFrom(path);
+                    }
+                }
+
+                if (eventArgs.Name.StartsWith("System.Memory, Version="))
+                {
+                    var baseDir = Path.GetDirectoryName(assemblyPath);
+                    var path = Path.Combine(baseDir, "System.Memory.dll");
+                    if (File.Exists(path))
+                    {
+                        return Assembly.LoadFrom(path);
+                    }
+                }
+
                 // Fallback to default assembly resolver
                 return null;
             };
