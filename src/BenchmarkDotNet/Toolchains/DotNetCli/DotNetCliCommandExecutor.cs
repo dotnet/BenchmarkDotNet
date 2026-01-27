@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = customDotNetCliPath ?? DefaultDotNetCliPath.Value,
+                FileName = customDotNetCliPath.IsBlank() ? DefaultDotNetCliPath.Value : customDotNetCliPath,
                 WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,
