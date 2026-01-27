@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "..\\BenchmarkDotNet.slnx",
+    "projects": [
+      "samples\\BenchmarkDotNet.Samples.Sandbox\\BenchmarkDotNet.Samples.Sandbox.csproj",
+      "src\\BenchmarkDotNet.Analyzers\\BenchmarkDotNet.Analyzers.csproj",
+      "src\\BenchmarkDotNet.TestAdapter\\BenchmarkDotNet.TestAdapter.csproj",
+      "src\\BenchmarkDotNet\\BenchmarkDotNet.csproj"
+    ]
+  }
+}
