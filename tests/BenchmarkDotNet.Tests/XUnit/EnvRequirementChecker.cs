@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Environments;
 using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -9,6 +10,8 @@ namespace BenchmarkDotNet.Tests.XUnit;
 
 public static class EnvRequirementChecker
 {
+    private const string MonoAotCompilerPathEnvVar = "MONOAOTLLVM_COMPILER_PATH";
+
     public static string? GetSkip(params EnvRequirement[] requirements) => requirements.Select(GetSkip).FirstOrDefault(skip => skip != null);
 
     internal static string? GetSkip(EnvRequirement requirement) => requirement switch
@@ -21,6 +24,7 @@ public static class EnvRequirementChecker
         EnvRequirement.NonFullFramework => !BdnRuntimeInformation.IsFullFramework ? null : "Non-Full .NET Framework test",
         EnvRequirement.DotNetCoreOnly => BdnRuntimeInformation.IsNetCore ? null : ".NET/.NET Core-only test",
         EnvRequirement.NeedsPrivilegedProcess => IsPrivilegedProcess() ? null : "Needs authorization to perform security-relevant functions",
+        EnvRequirement.MonoAotLlvmToolchain => IsMonoAotLlvmAvailable() ? null : $"Mono AOT LLVM toolchain not found. Set {MonoAotCompilerPathEnvVar} to the mono-sgen binary path",
         _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, "Unknown value")
     };
 
@@ -36,4 +40,10 @@ public static class EnvRequirementChecker
 
     private static bool IsArm()
         => BdnRuntimeInformation.GetCurrentPlatform() is Platform.Arm64 or Platform.Arm or Platform.Armv6;
+
+    private static bool IsMonoAotLlvmAvailable()
+    {
+        var compilerPath = Environment.GetEnvironmentVariable(MonoAotCompilerPathEnvVar);
+        return !string.IsNullOrEmpty(compilerPath) && File.Exists(compilerPath);
+    }
 }
