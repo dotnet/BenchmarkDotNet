@@ -131,5 +131,48 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                 ilBuilder.Emit(OpCodes.Starg, checked((short) position));
             }
         }
+
+        public static void EmitLdc_I4(this ILGenerator ilBuilder, int value)
+        {
+            switch (value)
+            {
+                case -1:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_M1);
+                    break;
+                case 0:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_0);
+                    break;
+                case 1:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_1);
+                    break;
+                case 2:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_2);
+                    break;
+                case 3:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_3);
+                    break;
+                case 4:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_4);
+                    break;
+                case 5:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_5);
+                    break;
+                case 6:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_6);
+                    break;
+                case 7:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_7);
+                    break;
+                case 8:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_8);
+                    break;
+                case var i when sbyte.MinValue <= i && i <= sbyte.MaxValue:
+                    ilBuilder.Emit(OpCodes.Ldc_I4_S, (sbyte) value);
+                    break;
+                default:
+                    ilBuilder.Emit(OpCodes.Ldc_I4, value);
+                    break;
+            }
+        }
     }
 }

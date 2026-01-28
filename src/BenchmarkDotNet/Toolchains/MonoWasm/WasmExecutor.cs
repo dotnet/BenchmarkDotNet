@@ -15,23 +15,22 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     internal class WasmExecutor : IExecutor
     {
-        public ExecuteResult Execute(ExecuteParameters executeParameters)
+        public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
-            if (!File.Exists(exePath))
-            {
-                return ExecuteResult.CreateFailed();
-            }
-
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+            var executeResult = !File.Exists(exePath)
+                ? ExecuteResult.CreateFailed()
+                : Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                 executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
                 executeParameters.DiagnoserRunMode);
+            return new ValueTask<ExecuteResult>(executeResult);
         }
 
         private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,

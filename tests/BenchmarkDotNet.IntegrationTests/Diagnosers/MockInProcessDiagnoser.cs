@@ -8,6 +8,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
@@ -35,7 +36,7 @@ public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDi
 
     public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
+    public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
 
     InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         => RunMode == RunMode.None

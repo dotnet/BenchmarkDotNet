@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return new NativeMemoryLogParser(traceFilePath, results.BenchmarkCase, logger, results.BuildResult.ArtifactsPaths.ProgramName).Parse();
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => etwProfiler.ValidateAsync(validationParameters);
 
         private static EtwProfilerConfig CreateDefaultConfig()
         {

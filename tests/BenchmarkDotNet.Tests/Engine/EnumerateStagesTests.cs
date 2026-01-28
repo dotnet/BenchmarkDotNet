@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
@@ -172,17 +173,18 @@ namespace BenchmarkDotNet.Tests.Engine
         private EngineParameters CreateEngineParameters(Job job)
         {
             var host = new NoAcknowledgementConsoleHost();
+            Func<long, IClock, ValueTask<ClockSpan>> emptyAction = (_, _) => new(default(ClockSpan));
             return new()
             {
-                GlobalSetupAction = () => { },
-                GlobalCleanupAction = () => { },
+                GlobalSetupAction = () => new(),
+                GlobalCleanupAction = () => new(),
                 Host = host,
-                OverheadActionUnroll = _ => { },
-                OverheadActionNoUnroll = _ => { },
-                IterationCleanupAction = () => { },
-                IterationSetupAction = () => { },
-                WorkloadActionUnroll = _ => { },
-                WorkloadActionNoUnroll = _ => { },
+                OverheadActionUnroll = emptyAction,
+                OverheadActionNoUnroll = emptyAction,
+                IterationCleanupAction = () => new(),
+                IterationSetupAction = () => new(),
+                WorkloadActionUnroll = emptyAction,
+                WorkloadActionNoUnroll = emptyAction,
                 TargetJob = job,
                 InProcessDiagnoserHandler = new([], host, Diagnosers.RunMode.None, null)
             };

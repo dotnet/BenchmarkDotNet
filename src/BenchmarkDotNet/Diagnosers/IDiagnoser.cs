@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         void DisplayResults(ILogger logger);
 
-        IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
+        IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters);
     }
 
     public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser

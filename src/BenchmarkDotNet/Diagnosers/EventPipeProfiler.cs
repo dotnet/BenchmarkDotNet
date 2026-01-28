@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {

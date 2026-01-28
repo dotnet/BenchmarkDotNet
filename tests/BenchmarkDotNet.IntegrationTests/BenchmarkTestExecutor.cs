@@ -11,6 +11,7 @@ using Xunit.Abstractions;
 using System.Collections.Generic;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Reports;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -36,10 +37,8 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        public Reports.Summary CanExecute<TBenchmark>(IConfig? config = null, bool fullValidation = true)
-        {
-            return CanExecute(typeof(TBenchmark), config, fullValidation);
-        }
+        public Summary CanExecute<TBenchmark>(IConfig? config = null, bool fullValidation = true)
+            => CanExecute(typeof(TBenchmark), config, fullValidation);
 
         /// <summary>
         /// Runs Benchmarks with the most simple config (SingleRunFastConfig)
@@ -50,7 +49,36 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        public Reports.Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true)
+        public Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true)
+        {
+            // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
+            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config));
+
+            if (fullValidation)
+            {
+                ValidateSummary(summary);
+            }
+
+            return summary;
+        }
+
+        public ValueTask<Summary> CanExecuteAsync<TBenchmark>(IConfig? config = null, bool fullValidation = true)
+            => CanExecuteAsync(typeof(TBenchmark), config, fullValidation);
+
+        public async ValueTask<Summary> CanExecuteAsync(Type type, IConfig? config = null, bool fullValidation = true)
+        {
+            // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
+            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config));
+
+            if (fullValidation)
+            {
+                ValidateSummary(summary);
+            }
+
+            return summary;
+        }
+
+        private IConfig GetMinimalConfig(IConfig? config)
         {
             // Add logging, so the Benchmark execution is in the TestRunner output (makes Debugging easier)
             if (config == null)
@@ -64,30 +92,27 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!config.GetColumnProviders().Any())
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);
 
-            // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = BenchmarkRunner.Run(type, config);
+            return config!;
+        }
 
-            if (fullValidation)
-            {
-                Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
+        private static void ValidateSummary(Summary summary)
+        {
+            Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
 
-                Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
+            Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
 
-                summary.CheckPlatformLinkerIssues();
+            summary.CheckPlatformLinkerIssues();
 
-                Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
-                    "The following benchmarks have failed to build: " +
-                    string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
+            Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
+                "The following benchmarks have failed to build: " +
+                string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
 
-                Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
-                    "The following benchmarks don't have any execution results: " +
-                    string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
+            Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
+                "The following benchmarks don't have any execution results: " +
+                string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
 
-                Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
-                    "All reports should have succeeded to execute");
-            }
-
-            return summary;
+            Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
+                "All reports should have succeeded to execute");
         }
 
         protected IConfig CreateSimpleConfig(OutputLogger? logger = null, Job? job = null)

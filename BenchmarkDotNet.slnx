@@ -8,6 +8,9 @@
     <Project Path="samples/BenchmarkDotNet.Samples.FSharp/BenchmarkDotNet.Samples.FSharp.fsproj" />
     <Project Path="samples/BenchmarkDotNet.Samples/BenchmarkDotNet.Samples.csproj" DefaultStartup="true" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/BenchmarkDotNet.Analyzers/BenchmarkDotNet.Analyzers.csproj" />
     <Project Path="src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj" />

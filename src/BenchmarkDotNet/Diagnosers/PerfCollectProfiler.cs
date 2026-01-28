@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => config.RunMode;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             if (!OsDetector.IsLinux())
             {

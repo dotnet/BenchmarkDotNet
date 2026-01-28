@@ -14,6 +14,6 @@ namespace BenchmarkDotNet.Toolchains
         IExecutor Executor { get; }
         bool IsInProcess { get; }
 
-        IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver);
+        IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver);
     }
 }

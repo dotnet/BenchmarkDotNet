@@ -26,6 +26,7 @@
     <PackageReference Include="System.IO.Hashing" Version="$(SihVersion)" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.1" />
     <!-- The Test SDK is required only for the VSTest Adapter to work -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
