@@ -1,8 +1,12 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class CompositeLogger : ILogger
+    internal class CompositeLogger : ILogger, ILinkLogger
     {
         private readonly ImmutableHashSet<ILogger> loggers;
 
