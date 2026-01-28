@@ -1,5 +1,7 @@
 #!/usr/bin/env pwsh
 
+#Requires -PSEdition Core
+
 $DotNetInstallerUri = 'https://dot.net/v1/dotnet-install.ps1';
 $BuildPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 $PSScriptRoot = Split-Path $PSScriptRoot -Parent
@@ -55,7 +57,9 @@ $GlobalJsonPath = Join-Path $SdkPath "global.json"
 if (!(Test-Path $InstallPath)) {
     New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
     $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
-    (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
+
+    curl -LsSfo $ScriptPath $DotNetInstallerUri --retry 5 --retry-delay 5
+
     & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath;
 
     # Install .NET 8 SDK
