@@ -31,5 +31,32 @@ namespace BenchmarkDotNet.Tests
             [Benchmark]
             public object FooBar() => O;
         }
+
+        // #2980
+        [Fact]
+        public void WriteOnlyPropertyDoesThrowNullReferenceException()
+        {
+            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
+                () => BenchmarkConverter.TypeToBenchmarks(typeof(ClassWithWriteOnlyProperty)));
+
+            Assert.Contains(nameof(ClassWithWriteOnlyProperty.WriteOnlyValues), exception.Message);
+            Assert.Contains("no public, accessible method/property", exception.Message);
+        }
+
+        public class ClassWithWriteOnlyProperty
+        {
+            private int _writeOnlyValue;
+
+            public int WriteOnlyValues
+            {
+                set { _writeOnlyValue = value; }
+            }
+
+            [ParamsSource(nameof(WriteOnlyValues))]
+            public int MyParam { get; set; }
+
+            [Benchmark]
+            public void Run() { }
+        }
     }
 }

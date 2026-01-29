@@ -321,7 +321,7 @@ namespace BenchmarkDotNet.Running
                     paramsSourceMethod,
                     sourceType));
 
-            var paramsSourceProperty = sourceType.GetAllProperties().FirstOrDefault(property => property.Name == sourceName && property.GetMethod.IsPublic);
+            var paramsSourceProperty = sourceType.GetAllProperties().FirstOrDefault(property => property.Name == sourceName && property.GetMethod?.IsPublic == true);
 
             if (paramsSourceProperty != default)
                 return (paramsSourceProperty, ToArray(
