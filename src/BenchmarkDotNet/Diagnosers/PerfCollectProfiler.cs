@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             EnsureSymbolsForNativeRuntime(parameters);
 
-            var traceName = GetTraceFile(parameters, extension: null).Name;
+            var traceName = GetTraceFile(parameters, extension: "").Name;
 
             var start = new ProcessStartInfo
             {
