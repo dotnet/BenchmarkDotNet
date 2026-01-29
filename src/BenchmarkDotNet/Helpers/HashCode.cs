@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+#nullable enable
+
 // Mimics System.HashCode, which is missing in NetStandard2.0.
 // Placed in root namespace to avoid ambiguous reference with System.HashCode
 
@@ -152,7 +154,7 @@ namespace BenchmarkDotNet
 
         [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes.", error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj) => throw new NotSupportedException();
+        public override bool Equals(object? obj) => throw new NotSupportedException();
 #pragma warning restore CS0809 // Obsolete member 'HashCode.GetHashCode()' overrides non-obsolete member 'object.GetHashCode()'
     }
 }

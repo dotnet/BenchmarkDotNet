@@ -8,6 +8,8 @@ using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 internal class MosCpuDetector : ICpuDetector
@@ -33,7 +35,7 @@ internal class MosCpuDetector : ICpuDetector
         {
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
             {
-                string name = moProcessor[WmicCpuInfoKeyNames.Name]?.ToString();
+                string? name = moProcessor[WmicCpuInfoKeyNames.Name]?.ToString();
                 if (name.IsNotBlank())
                 {
                     processorModelNames.Add(name);
@@ -51,7 +53,7 @@ internal class MosCpuDetector : ICpuDetector
             }
         }
 
-        string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
+        string? processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         Frequency? maxFrequencyActual = maxFrequency > 0 && processorsCount > 0
             ? Frequency.FromMHz(maxFrequency)
             : null;

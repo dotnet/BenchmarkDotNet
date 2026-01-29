@@ -4,6 +4,8 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     /// <summary>
@@ -26,7 +28,7 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI] public bool Equals(BenchmarkId other) => Value == other.Value;
 
-        public override bool Equals(object obj) => throw new InvalidOperationException("boxing");
+        public override bool Equals(object? obj) => throw new InvalidOperationException("boxing");
 
         public override int GetHashCode() => Value;
 

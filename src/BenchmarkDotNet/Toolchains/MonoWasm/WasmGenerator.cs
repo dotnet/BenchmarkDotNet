@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 GenerateProjectFile(buildPartition, artifactsPaths, aot: true, logger);
 
                 var linkDescriptionFileName = "WasmLinkerDescription.xml";
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), linkDescriptionFileName), ResourceHelper.LoadTemplate(linkDescriptionFileName));
+                File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, linkDescriptionFileName), ResourceHelper.LoadTemplate(linkDescriptionFileName));
             } else
             {
                 GenerateProjectFile(buildPartition, artifactsPaths, aot: false, logger);

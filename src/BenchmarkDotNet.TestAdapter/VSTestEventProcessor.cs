@@ -15,6 +15,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
+#nullable enable
+
 namespace BenchmarkDotNet.TestAdapter
 {
     /// <summary>
@@ -81,7 +83,7 @@ namespace BenchmarkDotNet.TestAdapter
 
                     if (buildResult.GenerateException != null)
                         testResult.ErrorMessage = $"// Generate Exception: {buildResult.GenerateException.Message}";
-                    else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string reason))
+                    else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string? reason))
                         testResult.ErrorMessage = $"// Build Error: {reason}";
                     else if (buildResult.ErrorMessage != null)
                         testResult.ErrorMessage = $"// Build Error: {buildResult.ErrorMessage}";

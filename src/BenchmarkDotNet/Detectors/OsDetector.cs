@@ -10,6 +10,8 @@ using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using System.Runtime.Versioning;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Detectors;
 
 public class OsDetector
@@ -41,7 +43,7 @@ public class OsDetector
         {
             try
             {
-                string version = LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
+                string? version = LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
                 bool wsl = IsUnderWsl();
                 return new OsInfo
                 {

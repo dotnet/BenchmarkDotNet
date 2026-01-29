@@ -3,6 +3,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters
 {
     public class MarkdownExporter : ExporterBase
@@ -22,7 +24,7 @@ namespace BenchmarkDotNet.Exporters
         protected override string FileExtension => "md";
         protected override string FileNameSuffix => $"-{Dialect.ToLower()}";
 
-        protected string Dialect { get; set; }
+        protected string Dialect { get; set; } = default!;
 
         public static readonly IExporter Default = new MarkdownExporter
         {

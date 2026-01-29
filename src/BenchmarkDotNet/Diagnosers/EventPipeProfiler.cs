@@ -18,6 +18,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.NETCore.Client;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Diagnosers
 {
     public class EventPipeProfiler : IProfiler
@@ -28,11 +30,11 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly ImmutableHashSet<EventPipeProvider> eventPipeProviders;
         private readonly bool performExtraBenchmarksRun;
 
-        private Task collectingTask;
+        private Task collectingTask = default!;
 
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
         // we use performExtraBenchmarksRun = false for better first user experience
-        public EventPipeProfiler() :this(profile: EventPipeProfile.CpuSampling, performExtraBenchmarksRun: false) { }
+        public EventPipeProfiler() : this(profile: EventPipeProfile.CpuSampling, performExtraBenchmarksRun: false) { }
 
         /// <summary>
         /// Creates a new instance of EventPipeProfiler
@@ -60,7 +62,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
+                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance)!;
 
                 if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
                 {
@@ -127,7 +129,7 @@ namespace BenchmarkDotNet.Diagnosers
             resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
         }
 
-        internal static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider> providers)
+        internal static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider>? providers)
         {
             var uniqueProviders = ImmutableHashSet.CreateBuilder<EventPipeProvider>(EventPipeProviderEqualityComparer.Instance);
 
@@ -154,7 +156,16 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal static readonly IEqualityComparer<EventPipeProvider> Instance = new EventPipeProviderEqualityComparer();
 
-            public bool Equals(EventPipeProvider x, EventPipeProvider y) => x.Name.Equals(y.Name);
+            public bool Equals(EventPipeProvider? x, EventPipeProvider? y)
+            {
+                if (ReferenceEquals(x, y))
+                    return true;
+
+                if (x is null || y is null)
+                    return false;
+
+                return x.Name.Equals(y.Name);
+            }
 
             public int GetHashCode(EventPipeProvider obj) => obj.Name.GetHashCode();
         }

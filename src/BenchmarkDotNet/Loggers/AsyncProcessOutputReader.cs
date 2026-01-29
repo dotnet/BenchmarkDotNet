@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Loggers
 {
     internal class AsyncProcessOutputReader : IDisposable
@@ -35,7 +37,7 @@ namespace BenchmarkDotNet.Loggers
             errorFinishEvent = new AutoResetEvent(false);
             status = (long)Status.Created;
             this.logOutput = logOutput;
-            this.logger = logger;
+            this.logger = logger ?? NullLogger.Instance;
             this.readStandardError = readStandardError;
         }
 

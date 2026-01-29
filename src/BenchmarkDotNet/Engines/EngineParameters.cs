@@ -10,19 +10,19 @@ namespace BenchmarkDotNet.Engines
         public static readonly IResolver DefaultResolver = new CompositeResolver(BenchmarkRunnerClean.DefaultResolver, EngineResolver.Instance);
 
         public IResolver Resolver { get; set; } = DefaultResolver;
-        public IHost Host { get; set; }
-        public Action<long> WorkloadActionNoUnroll { get; set; }
-        public Action<long> WorkloadActionUnroll { get; set; }
-        public Action<long> OverheadActionNoUnroll { get; set; }
-        public Action<long> OverheadActionUnroll { get; set; }
+        public required IHost Host { get; set; }
+        public required Action<long> WorkloadActionNoUnroll { get; set; }
+        public required Action<long> WorkloadActionUnroll { get; set; }
+        public required Action<long> OverheadActionNoUnroll { get; set; }
+        public required Action<long> OverheadActionUnroll { get; set; }
         public Job TargetJob { get; set; } = Job.Default;
         public long OperationsPerInvoke { get; set; } = 1;
-        public Action GlobalSetupAction { get; set; }
-        public Action GlobalCleanupAction { get; set; }
-        public Action IterationSetupAction { get; set; }
-        public Action IterationCleanupAction { get; set; }
+        public required Action GlobalSetupAction { get; set; }
+        public required Action GlobalCleanupAction { get; set; }
+        public required Action IterationSetupAction { get; set; }
+        public required Action IterationCleanupAction { get; set; }
         public bool RunExtraIteration { get; set; }
-        public string BenchmarkName { get;  set; }
-        public Diagnosers.CompositeInProcessDiagnoserHandler InProcessDiagnoserHandler { get; set; }
+        public required string BenchmarkName { get;  set; }
+        public required Diagnosers.CompositeInProcessDiagnoserHandler InProcessDiagnoserHandler { get; set; }
     }
 }

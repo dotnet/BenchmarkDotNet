@@ -7,6 +7,8 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
+#nullable enable
+
 internal static class PowershellWmiCpuInfoParser
 {
     internal static CpuInfo Parse(string powershellWmiOutput)
@@ -22,23 +24,23 @@ internal static class PowershellWmiCpuInfoParser
         List<Dictionary<string, string>> processors = SectionsHelper.ParseSectionsForPowershellWmi(powershellWmiOutput, ':');
         foreach (Dictionary<string, string> processor in processors)
         {
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string numberOfCoresValue) &&
+            if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out string? numberOfCoresValue) &&
                 int.TryParse(numberOfCoresValue, out int numberOfCores) &&
                 numberOfCores > 0)
                 physicalCoreCount += numberOfCores;
 
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfLogicalProcessors, out string numberOfLogicalValue) &&
+            if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfLogicalProcessors, out string? numberOfLogicalValue) &&
                 int.TryParse(numberOfLogicalValue, out int numberOfLogical) &&
                 numberOfLogical > 0)
                 logicalCoreCount += numberOfLogical;
 
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.Name, out string name))
+            if (processor.TryGetValue(WmicCpuInfoKeyNames.Name, out string? name))
             {
                 processorModelNames.Add(name);
                 processorCount++;
             }
 
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue)
+            if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string? frequencyValue)
                 && double.TryParse(frequencyValue, out double frequency)
                 && frequency > 0)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -53,17 +54,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return Path.Combine(parent.FullName, programName);
         }
 
-        internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
+        internal static bool GetSolutionRootDirectory([NotNullWhen(true)] out DirectoryInfo? directoryInfo)
         {
             return GetRootDirectory(IsRootSolutionFolder, out directoryInfo);
         }
 
-        internal static bool GetProjectRootDirectory(out DirectoryInfo directoryInfo)
+        internal static bool GetProjectRootDirectory([NotNullWhen(true)] out DirectoryInfo? directoryInfo)
         {
             return GetRootDirectory(IsRootProjectFolder, out directoryInfo);
         }
 
-        internal static bool GetRootDirectory(Func<DirectoryInfo, bool> condition, out DirectoryInfo? directoryInfo)
+        internal static bool GetRootDirectory(Func<DirectoryInfo, bool> condition, [NotNullWhen(true)] out DirectoryInfo? directoryInfo)
         {
             directoryInfo = null;
             try

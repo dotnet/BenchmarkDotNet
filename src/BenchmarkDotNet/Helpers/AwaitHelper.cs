@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     public static class AwaitHelper
@@ -13,7 +15,7 @@ namespace BenchmarkDotNet.Helpers
         {
             // We use thread static field so that each thread uses its own individual callback and reset event.
             [ThreadStatic]
-            private static ValueTaskWaiter ts_current;
+            private static ValueTaskWaiter? ts_current;
             internal static ValueTaskWaiter Current => ts_current ??= new ValueTaskWaiter();
 
             // We cache the callback to prevent allocations for memory diagnoser.
@@ -76,14 +78,14 @@ namespace BenchmarkDotNet.Helpers
             return awaiter.GetResult();
         }
 
-        internal static MethodInfo GetGetResultMethod(Type taskType)
+        internal static MethodInfo? GetGetResultMethod(Type taskType)
         {
             if (!taskType.IsGenericType)
             {
-                return typeof(AwaitHelper).GetMethod(nameof(AwaitHelper.GetResult), BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null);
+                return typeof(AwaitHelper).GetMethod(nameof(AwaitHelper.GetResult), BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null)!;
             }
 
-            Type compareType = taskType.GetGenericTypeDefinition() == typeof(ValueTask<>) ? typeof(ValueTask<>)
+            Type? compareType = taskType.GetGenericTypeDefinition() == typeof(ValueTask<>) ? typeof(ValueTask<>)
                 : typeof(Task).IsAssignableFrom(taskType.GetGenericTypeDefinition()) ? typeof(Task<>)
                 : null;
             if (compareType == null)
@@ -91,9 +93,9 @@ namespace BenchmarkDotNet.Helpers
                 return null;
             }
             var resultType = taskType
-                .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
+                .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
                 .ReturnType
-                .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
+                .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!
                 .ReturnType;
             return typeof(AwaitHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m =>

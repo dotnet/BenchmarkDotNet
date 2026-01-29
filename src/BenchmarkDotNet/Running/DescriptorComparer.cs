@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Order;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     internal class DescriptorComparer : IComparer<Descriptor>
@@ -17,11 +19,12 @@ namespace BenchmarkDotNet.Running
             this.methodOrderPolicy = methodOrderPolicy;
         }
 
-        public int Compare(Descriptor x, Descriptor y)
+        public int Compare(Descriptor? x, Descriptor? y)
         {
-            if (x == null && y == null) return 0;
-            if (x != null && y == null) return 1;
-            if (x == null) return -1;
+            if (ReferenceEquals(x, y)) return 0;
+            if (x is null) return -1;
+            if (y is null) return 1;
+
             switch (methodOrderPolicy)
             {
                 case MethodOrderPolicy.Alphabetical:

@@ -4,6 +4,8 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     public class SetupCleanupValidator : IValidator
@@ -48,7 +50,7 @@ namespace BenchmarkDotNet.Validators
                     }
                     else
                     {
-                        foreach (string target in attribute.Targets)
+                        foreach (string target in attribute.Targets!)
                         {
                             if (!targetCount.ContainsKey(target))
                             {

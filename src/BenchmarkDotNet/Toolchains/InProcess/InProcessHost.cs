@@ -12,6 +12,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>Host API for in-process benchmarks.</summary>
@@ -27,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="benchmarkCase">Current benchmark.</param>
         /// <param name="logger">Logger for informational output.</param>
         /// <param name="diagnoser">Diagnosers, if attached.</param>
-        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser)
+        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser? diagnoser)
         {
             if (benchmarkCase == null)
                 throw new ArgumentNullException(nameof(benchmarkCase));
@@ -72,7 +74,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void SendSignal(HostSignal hostSignal) => diagnoser?.Handle(hostSignal, diagnoserActionParameters);
+        public void SendSignal(HostSignal hostSignal) => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
 
         public void SendError(string message) => logger.WriteLine(LogKind.Error, $"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 

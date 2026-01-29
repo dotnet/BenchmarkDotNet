@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Parameters
         public IReadOnlyList<ParameterInstance> Items { get; }
         public int Count => Items.Count;
         public ParameterInstance this[int index] => Items[index];
-        public object this[string name] => Items.FirstOrDefault(item => item.Name == name)?.Value;
+        public object? this[string name] => Items.FirstOrDefault(item => item.Name == name)?.Value;
 
-        private string printInfo;
+        private string? printInfo = null;
 
         public ParameterInstances(IReadOnlyList<ParameterInstance> items)
         {
@@ -37,25 +37,40 @@ namespace BenchmarkDotNet.Parameters
 
         public ParameterInstance GetArgument(string name) => Items.Single(parameter => parameter.IsArgument && parameter.Name == name);
 
-        public bool Equals(ParameterInstances other)
+        public bool Equals(ParameterInstances? other)
         {
-            if (other.Count != Count)
-            {
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (other == null)
                 return false;
-            }
+
+            if (other.Count != Count)
+                return false;
+
+            if (Count != other.Count)
+                return false;
 
             for (int i = 0; i < Count; i++)
             {
-                if (!Items[i].Value.Equals(other[i].Value))
-                {
+                var currentItem = Items[i];
+                var otherItem = other.Items[i];
+
+                if (ReferenceEquals(currentItem, otherItem))
+                    continue;
+
+                if (currentItem is null || otherItem == null)
                     return false;
-                }
+
+                if (!currentItem.Equals(otherItem.Value))
+                    return false;
             }
 
             return true;
         }
 
-        public override bool Equals(object obj) => obj is ParameterInstances other && Equals(other);
+        public override bool Equals(object? obj) 
+            => obj is ParameterInstances other && Equals(other);
 
         public override int GetHashCode() => FolderInfo.GetHashCode();
     }

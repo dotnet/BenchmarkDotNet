@@ -18,6 +18,8 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains
 {
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
@@ -166,7 +168,7 @@ namespace BenchmarkDotNet.Toolchains
         private static string GetMonoArguments(Job job, string exePath, string args, IResolver resolver)
         {
             var arguments = job.HasValue(InfrastructureMode.ArgumentsCharacteristic)
-                ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MonoArgument>().ToArray()
+                ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver)!.OfType<MonoArgument>().ToArray()
                 : Array.Empty<MonoArgument>();
 
             // from mono --help: "Usage is: mono [options] program [program-options]"

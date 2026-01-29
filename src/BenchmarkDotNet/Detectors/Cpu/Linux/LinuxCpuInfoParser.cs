@@ -10,6 +10,8 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;
 
+#nullable enable
+
 internal static class LinuxCpuInfoParser
 {
     private static class ProcCpu
@@ -42,27 +44,27 @@ internal static class LinuxCpuInfoParser
         var logicalCores = SectionsHelper.ParseSections(cpuInfo, ':');
         foreach (var logicalCore in logicalCores)
         {
-            if (logicalCore.TryGetValue(ProcCpu.PhysicalId, out string physicalId) &&
-                logicalCore.TryGetValue(ProcCpu.CpuCores, out string cpuCoresValue) &&
+            if (logicalCore.TryGetValue(ProcCpu.PhysicalId, out var physicalId) &&
+                logicalCore.TryGetValue(ProcCpu.CpuCores, out var cpuCoresValue) &&
                 int.TryParse(cpuCoresValue, out int cpuCoreCount) &&
                 cpuCoreCount > 0)
                 processorsToPhysicalCoreCount[physicalId] = cpuCoreCount;
 
-            if (logicalCore.TryGetValue(ProcCpu.ModelName, out string modelName))
+            if (logicalCore.TryGetValue(ProcCpu.ModelName, out var modelName))
             {
                 processorModelNames.Add(modelName);
                 logicalCoreCount++;
             }
 
-            if (logicalCore.TryGetValue(ProcCpu.MaxFrequency, out string maxCpuFreqValue) &&
+            if (logicalCore.TryGetValue(ProcCpu.MaxFrequency, out var maxCpuFreqValue) &&
                 Frequency.TryParseMHz(maxCpuFreqValue.Replace(',', '.'), out Frequency maxCpuFreq)
                 && maxCpuFreq > 0)
             {
                 maxFrequency = Math.Max(maxFrequency, maxCpuFreq.ToMHz());
             }
 
-            bool nominalFrequencyHasValue = logicalCore.TryGetValue(ProcCpu.NominalFrequency, out string nominalFreqValue);
-            bool nominalFrequencyBackupHasValue = logicalCore.TryGetValue(ProcCpu.NominalFrequencyBackup, out string nominalFreqBackupValue);
+            bool nominalFrequencyHasValue = logicalCore.TryGetValue(ProcCpu.NominalFrequency, out var nominalFreqValue);
+            bool nominalFrequencyBackupHasValue = logicalCore.TryGetValue(ProcCpu.NominalFrequencyBackup, out var nominalFreqBackupValue);
 
             double nominalCpuFreq = 0.0;
             double nominalCpuBackupFreq = 0.0;
@@ -115,7 +117,7 @@ internal static class LinuxCpuInfoParser
             }
         }
 
-        string processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
+        string? processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
         int? physicalProcessorCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Count : null;
         int? physicalCoreCount = processorsToPhysicalCoreCount.Count > 0 ? processorsToPhysicalCoreCount.Values.Sum() : coresPerSocket;
 
