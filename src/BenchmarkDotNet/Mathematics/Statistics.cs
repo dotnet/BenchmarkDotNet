@@ -159,25 +159,5 @@ namespace BenchmarkDotNet.Mathematics
                 throw new DivideByZeroException();
             return MulMean(x, yInvert);
         }
-
-        public static Statistics Divide(Statistics x, Statistics y)
-        {
-            if (x.N < 1)
-                throw new ArgumentOutOfRangeException(nameof(x), "Argument doesn't contain any values");
-            if (y.N < 1)
-                throw new ArgumentOutOfRangeException(nameof(y), "Argument doesn't contain any values");
-
-            double[]? z = new double[x.N * y.N];
-            int k = 0;
-            for (int i = 0; i < x.N; i++)
-            for (int j = 0; j < y.N; j++)
-            {
-                if (Math.Abs(y.Sample.Values[j]) < 1e-9)
-                    throw new DivideByZeroException($"y[{j}] is {y.Sample.Values[j]}");
-                z[k++] = x.Sample.Values[i] / y.Sample.Values[j];
-            }
-
-            return new Statistics(z);
-        }
     }
 }
