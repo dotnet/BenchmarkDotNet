@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace BenchmarkDotNet.TestAdapter;
 
@@ -138,7 +139,8 @@ internal class TestCaseFilter
                     return false;
                 }
 
-                throw e.InnerException ?? e;
+                ExceptionDispatchInfo.Capture(e.InnerException ?? e).Throw();
+                return default!;// It's required to suppress error CS0161.
             }
         }
     }

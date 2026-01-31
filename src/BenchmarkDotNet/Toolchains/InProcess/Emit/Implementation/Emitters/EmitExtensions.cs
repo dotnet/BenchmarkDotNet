@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.ExceptionServices;
 
 #nullable enable
 
@@ -34,7 +35,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
             catch (TargetInvocationException wrappedByReflection)
             {
-                throw wrappedByReflection.InnerException ?? wrappedByReflection;
+                var ex = wrappedByReflection.InnerException ?? wrappedByReflection;
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                return default!;// It's required to suppress error CS0161.
             }
         }
     }
