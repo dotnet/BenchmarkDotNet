@@ -399,9 +399,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
 
             return TargetFrameworkMoniker == other.TargetFrameworkMoniker
-                        && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
-                        && CliPath == other.CliPath
-                        && PackagesPath == other.PackagesPath;
+                && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
+                && CliPath == other.CliPath
+                && PackagesPath == other.PackagesPath;
         }
 
         public override int GetHashCode()

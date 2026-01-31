@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Parameters
                 case IFormattable formattable:
                     return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth).EscapeSpecialCharacters(false);
                 // no trimming for types!
-                case Type type :
+                case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type)!.GetDisplayName()}?" : type.GetDisplayName();
                 default:
                     return Trim(value.ToString()!, maxParameterColumnWidth).EscapeSpecialCharacters(false);
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Parameters
             var takeFromStart = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
             var takeFromEnd = takeFromStart;
 
-            if (IsFirstCharInSurrogatePair(value[takeFromStart-1]))
+            if (IsFirstCharInSurrogatePair(value[takeFromStart - 1]))
             {
                 takeFromStart = Math.Max(0, takeFromStart - 1);
             }

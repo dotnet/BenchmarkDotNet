@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Parameters
                 if (ReferenceEquals(currentItem, otherItem))
                     continue;
 
-                if (currentItem is null || otherItem == null)
+                if (currentItem is null || otherItem is null)
                     return false;
 
                 if (!currentItem.Equals(otherItem.Value))
