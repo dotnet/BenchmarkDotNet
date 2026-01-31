@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static bool IsNullOrEmpty<T>([NotNullWhen(true)] this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
+        public static bool IsNullOrEmpty<T>([NotNullWhen(false)] this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
         public static bool IsEmpty<T>(this IEnumerable<T> value) => !value.Any();
 

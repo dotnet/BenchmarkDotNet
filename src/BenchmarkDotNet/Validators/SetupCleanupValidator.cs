@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Validators
                     }
                     else
                     {
-                        foreach (string target in attribute.Targets!)
+                        foreach (string target in attribute.Targets)
                         {
                             if (!targetCount.ContainsKey(target))
                             {
