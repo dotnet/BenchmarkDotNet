@@ -211,7 +211,6 @@ namespace BenchmarkDotNet.Extensions
                 .Select(x => x!.Value)
                 .ToArray();
 
-            // Helper method to create valkue tuple. It returns null if attribute is null.
             static (string Name, TAttribute Attribute, bool IsStatic, Type MemberType)?
                 Create(string name, TAttribute? attribute, bool isStatic, Type memberType)
             {
