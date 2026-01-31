@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Validators
 {
     [UsedImplicitly]
@@ -19,7 +21,7 @@ namespace BenchmarkDotNet.Validators
                 yield return validationError;
             }
 
-            var inlineableBenchmarks = benchmarkInstance.GetType().BaseType
+            var inlineableBenchmarks = benchmarkInstance.GetType().BaseType!
                 .GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public)
                 .Where(method => method.HasAttribute<BenchmarkAttribute>() && !method.MethodImplementationFlags.HasFlag(MethodImplAttributes.NoInlining));
             foreach (var benchmark in inlineableBenchmarks)

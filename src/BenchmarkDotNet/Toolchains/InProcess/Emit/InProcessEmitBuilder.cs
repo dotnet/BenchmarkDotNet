@@ -5,6 +5,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Results;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitBuilder : IBuilder
@@ -28,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             // HACK: use custom artifacts path class to pass the generated assembly.
             return BuildResult.Success(
                 GenerateResult.Success(
-                    new InProcessEmitArtifactsPath(assembly, generateResult.ArtifactsPaths),
+                    new InProcessEmitArtifactsPath(assembly!, generateResult.ArtifactsPaths),
                     generateResult.ArtifactsToCleanup));
         }
     }

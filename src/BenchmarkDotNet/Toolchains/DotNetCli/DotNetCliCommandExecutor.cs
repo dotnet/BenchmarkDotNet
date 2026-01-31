@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static string? GetDotNetSdkVersion()
+        internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) })
             using (new ConsoleExitHandler(process, NullLogger.Instance))
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 }
                 catch (Win32Exception) // dotnet cli is not installed
                 {
-                    return null;
+                    return "";
                 }
 
                 string output = process.StandardOutput.ReadToEnd();
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
                 return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
-                    .FirstOrDefault(line => line.IsNotBlank());
+                    .FirstOrDefault(line => line.IsNotBlank()) ?? "";
             }
         }
 

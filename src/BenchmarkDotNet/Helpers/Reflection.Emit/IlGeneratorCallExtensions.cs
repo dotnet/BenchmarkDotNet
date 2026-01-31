@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal static class IlGeneratorCallExtensions
@@ -27,7 +29,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
         public static void EmitInstanceCallThisValueOnStack(
             this ILGenerator ilBuilder,
-            LocalBuilder optionalLocalThis,
+            LocalBuilder? optionalLocalThis,
             MethodInfo methodToCall,
             IEnumerable<LocalBuilder> argLocals,
             bool forceDirectCall = false)
@@ -62,7 +64,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
         private static void EmitCallCore(
             this ILGenerator ilBuilder,
-            LocalBuilder optionalLocalThis,
+            LocalBuilder? optionalLocalThis,
             MethodInfo methodToCall,
             IEnumerable<LocalBuilder> argLocals,
             bool forceDirectCall = false)

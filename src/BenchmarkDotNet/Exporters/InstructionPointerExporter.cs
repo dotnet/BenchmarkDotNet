@@ -10,6 +10,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters
 {
     internal class InstructionPointerExporter : IExporter
@@ -52,7 +54,7 @@ namespace BenchmarkDotNet.Exporters
             string filePath = Path.Combine(summary.ResultsDirectoryPath,
                                             $"{FolderNameHelper.ToFolderName(benchmarkCase.Descriptor.Type)}." +
                                             $"{benchmarkCase.Descriptor.WorkloadMethod.Name}." +
-                                            $"{GetShortRuntimeInfo(summary[benchmarkCase].GetRuntimeInfo())}.counters.html");
+                                            $"{GetShortRuntimeInfo(summary[benchmarkCase]!.GetRuntimeInfo()!)}.counters.html");
 
             filePath.DeleteFileIfExists();
 
@@ -291,15 +293,15 @@ namespace BenchmarkDotNet.Exporters
 
         private class CodeWithCounters
         {
-            internal SourceCode Code { get; set; }
-            internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
+            internal required SourceCode Code { get; set; }
+            internal required IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
         }
 
         private class MethodWithCounters
         {
-            internal DisassembledMethod Method { get; set; }
-            internal IReadOnlyList<IReadOnlyList<CodeWithCounters>> Instructions { get; set; }
-            internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
+            internal required DisassembledMethod Method { get; set; }
+            internal required IReadOnlyList<IReadOnlyList<CodeWithCounters>> Instructions { get; set; }
+            internal required IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
 
             internal bool HasCounters => SumPerCounter.Values.Any(value => value != default);
         }

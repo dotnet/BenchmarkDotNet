@@ -15,6 +15,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Extensions
 {
     // we need it public to reuse it in the auto-generated dll
@@ -241,7 +243,7 @@ namespace BenchmarkDotNet.Extensions
                 processOutputReader.CancelRead();
                 consoleExitHandler.KillProcessTree();
 
-                return (process.HasExited ? process.ExitCode : -1, default);
+                return (process.HasExited ? process.ExitCode : -1, "");
             }
 
             processOutputReader.StopRead();
@@ -260,7 +262,7 @@ namespace BenchmarkDotNet.Extensions
                 CreateNoWindow = true
             };
 
-            using (var process = Process.Start(startInfo))
+            using (var process = Process.Start(startInfo)!)
             {
                 if (!process.WaitForExit((int)timeout.TotalMilliseconds))
                     process.Kill();

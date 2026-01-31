@@ -18,6 +18,8 @@ using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
@@ -56,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
             string directoryName = assemblyLocation.IsEmpty() ?
                 Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin") :
-                Path.GetDirectoryName(buildPartition.AssemblyLocation);
+                Path.GetDirectoryName(buildPartition.AssemblyLocation)!;
 
             return Path.Combine(directoryName, programName);
         }
@@ -117,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
 
         private static string GetDllGathererPath(string filePath)
-            => Path.Combine(Path.GetDirectoryName(filePath), $"DllGatherer{Path.GetExtension(filePath)}");
+            => Path.Combine(Path.GetDirectoryName(filePath)!, $"DllGatherer{Path.GetExtension(filePath)}");
 
         protected void GatherReferences(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
@@ -125,12 +127,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // We can't just build the original project directly because it could be a library project, so we need an exe project to reference it.
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(GenerateBuildProject(buildPartition, artifactsPaths, logger));
-            var projectElement = xmlDoc.DocumentElement;
+            var projectElement = xmlDoc.DocumentElement!;
 
             // Replace the default C# file with an empty Main method to satisfy the exe build.
-            var compileNode = projectElement.SelectSingleNode("ItemGroup/Compile");
+            var compileNode = projectElement.SelectSingleNode("ItemGroup/Compile")!;
             string emptyMainFile = GetDllGathererPath(artifactsPaths.ProgramCodePath);
-            compileNode.Attributes["Include"].Value = emptyMainFile;
+            compileNode.Attributes!["Include"]!.Value = emptyMainFile;
             string gathererProject = GetDllGathererPath(artifactsPaths.ProjectFilePath);
             xmlDoc.Save(gathererProject);
 
@@ -162,7 +164,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!buildResult.IsBuildSuccess)
             {
-                if (!buildResult.TryToExplainFailureReason(out string reason))
+                if (!buildResult.TryToExplainFailureReason(out string? reason))
                 {
                     reason = buildResult.ErrorMessage;
                 }
@@ -175,7 +177,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             xmlDoc = new XmlDocument();
             xmlDoc.Load(artifactsPaths.ProjectFilePath);
-            projectElement = xmlDoc.DocumentElement;
+            projectElement = xmlDoc.DocumentElement!;
             var itemGroup = xmlDoc.CreateElement("ItemGroup");
             projectElement.AppendChild(itemGroup);
             foreach (var assemblyFile in Directory.GetFiles(artifactsPaths.BinariesDirectoryPath, "*.dll"))
@@ -194,7 +196,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // We still need to preserve the ProjectReference in every other case for disassembly, though.
             if (XUnitHelper.IsIntegrationTest.Value && this is MonoGenerator)
             {
-                projectElement.RemoveChild(projectElement.SelectSingleNode("ItemGroup/ProjectReference").ParentNode);
+                projectElement.RemoveChild(projectElement.SelectSingleNode("ItemGroup/ProjectReference")!.ParentNode!);
             }
 
             xmlDoc.Save(artifactsPaths.ProjectFilePath);
@@ -229,7 +231,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 </PropertyGroup>", DefaultSdkName);
             }
 
-            XmlElement projectElement = xmlDoc.DocumentElement;
+            XmlElement projectElement = xmlDoc.DocumentElement!;
             // custom SDKs are not added for non-netcoreapp apps (like net471), so when the TFM != netcoreapp we dont parse "<Import Sdk="
             // we don't allow for that mostly to prevent from edge cases like the following
             // <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.0'"/>
@@ -291,7 +293,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             return (string.Join(Environment.NewLine + Environment.NewLine, customSettings), sdkName);
         }
 
-        private static void GetSettingsThatNeedToBeCopied(XmlElement projectElement, ref XmlDocument itemGroupsettings, ref XmlDocument propertyGroupSettings, FileInfo projectFile)
+        private static void GetSettingsThatNeedToBeCopied(XmlElement projectElement, ref XmlDocument? itemGroupsettings, ref XmlDocument? propertyGroupSettings, FileInfo projectFile)
         {
             CopyProperties(projectElement, ref itemGroupsettings, "ItemGroup");
             CopyProperties(projectElement, ref propertyGroupSettings, "PropertyGroup");
@@ -307,14 +309,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 {
                     var importXmlDoc = new XmlDocument();
                     importXmlDoc.Load(absolutePath);
-                    GetSettingsThatNeedToBeCopied(importXmlDoc.DocumentElement, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
+                    GetSettingsThatNeedToBeCopied(importXmlDoc.DocumentElement!, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
                 }
             }
         }
 
-        private static void CopyProperties(XmlElement projectElement, ref XmlDocument copyToDocument, string groupName)
+        private static void CopyProperties(XmlElement projectElement, ref XmlDocument? copyToDocument, string groupName)
         {
-            XmlElement itemGroupElement = copyToDocument?.DocumentElement;
+            XmlElement? itemGroupElement = copyToDocument?.DocumentElement;
             foreach (XmlElement groupElement in projectElement.GetElementsByTagName(groupName))
             {
                 foreach (var node in groupElement.ChildNodes)
@@ -328,7 +330,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                             copyToDocument.AppendChild(itemGroupElement);
                         }
                         XmlNode copiedNode = copyToDocument.ImportNode(setting, true);
-                        itemGroupElement.AppendChild(copiedNode);
+                        itemGroupElement!.AppendChild(copiedNode);
                     }
                 }
             }
@@ -364,7 +366,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
 
             // important assumption! project's file name === output dll name
-            string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
+            string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name!;
 
             var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
             var projectFiles = rootDirectory
@@ -386,13 +388,21 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             return projectFiles[0];
         }
 
-        public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);
+        public override bool Equals(object? obj) => obj is CsProjGenerator other && Equals(other);
 
-        public bool Equals(CsProjGenerator other)
-            => TargetFrameworkMoniker == other.TargetFrameworkMoniker
+        public bool Equals(CsProjGenerator? other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (other is null)
+                return false;
+
+            return TargetFrameworkMoniker == other.TargetFrameworkMoniker
                 && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
                 && CliPath == other.CliPath
                 && PackagesPath == other.PackagesPath;
+        }
 
         public override int GetHashCode()
             => HashCode.Combine(TargetFrameworkMoniker, RuntimeFrameworkVersion, CliPath, PackagesPath);

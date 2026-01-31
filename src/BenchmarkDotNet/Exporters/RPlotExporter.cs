@@ -10,6 +10,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters
 {
     public class RPlotExporter : IExporter, IExporterDependencies
@@ -42,7 +44,7 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            if (!TryFindRScript(consoleLogger, out string rscriptPath))
+            if (!TryFindRScript(consoleLogger, out var rscriptPath))
             {
                 yield break;
             }
@@ -86,7 +88,7 @@ namespace BenchmarkDotNet.Exporters
             string rscriptExecutable = OsDetector.IsWindows() ? "Rscript.exe" : "Rscript";
             rscriptPath = null;
 
-            string rHome = Environment.GetEnvironmentVariable("R_HOME");
+            string? rHome = Environment.GetEnvironmentVariable("R_HOME");
             if (rHome != null)
             {
                 rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
@@ -126,7 +128,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static string? FindInPath(string fileName)
         {
-            string path = Environment.GetEnvironmentVariable("PATH");
+            string? path = Environment.GetEnvironmentVariable("PATH");
             if (path == null)
                 return null;
 

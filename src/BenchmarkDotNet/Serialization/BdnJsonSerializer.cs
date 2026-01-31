@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace BenchmarkDotNet.Serialization;
 
+#nullable enable
+
 internal static class BdnJsonSerializer
 {
     private static readonly JsonSerializerOptions DefaultOptions = new()
@@ -40,7 +42,7 @@ internal static class BdnJsonSerializer
             return JsonSerializer.Serialize(item, DefaultOptions);
     }
 
-    public static T Deserialize<T>(string json)
+    public static T? Deserialize<T>(string json)
     {
         return JsonSerializer.Deserialize<T>(json, DefaultOptions);
     }

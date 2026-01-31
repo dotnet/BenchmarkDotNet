@@ -10,6 +10,8 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Engines
 {
     [UsedImplicitly]
@@ -52,7 +54,7 @@ namespace BenchmarkDotNet.Engines
                 InProcessDiagnoserHandler = engineParameters.InProcessDiagnoserHandler ?? throw new ArgumentNullException(nameof(EngineParameters.InProcessDiagnoserHandler)),
             };
 
-            Clock = TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
+            Clock = TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver)!;
             ForceGcCleanups = TargetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
             MemoryRandomization = TargetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 

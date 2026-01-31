@@ -1,8 +1,11 @@
 ﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -31,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             ),
         };
 
-        internal static bool TryToExplainFailureReason(BuildResult buildResult, out string? reason)
+        internal static bool TryToExplainFailureReason(BuildResult buildResult, [NotNullWhen(true)] out string? reason)
         {
             reason = null;
 

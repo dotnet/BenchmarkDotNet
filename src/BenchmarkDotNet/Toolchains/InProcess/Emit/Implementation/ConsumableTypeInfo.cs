@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     public class ConsumableTypeInfo
@@ -28,9 +30,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             else
             {
                 WorkloadMethodReturnType = methodReturnType
-                    .GetMethod(nameof(Task.GetAwaiter), BindingFlagsPublicInstance)
+                    .GetMethod(nameof(Task.GetAwaiter), BindingFlagsPublicInstance)!
                     .ReturnType
-                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlagsPublicInstance)
+                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlagsPublicInstance)!
                     .ReturnType;
                 GetResultMethod = Helpers.AwaitHelper.GetGetResultMethod(methodReturnType);
             }

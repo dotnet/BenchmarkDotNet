@@ -6,6 +6,8 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Extensions
 {
     internal static class CommonExtensions
@@ -23,9 +25,13 @@ namespace BenchmarkDotNet.Extensions
                 case UnitType.CodeSize:
                     return $"{column.ColumnName} [{style.CodeSizeUnit.Abbreviation}]";
                 case UnitType.Size:
-                    return $"{column.ColumnName} [{style.SizeUnit.Abbreviation}]";
+                    return style.SizeUnit != null
+                        ? $"{column.ColumnName} [{style.SizeUnit.Abbreviation}]"
+                        : $"{column.ColumnName}";
                 case UnitType.Time:
-                    return $"{column.ColumnName} [{style.TimeUnit.Abbreviation}]";
+                    return style.TimeUnit != null
+                        ? $"{column.ColumnName} [{style.TimeUnit.Abbreviation}]"
+                        : $"{column.ColumnName}";
                 case UnitType.Dimensionless:
                     return column.ColumnName;
                 default:
@@ -33,7 +39,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        public static bool IsNullOrEmpty<T>([MaybeNullWhen(true)] this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
+        public static bool IsNullOrEmpty<T>([NotNullWhen(false)] this IReadOnlyCollection<T>? value) => value == null || value.Count == 0;
         public static bool IsEmpty<T>(this IReadOnlyCollection<T> value) => value.Count == 0;
         public static bool IsEmpty<T>(this IEnumerable<T> value) => !value.Any();
 

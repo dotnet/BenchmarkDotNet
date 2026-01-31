@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -20,7 +22,7 @@ namespace BenchmarkDotNet.Helpers
                 if (res != SuccessCode)
                     return null;
 
-                return (Guid)Marshal.PtrToStructure(activeGuidPtr, typeof(Guid));
+                return (Guid?)Marshal.PtrToStructure(activeGuidPtr, typeof(Guid));
             }
         }
 
@@ -33,7 +35,7 @@ namespace BenchmarkDotNet.Helpers
                 IntPtr activeGuidPtr = IntPtr.Zero;
                 uint res = PowerGetActiveScheme(IntPtr.Zero, ref activeGuidPtr);
                 if (res != SuccessCode)
-                    return null;
+                    return "";
                 res = PowerReadFriendlyName(IntPtr.Zero, activeGuidPtr, IntPtr.Zero, IntPtr.Zero, buffer, ref buffSize);
                 if (res == ErrorMoreData)
                 {
@@ -42,7 +44,7 @@ namespace BenchmarkDotNet.Helpers
                         IntPtr.Zero, IntPtr.Zero, buffer, ref buffSize);
                 }
                 if (res != SuccessCode)
-                    return null;
+                    return "";
 
                 return buffer.ToString();
             }

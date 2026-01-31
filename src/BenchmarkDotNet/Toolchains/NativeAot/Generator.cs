@@ -200,7 +200,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             yield return GeneratedRdXmlFileName;
 
             var projectFile = GetProjectFilePath(benchmarkTarget, logger);
-            var projectFileFolder = projectFile.DirectoryName;
+            var projectFileFolder = projectFile.DirectoryName!;
             var rdXml = Path.Combine(projectFileFolder, "rd.xml");
             if (File.Exists(rdXml))
             {
@@ -234,7 +234,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 </Directives>
 ";
 
-            string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
+            string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!;
             if (directoryName != null)
                 File.WriteAllText(Path.Combine(directoryName, GeneratedRdXmlFileName), content);
             else

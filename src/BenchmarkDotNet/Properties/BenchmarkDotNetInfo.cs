@@ -3,6 +3,8 @@ using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Properties
 {
     public class BenchmarkDotNetInfo
@@ -12,8 +14,8 @@ namespace BenchmarkDotNet.Properties
         private static readonly Lazy<BenchmarkDotNetInfo> LazyInstance = new(() =>
         {
             var assembly = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly;
-            var assemblyVersion = assembly.GetName().Version;
-            string informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion ?? "";
+            var assemblyVersion = assembly.GetName().Version!;
+            string informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion ?? "";
             return new BenchmarkDotNetInfo(assemblyVersion, RemoveVersionMetadata(informationVersion));
         });
 

@@ -7,6 +7,8 @@ using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines;
 
+#nullable enable
+
 internal abstract class EngineJitStage(EngineParameters parameters) : EngineStage(IterationStage.Jitting, IterationMode.Workload, parameters)
 {
 }
@@ -90,7 +92,7 @@ internal sealed class EngineFirstJitStage : EngineJitStage
         s_tieredDelay = TimeSpan.Zero;
 
         // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
-        StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
+        StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver)!.Start();
 
         int remainingTiers = JitInfo.MaxTierPromotions;
         int lastInvokeCount = 1;

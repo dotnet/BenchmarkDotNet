@@ -62,7 +62,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             T instance,
             BenchmarkCase benchmarkCase,
             ParameterInfo argInfo,
-            int argIndex)
+            int argIndex
+        )
+            where T : notnull
         {
             var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name);
             if (argValue == null)
@@ -84,7 +86,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         public static void SetParameter<T>(
             T instance,
-            ParameterInstance paramInfo)
+            ParameterInstance paramInfo
+        )
+            where T : notnull
         {
             var instanceArg = paramInfo.IsStatic ? null : (object)instance;
             var bindingFlags = paramInfo.IsStatic ? BindingFlagsAllStatic : BindingFlagsAllInstance;
@@ -105,16 +109,19 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         }
 
         public static Action CallbackFromField<T>(T instance, string memberName)
+            where T : notnull
         {
             return GetFieldValueCore<T, Action>(instance, memberName);
         }
 
         public static Action<long> LoopCallbackFromMethod<T>(T instance, string memberName)
+            where T : notnull
         {
             return GetDelegateCore<T, Action<long>>(instance, memberName);
         }
 
         private static TResult GetFieldValueCore<T, TResult>(T instance, string memberName)
+            where T : notnull
         {
             var result = instance.GetType().GetField(
                 memberName,
@@ -126,6 +133,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         }
 
         private static TDelegate GetDelegateCore<T, TDelegate>(T instance, string memberName)
+            where T : notnull
         {
             var result = instance.GetType().GetMethod(
                 memberName,

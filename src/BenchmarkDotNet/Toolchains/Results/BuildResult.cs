@@ -2,6 +2,8 @@
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.Results
 {
     [PublicAPI]
@@ -19,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         [PublicAPI]
         public static BuildResult Success(GenerateResult generateResult)
-            => new BuildResult(generateResult, true, null);
+            => new BuildResult(generateResult, true, errorMessage: "");
 
         [PublicAPI]
         public static BuildResult Failure(GenerateResult generateResult, string errorMessage)
@@ -31,6 +33,6 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Failure");
 
-        internal bool TryToExplainFailureReason(out string reason) => MsBuildErrorMapper.TryToExplainFailureReason(this, out reason);
+        internal bool TryToExplainFailureReason(out string? reason) => MsBuildErrorMapper.TryToExplainFailureReason(this, out reason);
     }
 }

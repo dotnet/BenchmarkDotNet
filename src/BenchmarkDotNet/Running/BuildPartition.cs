@@ -15,6 +15,8 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     public class BuildPartition
@@ -47,7 +49,7 @@ namespace BenchmarkDotNet.Running
 
         public string AssemblyLocation => GetResolvedAssemblyLocation(RepresentativeBenchmarkCase.Descriptor.Type.Assembly);
 
-        public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
+        public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver)!;
 
         public Platform Platform => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.PlatformCharacteristic, Resolver);
 
@@ -76,12 +78,12 @@ namespace BenchmarkDotNet.Running
         private static string GetResolvedAssemblyLocation(Assembly assembly) =>
             // in case of SingleFile, location.Length returns 0, so we use GetName() and
             // manually construct the path.
-            assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
+            assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name!) : assembly.Location;
 
         internal static string GetProgramName(BenchmarkCase representativeBenchmarkCase, int id)
         {
             // Combine the benchmark's assembly name, folder info, and build partition id.
-            string benchmarkAssemblyName = representativeBenchmarkCase.Descriptor.Type.Assembly.GetName().Name;
+            string benchmarkAssemblyName = representativeBenchmarkCase.Descriptor.Type.Assembly.GetName().Name!;
             string folderInfo = representativeBenchmarkCase.Job.FolderInfo;
             var programName = $"{benchmarkAssemblyName}-{folderInfo}-{id}";
             // Very long program name can cause the path to exceed Windows' 260 character limit,

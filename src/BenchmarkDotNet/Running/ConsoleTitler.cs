@@ -4,6 +4,8 @@ using System.Runtime.Versioning;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     /// <summary>
@@ -18,7 +20,7 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         public bool IsEnabled { get; private set; }
 
-        private string oldConsoleTitle;
+        private string oldConsoleTitle = "";
 
         public ConsoleTitler(string initialTitle)
         {

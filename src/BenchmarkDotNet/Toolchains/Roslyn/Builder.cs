@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -14,6 +15,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
@@ -101,7 +104,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 {
                     LargeAddressAware.SetLargeAddressAware(generateResult.ArtifactsPaths.ExecutablePath);
                 }
-                return (BuildResult.Success(generateResult), default);
+                return (BuildResult.Success(generateResult), missingReference: []);
             }
 
             var compilationErrors = emitResult.Diagnostics
@@ -144,7 +147,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static string[] GetFrameworkAssembliesPaths()
         {
-            string frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            string? frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             if (frameworkAssembliesDirectory == null)
                 return Array.Empty<string>();
 
@@ -161,14 +164,14 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             => compilationErrors
                     .Where(diagnostic => diagnostic.Id == MissingReferenceError)
                     .Select(GetAssemblyName)
-                    .Where(assemblyName => assemblyName != default)
+                    .WhereNotNull()
                     .Distinct()
                     .Select(assemblyName => Assembly.Load(new AssemblyName(assemblyName)))
                     .Where(assembly => assembly != default)
                     .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                     .ToArray();
 
-        private static string GetAssemblyName(Diagnostic diagnostic)
+        private static string? GetAssemblyName(Diagnostic diagnostic)
         {
             if (diagnostic.Id != MissingReferenceError)
                 return default;

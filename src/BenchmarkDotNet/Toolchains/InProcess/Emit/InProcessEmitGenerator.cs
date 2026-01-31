@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
         private string GetExecutableExtension() => ".dll";
 
-        private string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition) => Path.GetDirectoryName(buildPartition.AssemblyLocation);
+        private string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition) => Path.GetDirectoryName(buildPartition.AssemblyLocation)!;
 
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {

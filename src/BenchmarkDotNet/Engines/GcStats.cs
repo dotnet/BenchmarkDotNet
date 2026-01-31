@@ -7,6 +7,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Engines
 {
     public struct GcStats : IEquatable<GcStats>
@@ -231,7 +233,7 @@ namespace BenchmarkDotNet.Engines
 
         public bool Equals(GcStats other) => Gen0Collections == other.Gen0Collections && Gen1Collections == other.Gen1Collections && Gen2Collections == other.Gen2Collections && AllocatedBytes == other.AllocatedBytes && TotalOperations == other.TotalOperations;
 
-        public override bool Equals(object obj) => obj is GcStats other && Equals(other);
+        public override bool Equals(object? obj) => obj is GcStats other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(Gen0Collections, Gen1Collections, Gen2Collections, AllocatedBytes, TotalOperations);
 
@@ -240,11 +242,11 @@ namespace BenchmarkDotNet.Engines
         private static class GcHelpers
         {
             // do not reorder these, CheckMonitoringTotalAllocatedMemorySize relies on GetTotalAllocatedBytesDelegate being initialized first
-            public static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
-            public static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
+            public static readonly Func<bool, long>? GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
+            public static readonly Func<long>? GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
             public static readonly bool CanUseMonitoringTotalAllocatedMemorySize = CheckMonitoringTotalAllocatedMemorySize();
 
-            private static Func<bool, long> CreateGetTotalAllocatedBytesDelegate()
+            private static Func<bool, long>? CreateGetTotalAllocatedBytesDelegate()
             {
                 try
                 {
@@ -266,7 +268,7 @@ namespace BenchmarkDotNet.Engines
                 }
             }
 
-            private static Func<long> CreateGetAllocatedBytesForCurrentThreadDelegate()
+            private static Func<long>? CreateGetAllocatedBytesForCurrentThreadDelegate()
             {
                 try
                 {

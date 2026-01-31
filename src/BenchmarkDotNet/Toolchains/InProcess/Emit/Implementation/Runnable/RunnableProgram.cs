@@ -6,6 +6,8 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal class RunnableProgram
@@ -48,9 +50,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private static MethodInfo GetRunCallback(
             BenchmarkId benchmarkId, Assembly partitionAssembly)
         {
-            var runnableType = partitionAssembly.GetType(GetRunnableTypeName(benchmarkId));
+            var runnableType = partitionAssembly.GetType(GetRunnableTypeName(benchmarkId))!;
 
-            var runnableMethod = runnableType.GetMethod(RunMethodName, BindingFlagsPublicStatic);
+            var runnableMethod = runnableType.GetMethod(RunMethodName, BindingFlagsPublicStatic)!;
 
             return runnableMethod;
         }

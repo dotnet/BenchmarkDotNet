@@ -34,8 +34,8 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly DateTime creationTime = DateTime.Now;
         private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new();
         private readonly HashSet<string> cliPathWithSymbolsInstalled = new();
-        private FileInfo perfCollectFile;
-        private Process perfCollectProcess;
+        private FileInfo perfCollectFile = default!;
+        private Process perfCollectProcess = default!;
 
         [PublicAPI]
         public PerfCollectProfiler(PerfCollectProfilerConfig config) => this.config = config;
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
             else
             {
-                (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install -force", perfCollectFile.Directory.FullName, null, includeErrors: true, logger);
+                (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install -force", perfCollectFile.Directory!.FullName, null, includeErrors: true, logger);
 
                 if (exitCode == 0)
                 {
@@ -147,10 +147,10 @@ namespace BenchmarkDotNet.Diagnosers
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
-                WorkingDirectory = perfCollectFile.Directory.FullName
+                WorkingDirectory = perfCollectFile.Directory!.FullName
             };
 
-            return Process.Start(start);
+            return Process.Start(start)!;
         }
 
         private void StopCollection(DiagnoserActionParameters parameters)
@@ -213,10 +213,10 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             string sdkPath = DotNetCliCommandExecutor.GetSdkPath(cliPath); // /usr/share/dotnet/sdk/
-            string dotnetPath = Path.GetDirectoryName(sdkPath); // /usr/share/dotnet/
+            string dotnetPath = Path.GetDirectoryName(sdkPath)!; // /usr/share/dotnet/
             string[] missingSymbols = Directory.GetFiles(dotnetPath, "lib*.so", SearchOption.AllDirectories)
                 .Where(nativeLibPath => !nativeLibPath.Contains("FallbackFolder") && !File.Exists(Path.ChangeExtension(nativeLibPath, "so.dbg")))
-                .Select(Path.GetDirectoryName)
+                .Select(x => Path.GetDirectoryName(x)!)
                 .Distinct()
                 .ToArray();
 
