@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} this.__fieldsContainer.__argField{index}")
+                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} this.__fieldsContainer.argField{index}")
             );
     }
 
@@ -166,7 +166,7 @@ namespace BenchmarkDotNet.Code
                     .Select((parameter, index) =>
                     {
                         var refModifier = parameter.ParameterType.IsByRef ? "ref" : string.Empty;
-                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.__fieldsContainer.__argField{index};";
+                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.__fieldsContainer.argField{index};";
                     })
             );
 

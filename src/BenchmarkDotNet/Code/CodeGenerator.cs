@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Code
         private static string GetDeclareFieldsContainer(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, string[] extraFields)
         {
             var fields = benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} __argField{index};")
+                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} argField{index};")
                 .Concat(extraFields)
                 .ToArray();
 
@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"this.__fieldsContainer.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name!).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
+                    .Select((parameter, index) => $"this.__fieldsContainer.argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name!).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
