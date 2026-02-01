@@ -258,71 +258,76 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private void EmitFields()
         {
-            /*
-                private unsafe struct FieldsContainer
-                {
-                }
-            */
-            var fieldsContainerBuilder = runnableBuilder.DefineNestedType(
-                "FieldsContainer",
-                TypeAttributes.NestedPrivate | TypeAttributes.AutoLayout | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
-                typeof(ValueType));
-            nestedTypeBuilders.Add(fieldsContainerBuilder);
-
-            // Define arg fields
-            foreach (var parameter in Descriptor.WorkloadMethod.GetParameters())
+            var parameters = Descriptor.WorkloadMethod.GetParameters();
+            if (parameters.Length + GetExtraFieldsCount() > 0)
             {
-                var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name!);
-                var parameterType = parameter.ParameterType;
+                /*
+                    private unsafe struct FieldsContainer
+                    {
+                    }
+                */
+                var fieldsContainerBuilder = runnableBuilder.DefineNestedType(
+                    "FieldsContainer",
+                    TypeAttributes.NestedPrivate | TypeAttributes.AutoLayout | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
+                    typeof(ValueType));
+                nestedTypeBuilders.Add(fieldsContainerBuilder);
 
-                Type argLocalsType;
-                Type argFieldType;
-                MethodInfo? opConversion = null;
-                if (parameterType.IsByRef)
+                // Define arg fields
+                foreach (var parameter in parameters)
                 {
-                    argLocalsType = parameterType;
-                    argFieldType = argLocalsType.GetElementType()
-                        ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
+                    var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name!);
+                    var parameterType = parameter.ParameterType;
+
+                    Type argLocalsType;
+                    Type argFieldType;
+                    MethodInfo? opConversion = null;
+                    if (parameterType.IsByRef)
+                    {
+                        argLocalsType = parameterType;
+                        argFieldType = argLocalsType.GetElementType()
+                            ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
+                    }
+                    else if (parameterType.IsByRefLike() && argValue.Value != null)
+                    {
+                        argLocalsType = parameterType;
+
+                        // Use conversion on load; store passed value
+                        var passedArgType = argValue.Value.GetType();
+                        opConversion = GetImplicitConversionOpFromTo(passedArgType, argLocalsType)
+                            ?? throw new InvalidOperationException($"Bug: No conversion from {passedArgType} to {argLocalsType}.");
+                        argFieldType = passedArgType;
+                    }
+                    else
+                    {
+                        // No conversion; load ref to arg field;
+                        argLocalsType = parameterType;
+                        argFieldType = parameterType;
+                    }
+
+                    if (argFieldType.IsByRefLike())
+                        throw new NotSupportedException($"Passing ref readonly structs by ref is not supported (cannot store {argFieldType} as a class field).");
+
+                    var argField = fieldsContainerBuilder.DefineField(
+                        ArgFieldPrefix + parameter.Position,
+                        argFieldType,
+                        FieldAttributes.Public);
+
+                    argFields.Add(new(argField, argLocalsType, opConversion));
                 }
-                else if (parameterType.IsByRefLike() && argValue.Value != null)
-                {
-                    argLocalsType = parameterType;
 
-                    // Use conversion on load; store passed value
-                    var passedArgType = argValue.Value.GetType();
-                    opConversion = GetImplicitConversionOpFromTo(passedArgType, argLocalsType) ??
-                        throw new InvalidOperationException($"Bug: No conversion from {passedArgType} to {argLocalsType}.");
-                    argFieldType = passedArgType;
-                }
-                else
-                {
-                    // No conversion; load ref to arg field;
-                    argLocalsType = parameterType;
-                    argFieldType = parameterType;
-                }
+                EmitExtraFields(fieldsContainerBuilder);
 
-                if (argFieldType.IsByRefLike())
-                    throw new NotSupportedException(
-                        $"Passing ref readonly structs by ref is not supported (cannot store {argFieldType} as a class field).");
-
-                var argField = fieldsContainerBuilder.DefineField(
-                    ArgFieldPrefix + parameter.Position,
-                    argFieldType,
-                    FieldAttributes.Public);
-
-                argFields.Add(new(argField, argLocalsType, opConversion));
+                // private FieldsContainer __fieldsContainer;
+                fieldsContainerField = runnableBuilder.DefineField(
+                    FieldsContainerName,
+                    fieldsContainerBuilder,
+                    FieldAttributes.Private);
             }
-
-            EmitExtraFields(fieldsContainerBuilder);
-
-            // private FieldsContainer __fieldsContainer;
-            fieldsContainerField = runnableBuilder.DefineField(
-                FieldsContainerName,
-                fieldsContainerBuilder,
-                FieldAttributes.Private);
 
             notElevenField = runnableBuilder.DefineField(NotElevenFieldName, typeof(int), FieldAttributes.Public);
         }
+
+        protected virtual int GetExtraFieldsCount() => 0;
 
         protected virtual void EmitExtraFields(TypeBuilder fieldsContainerBuilder) { }
 

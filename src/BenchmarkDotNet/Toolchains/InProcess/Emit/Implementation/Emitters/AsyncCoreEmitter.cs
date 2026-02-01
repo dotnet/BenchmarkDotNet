@@ -24,6 +24,8 @@ partial class RunnableEmitter
         private FieldInfo clockField = null!;
         private FieldInfo invokeCountField = null!;
 
+        protected override int GetExtraFieldsCount() => 3;
+
         protected override void EmitExtraFields(TypeBuilder fieldsContainerBuilder)
         {
             base.EmitExtraFields(fieldsContainerBuilder);
