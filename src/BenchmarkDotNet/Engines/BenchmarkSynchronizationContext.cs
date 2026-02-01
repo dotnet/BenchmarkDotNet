@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,8 +38,10 @@ public readonly ref struct BenchmarkSynchronizationContext : IDisposable
 internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationContext
 {
     private readonly SynchronizationContext? previousContext;
-    private readonly Queue<(SendOrPostCallback d, object? state)> queue = new();
-    private bool isDisposed;
+    // Use 2 arrays to reduce lock contention while executing. The common case is only 1 callback will be queued at a time.
+    private (SendOrPostCallback d, object? state)[] queue = new (SendOrPostCallback d, object? state)[1];
+    private (SendOrPostCallback d, object? state)[] executing = new (SendOrPostCallback d, object? state)[1];
+    private int queueCount = 0;
     volatile private bool isCompleted;
 
     internal BenchmarkDotNetSynchronizationContext(SynchronizationContext? previousContext)
@@ -59,28 +60,38 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         {
             ThrowIfDisposed();
 
-            queue.Enqueue((d, state));
+            int index = queueCount;
+            if (++queueCount > queue.Length)
+            {
+                Array.Resize(ref queue, queue.Length * 2);
+            }
+            queue[index] = (d, state);
+
             Monitor.Pulse(queue);
         }
     }
 
-    private void ThrowIfDisposed()
-    {
-        if (isDisposed) throw new ObjectDisposedException(nameof(BenchmarkDotNetSynchronizationContext));
-    }
+    private void ThrowIfDisposed() => _ = queue ?? throw new ObjectDisposedException(nameof(BenchmarkDotNetSynchronizationContext));
 
     internal void Dispose()
     {
+        int count;
+        (SendOrPostCallback d, object? state)[] executing;
         lock (queue)
         {
             ThrowIfDisposed();
-            isDisposed = true;
 
             // Flush any remaining posted callbacks.
-            while (TryDequeue(out var callbackAndState))
-            {
-                callbackAndState.d(callbackAndState.state);
-            }
+            count = queueCount;
+            queueCount = 0;
+            executing = queue;
+            queue = null;
+        }
+        this.executing = null;
+        for (int i = 0; i < count; ++i)
+        {
+            executing[i].d(executing[i].state);
+            executing[i] = default;
         }
         SetSynchronizationContext(previousContext);
     }
@@ -132,15 +143,26 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         var spinner = new SpinWait();
         while (true)
         {
-            if (TryDequeue(out var callbackAndState))
+            int count;
+            (SendOrPostCallback d, object? state)[] executing;
+            lock (queue)
             {
-                do
-                {
-                    callbackAndState.d(callbackAndState.state);
-                }
-                while (TryDequeue(out callbackAndState));
+                count = queueCount;
+                queueCount = 0;
+                executing = queue;
+                queue = this.executing;
+            }
+            this.executing = executing;
+            for (int i = 0; i < count; ++i)
+            {
+                executing[i].d(executing[i].state);
+                executing[i] = default;
+            }
+            if (count > 0)
+            {
                 // Reset spinner after any posted callback is executed.
                 spinner = new();
+                continue;
             }
 
             if (isCompleted)
@@ -148,37 +170,19 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
                 return;
             }
 
-            if (spinner.NextSpinWillYield)
+            if (!spinner.NextSpinWillYield)
             {
-                // Yield the thread and wait for completion or for a posted callback.
-                lock (queue)
-                {
-                    Monitor.Wait(queue);
-                }
-                // Reset the spinner.
-                spinner = new();
+                spinner.SpinOnce();
                 continue;
             }
 
-            spinner.SpinOnce();
-        }
-    }
-
-    private bool TryDequeue(out (SendOrPostCallback d, object? state) callbackAndState)
-    {
-        lock (queue)
-        {
-#if NETSTANDARD2_0
-            if (queue.Count > 0)
+            // Yield the thread and wait for completion or for a posted callback.
+            lock (queue)
             {
-                callbackAndState = queue.Dequeue();
-                return true;
+                Monitor.Wait(queue);
             }
-            callbackAndState = default;
-            return false;
-#else
-            return queue.TryDequeue(out callbackAndState);
-#endif
+            // Reset the spinner.
+            spinner = new();
         }
     }
 }
