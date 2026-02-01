@@ -38,6 +38,7 @@ public readonly ref struct BenchmarkSynchronizationContext : IDisposable
 internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationContext
 {
     private readonly SynchronizationContext? previousContext;
+    private readonly object syncRoot = new();
     // Use 2 arrays to reduce lock contention while executing. The common case is only 1 callback will be queued at a time.
     private (SendOrPostCallback d, object? state)[] queue = new (SendOrPostCallback d, object? state)[1];
     private (SendOrPostCallback d, object? state)[] executing = new (SendOrPostCallback d, object? state)[1];
@@ -56,7 +57,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
     {
         if (d is null) throw new ArgumentNullException(nameof(d));
 
-        lock (queue)
+        lock (syncRoot)
         {
             ThrowIfDisposed();
 
@@ -67,7 +68,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             }
             queue[index] = (d, state);
 
-            Monitor.Pulse(queue);
+            Monitor.Pulse(syncRoot);
         }
     }
 
@@ -77,7 +78,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
     {
         int count;
         (SendOrPostCallback d, object? state)[] executing;
-        lock (queue)
+        lock (syncRoot)
         {
             ThrowIfDisposed();
 
@@ -132,9 +133,9 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
     private void OnCompleted()
     {
         isCompleted = true;
-        lock (queue)
+        lock (syncRoot)
         {
-            Monitor.Pulse(queue);
+            Monitor.Pulse(syncRoot);
         }
     }
 
@@ -145,7 +146,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         {
             int count;
             (SendOrPostCallback d, object? state)[] executing;
-            lock (queue)
+            lock (syncRoot)
             {
                 count = queueCount;
                 queueCount = 0;
@@ -155,8 +156,9 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             this.executing = executing;
             for (int i = 0; i < count; ++i)
             {
-                executing[i].d(executing[i].state);
+                var (d, state) = executing[i];
                 executing[i] = default;
+                d(state);
             }
             if (count > 0)
             {
@@ -177,9 +179,9 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             }
 
             // Yield the thread and wait for completion or for a posted callback.
-            lock (queue)
+            lock (syncRoot)
             {
-                Monitor.Wait(queue);
+                Monitor.Wait(syncRoot);
             }
             // Reset the spinner.
             spinner = new();
