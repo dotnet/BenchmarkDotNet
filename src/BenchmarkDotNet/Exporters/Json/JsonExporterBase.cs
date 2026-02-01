@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Serialization;
 using Perfolizer.Helpers;
 using Perfolizer.Horology;
-using SimpleJson;
+using System.Collections.Generic;
+using System.Linq;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Exporters.Json
 {
@@ -24,8 +26,9 @@ namespace BenchmarkDotNet.Exporters.Json
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            SimpleJsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
-            logger.WriteLine(SimpleJsonSerializer.SerializeObject(GetDataToSerialize(summary)));
+            var dataToSerialize = GetDataToSerialize(summary);
+            var json = BdnSimpleJsonSerializer.Serialize(dataToSerialize, IndentJson);
+            logger.WriteLine(json);
         }
 
         protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(Summary summary)
@@ -40,11 +43,11 @@ namespace BenchmarkDotNet.Exporters.Json
             };
         }
 
-        protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(HostEnvironmentInfo environmentInfo)
+        protected virtual IReadOnlyDictionary<string, object?> GetDataToSerialize(HostEnvironmentInfo environmentInfo)
         {
             // We construct HostEnvironmentInfo manually, so that we can have the HardwareTimerKind enum as text, rather than an integer
             // SimpleJson serializer doesn't seem to have an enum String/Value option (to-be-fair, it is meant to be "Simple")
-            return new Dictionary<string, object>
+            return new Dictionary<string, object?>
             {
                 { nameof(HostEnvironmentInfo.BenchmarkDotNetCaption), HostEnvironmentInfo.BenchmarkDotNetCaption },
                 { nameof(environmentInfo.BenchmarkDotNetVersion), environmentInfo.BenchmarkDotNetVersion },
@@ -64,9 +67,9 @@ namespace BenchmarkDotNet.Exporters.Json
             };
         }
 
-        protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(BenchmarkReport report)
+        protected virtual IReadOnlyDictionary<string, object?> GetDataToSerialize(BenchmarkReport report)
         {
-            var benchmark = new Dictionary<string, object>
+            var benchmark = new Dictionary<string, object?>
             {
                 // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
                 { "DisplayInfo", report.BenchmarkCase.DisplayInfo },

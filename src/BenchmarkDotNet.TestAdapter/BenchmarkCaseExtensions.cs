@@ -35,6 +35,15 @@ namespace BenchmarkDotNet.TestAdapter
             // See: https://github.com/dotnet/BenchmarkDotNet/issues/2494
             var fullyQualifiedName = displayName;
 
+            // Use benchmark method FQN on Visual Studio environment to avoid TestExplorer hierarchy split
+            // when job display name contains '.' which is interpreted as a namespace separator by VS.
+            // See: https://github.com/dotnet/BenchmarkDotNet/issues/2793
+            if (Environment.GetEnvironmentVariable("VSAPPIDNAME") != null)
+            {
+                var benchmarkMethodName = benchmarkMethod.Name;
+                fullyQualifiedName = $"{fullClassName}.{benchmarkMethodName}";
+            }
+
             var vsTestCase = new TestCase(fullyQualifiedName, VsTestAdapter.ExecutorUri, assemblyPath)
             {
                 DisplayName = displayName,

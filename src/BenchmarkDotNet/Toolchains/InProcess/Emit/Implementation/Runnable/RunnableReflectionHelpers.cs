@@ -7,6 +7,8 @@ using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal static class RunnableReflectionHelpers
@@ -17,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public const BindingFlags BindingFlagsAllStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
         public const BindingFlags BindingFlagsAllInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-        private static object TryChangeType(object value, Type targetType)
+        private static object? TryChangeType(object? value, Type targetType)
         {
             try
             {
@@ -39,13 +41,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return value;
         }
 
-        public static MethodInfo GetImplicitConversionOpFromTo(Type from, Type to)
+        public static MethodInfo? GetImplicitConversionOpFromTo(Type from, Type to)
         {
             return GetImplicitConversionOpCore(to, from, to)
                 ?? GetImplicitConversionOpCore(from, from, to);
         }
 
-        private static MethodInfo GetImplicitConversionOpCore(Type owner, Type from, Type to)
+        private static MethodInfo? GetImplicitConversionOpCore(Type owner, Type from, Type to)
         {
             return owner.GetMethods(BindingFlagsPublicStatic)
                 .FirstOrDefault(m =>
@@ -56,13 +58,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         public static void SetArgumentField(object instance, BenchmarkCase benchmarkCase, ParameterInfo argInfo, int argIndex)
         {
-            var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name)
+            var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name!)
                 ?? throw new InvalidOperationException($"Can't find arg member for {argInfo.Name}.");
 
             var containerField = instance.GetType().GetField(FieldsContainerName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                 ?? throw new InvalidOperationException("FieldsContainer field not found on runnable instance.");
 
-            var container = containerField.GetValue(instance);
+            var container = containerField.GetValue(instance)!;
 
             var argName = ArgFieldPrefix + argIndex;
 

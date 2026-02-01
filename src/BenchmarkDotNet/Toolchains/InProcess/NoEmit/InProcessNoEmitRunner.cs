@@ -12,6 +12,8 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                await (ValueTask) methodInfo.Invoke(null, [host, parameters]);
+                await (ValueTask) methodInfo.Invoke(null, [host, parameters])!;
 
                 return 0;
             }
@@ -113,7 +115,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
-                var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
+                var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type)!;
                 var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, unrollFactor);
                 var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
@@ -173,7 +175,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 };
 
                 var results = await job
-                    .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
+                    .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
                     .Create(engineParameters)
                     .RunAsync();
                 host.ReportResults(results); // printing costs memory, do this after runs

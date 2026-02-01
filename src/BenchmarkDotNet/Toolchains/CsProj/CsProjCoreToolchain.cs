@@ -84,9 +84,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
         }
 
-        public override bool Equals(object obj) => obj is CsProjCoreToolchain typed && Equals(typed);
+        public override bool Equals(object? obj) => obj is CsProjCoreToolchain typed && Equals(typed);
 
-        public bool Equals(CsProjCoreToolchain other) => Generator.Equals(other.Generator);
+        public bool Equals(CsProjCoreToolchain? other)
+        {
+            if (other == null)
+                return false;
+
+            return Generator.Equals(other.Generator);
+        }
 
         public override int GetHashCode() => Generator.GetHashCode();
     }

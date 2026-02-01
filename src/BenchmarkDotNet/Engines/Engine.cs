@@ -12,6 +12,8 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Engines
 {
     // MethodImplOptions.AggressiveOptimization is applied to all methods to force them to go straight to tier1 JIT,
@@ -57,7 +59,7 @@ namespace BenchmarkDotNet.Engines
                 InProcessDiagnoserHandler = engineParameters.InProcessDiagnoserHandler ?? throw new ArgumentNullException(nameof(EngineParameters.InProcessDiagnoserHandler)),
             };
 
-            Clock = TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
+            Clock = TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver)!;
             ForceGcCleanups = TargetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
             MemoryRandomization = TargetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
@@ -168,7 +170,7 @@ namespace BenchmarkDotNet.Engines
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
 
-                await extraIterationData.setupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
+                await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
                 Host.SendSignal(HostSignal.BeforeExtraIteration);
                 Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeExtraIteration);
@@ -185,13 +187,13 @@ namespace BenchmarkDotNet.Engines
                 ClockSpan clockSpan;
                 using (FinalizerBlocker.MaybeStart())
                 {
-                    (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction, extraIterationData.invokeCount / extraIterationData.unrollFactor);
+                    (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
                 }
 
                 Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
                 Host.SendSignal(HostSignal.AfterExtraIteration);
 
-                await extraIterationData.cleanupAction(); // we run iteration cleanup after diagnosers are complete.
+                await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
 
                 var totalOperations = extraIterationData.invokeCount * Parameters.OperationsPerInvoke;
                 var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());

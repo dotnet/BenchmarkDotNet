@@ -128,9 +128,9 @@ namespace BenchmarkDotNet.Extensions
         /// <param name="stringBuilder">The string builder that will hold the arguments</param>
         /// <param name="argument">The argument to append to this string builder</param>
         /// <returns>The string builder with the arguments added</returns>
-        internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, string argument)
+        internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, string? argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
+            if (argument.IsBlank())
             {
                 return stringBuilder;
             }

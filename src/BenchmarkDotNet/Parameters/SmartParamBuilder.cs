@@ -10,6 +10,8 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Parameters
 {
     internal static class SmartParamBuilder
@@ -34,7 +36,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (unwrappedValue is object[] array)
             {
-                Type firstParamType = benchmark.GetParameters().FirstOrDefault()?.ParameterType;
+                Type? firstParamType = benchmark.GetParameters().FirstOrDefault()?.ParameterType;
                 // the user provided object[] for a benchmark accepting a single argument
                 if (parameterDefinitions.Length == 1 && array.Length == 1
                     && (array[0]?.GetType() == firstParamType || (firstParamType != null && firstParamType.IsStackOnlyWithImplicitCast(array[0])))) // the benchmark that accepts an object[] as argument
@@ -102,14 +104,14 @@ namespace BenchmarkDotNet.Parameters
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            MethodInfo sourceAsMethodInfo =  source as MethodInfo;
-            PropertyInfo sourceAsPropertyInfo = source as PropertyInfo;
+            MethodInfo? sourceAsMethodInfo =  source as MethodInfo;
+            PropertyInfo? sourceAsPropertyInfo = source as PropertyInfo;
 
             Type indexableType = typeof(IEnumerable<object[]>);
 
             string indexPostfix;
             if (sourceAsMethodInfo?.ReturnType == indexableType ||
-                sourceAsPropertyInfo?.GetMethod.ReturnType == indexableType) {
+                sourceAsPropertyInfo?.GetMethod?.ReturnType == indexableType) {
                 indexPostfix = $"[{argumentIndex}]";
             }
             else
@@ -118,10 +120,10 @@ namespace BenchmarkDotNet.Parameters
             }
 
             string methodCall;
-            if (sourceAsMethodInfo?.IsStatic ?? sourceAsPropertyInfo?.GetMethod.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
+            if (sourceAsMethodInfo?.IsStatic ?? sourceAsPropertyInfo?.GetMethod?.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
             {
                 // If the source member is static, we need to place the fully qualified type name before it, in case the source member is from another type that this generated type does not inherit from.
-                methodCall = $"{source.DeclaringType.GetCorrectCSharpTypeName()}.{source.Name}";
+                methodCall = $"{source.DeclaringType!.GetCorrectCSharpTypeName()}.{source.Name}";
             }
             else
             {
@@ -145,7 +147,7 @@ namespace BenchmarkDotNet.Parameters
         {
             this.parameterType = parameterType;
             this.source = source;
-            method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;
+            method = source is PropertyInfo property ? property.GetMethod! : (MethodInfo)source;
             Value = value;
             this.index = index;
         }
@@ -158,7 +160,7 @@ namespace BenchmarkDotNet.Parameters
         {
             string cast = $"({parameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
-            string callPrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "base";
+            string callPrefix = method.IsStatic ? source.DeclaringType!.GetCorrectCSharpTypeName() : "base";
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 

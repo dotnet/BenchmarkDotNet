@@ -9,6 +9,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.Mono
 {
     [PublicAPI]
@@ -31,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
             var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(
                 fileName: monoRuntime.CustomPath.IsNotBlank() ? monoRuntime.CustomPath : "mono",
                 arguments: $"{monoRuntime.AotArgs} \"{Path.GetFullPath(exePath)}\"",
-                workingDirectory: Path.GetDirectoryName(exePath),
+                workingDirectory: Path.GetDirectoryName(exePath)!,
                 environmentVariables: environmentVariables,
                 includeErrors: true,
                 logger: logger);

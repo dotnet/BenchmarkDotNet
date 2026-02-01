@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -67,7 +70,7 @@ namespace BenchmarkDotNet.Extensions
 
             if (type.IsArray)
             {
-                var typeName = GetCorrectCSharpTypeName(type.GetElementType(), includeNamespace, includeGenericArgumentsNamespace, prefixWithGlobal);
+                var typeName = GetCorrectCSharpTypeName(type.GetElementType()!, includeNamespace, includeGenericArgumentsNamespace, prefixWithGlobal);
                 var parts = typeName.Split(['['], count: 2);
 
                 string repr = parts[0] + '[' + new string(',', type.GetArrayRank() - 1) + ']';
@@ -106,7 +109,7 @@ namespace BenchmarkDotNet.Extensions
                 }
 
                 yield return name;
-                currentType = currentType.DeclaringType;
+                currentType = currentType.DeclaringType!;
             }
         }
 
@@ -186,28 +189,40 @@ namespace BenchmarkDotNet.Extensions
                 .ToArray();
 
         internal static (string Name, TAttribute Attribute, bool IsStatic, Type ParameterType)[]
-            GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags) where TAttribute : Attribute
+            GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags)
+            where TAttribute : Attribute
         {
-            var allFields = type
+            var fields = type
                 .GetFields(reflectionFlags)
-                .Select(f => (
-                    Name: f.Name,
-                    Attribute: f.ResolveAttribute<TAttribute>(),
-                    IsStatic: f.IsStatic,
-                    ParameterType: f.FieldType));
+                .Select(f => Create(
+                    f.Name,
+                    f.ResolveAttribute<TAttribute>(),
+                    f.IsStatic,
+                    f.FieldType));
 
-            var allProperties = type
+            var properties = type
                 .GetProperties(reflectionFlags)
-                .Select(p => (
-                    Name: p.Name,
-                    Attribute: p.ResolveAttribute<TAttribute>(),
-                    IsStatic: p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
-                    PropertyType: p.PropertyType));
+                .Select(p => Create(
+                    p.Name,
+                    p.ResolveAttribute<TAttribute>(),
+                    p.GetSetMethod()?.IsStatic == true,
+                    p.PropertyType));
 
-            return allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
+            return fields.Concat(properties)
+                .WhereNotNull()
+                .Select(x => x!.Value)
+                .ToArray();
+
+            static (string Name, TAttribute Attribute, bool IsStatic, Type MemberType)?
+                Create(string name, TAttribute? attribute, bool isStatic, Type memberType)
+            {
+                if (attribute == null)
+                    return null;
+                return (name, attribute, isStatic, memberType);
+            }
         }
 
-        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object? argumentInstance)
+        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, [NotNullWhen(true)] object? argumentInstance)
         {
             if (argumentInstance == null)
                 return false;
@@ -233,7 +248,7 @@ namespace BenchmarkDotNet.Extensions
                 (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
 
-        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
+        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName!.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
 
         internal static bool IsByRefLike(this Type type)
 #if NETSTANDARD2_0

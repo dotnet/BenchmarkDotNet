@@ -40,9 +40,18 @@ namespace BenchmarkDotNet.Toolchains.R2R
             }
         }
 
-        public override bool Equals(object obj) => obj is R2RToolchain typed && Equals(typed);
+        public override bool Equals(object? obj) => obj is R2RToolchain typed && Equals(typed);
 
-        public bool Equals(R2RToolchain other) => Generator.Equals(other.Generator);
+        public bool Equals(R2RToolchain? other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (other is null)
+                return false;
+
+            return Generator.Equals(other.Generator);
+        }
 
         public override int GetHashCode() => Generator.GetHashCode();
     }

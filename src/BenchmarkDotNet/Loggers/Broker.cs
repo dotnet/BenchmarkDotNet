@@ -10,6 +10,8 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Loggers
 {
     internal class Broker
@@ -61,7 +63,7 @@ namespace BenchmarkDotNet.Loggers
             finished.WaitOne();
         }
 
-        private void OnProcessExited(object sender, EventArgs e)
+        private void OnProcessExited(object? sender, EventArgs e)
         {
             process.Exited -= OnProcessExited;
 
@@ -101,7 +103,7 @@ namespace BenchmarkDotNet.Loggers
                     for (int i = 0; i < resultsLinesCount;)
                     {
                         // Strip the prepended "// InProcessDiagnoserResults ".
-                        line = reader.ReadLine().Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
+                        line = reader.ReadLine()!.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
                         resultsStringBuilder.Append(line);
                         if (++i < resultsLinesCount)
                         {

@@ -12,6 +12,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     internal class InProcessNoEmitExecutor(bool executeOnSeparateThread) : IExecutor

@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommand(string cliPath, string filePath, string tfm, string? arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable>? environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
-            CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
+            CliPath = cliPath.IsBlank() ? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value : cliPath;
             Arguments = arguments;
             FilePath = filePath;
             TargetFrameworkMoniker = tfm;
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             LogOutput = logOutput || (buildPartition is not null && buildPartition.LogBuildOutput);
         }
 
-        public DotNetCliCommand WithArguments(string arguments)
+        public DotNetCliCommand WithArguments(string? arguments)
             => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         public DotNetCliCommand WithCliPath(string cliPath)
@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .MaybeAppendOutputPaths(artifactsPaths)
                 .ToString();
 
-        private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string suffix)
+        private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string? suffix)
         {
             if (!buildPartition.GenerateMSBuildBinLog || suffix.IsBlank())
                 return string.Empty;
@@ -187,7 +187,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
                 return null;
 
-            var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MsBuildArgument>();
+            var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver)!.OfType<MsBuildArgument>();
 
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }

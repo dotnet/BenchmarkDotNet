@@ -5,6 +5,8 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Diagnosers;
 
 [UsedImplicitly]
@@ -30,7 +32,7 @@ public struct InProcessDiagnoserRouter
         }
         return new()
         {
-            handler = Init((IInProcessDiagnoserHandler) Activator.CreateInstance(data.HandlerType), data.SerializedConfig),
+            handler = Init((IInProcessDiagnoserHandler) Activator.CreateInstance(data.HandlerType)!, data.SerializedConfig!),
             index = index,
             runMode = diagnoser.GetRunMode(benchmarkCase)
         };

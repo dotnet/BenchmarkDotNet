@@ -10,6 +10,8 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters
 {
     public static class FullNameProvider
@@ -69,13 +71,13 @@ namespace BenchmarkDotNet.Exporters
         private static string GetNestedTypes(Type type)
         {
             string nestedTypes = "";
-            Type child = type, parent = type.DeclaringType;
+            Type child = type, parent = type.DeclaringType!;
             while (child.IsNested && parent != null)
             {
                 nestedTypes = parent.Name + "+" + nestedTypes;
 
                 child = parent;
-                parent = parent.DeclaringType;
+                parent = parent.DeclaringType!;
             }
 
             return nestedTypes;
@@ -114,7 +116,7 @@ namespace BenchmarkDotNet.Exporters
                     parametersBuilder.Append(", ");
 
                 parametersBuilder.Append(methodArguments[i].Name).Append(':').Append(' ');
-                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name).Value, methodArguments[i].ParameterType));
+                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name!).Value, methodArguments[i].ParameterType));
             }
 
             for (int i = 0; i < benchmarkParams.Length; i++)
@@ -131,7 +133,7 @@ namespace BenchmarkDotNet.Exporters
             return parametersBuilder.Append(')').ToString();
         }
 
-        private static string GetArgument(object argumentValue, Type argumentType)
+        private static string GetArgument(object? argumentValue, Type? argumentType)
         {
             switch (argumentValue) {
                 case null:
@@ -153,7 +155,7 @@ namespace BenchmarkDotNet.Exporters
             if (argumentType != null && argumentType.IsArray)
                 return GetArray((IEnumerable)argumentValue);
 
-            return argumentValue.ToString();
+            return argumentValue.ToString()!;
         }
 
         // it's not generic so I can't simply use .Skip and all other LINQ goodness
@@ -185,11 +187,11 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetTypeArgumentName(Type type)
         {
-            if (Aliases.TryGetValue(type, out string alias))
+            if (Aliases.TryGetValue(type, out var alias))
                 return alias;
 
             if (type.IsNullable())
-                return $"{GetTypeArgumentName(Nullable.GetUnderlyingType(type))}?";
+                return $"{GetTypeArgumentName(Nullable.GetUnderlyingType(type)!)}?";
 
             if (type.Namespace.IsNotBlank())
                 return $"{type.Namespace}.{GetTypeName(type)}";

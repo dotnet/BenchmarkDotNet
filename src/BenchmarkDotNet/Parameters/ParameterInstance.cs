@@ -6,6 +6,8 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstance : IDisposable
@@ -14,10 +16,10 @@ namespace BenchmarkDotNet.Parameters
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
-        private readonly object value;
+        private readonly object? value;
         private readonly int maxParameterColumnWidthFromConfig;
 
-        public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
+        public ParameterInstance(ParameterDefinition definition, object? value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
@@ -30,7 +32,7 @@ namespace BenchmarkDotNet.Parameters
         public bool IsStatic => Definition.IsStatic;
         public bool IsArgument => Definition.IsArgument;
 
-        public object Value => value is IParam parameter ? parameter.Value : value;
+        public object? Value => value is IParam parameter ? parameter.Value : value;
 
         public string ToSourceCode()
             => value is IParam parameter
@@ -49,9 +51,9 @@ namespace BenchmarkDotNet.Parameters
                     return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth).EscapeSpecialCharacters(false);
                 // no trimming for types!
                 case Type type:
-                    return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+                    return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type)!.GetDisplayName()}?" : type.GetDisplayName();
                 default:
-                    return Trim(value.ToString(), maxParameterColumnWidth).EscapeSpecialCharacters(false);
+                    return Trim(value.ToString()!, maxParameterColumnWidth).EscapeSpecialCharacters(false);
             }
         }
 
@@ -75,7 +77,7 @@ namespace BenchmarkDotNet.Parameters
             var takeFromStart = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
             var takeFromEnd = takeFromStart;
 
-            if (IsFirstCharInSurrogatePair(value[takeFromStart-1]))
+            if (IsFirstCharInSurrogatePair(value[takeFromStart - 1]))
             {
                 takeFromStart = Math.Max(0, takeFromStart - 1);
             }

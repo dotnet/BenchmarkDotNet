@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.Results
 {
     public class GenerateResult
     {
         public ArtifactsPaths ArtifactsPaths { get; }
         public bool IsGenerateSuccess { get; }
-        public Exception GenerateException { get; }
+        public Exception? GenerateException { get; }
         public IReadOnlyCollection<string> ArtifactsToCleanup { get; }
 
-        public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception generateException,
+        public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception? generateException,
             IReadOnlyCollection<string> artifactsToCleanup)
         {
             ArtifactsPaths = artifactsPaths;

@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     internal static class AsciiHelper
@@ -7,10 +9,10 @@ namespace BenchmarkDotNet.Helpers
         /// </summary>
         private const string Mu = "\u03BC";
 
-        public static string ToAscii(this string? s)
+        public static string ToAscii(this string s)
         {
             // We should replace all non-ASCII symbols that used in BenchmarkDotNet by ASCII-compatible analogues
-            return s?.Replace(Mu, "u");
+            return s.Replace(Mu, "u");
         }
     }
 }

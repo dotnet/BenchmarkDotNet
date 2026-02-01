@@ -7,9 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
@@ -21,6 +19,8 @@ using Perfolizer.Horology;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     /// <summary>
@@ -29,18 +29,44 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
     /// </summary>
     internal abstract partial class RunnableEmitter
     {
-        private RunnableEmitter() { }
-
         /// <summary>
         /// Maps action args to fields that store arg values.
         /// </summary>
-        private record struct ArgFieldInfo(FieldInfo Field, Type ArgLocalsType, MethodInfo OpImplicitMethod);
+        private record struct ArgFieldInfo(FieldInfo Field, Type ArgLocalsType, MethodInfo? OpImplicitMethod);
+
+        private readonly BuildPartition buildPartition;
+        private readonly ModuleBuilder moduleBuilder;
+        private readonly BenchmarkBuildInfo benchmark;
+        private readonly int jobUnrollFactor;
+
+        private readonly TypeBuilder runnableBuilder;
+        private readonly List<TypeBuilder> nestedTypeBuilders = [];
+
+        private FieldBuilder fieldsContainerField = null!;
+        private readonly List<ArgFieldInfo> argFields = [];
+        private FieldBuilder notElevenField = null!;
+
+        private MethodBuilder overheadImplementationMethod = null!;
+
+        private Descriptor Descriptor => benchmark.BenchmarkCase.Descriptor;
+        private Type BenchmarkReturnType => Descriptor.WorkloadMethod.ReturnType;
+
+        private RunnableEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark)
+        {
+            this.buildPartition = buildPartition;
+            this.moduleBuilder = moduleBuilder;
+            this.benchmark = benchmark;
+            jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, buildPartition.Resolver);
+            runnableBuilder = DefineRunnableTypeBuilder();
+        }
 
         /// <summary>
         /// Emits assembly with runnables from current build partition.
         /// </summary>
         public static Assembly EmitPartitionAssembly(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
+            if (buildPartition is null) throw new ArgumentNullException(nameof(buildPartition));
+
             var assemblyResultPath = generateResult.ArtifactsPaths.ExecutablePath;
             var assemblyFileName = Path.GetFileName(assemblyResultPath);
             var config = buildPartition.Benchmarks.First().Config;
@@ -52,12 +78,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             {
                 var returnType = benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType;
                 RunnableEmitter runnableEmitter = returnType.IsAwaitable()
-                    ? new AsyncCoreEmitter()
-                    : new SyncCoreEmitter();
-                runnableEmitter.buildPartition = buildPartition ?? throw new ArgumentNullException(nameof(buildPartition));
-                runnableEmitter.moduleBuilder = moduleBuilder ?? throw new ArgumentNullException(nameof(moduleBuilder));
-                runnableEmitter.benchmark = benchmark;
-                runnableEmitter.jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, buildPartition.Resolver);
+                    ? new AsyncCoreEmitter(buildPartition, moduleBuilder, benchmark)
+                    : new SyncCoreEmitter(buildPartition, moduleBuilder, benchmark);
                 runnableEmitter.EmitRunnableCore();
             }
 
@@ -95,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 : AssemblyBuilderAccess.RunAndCollect;
 
             var assemblyBuilder = saveToDisk
-                ? AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, assemblyMode, Path.GetDirectoryName(assemblyResultPath))
+                ? AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, assemblyMode, Path.GetDirectoryName(assemblyResultPath)!)
                 : AssemblyBuilder.DefineDynamicAssembly(assemblyName, assemblyMode);
 
             DefineAssemblyAttributes(assemblyBuilder);
@@ -125,7 +147,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             attBuilder = new CustomAttributeBuilder(
                 attributeCtor,
                 Array.Empty<object>(),
-                new[] { attributeProp },
+                new[] { attributeProp! },
                 new object[] { true });
             assemblyBuilder.SetCustomAttribute(attBuilder);
 
@@ -216,27 +238,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.Emit(OpCodes.Pop);
         }
 
-        private BuildPartition buildPartition;
-        private ModuleBuilder moduleBuilder;
-        private BenchmarkBuildInfo benchmark;
-        private int jobUnrollFactor;
-
-        private TypeBuilder runnableBuilder;
-        private readonly List<TypeBuilder> nestedTypeBuilders = [];
-
-        private FieldBuilder fieldsContainerField;
-        private readonly List<ArgFieldInfo> argFields = [];
-        private FieldBuilder notElevenField;
-
-        private MethodBuilder overheadImplementationMethod;
-
-        private Descriptor Descriptor => benchmark.BenchmarkCase.Descriptor;
-        private Type BenchmarkReturnType => Descriptor.WorkloadMethod.ReturnType;
-
         private void EmitRunnableCore()
         {
-            runnableBuilder = DefineRunnableTypeBuilder();
-
             EmitFields();
             EmitCtor();
             EmitSetupCleanupMethods();
@@ -269,12 +272,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Define arg fields
             foreach (var parameter in Descriptor.WorkloadMethod.GetParameters())
             {
-                var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name);
+                var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name!);
                 var parameterType = parameter.ParameterType;
 
                 Type argLocalsType;
                 Type argFieldType;
-                MethodInfo opConversion = null;
+                MethodInfo? opConversion = null;
                 if (parameterType.IsByRef)
                 {
                     argLocalsType = parameterType;
@@ -545,6 +548,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 null,
                 [typeof(IClock)],
                 null
-            );
+            )!;
     }
 }

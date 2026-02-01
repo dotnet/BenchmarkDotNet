@@ -6,6 +6,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Portability;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable
@@ -29,12 +31,18 @@ namespace BenchmarkDotNet.Running
         }
 
         public Runtime GetRuntime() => Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? Job.Environment.Runtime
+                ? Job.Environment.Runtime!
                 : RuntimeInformation.GetTargetOrCurrentRuntime(Descriptor.Type.Assembly);
 
         public void Dispose() => Parameters.Dispose();
 
-        public int CompareTo(BenchmarkCase other) => string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
+        public int CompareTo(BenchmarkCase? other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (other is null) return 1;
+
+            return string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
+        }
 
         public bool HasParameters => Parameters != null && Parameters.Items.Any();
 

@@ -11,6 +11,8 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Order
 {
     [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]
@@ -54,8 +56,8 @@ namespace BenchmarkDotNet.Order
         {
             var benchmarkLogicalGroups = benchmarksCases.GroupBy(b => GetLogicalGroupKey(benchmarksCases, b));
             foreach (var logicalGroup in GetLogicalGroupOrder(benchmarkLogicalGroups, benchmarksCases.FirstOrDefault()?.Config.GetLogicalGroupRules()))
-            foreach (var benchmark in GetSummaryOrderForGroup(logicalGroup.ToImmutableArray(), summary))
-                yield return benchmark;
+                foreach (var benchmark in GetSummaryOrderForGroup(logicalGroup.ToImmutableArray(), summary))
+                    yield return benchmark;
         }
 
         protected virtual IEnumerable<BenchmarkCase> GetSummaryOrderForGroup(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary)
@@ -75,7 +77,7 @@ namespace BenchmarkDotNet.Order
             }
         }
 
-        public string GetHighlightGroupKey(BenchmarkCase benchmarkCase)
+        public string? GetHighlightGroupKey(BenchmarkCase benchmarkCase)
         {
             switch (SummaryOrderPolicy)
             {
@@ -173,7 +175,7 @@ namespace BenchmarkDotNet.Order
                 IComparer<ParameterInstances> paramsComparer,
                 IComparer<Job> jobComparer,
                 IComparer<Descriptor> targetComparer,
-                IEnumerable<BenchmarkLogicalGroupRule> order)
+                IEnumerable<BenchmarkLogicalGroupRule>? order)
             {
                 this.categoryComparer = categoryComparer;
                 this.targetComparer = targetComparer;
@@ -181,16 +183,16 @@ namespace BenchmarkDotNet.Order
                 this.paramsComparer = paramsComparer;
 
                 this.order = new List<BenchmarkLogicalGroupRule>();
-                foreach (var rule in (order ?? ImmutableArray<BenchmarkLogicalGroupRule>.Empty).Concat(DefaultOrder))
+                foreach (var rule in (order ?? []).Concat(DefaultOrder))
                     if (!this.order.Contains(rule))
                         this.order.Add(rule);
             }
 
-            public int Compare(BenchmarkCase x, BenchmarkCase y)
+            public int Compare(BenchmarkCase? x, BenchmarkCase? y)
             {
-                if (x == null && y == null) return 0;
-                if (x != null && y == null) return 1;
-                if (x == null) return -1;
+                if (ReferenceEquals(x, y)) return 0;
+                if (x is null) return -1;
+                if (y is null) return 1;
 
                 foreach (var rule in order)
                 {
@@ -213,8 +215,15 @@ namespace BenchmarkDotNet.Order
         {
             internal static readonly BenchmarkParamsEqualityComparer Instance = new();
 
-            bool IEqualityComparer<BenchmarkCase>.Equals(BenchmarkCase x, BenchmarkCase y)
-                => ParameterEqualityComparer.Instance.Equals(x.Parameters, y.Parameters);
+            bool IEqualityComparer<BenchmarkCase>.Equals(BenchmarkCase? x, BenchmarkCase? y)
+            {
+                if (ReferenceEquals(x, y))
+                    return true;
+                if (x is null || y is null)
+                    return false;
+
+                return ParameterEqualityComparer.Instance.Equals(x.Parameters, y.Parameters);
+            }
 
             int IEqualityComparer<BenchmarkCase>.GetHashCode(BenchmarkCase obj)
                 => ParameterEqualityComparer.Instance.GetHashCode(obj.Parameters);
@@ -226,11 +235,12 @@ namespace BenchmarkDotNet.Order
 
             public LogicalGroupComparer(IComparer<BenchmarkCase> benchmarkComparer) => this.benchmarkComparer = benchmarkComparer;
 
-            public int Compare(IGrouping<string, BenchmarkCase> x, IGrouping<string, BenchmarkCase> y)
+            public int Compare(IGrouping<string, BenchmarkCase>? x, IGrouping<string, BenchmarkCase>? y)
             {
-                if (x == null && y == null) return 0;
-                if (x != null && y == null) return 1;
-                if (x == null) return -1;
+                if (ReferenceEquals(x, y)) return 0;
+                if (x is null) return -1;
+                if (y is null) return 1;
+
                 return benchmarkComparer.Compare(x.First(), y.First());
             }
         }

@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Helpers.Reflection.Emit;
+using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,11 @@ using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableCo
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
+#nullable enable
+
 partial class RunnableEmitter
 {
-    private sealed class SyncCoreEmitter : RunnableEmitter
+    private sealed class SyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
     {
         protected override void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
 
@@ -99,8 +102,8 @@ partial class RunnableEmitter
 	            IL_0040: ret
              */
             ilBuilder.EmitLdloca(startedClockLocal);
-            ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance));
-            ilBuilder.Emit(OpCodes.Newobj, typeof(ValueTask<ClockSpan>).GetConstructor([typeof(ClockSpan)]));
+            ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
+            ilBuilder.Emit(OpCodes.Newobj, typeof(ValueTask<ClockSpan>).GetConstructor([typeof(ClockSpan)])!);
             ilBuilder.Emit(OpCodes.Ret);
 
             return actionMethodBuilder;

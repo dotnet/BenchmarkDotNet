@@ -7,6 +7,8 @@ using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines;
 
+#nullable enable
+
 // We do our best to encourage the jit to fully promote methods to tier1, but tiered jit relies on heuristics,
 // and we purposefully don't spend too much time in this stage, so we can't guarantee it.
 // This should succeed for 99%+ of microbenchmarks. For any sufficiently short benchmarks where this fails,
@@ -86,7 +88,7 @@ internal sealed class EngineJitStage : EngineStage
         s_tieredDelay = TimeSpan.Zero;
 
         // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
-        StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).Start();
+        StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver)!.Start();
 
         int remainingTiers = JitInfo.MaxTierPromotions;
         int lastInvokeCount = 1;

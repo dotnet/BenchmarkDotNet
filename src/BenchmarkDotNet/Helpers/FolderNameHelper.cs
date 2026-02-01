@@ -4,7 +4,8 @@ using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
-using SimpleJson.Reflection;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Helpers
 
             var valueType = value.GetType();
             if (valueType.IsEnum)
-                return value.ToString();
+                return value.ToString()!;
             if (value is Type type)
                 return ToFolderName(type: type);
             if (!valueType.IsValueType)
@@ -39,7 +40,7 @@ namespace BenchmarkDotNet.Helpers
             if (value is TimeInterval interval)
                 return interval.Nanoseconds + "ns";
 
-            return value.ToString();
+            return value.ToString()!;
         }
 
         // we can't simply use type.FullName, because for generics it's too long

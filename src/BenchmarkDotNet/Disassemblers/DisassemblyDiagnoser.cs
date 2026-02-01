@@ -242,7 +242,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         void IInProcessDiagnoser.DeserializeResults(BenchmarkCase benchmarkCase, string results)
         {
-            var disassemblyResult = BdnJsonSerializer.Deserialize<DisassemblyResult>(results);
+            var disassemblyResult = BdnJsonSerializer.Deserialize<DisassemblyResult>(results)!;
             this.results.Add(benchmarkCase, disassemblyResult);
         }
 

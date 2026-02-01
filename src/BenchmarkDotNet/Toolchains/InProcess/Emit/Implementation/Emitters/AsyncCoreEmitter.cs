@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
+using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System;
 using System.Reflection;
@@ -12,14 +13,16 @@ using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableCo
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
+#nullable enable
+
 partial class RunnableEmitter
 {
     // TODO: update this to support runtime-async.
-    private sealed class AsyncCoreEmitter : RunnableEmitter
+    private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
     {
-        private FieldInfo workloadContinuerAndValueTaskSourceField;
-        private FieldInfo clockField;
-        private FieldInfo invokeCountField;
+        private FieldInfo workloadContinuerAndValueTaskSourceField = null!;
+        private FieldInfo clockField = null!;
+        private FieldInfo invokeCountField = null!;
 
         protected override void EmitExtraFields(TypeBuilder fieldsContainerBuilder)
         {
@@ -82,7 +85,7 @@ partial class RunnableEmitter
                 IL_0022: call instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.WorkloadContinuerAndValueTaskSource::Complete()
              */
             ilBuilder.MarkLabel(callCompleteLabel);
-            ilBuilder.Emit(OpCodes.Call, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.Complete), BindingFlags.Public | BindingFlags.Instance));
+            ilBuilder.Emit(OpCodes.Call, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.Complete), BindingFlags.Public | BindingFlags.Instance)!);
 
             ilBuilder.MarkLabel(skipCompleteLabel);
         }
@@ -165,8 +168,8 @@ partial class RunnableEmitter
 	                IL_0026: ret
                  */
                 ilBuilder.EmitLdloca(startedClockLocal);
-                ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance));
-                ilBuilder.Emit(OpCodes.Newobj, typeof(ValueTask<ClockSpan>).GetConstructor([typeof(ClockSpan)]));
+                ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
+                ilBuilder.Emit(OpCodes.Newobj, typeof(ValueTask<ClockSpan>).GetConstructor([typeof(ClockSpan)])!);
                 ilBuilder.Emit(OpCodes.Ret);
 
                 return methodBuilder;
@@ -274,9 +277,9 @@ partial class RunnableEmitter
                     throw new NotSupportedException($"AsyncMethodBuilder {builderType.GetDisplayName()} has generic arity greater than 1.");
                 }
                 var resultType = Descriptor.WorkloadMethod.ReturnType
-                    .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
+                    .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
                     .ReturnType
-                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
+                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!
                     .ReturnType;
                 return builderType.MakeGenericType([resultType]);
             }
@@ -301,7 +304,7 @@ partial class RunnableEmitter
             var benchmarkAwaiterField = asyncStateMachineTypeBuilder.DefineField(
                 "<>u__2",
                 Descriptor.WorkloadMethod.ReturnType
-                    .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
+                    .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
                     .ReturnType,
                 FieldAttributes.Private
             );
@@ -387,10 +390,10 @@ partial class RunnableEmitter
                         IL_002d: stloc.3
                      */
                     ilBuilder.MarkLabel(whileTrueLabel);
-                    ilBuilder.EmitLdloc(thisLocal);
+                    ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
-                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.GetAwaiter), BindingFlags.Public | BindingFlags.Instance));
+                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.EmitStloc(workloadContinuerLocal);
                     /*
                         // if (!awaiter2.IsCompleted)
@@ -399,7 +402,7 @@ partial class RunnableEmitter
                         IL_0034: brtrue.s IL_0075
                      */
                     ilBuilder.EmitLdloc(workloadContinuerLocal);
-                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetProperty(nameof(WorkloadContinuerAndValueTaskSource.IsCompleted), BindingFlags.Public | BindingFlags.Instance).GetMethod);
+                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetProperty(nameof(WorkloadContinuerAndValueTaskSource.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
                     ilBuilder.Emit(OpCodes.Brtrue_S, workloadContinuationGetResultLabel);
                     /*
                         // num = (<>1__state = 0);
@@ -483,7 +486,7 @@ partial class RunnableEmitter
                      */
                     ilBuilder.MarkLabel(workloadContinuationGetResultLabel);
                     ilBuilder.EmitLdloc(workloadContinuerLocal);
-                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.GetResult), BindingFlags.Public | BindingFlags.Instance));
+                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.GetResult), BindingFlags.Public | BindingFlags.Instance)!);
                     /*
                         // if (!runnable_.__fieldsContainer.workloadContinuerAndValueTaskSource.IsCompleted)
                         IL_007b: ldloc.1
@@ -492,10 +495,10 @@ partial class RunnableEmitter
                         IL_0086: callvirt instance bool [BenchmarkDotNet]BenchmarkDotNet.Engines.WorkloadContinuerAndValueTaskSource::get_IsCompleted()
                         IL_008b: brfalse.s IL_009a
                      */
-                    ilBuilder.EmitLdloc(thisLocal);
+                    ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
-                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetProperty(nameof(WorkloadContinuerAndValueTaskSource.IsCompleted), BindingFlags.Public | BindingFlags.Instance).GetMethod);
+                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetProperty(nameof(WorkloadContinuerAndValueTaskSource.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
                     ilBuilder.Emit(OpCodes.Brfalse_S, startClockLabel);
 
                     /*
@@ -520,7 +523,7 @@ partial class RunnableEmitter
                      */
                     ilBuilder.MarkLabel(startClockLabel);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.EmitLdloc(thisLocal);
+                    ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldfld, clockField);
                     ilBuilder.Emit(OpCodes.Call, GetStartClockMethod());
@@ -541,19 +544,19 @@ partial class RunnableEmitter
                     ilBuilder.MarkLabel(callBenchmarkLabel);
                     if (!Descriptor.WorkloadMethod.IsStatic)
                     {
-                        ilBuilder.EmitLdloc(thisLocal);
+                        ilBuilder.EmitLdloc(thisLocal!);
                     }
                     EmitLoadArgFieldsForCall(ilBuilder, thisLocal);
                     ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
                     if (benchmarkAwaitableLocal == null)
                     {
-                        ilBuilder.Emit(OpCodes.Callvirt, Descriptor.WorkloadMethod.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance));
+                        ilBuilder.Emit(OpCodes.Callvirt, Descriptor.WorkloadMethod.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
                     }
                     else
                     {
                         ilBuilder.EmitStloc(benchmarkAwaitableLocal);
                         ilBuilder.EmitLdloca(benchmarkAwaitableLocal);
-                        ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance));
+                        ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
                     }
                     /*
                         // if (!awaiter.IsCompleted)
@@ -565,7 +568,7 @@ partial class RunnableEmitter
                      */
                     ilBuilder.EmitStloc(benchmarkAwaiterLocal);
                     ilBuilder.EmitLdloca(benchmarkAwaiterLocal);
-                    ilBuilder.Emit(OpCodes.Call, benchmarkAwaiterField.FieldType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance).GetMethod);
+                    ilBuilder.Emit(OpCodes.Call, benchmarkAwaiterField.FieldType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
                     ilBuilder.Emit(OpCodes.Brtrue_S, benchmarkContinuationGetResultLabel);
 
                     /*
@@ -649,7 +652,7 @@ partial class RunnableEmitter
                      */
                     ilBuilder.MarkLabel(benchmarkContinuationGetResultLabel);
                     ilBuilder.EmitLdloca(benchmarkAwaiterLocal);
-                    var benchmarkAwaiterGetResultMethod = benchmarkAwaiterField.FieldType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance);
+                    var benchmarkAwaiterGetResultMethod = benchmarkAwaiterField.FieldType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!;
                     ilBuilder.Emit(OpCodes.Call, benchmarkAwaiterGetResultMethod);
                     if (benchmarkAwaiterGetResultMethod.ReturnType != typeof(void))
                     {
@@ -671,7 +674,7 @@ partial class RunnableEmitter
                         IL_0129: stind.i8
                      */
                     ilBuilder.MarkLabel(callBenchmarkLoopLabel);
-                    ilBuilder.EmitLdloc(thisLocal);
+                    ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldflda, invokeCountField);
                     ilBuilder.Emit(OpCodes.Dup);
@@ -703,13 +706,13 @@ partial class RunnableEmitter
                         IL_0141: call instance valuetype [Perfolizer]Perfolizer.Horology.ClockSpan [Perfolizer]Perfolizer.Horology.StartedClock::GetElapsed()
                         IL_0146: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.WorkloadContinuerAndValueTaskSource::SetResult(valuetype [Perfolizer]Perfolizer.Horology.ClockSpan)
                      */
-                    ilBuilder.EmitLdloc(thisLocal);
+                    ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldflda, startedClockField);
-                    ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance));
-                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.SetResult), [typeof(ClockSpan)]));
+                    ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
+                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.SetResult), [typeof(ClockSpan)])!);
                     /*
                         // <startedClock>5__2 = default(StartedClock);
                         IL_014b: ldarg.0
@@ -740,11 +743,11 @@ partial class RunnableEmitter
                         IL_0169: ldloc.s 7
                         IL_016b: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.WorkloadContinuerAndValueTaskSource::SetException(class [System.Runtime]System.Exception)
                      */
-                    ilBuilder.EmitLdloc(thisLocal);
+                    ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
                     ilBuilder.EmitLdloc(exceptionLocal);
-                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.SetException), [typeof(Exception)]));
+                    ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.SetException), [typeof(Exception)])!);
                     /*
                         // result = default(GcStats);
                         IL_0170: ldloca.s 2
@@ -826,7 +829,7 @@ partial class RunnableEmitter
                  */
                 ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                ilBuilder.Emit(OpCodes.Newobj, typeof(WorkloadContinuerAndValueTaskSource).GetConstructor([]));
+                ilBuilder.Emit(OpCodes.Newobj, typeof(WorkloadContinuerAndValueTaskSource).GetConstructor([])!);
                 ilBuilder.Emit(OpCodes.Stfld, workloadContinuerAndValueTaskSourceField);
                 /*
 	                // __StartWorkload();
@@ -848,7 +851,7 @@ partial class RunnableEmitter
                 ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                 ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
-                ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.Continue), BindingFlags.Public | BindingFlags.Instance));
+                ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadContinuerAndValueTaskSource).GetMethod(nameof(WorkloadContinuerAndValueTaskSource.Continue), BindingFlags.Public | BindingFlags.Instance)!);
                 ilBuilder.Emit(OpCodes.Ret);
 
                 return methodBuilder;

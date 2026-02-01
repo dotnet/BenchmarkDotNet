@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     public static class ExternalToolsHelper
@@ -14,11 +16,11 @@ namespace BenchmarkDotNet.Helpers
         public static readonly Lazy<Dictionary<string, string>> MacSystemProfilerData =
             LazyParse(OsDetector.IsMacOS, "system_profiler", "SPSoftwareDataType", s => SectionsHelper.ParseSection(s, ':'));
 
-        private static Lazy<T> LazyParse<T>(Func<bool> isAvailable, string fileName, string arguments, Func<string, T> parseFunc)
+        private static Lazy<T> LazyParse<T>(Func<bool> isAvailable, string fileName, string arguments, Func<string?, T> parseFunc)
         {
             return new Lazy<T>(() =>
             {
-                string content = isAvailable() ? ProcessHelper.RunAndReadOutput(fileName, arguments) : "";
+                string? content = isAvailable() ? ProcessHelper.RunAndReadOutput(fileName, arguments) : "";
                 return parseFunc(content);
             });
         }
