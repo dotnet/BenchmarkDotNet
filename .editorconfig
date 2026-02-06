@@ -28,3 +28,4 @@ trim_trailing_whitespace = false
 # C# files
 [*.cs]
 csharp_style_namespace_declarations=file_scoped:suggestion
+dotnet_sort_system_directives_first = true
