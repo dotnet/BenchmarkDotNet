@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains
                 using (ConsoleExitHandler consoleExitHandler = new(process, logger))
                 using (AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false))
                 {
-                    Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                    using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 

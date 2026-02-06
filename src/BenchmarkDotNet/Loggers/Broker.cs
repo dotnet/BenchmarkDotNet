@@ -14,13 +14,20 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class Broker
+    internal class Broker : IDisposable
     {
         private readonly ILogger logger;
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
         private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
         private readonly ManualResetEvent finished;
+
+        private enum Result
+        {
+            Success,
+            EndOfStream,
+            InvalidData,
+        }
 
         public Broker(ILogger logger, Process process, IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser,
             BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, AnonymousPipeServerStream inputFromBenchmark, AnonymousPipeServerStream acknowledgments)
@@ -33,9 +40,6 @@ namespace BenchmarkDotNet.Loggers
             this.acknowledgments = acknowledgments;
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
             finished = new ManualResetEvent(false);
-
-            process.EnableRaisingEvents = true;
-            process.Exited += OnProcessExited;
         }
 
         internal IDiagnoser? Diagnoser { get; }
@@ -45,6 +49,15 @@ namespace BenchmarkDotNet.Loggers
         internal List<string> Results { get; } = [];
 
         internal List<string> PrefixedOutput { get; } = [];
+
+        public void Dispose()
+        {
+            // Dispose all the pipes to let reading from pipe finish with EOF and avoid a reasource leak.
+            inputFromBenchmark.DisposeLocalCopyOfClientHandle();
+            inputFromBenchmark.Dispose();
+            acknowledgments.DisposeLocalCopyOfClientHandle();
+            acknowledgments.Dispose();
+        }
 
         internal void ProcessData()
         {
@@ -58,42 +71,56 @@ namespace BenchmarkDotNet.Loggers
                 return;
             }
 
-            Task.Run(ProcessDataBlocking);
+            var task = Task.Run(() =>
+            {
+                try
+                {
+                    var result = ProcessDataBlocking();
+                    if (result != Result.Success)
+                    {
+                        logger.WriteLineError($"ProcessData operation is interrupted by {result}.");
+                        logger.Flush();
+                    }
+                }
+                finally
+                {
+                    finished.Set();
+                }
+            });
 
             finished.WaitOne();
+
+            // Gets result to avoid UnobservedTaskException.
+            task.GetAwaiter().GetResult();
         }
 
-        private void OnProcessExited(object? sender, EventArgs e)
-        {
-            process.Exited -= OnProcessExited;
-
-            // Dispose all the pipes to let reading from pipe finish with EOF and avoid a reasource leak.
-            inputFromBenchmark.DisposeLocalCopyOfClientHandle();
-            inputFromBenchmark.Dispose();
-            acknowledgments.DisposeLocalCopyOfClientHandle();
-            acknowledgments.Dispose();
-
-            finished.Set();
-        }
-
-        private void ProcessDataBlocking()
+        private Result ProcessDataBlocking()
         {
             using StreamReader reader = new(inputFromBenchmark, AnonymousPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             using StreamWriter writer = new(acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
             writer.AutoFlush = true;
 
-            while (reader.ReadLine() is { } line)
+            while (true)
             {
+                var line = reader.ReadLine();
+                if (line == null)
+                    return Result.EndOfStream;
+
                 // TODO: implement Silent mode here
                 logger.WriteLine(LogKind.Default, line);
 
+                // Handle normal log.
                 if (!line.StartsWith("//"))
                 {
                     Results.Add(line);
+                    continue;
                 }
+
                 // Keep in sync with WasmExecutor and InProcessHost.
-                else if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
+
+                // Handle line prefixed with "// InProcessDiagnoser "
+                if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
                 {
                     // Something like "// InProcessDiagnoser 0 1"
                     string[] lineItems = line.Split(' ');
@@ -102,8 +129,15 @@ namespace BenchmarkDotNet.Loggers
                     var resultsStringBuilder = new StringBuilder();
                     for (int i = 0; i < resultsLinesCount;)
                     {
+                        line = reader.ReadLine();
+                        if (line == null)
+                            return Result.EndOfStream;
+
+                        if (!line.StartsWith("// InProcessDiagnoserResults "))
+                            return Result.InvalidData;
+
                         // Strip the prepended "// InProcessDiagnoserResults ".
-                        line = reader.ReadLine()!.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
+                        line = line.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
                         resultsStringBuilder.Append(line);
                         if (++i < resultsLinesCount)
                         {
@@ -111,8 +145,11 @@ namespace BenchmarkDotNet.Loggers
                         }
                     }
                     compositeInProcessDiagnoser.DeserializeResults(diagnoserIndex, DiagnoserActionParameters.BenchmarkCase, resultsStringBuilder.ToString());
+                    continue;
                 }
-                else if (Engine.Signals.TryGetSignal(line, out var signal))
+
+                // Handle HostSignal data
+                if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
                     Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
@@ -130,15 +167,14 @@ namespace BenchmarkDotNet.Loggers
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
-                        process.Exited -= OnProcessExited;
-                        finished.Set();
-                        return;
+                        return Result.Success;
                     }
+
+                    continue;
                 }
-                else if (!string.IsNullOrEmpty(line))
-                {
-                    PrefixedOutput.Add(line);
-                }
+
+                // Other line that have "//" prefix.
+                PrefixedOutput.Add(line);
             }
         }
     }
