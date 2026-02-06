@@ -40,6 +40,9 @@ namespace BenchmarkDotNet.Loggers
             this.acknowledgments = acknowledgments;
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
             finished = new ManualResetEvent(false);
+
+            process.EnableRaisingEvents = true;
+            process.Exited += OnProcessExited;
         }
 
         internal IDiagnoser? Diagnoser { get; }
@@ -53,10 +56,21 @@ namespace BenchmarkDotNet.Loggers
         public void Dispose()
         {
             // Dispose all the pipes to let reading from pipe finish with EOF and avoid a reasource leak.
-            inputFromBenchmark.DisposeLocalCopyOfClientHandle();
+            DisposeLocalCopyOfClientHandles();
             inputFromBenchmark.Dispose();
-            acknowledgments.DisposeLocalCopyOfClientHandle();
             acknowledgments.Dispose();
+        }
+
+        private void DisposeLocalCopyOfClientHandles()
+        {
+            inputFromBenchmark.DisposeLocalCopyOfClientHandle();
+            acknowledgments.DisposeLocalCopyOfClientHandle();
+        }
+
+        private void OnProcessExited(object? sender, EventArgs e)
+        {
+            process.Exited -= OnProcessExited;
+            DisposeLocalCopyOfClientHandles();
         }
 
         internal void ProcessData()
@@ -160,13 +174,13 @@ namespace BenchmarkDotNet.Loggers
                         // The client has connected, we no longer need to keep the local copy of client handle alive.
                         // This allows server to detect that child process is done and hence avoid resource leak.
                         // Full explanation: https://stackoverflow.com/a/39700027
-                        inputFromBenchmark.DisposeLocalCopyOfClientHandle();
-                        acknowledgments.DisposeLocalCopyOfClientHandle();
+                        DisposeLocalCopyOfClientHandles();
                     }
                     else if (signal == HostSignal.AfterAll)
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
+                        process.Exited -= OnProcessExited;
                         return Result.Success;
                     }
 
