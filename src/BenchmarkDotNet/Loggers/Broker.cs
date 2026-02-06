@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
@@ -20,7 +18,6 @@ namespace BenchmarkDotNet.Loggers
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
         private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
-        private readonly ManualResetEvent finished;
 
         private enum Result
         {
@@ -39,10 +36,9 @@ namespace BenchmarkDotNet.Loggers
             this.inputFromBenchmark = inputFromBenchmark;
             this.acknowledgments = acknowledgments;
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
-            finished = new ManualResetEvent(false);
 
             process.EnableRaisingEvents = true;
-            process.Exited += OnProcessExited;
+            process.Exited += (_, _) => DisposeLocalCopyOfClientHandles();
         }
 
         internal IDiagnoser? Diagnoser { get; }
@@ -67,12 +63,6 @@ namespace BenchmarkDotNet.Loggers
             acknowledgments.DisposeLocalCopyOfClientHandle();
         }
 
-        private void OnProcessExited(object? sender, EventArgs e)
-        {
-            process.Exited -= OnProcessExited;
-            DisposeLocalCopyOfClientHandles();
-        }
-
         internal void ProcessData()
         {
             // When the process fails to start, there is no pipe to read from.
@@ -81,31 +71,11 @@ namespace BenchmarkDotNet.Loggers
 
             // Usually, this property is not set yet.
             if (process.HasExited)
-            {
                 return;
-            }
 
-            var task = Task.Run(() =>
-            {
-                try
-                {
-                    var result = ProcessDataBlocking();
-                    if (result != Result.Success)
-                    {
-                        logger.WriteLineError($"ProcessData operation is interrupted by {result}.");
-                        logger.Flush();
-                    }
-                }
-                finally
-                {
-                    finished.Set();
-                }
-            });
-
-            finished.WaitOne();
-
-            // Gets result to avoid UnobservedTaskException.
-            task.GetAwaiter().GetResult();
+            var result = ProcessDataBlocking();
+            if (result != Result.Success)
+                logger.WriteLineError($"ProcessData operation is interrupted by {result}.");
         }
 
         private Result ProcessDataBlocking()
@@ -180,7 +150,6 @@ namespace BenchmarkDotNet.Loggers
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
-                        process.Exited -= OnProcessExited;
                         return Result.Success;
                     }
 
