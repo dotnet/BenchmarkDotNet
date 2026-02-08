@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Loggers
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             process.EnableRaisingEvents = true;
-            process.Exited += (_, _) => DisposeLocalCopyOfClientHandles();
+            process.Exited += OnProcessExited;
         }
 
         internal IDiagnoser? Diagnoser { get; }
@@ -51,10 +51,17 @@ namespace BenchmarkDotNet.Loggers
 
         public void Dispose()
         {
-            // Dispose all the pipes to let reading from pipe finish with EOF and avoid a reasource leak.
+            process.Exited -= OnProcessExited;
+
+            // Dispose all the pipes to let reading from pipe finish with EOF and avoid a resource leak.
             DisposeLocalCopyOfClientHandles();
             inputFromBenchmark.Dispose();
             acknowledgments.Dispose();
+        }
+
+        private void OnProcessExited(object? sender, EventArgs e)
+        {
+            DisposeLocalCopyOfClientHandles();
         }
 
         private void DisposeLocalCopyOfClientHandles()
@@ -117,7 +124,7 @@ namespace BenchmarkDotNet.Loggers
                         if (line == null)
                             return Result.EndOfStream;
 
-                        if (!line.StartsWith("// InProcessDiagnoserResults "))
+                        if (!line.StartsWith($"{CompositeInProcessDiagnoser.ResultsKey} "))
                             return Result.InvalidData;
 
                         // Strip the prepended "// InProcessDiagnoserResults ".
