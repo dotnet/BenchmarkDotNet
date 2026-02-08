@@ -32,6 +32,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(
                 [new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([]))],
                 BenchmarkRunnerClean.DefaultResolver),
+                CodeGenEntryPointType.Synchronous,
                 benchmarkRunCallType
             ));
         }
@@ -52,6 +53,7 @@ namespace BenchmarkDotNet.Tests
             var generatedSourceFile = CodeGenerator.Generate(new BuildPartition(
                 [new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([]))],
                 BenchmarkRunnerClean.DefaultResolver),
+                CodeGenEntryPointType.Synchronous,
                 benchmarkRunCallType
             );
 

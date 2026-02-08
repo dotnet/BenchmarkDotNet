@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
             CustomRuntimePack = customRuntimePack;
             MainJS = (targetFrameworkMoniker == "net5.0" || targetFrameworkMoniker == "net6.0") ? "main.js" : "test-main.js";
+            EntryPointType = Code.CodeGenEntryPointType.Asynchronous;
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
         }
 

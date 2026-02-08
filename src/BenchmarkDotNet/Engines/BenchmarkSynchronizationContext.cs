@@ -28,9 +28,6 @@ public readonly ref struct BenchmarkSynchronizationContext : IDisposable
     public void Dispose()
         => context.Dispose();
 
-    public void ExecuteUntilComplete(ValueTask valueTask)
-        => context.ExecuteUntilComplete(valueTask);
-
     public T ExecuteUntilComplete<T>(ValueTask<T> valueTask)
         => context.ExecuteUntilComplete(valueTask);
 }
@@ -97,23 +94,6 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         SetSynchronizationContext(previousContext);
     }
 
-    internal void ExecuteUntilComplete(ValueTask valueTask)
-    {
-        ThrowIfDisposed();
-
-        var awaiter = valueTask.GetAwaiter();
-        if (valueTask.IsCompleted)
-        {
-            awaiter.GetResult();
-            return;
-        }
-
-        isCompleted = false;
-        awaiter.UnsafeOnCompleted(OnCompleted);
-        ExecuteUntilComplete();
-        awaiter.GetResult();
-    }
-
     internal T ExecuteUntilComplete<T>(ValueTask<T> valueTask)
     {
         ThrowIfDisposed();
@@ -126,21 +106,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
 
         isCompleted = false;
         awaiter.UnsafeOnCompleted(OnCompleted);
-        ExecuteUntilComplete();
-        return awaiter.GetResult();
-    }
 
-    private void OnCompleted()
-    {
-        isCompleted = true;
-        lock (syncRoot)
-        {
-            Monitor.Pulse(syncRoot);
-        }
-    }
-
-    private void ExecuteUntilComplete()
-    {
         var spinner = new SpinWait();
         while (true)
         {
@@ -169,7 +135,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
 
             if (isCompleted)
             {
-                return;
+                return awaiter.GetResult();
             }
 
             if (!spinner.NextSpinWillYield)
@@ -185,6 +151,15 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             }
             // Reset the spinner.
             spinner = new();
+        }
+    }
+
+    private void OnCompleted()
+    {
+        isCompleted = true;
+        lock (syncRoot)
+        {
+            Monitor.Pulse(syncRoot);
         }
     }
 }
