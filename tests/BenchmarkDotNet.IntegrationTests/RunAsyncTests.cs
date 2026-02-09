@@ -35,8 +35,8 @@ public class RunAsyncTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
     }
 
     [Fact]
-    public void OutOfProcessAsyncBenchmarksRunSync()
-        => ExecuteAndAssert<BenchmarkAsync>(Job.Default.GetToolchain(), false);
+    public void OutOfProcessBenchmarks()
+        => ExecuteAndAssert<BenchmarkAsync>(Job.Default.GetToolchain(), true);
 
     [Theory]
     [MemberData(nameof(GetInProcessToolchains), DisableDiscoveryEnumeration = true)]

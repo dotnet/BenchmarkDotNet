@@ -67,7 +67,15 @@ namespace BenchmarkDotNet.Loggers
 
         private async ValueTask ProcessDataCore()
         {
-            await pipe.WaitForConnectionAsync();
+            try
+            {
+                await pipe.WaitForConnectionAsync();
+            }
+            catch (IOException)
+            {
+                // If the process exited before the connection was established, it throws IOException.
+                return;
+            }
 
             using StreamReader reader = new(pipe, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
