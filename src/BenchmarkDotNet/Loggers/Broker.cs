@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
@@ -71,9 +72,9 @@ namespace BenchmarkDotNet.Loggers
             {
                 await pipe.WaitForConnectionAsync();
             }
-            catch (IOException)
+            // If the process exited before the connection was established, it throws IOException on Windows or SocketException on Unix.
+            catch (Exception e) when (e is IOException || e is SocketException)
             {
-                // If the process exited before the connection was established, it throws IOException.
                 return;
             }
 
