@@ -10,7 +10,7 @@ Frequency: 2531248 Hz, Resolution: 395.062 ns, Timer: TSC
 
  Method | Job  | Mean     | Error   | StdDev  | Ratio | RatioSD | Rank | LogicalGroup      | Baseline |
 ------- |----- |---------:|--------:|--------:|------:|--------:|-----:|------------------ |--------- |
- Foo    | Job1 | 114.5 ns | 5.88 ns | 8.80 ns |  1.01 |    0.11 |    1 | DistinctParamSet0 | Yes      |
+ Foo    | Job1 | 114.5 ns | 5.88 ns | 8.80 ns |  1.00 |    0.00 |    1 | DistinctParamSet0 | Yes      |
  Bar    | Job1 | 214.5 ns | 5.88 ns | 8.80 ns |  1.88 |    0.16 |    2 | DistinctParamSet0 | No       |
  Foo    | Job2 | 314.5 ns | 5.88 ns | 8.80 ns |  2.76 |    0.22 |    3 | DistinctParamSet0 | No       |
  Bar    | Job2 | 414.5 ns | 5.88 ns | 8.80 ns |  3.64 |    0.29 |    4 | DistinctParamSet0 | No       |
