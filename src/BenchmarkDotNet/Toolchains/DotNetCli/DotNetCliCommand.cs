@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -139,6 +140,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument($"\"{filePath}\"")
                 // restore doesn't support -f argument.
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument(buildPartition?.Runtime is WasmRuntime ? "-r browser-wasm" : string.Empty)
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
