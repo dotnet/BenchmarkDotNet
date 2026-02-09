@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -70,7 +71,12 @@ namespace BenchmarkDotNet.Loggers
         {
             try
             {
-                await pipe.WaitForConnectionAsync();
+                using var cts = new CancellationTokenSource(NamedPipeHost.PipeConnectionTimeout);
+                await pipe.WaitForConnectionAsync(cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException($"The connection to the benchmark process timed out after {NamedPipeHost.PipeConnectionTimeout}.");
             }
             // If the process exited before the connection was established, it throws IOException on Windows or SocketException on Unix.
             catch (Exception e) when (e is IOException || e is SocketException)

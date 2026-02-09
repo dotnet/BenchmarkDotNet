@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes.CompilerServices;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -6,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +22,7 @@ public class NamedPipeHost : IHost
 {
     internal const string PipeNameDescriptor = "--pipeName";
     internal static readonly Encoding UTF8NoBOM = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+    public static readonly TimeSpan PipeConnectionTimeout = TimeSpan.FromMinutes(1);
 
     private readonly NamedPipeClientStream pipe;
     private readonly StreamWriter outWriter;
@@ -83,7 +86,7 @@ public class NamedPipeHost : IHost
             {
                 var pipeName = args[i + 1]; // IndexOutOfRangeException means a bug (incomplete data)
                 var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-                await pipe.ConnectAsync();
+                await pipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds);
                 return new NamedPipeHost(pipe);
             }
         }
@@ -99,7 +102,13 @@ public class NamedPipeHost : IHost
             {
                 // MacOS has a small character limit, so we use random file name instead of guid.
                 pipeName = $"BDN-{benchmarkId.Value}-{Path.GetRandomFileName().Replace(".", "")}";
-                return new(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                // Ensure the pipe handle is not inherited to prevent hangs on Windows.
+                if (OsDetector.IsWindows())
+                {
+                    SetHandleInformation(pipe.SafePipeHandle.DangerousGetHandle(), HANDLE_FLAG_INHERIT, 0);
+                }
+                return pipe;
             }
             catch (IOException)
             {
@@ -111,4 +120,9 @@ public class NamedPipeHost : IHost
             }
         }
     }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool SetHandleInformation(IntPtr hObject, int dwMask, int dwFlags);
+
+    const int HANDLE_FLAG_INHERIT = 1;
 }
