@@ -97,7 +97,8 @@ public class NamedPipeHost : IHost
         {
             try
             {
-                pipeName = $"BenchmarkDotNet-{benchmarkId.Value}-{Guid.NewGuid()}";
+                // MacOS has a small character limit, so we use random file name instead of guid.
+                pipeName = $"BDN-{benchmarkId.Value}-{Path.GetRandomFileName().Replace(".", "")}";
                 return new(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             }
             catch (IOException)
