@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<ILogger> GetLoggers()
         {
             if (LinqPadLogger.IsAvailable)
-                yield return LinqPadLogger.Instance;
+                yield return LinqPadLogger.Instance!;
             else
                 yield return ConsoleLogger.Default;
         }
