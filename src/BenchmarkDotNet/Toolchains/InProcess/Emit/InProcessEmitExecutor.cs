@@ -9,9 +9,10 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
@@ -36,9 +37,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 runThread.IsBackground = true;
 
                 runThread.Start();
-                runThread.Join();
 
-                // We must await the task after joining the thread or else it can deadlock.
                 exitCode = await taskCompletionSource.Task;
             }
             else

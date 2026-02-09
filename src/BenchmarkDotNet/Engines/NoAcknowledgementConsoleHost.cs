@@ -1,35 +1,39 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Portability;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Engines
+namespace BenchmarkDotNet.Engines;
+
+// This class is used when somebody manually launches benchmarking .exe without providing pipe name, or for wasm that doesn't support pipes.
+[AggressivelyOptimizeMethods]
+internal sealed class NoAcknowledgementConsoleHost : IHost
 {
-    // this class is used only when somebody manually launches benchmarking .exe without providing anonymous pipes file descriptors
-    public sealed class NoAcknowledgementConsoleHost : IHost
+    private readonly TextWriter outWriter;
+
+    public NoAcknowledgementConsoleHost() => outWriter = Console.Out;
+
+    public async ValueTask WriteAsync(string message)
+        => await outWriter.WriteAsync(message);
+
+    public async ValueTask WriteLineAsync()
+        => await outWriter.WriteLineAsync();
+
+    public async ValueTask WriteLineAsync(string message)
+        => await outWriter.WriteLineAsync(message);
+
+    public ValueTask SendSignalAsync(HostSignal hostSignal)
+        => WriteLineAsync(Engine.Signals.ToMessage(hostSignal));
+
+    public ValueTask SendErrorAsync(string message)
+        => WriteLineAsync($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
+
+    public ValueTask ReportResultsAsync(RunResults runResults)
+        => runResults.WriteAsync(this);
+
+    public void Dispose()
     {
-        private readonly TextWriter outWriter;
-
-        public NoAcknowledgementConsoleHost() => outWriter = Console.Out;
-
-        public void Write(string message) => outWriter.Write(message);
-
-        public void WriteLine() => outWriter.WriteLine();
-
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void WriteLine(string message) => outWriter.WriteLine(message);
-
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void SendSignal(HostSignal hostSignal) => WriteLine(Engine.Signals.ToMessage(hostSignal));
-
-        public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
-
-        public void ReportResults(RunResults runResults) => runResults.Print(outWriter);
-
-        public void Dispose()
-        {
-            // do nothing on purpose - there is no point in closing STD OUT
-        }
+        // do nothing on purpose - there is no point in closing STD OUT
     }
 }

@@ -29,38 +29,36 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// Out-of-process executor executes synchronously. 
         /// </summary>
-        public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
-            var executeResult = !File.Exists(exePath)
+            return !File.Exists(exePath)
                 ? ExecuteResult.CreateFailed()
-                : Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+                : await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
                     executeParameters.DiagnoserRunMode);
-            return new ValueTask<ExecuteResult>(executeResult);
         }
 
-        private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+        private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
             try
             {
-                using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
-                using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
+                using var pipe = NamedPipeHost.GetPipeServerStream(benchmarkId, out string pipeName);
 
-                string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode);
+                string args = benchmarkId.ToArguments(pipeName, diagnoserRunMode);
 
                 using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
                 using ConsoleExitHandler consoleExitHandler = new(process, logger);
                 using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
                 
-                Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, pipe);
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
-                return Execute(process, benchmarkCase, broker, logger, consoleExitHandler, launchIndex, processOutputReader);
+                return await Execute(process, benchmarkCase, broker, logger, consoleExitHandler, launchIndex, processOutputReader);
             }
             finally
             {
@@ -68,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, Broker broker,
+        private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, Broker broker,
             ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, AsyncProcessOutputReader processOutputReader)
         {
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
@@ -94,7 +92,7 @@ namespace BenchmarkDotNet.Toolchains
                 process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
             }
 
-            broker.ProcessData();
+            await broker.ProcessData();
 
             if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {

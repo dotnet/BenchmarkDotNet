@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -19,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public class DotNetCliExecutor(string customDotNetCliPath) : IExecutor
     {
-        public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
         {
             if (!File.Exists(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath))
             {
@@ -29,12 +28,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.Logger.WriteLineError(file.Name);
                 }
 
-                return new ValueTask<ExecuteResult>(ExecuteResult.CreateFailed());
+                return ExecuteResult.CreateFailed();
             }
 
             try
             {
-                var executeResult = Execute(
+                return await Execute(
                     executeParameters.BenchmarkCase,
                     executeParameters.BenchmarkId,
                     executeParameters.Logger,
@@ -45,7 +44,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.Resolver,
                     executeParameters.LaunchIndex,
                     executeParameters.DiagnoserRunMode);
-                return new ValueTask<ExecuteResult>(executeResult);
             }
             finally
             {
@@ -55,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase,
+        private async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase,
             BenchmarkId benchmarkId,
             ILogger logger,
             ArtifactsPaths artifactsPaths,
@@ -66,13 +64,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
-            using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
+            using var pipe = NamedPipeHost.GetPipeServerStream(benchmarkId, out string pipeName);
 
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 customDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode)}",
+                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(pipeName, diagnoserRunMode)}",
                 redirectStandardOutput: true,
                 redirectStandardInput: false,
                 redirectStandardError: false); // #1629
@@ -83,7 +80,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using ConsoleExitHandler consoleExitHandler = new(process, logger);
             using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
             
-            Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+            Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, pipe);
 
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -101,7 +98,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
             }
 
-            broker.ProcessData();
+            await broker.ProcessData();
 
             if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {

@@ -20,7 +20,7 @@ internal static class InProcessEmitRunner
     {
         // the first thing to do is to let diagnosers hook in before anything happens
         // so all jit-related diagnosers can catch first jit compilation!
-        host.BeforeAnythingElse();
+        await host.BeforeAnythingElseAsync();
 
         try
         {
@@ -34,25 +34,25 @@ internal static class InProcessEmitRunner
         }
         catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
         {
-            host.WriteLine();
-            host.WriteLine("OutOfMemoryException!");
-            host.WriteLine("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
-            host.WriteLine("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
-            host.WriteLine("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
-            host.WriteLine();
-            host.WriteLine(oom.ToString());
+            await host.WriteLineAsync();
+            await host.WriteLineAsync("OutOfMemoryException!");
+            await host.WriteLineAsync("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
+            await host.WriteLineAsync("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
+            await host.WriteLineAsync("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
+            await host.WriteLineAsync();
+            await host.WriteLineAsync(oom.ToString());
 
             return -1;
         }
         catch (Exception ex)
         {
-            host.WriteLine();
-            host.WriteLine(ex.ToString());
+            await host.WriteLineAsync();
+            await host.WriteLineAsync(ex.ToString());
             return -1;
         }
         finally
         {
-            host.AfterAll();
+            await host.AfterAllAsync();
         }
     }
 
@@ -63,17 +63,17 @@ internal static class InProcessEmitRunner
         var instance = Activator.CreateInstance(runnableType);
         FillMembers(instance, benchmarkCase);
 
-        host.WriteLine();
+        await host.WriteLineAsync();
         foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
         {
-            host.WriteLine($"// {infoLine}");
+            await host.WriteLineAsync($"// {infoLine}");
         }
         var job = new Job().Apply(benchmarkCase.Job).Freeze();
-        host.WriteLine($"// Job: {job.DisplayInfo}");
-        host.WriteLine();
+        await host.WriteLineAsync($"// Job: {job.DisplayInfo}");
+        await host.WriteLineAsync();
 
         var errors = BenchmarkProcessValidator.Validate(job, instance);
-        if (ValidationErrorReporter.ReportIfAny(errors, host))
+        if (await ValidationErrorReporter.ReportIfAnyAsync(errors, host))
             return;
 
         var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
@@ -87,10 +87,10 @@ internal static class InProcessEmitRunner
         );
         if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
         {
-            compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+            await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic);
             return;
         }
-        compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine);
 
         var engineParameters = new EngineParameters()
         {
@@ -114,11 +114,11 @@ internal static class InProcessEmitRunner
             .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
             .Create(engineParameters)
             .RunAsync();
-        host.ReportResults(results);
+        await host.ReportResultsAsync(results);
 
         runnableType.GetMethod(TrickTheJitCoreMethodName).Invoke(instance, []);
 
-        compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine);
     }
 
     private static void FillMembers(object instance, BenchmarkCase benchmarkCase)

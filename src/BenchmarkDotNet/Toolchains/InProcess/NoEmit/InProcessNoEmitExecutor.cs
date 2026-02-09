@@ -37,9 +37,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 runThread.IsBackground = true;
 
                 runThread.Start();
-                runThread.Join();
 
-                // We must await the task after joining the thread or else it can deadlock.
                 exitCode = await taskCompletionSource.Task;
             }
             else

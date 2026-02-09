@@ -80,8 +80,7 @@ namespace BenchmarkDotNet.Running
         }
 
         /// <summary>
-        /// Run all available benchmarks.
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
+        /// Run all available benchmarks asynchronously.
         /// </summary>
         [PublicAPI]
         public ValueTask<IEnumerable<Summary>> RunAllAsync(IConfig? config = null, string[]? args = null)
@@ -94,8 +93,7 @@ namespace BenchmarkDotNet.Running
         }
 
         /// <summary>
-        /// Run all available benchmarks and join them to a single summary.
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
+        /// Run all available benchmarks and join them to a single summary asynchronously.
         /// </summary>
         [PublicAPI]
         public async ValueTask<Summary> RunAllJoinedAsync(IConfig? config = null, string[]? args = null)
@@ -108,9 +106,6 @@ namespace BenchmarkDotNet.Running
             return results.Single();
         }
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public async ValueTask<IEnumerable<Summary>> RunAsync(string[]? args = null, IConfig? config = null)
         {

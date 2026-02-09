@@ -66,16 +66,10 @@ namespace BenchmarkDotNet.Running
             return context.ExecuteUntilComplete(RunAsync(benchmarkRunInfos));
         }
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static ValueTask<Summary> RunAsync<T>(IConfig? config = null, string[]? args = null)
             => RunAsync(typeof(T), config, args);
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static async ValueTask<Summary> RunAsync(Type type, IConfig? config = null, string[]? args = null)
         {
@@ -85,9 +79,6 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static async ValueTask<Summary[]> RunAsync(Type[] types, IConfig? config = null, string[]? args = null)
         {
@@ -97,9 +88,6 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static async ValueTask<Summary> RunAsync(Type type, MethodInfo[] methods, IConfig? config = null)
         {
@@ -109,9 +97,6 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static async ValueTask<Summary[]> RunAsync(Assembly assembly, IConfig? config = null, string[]? args = null)
         {
@@ -121,16 +106,10 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static async ValueTask<Summary> RunAsync(BenchmarkRunInfo benchmarkRunInfo)
             => (await RunAsync([benchmarkRunInfo])).Single();
 
-        /// <summary>
-        /// Runs async if any benchmark is async and ran in-process; otherwise runs sync.
-        /// </summary>
         [PublicAPI]
         public static async ValueTask<Summary[]> RunAsync(BenchmarkRunInfo[] benchmarkRunInfos)
         {

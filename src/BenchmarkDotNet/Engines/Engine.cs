@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Engines
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
                 catch (Exception e) when (didThrow)
                 {
-                    Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
+                    await Host.SendErrorAsync($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                 }
             }
         }
@@ -108,8 +108,8 @@ namespace BenchmarkDotNet.Engines
             {
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    Host.BeforeMainRun();
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
+                    await Host.BeforeMainRunAsync();
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
@@ -147,19 +147,19 @@ namespace BenchmarkDotNet.Engines
 
                     // Results
                     var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, totalOperations, clockSpan.GetNanoseconds());
-                    Host.WriteLine(measurement.ToString());
+                    await Host.WriteLineAsync(measurement.ToString());
                     stageMeasurements.Add(measurement);
                     // Actual Workload is always the last stage, so we use the same data to run extra stats.
                     extraIterationData = iterationData;
                 }
                 measurements.AddRange(stageMeasurements);
 
-                Host.WriteLine();
+                await Host.WriteLineAsync();
 
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    Host.AfterMainRun();
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
+                    await Host.AfterMainRunAsync();
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun);
                 }
             }
 
@@ -172,8 +172,8 @@ namespace BenchmarkDotNet.Engines
 
                 await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
-                Host.SendSignal(HostSignal.BeforeExtraIteration);
-                Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeExtraIteration);
+                await Host.SendSignalAsync(HostSignal.BeforeExtraIteration);
+                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration);
 
                 // GC collect before measuring allocations.
                 ForceGcCollect();
@@ -190,14 +190,14 @@ namespace BenchmarkDotNet.Engines
                     (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
                 }
 
-                Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
-                Host.SendSignal(HostSignal.AfterExtraIteration);
+                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration);
+                await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
 
                 await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
 
                 var totalOperations = extraIterationData.invokeCount * Parameters.OperationsPerInvoke;
                 var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());
-                Host.WriteLine(measurement.ToString());
+                await Host.WriteLineAsync(measurement.ToString());
                 workGcHasDone = gcStats.WithTotalOperations(totalOperations);
                 measurements.Add(measurement);
             }

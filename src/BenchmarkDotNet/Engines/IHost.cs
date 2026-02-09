@@ -1,18 +1,19 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using JetBrains.Annotations;
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
-namespace BenchmarkDotNet.Engines
+namespace BenchmarkDotNet.Engines;
+
+[UsedImplicitly]
+[EditorBrowsable(EditorBrowsableState.Never)]
+public interface IHost : IDisposable
 {
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public interface IHost : IDisposable
-    {
-        void Write(string message);
-        void WriteLine();
-        void WriteLine(string message);
+    ValueTask WriteLineAsync();
+    ValueTask WriteLineAsync(string message);
 
-        void SendSignal(HostSignal hostSignal);
-        void SendError(string message);
+    ValueTask SendSignalAsync(HostSignal hostSignal);
+    ValueTask SendErrorAsync(string message);
 
-        void ReportResults(RunResults runResults);
-    }
+    ValueTask ReportResultsAsync(RunResults runResults);
 }

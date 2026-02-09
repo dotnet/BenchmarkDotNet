@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
-            host.BeforeAnythingElse();
+            await host.BeforeAnythingElseAsync();
 
             try
             {
@@ -46,25 +46,25 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
             catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
             {
-                host.WriteLine();
-                host.WriteLine("OutOfMemoryException!");
-                host.WriteLine("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
-                host.WriteLine("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
-                host.WriteLine("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
-                host.WriteLine();
-                host.WriteLine(oom.ToString());
+                await host.WriteLineAsync();
+                await host.WriteLineAsync("OutOfMemoryException!");
+                await host.WriteLineAsync("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
+                await host.WriteLineAsync("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
+                await host.WriteLineAsync("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
+                await host.WriteLineAsync();
+                await host.WriteLineAsync(oom.ToString());
 
                 return -1;
             }
             catch (Exception ex)
             {
-                host.WriteLine();
-                host.WriteLine(ex.ToString());
+                await host.WriteLineAsync();
+                await host.WriteLineAsync(ex.ToString());
                 return -1;
             }
             finally
             {
-                host.AfterAll();
+                await host.AfterAllAsync();
             }
         }
 
@@ -125,14 +125,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 FillMembers(instance, benchmarkCase);
 
-                host.WriteLine();
+                await host.WriteLineAsync();
                 foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
-                    host.WriteLine("// {0}", infoLine);
-                host.WriteLine("// Job: {0}", job.DisplayInfo);
-                host.WriteLine();
+                    await host.WriteLineAsync("// {0}", infoLine);
+                await host.WriteLineAsync("// Job: {0}", job.DisplayInfo);
+                await host.WriteLineAsync();
 
                 var errors = BenchmarkProcessValidator.Validate(job, instance);
-                if (ValidationErrorReporter.ReportIfAny(errors, host))
+                if (await ValidationErrorReporter.ReportIfAnyAsync(errors, host))
                     return;
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
@@ -146,10 +146,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 );
                 if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
                 {
-                    compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+                    await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic);
                     return;
                 }
-                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine);
 
                 var engineParameters = new EngineParameters
                 {
@@ -178,9 +178,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
                     .Create(engineParameters)
                     .RunAsync();
-                host.ReportResults(results); // printing costs memory, do this after runs
+                await host.ReportResultsAsync(results); // printing costs memory, do this after runs
 
-                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine);
             }
         }
     }
