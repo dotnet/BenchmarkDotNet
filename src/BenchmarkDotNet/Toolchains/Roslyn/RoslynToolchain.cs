@@ -29,10 +29,10 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 yield return validationError;
             }
 
-            if (!RuntimeInformation.IsFullFramework)
+            if (!(RuntimeInformation.IsFullFramework || RuntimeInformation.IsOldMono))
             {
                 yield return new ValidationError(true,
-                    "The Roslyn toolchain is only supported on .NET Framework",
+                    "The Roslyn toolchain is only supported on .NET Framework and legacy Mono",
                     benchmarkCase);
             }
 
