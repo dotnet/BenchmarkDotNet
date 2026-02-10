@@ -25,8 +25,8 @@ As a result, you will have additional `Ratio` column in the summary table:
 This column contains the mean value of the ratio distribution.
 
 For example, in the case of `Time50`, we divide
-  the first measurement of `Time50` into the first measurement of `Time100` (it's the baseline),
-  the second measurement of `Time50` into the second measurement of `Time100`,
+  the first measurement of `Time50` into each measurement of `Time100` (it's the baseline),
+  the second measurement of `Time50` into each measurement of `Time100`,
   and so on.
 Next, we calculate the mean of all these values and display it in the `Ratio` column.
 For `Time50`, we have 0.50.

@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Columns
             return nonBaselines.Any(x => GetRatioStatistics(summary[x]?.ResultStatistics, baselineStat)?.Mean < 0.01);
         }
 
-        private static Statistics? GetRatioStatistics(Statistics? current, Statistics? baseline)
+        private static RatioStatistics? GetRatioStatistics(Statistics? current, Statistics? baseline)
         {
             if (current == null || current.N < 1)
                 return null;
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Columns
                 return null;
             try
             {
-                return Statistics.Divide(current, baseline);
+                return new RatioStatistics(current, baseline);
             }
             catch (DivideByZeroException)
             {

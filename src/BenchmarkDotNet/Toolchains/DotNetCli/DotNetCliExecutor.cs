@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -79,26 +80,32 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using Process process = new() { StartInfo = startInfo };
             using ConsoleExitHandler consoleExitHandler = new(process, logger);
             using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
-            
-            Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, pipe);
 
-            logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-            diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
-
-            process.Start();
-
-            diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
-
-            processOutputReader.BeginRead();
-
-            process.EnsureHighPriority(logger);
-            if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+            List<string> results;
+            List<string> prefixedOutput;
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, pipe))
             {
-                process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
-            }
+                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-            await broker.ProcessData();
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+
+                process.Start();
+
+                diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+
+                processOutputReader.BeginRead();
+
+                process.EnsureHighPriority(logger);
+                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                {
+                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                }
+
+                await broker.ProcessData();
+
+                results = broker.Results;
+                prefixedOutput = broker.PrefixedOutput;
+            }
 
             if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {
@@ -115,8 +122,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return new ExecuteResult(true,
                 process.HasExited ? process.ExitCode : null,
                 process.Id,
-                broker.Results,
-                broker.PrefixedOutput,
+                results,
+                prefixedOutput,
                 processOutputReader.GetOutputLines(),
                 launchIndex);
         }

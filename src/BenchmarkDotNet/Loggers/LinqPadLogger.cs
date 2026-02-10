@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Loggers
 
         public static bool IsAvailable => Instance != null;
 
-        public static ILogger Instance => lazyInstance.Value ?? NullLogger.Instance;
+        public static ILogger? Instance => lazyInstance.Value;
 
         private LinqPadLogger(MethodInfo withStyle, IReadOnlyDictionary<LogKind, string> colorScheme)
         {
