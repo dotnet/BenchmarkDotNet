@@ -2,9 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
-    <TargetFrameworks>net462;net48;net8.0;</TargetFrameworks>
-    <!-- Deprecated runtime and vulnerabilities from old runtime, just in case any are found in the future. -->
-    <NoWarn>$(NoWarn);NETSDK1138;NU1903</NoWarn>
+    <TargetFrameworks>net462;net48;net8.0</TargetFrameworks>
     <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -16,8 +14,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <!-- Suppress tfm compatibility error when targeting net461 -->
-    <SuppressTfmSupportBuildErrors>true</SuppressTfmSupportBuildErrors>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
@@ -40,11 +36,9 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Microsoft.NET.Test.Sdk breaks netcoreapp2.0 -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" Condition=" '$(TargetFramework)' != 'netcoreapp2.0' " />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <!-- We use older version 2.4.1 for combatibility with netcoreapp2.0. -->
-    <PackageReference Include="xunit.runner.visualstudio" Version="[2.4.1]">
+    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
