@@ -10,11 +10,14 @@ using BenchmarkDotNet.Validators;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     public static class RunnableReuse
     {
         public static (Job, EngineParameters, IEngineFactory) PrepareForRun<T>(T instance, IHost host, ExecuteParameters parameters)
+            where T : notnull
         {
             var benchmarkCase = parameters.BenchmarkCase;
             FillObjectMembers(instance, benchmarkCase);
@@ -51,6 +54,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         }
 
         public static void FillObjectMembers<T>(T instance, BenchmarkCase benchmarkCase)
+            where T : notnull
         {
             var argIndex = 0;
             foreach (var argInfo in benchmarkCase.Descriptor.WorkloadMethod.GetParameters())
@@ -93,10 +97,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             return benchmarkCase.Job.ResolveValue(
                 InfrastructureMode.EngineFactoryCharacteristic,
-                InfrastructureResolver.Instance);
+                InfrastructureResolver.Instance)!;
         }
 
         private static EngineParameters CreateEngineParameters<T>(T instance, BenchmarkCase benchmarkCase, IHost host, CompositeInProcessDiagnoserHandler inProcessDiagnoserHandler)
+            where T : notnull
             => new()
             {
                 Host = host,

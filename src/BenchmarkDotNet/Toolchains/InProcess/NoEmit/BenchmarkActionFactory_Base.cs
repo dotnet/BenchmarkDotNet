@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
@@ -45,15 +46,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
 
             protected static TDelegate Unroll<TDelegate>(TDelegate callback, int unrollFactor)
+                 where TDelegate : notnull, Delegate
             {
-                if (callback == null)
-                    throw new ArgumentNullException(nameof(callback));
-
                 if (unrollFactor <= 1)
                     return callback;
 
-                return (TDelegate)(object)Delegate.Combine(
-                    Enumerable.Repeat((Delegate)(object)callback, unrollFactor).ToArray());
+                var delegates = new Delegate[unrollFactor];
+                for (int i = 0; i < unrollFactor; i++)
+                    delegates[i] = callback;
+
+                return (TDelegate)Delegate.Combine(delegates)!;
             }
 
             // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
