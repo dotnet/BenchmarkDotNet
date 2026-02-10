@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -45,21 +46,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             try
             {
-                using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
-                using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
-
-                string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode);
-
-                using (Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
-                using (ConsoleExitHandler consoleExitHandler = new(process, logger))
-                using (AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false))
-                {
-                    Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
-
-                    diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
-
-                    return Execute(process, benchmarkCase, broker, logger, consoleExitHandler, launchIndex, processOutputReader);
-                }
+                return ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode);
             }
             finally
             {
@@ -67,33 +54,53 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, Broker broker,
-            ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, AsyncProcessOutputReader processOutputReader)
+        private static ExecuteResult ExecuteCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+            IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
+            Diagnosers.RunMode diagnoserRunMode)
         {
-            logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+            using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
+            using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
 
-            try
+            string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode);
+
+            using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
+            using ConsoleExitHandler consoleExitHandler = new(process, logger);
+            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+
+            List<string> results;
+            List<string> prefixedOutput;
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments))
             {
-                process.Start();
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
+
+                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
+                try
+                {
+                    process.Start();
+                }
+                catch (Win32Exception ex)
+                {
+                    logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
+
+                    return new ExecuteResult(true, null, null, [], [], [], launchIndex);
+                }
+
+                broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+
+                processOutputReader.BeginRead();
+
+                process.EnsureHighPriority(logger);
+                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                {
+                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                }
+
+                broker.ProcessData();
+
+                results = broker.Results;
+                prefixedOutput = broker.PrefixedOutput;
             }
-            catch (Win32Exception ex)
-            {
-                logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
-
-                return new ExecuteResult(true, null, null, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), launchIndex);
-            }
-
-            broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
-
-            processOutputReader.BeginRead();
-
-            process.EnsureHighPriority(logger);
-            if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
-            {
-                process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
-            }
-
-            broker.ProcessData();
 
             if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {
@@ -107,14 +114,14 @@ namespace BenchmarkDotNet.Toolchains
                 processOutputReader.StopRead();
             }
 
-            if (broker.Results.Any(line => line.Contains("BadImageFormatException")))
+            if (results.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
             return new ExecuteResult(true,
                 process.HasExited ? process.ExitCode : null,
                 process.Id,
-                broker.Results,
-                broker.PrefixedOutput,
+                results,
+                prefixedOutput,
                 processOutputReader.GetOutputLines(),
                 launchIndex);
         }
