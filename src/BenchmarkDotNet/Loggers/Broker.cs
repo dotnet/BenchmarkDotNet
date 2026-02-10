@@ -20,7 +20,8 @@ namespace BenchmarkDotNet.Loggers
         private readonly ILogger logger;
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
-        private NamedPipeServerStream? pipe;
+        private NamedPipeServerStream? inPipe;
+        private NamedPipeServerStream? outPipe;
 
         private enum Result
         {
@@ -31,13 +32,14 @@ namespace BenchmarkDotNet.Loggers
         }
 
         public Broker(ILogger logger, Process process, IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser,
-            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, NamedPipeServerStream pipe)
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, NamedPipeServerStream inPipe, NamedPipeServerStream outPipe)
         {
             this.logger = logger;
             this.process = process;
             this.Diagnoser = diagnoser;
             this.compositeInProcessDiagnoser = compositeInProcessDiagnoser;
-            this.pipe = pipe;
+            this.inPipe = inPipe;
+            this.outPipe = outPipe;
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             process.EnableRaisingEvents = true;
@@ -56,8 +58,9 @@ namespace BenchmarkDotNet.Loggers
         {
             process.Exited -= OnProcessExited;
 
-            // Dispose the pipe to let reading from pipe finish with EOF and avoid a resource leak.
-            Interlocked.Exchange(ref pipe, null)?.Dispose();
+            // Dispose the pipes to let reading from pipe finish with EOF and avoid a resource leak.
+            Interlocked.Exchange(ref inPipe, null)?.Dispose();
+            Interlocked.Exchange(ref outPipe, null)?.Dispose();
         }
 
         private void OnProcessExited(object? sender, EventArgs e)
@@ -74,13 +77,16 @@ namespace BenchmarkDotNet.Loggers
 
         private async ValueTask<Result> ProcessDataCore()
         {
-            if (process.HasExited || this.pipe is not { } pipe)
+            if (process.HasExited || this.inPipe is not { } inPipe || this.outPipe is not { } outPipe)
                 return Result.EarlyProcessExit;
 
             try
             {
                 using var cts = new CancellationTokenSource(NamedPipeHost.PipeConnectionTimeout);
-                await pipe.WaitForConnectionAsync(cts.Token);
+                await Task.WhenAll([
+                    inPipe.WaitForConnectionAsync(cts.Token),
+                    outPipe.WaitForConnectionAsync(cts.Token)]
+                );
             }
             catch (OperationCanceledException)
             {
@@ -93,9 +99,9 @@ namespace BenchmarkDotNet.Loggers
                 return Result.EarlyProcessExit;
             }
 
-            using StreamReader reader = new(pipe, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+            using StreamReader reader = new(inPipe, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
-            using StreamWriter writer = new(pipe, NamedPipeHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
+            using StreamWriter writer = new(outPipe, NamedPipeHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
 
             while (true)
             {
@@ -149,14 +155,14 @@ namespace BenchmarkDotNet.Loggers
                 {
                     Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
-                    await writer.WriteLineAsync(Engine.Signals.Acknowledgment);
-
                     if (signal == HostSignal.AfterAll)
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
                         return Result.Success;
                     }
+
+                    await writer.WriteLineAsync(Engine.Signals.Acknowledgment);
 
                     continue;
                 }

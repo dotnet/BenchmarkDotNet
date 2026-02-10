@@ -20,27 +20,24 @@ namespace BenchmarkDotNet.Engines;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class NamedPipeHost : IHost
 {
-    internal const string PipeNameDescriptor = "--pipeName";
+    internal const string PipeNamesDescriptor = "--pipeNames";
     internal static readonly Encoding UTF8NoBOM = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
     public static readonly TimeSpan PipeConnectionTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly NamedPipeClientStream pipe;
     private readonly StreamWriter outWriter;
     private readonly StreamReader inReader;
 
-    public NamedPipeHost(NamedPipeClientStream pipe)
+    public NamedPipeHost(NamedPipeClientStream fromBenchmarkPipe, NamedPipeClientStream toBenchmarkPipe)
     {
-        this.pipe = pipe;
         // Flush the data to the Stream after each write, otherwise the host process will wait for input endlessly!
-        outWriter = new(pipe, UTF8NoBOM, bufferSize: 1024, leaveOpen: true) { AutoFlush = true };
-        inReader = new(pipe, UTF8NoBOM, detectEncodingFromByteOrderMarks: false, bufferSize: 1024, leaveOpen: true);
+        outWriter = new(fromBenchmarkPipe, UTF8NoBOM) { AutoFlush = true };
+        inReader = new(toBenchmarkPipe, UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
     }
 
     public void Dispose()
     {
         outWriter.Dispose();
         inReader.Dispose();
-        pipe.Dispose();
     }
 
     public async ValueTask WriteAsync(string message)
@@ -82,18 +79,24 @@ public class NamedPipeHost : IHost
     {
         for (int i = 0; i < args.Length; i++)
         {
-            if (args[i] == PipeNameDescriptor)
+            if (args[i] == PipeNamesDescriptor)
             {
-                var pipeName = args[i + 1]; // IndexOutOfRangeException means a bug (incomplete data)
-                var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-                await pipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds);
-                return new NamedPipeHost(pipe);
+                // IndexOutOfRangeException means a bug (incomplete data)
+                var fromBenchmarkPipeName = args[i + 1];
+                var toBenchmarkPipeName = args[i + 2];
+                var fromBenchmarkPipe = new NamedPipeClientStream(".", fromBenchmarkPipeName, PipeDirection.Out, PipeOptions.Asynchronous);
+                var toBenchmarkPipe = new NamedPipeClientStream(".", toBenchmarkPipeName, PipeDirection.In, PipeOptions.Asynchronous);
+                await Task.WhenAll([
+                    fromBenchmarkPipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds),
+                    toBenchmarkPipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds)
+                ]);
+                return new NamedPipeHost(fromBenchmarkPipe, toBenchmarkPipe);
             }
         }
         return new NoAcknowledgementConsoleHost();
     }
 
-    public static NamedPipeServerStream GetPipeServerStream(BenchmarkId benchmarkId, out string pipeName)
+    public static NamedPipeServerStream GetPipeServerStream(BenchmarkId benchmarkId, PipeDirection pipeDirection, out string pipeName)
     {
         int retryCounter = 0;
         while (true)
@@ -101,8 +104,8 @@ public class NamedPipeHost : IHost
             try
             {
                 // MacOS has a small character limit, so we use random file name instead of guid.
-                pipeName = $"BDN-{benchmarkId.Value}-{Path.GetRandomFileName().Replace(".", "")}";
-                var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                pipeName = $"BDN-{benchmarkId.Value}-{pipeDirection}-{Path.GetRandomFileName().Replace(".", "")}";
+                var pipe = new NamedPipeServerStream(pipeName, pipeDirection, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
                 // Ensure the pipe handle is not inherited to prevent hangs on Windows.
                 if (OsDetector.IsWindows())
                 {

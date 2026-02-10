@@ -59,9 +59,10 @@ namespace BenchmarkDotNet.Toolchains
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using var pipe = NamedPipeHost.GetPipeServerStream(benchmarkId, out string pipeName);
+            using var fromBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
+            using var toBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
 
-            string args = benchmarkId.ToArguments(pipeName, diagnoserRunMode);
+            string args = benchmarkId.ToArguments(fromBenchmarkPipeName, toBenchmarkPipeName, diagnoserRunMode);
 
             using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
             using ConsoleExitHandler consoleExitHandler = new(process, logger);
@@ -69,7 +70,7 @@ namespace BenchmarkDotNet.Toolchains
 
             List<string> results;
             List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, pipe))
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, fromBenchmarkPipe, toBenchmarkPipe))
             {
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 

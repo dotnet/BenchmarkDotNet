@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -65,12 +66,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using var pipe = NamedPipeHost.GetPipeServerStream(benchmarkId, out string pipeName);
+            using var fromBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
+            using var toBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
 
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 customDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(pipeName, diagnoserRunMode)}",
+                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(fromBenchmarkPipeName, toBenchmarkPipeName, diagnoserRunMode)}",
                 redirectStandardOutput: true,
                 redirectStandardInput: false,
                 redirectStandardError: false); // #1629
@@ -83,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             List<string> results;
             List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, pipe))
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, fromBenchmarkPipe, toBenchmarkPipe))
             {
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
