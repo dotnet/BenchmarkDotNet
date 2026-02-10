@@ -74,9 +74,6 @@ namespace BenchmarkDotNet.Loggers
 
         private async ValueTask<Result> ProcessDataCore()
         {
-            if (process.HasExited)
-                return Result.EarlyProcessExit;
-
             if (process.HasExited || this.pipe is not { } pipe)
                 return Result.EarlyProcessExit;
 
