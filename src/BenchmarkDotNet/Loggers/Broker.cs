@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Loggers
 
             while (true)
             {
-                var line = reader.ReadLine();
+                var line = await reader.ReadLineAsync();
                 if (line == null)
                     return Result.EndOfStream;
 
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Loggers
                     var resultsStringBuilder = new StringBuilder();
                     for (int i = 0; i < resultsLinesCount;)
                     {
-                        line = reader.ReadLine();
+                        line = await reader.ReadLineAsync();
                         if (line == null)
                             return Result.EndOfStream;
 
