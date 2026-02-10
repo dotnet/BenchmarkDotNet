@@ -59,8 +59,8 @@ namespace BenchmarkDotNet.Toolchains
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using var fromBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
-            using var toBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
+            using var fromBenchmarkPipe = NamedPipesHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
+            using var toBenchmarkPipe = NamedPipesHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
 
             string args = benchmarkId.ToArguments(fromBenchmarkPipeName, toBenchmarkPipeName, diagnoserRunMode);
 

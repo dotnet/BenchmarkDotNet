@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Loggers
 
             try
             {
-                using var cts = new CancellationTokenSource(NamedPipeHost.PipeConnectionTimeout);
+                using var cts = new CancellationTokenSource(NamedPipesHost.PipeConnectionTimeout);
                 await Task.WhenAll([
                     inPipe.WaitForConnectionAsync(cts.Token),
                     outPipe.WaitForConnectionAsync(cts.Token)]
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Loggers
             }
             catch (OperationCanceledException)
             {
-                throw new TimeoutException($"The connection to the benchmark process timed out after {NamedPipeHost.PipeConnectionTimeout}.");
+                throw new TimeoutException($"The connection to the benchmark process timed out after {NamedPipesHost.PipeConnectionTimeout}.");
             }
             // If the process exited before the connection was established such that the pipe is disposed from the exited handler,
             // it throws IOException on Windows or SocketException on Unix.
@@ -99,9 +99,9 @@ namespace BenchmarkDotNet.Loggers
                 return Result.EarlyProcessExit;
             }
 
-            using StreamReader reader = new(inPipe, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+            using StreamReader reader = new(inPipe, NamedPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
-            using StreamWriter writer = new(outPipe, NamedPipeHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
+            using StreamWriter writer = new(outPipe, NamedPipesHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
 
             while (true)
             {

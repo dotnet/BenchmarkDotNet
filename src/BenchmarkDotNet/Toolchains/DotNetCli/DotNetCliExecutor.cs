@@ -66,8 +66,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using var fromBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
-            using var toBenchmarkPipe = NamedPipeHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
+            using var fromBenchmarkPipe = NamedPipesHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
+            using var toBenchmarkPipe = NamedPipesHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
 
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 customDotNetCliPath,

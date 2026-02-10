@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Engines;
 [AggressivelyOptimizeMethods]
 [UsedImplicitly]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class NamedPipeHost : IHost
+public class NamedPipesHost : IHost
 {
     internal const string PipeNamesDescriptor = "--pipeNames";
     internal static readonly Encoding UTF8NoBOM = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
@@ -27,7 +27,7 @@ public class NamedPipeHost : IHost
     private readonly StreamWriter outWriter;
     private readonly StreamReader inReader;
 
-    public NamedPipeHost(NamedPipeClientStream fromBenchmarkPipe, NamedPipeClientStream toBenchmarkPipe)
+    public NamedPipesHost(NamedPipeClientStream fromBenchmarkPipe, NamedPipeClientStream toBenchmarkPipe)
     {
         // Flush the data to the Stream after each write, otherwise the host process will wait for input endlessly!
         outWriter = new(fromBenchmarkPipe, UTF8NoBOM) { AutoFlush = true };
@@ -90,7 +90,7 @@ public class NamedPipeHost : IHost
                     fromBenchmarkPipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds),
                     toBenchmarkPipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds)
                 ]);
-                return new NamedPipeHost(fromBenchmarkPipe, toBenchmarkPipe);
+                return new NamedPipesHost(fromBenchmarkPipe, toBenchmarkPipe);
             }
         }
         return new NoAcknowledgementConsoleHost();
