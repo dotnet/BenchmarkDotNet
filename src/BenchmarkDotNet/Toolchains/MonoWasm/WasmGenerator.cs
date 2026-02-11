@@ -46,7 +46,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(projectFile.FullName);
-            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+            var (customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+            // Always use Microsoft.NET.Sdk.WebAssembly for WASM projects. It auto-defaults UseMonoRuntime=true.
+            const string sdkName = "Microsoft.NET.Sdk.WebAssembly";
 
             string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
@@ -63,10 +65,15 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
+            // Place test-main.js in wwwroot/ next to the generated csproj.
+            string projectWwwroot = Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "wwwroot");
+            Directory.CreateDirectory(projectWwwroot);
+            File.WriteAllText(Path.Combine(projectWwwroot, MainJS), ResourceHelper.LoadTemplate(MainJS));
+
             GatherReferences(buildPartition, artifactsPaths, logger);
         }
 
-        protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "AppBundle", MainJS);
+        protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "wwwroot", MainJS);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "browser-wasm");

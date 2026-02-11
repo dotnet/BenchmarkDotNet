@@ -140,7 +140,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument($"\"{filePath}\"")
                 // restore doesn't support -f argument.
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
-                .AppendArgument(buildPartition?.Runtime is WasmRuntime ? "-r browser-wasm" : string.Empty)
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))

@@ -57,12 +57,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
             WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
             string mainJs = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.js";
+            // test-main.js (net7.0+) uses ES module imports, V8 requires --module for that
+            string moduleFlag = runtime.RuntimeMoniker >= RuntimeMoniker.WasmNet70 ? "--module" : "";
 
             var start = new ProcessStartInfo
             {
                 FileName = runtime.JavaScriptEngine,
-                Arguments = $"{runtime.JavaScriptEngineArguments} {mainJs} -- --run {artifactsPaths.ProgramName}.dll {args} ",
-                WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "AppBundle"),
+                Arguments = $"{runtime.JavaScriptEngineArguments} {moduleFlag} {mainJs} -- --run {artifactsPaths.ProgramName}.dll {args} ",
+                WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "wwwroot"),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = false, // not supported by WASM!
