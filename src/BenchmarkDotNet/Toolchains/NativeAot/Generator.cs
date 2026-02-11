@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
-            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData,
+            bool rootAllApplicationAssemblies, bool ilcGenerateStackTraceData,
             string ilcOptimizationPreference, string ilcInstructionSet)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
@@ -42,7 +42,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.useNuGetClearTag = useNuGetClearTag;
             this.useTempFolderForRestore = useTempFolderForRestore;
             this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
-            this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
             this.ilcOptimizationPreference = ilcOptimizationPreference;
             this.ilcInstructionSet = ilcInstructionSet;
@@ -55,7 +54,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly bool useNuGetClearTag;
         private readonly bool useTempFolderForRestore;
         private readonly bool rootAllApplicationAssemblies;
-        private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
         private readonly string ilcOptimizationPreference;
         private readonly string ilcInstructionSet;
