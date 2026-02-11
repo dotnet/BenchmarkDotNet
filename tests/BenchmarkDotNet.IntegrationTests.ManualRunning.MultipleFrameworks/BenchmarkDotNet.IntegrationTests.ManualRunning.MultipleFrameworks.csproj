@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
-    <TargetFrameworks>net462;net48;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net48;net8.0;net10.0</TargetFrameworks>
     <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
