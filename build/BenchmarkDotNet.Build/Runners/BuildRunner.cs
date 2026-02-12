@@ -128,7 +128,7 @@ public class BuildRunner
     public void BuildAnalyzers()
     {
         context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
-        string[] mccVersions = ["2.8", "3.8", "4.8"];
+        string[] mccVersions = ["2.8", "3.8", "4.8", "5.0"];
         foreach (string version in mccVersions)
         {
             context.DotNetBuild(context.AnalyzersProjectFile.FullPath, new DotNetBuildSettings
