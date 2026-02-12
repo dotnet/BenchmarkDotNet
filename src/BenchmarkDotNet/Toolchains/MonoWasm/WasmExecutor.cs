@@ -56,14 +56,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         private static Process CreateProcess(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
         {
             WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
-            string mainJs = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.js";
-            // test-main.js (net7.0+) uses ES module imports, V8 requires --module for that
-            string moduleFlag = runtime.RuntimeMoniker >= RuntimeMoniker.WasmNet70 ? "--module" : "";
+            string mainJs = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "benchmark-main.mjs";
 
             var start = new ProcessStartInfo
             {
                 FileName = runtime.JavaScriptEngine,
-                Arguments = $"{runtime.JavaScriptEngineArguments} {moduleFlag} {mainJs} -- --run {artifactsPaths.ProgramName}.dll {args} ",
+                Arguments = $"{runtime.JavaScriptEngineArguments} {mainJs} -- --run {artifactsPaths.ProgramName}.dll {args} ",
                 WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "wwwroot"),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,

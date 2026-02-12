@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             CustomRuntimePack = customRuntimePack;
-            MainJS = (targetFrameworkMoniker == "net5.0" || targetFrameworkMoniker == "net6.0") ? "main.js" : "test-main.js";
+            MainJS = (targetFrameworkMoniker == "net5.0" || targetFrameworkMoniker == "net6.0") ? "main.js" : "benchmark-main.mjs";
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
         }
 
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
-            // Place test-main.js in wwwroot/ next to the generated csproj.
+            // Place benchmark-main.mjs in wwwroot/ next to the generated csproj.
             string projectWwwroot = Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "wwwroot");
             Directory.CreateDirectory(projectWwwroot);
             File.WriteAllText(Path.Combine(projectWwwroot, MainJS), ResourceHelper.LoadTemplate(MainJS));
