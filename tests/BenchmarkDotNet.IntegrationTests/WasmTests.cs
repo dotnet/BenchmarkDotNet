@@ -34,10 +34,11 @@ namespace BenchmarkDotNet.IntegrationTests
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm", aotCompilerMode: aotCompilerMode);
+            const string mainJsName = "benchmark-main.mjs";
             var mainJsDir = Path.Combine(Path.GetTempPath(), "BenchmarkDotNet.IntegrationTests");
             Directory.CreateDirectory(mainJsDir);
-            var mainJsPath = Path.Combine(mainJsDir, "test-main.js");
-            File.WriteAllText(mainJsPath, ResourceHelper.LoadTemplate("test-main.js"));
+            var mainJsPath = Path.Combine(mainJsDir, mainJsName);
+            File.WriteAllText(mainJsPath, ResourceHelper.LoadTemplate(mainJsName));
 
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
