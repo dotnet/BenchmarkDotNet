@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             if (resultType.IsByRef)
             {
-                var returnParameter = targetMethod?.ReturnParameter ?? fallbackIdleSignature!.ReturnParameter;
+                var returnParameter = targetMethod.ReturnParameter;
                 // IsReadOnlyAttribute is not part of netstandard2.0, so we need to check the attribute name as usual.
                 if (returnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
                     return Create(
