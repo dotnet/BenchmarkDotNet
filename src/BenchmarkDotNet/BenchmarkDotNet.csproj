@@ -22,7 +22,7 @@
     <PackageReference Include="Gee.External.Capstone" Version="2.3.0" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="3.1.512801" />
-    <PackageReference Include="Perfolizer" Version="[0.6.1]" />
+    <PackageReference Include="Perfolizer" Version="[0.6.6]" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.28" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
