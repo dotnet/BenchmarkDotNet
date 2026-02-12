@@ -155,14 +155,14 @@ namespace BenchmarkDotNet.Loggers
                 {
                     Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
+                    await writer.WriteLineAsync(Engine.Signals.Acknowledgment);
+
                     if (signal == HostSignal.AfterAll)
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
                         return Result.Success;
                     }
-
-                    await writer.WriteLineAsync(Engine.Signals.Acknowledgment);
 
                     continue;
                 }

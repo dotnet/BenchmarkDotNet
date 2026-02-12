@@ -41,13 +41,13 @@ public class NamedPipesHost : IHost
     }
 
     public async ValueTask WriteAsync(string message)
-        => await outWriter.WriteAsync(message);
+        => outWriter.Write(message);
 
     public async ValueTask WriteLineAsync()
-        => await outWriter.WriteLineAsync();
+        => outWriter.WriteLine();
 
     public async ValueTask WriteLineAsync(string message)
-        => await outWriter.WriteLineAsync(message);
+        => outWriter.WriteLine(message);
 
     public async ValueTask SendSignalAsync(HostSignal hostSignal)
     {
@@ -58,10 +58,10 @@ public class NamedPipesHost : IHost
             System.Threading.Thread.Sleep(1);
         }
 
-        await WriteLineAsync(Engine.Signals.ToMessage(hostSignal));
+        outWriter.WriteLine(Engine.Signals.ToMessage(hostSignal));
 
         // Read the response from Parent process.
-        string? acknowledgment = await inReader.ReadLineAsync();
+        string? acknowledgment = inReader.ReadLine();
         if (acknowledgment != Engine.Signals.Acknowledgment
             && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
         {
@@ -70,7 +70,7 @@ public class NamedPipesHost : IHost
     }
 
     public async ValueTask SendErrorAsync(string message)
-        => await outWriter.WriteLineAsync($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
+        => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
     public ValueTask ReportResultsAsync(RunResults runResults)
         => runResults.WriteAsync(this);
@@ -86,10 +86,8 @@ public class NamedPipesHost : IHost
                 var toBenchmarkPipeName = args[i + 2];
                 var fromBenchmarkPipe = new NamedPipeClientStream(".", fromBenchmarkPipeName, PipeDirection.Out, PipeOptions.Asynchronous);
                 var toBenchmarkPipe = new NamedPipeClientStream(".", toBenchmarkPipeName, PipeDirection.In, PipeOptions.Asynchronous);
-                await Task.WhenAll([
-                    fromBenchmarkPipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds),
-                    toBenchmarkPipe.ConnectAsync((int) PipeConnectionTimeout.TotalMilliseconds)
-                ]);
+                fromBenchmarkPipe.Connect((int) PipeConnectionTimeout.TotalMilliseconds);
+                toBenchmarkPipe.Connect((int) PipeConnectionTimeout.TotalMilliseconds);
                 return new NamedPipesHost(fromBenchmarkPipe, toBenchmarkPipe);
             }
         }
