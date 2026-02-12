@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Loggers
 
             while (true)
             {
-                var line = await reader.ReadLineAsync();
+                var line = reader.ReadLine();
                 if (line == null)
                     return Result.EndOfStream;
 
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Loggers
                     var resultsStringBuilder = new StringBuilder();
                     for (int i = 0; i < resultsLinesCount;)
                     {
-                        line = await reader.ReadLineAsync();
+                        line = reader.ReadLine();
                         if (line == null)
                             return Result.EndOfStream;
 
@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.Loggers
                 {
                     Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
-                    await writer.WriteLineAsync(Engine.Signals.Acknowledgment);
+                    writer.WriteLine(Engine.Signals.Acknowledgment);
 
                     if (signal == HostSignal.AfterAll)
                     {
