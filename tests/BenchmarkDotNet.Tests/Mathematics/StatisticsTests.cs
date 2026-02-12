@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Tests.Common;
 using JetBrains.Annotations;
+using Pragmastat.Exceptions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -32,7 +33,7 @@ public class StatisticsTests(ITestOutputHelper output)
     [Fact]
     public void StatisticsWithN0Test()
     {
-        Assert.Throws<ArgumentException>(() => new Statistics());
+        Assert.Throws<AssumptionException>(() => new Statistics());
     }
 
     [Fact]
