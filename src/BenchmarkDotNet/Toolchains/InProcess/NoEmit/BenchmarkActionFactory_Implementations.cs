@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /*
@@ -54,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly PointerFunc callback;
             private readonly PointerFunc unrolledCallback;
 
-            public BenchmarkActionVoidPointer(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionVoidPointer(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<PointerFunc>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -92,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly ByRefFunc callback;
             private readonly ByRefFunc unrolledCallback;
 
-            public BenchmarkActionByRef(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionByRef(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<ByRefFunc>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -130,7 +132,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly ByRefReadonlyFunc callback;
             private readonly ByRefReadonlyFunc unrolledCallback;
 
-            public BenchmarkActionByRefReadonly(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionByRefReadonly(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<ByRefReadonlyFunc>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -166,7 +168,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Func<T> callback;
             private readonly Func<T> unrolledCallback;
 
-            public BenchmarkAction(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkAction(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<Func<T>>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -200,10 +202,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Action callback;
             private readonly Action unrolledCallback;
 
-            public BenchmarkActionTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 if (method == null)
                 {
+                    startTaskCallback = default!;
                     callback = CreateWorkloadOrOverhead(instance, method);
                 }
                 else
@@ -245,10 +248,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Action callback;
             private readonly Action unrolledCallback;
 
-            public BenchmarkActionTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 if (method == null)
                 {
+                    startTaskCallback = default!;
                     callback = CreateWorkloadOrOverhead(instance, method);
                 }
                 else
@@ -290,10 +294,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Action callback;
             private readonly Action unrolledCallback;
 
-            public BenchmarkActionValueTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionValueTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 if (method == null)
                 {
+                    startTaskCallback = default!;
                     callback = CreateWorkloadOrOverhead(instance, method);
                 }
                 else
@@ -335,10 +340,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Action callback;
             private readonly Action unrolledCallback;
 
-            public BenchmarkActionValueTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionValueTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 if (method == null)
                 {
+                    startTaskCallback = default!;
                     callback = CreateWorkloadOrOverhead(instance, method);
                 }
                 else

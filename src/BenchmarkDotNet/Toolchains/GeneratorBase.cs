@@ -10,6 +10,8 @@ using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using StreamWriter = System.IO.StreamWriter;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains
 {
     [PublicAPI]
@@ -99,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns a path to the folder where NuGet packages should be restored
         /// </summary>
-        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => default;
+        [PublicAPI] protected virtual string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => "";
 
         /// <summary>
         /// generates an app.config file next to the executable with benchmarks
