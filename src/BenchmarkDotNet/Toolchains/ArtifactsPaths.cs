@@ -1,4 +1,7 @@
+using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -36,15 +39,15 @@ namespace BenchmarkDotNet.Toolchains
             RootArtifactsFolderPath = rootArtifactsFolderPath;
             BuildArtifactsDirectoryPath = buildArtifactsDirectoryPath;
             BinariesDirectoryPath = binariesDirectoryPath;
-            PublishDirectoryPath = publishDirectoryPath;
-            ProgramCodePath = programCodePath;
-            AppConfigPath = appConfigPath;
-            NuGetConfigPath = nuGetConfigPath;
-            ProjectFilePath = projectFilePath;
-            BuildScriptFilePath = buildScriptFilePath;
+            PublishDirectoryPath = publishDirectoryPath.EnsureNotNull();
+            ProgramCodePath = programCodePath.EnsureNotNull();
+            AppConfigPath = appConfigPath.EnsureNotNull();
+            NuGetConfigPath = nuGetConfigPath.EnsureNotNull();
+            ProjectFilePath = projectFilePath.EnsureNotNull();
+            BuildScriptFilePath = buildScriptFilePath.EnsureNotNull();
             ExecutablePath = executablePath;
             ProgramName = programName;
-            PackagesDirectoryName = packagesDirectoryName;
+            PackagesDirectoryName = packagesDirectoryName.EnsureNotNull();
         }
     }
 }

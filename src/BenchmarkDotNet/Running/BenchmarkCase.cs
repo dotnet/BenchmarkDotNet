@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Running
         {
             Descriptor = descriptor;
             Job = job;
-            Parameters = parameters;
+            Parameters = parameters ?? ParameterInstances.Empty;
             Config = config;
         }
 

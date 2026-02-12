@@ -2,12 +2,14 @@
 using System.Linq;
 using BenchmarkDotNet.Toolchains.CsProj;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunGenerator : CsProjGenerator
     {
         public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, string targetFrameworkMoniker, string cliPath, string packagesPath)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+            : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             SourceCoreRun = sourceCoreRun;
             CopyCoreRun = copyCoreRun;
@@ -27,14 +29,14 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
         {
             if (NeedsCopy)
-                CopyFilesRecursively(SourceCoreRun.Directory, CopyCoreRun.Directory);
+                CopyFilesRecursively(SourceCoreRun.Directory!, CopyCoreRun.Directory!);
 
             base.CopyAllRequiredFiles(artifactsPaths);
         }
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
             => NeedsCopy
-                ? base.GetArtifactsToCleanup(artifactsPaths).Concat(new[] { CopyCoreRun.Directory.FullName }).ToArray()
+                ? base.GetArtifactsToCleanup(artifactsPaths).Concat([CopyCoreRun.Directory!.FullName]).ToArray()
                 : base.GetArtifactsToCleanup(artifactsPaths);
 
         // source: https://stackoverflow.com/a/58779/5852046

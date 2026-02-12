@@ -5,19 +5,21 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     public class NativeAotToolchainBuilder : CustomDotNetCliToolchainBuilder
     {
         public static NativeAotToolchainBuilder Create() => new NativeAotToolchainBuilder();
 
-        private string ilCompilerVersion;
-        private string packagesRestorePath;
+        private string? ilCompilerVersion;
+        private string? packagesRestorePath;
         // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
         private bool rootAllApplicationAssemblies;
         private bool ilcGenerateStackTraceData = true;
         private string ilcOptimizationPreference = "Speed";
-        private string? ilcInstructionSet = null;
+        private string? ilcInstructionSet;
 
         private bool isIlCompilerConfigured;
 
@@ -137,20 +139,20 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 throw new InvalidOperationException("You need to use UseNuGet or UseLocalBuild methods to tell us which ILCompiler to use.");
 
             return new NativeAotToolchain(
-                displayName: displayName,
-                ilCompilerVersion: ilCompilerVersion,
-                runtimeFrameworkVersion: runtimeFrameworkVersion,
+                displayName: displayName!,
+                ilCompilerVersion: ilCompilerVersion!,
+                runtimeFrameworkVersion: runtimeFrameworkVersion ?? "",
                 targetFrameworkMoniker: GetTargetFrameworkMoniker(),
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),
-                customDotNetCliPath: customDotNetCliPath,
-                packagesRestorePath: packagesRestorePath,
+                customDotNetCliPath: customDotNetCliPath ?? "",
+                packagesRestorePath: packagesRestorePath ?? "",
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore,
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateStackTraceData: ilcGenerateStackTraceData,
                 ilcOptimizationPreference: ilcOptimizationPreference,
-                ilcInstructionSet: ilcInstructionSet
+                ilcInstructionSet: ilcInstructionSet ?? ""
             );
         }
     }

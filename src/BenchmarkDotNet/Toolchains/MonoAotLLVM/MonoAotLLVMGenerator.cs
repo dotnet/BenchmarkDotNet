@@ -9,6 +9,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 {
     public class MonoAotLLVMGenerator : CsProjGenerator
@@ -18,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
         private readonly MonoAotCompilerMode AotCompilerMode;
 
         public MonoAotLLVMGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string aotCompilerPath, MonoAotCompilerMode aotCompilerMode)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+            : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             CustomRuntimePack = customRuntimePack;
             AotCompilerPath = aotCompilerPath;
@@ -45,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
                 .Replace("$COPIEDSETTINGS$", customProperties)
                 .Replace("$SDKNAME$", sdkName)
-                .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
+                .Replace("$RUNTIMEPACK$", CustomRuntimePack)
                 .Replace("$COMPILERBINARYPATH$", AotCompilerPath)
                 .Replace("$RUNTIMEIDENTIFIER$", CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
                 .Replace("$USELLVM$", useLLVM)

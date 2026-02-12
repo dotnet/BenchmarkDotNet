@@ -91,9 +91,9 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public GcMode Gc => GcCharacteristic[this]!;
 
-        public IReadOnlyList<EnvironmentVariable>? EnvironmentVariables
+        public IReadOnlyList<EnvironmentVariable> EnvironmentVariables
         {
-            get => EnvironmentVariablesCharacteristic[this];
+            get => EnvironmentVariablesCharacteristic[this] ?? [];
             set => EnvironmentVariablesCharacteristic[this] = value;
         }
 
@@ -135,8 +135,7 @@ namespace BenchmarkDotNet.Jobs
         public void SetEnvironmentVariable(EnvironmentVariable variable)
         {
             var newVariables = new List<EnvironmentVariable>();
-            if (EnvironmentVariables != null)
-                newVariables.AddRange(EnvironmentVariables);
+            newVariables.AddRange(EnvironmentVariables);
             newVariables.RemoveAll(v => v.Key.Equals(variable.Key, StringComparison.Ordinal));
             newVariables.Add(variable);
             EnvironmentVariables = newVariables;

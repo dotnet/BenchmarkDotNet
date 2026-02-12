@@ -11,7 +11,11 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -23,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult?.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
+            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
             using (new ConsoleExitHandler(process, parameters.Logger))
             {
@@ -162,9 +166,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 filePath: string.Empty,
                 tfm: string.Empty,
                 arguments: "--info",
-                generateResult: null,
+                generateResult: GenerateResult.Success(ArtifactsPaths.Empty, []),
                 logger: NullLogger.Instance,
-                buildPartition: null,
+                buildPartition: BuildPartition.Empty,
                 environmentVariables: [],
                 timeout: TimeSpan.FromMinutes(1),
                 logOutput: false);

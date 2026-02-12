@@ -25,6 +25,8 @@ namespace BenchmarkDotNet.Running
         // assuming there are fewer than 4 billion build partitions (a safe assumption).
         internal static int s_partitionCounter;
 
+        internal static readonly BuildPartition Empty = new();
+
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
             Resolver = resolver;
@@ -33,6 +35,14 @@ namespace BenchmarkDotNet.Running
             ProgramName = GetProgramName(RepresentativeBenchmarkCase, Interlocked.Increment(ref s_partitionCounter));
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
+        }
+
+        private BuildPartition()
+        {
+            Resolver = default!;
+            RepresentativeBenchmarkCase = default!;
+            Benchmarks = [];
+            ProgramName = default!;
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }

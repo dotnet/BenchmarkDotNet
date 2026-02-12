@@ -553,8 +553,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                                     runtimeId,
                                     runtimeFrameworkVersion: "",
                                     name: runtimeId,
-                                    options.CliPath?.FullName ?? "",
-                                    options.RestorePath?.FullName ?? "")));
+                                    options: options)));
                     }
 
                 case RuntimeMoniker.Mono:
@@ -677,8 +676,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                         targetFrameworkMoniker: runtime.MsBuildMoniker,
                         runtimeFrameworkVersion: "",
                         name: runtime.Name,
-                        customDotNetCliPath: options.CliPath?.FullName ?? "",
-                        packagesPath: options.RestorePath?.FullName ?? "")));
+                        options: options)));
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
@@ -694,11 +692,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
                 runtimeFrameworkVersion: "",
                 name: monoAotLLVMRuntime.Name,
-                customDotNetCliPath: options.CliPath?.FullName ?? "",
-                packagesPath: options.RestorePath?.FullName ?? "",
-                customRuntimePack: options.CustomRuntimePack ?? "",
-                aotCompilerPath: options.AOTCompilerPath?.ToString() ?? "",
-                aotCompilerMode: options.AOTCompilerMode));
+                options: options));
 
             return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain).WithId(monoAotLLVMRuntime.Name);
         }
@@ -708,12 +702,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             var toolChain = R2RToolchain.From(
             new NetCoreAppSettings(
                 targetFrameworkMoniker: runtime.MsBuildMoniker,
-                runtimeFrameworkVersion: null,
+                runtimeFrameworkVersion: "",
                 name: runtime.Name,
-                customDotNetCliPath: options.CliPath?.FullName,
-                packagesPath: options.RestorePath?.FullName,
-                customRuntimePack: options.CustomRuntimePack,
-                aotCompilerPath: options.AOTCompilerPath != null ? options.AOTCompilerPath.ToString() : null));
+                options: options));
 
             return baseJob.WithRuntime(runtime).WithToolchain(toolChain).WithId(runtime.Name);
         }
@@ -735,10 +726,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
                 runtimeFrameworkVersion: "",
                 name: wasmRuntime.Name,
-                customDotNetCliPath: options.CliPath?.FullName ?? "",
-                packagesPath: options.RestorePath?.FullName ?? "",
-                customRuntimePack: options.CustomRuntimePack ?? "",
-                aotCompilerMode: options.AOTCompilerMode));
+                options: options));
 
             return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain).WithId(wasmRuntime.Name);
         }
@@ -785,10 +773,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .WithToolchain(CsProjCoreToolchain.From(
                     new NetCoreAppSettings(
                         targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
-                        customDotNetCliPath: options.CliPath?.FullName ?? "",
                         runtimeFrameworkVersion: "",
                         name: RuntimeInformation.GetCurrentRuntime().Name,
-                        packagesPath: options.RestorePath?.FullName ?? "")));
+                        options: options)));
 
         /// <summary>
         /// we have a limited amount of space when printing the output to the console, so we try to keep things small and simple

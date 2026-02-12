@@ -4,6 +4,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     public class NativeAotToolchain : Toolchain

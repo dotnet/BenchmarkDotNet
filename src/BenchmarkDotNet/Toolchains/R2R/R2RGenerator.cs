@@ -9,6 +9,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.R2R
 {
     public class R2RGenerator : CsProjGenerator
@@ -17,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.R2R
         private readonly string Crossgen2Pack;
 
         public R2RGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string crossgen2Pack)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+            : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             CustomRuntimePack = customRuntimePack;
             Crossgen2Pack = crossgen2Pack;

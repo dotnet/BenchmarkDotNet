@@ -31,11 +31,18 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         internal const string GeneratedRdXmlFileName = "bdn_generated.rd.xml";
 
         internal Generator(string ilCompilerVersion,
-            string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
-            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
-            bool useTempFolderForRestore, string packagesRestorePath,
-            bool rootAllApplicationAssemblies, bool ilcGenerateStackTraceData,
-            string ilcOptimizationPreference, string ilcInstructionSet)
+            string runtimeFrameworkVersion,
+            string targetFrameworkMoniker,
+            string cliPath,
+            string runtimeIdentifier,
+            IReadOnlyDictionary<string, string> feeds,
+            bool useNuGetClearTag,
+            bool useTempFolderForRestore,
+            string packagesRestorePath,
+            bool rootAllApplicationAssemblies,
+            bool ilcGenerateStackTraceData,
+            string ilcOptimizationPreference,
+            string ilcInstructionSet)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
@@ -76,10 +83,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath, extraArguments)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker, extraArguments)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker, extraArguments)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker, extraArguments)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker, extraArguments)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -90,7 +97,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
         private static string GetPackagesDirectoryPath(bool useTempFolderForRestore, string packagesRestorePath)
-            => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : "");
+            => packagesRestorePath.IsBlank() && useTempFolderForRestore
+                   ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
+                   : "";
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
             => useTempFolderForRestore && artifactsPaths.PackagesDirectoryName.IsNotBlank()
@@ -191,8 +200,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         private string GetInstructionSetSettings(BuildPartition buildPartition)
         {
-            string instructionSet = ilcInstructionSet ?? GetCurrentInstructionSet(buildPartition.Platform);
-            return instructionSet.IsNotBlank() ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>" : "";
+            string instructionSet = ilcInstructionSet.IsBlank()
+                ? GetCurrentInstructionSet(buildPartition.Platform)
+                : ilcInstructionSet;
+
+            return instructionSet.IsNotBlank()
+                ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>"
+                : "";
         }
 
         public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)

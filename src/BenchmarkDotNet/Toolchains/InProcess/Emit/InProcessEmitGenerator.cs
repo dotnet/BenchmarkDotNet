@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitGenerator : IGenerator
@@ -47,15 +49,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,
-                publishDirectoryPath: null,
-                programCodePath: null,
-                appConfigPath: null,
-                nuGetConfigPath: null,
-                projectFilePath: null,
-                buildScriptFilePath: null,
+                publishDirectoryPath: "",
+                programCodePath: "",
+                appConfigPath: "",
+                nuGetConfigPath: "",
+                projectFilePath: "",
+                buildScriptFilePath: "",
                 executablePath: executablePath,
                 programName: programName,
-                packagesDirectoryName: null);
+                packagesDirectoryName: "");
         }
     }
 }

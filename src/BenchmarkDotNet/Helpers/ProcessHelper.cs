@@ -25,9 +25,10 @@ namespace BenchmarkDotNet.Helpers
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
             };
-            if (environmentVariables != null)
-                foreach (var variable in environmentVariables)
-                    processStartInfo.Environment[variable.Key] = variable.Value;
+
+            foreach (var variable in environmentVariables ?? [])
+                processStartInfo.Environment[variable.Key] = variable.Value;
+
             using (var process = new Process { StartInfo = processStartInfo })
             using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
             {
@@ -59,9 +60,8 @@ namespace BenchmarkDotNet.Helpers
                 RedirectStandardError = true
             };
 
-            if (environmentVariables != null)
-                foreach (var environmentVariable in environmentVariables)
-                    processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
+            foreach (var environmentVariable in environmentVariables ?? [])
+                processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
 
             using (var process = new Process { StartInfo = processStartInfo })
             using (var outputReader = new AsyncProcessOutputReader(process))

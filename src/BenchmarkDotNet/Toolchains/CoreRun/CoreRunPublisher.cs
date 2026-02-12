@@ -11,7 +11,7 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
-    public class CoreRunPublisher(string tfm, FileInfo coreRun, FileInfo? customDotNetCliPath = null) : DotNetCliPublisher(tfm, customDotNetCliPath?.FullName)
+    public class CoreRunPublisher(string tfm, FileInfo coreRun, FileInfo? customDotNetCliPath = null) : DotNetCliPublisher(tfm, customDotNetCliPath?.FullName ?? "")
     {
         public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {

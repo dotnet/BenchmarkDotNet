@@ -8,6 +8,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     public class WasmGenerator : CsProjGenerator
@@ -16,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         private const string MainJS = "benchmark-main.mjs";
 
         public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+            : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             CustomRuntimePack = customRuntimePack;
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
@@ -59,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 .Replace("$COPIEDSETTINGS$", customProperties)
                 .Replace("$SDKNAME$", sdkName)
                 .Replace("$WASMDATADIR$", runtime.WasmDataDir)
-                .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
+                .Replace("$TARGET$", CustomRuntimePack.IsNotBlank() ? "PublishWithCustomRuntimePack" : "Publish")
             .ToString();
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
