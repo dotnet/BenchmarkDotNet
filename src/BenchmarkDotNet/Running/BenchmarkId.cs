@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Running
         public string ToArguments(Diagnosers.RunMode diagnoserRunMode)
             => $"--benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --diagnoserRunMode {(int) diagnoserRunMode} --benchmarkId {Value}";
 
-        public string ToArguments(string fromBenchmark, string toBenchmark, Diagnosers.RunMode diagnoserRunMode)
-            => $"{NamedPipesHost.PipeNamesDescriptor} {fromBenchmark} {toBenchmark} {ToArguments(diagnoserRunMode)}";
+        public string ToArguments(int port, Diagnosers.RunMode diagnoserRunMode)
+            => $"{TcpHost.TcpPortDescriptor} {port} {ToArguments(diagnoserRunMode)}";
 
         public override string ToString() => Value.ToString();
 

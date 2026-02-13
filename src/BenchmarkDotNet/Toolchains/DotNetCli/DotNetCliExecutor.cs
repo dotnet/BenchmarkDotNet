@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -66,68 +68,75 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using var fromBenchmarkPipe = NamedPipesHost.GetPipeServerStream(benchmarkId, PipeDirection.In, out string fromBenchmarkPipeName);
-            using var toBenchmarkPipe = NamedPipesHost.GetPipeServerStream(benchmarkId, PipeDirection.Out, out string toBenchmarkPipeName);
-
-            var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
-                customDotNetCliPath,
-                artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(fromBenchmarkPipeName, toBenchmarkPipeName, diagnoserRunMode)}",
-                redirectStandardOutput: true,
-                redirectStandardInput: false,
-                redirectStandardError: false); // #1629
-
-            startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
-
-            using Process process = new() { StartInfo = startInfo };
-            using ConsoleExitHandler consoleExitHandler = new(process, logger);
-            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
-
-            List<string> results;
-            List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, fromBenchmarkPipe, toBenchmarkPipe))
+            var tcplistener = new TcpListener(IPAddress.Loopback, port: 0);
+            try
             {
-                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+                tcplistener.Start(1);
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+                var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
+                    customDotNetCliPath,
+                    artifactsPaths.BinariesDirectoryPath,
+                    $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(((IPEndPoint) tcplistener.LocalEndpoint).Port, diagnoserRunMode)}",
+                    redirectStandardOutput: true,
+                    redirectStandardInput: false,
+                    redirectStandardError: false); // #1629
 
-                process.Start();
+                startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
-                diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+                using Process process = new() { StartInfo = startInfo };
+                using ConsoleExitHandler consoleExitHandler = new(process, logger);
+                using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
 
-                processOutputReader.BeginRead();
-
-                process.EnsureHighPriority(logger);
-                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                List<string> results;
+                List<string> prefixedOutput;
+                using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener))
                 {
-                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                    logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
+                    diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+
+                    process.Start();
+
+                    diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+
+                    processOutputReader.BeginRead();
+
+                    process.EnsureHighPriority(logger);
+                    if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                    {
+                        process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                    }
+
+                    await broker.ProcessData();
+
+                    results = broker.Results;
+                    prefixedOutput = broker.PrefixedOutput;
                 }
 
-                await broker.ProcessData();
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
-                results = broker.Results;
-                prefixedOutput = broker.PrefixedOutput;
+                    processOutputReader.CancelRead();
+                    consoleExitHandler.KillProcessTree();
+                }
+                else
+                {
+                    processOutputReader.StopRead();
+                }
+
+                return new ExecuteResult(true,
+                    process.HasExited ? process.ExitCode : null,
+                    process.Id,
+                    results,
+                    prefixedOutput,
+                    processOutputReader.GetOutputLines(),
+                    launchIndex);
             }
-
-            if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+            finally
             {
-                logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
-
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
+                tcplistener.Stop();
             }
-            else
-            {
-                processOutputReader.StopRead();
-            }
-
-            return new ExecuteResult(true,
-                process.HasExited ? process.ExitCode : null,
-                process.Id,
-                results,
-                prefixedOutput,
-                processOutputReader.GetOutputLines(),
-                launchIndex);
         }
     }
 }
