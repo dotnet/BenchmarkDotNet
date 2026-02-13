@@ -1408,7 +1408,7 @@ public class GeneralParameterAttributesAnalyzerTests
 
                 public class BenchmarkClass
                 {
-                    public static IEnumerable<int> ValidValues => new[] { 1, 2, 3 };
+                    public static int[] ValidValues { get; set; } = new[] { 1, 2, 3 };
 
                     [ParamsSource(nameof(ValidValues))]
                     public int MyParam { get; set; }
