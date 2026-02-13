@@ -209,14 +209,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
             var builder = new StringBuilder(80)
-                .AppendLine("<PropertyGroup>")
-                .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
-                .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
+                .AppendLine($"<PropertyGroup>")
+                .AppendLine($"    <ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
+                .AppendLine($"    <ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
 
             if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
-                builder.AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
+                builder.AppendLine($"    <RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
 
-            return builder.AppendLine("</PropertyGroup>").ToString();
+            return builder.AppendLine("  </PropertyGroup>").ToString();
         }
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
@@ -227,8 +227,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             if (RuntimeFrameworkVersion.IsNotBlank()) // some power users knows what to configure, just do it and copy nothing more
             {
                 return (@$"<PropertyGroup>
-  <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
-</PropertyGroup>", DefaultSdkName);
+    <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
+  </PropertyGroup>", DefaultSdkName);
             }
 
             XmlElement projectElement = xmlDoc.DocumentElement!;
