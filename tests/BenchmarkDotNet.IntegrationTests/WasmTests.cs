@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -34,16 +32,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm", aotCompilerMode: aotCompilerMode);
-            const string mainJsName = "benchmark-main.mjs";
-            var mainJsDir = Path.Combine(Path.GetTempPath(), "BenchmarkDotNet.IntegrationTests");
-            Directory.CreateDirectory(mainJsDir);
-            var mainJsPath = Path.Combine(mainJsDir, mainJsName);
-            File.WriteAllText(mainJsPath, ResourceHelper.LoadTemplate(mainJsName));
 
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithArguments([new MsBuildArgument($"/p:WasmMainJSPath={mainJsPath}")])
                     .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet80, javaScriptEngineArguments: "--expose_wasm --module"))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))

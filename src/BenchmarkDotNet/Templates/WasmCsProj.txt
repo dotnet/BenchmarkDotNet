@@ -31,9 +31,7 @@
   <ItemGroup>
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
     <TrimmerRootDescriptor Include="WasmLinkerDescription.xml" Condition="'$(RunAOTCompilation)' == 'true'" />
-    <!-- Static Web Assets only physically copies wwwroot/ content during publish.
-         Since BDN uses dotnet build, explicitly copy benchmark-main.mjs to the output. -->
-    <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" LinkBase="wwwroot" />
+    <Content Update="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
@@ -135,7 +136,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "publish-no-restore")));
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
-            => new StringBuilder()
+        {
+            bool excludeArtifactsPath = buildPartition.RepresentativeBenchmarkCase.Job.GetToolchain() is WasmToolchain;
+            return new StringBuilder()
                 .AppendArgument("restore")
                 .AppendArgument($"\"{filePath}\"")
                 // restore doesn't support -f argument.
@@ -144,11 +147,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths, true, excludeOutput)
+                .MaybeAppendOutputPaths(artifactsPaths, isRestore: true, excludeOutput: excludeOutput, excludeArtifactsPath: excludeArtifactsPath)
                 .ToString();
+        }
 
         internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
-            => new StringBuilder()
+        {
+            bool excludeArtifactsPath = buildPartition.RepresentativeBenchmarkCase.Job.GetToolchain() is WasmToolchain;
+            return new StringBuilder()
                 .AppendArgument("build")
                 .AppendArgument($"\"{filePath}\"")
                 .AppendArgument($"-f {tfm}")
@@ -158,11 +164,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths, excludeOutput: excludeOutput)
+                .MaybeAppendOutputPaths(artifactsPaths, excludeOutput: excludeOutput, excludeArtifactsPath: excludeArtifactsPath)
                 .ToString();
+        }
 
         internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null)
-            => new StringBuilder()
+        {
+            bool excludeArtifactsPath = buildPartition.RepresentativeBenchmarkCase.Job.GetToolchain() is WasmToolchain;
+            return new StringBuilder()
                 .AppendArgument("publish")
                 .AppendArgument($"\"{filePath}\"")
                 .AppendArgument($"-f {tfm}")
@@ -172,8 +181,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths)
+                .MaybeAppendOutputPaths(artifactsPaths, excludeArtifactsPath: excludeArtifactsPath)
                 .ToString();
+        }
 
         private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string? suffix)
         {
@@ -215,12 +225,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         // We force the project to output binaries to a new directory.
         // Specifying --output and --no-dependencies breaks the build (because the previous build was not done using the custom output path),
         // so we don't include it if we're building no-deps (only supported for integration tests).
-        internal static StringBuilder MaybeAppendOutputPaths(this StringBuilder stringBuilder, ArtifactsPaths artifactsPaths, bool isRestore = false, bool excludeOutput = false)
+        internal static StringBuilder MaybeAppendOutputPaths(this StringBuilder stringBuilder, ArtifactsPaths artifactsPaths, bool isRestore = false, bool excludeOutput = false, bool excludeArtifactsPath = false)
             => excludeOutput
                 ? stringBuilder
                 : stringBuilder
                     // Use AltDirectorySeparatorChar so it's not interpreted as an escaped quote `\"`.
-                    .AppendArgument($"/p:ArtifactsPath=\"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
+                    // When excludeArtifactsPath is true, we skip /p:ArtifactsPath and set /p:UseArtifactsOutput=false instead.
+                    // This prevents the SDK from adding $(ArtifactsPath)/** to DefaultItemExcludes, which would
+                    // exclude all project files (including wwwroot/) from default Content globs.
+                    .AppendArgument(excludeArtifactsPath
+                        ? "/p:UseArtifactsOutput=false"
+                        : $"/p:ArtifactsPath=\"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
                     .AppendArgument($"/p:OutDir=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
                     // OutputPath is legacy, per-project version of OutDir. We set both just in case. https://github.com/dotnet/msbuild/issues/87
                     .AppendArgument($"/p:OutputPath=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
