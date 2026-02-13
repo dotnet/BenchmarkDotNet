@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -167,10 +166,19 @@ namespace BenchmarkDotNet.Loggers
                     PrefixedOutput.Add(line);
                 }
             }
-            catch (SocketException e) when (e.ErrorCode == 10004) // The socket was closed.
+            catch (IOException e) when (e.InnerException is SocketException se && IsEarlyExitCode(se.SocketErrorCode))
             {
                 return Result.EarlyProcessExit;
             }
+            catch (SocketException e) when (IsEarlyExitCode(e.SocketErrorCode))
+            {
+                return Result.EarlyProcessExit;
+            }
+
+            static bool IsEarlyExitCode(SocketError error)
+                => error is SocketError.ConnectionReset
+                or SocketError.Shutdown
+                or SocketError.OperationAborted;
         }
     }
 }

@@ -84,7 +84,6 @@ public class TcpHost : IHost
                 int port = int.Parse(args[i + 1]);
                 var client = new TcpClient();
 #if NETSTANDARD2_0
-                client.Connect(IPAddress.Loopback, port);
                 await client.ConnectAsync(IPAddress.Loopback, port);
 #else
                 try
