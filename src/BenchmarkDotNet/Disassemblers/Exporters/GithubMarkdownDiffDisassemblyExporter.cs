@@ -10,6 +10,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal class GithubMarkdownDiffDisassemblyExporter : ExporterBase
@@ -57,8 +59,8 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     RunGitDiff(firstFileName, secondFileName, builder);
 
                     logger.WriteLine($"**Diff for {firstBenchmarkCase.Descriptor.WorkloadMethod.Name} method between:**");
-                    logger.WriteLine($"{GetImportantInfo(summary[firstBenchmarkCase])}");
-                    logger.WriteLine($"{GetImportantInfo(summary[secondBenchmarkCase])}");
+                    logger.WriteLine($"{GetImportantInfo(summary[firstBenchmarkCase]!)}");
+                    logger.WriteLine($"{GetImportantInfo(summary[secondBenchmarkCase]!)}");
 
                     logger.WriteLine("```diff");
                     logger.WriteLine(builder.ToString().Trim());

@@ -5,6 +5,8 @@ using BenchmarkDotNet.Validators;
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.Results
 {
     public class ExecuteResult
@@ -57,6 +59,8 @@ namespace BenchmarkDotNet.Toolchains.Results
             PrefixedLines = [];
             this.measurements = measurements;
             GcStats = gcStats;
+            StandardOutput = [];
+            Results = [];
         }
 
         internal ExecuteResult(List<Measurement> measurements)
@@ -67,6 +71,8 @@ namespace BenchmarkDotNet.Toolchains.Results
             PrefixedLines = [];
             this.measurements = measurements;
             GcStats = GcStats.Empty;
+            StandardOutput = [];
+            Results = [];
         }
 
         internal static ExecuteResult FromRunResults(RunResults runResults, int exitCode)

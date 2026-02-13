@@ -33,6 +33,9 @@ namespace BenchmarkDotNet.Tests.Mocks
                 GlobalCleanupAction = () => { },
                 IterationSetupAction = () => { },
                 IterationCleanupAction = () => { },
+                BenchmarkName = "",
+                Host = default!,
+                InProcessDiagnoserHandler = default!
             };
         }
 

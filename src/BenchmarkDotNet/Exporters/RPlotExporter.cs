@@ -10,6 +10,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Exporters
 {
     public class RPlotExporter : IExporter, IExporterDependencies
@@ -32,9 +34,10 @@ namespace BenchmarkDotNet.Exporters
             const string logFileName = "BuildPlots.log";
             yield return Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
 
-            string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
-            string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
-            string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
+            string csvFullPath = Path.GetFullPath(CsvMeasurementsExporter.Default.GetArtifactFullName(summary));
+            string scriptFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, scriptFileName));
+            string logFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, logFileName));
+            
             string script = ResourceHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle).
@@ -42,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            if (!TryFindRScript(consoleLogger, out string rscriptPath))
+            if (!TryFindRScript(consoleLogger, out var rscriptPath))
             {
                 yield break;
             }
@@ -54,7 +57,6 @@ namespace BenchmarkDotNet.Exporters
                 RedirectStandardError = true,
                 CreateNoWindow = true,
                 FileName = rscriptPath,
-                WorkingDirectory = summary.ResultsDirectoryPath,
                 Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
             using (var process = new Process {StartInfo = start})
@@ -68,6 +70,10 @@ namespace BenchmarkDotNet.Exporters
                 process.Start();
                 reader.BeginRead();
                 process.WaitForExit();
+                Debug.Assert(process.HasExited);
+                if (process.ExitCode != 0)
+                    throw new ApplicationException($"Process {rscriptPath} has exited with code {process.ExitCode}");
+
                 reader.StopRead();
                 File.WriteAllLines(logFullPath, reader.GetOutputLines());
                 File.AppendAllLines(logFullPath, reader.GetErrorLines());
@@ -86,7 +92,7 @@ namespace BenchmarkDotNet.Exporters
             string rscriptExecutable = OsDetector.IsWindows() ? "Rscript.exe" : "Rscript";
             rscriptPath = null;
 
-            string rHome = Environment.GetEnvironmentVariable("R_HOME");
+            string? rHome = Environment.GetEnvironmentVariable("R_HOME");
             if (rHome != null)
             {
                 rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
@@ -126,7 +132,7 @@ namespace BenchmarkDotNet.Exporters
 
         private static string? FindInPath(string fileName)
         {
-            string path = Environment.GetEnvironmentVariable("PATH");
+            string? path = Environment.GetEnvironmentVariable("PATH");
             if (path == null)
                 return null;
 

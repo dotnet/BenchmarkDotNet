@@ -5,12 +5,14 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.Parameters
 {
     public class ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId,
         ILogger logger, IResolver resolver, int launchIndex,
         CompositeInProcessDiagnoser compositeInProcessDiagnoser,
-        IDiagnoser diagnoser = null, RunMode diagnoserRunMode = RunMode.None)
+        IDiagnoser? diagnoser = null, RunMode diagnoserRunMode = RunMode.None)
     {
         internal static readonly TimeSpan ProcessExitTimeout = TimeSpan.FromSeconds(2);
 

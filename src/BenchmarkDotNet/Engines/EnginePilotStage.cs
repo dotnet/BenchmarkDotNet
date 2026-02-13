@@ -5,6 +5,8 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Engines
 {
     // TODO: use clockResolution
@@ -86,7 +88,7 @@ namespace BenchmarkDotNet.Engines
         private readonly TimeInterval minIterationTime = parameters.TargetJob.ResolveValue(AccuracyMode.MinIterationTimeCharacteristic, parameters.Resolver);
         private readonly double maxRelativeError = parameters.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, parameters.Resolver);
         private readonly TimeInterval? maxAbsoluteError = parameters.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
-        private readonly double resolution = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver).GetResolution().Nanoseconds;
+        private readonly double resolution = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver)!.GetResolution().Nanoseconds;
 
         internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)
         {

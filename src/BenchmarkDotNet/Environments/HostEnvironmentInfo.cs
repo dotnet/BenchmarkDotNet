@@ -17,6 +17,8 @@ using Perfolizer.Models;
 using Perfolizer.Metrology;
 using BenchmarkDotNet.Extensions;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Environments
 {
     // this class is used by our auto-generated benchmark program,
@@ -77,7 +79,7 @@ namespace BenchmarkDotNet.Environments
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
             IsMonoInstalled = new Lazy<bool>(() => ProcessHelper.TestCommandExists("mono"));
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);
-            VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(RuntimeInformation.GetVirtualMachineHypervisor);
+            VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor?>(RuntimeInformation.GetVirtualMachineHypervisor);
             Os = new Lazy<OsInfo>(OsDetector.GetOs);
             Cpu = new Lazy<CpuInfo>(() => CpuDetector.CrossPlatform.Detect() ?? CpuInfo.Unknown);
         }

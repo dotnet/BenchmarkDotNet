@@ -2,6 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.ExceptionServices;
+
+#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
@@ -24,15 +27,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             var type = typeof(T);
 
-            var method = type.GetMethod(name: methodName, types: arguments.Select(argument => argument.GetType()).ToArray());
+            var method = type.GetMethod(name: methodName, types: arguments.Select(argument => argument.GetType()).ToArray())!;
 
             try
             {
-                return method.Invoke(instance, parameters: arguments);
+                return method.Invoke(instance, parameters: arguments)!;
             }
             catch (TargetInvocationException wrappedByReflection)
             {
-                throw wrappedByReflection.InnerException;
+                var ex = wrappedByReflection.InnerException ?? wrappedByReflection;
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                return default!;// It's required to suppress error CS0161.
             }
         }
     }

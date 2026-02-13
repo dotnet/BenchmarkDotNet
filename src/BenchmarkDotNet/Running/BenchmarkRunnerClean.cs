@@ -28,6 +28,8 @@ using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     internal static class BenchmarkRunnerClean
@@ -268,7 +270,7 @@ namespace BenchmarkDotNet.Running
 
                         if (buildResult.GenerateException != null)
                             logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException}");
-                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string reason))
+                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string? reason))
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
@@ -420,7 +422,7 @@ namespace BenchmarkDotNet.Running
             {
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
                 {
-                    if (!buildResults[buildPartition].TryToExplainFailureReason(out string _))
+                    if (!buildResults[buildPartition].TryToExplainFailureReason(out _))
                         buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
 
                     eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
@@ -466,7 +468,11 @@ namespace BenchmarkDotNet.Running
             try
             {
                 if (!generateResult.IsGenerateSuccess)
-                    return BuildResult.Failure(generateResult, generateResult.GenerateException);
+                {
+                    return generateResult.GenerateException != null
+                        ? BuildResult.Failure(generateResult, generateResult.GenerateException)
+                        : BuildResult.Failure(generateResult, errorMessage: "");
+                }
 
                 return toolchain.Builder.Build(generateResult, buildPartition, buildLogger);
             }
@@ -539,7 +545,7 @@ namespace BenchmarkDotNet.Running
 
                 if (useDiagnoser)
                 {
-                    metrics.AddRange(noOverheadCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
+                    metrics.AddRange(noOverheadCompositeDiagnoser!.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
@@ -698,7 +704,7 @@ namespace BenchmarkDotNet.Running
 
         private static string GetRootArtifactsFolderPath(BenchmarkRunInfo[] benchmarkRunInfos)
         {
-            var defaultPath = DefaultConfig.Instance.ArtifactsPath;
+            var defaultPath = DefaultConfig.Instance.ArtifactsPath!;
 
             var customPath = benchmarkRunInfos
                 .Where(benchmark => benchmark.Config.ArtifactsPath.IsNotBlank() && benchmark.Config.ArtifactsPath != defaultPath)

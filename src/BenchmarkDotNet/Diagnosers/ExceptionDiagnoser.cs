@@ -17,6 +17,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Diagnosers
 {
     public class ExceptionDiagnoser(ExceptionDiagnoserConfig config) : IInProcessDiagnoser
@@ -98,7 +100,7 @@ namespace BenchmarkDotNet.Diagnosers
             => exceptionsCount.ToString();
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        private void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)
+        private void OnFirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
         {
             Interlocked.Increment(ref exceptionsCount);
         }

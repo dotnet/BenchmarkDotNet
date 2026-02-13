@@ -184,6 +184,7 @@ namespace BenchmarkDotNet.Tests.Engine
                 WorkloadActionUnroll = _ => { },
                 WorkloadActionNoUnroll = _ => { },
                 TargetJob = job,
+                BenchmarkName = "",
                 InProcessDiagnoserHandler = new([], host, Diagnosers.RunMode.None, null)
             };
         }

@@ -12,11 +12,13 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     public static class BenchmarkConverter
     {
-        private const BindingFlags AllMethodsFlags =  BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags AllMethodsFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig? config = null)
         {
@@ -36,8 +38,8 @@ namespace BenchmarkDotNet.Running
             => methods
                 .Select(method => (method, attribute: method.ResolveAttribute<BenchmarkAttribute>()))
                 .Where(pair => pair.attribute is not null)
-                .OrderBy(pair => pair.attribute.SourceCodeFile)
-                .ThenBy(pair => pair.attribute.SourceCodeLineNumber)
+                .OrderBy(pair => pair.attribute!.SourceCodeFile)
+                .ThenBy(pair => pair.attribute!.SourceCodeLineNumber)
                 .Select(pair => pair.method)
                 .ToArray();
 
@@ -131,12 +133,12 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, globalCleanupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
-                                                   methodInfo.ResolveAttribute<BenchmarkAttribute>(),
+                                                   methodInfo.ResolveAttribute<BenchmarkAttribute>()!,
                                                    targetMethods,
                                                    config));
         }
 
-        private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
+        private static MethodInfo? GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
             => methods.Where(method => method.Item2.Match(benchmarkMethod)).Select(method => method.Item1).FirstOrDefault();
 
         private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName) where T : TargetedAttribute
@@ -154,11 +156,11 @@ namespace BenchmarkDotNet.Running
 
         private static Descriptor CreateDescriptor(
             Type type,
-            MethodInfo globalSetupMethod,
+            MethodInfo? globalSetupMethod,
             MethodInfo methodInfo,
-            MethodInfo globalCleanupMethod,
-            MethodInfo iterationSetupMethod,
-            MethodInfo iterationCleanupMethod,
+            MethodInfo? globalCleanupMethod,
+            MethodInfo? iterationSetupMethod,
+            MethodInfo? iterationCleanupMethod,
             BenchmarkAttribute attr,
             MethodInfo[] targetMethods,
             IConfig config)
@@ -184,7 +186,7 @@ namespace BenchmarkDotNet.Running
 
         private static ParameterDefinitions GetParameterDefinitions(Type type)
         {
-            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object[]> getValidValues) where TAttribute : PriorityAttribute
+            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object?[]> getValidValues) where TAttribute : PriorityAttribute
             {
                 const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -221,7 +223,7 @@ namespace BenchmarkDotNet.Running
             int priority = argumentsAttributes.Select(attribute => attribute.Priority).Sum();
 
             var parameterDefinitions = benchmark.GetParameters()
-                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType, priority))
+                .Select(parameter => new ParameterDefinition(parameter.Name!, false, Array.Empty<object>(), true, parameter.ParameterType, priority))
                 .ToArray();
 
             if (parameterDefinitions.IsEmpty())
@@ -250,7 +252,7 @@ namespace BenchmarkDotNet.Running
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
                 yield break;
 
-            var argumentsSourceAttribute = benchmark.GetCustomAttribute<ArgumentsSourceAttribute>();
+            var argumentsSourceAttribute = benchmark.GetCustomAttribute<ArgumentsSourceAttribute>()!;
             var targetType = argumentsSourceAttribute.Type ?? benchmarkType;
 
             var valuesInfo = GetValidValuesForParamsSource(targetType, argumentsSourceAttribute.Name);
@@ -280,17 +282,10 @@ namespace BenchmarkDotNet.Running
                 throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
         }
 
-        private static object[] GetValidValues(object[] values, Type parameterType)
-        {
-            if (values == null && parameterType.IsNullable())
-            {
-                return new object[] { null };
-            }
+        private static object?[] GetValidValues(object?[] values, Type parameterType)
+            => values.Select(value => Map(value, parameterType)).ToArray();
 
-            return values?.Select(value => Map(value, parameterType)).ToArray();
-        }
-
-        private static object Map(object providedValue, Type type)
+        private static object? Map(object? providedValue, Type type)
         {
             if (providedValue == null)
                 return null;
@@ -317,19 +312,19 @@ namespace BenchmarkDotNet.Running
 
             if (paramsSourceMethod != default)
                 return (paramsSourceMethod, ToArray(
-                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(sourceType), null),
+                    paramsSourceMethod.Invoke(paramsSourceMethod.IsStatic ? null : Activator.CreateInstance(sourceType), null)!,
                     paramsSourceMethod,
                     sourceType));
 
             var paramsSourceProperty = sourceType.GetAllProperties().FirstOrDefault(property => property.Name == sourceName && property.GetMethod?.IsPublic == true);
 
-            if (paramsSourceProperty != default)
-                return (paramsSourceProperty, ToArray(
-                    paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod.IsStatic ? null : Activator.CreateInstance(sourceType)),
-                    paramsSourceProperty,
-                    sourceType));
+            if (paramsSourceProperty == null)
+                throw new InvalidBenchmarkDeclarationException($"{sourceType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
 
-            throw new InvalidBenchmarkDeclarationException($"{sourceType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
+            return (paramsSourceProperty, ToArray(
+                paramsSourceProperty.GetValue(paramsSourceProperty.GetMethod!.IsStatic ? null : Activator.CreateInstance(sourceType)!)!,
+                paramsSourceProperty,
+                sourceType));
         }
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)
@@ -340,24 +335,24 @@ namespace BenchmarkDotNet.Running
             return collection.Cast<object>().ToArray();
         }
 
-        private static object[] GetAllValidValues(Type parameterType)
+        private static object?[] GetAllValidValues(Type parameterType)
         {
             if (parameterType == typeof(bool))
-                return new object[] { false, true };
+                return [false, true];
 
             if (parameterType.GetTypeInfo().IsEnum)
             {
                 if (parameterType.GetTypeInfo().IsDefined(typeof(FlagsAttribute)))
-                    return new object[] { Activator.CreateInstance(parameterType) };
+                    return [Activator.CreateInstance(parameterType)!];
 
                 return Enum.GetValues(parameterType).Cast<object>().ToArray();
             }
 
             var nullableUnderlyingType = Nullable.GetUnderlyingType(parameterType);
             if (nullableUnderlyingType != null)
-                return new object[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
+                return new object?[] { null }.Concat(GetAllValidValues(nullableUnderlyingType)).ToArray();
 
-            return new object[] { Activator.CreateInstance(parameterType) };
+            return [Activator.CreateInstance(parameterType)!];
         }
     }
 }

@@ -12,6 +12,8 @@ using BenchmarkDotNet.Validators;
 
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>
@@ -59,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         // ReSharper restore HeapView.DelegateAllocation
 
-        private static string DontValidate(Job job, Characteristic characteristic) => null;
+        private static string DontValidate(Job job, Characteristic characteristic) => "";
 
         private static string ValidateEnvironment(Job job, Characteristic characteristic)
         {
@@ -67,14 +69,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var actual = resolver.Resolve(Job.Default, characteristic);
             var expected = resolver.Resolve(job, characteristic);
             return Equals(actual, expected)
-                ? null
+                ? ""
                 : $"was run as {actual} ({expected} expected). Fix your test runner options.";
         }
 
         private static string ValidatePlatform(Job job, Characteristic characteristic)
         {
             if (job.Environment.Platform == Platform.AnyCpu)
-                return null;
+                return "";
 
             return ValidateEnvironment(job, characteristic);
         }
@@ -82,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private static string ValidateToolchain(Job job, Characteristic characteristic) =>
             job.Infrastructure.Toolchain is InProcessEmitToolchain
             || job.Infrastructure.Toolchain is InProcessNoEmitToolchain
-                ? null
+                ? ""
                 : $"should be instance of {nameof(InProcessEmitToolchain)} or {nameof(InProcessNoEmitToolchain)}.";
 
         /// <summary>The instance of validator that does NOT fail on error.</summary>

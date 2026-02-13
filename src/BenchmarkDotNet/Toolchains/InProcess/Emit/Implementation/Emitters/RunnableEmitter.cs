@@ -18,6 +18,8 @@ using BenchmarkDotNet.Toolchains.Results;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     /// <summary>
@@ -101,7 +103,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 : AssemblyBuilderAccess.RunAndCollect;
 
             var assemblyBuilder = saveToDisk
-                ? AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, assemblyMode, Path.GetDirectoryName(assemblyResultPath))
+                ? AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, assemblyMode, Path.GetDirectoryName(assemblyResultPath)!)
                 : AssemblyBuilder.DefineDynamicAssembly(assemblyName, assemblyMode);
 
             DefineAssemblyAttributes(assemblyBuilder);
@@ -127,12 +129,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ?? throw new MissingMemberException(nameof(RuntimeCompatibilityAttribute));
 
             var attributeProp = typeof(RuntimeCompatibilityAttribute)
-                .GetProperty(nameof(RuntimeCompatibilityAttribute.WrapNonExceptionThrows));
+                .GetProperty(nameof(RuntimeCompatibilityAttribute.WrapNonExceptionThrows))!;
             attBuilder = new CustomAttributeBuilder(
                 attributeCtor,
-                Array.Empty<object>(),
-                new[] { attributeProp },
-                new object[] { true });
+                constructorArgs: [],
+                namedProperties: [attributeProp],
+                propertyValues: [true]);
             assemblyBuilder.SetCustomAttribute(attBuilder);
 
             // [assembly: Debuggable(DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
@@ -237,39 +239,39 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private readonly BuildPartition buildPartition;
         private readonly ModuleBuilder moduleBuilder;
 
-        private BenchmarkBuildInfo benchmark;
-        private List<ArgFieldInfo> argFields;
+        private BenchmarkBuildInfo benchmark = default!;
+        private List<ArgFieldInfo> argFields = default!;
         private int jobUnrollFactor;
 
-        private TypeBuilder runnableBuilder;
-        private ConsumableTypeInfo consumableInfo;
-        private ConsumableTypeInfo globalSetupReturnInfo;
-        private ConsumableTypeInfo globalCleanupReturnInfo;
-        private ConsumableTypeInfo iterationSetupReturnInfo;
-        private ConsumableTypeInfo iterationCleanupReturnInfo;
+        private TypeBuilder runnableBuilder = default!;
+        private ConsumableTypeInfo consumableInfo = default!;
+        private ConsumableTypeInfo? globalSetupReturnInfo;
+        private ConsumableTypeInfo? globalCleanupReturnInfo;
+        private ConsumableTypeInfo? iterationSetupReturnInfo;
+        private ConsumableTypeInfo? iterationCleanupReturnInfo;
 
-        private FieldBuilder globalSetupActionField;
-        private FieldBuilder globalCleanupActionField;
-        private FieldBuilder iterationSetupActionField;
-        private FieldBuilder iterationCleanupActionField;
-        private FieldBuilder notElevenField;
+        private FieldBuilder globalSetupActionField = default!;
+        private FieldBuilder globalCleanupActionField = default!;
+        private FieldBuilder iterationSetupActionField = default!;
+        private FieldBuilder iterationCleanupActionField = default!;
+        private FieldBuilder notElevenField = default!;
 
         // ReSharper disable NotAccessedField.Local
-        private ConstructorBuilder ctorMethod;
-        private MethodBuilder trickTheJitMethod;
-        private MethodBuilder overheadImplementationMethod;
-        private MethodBuilder overheadActionUnrollMethod;
-        private MethodBuilder overheadActionNoUnrollMethod;
-        private MethodBuilder workloadActionUnrollMethod;
-        private MethodBuilder workloadActionNoUnrollMethod;
-        private MethodBuilder forDisassemblyDiagnoserMethod;
+        private ConstructorBuilder ctorMethod = default!;
+        private MethodBuilder trickTheJitMethod = default!;
+        private MethodBuilder overheadImplementationMethod = default!;
+        private MethodBuilder overheadActionUnrollMethod = default!;
+        private MethodBuilder overheadActionNoUnrollMethod = default!;
+        private MethodBuilder workloadActionUnrollMethod = default!;
+        private MethodBuilder workloadActionNoUnrollMethod = default!;
+        private MethodBuilder forDisassemblyDiagnoserMethod = default!;
 
-        private MethodBuilder globalSetupMethod;
-        private MethodBuilder globalCleanupMethod;
-        private MethodBuilder iterationSetupMethod;
-        private MethodBuilder iterationCleanupMethod;
+        private MethodBuilder globalSetupMethod = default!;
+        private MethodBuilder globalCleanupMethod = default!;
+        private MethodBuilder iterationSetupMethod = default!;
+        private MethodBuilder iterationCleanupMethod = default!;
 
-        private MethodBuilder runMethod;
+        private MethodBuilder runMethod = default!;
         // ReSharper restore NotAccessedField.Local
 
         private RunnableEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder)
@@ -326,7 +328,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 #if NETFRAMEWORK
             return runnableBuilder.CreateType();
 #else
-            return runnableBuilder.CreateTypeInfo();
+            return runnableBuilder.CreateTypeInfo()!;
 #endif
         }
 
@@ -349,7 +351,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             runnableBuilder = DefineRunnableTypeBuilder(benchmark, moduleBuilder);
         }
 
-        private static ConsumableTypeInfo GetConsumableTypeInfo(Type methodReturnType)
+        private static ConsumableTypeInfo? GetConsumableTypeInfo(Type? methodReturnType)
         {
             return methodReturnType == null ? null : new ConsumableTypeInfo(methodReturnType);
         }
@@ -368,12 +370,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Define arg fields
             foreach (var parameter in Descriptor.WorkloadMethod.GetParameters())
             {
-                var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name);
+                var argValue = benchmark.BenchmarkCase.Parameters.GetArgument(parameter.Name!);
                 var parameterType = parameter.ParameterType;
 
                 Type argLocalsType;
                 Type argFieldType;
-                MethodInfo opConversion = null;
+                MethodInfo? opConversion = null;
                 if (parameterType.IsByRef)
                 {
                     argLocalsType = parameterType;
@@ -406,7 +408,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     argFieldType,
                     FieldAttributes.Private);
 
-                argFields.Add(new ArgFieldInfo(argField, argLocalsType, opConversion));
+                argFields.Add(new ArgFieldInfo(argField, argLocalsType, opConversion!));
             }
 
             notElevenField = runnableBuilder.DefineField(NotElevenFieldName, typeof(int), FieldAttributes.Public);
@@ -439,7 +441,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Replace arg names
             var parameters = Descriptor.WorkloadMethod.GetParameters()
                 .Select(p =>
-                    (ParameterInfo) new EmitParameterInfo(
+                    (ParameterInfo)new EmitParameterInfo(
                         p.Position,
                         ArgParamPrefix + p.Position,
                         p.ParameterType,
@@ -503,7 +505,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
                     IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
                 */
-                ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
+                ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod!);
             }
 
             if (consumableInfo.WorkloadMethodReturnType != typeof(void))
@@ -705,7 +707,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
                         IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
                     */
-                    ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
+                    ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod!);
                 }
 
                 if (consumableInfo.WorkloadMethodReturnType != typeof(void))
@@ -732,7 +734,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             iterationCleanupMethod = EmitWrapperMethod(IterationCleanupMethodName, Descriptor.IterationCleanupMethod, iterationCleanupReturnInfo);
         }
 
-        private MethodBuilder EmitWrapperMethod(string methodName, MethodInfo optionalTargetMethod, ConsumableTypeInfo returnTypeInfo)
+        private MethodBuilder EmitWrapperMethod(string methodName, MethodInfo? optionalTargetMethod, ConsumableTypeInfo? returnTypeInfo)
         {
             var methodBuilder = runnableBuilder.DefinePrivateVoidInstanceMethod(methodName);
 
@@ -800,7 +802,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
             */
 
-            ilBuilder.Emit(OpCodes.Call, returnTypeInfo.GetResultMethod);
+            ilBuilder.Emit(OpCodes.Call, returnTypeInfo.GetResultMethod!);
             ilBuilder.Emit(OpCodes.Pop);
         }
 
@@ -873,7 +875,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var argsExceptInstance = prepareForRunMethodTemplate
                 .GetParameters()
                 .Skip(1)
-                .Select(p => (ParameterInfo) new EmitParameterInfo(p.Position - 1, p.Name, p.ParameterType, p.Attributes, null))
+                .Select(p => (ParameterInfo)new EmitParameterInfo(p.Position - 1, p.Name, p.ParameterType, p.Attributes, null))
                 .ToArray();
             var methodBuilder = runnableBuilder.DefineStaticMethod(
                 RunMethodName,
@@ -928,7 +930,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0014: stloc.1
              */
             ilBuilder.Emit(OpCodes.Dup);
-            ilBuilder.Emit(OpCodes.Ldfld, resultTuple.GetType().GetField(nameof(resultTuple.Item1)));
+            ilBuilder.Emit(OpCodes.Ldfld, resultTuple.GetType().GetField(nameof(resultTuple.Item1))!);
             ilBuilder.EmitStloc(jobLocal);
             /*
                 // EngineParameters engineParameters = valueTuple.Item2;
@@ -937,14 +939,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_001b: stloc.2
              */
             ilBuilder.Emit(OpCodes.Dup);
-            ilBuilder.Emit(OpCodes.Ldfld, resultTuple.GetType().GetField(nameof(resultTuple.Item2)));
+            ilBuilder.Emit(OpCodes.Ldfld, resultTuple.GetType().GetField(nameof(resultTuple.Item2))!);
             ilBuilder.EmitStloc(engineParametersLocal);
             /*
                 // IEngineFactory engineFactory = valueTuple.Item3;
                 IL_001c: ldfld !2 valuetype [mscorlib]System.ValueTuple`3<class [BenchmarkDotNet]BenchmarkDotNet.Jobs.Job, class [BenchmarkDotNet]BenchmarkDotNet.Engines.EngineParameters, class [BenchmarkDotNet]BenchmarkDotNet.Engines.IEngineFactory>::Item3
                 IL_0021: stloc.3
              */
-            ilBuilder.Emit(OpCodes.Ldfld, resultTuple.GetType().GetField(nameof(resultTuple.Item3)));
+            ilBuilder.Emit(OpCodes.Ldfld, resultTuple.GetType().GetField(nameof(resultTuple.Item3))!);
             ilBuilder.EmitStloc(engineFactoryLocal);
 
             var notNullLabel = ilBuilder.DefineLabel();
@@ -1003,9 +1005,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0049: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler::Handle(valuetype [BenchmarkDotNet]BenchmarkDotNet.Engines.BenchmarkSignal)
             */
             ilBuilder.EmitLdloc(engineParametersLocal);
-            ilBuilder.Emit(OpCodes.Callvirt, typeof(EngineParameters).GetProperty(nameof(EngineParameters.InProcessDiagnoserHandler)).GetGetMethod());
+            ilBuilder.Emit(OpCodes.Callvirt, typeof(EngineParameters).GetProperty(nameof(EngineParameters.InProcessDiagnoserHandler))!.GetGetMethod()!);
             ilBuilder.Emit(OpCodes.Ldc_I4_5);
-            ilBuilder.Emit(OpCodes.Callvirt, typeof(Diagnosers.CompositeInProcessDiagnoserHandler).GetMethod(nameof(Diagnosers.CompositeInProcessDiagnoserHandler.Handle)));
+            ilBuilder.Emit(OpCodes.Callvirt, typeof(Diagnosers.CompositeInProcessDiagnoserHandler).GetMethod(nameof(Diagnosers.CompositeInProcessDiagnoserHandler.Handle))!);
 
             ilBuilder.EmitVoidReturn(methodBuilder);
 

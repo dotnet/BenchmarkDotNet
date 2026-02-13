@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     internal static class LinuxOsReleaseHelper
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet.Helpers
                 string? version = values.GetValueOrDefault("VERSION");
 
                 string[] idsWithExtendedVersion = { "ubuntu", "linuxmint", "solus", "kali" };
-                if (idsWithExtendedVersion.Contains(id) && version.IsNotBlank() && name.IsNotBlank())
+                if (id != null && idsWithExtendedVersion.Contains(id) && version.IsNotBlank() && name.IsNotBlank())
                     return name + " " + version;
 
                 string? prettyName = values.GetValueOrDefault("PRETTY_NAME");

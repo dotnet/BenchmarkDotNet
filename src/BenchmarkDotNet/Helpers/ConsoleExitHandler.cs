@@ -3,6 +3,8 @@ using System.Diagnostics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     internal class ConsoleExitHandler : IDisposable
@@ -49,13 +51,13 @@ namespace BenchmarkDotNet.Helpers
         }
 
         // the process has exited, so we detach the events
-        private void ProcessOnExited(object sender, EventArgs e) => Detach();
+        private void ProcessOnExited(object? sender, EventArgs e) => Detach();
 
         // the user has clicked Ctrl+C so we kill the entire process tree
-        private void CancelKeyPressHandlerCallback(object sender, ConsoleCancelEventArgs e) => KillProcessTree();
+        private void CancelKeyPressHandlerCallback(object? sender, ConsoleCancelEventArgs e) => KillProcessTree();
 
         // the user has closed the console window so we kill the entire process tree
-        private void ProcessExitEventHandlerHandlerCallback(object sender, EventArgs e) => KillProcessTree();
+        private void ProcessExitEventHandlerHandlerCallback(object? sender, EventArgs e) => KillProcessTree();
 
         internal void KillProcessTree()
         {

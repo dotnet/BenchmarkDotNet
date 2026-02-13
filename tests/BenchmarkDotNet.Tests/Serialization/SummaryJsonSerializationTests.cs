@@ -59,7 +59,7 @@ public class SummarySerializationTests
               "Statistic6": ""
             }
             """;
-        Assert.Equal(expected, json);
+        Assert.Equal(expected, json, ignoreLineEndingDifferences: true);
     }
 
     private const string JSON_EMPTY_STRING = "\"\"";

@@ -25,14 +25,14 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public class ValuePerTfm
         {
             private const RuntimeMoniker moniker =
-#if NET461
-                RuntimeMoniker.Net461;
+#if NET462
+                RuntimeMoniker.Net462;
 #elif NET48
                 RuntimeMoniker.Net48;
-#elif NETCOREAPP2_0
-                RuntimeMoniker.NetCoreApp20;
 #elif NET8_0
                 RuntimeMoniker.Net80;
+#elif NET10_0
+                RuntimeMoniker.Net10_0;
 #else
                 RuntimeMoniker.NotRecognized;
 #endif

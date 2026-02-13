@@ -9,6 +9,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 #endif
 
+#nullable enable
+
 namespace BenchmarkDotNet.Parameters
 {
     internal class ParameterComparer : IComparer<ParameterInstances>
@@ -31,11 +33,11 @@ namespace BenchmarkDotNet.Parameters
 
         public static readonly ParameterComparer Instance = new ParameterComparer();
 
-        public int Compare(ParameterInstances x, ParameterInstances y)
+        public int Compare(ParameterInstances? x, ParameterInstances? y)
         {
-            if (x == null && y == null) return 0;
-            if (x == null) return -1;
-            if (y == null) return 1;
+            if (ReferenceEquals(x, y)) return 0;
+            if (x is null) return -1;
+            if (y is null) return 1;
 
             for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
             {
@@ -119,9 +121,9 @@ namespace BenchmarkDotNet.Parameters
                         ? nameof(CompareTwoDArray)
                         : nameof(CompareThreeDArray);
                     comparison = (int) typeof(ParameterComparer)
-                        .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)
-                        .MakeGenericMethod(xArr.GetType().GetElementType(), yArr.GetType().GetElementType())
-                        .Invoke(null, [xArr, yArr]);
+                        .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)!
+                        .MakeGenericMethod(xArr.GetType().GetElementType()!, yArr.GetType().GetElementType()!)
+                        .Invoke(null, [xArr, yArr])!;
                     return true;
                 }
 

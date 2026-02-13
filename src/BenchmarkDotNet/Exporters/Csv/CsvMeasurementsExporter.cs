@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             var columns = new List<MeasurementColumn>
             {
                 new MeasurementColumn("Target", (summary, report, m) => report.BenchmarkCase.Descriptor.Type.Name + "." + report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo),
-                new MeasurementColumn("Target_Namespace", (summary, report, m) => report.BenchmarkCase.Descriptor.Type.Namespace),
+                new MeasurementColumn("Target_Namespace", (summary, report, m) => report.BenchmarkCase.Descriptor.Type.Namespace ?? ""),
                 new MeasurementColumn("Target_Type", (summary, report, m) => report.BenchmarkCase.Descriptor.Type.Name),
                 new MeasurementColumn("Target_Method", (summary, report, m) => report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo)
             };

@@ -5,6 +5,8 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     public static class BenchmarkPartitioner
@@ -20,12 +22,14 @@ namespace BenchmarkDotNet.Running
         {
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkRuntimePropertiesComparer();
 
-            public bool Equals(BenchmarkCase x, BenchmarkCase y)
+            public bool Equals(BenchmarkCase? x, BenchmarkCase? y)
             {
-                if (x == y)
+                if (ReferenceEquals(x, y)) 
                     return true;
-                if (x == null || y == null)
+
+                if (x is null || y is null) 
                     return false;
+
                 var jobX = x.Job;
                 var jobY = y.Job;
 
@@ -74,23 +78,18 @@ namespace BenchmarkDotNet.Running
                 return hashCode.ToHashCode();
             }
 
-            private static bool AreDifferent(object x, object y)
+            private static bool AreDifferent(object? x, object? y)
                 => !Equals(x, y);
 
-            private static bool AreDifferent(IReadOnlyList<Argument> x, IReadOnlyList<Argument> y)
+            private static bool AreDifferent(IReadOnlyList<Argument>? x, IReadOnlyList<Argument>? y)
             {
-                if (x == null && y == null)
+                if (ReferenceEquals(x, y)) 
                     return false;
-                if (x == null || y == null)
-                    return true;
-                if (x.Count != y.Count)
+
+                if (x is null || y is null) 
                     return true;
 
-                for (int i = 0; i < x.Count; i++)
-                    if (!x[i].Equals(y[i]))
-                        return true;
-
-                return false;
+                return !x.SequenceEqual(y);
             }
         }
     }

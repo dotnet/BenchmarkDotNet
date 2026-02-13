@@ -8,6 +8,8 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Extensions
 {
     internal static class PathFeatures
@@ -59,7 +61,7 @@ namespace BenchmarkDotNet.Extensions
             if (RunningOnCoreLib)
                 return false;
 
-            Type t = typeof(object).GetTypeInfo().Assembly.GetType("System.AppContextSwitches");
+            Type t = typeof(object).GetTypeInfo().Assembly.GetType("System.AppContextSwitches")!;
             var p = t.GetProperty(propertyName, BindingFlags.Static | BindingFlags.Public);
 
             // If the switch actually exists use it, otherwise we predate the switch and are effectively on

@@ -11,6 +11,8 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>
@@ -112,7 +114,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
-                var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
+                var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type)!;
                 var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, unrollFactor);
                 var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
@@ -167,7 +169,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 };
 
                 var results = job
-                    .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
+                    .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
                     .Create(engineParameters)
                     .Run();
                 host.ReportResults(results); // printing costs memory, do this after runs

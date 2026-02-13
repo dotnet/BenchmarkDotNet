@@ -7,6 +7,8 @@ using JetBrains.Annotations;
 using BenchmarkDotNet.Portability;
 using System.Runtime.CompilerServices;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Engines
 {
     public class AnonymousPipesHost : IHost
@@ -54,7 +56,7 @@ namespace BenchmarkDotNet.Engines
             WriteLine(Engine.Signals.ToMessage(hostSignal));
 
             // read the response from Parent process, make the communication blocking
-            string acknowledgment = inReader.ReadLine();
+            string? acknowledgment = inReader.ReadLine();
             if (acknowledgment != Engine.Signals.Acknowledgment
                 && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
             {

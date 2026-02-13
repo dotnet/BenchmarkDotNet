@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
@@ -24,22 +26,27 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, unrollFactor);
 
+            // targetMethod must not be null here. Because it's checked by PrepareInstanceAndResultType.
+            // Following null check is added to suppress nullable annotation errors.
+            if (targetMethod == null)
+                throw new ArgumentNullException(nameof(targetMethod));
+
             if (resultType == typeof(void*))
                 return new BenchmarkActionVoidPointer(resultInstance, targetMethod, unrollFactor);
 
             if (resultType.IsByRef)
             {
-                var returnParameter = targetMethod?.ReturnParameter ?? fallbackIdleSignature.ReturnParameter;
+                var returnParameter = targetMethod.ReturnParameter;
                 // IsReadOnlyAttribute is not part of netstandard2.0, so we need to check the attribute name as usual.
                 if (returnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
                     return Create(
-                        typeof(BenchmarkActionByRefReadonly<>).MakeGenericType(resultType.GetElementType()),
+                        typeof(BenchmarkActionByRefReadonly<>).MakeGenericType(resultType.GetElementType()!),
                         resultInstance,
                         targetMethod,
                         unrollFactor);
 
                 return Create(
-                    typeof(BenchmarkActionByRef<>).MakeGenericType(resultType.GetElementType()),
+                    typeof(BenchmarkActionByRef<>).MakeGenericType(resultType.GetElementType()!),
                     resultInstance,
                     targetMethod,
                     unrollFactor);
@@ -78,8 +85,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         }
 
         private static void PrepareInstanceAndResultType(
-            object instance, MethodInfo targetMethod, MethodInfo fallbackIdleSignature,
-            out object resultInstance, out Type resultType)
+            object? instance,
+            MethodInfo? targetMethod,
+            MethodInfo? fallbackIdleSignature,
+            out object? resultInstance,
+            out Type resultType)
         {
             var signature = targetMethod ?? fallbackIdleSignature;
             if (signature == null)
@@ -92,7 +102,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     nameof(instance),
                     $"The {nameof(instance)} parameter should be not null as invocation method is instance method.");
 
-            resultInstance = signature.IsStatic ? null : instance;
+            resultInstance = signature.IsStatic ? null : instance!;
             resultType = signature.ReturnType;
 
             if (resultType == typeof(void))
@@ -110,8 +120,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         }
 
         /// <summary>Helper to enforce .ctor signature.</summary>
-        private static BenchmarkActionBase Create(Type actionType, object instance, MethodInfo method, int unrollFactor) =>
-            (BenchmarkActionBase)Activator.CreateInstance(actionType, instance, method, unrollFactor);
+        private static BenchmarkActionBase Create(Type actionType, object? instance, MethodInfo? method, int unrollFactor) =>
+            (BenchmarkActionBase)Activator.CreateInstance(actionType, instance, method, unrollFactor)!;
 
         private static void FallbackMethod() { }
         private static readonly MethodInfo FallbackSignature = new Action(FallbackMethod).GetMethodInfo();

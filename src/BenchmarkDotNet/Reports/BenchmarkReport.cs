@@ -40,18 +40,17 @@ namespace BenchmarkDotNet.Reports
             BenchmarkCase benchmarkCase,
             GenerateResult generateResult,
             BuildResult buildResult,
-            IReadOnlyList<ExecuteResult> executeResults,
-            IReadOnlyList<Metric> metrics)
+            IReadOnlyList<ExecuteResult>? executeResults,
+            IReadOnlyList<Metric>? metrics)
         {
             Success = success;
             BenchmarkCase = benchmarkCase;
             GenerateResult = generateResult;
             BuildResult = buildResult;
-            ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
+            ExecuteResults = executeResults ?? [];
             AllMeasurements = ExecuteResults.SelectMany((results, index) => results.Measurements).ToArray();
             GcStats = ExecuteResults.Count > 0 ? ExecuteResults[ExecuteResults.Count - 1].GcStats : default;
-            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id)
-                      ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
+            Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id) ?? [];
         }
 
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";

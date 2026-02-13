@@ -9,6 +9,8 @@ using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
 #endif
 
+#nullable enable
+
 namespace BenchmarkDotNet.Detectors.Cpu
 {
     // based on https://github.com/dotnet/runtime/tree/v10.0.0-rc.1.25451.107/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
@@ -281,10 +283,10 @@ namespace BenchmarkDotNet.Detectors.Cpu
 
         private static bool GetIsSupported([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] string typeName)
         {
-            Type type = Type.GetType(typeName);
+            Type type = Type.GetType(typeName)!;
             if (type == null) return false;
 
-            return (bool)type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).GetValue(null, null);
+            return (bool)type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!.GetValue(null, null)!;
         }
     }
 }

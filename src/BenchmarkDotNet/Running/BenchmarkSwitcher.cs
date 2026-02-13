@@ -16,6 +16,8 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkSwitcher
@@ -98,13 +100,13 @@ namespace BenchmarkDotNet.Running
             if (args == null && Environment.GetCommandLineArgs().Length > 1) // The first element is the executable file name
                 logger.WriteLineHint("You haven't passed command line arguments to BenchmarkSwitcher.Run method. Running with default configuration.");
 
-            if (options.PrintInformation)
+            if (options!.PrintInformation)
             {
                 logger.WriteLine(HostEnvironmentInfo.GetInformation());
                 return Array.Empty<Summary>();
             }
 
-            var effectiveConfig = ManualConfig.Union(notNullConfig, parsedConfig);
+            var effectiveConfig = ManualConfig.Union(notNullConfig, parsedConfig!);
 
             var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors

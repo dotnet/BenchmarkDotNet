@@ -4,6 +4,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>
@@ -13,6 +15,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     {
         /// <summary>returns a success</summary>
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-            => GenerateResult.Success(null, Array.Empty<string>());
+            => GenerateResult.Success(ArtifactsPaths.Empty, artifactsToCleanup: []);
     }
 }

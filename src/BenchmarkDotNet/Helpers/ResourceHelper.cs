@@ -2,6 +2,8 @@
 using System.IO;
 using System.Reflection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers
 {
     internal static class ResourceHelper
@@ -21,7 +23,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static Stream GetResourceStream(string resourceName)
         {
-            return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName);
+            return typeof(ResourceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(resourceName)!;
         }
     }
 }

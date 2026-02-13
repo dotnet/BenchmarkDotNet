@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+
+#nullable enable
+
 // THIS TYPE MUST NOT HAVE ANY DEPENDENCIES TO BENCHMARKDOTNET, VALUE TUPLE, IMMUTABLE TYPES OR ANYTHING COMPLEX!!
 
 /// <summary>
@@ -28,10 +31,10 @@ internal class DirtyAssemblyResolveHelper : IDisposable
     /// "the handler is invoked whenever the runtime fails to bind to an assembly by name."
     /// </summary>
     /// <returns>not null when we find it manually, null when can't help</returns>
-    private Assembly? HelpTheFrameworkToResolveTheAssembly(object sender, ResolveEventArgs args)
+    private Assembly? HelpTheFrameworkToResolveTheAssembly(object? sender, ResolveEventArgs args)
     {
         var fullName = new AssemblyName(args.Name);
-        string simpleName = fullName.Name;
+        string simpleName = fullName.Name!;
 
         string guessedPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{simpleName}.dll");
 

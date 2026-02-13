@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal class EmitParameterInfo : ParameterInfo
@@ -27,16 +29,17 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
         public EmitParameterInfo(
             int position,
-            string name,
+            string? name,
             Type parameterType,
             ParameterAttributes parameterAttributes,
-            MemberInfo member)
+            MemberInfo? member)
         {
             PositionImpl = position;
             NameImpl = name;
             ClassImpl = parameterType;
             AttrsImpl = parameterAttributes;
-            MemberImpl = member;
+            if (member != null)
+                MemberImpl = member;
         }
 
         public ParameterInfo SetMember(MemberInfo member)
