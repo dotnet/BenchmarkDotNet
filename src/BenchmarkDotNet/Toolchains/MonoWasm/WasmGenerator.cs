@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
             // Always use Microsoft.NET.Sdk.WebAssembly for WASM projects. It auto-defaults UseMonoRuntime=true.
-            const string sdkName = "Microsoft.NET.Sdk.WebAssembly";
+            string sdkName = runtime.IsMonoRuntime ? "Microsoft.NET.Sdk.WebAssembly" : "Microsoft.NET.Sdk";
 
             string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
