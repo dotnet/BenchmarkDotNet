@@ -52,8 +52,10 @@ namespace BenchmarkDotNet.Tests
                 set { _writeOnlyValue = value; }
             }
 
+#pragma warning disable BDN1305 // Test intentionally uses write-only property
             [ParamsSource(nameof(WriteOnlyValues))]
             public int MyParam { get; set; }
+#pragma warning restore BDN1305
 
             [Benchmark]
             public void Run() { }
