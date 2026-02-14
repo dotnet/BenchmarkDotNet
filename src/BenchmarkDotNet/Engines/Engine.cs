@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Engines
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
                 catch (Exception e) when (didThrow)
                 {
-                    await Host.SendErrorAsync($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
+                    Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Engines
             {
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    await Host.BeforeMainRunAsync();
+                    Host.BeforeMainRun();
                     await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun);
                 }
 
@@ -147,18 +147,18 @@ namespace BenchmarkDotNet.Engines
 
                     // Results
                     var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, totalOperations, clockSpan.GetNanoseconds());
-                    await Host.WriteLineAsync(measurement.ToString());
+                    Host.WriteLine(measurement.ToString());
                     stageMeasurements.Add(measurement);
                     // Actual Workload is always the last stage, so we use the same data to run extra stats.
                     extraIterationData = iterationData;
                 }
                 measurements.AddRange(stageMeasurements);
 
-                await Host.WriteLineAsync();
+                Host.WriteLine();
 
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    await Host.AfterMainRunAsync();
+                    Host.AfterMainRun();
                     await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun);
                 }
             }
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.Engines
 
                 await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
-                await Host.SendSignalAsync(HostSignal.BeforeExtraIteration);
+                Host.SendSignal(HostSignal.BeforeExtraIteration);
                 await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration);
 
                 // GC collect before measuring allocations.
@@ -191,13 +191,13 @@ namespace BenchmarkDotNet.Engines
                 }
 
                 await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration);
-                await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
+                Host.SendSignal(HostSignal.AfterExtraIteration);
 
                 await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
 
                 var totalOperations = extraIterationData.invokeCount * Parameters.OperationsPerInvoke;
                 var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());
-                await Host.WriteLineAsync(measurement.ToString());
+                Host.WriteLine(measurement.ToString());
                 workGcHasDone = gcStats.WithTotalOperations(totalOperations);
                 measurements.Add(measurement);
             }

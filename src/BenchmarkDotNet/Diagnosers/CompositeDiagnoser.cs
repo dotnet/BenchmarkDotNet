@@ -109,10 +109,10 @@ namespace BenchmarkDotNet.Diagnosers
                 // Ideally we would simply use results.Length, write it directly to host, then the host reads the exact count of chars.
                 // But WasmExecutor does not use Broker, and reads all output, so we need to instead use line count and prepend every line with CompositeInProcessDiagnoser.ResultsKey.
                 var resultsLines = results.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-                await host.WriteLineAsync($"{CompositeInProcessDiagnoser.HeaderKey} {router.index} {resultsLines.Length}");
+                host.WriteLine($"{CompositeInProcessDiagnoser.HeaderKey} {router.index} {resultsLines.Length}");
                 foreach (var line in resultsLines)
                 {
-                    await host.WriteLineAsync($"{CompositeInProcessDiagnoser.ResultsKey} {line}");
+                    host.WriteLine($"{CompositeInProcessDiagnoser.ResultsKey} {line}");
                 }
             }
         }

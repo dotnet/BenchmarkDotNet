@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Validators;
 
@@ -14,23 +13,23 @@ internal sealed class NoAcknowledgementConsoleHost : IHost
 
     public NoAcknowledgementConsoleHost() => outWriter = Console.Out;
 
-    public async ValueTask WriteAsync(string message)
-        => await outWriter.WriteAsync(message);
+    public void WriteAsync(string message)
+        => outWriter.Write(message);
 
-    public async ValueTask WriteLineAsync()
-        => await outWriter.WriteLineAsync();
+    public void WriteLine()
+        => outWriter.WriteLine();
 
-    public async ValueTask WriteLineAsync(string message)
-        => await outWriter.WriteLineAsync(message);
+    public void WriteLine(string message)
+        => outWriter.WriteLine(message);
 
-    public ValueTask SendSignalAsync(HostSignal hostSignal)
-        => WriteLineAsync(Engine.Signals.ToMessage(hostSignal));
+    public void SendSignal(HostSignal hostSignal)
+        => WriteLine(Engine.Signals.ToMessage(hostSignal));
 
-    public ValueTask SendErrorAsync(string message)
-        => WriteLineAsync($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
+    public void SendError(string message)
+        => WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
-    public ValueTask ReportResultsAsync(RunResults runResults)
-        => runResults.WriteAsync(this);
+    public void ReportResults(RunResults runResults)
+        => runResults.Print(outWriter);
 
     public void Dispose()
     {

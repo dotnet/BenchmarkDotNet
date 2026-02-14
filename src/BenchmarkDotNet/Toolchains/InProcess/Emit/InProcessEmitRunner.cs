@@ -20,7 +20,7 @@ internal static class InProcessEmitRunner
     {
         // the first thing to do is to let diagnosers hook in before anything happens
         // so all jit-related diagnosers can catch first jit compilation!
-        await host.BeforeAnythingElseAsync();
+        host.BeforeAnythingElse();
 
         try
         {
@@ -34,25 +34,25 @@ internal static class InProcessEmitRunner
         }
         catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
         {
-            await host.WriteLineAsync();
-            await host.WriteLineAsync("OutOfMemoryException!");
-            await host.WriteLineAsync("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
-            await host.WriteLineAsync("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
-            await host.WriteLineAsync("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
-            await host.WriteLineAsync();
-            await host.WriteLineAsync(oom.ToString());
+            host.WriteLine();
+            host.WriteLine("OutOfMemoryException!");
+            host.WriteLine("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
+            host.WriteLine("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
+            host.WriteLine("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
+            host.WriteLine();
+            host.WriteLine(oom.ToString());
 
             return -1;
         }
         catch (Exception ex)
         {
-            await host.WriteLineAsync();
-            await host.WriteLineAsync(ex.ToString());
+            host.WriteLine();
+            host.WriteLine(ex.ToString());
             return -1;
         }
         finally
         {
-            await host.AfterAllAsync();
+            host.AfterAll();
         }
     }
 
@@ -63,14 +63,14 @@ internal static class InProcessEmitRunner
         var instance = Activator.CreateInstance(runnableType);
         FillMembers(instance, benchmarkCase);
 
-        await host.WriteLineAsync();
+        host.WriteLine();
         foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
         {
-            await host.WriteLineAsync($"// {infoLine}");
+            host.WriteLine($"// {infoLine}");
         }
         var job = new Job().Apply(benchmarkCase.Job).Freeze();
-        await host.WriteLineAsync($"// Job: {job.DisplayInfo}");
-        await host.WriteLineAsync();
+        host.WriteLine($"// Job: {job.DisplayInfo}");
+        host.WriteLine();
 
         var errors = BenchmarkProcessValidator.Validate(job, instance);
         if (await ValidationErrorReporter.ReportIfAnyAsync(errors, host))
@@ -114,7 +114,7 @@ internal static class InProcessEmitRunner
             .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
             .Create(engineParameters)
             .RunAsync();
-        await host.ReportResultsAsync(results);
+        host.ReportResults(results);
 
         runnableType.GetMethod(TrickTheJitCoreMethodName).Invoke(instance, []);
 

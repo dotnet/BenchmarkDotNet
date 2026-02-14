@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 #nullable enable
 
@@ -40,16 +39,16 @@ public class TcpHost : IHost
         inReader.Dispose();
     }
 
-    public async ValueTask WriteAsync(string message)
+    public void WriteAsync(string message)
         => outWriter.Write(message);
 
-    public async ValueTask WriteLineAsync()
+    public void WriteLine()
         => outWriter.WriteLine();
 
-    public async ValueTask WriteLineAsync(string message)
+    public void WriteLine(string message)
         => outWriter.WriteLine(message);
 
-    public async ValueTask SendSignalAsync(HostSignal hostSignal)
+    public void SendSignal(HostSignal hostSignal)
     {
         if (hostSignal == HostSignal.AfterAll)
         {
@@ -69,13 +68,13 @@ public class TcpHost : IHost
         }
     }
 
-    public async ValueTask SendErrorAsync(string message)
+    public void SendError(string message)
         => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
-    public ValueTask ReportResultsAsync(RunResults runResults)
-        => runResults.WriteAsync(this);
+    public void ReportResults(RunResults runResults)
+        => runResults.Print(outWriter);
 
-    public static async ValueTask<IHost> GetHostAsync(string[] args)
+    public static IHost GetHost(string[] args)
     {
         for (int i = 0; i < args.Length; i++)
         {
@@ -83,19 +82,7 @@ public class TcpHost : IHost
             {
                 int port = int.Parse(args[i + 1]);
                 var client = new TcpClient();
-#if NETSTANDARD2_0
-                await client.ConnectAsync(IPAddress.Loopback, port);
-#else
-                try
-                {
-                    using var cts = new CancellationTokenSource(ConnectionTimeout);
-                    await client.ConnectAsync(IPAddress.Loopback, port, cts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    throw new TimeoutException($"The connection to the host process timed out after {ConnectionTimeout}.");
-                }
-#endif
+                client.Connect(IPAddress.Loopback, port);
                 return new TcpHost(client);
             }
         }

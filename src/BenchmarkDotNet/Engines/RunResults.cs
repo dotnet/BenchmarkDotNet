@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -67,19 +67,15 @@ namespace BenchmarkDotNet.Engines
                 yield return measurement;
         }
 
-        internal async ValueTask WriteAsync(IHost host)
+        public void Print(TextWriter outWriter)
         {
             foreach (var measurement in GetWorkloadResultMeasurements())
-            {
-                await host.WriteLineAsync(measurement.ToString());
-            }
+                outWriter.WriteLine(measurement.ToString());
 
             if (!GCStats.Equals(GcStats.Empty))
-            {
-                await host.WriteLineAsync(GCStats.ToOutputLine());
-            }
+                outWriter.WriteLine(GCStats.ToOutputLine());
 
-            await host.WriteLineAsync();
+            outWriter.WriteLine();
         }
 
         // TODO: improve

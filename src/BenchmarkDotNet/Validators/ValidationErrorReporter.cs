@@ -15,7 +15,7 @@ public static class ValidationErrorReporter
         bool hasErrors = false;
         foreach (var validationError in validationErrors)
         {
-            await host.SendErrorAsync(validationError.Message);
+            host.SendError(validationError.Message);
             hasErrors = true;
         }
         return hasErrors;

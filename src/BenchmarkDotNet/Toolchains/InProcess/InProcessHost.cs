@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -54,14 +54,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>
-        public async ValueTask WriteAsync(string message) => logger.Write(message);
+        public void WriteAsync(string message) => logger.Write(message);
 
         /// <summary>Passes new line to the host.</summary>
-        public async ValueTask WriteLineAsync() => logger.WriteLine();
+        public void WriteLine() => logger.WriteLine();
 
         /// <summary>Passes text (new line appended) to the host.</summary>
         /// <param name="message">Text to write.</param>
-        public async ValueTask WriteLineAsync(string message)
+        public void WriteLine(string message)
         {
             logger.WriteLine(message);
             if (message.StartsWith(CompositeInProcessDiagnoser.HeaderKey)) // Captures both header and results
@@ -72,17 +72,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
-        public async ValueTask SendSignalAsync(HostSignal hostSignal) => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
+        public void SendSignal(HostSignal hostSignal) => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
 
-        public async ValueTask SendErrorAsync(string message) => logger.WriteLine(LogKind.Error, $"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
+        public void SendError(string message) => logger.WriteLine(LogKind.Error, $"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
         /// <summary>Submits run results to the host.</summary>
         /// <param name="runResults">The run results.</param>
-        public async ValueTask ReportResultsAsync(RunResults runResults)
+        public void ReportResults(RunResults runResults)
         {
             RunResults = runResults;
 
-            await runResults.WriteAsync(this);
+            using (var w = new StringWriter())
+            {
+                runResults.Print(w);
+                logger.Write(w.GetStringBuilder().ToString());
+            }
         }
 
         // Keep in sync with Broker and WasmExecutor.

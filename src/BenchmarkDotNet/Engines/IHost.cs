@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines;
 
@@ -9,11 +8,11 @@ namespace BenchmarkDotNet.Engines;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IHost : IDisposable
 {
-    ValueTask WriteLineAsync();
-    ValueTask WriteLineAsync(string message);
+    void WriteLine();
+    void WriteLine(string message);
 
-    ValueTask SendSignalAsync(HostSignal hostSignal);
-    ValueTask SendErrorAsync(string message);
+    void SendSignal(HostSignal hostSignal);
+    void SendError(string message);
 
-    ValueTask ReportResultsAsync(RunResults runResults);
+    void ReportResults(RunResults runResults);
 }
