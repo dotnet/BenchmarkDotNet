@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 #nullable enable
@@ -19,8 +21,8 @@ namespace BenchmarkDotNet.Loggers
         private readonly ILogger logger;
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
-        private TcpListener? tcpListener;
-        private TcpClient? client;
+        private readonly CancellationTokenSource cancellationTokenSource = new();
+        private readonly TcpListener tcpListener;
 
         private enum Result
         {
@@ -56,8 +58,7 @@ namespace BenchmarkDotNet.Loggers
         {
             process.Exited -= OnProcessExited;
 
-            Interlocked.Exchange(ref tcpListener, null)?.Stop();
-            Interlocked.Exchange(ref client, null)?.Dispose();
+            cancellationTokenSource.Cancel(throwOnFirstException: false);
         }
 
         private void OnProcessExited(object? sender, EventArgs e)
@@ -74,36 +75,35 @@ namespace BenchmarkDotNet.Loggers
 
         private async ValueTask<Result> ProcessDataCore()
         {
-            if (process.HasExited || this.tcpListener is not { } tcpListener)
+            if (process.HasExited || cancellationTokenSource.IsCancellationRequested)
                 return Result.EarlyProcessExit;
 
             try
             {
-#if NETSTANDARD2_0
-                this.client = await tcpListener.AcceptTcpClientAsync();
-#else
+#if NET6_0_OR_GREATER
+                TcpClient client;
+                using var timeoutCts = new CancellationTokenSource(TcpHost.ConnectionTimeout);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token, timeoutCts.Token);
                 try
                 {
-                    using var cts = new CancellationTokenSource(TcpHost.ConnectionTimeout);
-                    this.client = await tcpListener.AcceptTcpClientAsync(cts.Token);
+                    client = await tcpListener.AcceptTcpClientAsync(linkedCts.Token);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
                 {
                     throw new TimeoutException($"The connection to the benchmark process timed out after {TcpHost.ConnectionTimeout}.");
                 }
+                using var _ = client;
+#else
+                using var client = await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
 #endif
-                if (this.client is not { } client)
-                    return Result.EarlyProcessExit;
-
                 using var stream = client.GetStream();
-
-                using StreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+                using CancelableStreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
                 // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
                 using StreamWriter writer = new(stream, TcpHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
 
                 while (true)
                 {
-                    var line = await reader.ReadLineAsync();
+                    var line = await reader.ReadLineAsync(cancellationTokenSource.Token);
                     if (line == null)
                         return Result.EndOfStream;
 
@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Loggers
                         var resultsStringBuilder = new StringBuilder();
                         for (int i = 0; i < resultsLinesCount;)
                         {
-                            line = await reader.ReadLineAsync();
+                            line = await reader.ReadLineAsync(cancellationTokenSource.Token);
                             if (line == null)
                                 return Result.EndOfStream;
 
@@ -174,6 +174,10 @@ namespace BenchmarkDotNet.Loggers
                 return Result.EarlyProcessExit;
             }
             catch (SocketException e) when (IsEarlyExitCode(e.SocketErrorCode))
+            {
+                return Result.EarlyProcessExit;
+            }
+            catch (OperationCanceledException)
             {
                 return Result.EarlyProcessExit;
             }
