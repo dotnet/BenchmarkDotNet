@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
         private TcpListener? tcpListener;
+        private TcpClient? client;
 
         private enum Result
         {
@@ -56,6 +57,7 @@ namespace BenchmarkDotNet.Loggers
             process.Exited -= OnProcessExited;
 
             Interlocked.Exchange(ref tcpListener, null)?.Stop();
+            Interlocked.Exchange(ref client, null)?.Dispose();
         }
 
         private void OnProcessExited(object? sender, EventArgs e)
@@ -78,20 +80,21 @@ namespace BenchmarkDotNet.Loggers
             try
             {
 #if NETSTANDARD2_0
-                using var client = await tcpListener.AcceptTcpClientAsync();
+                this.client = await tcpListener.AcceptTcpClientAsync();
 #else
-                TcpClient client;
                 try
                 {
                     using var cts = new CancellationTokenSource(TcpHost.ConnectionTimeout);
-                    client = await tcpListener.AcceptTcpClientAsync(cts.Token);
+                    this.client = await tcpListener.AcceptTcpClientAsync(cts.Token);
                 }
                 catch (OperationCanceledException)
                 {
                     throw new TimeoutException($"The connection to the benchmark process timed out after {TcpHost.ConnectionTimeout}.");
                 }
-                using var _ = client;
 #endif
+                if (this.client is not { } client)
+                    return Result.EarlyProcessExit;
+
                 using var stream = client.GetStream();
 
                 using StreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
