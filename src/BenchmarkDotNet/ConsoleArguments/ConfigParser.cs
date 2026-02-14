@@ -443,7 +443,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
             if (options.NoEvaluationOverhead)
+#pragma warning disable CS0618 // Type or member is obsolete
                 baseJob = baseJob.WithEvaluateOverhead(false);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             if (options.EnvironmentVariables.Any())
             {

@@ -10,7 +10,9 @@ namespace BenchmarkDotNet.Attributes
     [PublicAPI]
     public class EvaluateOverheadAttribute : JobMutatorConfigBaseAttribute
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         public EvaluateOverheadAttribute(bool value = true) : base(Job.Default.WithEvaluateOverhead(value))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
         }
     }
