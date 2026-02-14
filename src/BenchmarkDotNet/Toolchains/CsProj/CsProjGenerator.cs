@@ -192,13 +192,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // TODO: Add Aliases here for extern alias #2289
             }
 
-            // Mono80IsSupported test fails when BenchmarkDotNet is restored for net9.0 if we don't remove the ProjectReference.
-            // We still need to preserve the ProjectReference in every other case for disassembly, though.
-            if (XUnitHelper.IsIntegrationTest.Value && this is MonoGenerator)
-            {
-                projectElement.RemoveChild(projectElement.SelectSingleNode("ItemGroup/ProjectReference")!.ParentNode!);
-            }
-
             xmlDoc.Save(artifactsPaths.ProjectFilePath);
         }
 

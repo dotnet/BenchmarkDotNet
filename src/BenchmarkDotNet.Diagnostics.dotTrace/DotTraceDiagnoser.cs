@@ -121,9 +121,6 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
             case RuntimeMoniker.Mono60:
             case RuntimeMoniker.Mono70:
             case RuntimeMoniker.Mono80:
-            case RuntimeMoniker.Mono90:
-            case RuntimeMoniker.Mono10_0:
-            case RuntimeMoniker.Mono11_0:
                 return false;
             case RuntimeMoniker.NetCoreApp20:
             case RuntimeMoniker.NetCoreApp21:

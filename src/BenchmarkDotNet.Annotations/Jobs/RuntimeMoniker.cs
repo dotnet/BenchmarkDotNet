@@ -235,21 +235,6 @@ namespace BenchmarkDotNet.Jobs
         Mono80,
 
         /// <summary>
-        /// .NET 9 using MonoVM (not CLR which is the default)
-        /// </summary>
-        Mono90,
-
-        /// <summary>
-        /// .NET 10 using MonoVM (not CLR which is the default)
-        /// </summary>
-        Mono10_0,
-
-        /// <summary>
-        /// .NET 11 using MonoVM (not CLR which is the default)
-        /// </summary>
-        Mono11_0,
-
-        /// <summary>
         /// .NET 8 CLR with composite ReadyToRun compilation
         /// </summary>
         R2R80,
