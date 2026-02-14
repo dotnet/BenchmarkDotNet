@@ -22,7 +22,9 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
     {
         _analyzerTest = new InternalAnalyzerTest
         {
-#if NET8_0_OR_GREATER
+#if NET10_0_OR_GREATER
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net100,
+#elif NET8_0_OR_GREATER
             ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
 #elif NET6_0_OR_GREATER
             ReferenceAssemblies = ReferenceAssemblies.Net.Net60,

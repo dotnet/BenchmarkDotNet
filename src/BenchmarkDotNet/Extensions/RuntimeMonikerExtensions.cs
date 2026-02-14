@@ -68,12 +68,6 @@ namespace BenchmarkDotNet.Extensions
                     return MonoRuntime.Mono70;
                 case RuntimeMoniker.Mono80:
                     return MonoRuntime.Mono80;
-                case RuntimeMoniker.Mono90:
-                    return MonoRuntime.Mono90;
-                case RuntimeMoniker.Mono10_0:
-                    return MonoRuntime.Mono10_0;
-                case RuntimeMoniker.Mono11_0:
-                    return MonoRuntime.Mono11_0;
                 case RuntimeMoniker.R2R80:
                     return R2RRuntime.Net80;
                 case RuntimeMoniker.R2R90:
@@ -117,9 +111,6 @@ namespace BenchmarkDotNet.Extensions
             RuntimeMoniker.Mono60 => new Version(6, 0),
             RuntimeMoniker.Mono70 => new Version(7, 0),
             RuntimeMoniker.Mono80 => new Version(8, 0),
-            RuntimeMoniker.Mono90 => new Version(9, 0),
-            RuntimeMoniker.Mono10_0 => new Version(10, 0),
-            RuntimeMoniker.Mono11_0 => new Version(11, 0),
             RuntimeMoniker.Wasm => Portability.RuntimeInformation.IsNetCore && CoreRuntime.TryGetVersion(out var version) ? version : new Version(5, 0),
             RuntimeMoniker.WasmNet50 => new Version(5, 0),
             RuntimeMoniker.WasmNet60 => new Version(6, 0),

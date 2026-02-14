@@ -192,13 +192,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // TODO: Add Aliases here for extern alias #2289
             }
 
-            // Mono80IsSupported test fails when BenchmarkDotNet is restored for net9.0 if we don't remove the ProjectReference.
-            // We still need to preserve the ProjectReference in every other case for disassembly, though.
-            if (XUnitHelper.IsIntegrationTest.Value && this is MonoGenerator)
-            {
-                projectElement.RemoveChild(projectElement.SelectSingleNode("ItemGroup/ProjectReference")!.ParentNode!);
-            }
-
             xmlDoc.Save(artifactsPaths.ProjectFilePath);
         }
 
@@ -209,14 +202,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
             var builder = new StringBuilder(80)
-                .AppendLine("<PropertyGroup>")
-                .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
-                .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
+                .AppendLine($"<PropertyGroup>")
+                .AppendLine($"    <ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
+                .AppendLine($"    <ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
 
             if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
-                builder.AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
+                builder.AppendLine($"    <RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
 
-            return builder.AppendLine("</PropertyGroup>").ToString();
+            return builder.AppendLine("  </PropertyGroup>").ToString();
         }
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
@@ -227,8 +220,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             if (RuntimeFrameworkVersion.IsNotBlank()) // some power users knows what to configure, just do it and copy nothing more
             {
                 return (@$"<PropertyGroup>
-  <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
-</PropertyGroup>", DefaultSdkName);
+    <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
+  </PropertyGroup>", DefaultSdkName);
             }
 
             XmlElement projectElement = xmlDoc.DocumentElement!;
@@ -368,24 +361,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // important assumption! project's file name === output dll name
             string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name!;
 
-            var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
-            var projectFiles = rootDirectory
-                .EnumerateFiles("*proj", SearchOption.AllDirectories)
-                .Where(file => possibleNames.Contains(file.Name))
-                .ToArray();
-
-            if (projectFiles.Length == 0)
-            {
-                throw new NotSupportedException(
-                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
-            }
-            else if (projectFiles.Length > 1)
-            {
-                throw new NotSupportedException(
-                    $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: {string.Join(",", projectFiles.Select(pf => $"'{pf.FullName}'"))}. Benchmark project names needs to be unique.");
-            }
-
-            return projectFiles[0];
+            var projectFile = Helpers.FindProjectFile(rootDirectory, projectName);
+            return projectFile;
         }
 
         public override bool Equals(object? obj) => obj is CsProjGenerator other && Equals(other);
@@ -406,5 +383,120 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         public override int GetHashCode()
             => HashCode.Combine(TargetFrameworkMoniker, RuntimeFrameworkVersion, CliPath, PackagesPath);
+    }
+
+    file static class Helpers
+    {
+        private static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.Ordinal)
+        {
+            ".git",
+            ".vs",
+            "bin",
+            "obj",
+        };
+
+        private static readonly HashSet<string> ProjectExtensions = new(StringComparer.Ordinal)
+        {
+            ".csproj",
+            ".fsproj",
+            ".vbproj"
+        };
+
+        public static FileInfo FindProjectFile(DirectoryInfo rootDirectory, string projectName)
+        {
+            var projectFiles = EnumerateProjectFiles(rootDirectory, projectName);
+
+            // Take first 2 items for performance reasons
+            var files = projectFiles.Take(2).ToArray();
+            return files.Length switch
+            {
+                1 => files[0],
+                0 => throw new NotSupportedException(
+                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj"),
+                _ => throw new NotSupportedException(
+                    $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: '{files[0].FullName}','{files[1].FullName}'. Benchmark project names needs to be unique."),
+            };
+        }
+
+        private static IEnumerable<FileInfo> EnumerateProjectFiles(DirectoryInfo rootDirectory, string projectName)
+        {
+            var stack = new Stack<DirectoryInfo>();
+            stack.Push(rootDirectory);
+
+            while (stack.Count > 0)
+            {
+                var currentDir = stack.Pop();
+
+                // 1. Search '*.proj' files in the current directory
+                IEnumerable<FileInfo> files = EnumerateProjectFiles(currentDir);
+
+                foreach (var file in files)
+                {
+                    if (!ProjectExtensions.Contains(file.Extension))
+                        continue;
+
+                    if (Path.GetFileNameWithoutExtension(file.Name) == projectName)
+                        yield return file;
+                }
+
+                var subDirectories = GetSubDirectories(currentDir);
+
+                // 2. Handle sub directories.
+                foreach (var dir in subDirectories)
+                {
+                    if (IgnoredDirectoryNames.Contains(dir.Name))
+                        continue;
+#if NETSTANDARD2_0
+                    // Ignore reparse point / symlink to avoid infinite loops
+                    if (dir.Attributes.HasFlag(FileAttributes.ReparsePoint))
+                        continue;
+#endif
+                    stack.Push(dir);
+                }
+            }
+        }
+
+#if NETSTANDARD2_0
+        private static IEnumerable<FileInfo> EnumerateProjectFiles(DirectoryInfo directory)
+        {
+            IEnumerable<FileInfo> projectFiles;
+            try
+            {
+                projectFiles = directory.EnumerateFiles("*proj", SearchOption.TopDirectoryOnly);
+            }
+            catch
+            {
+                yield break;
+            }
+
+            foreach (var file in projectFiles)
+                yield return file;
+        }
+
+        private static IEnumerable<DirectoryInfo> GetSubDirectories(DirectoryInfo currentDir)
+        {
+            try
+            {
+                return currentDir.EnumerateDirectories();
+            }
+            catch
+            {
+                return [];
+            }
+        }
+#else
+        private static readonly EnumerationOptions DirectoryEnumerationOptions = new()
+        {
+            RecurseSubdirectories = false,
+            IgnoreInaccessible = true,
+            AttributesToSkip = FileAttributes.ReparsePoint
+        };
+
+        private static IEnumerable<FileInfo> EnumerateProjectFiles(DirectoryInfo directory)
+            => directory.EnumerateFiles("*proj", DirectoryEnumerationOptions);
+
+        private static IEnumerable<DirectoryInfo> GetSubDirectories(DirectoryInfo currentDir)
+            => currentDir.EnumerateDirectories("*", DirectoryEnumerationOptions);
+#endif
     }
 }

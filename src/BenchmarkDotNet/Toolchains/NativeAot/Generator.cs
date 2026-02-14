@@ -16,6 +16,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     /// <summary>
@@ -32,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
-            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData,
+            bool rootAllApplicationAssemblies, bool ilcGenerateStackTraceData,
             string ilcOptimizationPreference, string ilcInstructionSet)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
@@ -42,7 +44,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.useNuGetClearTag = useNuGetClearTag;
             this.useTempFolderForRestore = useTempFolderForRestore;
             this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
-            this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
             this.ilcOptimizationPreference = ilcOptimizationPreference;
             this.ilcInstructionSet = ilcInstructionSet;
@@ -55,7 +56,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly bool useNuGetClearTag;
         private readonly bool useTempFolderForRestore;
         private readonly bool rootAllApplicationAssemblies;
-        private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
         private readonly string ilcOptimizationPreference;
         private readonly string ilcInstructionSet;
@@ -90,11 +90,11 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
         private static string GetPackagesDirectoryPath(bool useTempFolderForRestore, string packagesRestorePath)
-            => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : null);
+            => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : "");
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            => useTempFolderForRestore
-                ? base.GetArtifactsToCleanup(artifactsPaths).Concat(new[] { artifactsPaths.PackagesDirectoryName }).ToArray()
+            => useTempFolderForRestore && artifactsPaths.PackagesDirectoryName.IsNotBlank()
+                ? base.GetArtifactsToCleanup(artifactsPaths).Concat([artifactsPaths.PackagesDirectoryName]).ToArray()
                 : base.GetArtifactsToCleanup(artifactsPaths);
 
         protected override void GenerateNuGetConfig(ArtifactsPaths artifactsPaths)

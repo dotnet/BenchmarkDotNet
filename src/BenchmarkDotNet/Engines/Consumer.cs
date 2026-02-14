@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using JetBrains.Annotations;
 
+#nullable enable
+
 // ReSharper disable NotAccessedField.Local
 namespace BenchmarkDotNet.Engines
 {
@@ -88,11 +90,11 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(string stringValue) => Consume((object) stringValue);
+        public void Consume(string? stringValue) => Consume((object?)stringValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(object objectValue)
+        public void Consume(object? objectValue)
         {
             // Write to volatile field to prevent dead code elimination and out-of-order execution.
             objectHolder = objectValue;
@@ -114,6 +116,11 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)
         {
+            // Suppress CS8600/CS8605 warnings.
+            // Because the value is guaranteed not to be null when comparing typeof(T) with non-nullable type.
+            // And boxing/unboxing is expected to be removed by JIT.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8605 // Unboxing a possibly null value.
             if (typeof(T) == typeof(byte))
                 byteHolder = (byte)(object)value;
             else if (typeof(T) == typeof(sbyte))
@@ -138,8 +145,10 @@ namespace BenchmarkDotNet.Engines
                 Volatile.Write(ref longHolder, (long)(object)value);
             else if (typeof(T) == typeof(ulong))
                 Volatile.Write(ref ulongHolder, (ulong)(object)value);
+#pragma warning restore CS8600
+#pragma warning restore CS8605
             else if (default(T) == null && !typeof(T).IsValueType)
-                Consume((object) value);
+                Consume((object?)value);
             else
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive and nullable value types
         }

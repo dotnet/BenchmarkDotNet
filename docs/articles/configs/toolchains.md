@@ -243,7 +243,6 @@ var config = DefaultConfig.Instance
 The builder allows to configure more settings:
 - specify packages restore path by using `PackagesRestorePath($path)`
 - rooting all application assemblies by using `RootAllApplicationAssemblies($bool)`. This is disabled by default.
-- generating complete type metadata by using `IlcGenerateCompleteTypeMetadata($bool)`. This option is enabled by default.
 - generating stack trace metadata by using `IlcGenerateStackTraceData($bool)`. This option is enabled by default.
 - set optimization preference by using `IlcOptimizationPreference($value)`. The default is `Speed`, you can configure it to `Size` or nothing
 - set instruction set for the target OS, architecture and hardware by using `IlcInstructionSet($value)`. By default BDN recognizes most of the instruction sets on your machine and enables them.

@@ -15,7 +15,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private string packagesRestorePath;
         // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
         private bool rootAllApplicationAssemblies;
-        private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
         private string ilcOptimizationPreference = "Speed";
         private string? ilcInstructionSet = null;
@@ -90,20 +89,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         }
 
         /// <summary>
-        /// This controls the generation of complete type metadata.
-        /// This option is enabled by default.
-        /// This is a compilation mode that prevents a situation where some members of a type are visible to reflection at runtime, but others aren't, because they weren't compiled.
-        /// </summary>
-        /// <param name="value"></param>
-        [PublicAPI]
-        public NativeAotToolchainBuilder IlcGenerateCompleteTypeMetadata(bool value)
-        {
-            ilcGenerateCompleteTypeMetadata = value;
-
-            return this;
-        }
-
-        /// <summary>
         /// This controls generation of stack trace metadata that provides textual names in stack traces.
         /// This option is enabled by default.
         /// This is for example the text string one gets by calling Exception.ToString() on a caught exception.
@@ -163,7 +148,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore,
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
-                ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
                 ilcGenerateStackTraceData: ilcGenerateStackTraceData,
                 ilcOptimizationPreference: ilcOptimizationPreference,
                 ilcInstructionSet: ilcInstructionSet

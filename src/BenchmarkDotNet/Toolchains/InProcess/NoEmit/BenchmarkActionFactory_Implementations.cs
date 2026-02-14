@@ -5,6 +5,8 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /*
@@ -67,7 +69,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly PointerFunc callback;
             private readonly PointerFunc unrolledCallback;
 
-            public BenchmarkActionVoidPointer(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionVoidPointer(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<PointerFunc>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -116,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly ByRefFunc callback;
             private readonly ByRefFunc unrolledCallback;
 
-            public BenchmarkActionByRef(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionByRef(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<ByRefFunc>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -165,7 +167,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly ByRefReadonlyFunc callback;
             private readonly ByRefReadonlyFunc unrolledCallback;
 
-            public BenchmarkActionByRefReadonly(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionByRefReadonly(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<ByRefReadonlyFunc>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -212,7 +214,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Func<T> callback;
             private readonly Func<T> unrolledCallback;
 
-            public BenchmarkAction(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkAction(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<Func<T>>(instance, method);
                 unrolledCallback = Unroll(callback, unrollFactor);
@@ -256,7 +258,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Func<Task> callback;
             private readonly int unrollFactor;
             private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
-            private IClock clock;
+            private IClock? clock;
             private long invokeCount;
 
             public BenchmarkActionTask(object? instance, MethodInfo method, int unrollFactor)
@@ -297,13 +299,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 {
                     while (true)
                     {
-                        await workloadContinuerAndValueTaskSource;
+                        await workloadContinuerAndValueTaskSource!;
                         if (workloadContinuerAndValueTaskSource.IsCompleted)
                         {
                             return;
                         }
 
-                        var startedClock = clock.Start();
+                        var startedClock = clock!.Start();
                         while (--invokeCount >= 0)
                         {
                             await callback();
@@ -313,7 +315,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 }
                 catch (Exception e)
                 {
-                    workloadContinuerAndValueTaskSource.SetException(e);
+                    workloadContinuerAndValueTaskSource!.SetException(e);
                 }
             }
 
@@ -327,10 +329,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Func<Task<T>> callback;
             private readonly int unrollFactor;
             private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
-            private IClock clock;
+            private IClock? clock;
             private long invokeCount;
 
-            public BenchmarkActionTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<Func<Task<T>>>(instance, method);
                 this.unrollFactor = unrollFactor;
@@ -368,13 +370,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 {
                     while (true)
                     {
-                        await workloadContinuerAndValueTaskSource;
+                        await workloadContinuerAndValueTaskSource!;
                         if (workloadContinuerAndValueTaskSource.IsCompleted)
                         {
-                            return default;
+                            return default!;
                         }
 
-                        var startedClock = clock.Start();
+                        var startedClock = clock!.Start();
                         while (--invokeCount >= 0)
                         {
                             await callback();
@@ -384,8 +386,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 }
                 catch (Exception e)
                 {
-                    workloadContinuerAndValueTaskSource.SetException(e);
-                    return default;
+                    workloadContinuerAndValueTaskSource!.SetException(e);
+                    return default!;
                 }
             }
 
@@ -399,10 +401,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Func<ValueTask> callback;
             private readonly int unrollFactor;
             private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
-            private IClock clock;
+            private IClock? clock;
             private long invokeCount;
 
-            public BenchmarkActionValueTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionValueTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<Func<ValueTask>>(instance, method);
                 this.unrollFactor = unrollFactor;
@@ -440,13 +442,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 {
                     while (true)
                     {
-                        await workloadContinuerAndValueTaskSource;
+                        await workloadContinuerAndValueTaskSource!;
                         if (workloadContinuerAndValueTaskSource.IsCompleted)
                         {
                             return;
                         }
 
-                        var startedClock = clock.Start();
+                        var startedClock = clock!.Start();
                         while (--invokeCount >= 0)
                         {
                             await callback();
@@ -456,7 +458,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 }
                 catch (Exception e)
                 {
-                    workloadContinuerAndValueTaskSource.SetException(e);
+                    workloadContinuerAndValueTaskSource!.SetException(e);
                 }
             }
 
@@ -470,10 +472,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private readonly Func<ValueTask<T>> callback;
             private readonly int unrollFactor;
             private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
-            private IClock clock;
+            private IClock? clock;
             private long invokeCount;
 
-            public BenchmarkActionValueTask(object? instance, MethodInfo? method, int unrollFactor)
+            public BenchmarkActionValueTask(object? instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkload<Func<ValueTask<T>>>(instance, method);
                 this.unrollFactor = unrollFactor;
@@ -511,13 +513,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 {
                     while (true)
                     {
-                        await workloadContinuerAndValueTaskSource;
+                        await workloadContinuerAndValueTaskSource!;
                         if (workloadContinuerAndValueTaskSource.IsCompleted)
                         {
-                            return default;
+                            return default!;
                         }
 
-                        var startedClock = clock.Start();
+                        var startedClock = clock!.Start();
                         while (--invokeCount >= 0)
                         {
                             await callback();
@@ -527,8 +529,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 }
                 catch (Exception e)
                 {
-                    workloadContinuerAndValueTaskSource.SetException(e);
-                    return default;
+                    workloadContinuerAndValueTaskSource!.SetException(e);
+                    return default!;
                 }
             }
 

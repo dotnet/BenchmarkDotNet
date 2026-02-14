@@ -633,15 +633,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Mono80:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
 
-                case RuntimeMoniker.Mono90:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono90);
-
-                case RuntimeMoniker.Mono10_0:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono10_0);
-
-                case RuntimeMoniker.Mono11_0:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono11_0);
-
                 case RuntimeMoniker.R2R80:
                 case RuntimeMoniker.R2R90:
                 case RuntimeMoniker.R2R10_0:
