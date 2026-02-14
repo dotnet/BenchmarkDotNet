@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Loggers
                     {
                         Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
-                        await writer.WriteLineAsync(Engine.Signals.Acknowledgment);
+                        writer.WriteLine(Engine.Signals.Acknowledgment);
 
                         if (signal == HostSignal.AfterAll)
                         {

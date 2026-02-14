@@ -41,13 +41,13 @@ public class TcpHost : IHost
     }
 
     public async ValueTask WriteAsync(string message)
-        => await outWriter.WriteAsync(message);
+        => outWriter.Write(message);
 
     public async ValueTask WriteLineAsync()
-        => await outWriter.WriteLineAsync();
+        => outWriter.WriteLine();
 
     public async ValueTask WriteLineAsync(string message)
-        => await outWriter.WriteLineAsync(message);
+        => outWriter.WriteLine(message);
 
     public async ValueTask SendSignalAsync(HostSignal hostSignal)
     {
@@ -58,10 +58,10 @@ public class TcpHost : IHost
             Thread.Sleep(1);
         }
 
-        await outWriter.WriteLineAsync(Engine.Signals.ToMessage(hostSignal));
+        outWriter.WriteLine(Engine.Signals.ToMessage(hostSignal));
 
         // Read the response from Parent process.
-        string? acknowledgment = await inReader.ReadLineAsync();
+        string? acknowledgment = inReader.ReadLine();
         if (acknowledgment != Engine.Signals.Acknowledgment
             && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
         {
@@ -70,7 +70,7 @@ public class TcpHost : IHost
     }
 
     public async ValueTask SendErrorAsync(string message)
-        => await outWriter.WriteLineAsync($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
+        => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
     public ValueTask ReportResultsAsync(RunResults runResults)
         => runResults.WriteAsync(this);
