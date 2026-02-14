@@ -1,5 +1,6 @@
-﻿using BenchmarkDotNet.Analyzers.Attributes;
+using BenchmarkDotNet.Analyzers.Attributes;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -1301,6 +1302,150 @@ public class GeneralParameterAttributesAnalyzerTests
             => [.. NonPublicPropertySetters()];
     }
 
+    public class ParamsSourceCannotUseWriteOnlyProperty : AnalyzerTestFixture<GeneralParameterAttributesAnalyzer>
+    {
+        public ParamsSourceCannotUseWriteOnlyProperty() : base(GeneralParameterAttributesAnalyzer.ParamsSourceCannotUseWriteOnlyPropertyRule) { }
+
+        [Fact]
+        public async Task UsingNameofWithWriteOnlyProperty_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    private int _value;
+
+                    public int WriteOnlyProperty
+                    {
+                        set { _value = value; }
+                    }
+
+                    [ParamsSource({|#0:nameof(WriteOnlyProperty)|})]
+                    public int MyParam { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "WriteOnlyProperty");
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task UsingStringLiteralWithWriteOnlyProperty_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    private int _value;
+
+                    public int WriteOnlyProperty
+                    {
+                        set { _value = value; }
+                    }
+
+                    [ParamsSource({|#0:"WriteOnlyProperty"|})]
+                    public int MyParam { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "WriteOnlyProperty");
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task UsingTwoParameterConstructorWithWriteOnlyProperty_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class OtherClass
+                {
+                    private int _value;
+
+                    public int WriteOnlyProperty
+                    {
+                        set { _value = value; }
+                    }
+                }
+
+                public class BenchmarkClass
+                {
+                    [ParamsSource(typeof(OtherClass), {|#0:nameof(OtherClass.WriteOnlyProperty)|})]
+                    public int MyParam { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "WriteOnlyProperty");
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task UsingNameofWithReadWriteProperty_ShouldNotReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static int[] ValidValues { get; set; } = new[] { 1, 2, 3 };
+
+                    [ParamsSource(nameof(ValidValues))]
+                    public int MyParam { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task UsingNameofWithReadOnlyProperty_ShouldNotReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<int> ValidValues => new[] { 1, 2, 3 };
+
+                    [ParamsSource(nameof(ValidValues))]
+                    public int MyParam { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
+    }
+    
     public static TheoryData<string, string> UniqueParameterAttributesTheoryData
         => new()
         {

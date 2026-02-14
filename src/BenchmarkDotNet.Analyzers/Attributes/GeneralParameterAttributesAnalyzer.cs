@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -82,6 +82,15 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Description)));
 
+    internal static readonly DiagnosticDescriptor ParamsSourceCannotUseWriteOnlyPropertyRule = new(
+        DiagnosticIds.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty_Description)));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
         MutuallyExclusiveOnFieldRule,
@@ -92,6 +101,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         NotValidOnConstantFieldRule,
         PropertyCannotBeInitOnlyRule,
         PropertyMustHavePublicSetterRule,
+        ParamsSourceCannotUseWriteOnlyPropertyRule,
     }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
@@ -206,7 +216,8 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             fieldOrPropertyIdentifierLocation,
             fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule,
             fieldOrPropertyMustBePublicDiagnosticRule,
-            attributeSyntax);
+            attributeSyntax,
+            attributeTarget);
     }
 
     private static void AnalyzeFieldOrPropertySymbol(
@@ -224,7 +235,8 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         Location fieldOrPropertyIdentifierLocation,
         DiagnosticDescriptor fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule,
         DiagnosticDescriptor fieldOrPropertyMustBePublicDiagnosticRule,
-        AttributeSyntax attributeSyntax)
+        AttributeSyntax attributeSyntax,
+        SyntaxNode attributeTarget)
     {
         ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols = new INamedTypeSymbol[]
         {
@@ -312,6 +324,161 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
                 attributeSyntax.Name.ToString())
             );
         }
+
+        if (parameterAttributeTypeSymbols.Contains(paramsSourceAttributeTypeSymbol))
+        {
+            AnalyzeParamsSourceWriteOnlyProperty(context, attributeSyntax, attributeTarget);
+        }
+    }
+
+    private static void AnalyzeParamsSourceWriteOnlyProperty(
+        SyntaxNodeAnalysisContext context,
+        AttributeSyntax attributeSyntax,
+        SyntaxNode attributeTarget)
+    {
+        ISymbol? symbol = attributeTarget switch
+        {
+            FieldDeclarationSyntax field => context.SemanticModel.GetDeclaredSymbol(field.Declaration.Variables[0]),
+            PropertyDeclarationSyntax property => context.SemanticModel.GetDeclaredSymbol(property),
+            _ => null
+        };
+
+        if (symbol == null)
+        {
+            return;
+        }
+
+        var attributeData = symbol.GetAttributes()
+            .FirstOrDefault(attr => attr.ApplicationSyntaxReference?.GetSyntax() == attributeSyntax);
+
+        if (attributeData == null)
+        {
+            return;
+        }
+
+        string? sourceName = null;
+        ITypeSymbol? targetType = null;
+
+        // [ParamsSource("name")]
+        if (attributeData.ConstructorArguments.Length == 1)
+        {
+            if (attributeData.ConstructorArguments[0].Kind == TypedConstantKind.Primitive
+                && attributeData.ConstructorArguments[0].Value is string name)
+            {
+                sourceName = name;
+            }
+            else
+            {
+                var syntax = (AttributeSyntax)attributeData.ApplicationSyntaxReference!.GetSyntax();
+                if (syntax.ArgumentList?.Arguments.Count > 0)
+                {
+                    sourceName = ExtractNameFromExpression(syntax.ArgumentList.Arguments[0].Expression, context.SemanticModel);
+                }
+            }
+            targetType = GetContainingType(attributeSyntax, context);
+        }
+        // [ParamsSource(typeof(OtherClass), nameof(OtherClass.Values))]
+        else if (attributeData.ConstructorArguments.Length == 2)
+        {
+            if (attributeData.ConstructorArguments[0].Kind == TypedConstantKind.Type
+                && attributeData.ConstructorArguments[0].Value is ITypeSymbol type)
+            {
+                targetType = type;
+            }
+
+            if (attributeData.ConstructorArguments[1].Kind == TypedConstantKind.Primitive
+                && attributeData.ConstructorArguments[1].Value is string name)
+            {
+                sourceName = name;
+            }
+            else
+            {
+                var syntax = (AttributeSyntax)attributeData.ApplicationSyntaxReference!.GetSyntax();
+                if (syntax.ArgumentList?.Arguments.Count > 1)
+                {
+                    sourceName = ExtractNameFromExpression(syntax.ArgumentList.Arguments[1].Expression, context.SemanticModel);
+                }
+            }
+        }
+
+        if (string.IsNullOrEmpty(sourceName) || targetType == null)
+        {
+            return;
+        }
+
+        var referencedMember = targetType.GetMembers(sourceName).FirstOrDefault();
+        if (referencedMember is IPropertySymbol propertySymbol
+            && propertySymbol.SetMethod != null
+            && propertySymbol.GetMethod == null)
+        {
+            Location? location = null;
+            if (attributeSyntax.ArgumentList != null)
+            {
+                if (attributeData.ConstructorArguments.Length == 1 && attributeSyntax.ArgumentList.Arguments.Count > 0)
+                {
+                    location = attributeSyntax.ArgumentList.Arguments[0].Expression.GetLocation();
+                }
+                else if (attributeData.ConstructorArguments.Length == 2 && attributeSyntax.ArgumentList.Arguments.Count > 1)
+                {
+                    location = attributeSyntax.ArgumentList.Arguments[1].Expression.GetLocation();
+                }
+            }
+            location ??= attributeSyntax.GetLocation();
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                ParamsSourceCannotUseWriteOnlyPropertyRule,
+                location,
+                sourceName));
+        }
+    }
+
+    private static string? ExtractNameFromExpression(ExpressionSyntax expression, SemanticModel semanticModel)
+    {
+        if (expression is InvocationExpressionSyntax invocation
+            && invocation.Expression is IdentifierNameSyntax identifierName
+            && identifierName.Identifier.ValueText == "nameof"
+            && invocation.ArgumentList.Arguments.Count > 0)
+        {
+            var argumentExpression = invocation.ArgumentList.Arguments[0].Expression;
+            var symbolInfo = semanticModel.GetSymbolInfo(argumentExpression);
+            if (symbolInfo.Symbol != null)
+            {
+                return symbolInfo.Symbol.Name;
+            }
+            if (argumentExpression is IdentifierNameSyntax id)
+            {
+                return id.Identifier.ValueText;
+            }
+            if (argumentExpression is MemberAccessExpressionSyntax memberAccess)
+            {
+                return memberAccess.Name.Identifier.ValueText;
+            }
+        }
+
+        if (expression is LiteralExpressionSyntax literal
+            && literal.Token.Value is string str)
+        {
+            return str;
+        }
+
+        return null;
+    }
+
+    private static INamedTypeSymbol? GetContainingType(AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context)
+    {
+        var fieldOrProperty = attributeSyntax.FirstAncestorOrSelf<SyntaxNode>(n => n is FieldDeclarationSyntax or PropertyDeclarationSyntax);
+        if (fieldOrProperty == null)
+        {
+            return null;
+        }
+
+        var containingType = fieldOrProperty.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+        if (containingType == null)
+        {
+            return null;
+        }
+
+        return context.SemanticModel.GetDeclaredSymbol(containingType);
     }
 
     private static bool AllAttributeTypeSymbolsExist(

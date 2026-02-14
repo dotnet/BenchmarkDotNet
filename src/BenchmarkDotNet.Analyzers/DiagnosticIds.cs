@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Analyzers;
+namespace BenchmarkDotNet.Analyzers;
 
 public static class DiagnosticIds
 {
@@ -29,6 +29,7 @@ public static class DiagnosticIds
     public const string Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute = "BDN1302";
     public const string Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType = "BDN1303";
     public const string Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool = "BDN1304";
+    public const string Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty = "BDN1305";
     public const string Attributes_GeneralArgumentAttributes_MethodWithoutAttributeMustHaveNoParameters = "BDN1400";
     public const string Attributes_ArgumentsAttribute_RequiresBenchmarkAttribute = "BDN1500";
     public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1501";
