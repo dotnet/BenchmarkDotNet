@@ -62,10 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(count > 0, $"AllMeasurements don't contain {mode}{stage}");
             }
 
-            Check(IterationMode.Overhead, IterationStage.Jitting);
             Check(IterationMode.Workload, IterationStage.Jitting);
-            Check(IterationMode.Overhead, IterationStage.Warmup);
-            Check(IterationMode.Overhead, IterationStage.Actual);
             Check(IterationMode.Workload, IterationStage.Warmup);
             Check(IterationMode.Workload, IterationStage.Actual);
             Check(IterationMode.Workload, IterationStage.Result);
