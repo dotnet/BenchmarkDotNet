@@ -17,12 +17,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ZeroWarmupCountIsApplied()
         {
+#pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
             var job = Job.InProcess
                 .WithEvaluateOverhead(false)
                 .WithWarmupCount(0)
                 .WithIterationCount(1)
                 .WithInvocationCount(1)
                 .WithUnrollFactor(1);
+#pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
             var config = DefaultConfig.Instance.AddJob(job).WithOptions(ConfigOptions.DisableOptimizationsValidator);
             var summary = CanExecute<FooBench>(config);
             var report = summary.Reports.Single();

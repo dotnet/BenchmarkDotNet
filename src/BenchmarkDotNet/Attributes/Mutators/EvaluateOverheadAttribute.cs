@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Jobs;
+﻿using System;
+using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
@@ -8,11 +9,10 @@ namespace BenchmarkDotNet.Attributes
     /// True by default, very important for nano-benchmarks.
     /// </summary>
     [PublicAPI]
+    [Obsolete("Overhead evaluation affects the accuracy of benchmark results. This will be removed soon.")]
     public class EvaluateOverheadAttribute : JobMutatorConfigBaseAttribute
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         public EvaluateOverheadAttribute(bool value = true) : base(Job.Default.WithEvaluateOverhead(value))
-#pragma warning restore CS0618 // Type or member is obsolete
         {
         }
     }

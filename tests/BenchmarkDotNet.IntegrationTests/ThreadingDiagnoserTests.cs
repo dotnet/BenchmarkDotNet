@@ -160,6 +160,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig(IToolchain toolchain)
+#pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
             => ManualConfig.CreateEmpty()
                 .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
@@ -172,6 +173,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddLogger(toolchain.IsInProcess
                     ? ConsoleLogger.Default
                     : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+#pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
 
         private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {
