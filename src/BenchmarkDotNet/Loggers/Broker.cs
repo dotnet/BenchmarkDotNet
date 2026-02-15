@@ -94,7 +94,9 @@ namespace BenchmarkDotNet.Loggers
                 }
                 using var _ = client;
 #else
-                using var client = await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
+                using var client = Portability.RuntimeInformation.IsFullFrameworkCompatibilityLayer
+                    ? await Task.Run(() => tcpListener.AcceptTcpClient(), cancellationTokenSource.Token).WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token)
+                    : await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
 #endif
                 using var stream = client.GetStream();
                 using CancelableStreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
