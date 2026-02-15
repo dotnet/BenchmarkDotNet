@@ -255,7 +255,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             public class Escape_ParamsAndArguments
             {
-                [Params("\t", "\n"), UsedImplicitly] public string StringParam;
+                [Params("\t", "\n"), UsedImplicitly] public string StringParam = default!;
 
                 [Arguments('\t')] [Arguments('\n')]
                 [Benchmark] public void Foo(char charArg) {}

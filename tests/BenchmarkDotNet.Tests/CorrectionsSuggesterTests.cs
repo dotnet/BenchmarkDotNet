@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CheckNullArgument()
         {
-            Assert.Throws<ArgumentNullException>(() => new CorrectionsSuggester(new[] { typeof(NamespaceB.NamespaceC.MyClassC) }).SuggestFor(null));
+            Assert.Throws<ArgumentNullException>(() => new CorrectionsSuggester(new[] { typeof(NamespaceB.NamespaceC.MyClassC) }).SuggestFor(null!));
         }
 
         [Fact]

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             string expected =
                 "Start " +
                 "MockSource " +
-                    "IsValid True IsValid "+
+                    "IsValid True IsValid " +
                     "IntNumber 42 IntNumber " +
                     $"DoubleNumber {double.MaxValue.ToString(CultureInfo.InvariantCulture)} DoubleNumber " +
                     $"LongNumber {long.MaxValue} LongNumber " +
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [Fact]
         public void CtorThrowsWhenParameterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => XmlSerializer.GetBuilder(null).Build());
+            Assert.Throws<ArgumentNullException>(() => XmlSerializer.GetBuilder(null!).Build());
         }
 
         [Theory]
@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         public void WithRootNameThrowsGivenNameIsNullOrWhiteSpace(string? name, Type exception)
         {
             Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
-                                                    .WithRootName(name)
+                                                    .WithRootName(name!)
                                                     .Build());
         }
 
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         public void WithCollectionItemNameThrowsGivenInvalidArguments(string? collectionName, string? itemName, Type exception)
         {
             Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
-                                                    .WithCollectionItemName(collectionName, itemName)
+                                                    .WithCollectionItemName(collectionName!, itemName!)
                                                     .Build());
         }
 
@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         public void WithExcludedPropertyThrowsGivenNameIsNullOrWhiteSpace(string? name, Type exception)
         {
             Assert.Throws(exception, () => XmlSerializer.GetBuilder(typeof(MockSource))
-                                                    .WithExcludedProperty(name)
+                                                    .WithExcludedProperty(name!)
                                                     .Build());
         }
 
@@ -166,9 +166,9 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         private static readonly Dictionary<string, SerializeTestData> SerializeTestDataItems = new Dictionary<string, SerializeTestData>
         {
-            {"Null", new SerializeTestData(null, null, typeof(ArgumentNullException))},
-            {"MockSource", new SerializeTestData(null, new MockSource(), typeof(ArgumentNullException))},
-            {"MockXmlWriter", new SerializeTestData(new MockXmlWriter(), null, typeof(ArgumentNullException))}
+            {"Null", new SerializeTestData(null!, null!, typeof(ArgumentNullException))},
+            {"MockSource", new SerializeTestData(null!, new MockSource(), typeof(ArgumentNullException))},
+            {"MockXmlWriter", new SerializeTestData(new MockXmlWriter(), null!, typeof(ArgumentNullException))}
         };
 
         [UsedImplicitly]
@@ -181,7 +181,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(SimpleItemSource)).Build();
 
             serializer.Serialize(writer, new SimpleItemSource());
-            string actual = writer.ToString();
+            string? actual = writer.ToString();
 
             Assert.Contains("Item s1 Item", actual);
             Assert.Contains("Item s2 Item", actual);
@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             IXmlSerializer serializer = XmlSerializer.GetBuilder(typeof(UnwriteableCollectionSource)).Build();
 
             serializer.Serialize(writer, new UnwriteableCollectionSource());
-            string actual = writer.ToString();
+            string actual = writer.ToString()!;
 
             Assert.DoesNotContain(actual, "Items");
         }
@@ -221,14 +221,14 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         private class UnwriteableCollectionSource
         {
-            public IEnumerable<string> Items { get; }
+            public IEnumerable<string> Items { get; } = [];
         }
 
         private class MockCollectionItem
         {
             public string Name { get; }
 
-            public MockCollectionItem(string name) { Name = name;  }
+            public MockCollectionItem(string name) { Name = name; }
         }
 
         public class MockXmlWriter : IXmlWriter

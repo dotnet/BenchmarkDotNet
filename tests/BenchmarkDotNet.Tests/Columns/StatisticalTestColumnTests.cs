@@ -59,9 +59,9 @@ namespace BenchmarkDotNet.Tests.Columns
             var emptyMetrics = new Dictionary<string, Metric>();
 
             Assert.Equal(expectedResult,
-                sut.GetValue(null, null, new Statistics(baseline), emptyMetrics, new Statistics(current), emptyMetrics, isBaseline: true));
+                sut.GetValue(null!, null!, new Statistics(baseline), emptyMetrics, new Statistics(current), emptyMetrics, isBaseline: true));
             Assert.Equal(expectedResult,
-                sut.GetValue(null, null, new Statistics(baseline), emptyMetrics, new Statistics(current), emptyMetrics, isBaseline: false));
+                sut.GetValue(null!, null!, new Statistics(baseline), emptyMetrics, new Statistics(current), emptyMetrics, isBaseline: false));
         }
     }
 }

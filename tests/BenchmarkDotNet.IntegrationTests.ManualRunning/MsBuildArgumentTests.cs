@@ -4,12 +4,17 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
     public class MsBuildArgumentTests : BenchmarkTestExecutor
     {
         private const string CustomPropEnvVarName = "CustomPropEnvVarName";
+
+        public MsBuildArgumentTests(ITestOutputHelper output) : base(output)
+        {
+        }
 
         [Theory]
         [InlineData(true)]

@@ -52,11 +52,11 @@ namespace BenchmarkDotNet.Tests
         }
 
         [AssertionMethod]
-        private void Verify(string msbuildError, bool expectedResult, string expectedReason)
+        private void Verify(string msbuildError, bool expectedResult, string? expectedReason)
         {
             var sut = BuildResult.Failure(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()), msbuildError);
 
-            Assert.Equal(expectedResult, sut.TryToExplainFailureReason(out string reason));
+            Assert.Equal(expectedResult, sut.TryToExplainFailureReason(out var reason));
             Assert.Equal(expectedReason, reason);
         }
     }

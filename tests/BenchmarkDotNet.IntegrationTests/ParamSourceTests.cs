@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 yield return null;
                 yield return Array.Empty<NonPublicSource>();
-                yield return new NonPublicSource[] { null };
+                yield return new NonPublicSource[] { null! };
                 yield return new[] { new NonPublicSource(1), new NonPublicSource(2) };
             }
 
@@ -179,13 +179,13 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public static IEnumerable<PublicSource> GetSource()
             {
-                yield return null;
+                yield return null!;
                 yield return new PublicSource(1);
                 yield return new PublicSource(2);
             }
 
             [ParamsSource(nameof(GetSource))]
-            public TargetType ParamsTarget { get; set; }
+            public TargetType ParamsTarget { get; set; } = default!;
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Data ?? 0;

@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class InvalidFileNamesInParams
         {
             [Params("/\\@#$%")]
-            public string Field;
+            public string Field = default!;
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine("// " + Field);
@@ -112,18 +112,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CompileSpecialCharactersInString
         {
-            [Params("\0")] public string Null;
-            [Params("\t")] public string Tab;
-            [Params("\n")] public string NewLine;
-            [Params("\\")] public string Slash;
-            [Params("\"")] public string Quote;
-            [Params("\u0061")] public string Unicode;
-            [Params("{")] public string Bracket;
+            [Params("\0")] public string Null = default!;
+            [Params("\t")] public string Tab = default!;
+            [Params("\n")] public string NewLine = default!;
+            [Params("\\")] public string Slash = default!;
+            [Params("\"")] public string Quote = default!;
+            [Params("\u0061")] public string Unicode = default!;
+            [Params("{")] public string Bracket = default!;
 
-            [Params("\n \0 \n")] public string Combo;
+            [Params("\n \0 \n")] public string Combo = default!;
 
-            [Params("C:\\file1.txt")] public string Path1;
-            [Params(@"C:\file2.txt")] public string Path2;
+            [Params("C:\\file1.txt")] public string Path1 = default!;
+            [Params(@"C:\file2.txt")] public string Path2 = default!;
 
             [Benchmark]
             public void Benchmark()
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArray
         {
             [Params(new[] { 0, 1, 2 })]
-            public int[] Array;
+            public int[] Array = default!;
 
             [Benchmark]
             public void AcceptingArray()

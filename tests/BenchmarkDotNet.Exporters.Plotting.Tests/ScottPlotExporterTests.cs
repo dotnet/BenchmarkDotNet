@@ -286,7 +286,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
 
             public class Escape_ParamsAndArguments
             {
-                [Params("\t", "\n")] public string StringParam;
+                [Params("\t", "\n")] public string StringParam = default!;
 
                 [Arguments('\t')]
                 [Arguments('\n')]

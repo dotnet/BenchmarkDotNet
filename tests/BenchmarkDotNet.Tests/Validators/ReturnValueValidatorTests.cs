@@ -221,18 +221,18 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class CustomEquatableA : IEquatable<CustomEquatableB>
         {
-            public bool Equals(CustomEquatableB other) => other != null;
+            public bool Equals(CustomEquatableB? other) => other != null;
 
-            public override bool Equals(object obj) => false; // Intentionally bad implementation
+            public override bool Equals(object? obj) => false; // Intentionally bad implementation
 
             public override int GetHashCode() => 0;
         }
 
         public class CustomEquatableB : IEquatable<CustomEquatableA>
         {
-            public bool Equals(CustomEquatableA other) => other != null;
+            public bool Equals(CustomEquatableA? other) => other != null;
 
-            public override bool Equals(object obj) => false; // Intentionally bad implementation
+            public override bool Equals(object? obj) => false; // Intentionally bad implementation
 
             public override int GetHashCode() => 0;
         }

@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetCorrectCSharpTypeNameSupportsGenericTypesPassedByReference()
         {
-            var byRefGenericType = typeof(GenericByRef).GetMethod(nameof(GenericByRef.TheMethod)).GetParameters().Single().ParameterType;
+            var byRefGenericType = typeof(GenericByRef).GetMethod(nameof(GenericByRef.TheMethod))!.GetParameters().Single().ParameterType;
 
             CheckCorrectTypeName("global::System.ValueTuple<global::System.Int32, global::System.Int16>", byRefGenericType);
         }
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetCorrectCSharpTypeNameSupportsNestedTypesPassedByReference()
         {
-            var byRefNestedType = typeof(Nested).GetMethod(nameof(Nested.TheMethod)).GetParameters().Single().ParameterType;
+            var byRefNestedType = typeof(Nested).GetMethod(nameof(Nested.TheMethod))!.GetParameters().Single().ParameterType;
 
             CheckCorrectTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.Nested", byRefNestedType);
         }
@@ -141,14 +141,14 @@ namespace BenchmarkDotNet.Tests
 
         public class Generic<T>
         {
-            [Benchmark] public T Create() => default;
+            [Benchmark] public T Create() => default!;
         }
 
         public class GenericNoPublicCtor<T>
         {
             private GenericNoPublicCtor() { }
 
-            [Benchmark] public T Create() => default;
+            [Benchmark] public T Create() => default!;
         }
 
         [FactEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests
 
         public class WithImplicitCastToStackOnlyStruct<T>
         {
-            public T[] Array;
+            public T[] Array = default!;
 
             public static implicit operator StackOnlyStruct<T>(WithImplicitCastToStackOnlyStruct<T> instance)
                 => new StackOnlyStruct<T> { Span = instance.Array };

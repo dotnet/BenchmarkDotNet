@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class ParameterInstanceTests
     {
-        private static readonly ParameterDefinition definition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null, 0);
+        private static readonly ParameterDefinition definition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null!, 0);
 
         [Theory]
         [InlineData(5)]

@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Reflection.Emit;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Validators;
-using Xunit;
+using System;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using Xunit;
 
 namespace BenchmarkDotNet.Tests.Validators
 {
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Tests.Validators
                     BenchmarkCase.Create(
                         new Descriptor(typeof(CompilationValidatorTests), method.Method),
                         Job.Dry,
-                        null,
+                        ParameterInstances.Empty,
                         config
                         )
                 }, config);
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Tests.Validators
                     BenchmarkCase.Create(
                         new Descriptor(typeof(CompilationValidatorTests), method.Method),
                         Job.Dry,
-                        null,
+                        ParameterInstances.Empty,
                         config)
                 }, config);
 

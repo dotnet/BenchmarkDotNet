@@ -19,14 +19,14 @@ namespace BenchmarkDotNet.Tests
         {
             public static IEnumerable<object> Values()
             {
-                yield return null;
+                yield return null!;
                 yield return ValueTuple.Create(10);
                 yield return (10, 20);
                 yield return (10, 20, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
             }
 
             [ParamsSource(nameof(Values))]
-            public object O { get; set; }
+            public object O { get; set; } = default!;
 
             [Benchmark]
             public object FooBar() => O;

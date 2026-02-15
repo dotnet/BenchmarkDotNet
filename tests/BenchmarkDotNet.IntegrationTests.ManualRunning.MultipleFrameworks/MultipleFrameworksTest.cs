@@ -4,12 +4,17 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
     public class MultipleFrameworksTest : BenchmarkTestExecutor
     {
         private const string TfmEnvVarName = "TfmEnvVarName";
+
+        public MultipleFrameworksTest(ITestOutputHelper output) :base(output)
+        {
+        }
 
         [Theory]
         [InlineData(RuntimeMoniker.Net461)]

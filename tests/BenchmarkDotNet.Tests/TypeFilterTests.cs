@@ -221,7 +221,7 @@ namespace BenchmarkDotNet.Tests
 
             var runnableTypes = TypeFilter.GetTypesWithRunnableBenchmarks(types, Array.Empty<Assembly>(), nonNullLogger);
 
-            return new HashSet<string>(TypeFilter.Filter(config.config, runnableTypes.runnable)
+            return new HashSet<string>(TypeFilter.Filter(config.config!, runnableTypes.runnable)
                 .SelectMany(runInfo => runInfo.BenchmarksCases)
                 .Select(benchmark => $"{benchmark.Descriptor.Type.GetDisplayName()}.{benchmark.Descriptor.WorkloadMethod.Name}"));
         }

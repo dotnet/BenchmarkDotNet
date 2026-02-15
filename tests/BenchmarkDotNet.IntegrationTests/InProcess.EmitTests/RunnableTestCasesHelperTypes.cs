@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
     public class CustomStructConsumable<T>
     {
-        public T Value;
+        public T Value = default!;
     }
 
     public class CustomClassConsumable
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
     public class CustomClassConsumable<T>
     {
-        public T Value;
+        public T Value = default!;
     }
 
     public struct CustomAwaitableStruct

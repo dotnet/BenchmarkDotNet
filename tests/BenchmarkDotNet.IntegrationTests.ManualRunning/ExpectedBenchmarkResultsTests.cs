@@ -262,5 +262,5 @@ public class EmptyVoidPointer
 
 public class EmptyClass
 {
-    [Benchmark] public object Class() => default;
+    [Benchmark] public object Class() => default!;
 }

@@ -266,7 +266,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var typeBuilder = moduleBuilder.DefineType("MockType", TypeAttributes.Public);
             typeBuilder.CreateType();
 
-            Summary[] summaries = null;
+            Summary[] summaries = null!;
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
@@ -305,24 +305,23 @@ namespace BenchmarkDotNet.IntegrationTests
             ilGenerator.Emit(OpCodes.Ret); // Just return from the method
 
             benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
-                typeof(BenchmarkAttribute).GetConstructor([typeof(int), typeof(string)]),
+                typeof(BenchmarkAttribute).GetConstructor([typeof(int), typeof(string)])!,
                 [0, ""]));
             // Assembly weaver does not run on assemblies created with AssemblyBuilder, so we need to apply NoInlining manually.
             benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
-                typeof(MethodImplAttribute).GetConstructor([typeof(MethodImplOptions)]),
+                typeof(MethodImplAttribute).GetConstructor([typeof(MethodImplOptions)])!,
                 [MethodImplOptions.NoInlining]));
             benchmarkTypeBuilder.CreateType();
 
-            Summary[] summaries = null;
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
-                summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
                 Assert.DoesNotContain(GetAssemblylValidationError(assemblyBuilder), logger.GetLog());
             }
             else
             {
-                summaries = BenchmarkRunner.Run(assemblyBuilder);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder);
                 var summary = summaries[0];
                 Assert.False(summary.HasCriticalValidationErrors);
                 Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());
@@ -353,13 +352,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 new object[] { 0, "" }));
             benchmarkTypeBuilder.CreateType();
 
-            Summary[] summaries = null;
-
             GetConfigWithLogger(out var logger, out var config);
 
             config.AddFilter(new NameFilter(name => name != "Benchmark")); // Filter out only benchmark method on MockBenchmark
 
-            summaries = BenchmarkRunner.Run(assemblyBuilder, config);
+            var summaries = BenchmarkRunner.Run(assemblyBuilder, config);
             Assert.DoesNotContain(GetValidationErrorForType(benchmarkTypeBuilder), logger.GetLog());
             Assert.Contains(GetExporterNoBenchmarksError(), logger.GetLog());
         }

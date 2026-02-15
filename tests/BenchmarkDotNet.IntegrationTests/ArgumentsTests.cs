@@ -206,10 +206,10 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithComplexTypesReturnedFromSources
         {
             [ParamsSource(nameof(DictionaryAsParam))]
-            public Dictionary<int, string> DictionaryParamInstance;
+            public Dictionary<int, string> DictionaryParamInstance = default!;
 
             [ParamsSource(nameof(SameButStatic))]
-            public Dictionary<int, string> DictionaryParamStatic;
+            public Dictionary<int, string> DictionaryParamStatic = default!;
 
             [Benchmark]
             [ArgumentsSource(nameof(NonPrimitive))]
@@ -1072,10 +1072,10 @@ namespace BenchmarkDotNet.IntegrationTests
             public int ParamTwo { get; set; }
 
             [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeMethod))]
-            public Version ParamThree { get; set; }
+            public Version ParamThree { get; set; } = default!;
 
             [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeProperty))]
-            public Version ParamFour { get; set; }
+            public Version ParamFour { get; set; } = default!;
 
             [Benchmark]
             public void Test()
@@ -1146,7 +1146,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class Perf_Regex_Industry_RustLang_Sherlock
         {
             [Params(@"[""'][^""']{0,30}[?!.][""']")]
-            public string Pattern { get; set; }
+            public string Pattern { get; set; } = default!;
 
             [Benchmark]
             public int Consume() => Pattern.Length;
@@ -1164,7 +1164,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetDisposables))]
-            public Disposable used;
+            public Disposable used = default!;
 
             [Benchmark]
             public void CheckDisposed()
@@ -1202,7 +1202,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig> furtherConfigure = null)
+        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig>? furtherConfigure = null)
         {
             var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
 
