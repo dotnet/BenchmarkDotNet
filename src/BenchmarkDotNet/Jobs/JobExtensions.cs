@@ -304,7 +304,7 @@ namespace BenchmarkDotNet.Jobs
         /// False by default.
         /// <remarks>WithEvaluateOverhead is deprecated.</remarks>
         /// </summary>
-        [Obsolete("WithEvaluateOverhead is deprecated by #1802. Use solutions outlined in #654 instead.")]
+        [Obsolete("Overhead evaluation affects the accuracy of benchmark results. This will be removed soon.")]
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
 
         /// <summary>
