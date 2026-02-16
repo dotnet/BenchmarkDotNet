@@ -17,8 +17,6 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator

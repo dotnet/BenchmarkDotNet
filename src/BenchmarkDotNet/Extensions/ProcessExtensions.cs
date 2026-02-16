@@ -15,8 +15,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Extensions
 {
     // we need it public to reuse it in the auto-generated dll

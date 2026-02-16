@@ -10,8 +10,6 @@ using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using StreamWriter = System.IO.StreamWriter;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains
 {
     [PublicAPI]

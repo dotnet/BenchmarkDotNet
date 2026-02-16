@@ -7,8 +7,6 @@ using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.R2R
 {
     [PublicAPI]

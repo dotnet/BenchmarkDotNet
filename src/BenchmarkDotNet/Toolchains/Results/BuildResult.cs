@@ -3,8 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.Results
 {
     [PublicAPI]

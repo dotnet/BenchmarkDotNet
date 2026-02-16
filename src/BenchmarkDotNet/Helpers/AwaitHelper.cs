@@ -5,8 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     public static class AwaitHelper

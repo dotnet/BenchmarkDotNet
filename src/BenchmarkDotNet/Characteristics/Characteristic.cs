@@ -2,8 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public abstract class Characteristic

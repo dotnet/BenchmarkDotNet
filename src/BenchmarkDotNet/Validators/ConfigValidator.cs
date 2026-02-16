@@ -6,8 +6,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class ConfigValidator : IValidator

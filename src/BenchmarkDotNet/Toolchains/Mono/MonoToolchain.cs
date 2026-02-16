@@ -3,8 +3,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using System;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.Mono
 {
     [PublicAPI]

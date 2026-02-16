@@ -5,8 +5,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public abstract class CharacteristicPresenter

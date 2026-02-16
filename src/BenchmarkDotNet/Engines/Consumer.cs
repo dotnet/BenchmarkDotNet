@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using JetBrains.Annotations;
 
-#nullable enable
-
 // ReSharper disable NotAccessedField.Local
 namespace BenchmarkDotNet.Engines
 {

@@ -6,8 +6,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstance : IDisposable

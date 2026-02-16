@@ -16,8 +16,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
     [PublicAPI]

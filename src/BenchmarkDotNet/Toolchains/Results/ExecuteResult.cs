@@ -5,8 +5,6 @@ using BenchmarkDotNet.Validators;
 using System.Collections.Generic;
 using System.Linq;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.Results
 {
     public class ExecuteResult

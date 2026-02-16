@@ -5,8 +5,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     public class NativeAotToolchainBuilder : CustomDotNetCliToolchainBuilder

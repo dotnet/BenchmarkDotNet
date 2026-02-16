@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers
 {
     internal class SourceCodeProvider : IDisposable

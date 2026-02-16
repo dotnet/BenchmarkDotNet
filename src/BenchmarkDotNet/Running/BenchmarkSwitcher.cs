@@ -16,8 +16,6 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkSwitcher

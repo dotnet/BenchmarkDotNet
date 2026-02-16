@@ -10,8 +10,6 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;
 
-#nullable enable
-
 internal static class LinuxCpuInfoParser
 {
     private static class ProcCpu

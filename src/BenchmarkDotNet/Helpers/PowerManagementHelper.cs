@@ -3,8 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]

@@ -15,8 +15,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]

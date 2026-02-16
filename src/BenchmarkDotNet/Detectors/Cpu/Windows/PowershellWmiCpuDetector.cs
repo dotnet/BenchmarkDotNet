@@ -8,8 +8,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 /// <summary>

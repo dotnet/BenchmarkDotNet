@@ -6,8 +6,6 @@ using System;
 using System.ComponentModel;
 using System.IO;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Environments
 {
     public class MonoAotLLVMRuntime : Runtime, IEquatable<MonoAotLLVMRuntime>

@@ -6,8 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Extensions
 {
     // Renamed to "StringAndTextExtensions", so it doesn't clash with "StringExtensions" in BenchmarkDotNet.Portability

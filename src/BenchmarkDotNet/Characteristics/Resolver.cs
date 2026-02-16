@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public class Resolver : IResolver

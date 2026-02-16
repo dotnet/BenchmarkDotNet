@@ -8,8 +8,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     internal class UserInteraction : IUserInteraction

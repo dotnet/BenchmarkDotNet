@@ -15,8 +15,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public class BuildPartition

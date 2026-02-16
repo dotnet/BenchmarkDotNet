@@ -6,8 +6,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Exporters.Xml
 {
     internal class XmlSerializer : IXmlSerializer

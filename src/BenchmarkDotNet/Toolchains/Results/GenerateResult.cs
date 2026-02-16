@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.Results
 {
     public class GenerateResult

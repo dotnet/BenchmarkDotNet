@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitGenerator : IGenerator

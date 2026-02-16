@@ -16,8 +16,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     /// <summary>

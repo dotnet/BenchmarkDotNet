@@ -12,8 +12,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>Host API for in-process benchmarks.</summary>

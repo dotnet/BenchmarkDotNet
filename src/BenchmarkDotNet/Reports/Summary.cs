@@ -16,8 +16,6 @@ using Perfolizer.Horology;
 using Perfolizer.Models;
 using Perfolizer.Perfonar.Tables;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public class Summary

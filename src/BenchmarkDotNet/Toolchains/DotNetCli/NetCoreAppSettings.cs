@@ -3,8 +3,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     /// <summary>

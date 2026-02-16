@@ -12,8 +12,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers
 {
     internal sealed class MonoDisassembler

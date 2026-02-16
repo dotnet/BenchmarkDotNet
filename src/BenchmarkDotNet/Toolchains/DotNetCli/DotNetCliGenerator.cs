@@ -7,8 +7,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]

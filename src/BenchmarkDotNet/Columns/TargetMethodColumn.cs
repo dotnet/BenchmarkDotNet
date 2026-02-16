@@ -3,8 +3,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Columns
 {
     public class TargetMethodColumn : IColumn

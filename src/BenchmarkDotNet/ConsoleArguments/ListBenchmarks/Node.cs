@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-#nullable enable
-
 namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
     internal class Node

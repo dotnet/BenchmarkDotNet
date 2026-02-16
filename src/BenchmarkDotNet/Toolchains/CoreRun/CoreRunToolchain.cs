@@ -6,8 +6,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunToolchain : IToolchain

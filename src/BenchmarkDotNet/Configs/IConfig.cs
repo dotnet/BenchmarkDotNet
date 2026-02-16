@@ -14,8 +14,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Configs
 {
     public interface IConfig

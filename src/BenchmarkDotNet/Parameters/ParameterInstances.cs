@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstances : IEquatable<ParameterInstances>, IDisposable

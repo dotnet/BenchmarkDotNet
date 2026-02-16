@@ -1,8 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     public abstract class Argument: IEquatable<Argument>

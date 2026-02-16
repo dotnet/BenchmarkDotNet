@@ -4,8 +4,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>

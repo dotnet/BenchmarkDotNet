@@ -8,8 +8,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal class CombinedDisassemblyExporter : ExporterBase

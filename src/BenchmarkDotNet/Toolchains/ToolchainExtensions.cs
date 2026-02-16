@@ -15,8 +15,6 @@ using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.Roslyn;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class ToolchainExtensions

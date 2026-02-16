@@ -5,8 +5,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Columns
 {
     public abstract class BaselineCustomColumn : IColumn

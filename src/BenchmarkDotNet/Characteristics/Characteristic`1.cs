@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public class Characteristic<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T> : Characteristic

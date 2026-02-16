@@ -17,8 +17,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers
 {
     public class ThreadingDiagnoser(ThreadingDiagnoserConfig config) : IInProcessDiagnoser

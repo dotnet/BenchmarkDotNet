@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class DeferredExecutionValidator : IValidator

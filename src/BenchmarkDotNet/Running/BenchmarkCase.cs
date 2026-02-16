@@ -6,8 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Portability;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable

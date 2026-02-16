@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class ValidationParameters

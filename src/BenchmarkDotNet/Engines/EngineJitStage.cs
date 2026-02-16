@@ -7,8 +7,6 @@ using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines;
 
-#nullable enable
-
 internal abstract class EngineJitStage(EngineParameters parameters) : EngineStage(IterationStage.Jitting, IterationMode.Workload, parameters)
 {
 }

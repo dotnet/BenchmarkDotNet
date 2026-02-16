@@ -11,8 +11,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Order
 {
     [SuppressMessage("ReSharper", "ClassWithVirtualMembersNeverInherited.Global")]

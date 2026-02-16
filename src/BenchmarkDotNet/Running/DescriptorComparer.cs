@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Order;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     internal class DescriptorComparer : IComparer<Descriptor>

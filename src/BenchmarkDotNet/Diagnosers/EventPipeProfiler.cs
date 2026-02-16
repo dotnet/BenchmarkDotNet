@@ -18,8 +18,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.NETCore.Client;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers
 {
     public class EventPipeProfiler : IProfiler

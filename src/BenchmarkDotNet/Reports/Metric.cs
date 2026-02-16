@@ -3,8 +3,6 @@ using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public class Metric

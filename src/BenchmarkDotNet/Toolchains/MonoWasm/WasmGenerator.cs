@@ -8,8 +8,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     public class WasmGenerator : CsProjGenerator

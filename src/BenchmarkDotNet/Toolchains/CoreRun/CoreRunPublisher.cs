@@ -7,8 +7,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Results;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunPublisher(string tfm, FileInfo coreRun, FileInfo? customDotNetCliPath = null) : DotNetCliPublisher(tfm, customDotNetCliPath?.FullName ?? "")

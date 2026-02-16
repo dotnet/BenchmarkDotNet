@@ -8,8 +8,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     /// <summary>

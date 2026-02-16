@@ -5,8 +5,6 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal static class RunnableReflectionHelpers

@@ -14,8 +14,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using static System.Runtime.InteropServices.RuntimeInformation;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Portability
 {
     internal static class RuntimeInformation

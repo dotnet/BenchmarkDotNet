@@ -18,8 +18,6 @@ using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]

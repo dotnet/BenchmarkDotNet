@@ -7,8 +7,6 @@ using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class EnvironmentMode : JobMode<EnvironmentMode>

@@ -1,7 +1,5 @@
 ﻿using System;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Parameters
 {
     public class ParameterDefinition

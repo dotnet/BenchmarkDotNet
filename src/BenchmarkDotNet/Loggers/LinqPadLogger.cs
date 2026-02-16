@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Loggers
 {
     public sealed class LinqPadLogger : ILogger

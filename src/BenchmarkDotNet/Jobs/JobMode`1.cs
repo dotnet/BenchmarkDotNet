@@ -1,8 +1,6 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     public abstract class JobMode<T> : CharacteristicObject<T> where T : JobMode<T>, new()

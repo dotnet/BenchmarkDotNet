@@ -17,8 +17,6 @@ using Perfolizer.Models;
 using Perfolizer.Metrology;
 using BenchmarkDotNet.Extensions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Environments
 {
     // this class is used by our auto-generated benchmark program,

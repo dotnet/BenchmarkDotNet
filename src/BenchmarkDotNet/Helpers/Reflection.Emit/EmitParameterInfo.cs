@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal class EmitParameterInfo : ParameterInfo

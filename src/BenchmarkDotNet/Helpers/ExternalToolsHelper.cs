@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     public static class ExternalToolsHelper

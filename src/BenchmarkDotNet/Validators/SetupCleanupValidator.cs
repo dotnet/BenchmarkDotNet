@@ -4,8 +4,6 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class SetupCleanupValidator : IValidator

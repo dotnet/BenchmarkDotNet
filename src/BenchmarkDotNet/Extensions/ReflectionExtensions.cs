@@ -5,8 +5,6 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions

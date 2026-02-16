@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-#nullable enable
-
 // Mimics System.HashCode, which is missing in NetStandard2.0.
 // Placed in root namespace to avoid ambiguous reference with System.HashCode
 

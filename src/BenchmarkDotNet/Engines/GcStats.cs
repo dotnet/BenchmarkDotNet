@@ -7,8 +7,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines
 {
     public struct GcStats : IEquatable<GcStats>

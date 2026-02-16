@@ -11,8 +11,6 @@ using JetBrains.Annotations;
 using Microsoft.DotNet.PlatformAbstractions;
 #endif
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]

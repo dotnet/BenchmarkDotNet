@@ -2,8 +2,6 @@
 using System.Linq;
 using BenchmarkDotNet.Toolchains.CsProj;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunGenerator : CsProjGenerator

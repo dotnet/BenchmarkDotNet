@@ -7,8 +7,6 @@ using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Columns
 {
     public class BaselineAllocationRatioColumn : BaselineCustomColumn

@@ -6,8 +6,6 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Extensions
 {
     internal static class CommonExtensions

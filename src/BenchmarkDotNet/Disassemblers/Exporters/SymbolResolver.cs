@@ -1,8 +1,6 @@
 ﻿using Iced.Intel;
 using System.Collections.Generic;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal sealed class SymbolResolver : ISymbolResolver

@@ -5,8 +5,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Results;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitBuilder : IBuilder

@@ -31,8 +31,6 @@ using Perfolizer.Mathematics.OutlierDetection;
 using BenchmarkDotNet.Toolchains.Mono;
 using Perfolizer.Metrology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.ConsoleArguments
 {
     public static class ConfigParser

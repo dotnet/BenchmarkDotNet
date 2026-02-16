@@ -1,8 +1,6 @@
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains
 {
     public class ArtifactsPaths

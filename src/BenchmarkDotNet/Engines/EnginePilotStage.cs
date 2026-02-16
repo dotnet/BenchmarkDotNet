@@ -5,8 +5,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines
 {
     // TODO: use clockResolution

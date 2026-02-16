@@ -8,8 +8,6 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Extensions
 {
     internal static class PathFeatures

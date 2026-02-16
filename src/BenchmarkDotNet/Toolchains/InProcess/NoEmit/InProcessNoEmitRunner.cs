@@ -11,8 +11,6 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>

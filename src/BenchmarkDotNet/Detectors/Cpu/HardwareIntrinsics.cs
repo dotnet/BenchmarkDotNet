@@ -9,8 +9,6 @@ using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
 #endif
 
-#nullable enable
-
 namespace BenchmarkDotNet.Detectors.Cpu
 {
     // based on https://github.com/dotnet/runtime/tree/v10.0.0-rc.1.25451.107/src/coreclr/tools/Common/JitInterface/ThunkGenerator/InstructionSetDesc.txt
