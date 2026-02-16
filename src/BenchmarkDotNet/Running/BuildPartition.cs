@@ -12,7 +12,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
@@ -116,14 +115,7 @@ namespace BenchmarkDotNet.Running
                     return false;
 
                 var job = RepresentativeBenchmarkCase.Job;
-                var toolchain = job.GetToolchain();
-                if (toolchain.Builder is not DotNetCliBuilder)
-                    return false;
-
-                // WASM builds require --output to place binaries in the RID-qualified path
-                // (e.g. browser-wasm/) that GetBinariesDirectoryPath expects.
-                // --no-dependencies with excludeOutput skips --output, breaking the build.
-                if (toolchain is WasmToolchain)
+                if (job.GetToolchain().Builder is not DotNetCliBuilder)
                     return false;
 
                 return !job.HasDynamicBuildCharacteristic();
