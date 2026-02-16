@@ -94,9 +94,7 @@ namespace BenchmarkDotNet.Loggers
                 }
                 using var _ = client;
 #else
-                using var client = Portability.RuntimeInformation.IsFullFrameworkCompatibilityLayer
-                    ? await Task.Run(() => tcpListener.AcceptTcpClient(), cancellationTokenSource.Token).WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token)
-                    : await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
+                using var client = await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
 #endif
                 using var stream = client.GetStream();
                 using CancelableStreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
@@ -105,9 +103,7 @@ namespace BenchmarkDotNet.Loggers
 
                 while (true)
                 {
-                    Console.Error.WriteLine($"[Broker] Before ReadLineAsync");
                     var line = await reader.ReadLineAsync(cancellationTokenSource.Token);
-                    Console.Error.WriteLine($"[Broker] After ReadLineAsync: {line}");
 
                     if (line == null)
                         return Result.EndOfStream;
@@ -134,9 +130,7 @@ namespace BenchmarkDotNet.Loggers
                         var resultsStringBuilder = new StringBuilder();
                         for (int i = 0; i < resultsLinesCount;)
                         {
-                            Console.Error.WriteLine($"[Broker] Before InProcessDiagnoser ReadLineAsync");
                             line = await reader.ReadLineAsync(cancellationTokenSource.Token);
-                            Console.Error.WriteLine($"[Broker] After InProcessDiagnoser ReadLineAsync: {line}");
 
                             if (line == null)
                                 return Result.EndOfStream;
@@ -161,9 +155,7 @@ namespace BenchmarkDotNet.Loggers
                     {
                         Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
-                        Console.Error.WriteLine($"[Broker] Before Write Acknowledgment");
                         writer.WriteLine(Engine.Signals.Acknowledgment);
-                        Console.Error.WriteLine($"[Broker] After Write Acknowledgment");
 
                         if (signal == HostSignal.AfterAll)
                         {

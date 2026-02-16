@@ -40,18 +40,10 @@ public class TcpHost : IHost
     }
 
     public void WriteLine()
-    {
-        Console.Error.WriteLine($"[TcpHost] Before WriteLine");
-        outWriter.WriteLine();
-        Console.Error.WriteLine($"[TcpHost] After WriteLine");
-    }
+        => outWriter.WriteLine();
 
     public void WriteLine(string message)
-    {
-        Console.Error.WriteLine($"[TcpHost] Before WriteLine: {message}");
-        outWriter.WriteLine(message);
-        Console.Error.WriteLine($"[TcpHost] After WriteLine: {message}");
-    }
+        => outWriter.WriteLine(message);
 
     public void SendSignal(HostSignal hostSignal)
     {
@@ -62,14 +54,10 @@ public class TcpHost : IHost
             Thread.Sleep(1);
         }
 
-        Console.Error.WriteLine($"[TcpHost] Before SendSignal: {hostSignal}");
         outWriter.WriteLine(Engine.Signals.ToMessage(hostSignal));
-        Console.Error.WriteLine($"[TcpHost] After SendSignal: {hostSignal}");
 
         // Read the response from Parent process.
         string? acknowledgment = inReader.ReadLine();
-        Console.Error.WriteLine($"[TcpHost] After acknowledgment: {acknowledgment}");
-
         if (acknowledgment != Engine.Signals.Acknowledgment
             && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
         {
@@ -78,11 +66,7 @@ public class TcpHost : IHost
     }
 
     public void SendError(string message)
-    {
-        Console.Error.WriteLine($"[TcpHost] Before SendError: {message}");
-        outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
-        Console.Error.WriteLine($"[TcpHost] After SendError: {message}");
-    }
+        => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
     public void ReportResults(RunResults runResults)
         => runResults.Print(outWriter);

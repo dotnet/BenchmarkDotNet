@@ -45,8 +45,6 @@ namespace BenchmarkDotNet.Portability
             FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #endif
 
-        public static readonly bool IsFullFrameworkCompatibilityLayer = IsFullFramework && GetCurrentPlatform() is not (Platform.X86 or Platform.X64);
-
         [SupportedOSPlatformGuard("browser")]
 #if NET6_0_OR_GREATER
         public static readonly bool IsWasm = OperatingSystem.IsBrowser();

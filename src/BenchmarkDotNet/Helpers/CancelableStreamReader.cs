@@ -32,11 +32,6 @@ internal sealed class CancelableStreamReader : IDisposable
     private const int DefaultBufferSize = 1024;
     private const int MinBufferSize = 128;
 
-    // Full Framework on Windows Arm runs on a compatibility layer rather than native.
-    // This difference was observed to cause hangs with async stream APIs over TcpClient that doesn't happen on other native supported environments.
-    // In that environment we change the async read to the default sync read via Task.Run.
-    private readonly StreamReader _defaultReader;
-
     private readonly Stream _stream;
     private Encoding _encoding;
     private Decoder _decoder;
@@ -56,18 +51,6 @@ internal sealed class CancelableStreamReader : IDisposable
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         if (!stream.CanRead) throw new ArgumentException("Stream is not readable", nameof(stream));
-
-        if (Portability.RuntimeInformation.IsFullFrameworkCompatibilityLayer)
-        {
-            _defaultReader = new(stream, encoding, detectEncodingFromByteOrderMarks, bufferSize == -1 ? DefaultBufferSize : bufferSize, leaveOpen);
-            _closable = true;
-            _stream = null!;
-            _encoding = null!;
-            _decoder = null!;
-            _byteBuffer = null!;
-            _charBuffer = null!;
-            return;
-        }
 
         if (bufferSize == -1)
         {
@@ -92,7 +75,6 @@ internal sealed class CancelableStreamReader : IDisposable
         _checkPreamble = preambleLength > 0 && preambleLength <= bufferSize;
 
         _closable = !leaveOpen;
-        _defaultReader = null!;
     }
 
     ~CancelableStreamReader()
@@ -118,14 +100,7 @@ internal sealed class CancelableStreamReader : IDisposable
             {
                 if (disposing)
                 {
-                    if (Portability.RuntimeInformation.IsFullFrameworkCompatibilityLayer)
-                    {
-                        _defaultReader.Dispose();
-                    }
-                    else
-                    {
-                        _stream.Close();
-                    }
+                    _stream.Close();
                 }
             }
             finally
@@ -138,12 +113,6 @@ internal sealed class CancelableStreamReader : IDisposable
 
     public async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
     {
-        if (Portability.RuntimeInformation.IsFullFrameworkCompatibilityLayer)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await Task.Run(() => _defaultReader.ReadLine(), cancellationToken).WaitAsync(cancellationToken);
-        }
-
         if (_charPos == _charLen && (await ReadBufferAsync(cancellationToken).ConfigureAwait(false)) == 0)
         {
             return null;
