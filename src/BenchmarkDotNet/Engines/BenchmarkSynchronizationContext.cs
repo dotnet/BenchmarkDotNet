@@ -40,7 +40,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
     private (SendOrPostCallback d, object? state)[] queue = new (SendOrPostCallback d, object? state)[1];
     private (SendOrPostCallback d, object? state)[] executing = new (SendOrPostCallback d, object? state)[1];
     private int queueCount = 0;
-    volatile private bool isCompleted;
+    private bool isCompleted;
 
     internal BenchmarkDotNetSynchronizationContext(SynchronizationContext? previousContext)
     {
@@ -99,7 +99,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         ThrowIfDisposed();
 
         var awaiter = valueTask.GetAwaiter();
-        if (valueTask.IsCompleted)
+        if (awaiter.IsCompleted)
         {
             return awaiter.GetResult();
         }
@@ -114,6 +114,11 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             (SendOrPostCallback d, object? state)[] executing;
             lock (syncRoot)
             {
+                if (isCompleted)
+                {
+                    return awaiter.GetResult();
+                }
+
                 count = queueCount;
                 queueCount = 0;
                 executing = queue;
@@ -131,11 +136,6 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
                 // Reset spinner after any posted callback is executed.
                 spinner = new();
                 continue;
-            }
-
-            if (isCompleted)
-            {
-                return awaiter.GetResult();
             }
 
             if (!spinner.NextSpinWillYield)
@@ -156,9 +156,9 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
 
     private void OnCompleted()
     {
-        isCompleted = true;
         lock (syncRoot)
         {
+            isCompleted = true;
             Monitor.Pulse(syncRoot);
         }
     }
