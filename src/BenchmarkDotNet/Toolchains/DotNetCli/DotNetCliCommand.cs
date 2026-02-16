@@ -140,7 +140,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument($"\"{filePath}\"")
                 // restore doesn't support -f argument.
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
-                .AppendArgument(buildPartition?.Runtime is WasmRuntime ? "-r browser-wasm" : string.Empty)
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -221,7 +220,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 ? stringBuilder
                 : stringBuilder
                     // Use AltDirectorySeparatorChar so it's not interpreted as an escaped quote `\"`.
-                    .AppendArgument($"/p:ArtifactsPath=\"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
+                    // Use a subdirectory for ArtifactsPath so that DefaultItemExcludes (which the SDK
+                    // sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
+                    .AppendArgument($"/p:ArtifactsPath=\"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}.artifacts{Path.AltDirectorySeparatorChar}\"")
                     .AppendArgument($"/p:OutDir=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
                     // OutputPath is legacy, per-project version of OutDir. We set both just in case. https://github.com/dotnet/msbuild/issues/87
                     .AppendArgument($"/p:OutputPath=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")

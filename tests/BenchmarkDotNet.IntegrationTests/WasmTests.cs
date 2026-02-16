@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -33,12 +32,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm", aotCompilerMode: aotCompilerMode);
-            var mainJsPath = Path.Combine(AppContext.BaseDirectory, "AppBundle", "test-main.js");
 
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithArguments([new MsBuildArgument($"/p:WasmMainJSPath={mainJsPath}")])
                     .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet80, javaScriptEngineArguments: "--expose_wasm --module"))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))

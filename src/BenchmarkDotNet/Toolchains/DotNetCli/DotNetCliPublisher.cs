@@ -6,7 +6,7 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli;
 
-public class DotNetCliPublisher(string tfm, string? customDotNetCliPath = null, string? extraArguments = null, IReadOnlyList<EnvironmentVariable>? environmentVariables = null) : IBuilder
+public class DotNetCliPublisher(string tfm, string? customDotNetCliPath = null, string? extraArguments = null, IReadOnlyList<EnvironmentVariable>? environmentVariables = null, bool logOutput = false) : IBuilder
 {
     public string TargetFrameworkMoniker { get; } = tfm;
     public string CustomDotNetCliPath { get; } = customDotNetCliPath;
@@ -21,6 +21,7 @@ public class DotNetCliPublisher(string tfm, string? customDotNetCliPath = null, 
             logger,
             buildPartition,
             environmentVariables,
-            buildPartition.Timeout
+            buildPartition.Timeout,
+            logOutput: logOutput
         ).RestoreThenBuildThenPublish();
 }

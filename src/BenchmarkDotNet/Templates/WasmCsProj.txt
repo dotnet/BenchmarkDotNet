@@ -21,7 +21,6 @@
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <RunAOTCompilation>$RUN_AOT$</RunAOTCompilation>
     <PublishTrimmed>$(RunAOTCompilation)</PublishTrimmed>
-    <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <EnableDefaultWasmAssembliesToBundle>false</EnableDefaultWasmAssembliesToBundle>
@@ -32,8 +31,8 @@
 
   <ItemGroup>
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
-    <!-- move this too? -->
     <TrimmerRootDescriptor Include="WasmLinkerDescription.xml" Condition="'$(RunAOTCompilation)' == 'true'" />
+    <Content Update="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
