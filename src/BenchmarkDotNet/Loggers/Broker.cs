@@ -105,7 +105,10 @@ namespace BenchmarkDotNet.Loggers
 
                 while (true)
                 {
+                    Console.Error.WriteLine($"[Broker] Before ReadLineAsync");
                     var line = await reader.ReadLineAsync(cancellationTokenSource.Token);
+                    Console.Error.WriteLine($"[Broker] After ReadLineAsync: {line}");
+
                     if (line == null)
                         return Result.EndOfStream;
 
@@ -131,7 +134,10 @@ namespace BenchmarkDotNet.Loggers
                         var resultsStringBuilder = new StringBuilder();
                         for (int i = 0; i < resultsLinesCount;)
                         {
+                            Console.Error.WriteLine($"[Broker] Before InProcessDiagnoser ReadLineAsync");
                             line = await reader.ReadLineAsync(cancellationTokenSource.Token);
+                            Console.Error.WriteLine($"[Broker] After InProcessDiagnoser ReadLineAsync: {line}");
+
                             if (line == null)
                                 return Result.EndOfStream;
 
@@ -155,7 +161,9 @@ namespace BenchmarkDotNet.Loggers
                     {
                         Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
+                        Console.Error.WriteLine($"[Broker] Before Write Acknowledgment");
                         writer.WriteLine(Engine.Signals.Acknowledgment);
+                        Console.Error.WriteLine($"[Broker] After Write Acknowledgment");
 
                         if (signal == HostSignal.AfterAll)
                         {
