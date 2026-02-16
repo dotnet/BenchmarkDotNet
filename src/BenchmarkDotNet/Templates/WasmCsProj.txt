@@ -20,6 +20,7 @@
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <RunAOTCompilation>$RUN_AOT$</RunAOTCompilation>
+    <PublishTrimmed>$(RunAOTCompilation)</PublishTrimmed>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <EnableDefaultWasmAssembliesToBundle>false</EnableDefaultWasmAssembliesToBundle>
