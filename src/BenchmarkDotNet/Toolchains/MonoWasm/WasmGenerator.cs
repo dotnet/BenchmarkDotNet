@@ -13,13 +13,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     public class WasmGenerator : CsProjGenerator
     {
         private readonly string CustomRuntimePack;
-        private readonly string MainJS;
+        private const string MainJS = "benchmark-main.mjs";
 
         public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             CustomRuntimePack = customRuntimePack;
-            MainJS = (targetFrameworkMoniker == "net5.0" || targetFrameworkMoniker == "net6.0") ? "main.js" : "benchmark-main.mjs";
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
         }
 
