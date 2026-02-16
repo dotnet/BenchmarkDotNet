@@ -176,10 +176,12 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
+#pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
             Job invocationCountJob = baselineJob
                 .WithWarmupCount(1)
                 .WithIterationCount(1)
                 .WithEvaluateOverhead(false);
+#pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
 
             ManualConfig invocationCountConfig = ManualConfig.Create(effectiveConfig);
             invocationCountConfig.RemoveAllJobs();
@@ -204,6 +206,7 @@ namespace BenchmarkDotNet.Running
 
             int iterationCount = baselineJob.Run.IterationCount;
             BenchmarkRunInfo[] benchmarksWithoutInvocationCount = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
+#pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
             BenchmarkRunInfo[] benchmarksWithInvocationCount = benchmarksWithoutInvocationCount
                 .Select(benchmarkInfo => new BenchmarkRunInfo(
                     benchmarkInfo.BenchmarksCases.Select(benchmark =>
@@ -220,6 +223,7 @@ namespace BenchmarkDotNet.Running
                             benchmark.Config)).ToArray(),
                     benchmarkInfo.Type, benchmarkInfo.Config, benchmarkInfo.CompositeInProcessDiagnoser))
                 .ToArray();
+#pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
 
             logger.WriteLineHeader("Actual benchmarking is going to happen now!");
             return BenchmarkRunnerClean.Run(benchmarksWithInvocationCount);
