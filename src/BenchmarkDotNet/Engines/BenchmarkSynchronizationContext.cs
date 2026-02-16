@@ -40,7 +40,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
     private (SendOrPostCallback d, object? state)[] queue = new (SendOrPostCallback d, object? state)[1];
     private (SendOrPostCallback d, object? state)[] executing = new (SendOrPostCallback d, object? state)[1];
     private int queueCount = 0;
-    private bool isCompleted;
+    volatile private bool isCompleted;
 
     internal BenchmarkDotNetSynchronizationContext(SynchronizationContext? previousContext)
     {
@@ -110,15 +110,15 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         var spinner = new SpinWait();
         while (true)
         {
+            if (isCompleted)
+            {
+                return awaiter.GetResult();
+            }
+
             int count;
             (SendOrPostCallback d, object? state)[] executing;
             lock (syncRoot)
             {
-                if (isCompleted)
-                {
-                    return awaiter.GetResult();
-                }
-
                 count = queueCount;
                 queueCount = 0;
                 executing = queue;
@@ -147,6 +147,11 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             // Yield the thread and wait for completion or for a posted callback.
             lock (syncRoot)
             {
+                // Check again inside the lock so we won't miss the pulse from a race condition and wait forever.
+                if (isCompleted)
+                {
+                    return awaiter.GetResult();
+                }
                 Monitor.Wait(syncRoot);
             }
             // Reset the spinner.
