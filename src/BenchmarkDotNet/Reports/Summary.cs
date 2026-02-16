@@ -163,12 +163,7 @@ namespace BenchmarkDotNet.Reports
 
         private static SummaryStyle GetConfiguredSummaryStyleOrDefaultOne(ImmutableArray<BenchmarkCase> benchmarkCases)
             => benchmarkCases
-                   .Where(benchmark => benchmark.Config.SummaryStyle != SummaryStyle.Default
-#nullable disable
-                                       // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract ConditionIsAlwaysTrueOrFalse
-                                       // TODO: remove this check once the nullability migration is finished
-                                       && benchmark.Config.SummaryStyle != null) // Paranoid
-#nullable enable
+                   .Where(benchmark => benchmark.Config.SummaryStyle != SummaryStyle.Default)
                    .Select(benchmark => benchmark.Config.SummaryStyle)
                    .Distinct()
                    .FirstOrDefault()
