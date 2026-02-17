@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     internal static class AsciiHelper

@@ -5,8 +5,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]

@@ -3,8 +3,6 @@ using System.Diagnostics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     internal class ConsoleExitHandler : IDisposable

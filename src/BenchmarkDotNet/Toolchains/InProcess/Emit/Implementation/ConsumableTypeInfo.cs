@@ -4,8 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     public class ConsumableTypeInfo

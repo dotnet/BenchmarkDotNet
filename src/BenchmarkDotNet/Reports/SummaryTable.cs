@@ -7,8 +7,6 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryTable

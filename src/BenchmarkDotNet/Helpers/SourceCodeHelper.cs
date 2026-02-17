@@ -5,8 +5,6 @@ using System.Numerics;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     public static class SourceCodeHelper

@@ -10,8 +10,6 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines
 {
     [UsedImplicitly]

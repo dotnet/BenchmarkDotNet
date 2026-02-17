@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public const BindingFlags BindingFlagsAllStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
         public const BindingFlags BindingFlagsAllInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-        private static object TryChangeType(object value, Type targetType)
+        private static object? TryChangeType(object? value, Type targetType)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             {
                 var implicitOp = GetImplicitConversionOpFromTo(value.GetType(), targetType);
                 if (implicitOp != null)
-                    return implicitOp.Invoke(null, new[] { value });
+                    return implicitOp.Invoke(null, [value])!;
             }
 
             return value;
@@ -43,13 +43,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 && t.GetCustomAttributes().Any(a => a.GetType().FullName == IsByRefLikeAttributeTypeName);
         }
 
-        public static MethodInfo GetImplicitConversionOpFromTo(Type from, Type to)
+        public static MethodInfo? GetImplicitConversionOpFromTo(Type from, Type to)
         {
             return GetImplicitConversionOpCore(to, from, to)
                 ?? GetImplicitConversionOpCore(from, from, to);
         }
 
-        private static MethodInfo GetImplicitConversionOpCore(Type owner, Type from, Type to)
+        private static MethodInfo? GetImplicitConversionOpCore(Type owner, Type from, Type to)
         {
             return owner.GetMethods(BindingFlagsPublicStatic)
                 .FirstOrDefault(m =>
@@ -66,12 +66,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         )
             where T : notnull
         {
-            var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name);
-            if (argValue == null)
-            {
-                throw new InvalidOperationException($"Can't find arg member for {argInfo.Name}.");
-            }
-
+            var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name!);
             var type = instance.GetType();
             var argName = ArgFieldPrefix + argIndex;
             if (type.GetField(argName, BindingFlagsNonPublicInstance) is var f && f != null)
@@ -129,7 +124,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (result == null)
                 throw new InvalidOperationException($"Can't find a member {memberName}.");
 
-            return (TResult)result.GetValue(instance);
+            return (TResult)result.GetValue(instance)!; // TODO: Currently this method is used to get Action field and assume it's not null.
         }
 
         private static TDelegate GetDelegateCore<T, TDelegate>(T instance, string memberName)

@@ -21,7 +21,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         /// <param name="restorePath">the directory to restore packages to</param>
         public CoreRunToolchain(FileInfo coreRun, bool createCopy = true,
             string targetFrameworkMoniker = "net8.0",
-            FileInfo? customDotNetCliPath = null, DirectoryInfo? restorePath = null,
+            FileInfo? customDotNetCliPath = null,
+            DirectoryInfo? restorePath = null,
             string displayName = "CoreRun")
         {
             if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             RestorePath = restorePath;
 
             Name = displayName;
-            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, customDotNetCliPath?.FullName, restorePath?.FullName);
+            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, customDotNetCliPath?.FullName ?? "", restorePath?.FullName ?? "");
             Builder = new CoreRunPublisher(targetFrameworkMoniker, CopyCoreRun, customDotNetCliPath);
             Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun.FullName); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll"
         }
@@ -52,9 +53,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         public FileInfo CopyCoreRun { get; }
 
-        public FileInfo CustomDotNetCliPath { get; }
+        public FileInfo? CustomDotNetCliPath { get; }
 
-        public DirectoryInfo RestorePath { get; }
+        public DirectoryInfo? RestorePath { get; }
 
         public override string ToString() => Name;
 
@@ -76,17 +77,17 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         {
             string randomSubfolderName = Guid.NewGuid().ToString();
 
-            FileInfo coreRunCopy = coreRunPath.Directory.Parent != null
+            FileInfo coreRunCopy = coreRunPath.Directory!.Parent != null
                 ? new FileInfo(Path.Combine(coreRunPath.Directory.Parent.FullName, randomSubfolderName, coreRunPath.Name))
                 : new FileInfo(Path.Combine(coreRunPath.Directory.FullName, randomSubfolderName, coreRunPath.Name)); // C:\CoreRun.exe case
 
-            if (!TryToCreateSubfolder(coreRunCopy.Directory))
+            if (!TryToCreateSubfolder(coreRunCopy.Directory!))
             {
                 // we are most likely missing permissions to write to given folder (it can be readonly etc)
                 // in such case, CoreRun copy is going to be stored in TEMP
                 coreRunCopy = new FileInfo(Path.Combine(Path.GetTempPath(), randomSubfolderName, coreRunPath.Name));
 
-                if (!TryToCreateSubfolder(coreRunCopy.Directory))
+                if (!TryToCreateSubfolder(coreRunCopy.Directory!))
                 {
                     // if even that is impossible, we return the original path and nothing is going to be copied
                     return coreRunPath;

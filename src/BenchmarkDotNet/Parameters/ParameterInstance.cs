@@ -6,8 +6,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstance : IDisposable
@@ -19,7 +17,7 @@ namespace BenchmarkDotNet.Parameters
         private readonly object? value;
         private readonly int maxParameterColumnWidthFromConfig;
 
-        public ParameterInstance(ParameterDefinition definition, object? value, SummaryStyle summaryStyle)
+        public ParameterInstance(ParameterDefinition definition, object? value, SummaryStyle? summaryStyle)
         {
             Definition = definition;
             this.value = value;

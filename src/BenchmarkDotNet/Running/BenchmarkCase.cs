@@ -6,8 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Portability;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable
@@ -26,7 +24,7 @@ namespace BenchmarkDotNet.Running
         {
             Descriptor = descriptor;
             Job = job;
-            Parameters = parameters;
+            Parameters = parameters ?? ParameterInstances.Empty;
             Config = config;
         }
 

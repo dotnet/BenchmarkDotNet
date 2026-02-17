@@ -19,8 +19,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Configs
 {
     public class ManualConfig : IConfig

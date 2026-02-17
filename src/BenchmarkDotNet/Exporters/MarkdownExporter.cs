@@ -3,8 +3,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Exporters
 {
     public class MarkdownExporter : ExporterBase

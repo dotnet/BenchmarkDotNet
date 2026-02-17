@@ -6,8 +6,6 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Perfolizer.Horology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]

@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Columns
 {
     public class LogicalGroupColumn : IColumn

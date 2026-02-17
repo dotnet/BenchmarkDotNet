@@ -7,8 +7,6 @@ using JetBrains.Annotations;
 using BenchmarkDotNet.Portability;
 using System.Runtime.CompilerServices;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines
 {
     public class AnonymousPipesHost : IHost

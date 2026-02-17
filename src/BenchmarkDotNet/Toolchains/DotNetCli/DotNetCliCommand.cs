@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
-        [PublicAPI] public string? Arguments { get; }
+        [PublicAPI] public string Arguments { get; }
 
         [PublicAPI] public GenerateResult GenerateResult { get; }
 
@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public BuildPartition BuildPartition { get; }
 
-        [PublicAPI] public IReadOnlyList<EnvironmentVariable>? EnvironmentVariables { get; }
+        [PublicAPI] public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
 
         [PublicAPI] public TimeSpan Timeout { get; }
 
         [PublicAPI] public bool LogOutput { get; }
 
-        public DotNetCliCommand(string cliPath, string filePath, string tfm, string? arguments, GenerateResult generateResult, ILogger logger,
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable>? environmentVariables, TimeSpan timeout, bool logOutput = false)
+        public DotNetCliCommand(string cliPath, string filePath, string tfm, string arguments, GenerateResult generateResult, ILogger logger,
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
             CliPath = cliPath.IsBlank() ? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value : cliPath;
             Arguments = arguments;
@@ -47,12 +47,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             GenerateResult = generateResult;
             Logger = logger;
             BuildPartition = buildPartition;
-            EnvironmentVariables = environmentVariables;
+            EnvironmentVariables = environmentVariables ?? [];
             Timeout = timeout;
-            LogOutput = logOutput || (buildPartition is not null && buildPartition.LogBuildOutput);
+            LogOutput = logOutput || buildPartition.LogBuildOutput;
         }
 
-        public DotNetCliCommand WithArguments(string? arguments)
+        public DotNetCliCommand WithArguments(string arguments)
             => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         public DotNetCliCommand WithCliPath(string cliPath)
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public BuildResult RestoreThenBuild()
         {
-            DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
+            DotNetCliCommandExecutor.LogEnvVars(WithArguments(""));
 
             // there is no way to do tell dotnet restore which configuration to use (https://github.com/NuGet/Home/issues/5119)
             // so when users go with custom build configuration, we must perform full build
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public BuildResult RestoreThenBuildThenPublish()
         {
-            DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
+            DotNetCliCommandExecutor.LogEnvVars(WithArguments(""));
 
             // there is no way to do tell dotnet restore which configuration to use (https://github.com/NuGet/Home/issues/5119)
             // so when users go with custom build configuration, we must perform full publish
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)
         {
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.ArgumentsCharacteristic))
-                return null;
+                return "";
 
             var msBuildArguments = benchmarkCase.Job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver)!.OfType<MsBuildArgument>();
 

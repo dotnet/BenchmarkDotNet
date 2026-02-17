@@ -9,8 +9,6 @@ using System.Collections.Concurrent;
 using System.Linq;
 #endif
 
-#nullable enable
-
 namespace BenchmarkDotNet.Parameters
 {
     internal class ParameterEqualityComparer : IEqualityComparer<ParameterInstances>

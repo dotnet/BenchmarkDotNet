@@ -3,8 +3,6 @@ using Iced.Intel;
 using System.Collections.Generic;
 using System.Text;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers
 {
     internal static class Arm64InstructionFormatter

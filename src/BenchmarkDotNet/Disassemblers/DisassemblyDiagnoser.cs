@@ -24,8 +24,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IInProcessDiagnoser

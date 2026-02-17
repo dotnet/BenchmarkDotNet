@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private bool LogOutput { get; }
 
         [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker, string? customDotNetCliPath = null, bool logOutput = false)
+        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = "", bool logOutput = false)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             CustomDotNetCliPath = customDotNetCliPath;

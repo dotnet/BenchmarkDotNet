@@ -1,8 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Jobs;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Environments
 {
     public class MonoRuntime : Runtime, IEquatable<MonoRuntime>

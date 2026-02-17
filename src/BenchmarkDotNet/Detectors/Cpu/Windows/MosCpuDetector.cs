@@ -8,8 +8,6 @@ using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 internal class MosCpuDetector : ICpuDetector

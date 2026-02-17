@@ -6,8 +6,6 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public static class SummaryTableExtensions

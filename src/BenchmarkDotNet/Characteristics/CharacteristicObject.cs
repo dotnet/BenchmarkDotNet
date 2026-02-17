@@ -6,8 +6,6 @@ using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     // TODO: better naming.

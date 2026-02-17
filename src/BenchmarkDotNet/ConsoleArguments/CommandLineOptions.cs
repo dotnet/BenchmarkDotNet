@@ -14,8 +14,6 @@ using CommandLine.Text;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.ConsoleArguments
 {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

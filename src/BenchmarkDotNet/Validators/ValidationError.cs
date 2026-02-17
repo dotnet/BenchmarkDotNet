@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class ValidationError : IEquatable<ValidationError>

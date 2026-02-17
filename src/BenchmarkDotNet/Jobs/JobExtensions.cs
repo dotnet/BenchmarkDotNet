@@ -12,8 +12,6 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions

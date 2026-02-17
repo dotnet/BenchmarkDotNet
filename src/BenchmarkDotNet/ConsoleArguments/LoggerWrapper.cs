@@ -2,8 +2,6 @@
 using System.Text;
 using BenchmarkDotNet.Loggers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.ConsoleArguments
 {
     internal class LoggerWrapper : TextWriter

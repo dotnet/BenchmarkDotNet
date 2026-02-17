@@ -4,8 +4,6 @@ using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Environments
 {
     public class WasmRuntime : Runtime, IEquatable<WasmRuntime>

@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Environments
 {
     public abstract class Runtime : IEquatable<Runtime>

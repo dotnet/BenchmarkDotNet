@@ -18,8 +18,6 @@ using BenchmarkDotNet.Toolchains.Results;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     /// <summary>

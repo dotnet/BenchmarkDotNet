@@ -15,8 +15,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public class BuildPartition
@@ -24,6 +22,8 @@ namespace BenchmarkDotNet.Running
         // We use an auto-increment global counter instead of Guid to guarantee uniqueness per benchmark run (Guid has a small chance to collide),
         // assuming there are fewer than 4 billion build partitions (a safe assumption).
         internal static int s_partitionCounter;
+
+        internal static readonly BuildPartition Empty = new();
 
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
@@ -33,6 +33,14 @@ namespace BenchmarkDotNet.Running
             ProgramName = GetProgramName(RepresentativeBenchmarkCase, Interlocked.Increment(ref s_partitionCounter));
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
+        }
+
+        private BuildPartition()
+        {
+            Resolver = default!;
+            RepresentativeBenchmarkCase = default!;
+            Benchmarks = [];
+            ProgramName = default!;
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }

@@ -18,12 +18,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     {
         protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
 
-        protected string runtimeIdentifier, customDotNetCliPath;
-        protected string displayName;
-        protected string runtimeFrameworkVersion;
+        protected string? runtimeIdentifier;
+        protected string? customDotNetCliPath;
+        protected string? displayName;
+        protected string? runtimeFrameworkVersion;
 
-        protected bool useNuGetClearTag, useTempFolderForRestore;
-        private string targetFrameworkMoniker;
+        protected bool useNuGetClearTag;
+        protected bool useTempFolderForRestore;
+        private string? targetFrameworkMoniker;
 
         public abstract IToolchain ToToolchain();
 

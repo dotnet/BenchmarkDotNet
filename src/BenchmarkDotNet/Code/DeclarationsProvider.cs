@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider

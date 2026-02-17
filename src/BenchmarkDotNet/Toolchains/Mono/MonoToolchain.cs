@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Toolchains.Mono
     [PublicAPI]
     public class MonoToolchain : CsProjCoreToolchain, IEquatable<MonoToolchain>
     {
-        [PublicAPI] public static readonly IToolchain Mono60 = From(new NetCoreAppSettings("net6.0", null, "mono60"));
-        [PublicAPI] public static readonly IToolchain Mono70 = From(new NetCoreAppSettings("net7.0", null, "mono70"));
-        [PublicAPI] public static readonly IToolchain Mono80 = From(new NetCoreAppSettings("net8.0", null, "mono80"));
+        [PublicAPI] public static readonly IToolchain Mono60 = From(new NetCoreAppSettings("net6.0", "mono60"));
+        [PublicAPI] public static readonly IToolchain Mono70 = From(new NetCoreAppSettings("net7.0", "mono70"));
+        [PublicAPI] public static readonly IToolchain Mono80 = From(new NetCoreAppSettings("net8.0", "mono80"));
 
         private MonoToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor, customDotNetCliPath)
@@ -25,9 +25,17 @@ namespace BenchmarkDotNet.Toolchains.Mono
                 new DotNetCliExecutor(settings.CustomDotNetCliPath),
                 settings.CustomDotNetCliPath);
 
-        public override bool Equals(object obj) => obj is MonoToolchain typed && Equals(typed);
+        public override bool Equals(object? obj) => obj is MonoToolchain typed && Equals(typed);
 
-        public bool Equals(MonoToolchain other) => Generator.Equals(other.Generator);
+        public bool Equals(MonoToolchain? other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Generator.Equals(other.Generator);
+        }
 
         public override int GetHashCode() => Generator.GetHashCode();
     }

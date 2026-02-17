@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Text.Json.Serialization;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers
 {
     internal struct ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = "")

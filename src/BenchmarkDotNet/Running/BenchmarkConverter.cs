@@ -12,8 +12,6 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public static class BenchmarkConverter

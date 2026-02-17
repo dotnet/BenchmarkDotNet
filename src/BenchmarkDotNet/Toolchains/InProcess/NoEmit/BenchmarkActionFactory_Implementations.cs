@@ -4,8 +4,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /*

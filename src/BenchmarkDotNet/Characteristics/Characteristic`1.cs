@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public class Characteristic<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T> : Characteristic
@@ -30,7 +28,7 @@ namespace BenchmarkDotNet.Characteristics
             set { obj.SetValue(this, value); }
         }
 
-        internal override object? ResolveValueCore(CharacteristicObject obj, object currentValue)
+        internal override object? ResolveValueCore(CharacteristicObject obj, object? currentValue)
         {
             if (Resolver == null)
                 return (T?)base.ResolveValueCore(obj, currentValue);

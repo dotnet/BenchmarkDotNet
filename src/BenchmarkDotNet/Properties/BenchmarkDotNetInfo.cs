@@ -3,8 +3,6 @@ using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Properties
 {
     public class BenchmarkDotNetInfo

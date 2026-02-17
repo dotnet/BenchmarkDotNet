@@ -1,7 +1,5 @@
 ﻿using System;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>Common API to run the Setup/Clean/Idle/Run methods</summary>

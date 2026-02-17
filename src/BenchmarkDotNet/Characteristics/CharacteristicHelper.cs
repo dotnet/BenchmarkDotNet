@@ -6,8 +6,6 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public static class CharacteristicHelper

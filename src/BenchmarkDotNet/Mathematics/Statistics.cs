@@ -10,8 +10,6 @@ using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.QuantileEstimators;
 using Pragmastat;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Mathematics
 {
     public class Statistics

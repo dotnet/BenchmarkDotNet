@@ -4,8 +4,6 @@ using System.Runtime.Versioning;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     /// <summary>

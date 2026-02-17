@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Order
 {
     internal class CategoryComparer : IComparer<string[]>

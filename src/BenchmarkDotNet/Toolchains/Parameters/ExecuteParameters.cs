@@ -5,8 +5,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.Parameters
 {
     public class ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId,

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal static class DisassemblyPrettifier
