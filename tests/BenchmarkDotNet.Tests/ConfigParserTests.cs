@@ -655,7 +655,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanSpecifyWasmArgsUsingEquals()
         {
-            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs=--expose_wasm --module" }, new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module" }, new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
@@ -671,7 +671,7 @@ namespace BenchmarkDotNet.Tests
             var tempResponseFile = Path.GetRandomFileName();
             File.WriteAllLines(tempResponseFile, new[]
             {
-                "--runtimes wasm",
+                "--runtimes wasmnet80",
                 "--wasmArgs \"--expose_wasm --module\""
             });
             var parsedConfiguration = ConfigParser.Parse(new[] { $"@{tempResponseFile}" }, new OutputLogger(Output));
