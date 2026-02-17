@@ -23,7 +23,7 @@
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsNotAsErrors>NU1900</WarningsNotAsErrors>
-    <Nullable>annotations</Nullable>
+    <Nullable Condition="'$(Nullable)'==''">annotations</Nullable>
     <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
