@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
+using Perfolizer.Horology;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
@@ -37,12 +39,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return value;
         }
 
-        public static bool IsRefLikeType(Type t)
-        {
-            return t.IsValueType
-                && t.GetCustomAttributes().Any(a => a.GetType().FullName == IsByRefLikeAttributeTypeName);
-        }
-
         public static MethodInfo? GetImplicitConversionOpFromTo(Type from, Type to)
         {
             return GetImplicitConversionOpCore(to, from, to)
@@ -58,34 +54,28 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     && m.GetParameters().Single().ParameterType == from);
         }
 
-        public static void SetArgumentField<T>(
-            T instance,
-            BenchmarkCase benchmarkCase,
-            ParameterInfo argInfo,
-            int argIndex
-        )
-            where T : notnull
+        public static void SetArgumentField(object instance, BenchmarkCase benchmarkCase, ParameterInfo argInfo, int argIndex)
         {
-            var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name!);
-            var type = instance.GetType();
+            var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name!)
+                ?? throw new InvalidOperationException($"Can't find arg member for {argInfo.Name}.");
+
+            var containerField = instance.GetType().GetField(FieldsContainerName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                ?? throw new InvalidOperationException("FieldsContainer field not found on runnable instance.");
+
+            var container = containerField.GetValue(instance)!;
+
             var argName = ArgFieldPrefix + argIndex;
-            if (type.GetField(argName, BindingFlagsNonPublicInstance) is var f && f != null)
-            {
-                f.SetValue(instance, TryChangeType(argValue.Value, f.FieldType));
-            }
-            else
-            {
-                throw new InvalidOperationException($"Can't find arg member for {argInfo.Name}.");
-            }
+
+            var argField = container.GetType().GetField(argName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                ?? throw new InvalidOperationException($"Can't find arg member {argName} inside FieldsContainer.");
+
+            argField.SetValue(container, TryChangeType(argValue.Value, argField.FieldType));
+            containerField.SetValue(instance, container);
         }
 
-        public static void SetParameter<T>(
-            T instance,
-            ParameterInstance paramInfo
-        )
-            where T : notnull
+        public static void SetParameter(object instance, ParameterInstance paramInfo)
         {
-            var instanceArg = paramInfo.IsStatic ? null : (object)instance;
+            var instanceArg = paramInfo.IsStatic ? null : instance;
             var bindingFlags = paramInfo.IsStatic ? BindingFlagsAllStatic : BindingFlagsAllInstance;
             var type = instance.GetType();
 
@@ -103,32 +93,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
         }
 
-        public static Action CallbackFromField<T>(T instance, string memberName)
-            where T : notnull
+        public static Func<ValueTask> SetupOrCleanupCallbackFromMethod(object instance, string memberName)
         {
-            return GetFieldValueCore<T, Action>(instance, memberName);
+            return GetDelegateCore<Func<ValueTask>>(instance, memberName);
         }
 
-        public static Action<long> LoopCallbackFromMethod<T>(T instance, string memberName)
-            where T : notnull
+        public static Func<long, IClock, ValueTask<ClockSpan>> LoopCallbackFromMethod(object instance, string memberName)
         {
-            return GetDelegateCore<T, Action<long>>(instance, memberName);
+            return GetDelegateCore<Func<long, IClock, ValueTask<ClockSpan>>>(instance, memberName);
         }
 
-        private static TResult GetFieldValueCore<T, TResult>(T instance, string memberName)
-            where T : notnull
-        {
-            var result = instance.GetType().GetField(
-                memberName,
-                BindingFlagsAllInstance);
-            if (result == null)
-                throw new InvalidOperationException($"Can't find a member {memberName}.");
-
-            return (TResult)result.GetValue(instance)!; // TODO: Currently this method is used to get Action field and assume it's not null.
-        }
-
-        private static TDelegate GetDelegateCore<T, TDelegate>(T instance, string memberName)
-            where T : notnull
+        private static TDelegate GetDelegateCore<TDelegate>(object instance, string memberName)
         {
             var result = instance.GetType().GetMethod(
                 memberName,

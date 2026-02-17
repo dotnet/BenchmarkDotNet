@@ -28,8 +28,10 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void DisplayResults(ILogger logger) => logger.WriteLineError(GetErrorMessage());
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => new[] { new ValidationError(false, GetErrorMessage()) };
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+        {
+            yield return new ValidationError(false, GetErrorMessage());
+        }
 
         private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser using dynamic assembly loading. 
             {(RuntimeInformation.IsFullFramework || OsDetector.IsWindows()

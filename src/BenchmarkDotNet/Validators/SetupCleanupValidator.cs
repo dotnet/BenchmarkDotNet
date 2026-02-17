@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true; // it is a must!
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input)
         {
             var validationErrors = new List<ValidationError>();
 
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Validators
                 validationErrors.AddRange(ValidateAttributes<IterationSetupAttribute>(groupByType.Key.Name, allMethods));
             }
 
-            return validationErrors;
+            return validationErrors.ToAsyncEnumerable();
         }
 
         private IEnumerable<ValidationError> ValidateAttributes<T>(string benchmarkClassName, IEnumerable<MethodInfo> allMethods) where T : TargetedAttribute

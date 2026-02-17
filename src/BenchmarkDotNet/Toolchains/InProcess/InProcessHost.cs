@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
@@ -16,6 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>Host API for in-process benchmarks.</summary>
     /// <seealso cref="IHost"/>
+    [AggressivelyOptimizeMethods]
     internal sealed class InProcessHost : IHost
     {
         private readonly ILogger logger;
@@ -52,14 +52,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>
-        public void Write(string message) => logger.Write(message);
+        public void WriteAsync(string message) => logger.Write(message);
 
         /// <summary>Passes new line to the host.</summary>
         public void WriteLine() => logger.WriteLine();
 
         /// <summary>Passes text (new line appended) to the host.</summary>
         /// <param name="message">Text to write.</param>
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void WriteLine(string message)
         {
             logger.WriteLine(message);
@@ -71,7 +70,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         public void SendSignal(HostSignal hostSignal) => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
 
         public void SendError(string message) => logger.WriteLine(LogKind.Error, $"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");

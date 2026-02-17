@@ -7,15 +7,11 @@ using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines;
 
-internal abstract class EngineJitStage(EngineParameters parameters) : EngineStage(IterationStage.Jitting, IterationMode.Workload, parameters)
-{
-}
-
 // We do our best to encourage the jit to fully promote methods to tier1, but tiered jit relies on heuristics,
 // and we purposefully don't spend too much time in this stage, so we can't guarantee it.
 // This should succeed for 99%+ of microbenchmarks. For any sufficiently short benchmarks where this fails,
 // the following stages (Pilot and Warmup) will likely take it the rest of the way. Long-running benchmarks may never fully reach tier1.
-internal sealed class EngineFirstJitStage : EngineJitStage
+internal sealed class EngineJitStage : EngineStage
 {
     // It is not worth spending a long time in jit stage for macro-benchmarks.
     private static readonly TimeInterval MaxTieringTime = TimeInterval.FromSeconds(10);
@@ -29,7 +25,7 @@ internal sealed class EngineFirstJitStage : EngineJitStage
     private readonly IEnumerator<IterationData> enumerator;
     private readonly bool evaluateOverhead;
 
-    internal EngineFirstJitStage(bool evaluateOverhead, EngineParameters parameters) : base(parameters)
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters) : base(IterationStage.Jitting, IterationMode.Workload, parameters)
     {
         enumerator = EnumerateIterations();
         this.evaluateOverhead = evaluateOverhead;
@@ -44,7 +40,7 @@ internal sealed class EngineFirstJitStage : EngineJitStage
             : 1;
         if (evaluateOverhead)
         {
-            count *= 2;
+            count += 1;
         }
         return count;
     }
@@ -111,10 +107,7 @@ internal sealed class EngineFirstJitStage : EngineJitStage
 
                 remainingCalls -= invokeCount;
                 ++iterationIndex;
-                if (evaluateOverhead)
-                {
-                    yield return GetOverheadIterationData(invokeCount);
-                }
+                // The generated __Overhead method is aggressively optimized, so we don't need to run it again.
                 yield return GetWorkloadIterationData(invokeCount);
 
                 if ((remainingTiers + remainingCalls) > 0
@@ -131,44 +124,12 @@ internal sealed class EngineFirstJitStage : EngineJitStage
         // Empirical evidence shows that the first call after the method is tiered up may take longer,
         // so we run an extra iteration to ensure the next stage gets a stable measurement.
         ++iterationIndex;
-        if (evaluateOverhead)
-        {
-            yield return GetOverheadIterationData(1);
-        }
         yield return GetWorkloadIterationData(1);
     }
 
     private IterationData GetOverheadIterationData(long invokeCount)
-        => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, invokeCount, 1, () => { }, () => { }, parameters.OverheadActionNoUnroll);
+        => new(IterationMode.Overhead, IterationStage.Jitting, iterationIndex, invokeCount, 1, () => new(), () => new(), parameters.OverheadActionNoUnroll);
 
     private IterationData GetWorkloadIterationData(long invokeCount)
         => new(IterationMode.Workload, IterationStage.Jitting, iterationIndex, invokeCount, 1, parameters.IterationSetupAction, parameters.IterationCleanupAction, parameters.WorkloadActionNoUnroll);
-}
-
-internal sealed class EngineSecondJitStage : EngineJitStage
-{
-    private readonly int unrollFactor;
-    private readonly bool evaluateOverhead;
-
-    public EngineSecondJitStage(int unrollFactor, bool evaluateOverhead, EngineParameters parameters) : base(parameters)
-    {
-        this.unrollFactor = unrollFactor;
-        this.evaluateOverhead = evaluateOverhead;
-        iterationIndex = evaluateOverhead ? 0 : 2;
-    }
-
-    internal override List<Measurement> GetMeasurementList() => new(evaluateOverhead ? 2 : 1);
-
-    // The benchmark method has already been jitted via *NoUnroll, we only need to jit the *Unroll methods here, which aren't tiered.
-    internal override bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData)
-    {
-        iterationData = ++iterationIndex switch
-        {
-            1 => new(IterationMode.Overhead, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.OverheadActionUnroll),
-            // IterationSetup/Cleanup are only used for *NoUnroll benchmarks
-            2 => new(IterationMode.Workload, IterationStage.Jitting, 1, unrollFactor, unrollFactor, () => { }, () => { }, parameters.WorkloadActionUnroll),
-            _ => default
-        };
-        return iterationIndex <= 2;
-    }
 }

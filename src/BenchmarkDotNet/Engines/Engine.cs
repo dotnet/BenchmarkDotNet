@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -12,6 +14,9 @@ using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
+    // MethodImplOptions.AggressiveOptimization is applied to all methods to force them to go straight to tier1 JIT,
+    // eliminating tiered JIT as a potential variable in measurements.
+    [AggressivelyOptimizeMethods]
     [UsedImplicitly]
     public class Engine : IEngine
     {
@@ -59,13 +64,13 @@ namespace BenchmarkDotNet.Engines
             random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
-        public RunResults Run()
+        public async ValueTask<RunResults> RunAsync()
         {
-            Parameters.GlobalSetupAction.Invoke();
+            await Parameters.GlobalSetupAction.Invoke();
             bool didThrow = false;
             try
             {
-                return RunCore();
+                return await RunCore();
             }
             catch
             {
@@ -76,7 +81,7 @@ namespace BenchmarkDotNet.Engines
             {
                 try
                 {
-                    Parameters.GlobalCleanupAction.Invoke();
+                    await Parameters.GlobalCleanupAction.Invoke();
                 }
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
                 catch (Exception e) when (didThrow)
@@ -86,17 +91,15 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
-        // AggressiveOptimization forces the method to go straight to tier1 JIT, and will never be re-jitted,
-        // eliminating tiered JIT as a potential variable in measurements.
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        private RunResults RunCore()
+        // This method is extra long because the helper methods were inlined in order to prevent extra async allocations on each iteration.
+        private async ValueTask<RunResults> RunCore()
         {
             var measurements = new List<Measurement>();
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(Parameters.BenchmarkName);
 
-            IterationData extraStatsIterationData = default;
+            IterationData extraIterationData = default;
             // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size.
             // #1120
             foreach (var stage in EngineStage.EnumerateStages(Parameters))
@@ -104,16 +107,48 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.BeforeMainRun();
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
                 {
-                    var measurement = RunIteration(iterationData);
+                    // Initialization
+                    long invokeCount = iterationData.invokeCount;
+                    int unrollFactor = iterationData.unrollFactor;
+                    if (invokeCount % unrollFactor != 0)
+                        throw new ArgumentOutOfRangeException(nameof(iterationData), $"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
+
+                    long totalOperations = invokeCount * Parameters.OperationsPerInvoke;
+                    bool randomizeMemory = iterationData.mode == IterationMode.Workload && MemoryRandomization;
+
+                    await iterationData.setupAction();
+
+                    GcCollect();
+
+                    if (EngineEventSource.Log.IsEnabled())
+                        EngineEventSource.Log.IterationStart(iterationData.mode, iterationData.stage, totalOperations);
+
+                    var clockSpan = randomizeMemory
+                        ? await MeasureWithRandomStack(iterationData.workloadAction, invokeCount / unrollFactor)
+                        : await iterationData.workloadAction(invokeCount / unrollFactor, Clock);
+
+                    if (EngineEventSource.Log.IsEnabled())
+                        EngineEventSource.Log.IterationStop(iterationData.mode, iterationData.stage, totalOperations);
+
+                    await iterationData.cleanupAction();
+
+                    if (randomizeMemory)
+                        await RandomizeManagedHeapMemory();
+
+                    GcCollect();
+
+                    // Results
+                    var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, totalOperations, clockSpan.GetNanoseconds());
+                    Host.WriteLine(measurement.ToString());
                     stageMeasurements.Add(measurement);
                     // Actual Workload is always the last stage, so we use the same data to run extra stats.
-                    extraStatsIterationData = iterationData;
+                    extraIterationData = iterationData;
                 }
                 measurements.AddRange(stageMeasurements);
 
@@ -122,15 +157,47 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     Host.AfterMainRun();
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun);
                 }
             }
 
             GcStats workGcHasDone = default;
             if (Parameters.RunExtraIteration)
             {
-                (workGcHasDone, var extraMeasurement) = RunExtraIteration(extraStatsIterationData);
-                measurements.Add(extraMeasurement);
+                // Warm up the GC measurement functions before starting the actual measurement.
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
+
+                await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
+
+                Host.SendSignal(HostSignal.BeforeExtraIteration);
+                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration);
+
+                // GC collect before measuring allocations.
+                ForceGcCollect();
+
+                // #1542
+                // If the jit is tiered, we put the current thread to sleep so it can kick in, compile its stuff,
+                // and NOT allocate anything on the background thread when we are measuring allocations.
+                SleepIfPositive(JitInfo.BackgroundCompilationDelay);
+
+                GcStats gcStats;
+                ClockSpan clockSpan;
+                using (FinalizerBlocker.MaybeStart())
+                {
+                    (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
+                }
+
+                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration);
+                Host.SendSignal(HostSignal.AfterExtraIteration);
+
+                await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
+
+                var totalOperations = extraIterationData.invokeCount * Parameters.OperationsPerInvoke;
+                var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());
+                Host.WriteLine(measurement.ToString());
+                workGcHasDone = gcStats.WithTotalOperations(totalOperations);
+                measurements.Add(measurement);
             }
 
             if (EngineEventSource.Log.IsEnabled())
@@ -141,107 +208,21 @@ namespace BenchmarkDotNet.Engines
             return new RunResults(measurements, outlierMode, workGcHasDone);
         }
 
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        private Measurement RunIteration(IterationData data)
-        {
-            // Initialization
-            long invokeCount = data.invokeCount;
-            int unrollFactor = data.unrollFactor;
-            if (invokeCount % unrollFactor != 0)
-                throw new ArgumentOutOfRangeException(nameof(data), $"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
-
-            long totalOperations = invokeCount * Parameters.OperationsPerInvoke;
-            bool randomizeMemory = data.mode == IterationMode.Workload && MemoryRandomization;
-
-            data.setupAction();
-
-            GcCollect();
-
-            if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStart(data.mode, data.stage, totalOperations);
-
-            var clockSpan = randomizeMemory
-                ? MeasureWithRandomStack(data.workloadAction, invokeCount / unrollFactor)
-                : Measure(data.workloadAction, invokeCount / unrollFactor);
-
-            if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStop(data.mode, data.stage, totalOperations);
-
-            data.cleanupAction();
-
-            if (randomizeMemory)
-                RandomizeManagedHeapMemory();
-
-            GcCollect();
-
-            // Results
-            var measurement = new Measurement(0, data.mode, data.stage, data.index, totalOperations, clockSpan.GetNanoseconds());
-            Host.WriteLine(measurement.ToString());
-            return measurement;
-        }
-
         // This is in a separate method, because stackalloc can affect code alignment,
         // resulting in unexpected measurements on some AMD cpus,
         // even if the stackalloc branch isn't executed. (#2366)
-        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
-        private unsafe ClockSpan MeasureWithRandomStack(Action<long> action, long invokeCount)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private unsafe ValueTask<ClockSpan> MeasureWithRandomStack(Func<long, IClock, ValueTask<ClockSpan>> action, long invokeCount)
         {
             byte* stackMemory = stackalloc byte[random.Next(32)];
-            var clockSpan = Measure(action, invokeCount);
+            var task = action(invokeCount, Clock);
             Consume(stackMemory);
-            return clockSpan;
+            return task;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private unsafe void Consume(byte* _) { }
 
-        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
-        private ClockSpan Measure(Action<long> action, long invokeCount)
-        {
-            var clock = Clock.Start();
-            action(invokeCount);
-            return clock.GetElapsed();
-        }
-
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        private (GcStats, Measurement) RunExtraIteration(IterationData data)
-        {
-            // Warm up the GC measurement functions before starting the actual measurement.
-            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
-            DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
-
-            data.setupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
-
-            Host.SendSignal(HostSignal.BeforeExtraIteration);
-            Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeExtraIteration);
-
-            // GC collect before measuring allocations.
-            ForceGcCollect();
-
-            // #1542
-            // If the jit is tiered, we put the current thread to sleep so it can kick in, compile its stuff,
-            // and NOT allocate anything on the background thread when we are measuring allocations.
-            SleepIfPositive(JitInfo.BackgroundCompilationDelay);
-
-            GcStats gcStats;
-            ClockSpan clockSpan;
-            using (FinalizerBlocker.MaybeStart())
-            {
-                (gcStats, clockSpan) = MeasureWithGc(data.workloadAction, data.invokeCount / data.unrollFactor);
-            }
-
-            Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
-            Host.SendSignal(HostSignal.AfterExtraIteration);
-
-            data.cleanupAction(); // we run iteration cleanup after diagnosers are complete.
-
-            var totalOperations = data.invokeCount * Parameters.OperationsPerInvoke;
-            var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());
-            Host.WriteLine(measurement.ToString());
-            return (gcStats.WithTotalOperations(totalOperations), measurement);
-        }
-
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         internal static void SleepIfPositive(TimeSpan timeSpan)
         {
             if (timeSpan > TimeSpan.Zero)
@@ -250,28 +231,27 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
-        // Isolate the allocation measurement and skip tier0 jit to make sure we don't get any unexpected allocations.
-        [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
-        private (GcStats, ClockSpan) MeasureWithGc(Action<long> action, long invokeCount)
+        // Isolate the allocation measurement to make sure we don't get any unexpected allocations.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private async ValueTask<(GcStats, ClockSpan)> MeasureWithGc(Func<long, IClock, ValueTask<ClockSpan>> action, long invokeCount)
         {
             var initialGcStats = GcStats.ReadInitial();
-            var clockSpan = Measure(action, invokeCount);
+            var clockSpan = await action(invokeCount, Clock);
             var finalGcStats = GcStats.ReadFinal();
             return (finalGcStats - initialGcStats, clockSpan);
         }
 
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        private void RandomizeManagedHeapMemory()
+        private async ValueTask RandomizeManagedHeapMemory()
         {
             // invoke global cleanup before global setup
-            Parameters.GlobalCleanupAction.Invoke();
+            await Parameters.GlobalCleanupAction.Invoke();
 
             var gen0object = new byte[random.Next(32)];
             var lohObject = new byte[85 * 1024 + random.Next(32)];
 
             // we expect the key allocations to happen in global setup (not ctor)
             // so we call it while keeping the random-size objects alive
-            Parameters.GlobalSetupAction.Invoke();
+            await Parameters.GlobalSetupAction.Invoke();
 
             GC.KeepAlive(gen0object);
             GC.KeepAlive(lohObject);
@@ -279,7 +259,6 @@ namespace BenchmarkDotNet.Engines
             // we don't enforce GC.Collects here as engine does it later anyway
         }
 
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private void GcCollect()
         {
             if (!ForceGcCleanups)
@@ -288,7 +267,6 @@ namespace BenchmarkDotNet.Engines
             ForceGcCollect();
         }
 
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         internal static void ForceGcCollect()
         {
             GC.Collect();
@@ -314,10 +292,8 @@ namespace BenchmarkDotNet.Engines
             private static readonly Dictionary<string, HostSignal> MessagesToSignals
                 = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
 
-            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
 
-            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
         }
@@ -343,7 +319,6 @@ namespace BenchmarkDotNet.Engines
                 private readonly object hangLock = new();
                 private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
 
-                [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
                 ~Impl()
                 {
                     lock (hangLock)
@@ -353,7 +328,7 @@ namespace BenchmarkDotNet.Engines
                     }
                 }
 
-                [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
+                [MethodImpl(MethodImplOptions.NoInlining)]
                 internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
                 {
                     var impl = new Impl();
@@ -361,7 +336,6 @@ namespace BenchmarkDotNet.Engines
                 }
             }
 
-            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             internal static FinalizerBlocker MaybeStart()
             {
                 if (Environment.GetEnvironmentVariable(UnitTestBlockFinalizerEnvKey) != UnitTestBlockFinalizerEnvValue)
@@ -378,7 +352,6 @@ namespace BenchmarkDotNet.Engines
                 return new FinalizerBlocker(hangLock);
             }
 
-            [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             public void Dispose()
             {
                 if (hangLock is not null)

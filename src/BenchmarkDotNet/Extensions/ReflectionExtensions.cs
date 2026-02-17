@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Extensions
@@ -253,5 +255,32 @@ namespace BenchmarkDotNet.Extensions
 #else
             => type.IsByRefLike;
 #endif
+
+        internal static bool IsAwaitable(this Type type)
+        {
+            // This does not handle await extension.
+            var awaiterType = type.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)?.ReturnType;
+            if (awaiterType is null)
+            {
+                return false;
+            }
+            if (awaiterType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance) is null)
+            {
+                return false;
+            }
+            var isCompletedProperty = awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance);
+            if (isCompletedProperty?.PropertyType != typeof(bool))
+            {
+                return false;
+            }
+            return awaiterType.GetInterfaces().Any(type => typeof(INotifyCompletion).IsAssignableFrom(type));
+        }
+
+        internal static Attribute? GetAsyncMethodBuilderAttribute(this MemberInfo memberInfo)
+            // AsyncMethodBuilderAttribute can come from any assembly, so we need to use reflection by name instead of searching for the exact type.
+            => memberInfo.GetCustomAttributes(false).FirstOrDefault(attr => attr.GetType().FullName == typeof(AsyncMethodBuilderAttribute).FullName) as Attribute;
+
+        internal static bool HasAsyncMethodBuilderAttribute(this MemberInfo memberInfo)
+            => memberInfo.GetAsyncMethodBuilderAttribute() != null;
     }
 }

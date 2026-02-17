@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Validators
         private ReturnValueValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
+        protected override async System.Threading.Tasks.ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
         {
             foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
             {
@@ -32,10 +33,16 @@ namespace BenchmarkDotNet.Validators
                     try
                     {
                         InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark);
-                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null)!;
+                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
 
                         if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
-                            results.Add((benchmark, result));
+                        {
+                            (var hasResult, result) = await DynamicAwaitHelper.GetOrAwaitResult(result);
+                            if (hasResult)
+                            {
+                                results.Add((benchmark, result!));
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {

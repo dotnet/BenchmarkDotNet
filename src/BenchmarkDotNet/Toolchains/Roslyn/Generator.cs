@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -17,14 +16,13 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             => Path.GetDirectoryName(buildPartition.AssemblyLocation)!;
 
         [PublicAPI]
-        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            => new[]
-            {
-                artifactsPaths.ProgramCodePath,
-                artifactsPaths.AppConfigPath,
-                artifactsPaths.BuildScriptFilePath,
-                artifactsPaths.ExecutablePath
-            };
+        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths) =>
+        [
+            artifactsPaths.ProgramCodePath,
+            artifactsPaths.AppConfigPath,
+            artifactsPaths.BuildScriptFilePath,
+            artifactsPaths.ExecutablePath
+        ];
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
@@ -54,11 +52,12 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Concat(
-                    new[]
-                    {
-                        benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(BenchmarkCase).Assembly // BenchmarkDotNet
-                    })
+                [
+                    benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
+                    typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
+                    typeof(System.Threading.Tasks.ValueTask).Assembly, // TaskExtensions
+                    typeof(Perfolizer.Horology.IClock).Assembly // Perfolizer
+                ])
                 .Distinct();
     }
 }

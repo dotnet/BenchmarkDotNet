@@ -15,6 +15,9 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI]
     public abstract class GeneratorBase : IGenerator
     {
+        /// <inheritdoc cref="CodeGenEntryPointType"/>
+        public CodeGenEntryPointType EntryPointType { get; init; }
+
         /// <inheritdoc cref="CodeGenBenchmarkRunCallType"/>
         public CodeGenBenchmarkRunCallType BenchmarkRunCallType { get; init; }
 
@@ -121,7 +124,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <remarks>You most probably do NOT need to override this method!!</remarks>
         /// </summary>
         [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
-            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition, BenchmarkRunCallType));
+            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition, EntryPointType, BenchmarkRunCallType));
 
         protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 

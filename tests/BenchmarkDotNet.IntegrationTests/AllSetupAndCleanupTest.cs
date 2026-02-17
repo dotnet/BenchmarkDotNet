@@ -96,10 +96,10 @@ namespace BenchmarkDotNet.IntegrationTests
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public Task IterationSetup() => Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")");
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public Task IterationCleanup() => Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
 
             [GlobalSetup]
             public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
@@ -117,10 +117,20 @@ namespace BenchmarkDotNet.IntegrationTests
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public async Task<int> IterationSetup()
+            {
+                await Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")");
+
+                return 42;
+            }
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public async Task<int> IterationCleanup()
+            {
+                await Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+
+                return 42;
+            }
 
             [GlobalSetup]
             public async Task<int> GlobalSetup()
@@ -148,10 +158,10 @@ namespace BenchmarkDotNet.IntegrationTests
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public ValueTask IterationSetup() => new ValueTask(Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")"));
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public ValueTask IterationCleanup() => new ValueTask(Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")"));
 
             [GlobalSetup]
             public ValueTask GlobalSetup() => new ValueTask(Console.Out.WriteLineAsync(GlobalSetupCalled));
@@ -169,10 +179,20 @@ namespace BenchmarkDotNet.IntegrationTests
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public async ValueTask<int> IterationSetup()
+            {
+                await Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")");
+
+                return 42;
+            }
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public async ValueTask<int> IterationCleanup()
+            {
+                await Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+
+                return 42;
+            }
 
             [GlobalSetup]
             public async ValueTask<int> GlobalSetup()
@@ -201,10 +221,20 @@ namespace BenchmarkDotNet.IntegrationTests
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public ValueTask IterationSetup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public ValueTask IterationCleanup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
 
             [GlobalSetup]
             public ValueTask GlobalSetup()
@@ -233,10 +263,20 @@ namespace BenchmarkDotNet.IntegrationTests
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public ValueTask<int> IterationSetup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public ValueTask<int> IterationCleanup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
 
             [GlobalSetup]
             public ValueTask<int> GlobalSetup()

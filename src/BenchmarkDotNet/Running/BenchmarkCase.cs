@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Running
 
         public Runtime GetRuntime() => Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? Job.Environment.Runtime!
-                : RuntimeInformation.GetTargetOrCurrentRuntime(Descriptor.WorkloadMethod.DeclaringType!.Assembly);
+                : RuntimeInformation.GetTargetOrCurrentRuntime(Descriptor.Type.Assembly);
 
         public void Dispose() => Parameters.Dispose();
 

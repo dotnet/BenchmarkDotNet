@@ -4,7 +4,9 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
@@ -55,8 +57,8 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+            => diagnosers.ToAsyncEnumerable().SelectMany(diagnoser => diagnoser.ValidateAsync(validationParameters));
     }
 
     public sealed class CompositeInProcessDiagnoser(IReadOnlyList<IInProcessDiagnoser> inProcessDiagnosers)
@@ -70,12 +72,12 @@ namespace BenchmarkDotNet.Diagnosers
             => InProcessDiagnosers[index].DeserializeResults(benchmarkCase, results);
     }
 
+    [AggressivelyOptimizeMethods]
     [UsedImplicitly]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class CompositeInProcessDiagnoserHandler(IReadOnlyList<InProcessDiagnoserRouter> routers, IHost host, RunMode runMode, InProcessDiagnoserActionArgs parameters)
     {
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void Handle(BenchmarkSignal signal)
+        public async ValueTask HandleAsync(BenchmarkSignal signal)
         {
             if (runMode == RunMode.None)
             {

@@ -13,10 +13,11 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => validationParameters
                 .Config
                 .GetDiagnosers()
-                .SelectMany(diagnoser => diagnoser.Validate(validationParameters));
+                .ToAsyncEnumerable()
+                .SelectMany(diagnoser => diagnoser.ValidateAsync(validationParameters));
     }
 }

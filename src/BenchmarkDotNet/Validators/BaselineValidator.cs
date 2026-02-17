@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true; // it is a must!
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input)
         {
             var allBenchmarks = input.Benchmarks.ToImmutableArray();
             var orderProvider = input.Config.Orderer ?? DefaultOrderer.Instance;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -14,9 +15,9 @@ namespace BenchmarkDotNet.Tests.Validators
         private const string ErrorMessagePrefix = "Inconsistent benchmark return values";
 
         [Fact]
-        public void ThrowingBenchmarksAreDiscovered()
+        public async Task ThrowingBenchmarksAreDiscovered()
         {
-            var validationErrors = ReturnValueValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(ThrowingBenchmark))).ToList();
+            var validationErrors = await ReturnValueValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(ThrowingBenchmark))).ToArrayAsync();
 
             Assert.Single(validationErrors);
             Assert.Contains("Oops, sorry", validationErrors.Single().Message);
@@ -29,9 +30,9 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void InconsistentReturnValuesAreDiscovered()
+        public async Task InconsistentReturnValuesAreDiscovered()
         {
-            var validationErrors = AssertInconsistent<InconsistentResults>();
+            var validationErrors = await AssertInconsistent<InconsistentResults>();
             Assert.Single(validationErrors);
         }
 
@@ -45,9 +46,9 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void NoDuplicateResultsArePrinted()
+        public async Task NoDuplicateResultsArePrinted()
         {
-            var validationErrors = AssertInconsistent<InconsistentResultsWithMultipleJobs>();
+            var validationErrors = await AssertInconsistent<InconsistentResultsWithMultipleJobs>();
             Assert.Single(validationErrors);
 
             var allInstancesOfFoo = Regex.Matches(validationErrors.Single().Message, @"\bFoo\b");
@@ -65,8 +66,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void ConsistentReturnValuesAreOmitted()
-            => AssertConsistent<ConsistentResults>();
+        public async Task ConsistentReturnValuesAreOmitted()
+            => await AssertConsistent<ConsistentResults>();
 
         public class ConsistentResults
         {
@@ -78,8 +79,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void BenchmarksWithOnlyVoidMethodsAreOmitted()
-            => AssertConsistent<VoidMethods>();
+        public async Task BenchmarksWithOnlyVoidMethodsAreOmitted()
+            => await AssertConsistent<VoidMethods>();
 
         public class VoidMethods
         {
@@ -91,8 +92,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void VoidMethodsAreIgnored()
-            => AssertConsistent<ConsistentResultsWithVoidMethod>();
+        public async Task VoidMethodsAreIgnored()
+            => await AssertConsistent<ConsistentResultsWithVoidMethod>();
 
         public class ConsistentResultsWithVoidMethod
         {
@@ -107,8 +108,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void ConsistentReturnValuesInParameterGroupAreOmitted()
-            => AssertConsistent<ConsistentResultsPerParameterGroup>();
+        public async Task ConsistentReturnValuesInParameterGroupAreOmitted()
+            => await AssertConsistent<ConsistentResultsPerParameterGroup>();
 
         public class ConsistentResultsPerParameterGroup
         {
@@ -123,10 +124,10 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void InconsistentReturnValuesInParameterGroupAreDetected()
+        public async Task InconsistentReturnValuesInParameterGroupAreDetected()
         {
-            var validationErrors = AssertInconsistent<InconsistentResultsPerParameterGroup>();
-            Assert.Equal(2, validationErrors.Count);
+            var validationErrors = await AssertInconsistent<InconsistentResultsPerParameterGroup>();
+            Assert.Equal(2, validationErrors.Length);
         }
 
         public class InconsistentResultsPerParameterGroup
@@ -142,8 +143,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void ConsistentCollectionsAreOmitted()
-            => AssertConsistent<ConsistentCollectionReturnType>();
+        public async Task ConsistentCollectionsAreOmitted()
+            => await AssertConsistent<ConsistentCollectionReturnType>();
 
         public class ConsistentCollectionReturnType
         {
@@ -155,8 +156,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void InconsistentCollectionsAreDetected()
-            => AssertInconsistent<InconsistentCollectionReturnType>();
+        public async Task InconsistentCollectionsAreDetected()
+            => await AssertInconsistent<InconsistentCollectionReturnType>();
 
         public class InconsistentCollectionReturnType
         {
@@ -168,8 +169,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void ConsistentDictionariesAreOmitted()
-            => AssertConsistent<ConsistentDictionaryReturnType>();
+        public async Task ConsistentDictionariesAreOmitted()
+            => await AssertConsistent<ConsistentDictionaryReturnType>();
 
         public class ConsistentDictionaryReturnType
         {
@@ -181,8 +182,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void InconsistentDictionariesAreDetected()
-            => AssertInconsistent<InconsistentDictionaryReturnType>();
+        public async Task InconsistentDictionariesAreDetected()
+            => await AssertInconsistent<InconsistentDictionaryReturnType>();
 
         public class InconsistentDictionaryReturnType
         {
@@ -194,8 +195,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void ConsistentCustomEquatableImplementationIsOmitted()
-            => AssertConsistent<ConsistentCustomEquatableReturnType>();
+        public async Task ConsistentCustomEquatableImplementationIsOmitted()
+            => await AssertConsistent<ConsistentCustomEquatableReturnType>();
 
         public class ConsistentCustomEquatableReturnType
         {
@@ -207,8 +208,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void InconsistentCustomEquatableImplementationIsDetected()
-            => AssertInconsistent<InconsistentCustomEquatableReturnType>();
+        public async Task InconsistentCustomEquatableImplementationIsDetected()
+            => await AssertInconsistent<InconsistentCustomEquatableReturnType>();
 
         public class InconsistentCustomEquatableReturnType
         {
@@ -238,8 +239,8 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void ConsistentBenchmarksAlteringParameterAreOmitted()
-            => AssertConsistent<ConsistentAlterParam>();
+        public async Task ConsistentBenchmarksAlteringParameterAreOmitted()
+            => await AssertConsistent<ConsistentAlterParam>();
 
         public class ConsistentAlterParam
         {
@@ -253,16 +254,16 @@ namespace BenchmarkDotNet.Tests.Validators
             public int Bar() => ++Value;
         }
 
-        private static void AssertConsistent<TBenchmark>()
+        private static async Task AssertConsistent<TBenchmark>()
         {
-            var validationErrors = ReturnValueValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmark))).ToList();
+            var validationErrors = await ReturnValueValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmark))).ToArrayAsync();
 
             Assert.Empty(validationErrors);
         }
 
-        private static List<ValidationError> AssertInconsistent<TBenchmark>()
+        private static async Task<ValidationError[]> AssertInconsistent<TBenchmark>()
         {
-            var validationErrors = ReturnValueValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmark))).ToList();
+            var validationErrors = await ReturnValueValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmark))).ToArrayAsync();
 
             Assert.NotEmpty(validationErrors);
             Assert.All(validationErrors, error => Assert.StartsWith(ErrorMessagePrefix, error.Message));

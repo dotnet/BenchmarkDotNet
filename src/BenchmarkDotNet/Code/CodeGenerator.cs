@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
@@ -21,7 +20,7 @@ namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(BuildPartition buildPartition, CodeGenBenchmarkRunCallType benchmarkRunCallType)
+        internal static string Generate(BuildPartition buildPartition, CodeGenEntryPointType entryPointType, CodeGenBenchmarkRunCallType benchmarkRunCallType)
         {
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
@@ -31,29 +30,20 @@ namespace BenchmarkDotNet.Code
             {
                 var benchmark = buildInfo.BenchmarkCase;
 
-                var provider = GetDeclarationsProvider(benchmark.Descriptor);
+                var declarationsProvider = GetDeclarationsProvider(benchmark);
+                var extraFields = declarationsProvider.GetExtraFields();
 
-                string passArguments = GetPassArguments(benchmark);
-
-                string benchmarkTypeCode = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt"))
+                string benchmarkTypeCode = declarationsProvider
+                    .ReplaceTemplate(new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt")))
                     .Replace("$ID$", buildInfo.Id.ToString())
-                    .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
-                    .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
-                    .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
-                    .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
-                    .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
-                    .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
+                    .Replace("$DeclareFieldsContainer$", GetDeclareFieldsContainer(benchmark, buildInfo.Id, extraFields))
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
-                    .Replace("$LoadArguments$", GetLoadArguments(benchmark))
-                    .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$RunExtraIteration$", buildInfo.Config.HasExtraIterationDiagnoser(benchmark) ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
                     .Replace("$InProcessDiagnoserRouters$", GetInProcessDiagnoserRouters(buildInfo))
                     .ToString();
 
@@ -63,11 +53,9 @@ namespace BenchmarkDotNet.Code
             }
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
-                .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
-                .Replace("$ExtraDefines$", buildPartition.IsNetFramework ? "#define NETFRAMEWORK" : string.Empty)
-                .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
-                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
+                .Replace("$EntryPoint$", GetEntryPoint(buildPartition, entryPointType, useShadowCopy, shadowCopyFolderPath))
                 .Replace("$BenchmarkRunCall$", GetBenchmarkRunCall(buildPartition, benchmarkRunCallType))
+                .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .ToString();
 
             return benchmarkProgramContent;
@@ -123,19 +111,13 @@ namespace BenchmarkDotNet.Code
                 Replace("; ", ";\n                ");
         }
 
-        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
+        private static DeclarationsProvider GetDeclarationsProvider(BenchmarkCase benchmark)
         {
-            var method = descriptor.WorkloadMethod;
+            var method = benchmark.Descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
+            if (method.ReturnType.IsAwaitable())
             {
-                return new AsyncDeclarationsProvider(descriptor);
-            }
-            if (method.ReturnType.GetTypeInfo().IsGenericType
-                && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
-                    || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
-            {
-                return new AsyncDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(benchmark);
             }
 
             if (method.ReturnType == typeof(void) && method.HasAttribute<AsyncStateMachineAttribute>())
@@ -143,7 +125,7 @@ namespace BenchmarkDotNet.Code
                 throw new NotSupportedException("async void is not supported by design");
             }
 
-            return new SyncDeclarationsProvider(descriptor);
+            return new SyncDeclarationsProvider(benchmark);
         }
 
         // internal for tests
@@ -159,34 +141,56 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                         .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
+                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
 
-        private static string GetDeclareArgumentFields(BenchmarkCase benchmarkCase)
-            => string.Join(
-                Environment.NewLine,
-                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                         .Select((parameter, index) => $"private {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} __argField{index};"));
+        private static string GetDeclareFieldsContainer(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, string[] extraFields)
+        {
+            var fields = benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
+                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} argField{index};")
+                .Concat(extraFields)
+                .ToArray();
+
+            // Prevent CS0169
+            if (fields.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            // Wrapper struct is necessary because of error CS4004: Cannot await in an unsafe context
+            var sb = new StringBuilder();
+            sb.AppendLine("""
+                    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
+                    private unsafe struct FieldsContainer
+                    {
+            """);
+            foreach (var field in fields)
+            {
+                sb.AppendLine($"            {field}");
+            }
+            sb.AppendLine("            }");
+            sb.AppendLine();
+            sb.AppendLine($"        private global::BenchmarkDotNet.Autogenerated.Runnable_{benchmarkId.Value}.FieldsContainer __fieldsContainer;");
+            return sb.ToString();
+        }
+
+        /*
+         
+        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
+        private unsafe struct FieldsContainer
+        {
+            $DeclareArgumentFields$
+            $ExtraFields$
+        }
+
+        private global::BenchmarkDotNet.Autogenerated.Runnable_$ID$.FieldsContainer __fieldsContainer;
+        
+         */
 
         private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
             => string.Join(
                 Environment.NewLine,
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"this.__argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name!).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
-
-        private static string GetLoadArguments(BenchmarkCase benchmarkCase)
-            => string.Join(
-                Environment.NewLine,
-                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {(parameter.ParameterType.IsByRef ? "ref" : string.Empty)} this.__argField{index};"));
-
-        private static string GetPassArguments(BenchmarkCase benchmarkCase)
-            => string.Join(
-                ", ",
-                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
-
-        private static string GetExtraAttributes(Descriptor descriptor)
-            => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
+                    .Select((parameter, index) => $"this.__fieldsContainer.argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name!).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {
@@ -226,7 +230,7 @@ namespace BenchmarkDotNet.Code
             }
         }
 
-        private static string GetParameterModifier(ParameterInfo parameterInfo)
+        internal static string GetParameterModifier(ParameterInfo parameterInfo)
         {
             if (!parameterInfo.ParameterType.IsByRef)
                 return string.Empty;
@@ -242,13 +246,126 @@ namespace BenchmarkDotNet.Code
                 return "ref";
         }
 
+        private static string GetEntryPoint(BuildPartition buildPartition, CodeGenEntryPointType entryPointType, bool useShadowCopy, string shadowCopyFolderPath)
+        {
+            if (entryPointType == CodeGenEntryPointType.Asynchronous)
+            {
+                // Only wasm uses async entry-point, we don't need to worry about .Net Framework assembly resolve helper.
+                // Async entry-points also cannot participate in STAThread, so we ignore that as well.
+                return """
+                public static async global::System.Threading.Tasks.Task<System.Int32> Main(global::System.String[] args)
+                        {
+                            return await MainCore(args);
+                        }
+                """;
+            }
+
+            string mainImpl = """
+            global::BenchmarkDotNet.Engines.BenchmarkSynchronizationContext benchmarkSynchronizationContext = global::BenchmarkDotNet.Engines.BenchmarkSynchronizationContext.CreateAndSetCurrent();
+                        try
+                        {
+                            global::System.Threading.Tasks.ValueTask<System.Int32> task = MainCore(args);
+                            return benchmarkSynchronizationContext.ExecuteUntilComplete(task);
+                        }
+                        finally
+                        {
+                            benchmarkSynchronizationContext.Dispose();
+                        }
+            """;
+
+            if (!buildPartition.IsNetFramework)
+            {
+                return $$"""
+                {{GetSTAThreadAttribute()}}
+                        public static global::System.Int32 Main(global::System.String[] args)
+                        {
+                            {{mainImpl}}
+                        }
+                """;
+            }
+
+            return $$"""
+            {{GetAssemblyResolveHelperClass()}}
+
+                    {{GetSTAThreadAttribute()}}
+                    public static global::System.Int32 Main(global::System.String[] args)
+                    {
+                        // this method MUST NOT have any dependencies to BenchmarkDotNet and any other external dlls!
+                        // otherwise if LINQPad's shadow copy is enabled, we will not register for AssemblyLoading event
+                        // before .NET Framework tries to load it for this method
+                        using(new BenchmarkDotNet.Autogenerated.UniqueProgramName.DirtyAssemblyResolveHelper())
+                            return AfterAssemblyLoadingAttached(args);
+                    }
+
+                    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+                    private static global::System.Int32 AfterAssemblyLoadingAttached(global::System.String[] args)
+                    {
+                        {{mainImpl}}
+                    }
+            """;
+
+            string GetSTAThreadAttribute()
+                => buildPartition.RepresentativeBenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any()
+                    ? "[global::System.STAThread]"
+                    : string.Empty;
+
+            string GetAssemblyResolveHelperClass()
+            {
+                string impl = useShadowCopy
+                    // used for LINQPad
+                    ? $$"""
+                    global::System.String guessedPath = global::System.IO.Path.Combine(@"{{shadowCopyFolderPath}}", $"{new global::System.Reflection.AssemblyName(args.Name).Name}.dll");
+                                    return global::System.IO.File.Exists(guessedPath) ? global::System.Reflection.Assembly.LoadFrom(guessedPath) : null;
+                    """
+                    : """
+                    global::System.Reflection.AssemblyName fullName = new global::System.Reflection.AssemblyName(args.Name);
+                                    global::System.String simpleName = fullName.Name;
+
+                                    global::System.String guessedPath = global::System.IO.Path.Combine(global::System.AppDomain.CurrentDomain.BaseDirectory, $"{simpleName}.dll");
+
+                                    if (!global::System.IO.File.Exists(guessedPath))
+                                    {
+                                        global::System.Console.WriteLine($"// Wrong assembly binding redirects for {args.Name}.");
+                                        return null; // we can't help, and we also don't call Assembly.Load which if fails comes back here, creates endless loop and causes StackOverflow
+                                    }
+
+                                    // the file is right there, but has most probably different version and there is no assembly binding redirect or there is a wrong one...
+                                    // so we just load it and ignore the version mismatch
+
+                                    // we warn the user about that, in case some Super User want to be aware of that
+                                    global::System.Console.WriteLine($"// Wrong assembly binding redirects for {simpleName}, loading it from disk anyway.");
+
+                                    return global::System.Reflection.Assembly.LoadFrom(guessedPath);
+                    """;
+
+                return $$"""
+                private sealed class DirtyAssemblyResolveHelper : global::System.IDisposable
+                        {
+                            internal DirtyAssemblyResolveHelper() => global::System.AppDomain.CurrentDomain.AssemblyResolve += HelpTheFrameworkToResolveTheAssembly;
+
+                            public void Dispose() => global::System.AppDomain.CurrentDomain.AssemblyResolve -= HelpTheFrameworkToResolveTheAssembly;
+
+                            /// <summary>
+                            /// according to https://msdn.microsoft.com/en-us/library/ff527268(v=vs.110).aspx
+                            /// "the handler is invoked whenever the runtime fails to bind to an assembly by name."
+                            /// </summary>
+                            /// <returns>not null when we find it manually, null when we can't help</returns>
+                            private global::System.Reflection.Assembly HelpTheFrameworkToResolveTheAssembly(global::System.Object sender, global::System.ResolveEventArgs args)
+                            {
+                                {{impl}}
+                            }
+                        }
+                """;
+            }
+        }
+
         private static string GetBenchmarkRunCall(BuildPartition buildPartition, CodeGenBenchmarkRunCallType runCallType)
         {
             if (runCallType == CodeGenBenchmarkRunCallType.Reflection)
             {
                 // Use reflection to call benchmark's Run method indirectly.
                 return """
-                typeof(global::BenchmarkDotNet.Autogenerated.UniqueProgramName).Assembly
+                await (global::System.Threading.Tasks.ValueTask) typeof(global::BenchmarkDotNet.Autogenerated.UniqueProgramName).Assembly
                                     .GetType($"BenchmarkDotNet.Autogenerated.Runnable_{id}")
                                     .GetMethod("Run", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.Static)
                                     .Invoke(null, new global::System.Object[] { host, benchmarkName, diagnoserRunMode });
@@ -260,7 +377,9 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("switch (id) {");
 
             foreach (var buildInfo in buildPartition.Benchmarks)
-                @switch.AppendLine($"case {buildInfo.Id.Value}: BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName, diagnoserRunMode); break;");
+            {
+                @switch.AppendLine($"case {buildInfo.Id.Value}: await BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName, diagnoserRunMode); break;");
+            }
 
             @switch.AppendLine("default: throw new System.NotSupportedException(\"invalid benchmark id\");");
             @switch.AppendLine("}");
@@ -276,28 +395,21 @@ namespace BenchmarkDotNet.Code
 
             return argumentType;
         }
+    }
 
-        private class SmartStringBuilder
+    internal class SmartStringBuilder(string text)
+    {
+        private readonly StringBuilder builder = new(text);
+
+        public SmartStringBuilder Replace(string oldValue, string? newValue)
         {
-            private readonly string originalText;
-            private readonly StringBuilder builder;
-
-            public SmartStringBuilder(string text)
-            {
-                originalText = text;
-                builder = new StringBuilder(text);
-            }
-
-            public SmartStringBuilder Replace(string oldValue, string? newValue)
-            {
-                if (originalText.Contains(oldValue))
-                    builder.Replace(oldValue, newValue);
-                else
-                    builder.Append($"\n// '{oldValue}' not found");
-                return this;
-            }
-
-            public override string ToString() => builder.ToString();
+            if (text.Contains(oldValue))
+                builder.Replace(oldValue, newValue);
+            else
+                builder.Append($"\n// '{oldValue}' not found");
+            return this;
         }
+
+        public override string ToString() => builder.ToString();
     }
 }

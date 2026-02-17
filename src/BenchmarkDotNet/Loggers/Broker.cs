@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -15,24 +19,25 @@ namespace BenchmarkDotNet.Loggers
         private readonly ILogger logger;
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
-        private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
+        private readonly CancellationTokenSource cancellationTokenSource = new();
+        private readonly TcpListener tcpListener;
 
         private enum Result
         {
             Success,
             EndOfStream,
             InvalidData,
+            EarlyProcessExit,
         }
 
         public Broker(ILogger logger, Process process, IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser,
-            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, AnonymousPipeServerStream inputFromBenchmark, AnonymousPipeServerStream acknowledgments)
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, TcpListener tcpListener)
         {
             this.logger = logger;
             this.process = process;
             this.Diagnoser = diagnoser;
             this.compositeInProcessDiagnoser = compositeInProcessDiagnoser;
-            this.inputFromBenchmark = inputFromBenchmark;
-            this.acknowledgments = acknowledgments;
+            this.tcpListener = tcpListener;
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             process.EnableRaisingEvents = true;
@@ -51,119 +56,136 @@ namespace BenchmarkDotNet.Loggers
         {
             process.Exited -= OnProcessExited;
 
-            // Dispose all the pipes to let reading from pipe finish with EOF and avoid a resource leak.
-            DisposeLocalCopyOfClientHandles();
-            inputFromBenchmark.Dispose();
-            acknowledgments.Dispose();
+            cancellationTokenSource.Cancel(throwOnFirstException: false);
         }
 
         private void OnProcessExited(object? sender, EventArgs e)
+            => Dispose();
+
+        internal async ValueTask ProcessData()
         {
-            DisposeLocalCopyOfClientHandles();
-        }
-
-        private void DisposeLocalCopyOfClientHandles()
-        {
-            inputFromBenchmark.DisposeLocalCopyOfClientHandle();
-            acknowledgments.DisposeLocalCopyOfClientHandle();
-        }
-
-        internal void ProcessData()
-        {
-            // When the process fails to start, there is no pipe to read from.
-            // If we try to read from such pipe, the read blocks and BDN hangs.
-            // We can't use async methods with cancellation tokens because Anonymous Pipes don't support async IO.
-
-            // Usually, this property is not set yet.
-            if (process.HasExited)
-                return;
-
-            var result = ProcessDataBlocking();
+            var result = await ProcessDataCore();
             if (result != Result.Success)
+            {
                 logger.WriteLineError($"ProcessData operation is interrupted by {result}.");
+            }
         }
 
-        private Result ProcessDataBlocking()
+        private async ValueTask<Result> ProcessDataCore()
         {
-            using StreamReader reader = new(inputFromBenchmark, AnonymousPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
-            using StreamWriter writer = new(acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
-            // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
-            writer.AutoFlush = true;
+            if (process.HasExited || cancellationTokenSource.IsCancellationRequested)
+                return Result.EarlyProcessExit;
 
-            while (true)
+            try
             {
-                var line = reader.ReadLine();
-                if (line == null)
-                    return Result.EndOfStream;
-
-                // TODO: implement Silent mode here
-                logger.WriteLine(LogKind.Default, line);
-
-                // Handle normal log.
-                if (!line.StartsWith("//"))
+#if NET6_0_OR_GREATER
+                TcpClient client;
+                using var timeoutCts = new CancellationTokenSource(TcpHost.ConnectionTimeout);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token, timeoutCts.Token);
+                try
                 {
-                    Results.Add(line);
-                    continue;
+                    client = await tcpListener.AcceptTcpClientAsync(linkedCts.Token);
                 }
-
-                // Keep in sync with WasmExecutor and InProcessHost.
-
-                // Handle line prefixed with "// InProcessDiagnoser "
-                if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
+                catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
                 {
-                    // Something like "// InProcessDiagnoser 0 1"
-                    string[] lineItems = line.Split(' ');
-                    int diagnoserIndex = int.Parse(lineItems[2]);
-                    int resultsLinesCount = int.Parse(lineItems[3]);
-                    var resultsStringBuilder = new StringBuilder();
-                    for (int i = 0; i < resultsLinesCount;)
+                    throw new TimeoutException($"The connection to the benchmark process timed out after {TcpHost.ConnectionTimeout}.");
+                }
+                using var _ = client;
+#else
+                using var client = await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
+#endif
+                using var stream = client.GetStream();
+                using CancelableStreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+                // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
+                using StreamWriter writer = new(stream, TcpHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
+
+                while (true)
+                {
+                    var line = await reader.ReadLineAsync(cancellationTokenSource.Token);
+
+                    if (line == null)
+                        return Result.EndOfStream;
+
+                    // TODO: implement Silent mode here
+                    logger.WriteLine(LogKind.Default, line);
+
+                    // Handle normal log.
+                    if (!line.StartsWith("//"))
                     {
-                        line = reader.ReadLine();
-                        if (line == null)
-                            return Result.EndOfStream;
+                        Results.Add(line);
+                        continue;
+                    }
 
-                        if (!line.StartsWith($"{CompositeInProcessDiagnoser.ResultsKey} "))
-                            return Result.InvalidData;
+                    // Keep in sync with WasmExecutor and InProcessHost.
 
-                        // Strip the prepended "// InProcessDiagnoserResults ".
-                        line = line.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
-                        resultsStringBuilder.Append(line);
-                        if (++i < resultsLinesCount)
+                    // Handle line prefixed with "// InProcessDiagnoser "
+                    if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
+                    {
+                        // Something like "// InProcessDiagnoser 0 1"
+                        string[] lineItems = line.Split(' ');
+                        int diagnoserIndex = int.Parse(lineItems[2]);
+                        int resultsLinesCount = int.Parse(lineItems[3]);
+                        var resultsStringBuilder = new StringBuilder();
+                        for (int i = 0; i < resultsLinesCount;)
                         {
-                            resultsStringBuilder.AppendLine();
+                            line = await reader.ReadLineAsync(cancellationTokenSource.Token);
+
+                            if (line == null)
+                                return Result.EndOfStream;
+
+                            if (!line.StartsWith($"{CompositeInProcessDiagnoser.ResultsKey} "))
+                                return Result.InvalidData;
+
+                            // Strip the prepended "// InProcessDiagnoserResults ".
+                            line = line.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
+                            resultsStringBuilder.Append(line);
+                            if (++i < resultsLinesCount)
+                            {
+                                resultsStringBuilder.AppendLine();
+                            }
                         }
+                        compositeInProcessDiagnoser.DeserializeResults(diagnoserIndex, DiagnoserActionParameters.BenchmarkCase, resultsStringBuilder.ToString());
+                        continue;
                     }
-                    compositeInProcessDiagnoser.DeserializeResults(diagnoserIndex, DiagnoserActionParameters.BenchmarkCase, resultsStringBuilder.ToString());
-                    continue;
-                }
 
-                // Handle HostSignal data
-                if (Engine.Signals.TryGetSignal(line, out var signal))
-                {
-                    Diagnoser?.Handle(signal, DiagnoserActionParameters);
-
-                    writer.WriteLine(Engine.Signals.Acknowledgment);
-
-                    if (signal == HostSignal.BeforeAnythingElse)
+                    // Handle HostSignal data
+                    if (Engine.Signals.TryGetSignal(line, out var signal))
                     {
-                        // The client has connected, we no longer need to keep the local copy of client handle alive.
-                        // This allows server to detect that child process is done and hence avoid resource leak.
-                        // Full explanation: https://stackoverflow.com/a/39700027
-                        DisposeLocalCopyOfClientHandles();
-                    }
-                    else if (signal == HostSignal.AfterAll)
-                    {
-                        // we have received the last signal so we can stop reading from the pipe
-                        // if the process won't exit after this, its hung and needs to be killed
-                        return Result.Success;
+                        Diagnoser?.Handle(signal, DiagnoserActionParameters);
+
+                        writer.WriteLine(Engine.Signals.Acknowledgment);
+
+                        if (signal == HostSignal.AfterAll)
+                        {
+                            // we have received the last signal so we can stop reading from the pipe
+                            // if the process won't exit after this, its hung and needs to be killed
+                            return Result.Success;
+                        }
+
+                        continue;
                     }
 
-                    continue;
+                    // Other line that have "//" prefix.
+                    PrefixedOutput.Add(line);
                 }
-
-                // Other line that have "//" prefix.
-                PrefixedOutput.Add(line);
             }
+            catch (IOException e) when (e.InnerException is SocketException se && IsEarlyExitCode(se.SocketErrorCode))
+            {
+                return Result.EarlyProcessExit;
+            }
+            catch (SocketException e) when (IsEarlyExitCode(e.SocketErrorCode))
+            {
+                return Result.EarlyProcessExit;
+            }
+            catch (OperationCanceledException)
+            {
+                return Result.EarlyProcessExit;
+            }
+
+            static bool IsEarlyExitCode(SocketError error)
+                => error is SocketError.ConnectionReset
+                or SocketError.Shutdown
+                or SocketError.OperationAborted;
         }
     }
 }

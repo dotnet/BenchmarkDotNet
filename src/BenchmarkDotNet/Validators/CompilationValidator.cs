@@ -7,7 +7,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
-using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -23,13 +22,13 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
-                    .Union(ValidateClassModifiers((validationParameters.Benchmarks))
-                    .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
-                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
-                    .Union(ValidateMethodImpl(validationParameters.Benchmarks))
-                );
+                .Union(ValidateClassModifiers(validationParameters.Benchmarks))
+                .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
+                .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
+                .Union(ValidateMethodImpl(validationParameters.Benchmarks))
+                .ToAsyncEnumerable();
 
         private static IEnumerable<ValidationError> ValidateClassModifiers(IEnumerable<BenchmarkCase> benchmarks)
         {

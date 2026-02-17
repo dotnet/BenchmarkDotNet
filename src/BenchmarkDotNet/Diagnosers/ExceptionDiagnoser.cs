@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
 
         void IInProcessDiagnoser.DeserializeResults(BenchmarkCase benchmarkCase, string serializedResults)
             => results.Add(benchmarkCase, long.Parse(serializedResults));

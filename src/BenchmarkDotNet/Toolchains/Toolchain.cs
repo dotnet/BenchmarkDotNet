@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains
             Executor = executor;
         }
 
-        public virtual IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public virtual async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
             var runtime = benchmarkCase.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, resolver);
             var jit = benchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver);

@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             var errors = new List<ValidationError>();
 
@@ -41,17 +41,20 @@ namespace BenchmarkDotNet.Validators
                     continue;
                 }
 
-                if (!TryToCallGlobalSetup(benchmarkTypeInstance, errors))
+                if (!await TryToCallGlobalSetup(benchmarkTypeInstance, errors))
                 {
                     continue;
                 }
 
-                ExecuteBenchmarks(benchmarkTypeInstance, typeGroup, errors);
+                await ExecuteBenchmarksAsync(benchmarkTypeInstance, typeGroup, errors);
 
-                TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
+                await TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
             }
 
-            return errors;
+            foreach (var error in errors)
+            {
+                yield return error;
+            }
         }
 
         private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, [NotNullWhen(true)] out object? instance)
@@ -73,17 +76,17 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        private bool TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors)
+        private async ValueTask<bool> TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
-            return TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors);
+            return await TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors);
         }
 
-        private void TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors)
+        private async ValueTask TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
-            TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors);
+            await TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors);
         }
 
-        private bool TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors)
+        private async ValueTask<bool> TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors)
         {
             var methods = benchmarkTypeInstance
                 .GetType()
@@ -91,7 +94,7 @@ namespace BenchmarkDotNet.Validators
                 .Where(methodInfo => methodInfo.GetCustomAttributes(false).OfType<T>().Any())
                 .ToArray();
 
-            if (!methods.Any())
+            if (methods.Length == 0)
             {
                 return true;
             }
@@ -107,9 +110,9 @@ namespace BenchmarkDotNet.Validators
 
             try
             {
-                var result = methods.First().Invoke(benchmarkTypeInstance, null);
+                var result = methods[0].Invoke(benchmarkTypeInstance, null);
 
-                TryToGetTaskResult(result);
+                await DynamicAwaitHelper.GetOrAwaitResult(result);
             }
             catch (Exception ex)
             {
@@ -124,17 +127,6 @@ namespace BenchmarkDotNet.Validators
         }
 
         private string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
-
-        private void TryToGetTaskResult(object? result)
-        {
-            if (result == null)
-            {
-                return;
-            }
-
-            AwaitHelper.GetGetResultMethod(result.GetType())
-                ?.Invoke(null, new[] { result });
-        }
 
         private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
         {
@@ -247,6 +239,6 @@ namespace BenchmarkDotNet.Validators
             return ex?.Message ?? "Unknown error";
         }
 
-        protected abstract void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors);
+        protected abstract ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors);
     }
 }

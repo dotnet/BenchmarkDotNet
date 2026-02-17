@@ -5,7 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -24,27 +27,27 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class Executor : IExecutor
     {
-        public ExecuteResult Execute(ExecuteParameters executeParameters)
+        /// <summary>
+        /// Out-of-process executor executes synchronously. 
+        /// </summary>
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
-            if (!File.Exists(exePath))
-            {
-                return ExecuteResult.CreateFailed();
-            }
-
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
-                executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
-                executeParameters.DiagnoserRunMode);
+            return !File.Exists(exePath)
+                ? ExecuteResult.CreateFailed()
+                : await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+                    executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
+                    executeParameters.DiagnoserRunMode);
         }
 
-        private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+        private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
             try
             {
-                return ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode);
+                return await ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode);
             }
             finally
             {
@@ -52,76 +55,83 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static ExecuteResult ExecuteCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+        private static async ValueTask<ExecuteResult> ExecuteCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using AnonymousPipeServerStream inputFromBenchmark = new(PipeDirection.In, HandleInheritability.Inheritable);
-            using AnonymousPipeServerStream acknowledgments = new(PipeDirection.Out, HandleInheritability.Inheritable);
-
-            string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode);
-
-            using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
-            using ConsoleExitHandler consoleExitHandler = new(process, logger);
-            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
-
-            List<string> results;
-            List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments))
+            var tcplistener = new TcpListener(IPAddress.Loopback, port: 0);
+            try
             {
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
+                tcplistener.Start(1);
 
-                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+                string args = benchmarkId.ToArguments(((IPEndPoint) tcplistener.LocalEndpoint).Port, diagnoserRunMode);
 
-                try
+                using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
+                using ConsoleExitHandler consoleExitHandler = new(process, logger);
+                using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+
+                List<string> results;
+                List<string> prefixedOutput;
+                using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener))
                 {
-                    process.Start();
+                    diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
+
+                    logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
+                    try
+                    {
+                        process.Start();
+                    }
+                    catch (Win32Exception ex)
+                    {
+                        logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
+
+                        return new ExecuteResult(true, null, null, [], [], [], launchIndex);
+                    }
+
+                    broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+
+                    processOutputReader.BeginRead();
+
+                    process.EnsureHighPriority(logger);
+                    if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                    {
+                        process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                    }
+
+                    await broker.ProcessData();
+
+                    results = broker.Results;
+                    prefixedOutput = broker.PrefixedOutput;
                 }
-                catch (Win32Exception ex)
+
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
-                    logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
+                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 
-                    return new ExecuteResult(true, null, null, [], [], [], launchIndex);
+                    processOutputReader.CancelRead();
+                    consoleExitHandler.KillProcessTree();
                 }
-
-                broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
-
-                processOutputReader.BeginRead();
-
-                process.EnsureHighPriority(logger);
-                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                else
                 {
-                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                    processOutputReader.StopRead();
                 }
 
-                broker.ProcessData();
+                if (results.Any(line => line.Contains("BadImageFormatException")))
+                    logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-                results = broker.Results;
-                prefixedOutput = broker.PrefixedOutput;
+                return new ExecuteResult(true,
+                    process.HasExited ? process.ExitCode : null,
+                    process.Id,
+                    results,
+                    prefixedOutput,
+                    processOutputReader.GetOutputLines(),
+                    launchIndex);
             }
-
-            if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+            finally
             {
-                logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
-
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
+                tcplistener.Stop();
             }
-            else
-            {
-                processOutputReader.StopRead();
-            }
-
-            if (results.Any(line => line.Contains("BadImageFormatException")))
-                logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
-
-            return new ExecuteResult(true,
-                process.HasExited ? process.ExitCode : null,
-                process.Id,
-                results,
-                prefixedOutput,
-                processOutputReader.GetOutputLines(),
-                launchIndex);
         }
 
         private static ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
@@ -174,7 +184,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             var arguments = job.HasValue(InfrastructureMode.ArgumentsCharacteristic)
                 ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver)!.OfType<MonoArgument>().ToArray()
-                : Array.Empty<MonoArgument>();
+                : [];
 
             // from mono --help: "Usage is: mono [options] program [program-options]"
             var builder = new StringBuilder(30);
@@ -182,7 +192,9 @@ namespace BenchmarkDotNet.Toolchains
             builder.Append(job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm");
 
             foreach (var argument in arguments)
+            {
                 builder.Append($" {argument.TextRepresentation}");
+            }
 
             builder.Append($" \"{exePath}\" ");
             builder.Append(args);

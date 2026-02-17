@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             CustomRuntimePack = customRuntimePack;
+            EntryPointType = Code.CodeGenEntryPointType.Asynchronous;
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
         }
 

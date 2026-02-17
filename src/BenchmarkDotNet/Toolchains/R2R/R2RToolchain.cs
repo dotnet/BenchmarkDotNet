@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains.R2R
                 new Executor(),
                 settings.CustomDotNetCliPath);
 
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
             foreach (var validationError in DotNetSdkValidator.ValidateCoreSdks(_customDotNetCliPath, benchmarkCase))
             {

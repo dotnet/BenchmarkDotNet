@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
@@ -27,7 +28,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public void DisplayResults(ILogger logger) { }
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
 
         // the action takes places in other process, and the values are gathered by Engine
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }

@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type.GetTypeInfo().Assembly))
             {

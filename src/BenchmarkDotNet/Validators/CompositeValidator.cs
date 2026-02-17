@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Validators
         public bool TreatsWarningsAsErrors
             => validators.Any(validator => validator.TreatsWarningsAsErrors);
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-            => validators.SelectMany(validator => validator.Validate(validationParameters)).Distinct();
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+            => validators.ToAsyncEnumerable().SelectMany(validator => validator.ValidateAsync(validationParameters)).Distinct();
     }
 }

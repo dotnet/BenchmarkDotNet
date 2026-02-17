@@ -6,8 +6,8 @@ using Xunit.Abstractions;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Reports;
 using Perfolizer.Mathematics.OutlierDetection;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -56,9 +56,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CustomEngine(EngineParameters engineParameters) : IEngine
         {
-            public RunResults Run()
+            public async ValueTask<RunResults> RunAsync()
             {
-                engineParameters.GlobalSetupAction.Invoke();
+                await engineParameters.GlobalSetupAction.Invoke();
                 Console.WriteLine(EngineRunMessage);
                 try
                 {
@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
                 finally
                 {
-                    engineParameters.GlobalCleanupAction.Invoke();
+                    await engineParameters.GlobalCleanupAction.Invoke();
                 }
             }
         }

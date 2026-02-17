@@ -73,11 +73,11 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(ReturningIQueryable))]
         [InlineData(typeof(ReturningIQueryableOfInt))]
         [InlineData(typeof(ReturningLazyOfInt))]
-        public void DeferredExecutionMeansError(Type returningDeferredExecutionResult)
+        public async Task DeferredExecutionMeansError(Type returningDeferredExecutionResult)
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(returningDeferredExecutionResult);
 
-            var validationErrors = DeferredExecutionValidator.FailOnError.Validate(benchmarks).ToArray();
+            var validationErrors = await DeferredExecutionValidator.FailOnError.ValidateAsync(benchmarks).ToArrayAsync();
 
             Assert.Equal(5, validationErrors.Count(error => error.IsCritical));
         }
@@ -107,11 +107,11 @@ namespace BenchmarkDotNet.Tests.Validators
         [Theory]
         [InlineData(typeof(ReturningArray))]
         [InlineData(typeof(ReturningDictionary))]
-        public void MaterializedCollectionsAreOk(Type returningMaterializedResult)
+        public async Task MaterializedCollectionsAreOk(Type returningMaterializedResult)
         {
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(returningMaterializedResult);
 
-            var validationErrors = DeferredExecutionValidator.FailOnError.Validate(benchmarks).ToArray();
+            var validationErrors = await DeferredExecutionValidator.FailOnError.ValidateAsync(benchmarks).ToArrayAsync();
 
             Assert.Empty(validationErrors);
         }

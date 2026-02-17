@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool TreatsWarningsAsErrors => true;
 
-            public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+            public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             {
                 foreach (var benchmark in validationParameters.Benchmarks)
                     yield return new ValidationError(false, "Mock Validation", benchmark);
@@ -221,7 +221,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
             }
 
-            public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+            public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
             {
                 yield return new ValidationError(true, "Unsupported Benchmark", benchmarkCase);
             }
