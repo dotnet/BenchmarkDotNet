@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetSource))]
-            public required ITargetInterface[] ParamsTarget { get; set; }
+            public required ITargetInterface?[]? ParamsTarget { get; set; }
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Sum(p => p?.Data ?? 0) ?? 0;
