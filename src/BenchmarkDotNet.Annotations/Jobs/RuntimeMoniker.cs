@@ -145,26 +145,6 @@ namespace BenchmarkDotNet.Jobs
         NativeAot11_0,
 
         /// <summary>
-        /// WebAssembly with default .Net version
-        /// </summary>
-        Wasm,
-
-        /// <summary>
-        /// WebAssembly with net5.0
-        /// </summary>
-        WasmNet50,
-
-        /// <summary>
-        /// WebAssembly with net6.0
-        /// </summary>
-        WasmNet60,
-
-        /// <summary>
-        /// WebAssembly with net7.0
-        /// </summary>
-        WasmNet70,
-
-        /// <summary>
         /// WebAssembly with net8.0
         /// </summary>
         WasmNet80,
