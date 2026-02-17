@@ -14,8 +14,6 @@ using CommandLine.Text;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.ConsoleArguments
 {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -220,6 +218,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
         public DirectoryInfo? WasmDataDirectory { get; set; }
+
+        [Option("wasmCoreCLR", Required = false, Default = false, HelpText = "Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.")]
+        public bool WasmCoreCLR { get; set; }
 
         [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }

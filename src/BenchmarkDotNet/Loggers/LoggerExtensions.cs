@@ -1,7 +1,5 @@
 ﻿using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Loggers
 {
     public static class LoggerExtensions

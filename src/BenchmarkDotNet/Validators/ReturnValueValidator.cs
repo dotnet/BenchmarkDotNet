@@ -11,8 +11,6 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class ReturnValueValidator : ExecutionValidatorBase

@@ -9,8 +9,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public abstract class ExecutionValidatorBase : IValidator

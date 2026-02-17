@@ -11,8 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     internal static class DotNetSdkValidator

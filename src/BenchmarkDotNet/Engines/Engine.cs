@@ -12,8 +12,6 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines
 {
     // MethodImplOptions.AggressiveOptimization is applied to all methods to force them to go straight to tier1 JIT,

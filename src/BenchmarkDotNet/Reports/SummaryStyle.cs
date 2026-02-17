@@ -8,8 +8,6 @@ using static BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public class SummaryStyle : IEquatable<SummaryStyle>

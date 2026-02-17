@@ -6,8 +6,6 @@ using Perfolizer.Horology;
 using Perfolizer.Metrology;
 using Pragmastat.Metrology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Columns
 {
     public class MetricColumn : IColumn

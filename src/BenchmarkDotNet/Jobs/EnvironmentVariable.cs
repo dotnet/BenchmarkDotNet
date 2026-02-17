@@ -1,7 +1,5 @@
 ﻿using System;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     public class EnvironmentVariable : IEquatable<EnvironmentVariable>

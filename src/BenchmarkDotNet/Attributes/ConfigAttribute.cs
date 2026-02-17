@@ -1,8 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]

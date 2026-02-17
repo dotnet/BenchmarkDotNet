@@ -5,8 +5,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Code
 {
     internal static class ArrayParam

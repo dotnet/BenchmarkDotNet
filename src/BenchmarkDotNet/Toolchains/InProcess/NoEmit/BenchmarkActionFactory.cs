@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 internal static partial class BenchmarkActionFactory

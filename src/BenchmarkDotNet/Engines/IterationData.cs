@@ -2,8 +2,6 @@
 using System;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines;
 
 internal readonly struct IterationData(IterationMode iterationMode, IterationStage iterationStage, int index, long invokeCount, int unrollFactor,

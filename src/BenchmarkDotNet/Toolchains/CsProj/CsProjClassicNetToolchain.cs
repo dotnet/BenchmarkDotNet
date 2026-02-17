@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -26,17 +27,25 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         internal string CustomDotNetCliPath { get; }
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string? packagesPath = null, string? customDotNetCliPath = null)
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = "", string customDotNetCliPath = "")
             : base(name,
-                new CsProjGenerator(targetFrameworkMoniker, customDotNetCliPath, packagesPath, runtimeFrameworkVersion: null, isNetCore: false),
+                new CsProjGenerator(
+                    targetFrameworkMoniker,
+                    customDotNetCliPath,
+                    packagesPath,
+                    isNetCore: false),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath),
                 new Executor())
         {
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        public static IToolchain From(string targetFrameworkMoniker, string? packagesPath = null, string? customDotNetCliPath = null)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath, customDotNetCliPath);
+        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = "", string customDotNetCliPath = "")
+            => new CsProjClassicNetToolchain(
+                targetFrameworkMoniker,
+                name: targetFrameworkMoniker,
+                packagesPath.EnsureNotNull(),
+                customDotNetCliPath.EnsureNotNull());
 
         public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {

@@ -9,8 +9,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Engines;
 
 [AggressivelyOptimizeMethods]

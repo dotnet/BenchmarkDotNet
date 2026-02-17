@@ -10,7 +10,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -20,9 +19,9 @@ using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -233,9 +232,9 @@ namespace BenchmarkDotNet.Diagnosers
                 filePath: string.Empty,
                 tfm: string.Empty,
                 arguments: $"tool install dotnet-symbol --tool-path \"{toolPath}\"",
-                generateResult: null,
+                generateResult: GenerateResult.Success(ArtifactsPaths.Empty, []),
                 logger: logger,
-                buildPartition: null,
+                buildPartition: BuildPartition.Empty,
                 environmentVariables: [],
                 timeout: TimeSpan.FromMinutes(3),
                 logOutput: true); // the following commands might take a while and fail, let's log them

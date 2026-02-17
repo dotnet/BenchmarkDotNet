@@ -9,8 +9,6 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers
 {
     internal static class DiagnosersLoader

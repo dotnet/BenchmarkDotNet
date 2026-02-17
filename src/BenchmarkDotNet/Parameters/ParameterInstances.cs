@@ -7,6 +7,8 @@ namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstances : IEquatable<ParameterInstances>, IDisposable
     {
+        public static readonly ParameterInstances Empty = new([]);
+
         public IReadOnlyList<ParameterInstance> Items { get; }
         public int Count => Items.Count;
         public ParameterInstance this[int index] => Items[index];

@@ -2,8 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

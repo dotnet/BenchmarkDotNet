@@ -2,8 +2,6 @@
 using System.IO;
 using System.Reflection;
 
-#nullable enable
-
 // THIS TYPE MUST NOT HAVE ANY DEPENDENCIES TO BENCHMARKDOTNET, VALUE TUPLE, IMMUTABLE TYPES OR ANYTHING COMPLEX!!
 
 /// <summary>

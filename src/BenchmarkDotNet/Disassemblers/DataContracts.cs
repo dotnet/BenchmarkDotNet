@@ -15,8 +15,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 #endif
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]

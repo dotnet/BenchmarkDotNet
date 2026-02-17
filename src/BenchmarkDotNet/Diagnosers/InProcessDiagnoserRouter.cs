@@ -5,8 +5,6 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers;
 
 [UsedImplicitly]

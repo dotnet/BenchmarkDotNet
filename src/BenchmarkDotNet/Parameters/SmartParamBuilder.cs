@@ -10,8 +10,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Parameters
 {
     internal static class SmartParamBuilder

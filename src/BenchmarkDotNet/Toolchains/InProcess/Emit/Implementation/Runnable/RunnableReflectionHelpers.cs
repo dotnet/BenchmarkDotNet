@@ -7,8 +7,6 @@ using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal static class RunnableReflectionHelpers
@@ -35,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             {
                 var implicitOp = GetImplicitConversionOpFromTo(value.GetType(), targetType);
                 if (implicitOp != null)
-                    return implicitOp.Invoke(null, [value]);
+                    return implicitOp.Invoke(null, [value])!;
             }
 
             return value;

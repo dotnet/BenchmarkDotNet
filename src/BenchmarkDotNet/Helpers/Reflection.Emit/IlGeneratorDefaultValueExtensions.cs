@@ -35,14 +35,14 @@ internal static class IlGeneratorDefaultValueExtensions
                 break;
             case Type t when t.IsClass || t.IsInterface:
                 ilBuilder.Emit(OpCodes.Ldnull);
-                ilBuilder.EmitStloc(optionalLocal);
+                ilBuilder.EmitStloc(optionalLocal!);
                 break;
             case Type t when t.UseInitObjForInitLocal():
-                EmitInitObj(ilBuilder, resultType, optionalLocal);
+                EmitInitObj(ilBuilder, resultType, optionalLocal!);
                 break;
             default:
                 EmitLoadDefaultPrimitive(ilBuilder, resultType);
-                ilBuilder.EmitStloc(optionalLocal);
+                ilBuilder.EmitStloc(optionalLocal!);
                 break;
         }
     }
@@ -142,7 +142,7 @@ internal static class IlGeneratorDefaultValueExtensions
                     // return decimal.Zero;
                     IL_0011: ldsfld valuetype [mscorlib]System.Decimal [mscorlib]System.Decimal::Zero
                  */
-                var zeroField = typeof(decimal).GetField(nameof(decimal.Zero));
+                var zeroField = typeof(decimal).GetField(nameof(decimal.Zero))!;
                 ilBuilder.Emit(OpCodes.Ldsfld, zeroField);
                 break;
             default:

@@ -3,8 +3,6 @@ using System.Diagnostics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserActionParameters

@@ -2,8 +2,6 @@
 using System;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 internal abstract class BenchmarkAction

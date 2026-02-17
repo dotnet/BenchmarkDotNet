@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
     internal static class IlGeneratorCallExtensions

@@ -12,8 +12,6 @@ using Perfolizer.Mathematics.Multimodality;
 using Perfolizer.Metrology;
 using Pragmastat.Metrology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Columns
 {
     public interface IStatisticColumn : IColumn

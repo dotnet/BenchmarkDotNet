@@ -3,8 +3,6 @@ using BenchmarkDotNet.Order;
 using System;
 using System.Collections.Generic;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Jobs
 {
     internal class JobComparer : IComparer<Job>, IEqualityComparer<Job>

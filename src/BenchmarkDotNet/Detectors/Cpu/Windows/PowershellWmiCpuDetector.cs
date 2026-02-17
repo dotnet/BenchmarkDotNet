@@ -32,7 +32,7 @@ internal class PowershellWmiCpuDetector : ICpuDetector
                                $"{WmicCpuInfoKeyNames.NumberOfLogicalProcessors}, " +
                                $"{WmicCpuInfoKeyNames.MaxClockSpeed}";
 
-        string output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
+        string? output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
             "Get-CimInstance Win32_Processor -Property " + argList);
 
         if (output.IsBlank())

@@ -26,7 +26,7 @@ internal static class InProcessEmitRunner
         {
             var runnableType = ((InProcessEmitArtifactsPath) parameters.BuildResult.ArtifactsPaths)
                 .GeneratedAssembly
-                .GetType(EmittedTypePrefix + parameters.BenchmarkId);
+                .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
 
             await RunCore(runnableType, host, parameters);
 
@@ -60,7 +60,7 @@ internal static class InProcessEmitRunner
     {
         var benchmarkCase = parameters.BenchmarkCase;
 
-        var instance = Activator.CreateInstance(runnableType);
+        var instance = Activator.CreateInstance(runnableType)!;
         FillMembers(instance, benchmarkCase);
 
         host.WriteLine();
@@ -111,12 +111,12 @@ internal static class InProcessEmitRunner
         };
 
         var results = await job
-            .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)
+            .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
             .Create(engineParameters)
             .RunAsync();
         host.ReportResults(results);
 
-        runnableType.GetMethod(TrickTheJitCoreMethodName).Invoke(instance, []);
+        runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
 
         await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine);
     }

@@ -11,8 +11,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider(BenchmarkCase benchmark)

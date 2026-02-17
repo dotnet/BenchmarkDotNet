@@ -14,8 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Diagnosers;
 
 public abstract class SnapshotProfilerBase : IProfiler

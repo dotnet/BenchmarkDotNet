@@ -11,8 +11,6 @@ using BenchmarkDotNet.Portability;
 using Microsoft.Diagnostics.NETCore.Client;
 using BenchmarkDotNet.Extensions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Disassemblers
 {
     internal abstract class ClrMdDisassembler

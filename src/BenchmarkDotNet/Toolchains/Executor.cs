@@ -22,8 +22,6 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains
 {
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]

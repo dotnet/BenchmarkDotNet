@@ -4,8 +4,6 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     /// <summary>

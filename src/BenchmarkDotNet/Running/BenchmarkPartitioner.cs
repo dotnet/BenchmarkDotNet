@@ -5,8 +5,6 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     public static class BenchmarkPartitioner

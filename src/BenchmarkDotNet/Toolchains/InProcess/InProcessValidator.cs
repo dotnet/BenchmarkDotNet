@@ -12,8 +12,6 @@ using BenchmarkDotNet.Validators;
 
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>

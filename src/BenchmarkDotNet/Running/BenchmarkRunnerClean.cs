@@ -29,8 +29,6 @@ using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Running
 {
     internal static class BenchmarkRunnerClean

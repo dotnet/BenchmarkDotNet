@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig()
+#pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
             => ManualConfig.CreateEmpty()
                 .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
@@ -70,6 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithIterationCount(1)) // single iteration is enough for us
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(ExceptionDiagnoser.Default);
+#pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
 
         private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {

@@ -10,8 +10,6 @@ using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Exporters
 {
     public static class FullNameProvider

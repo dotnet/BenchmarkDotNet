@@ -37,10 +37,10 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
     private readonly SynchronizationContext? previousContext;
     private readonly object syncRoot = new();
     // Use 2 arrays to reduce lock contention while executing. The common case is only 1 callback will be queued at a time.
-    private (SendOrPostCallback d, object? state)[] queue = new (SendOrPostCallback d, object? state)[1];
-    private (SendOrPostCallback d, object? state)[] executing = new (SendOrPostCallback d, object? state)[1];
+    private (SendOrPostCallback d, object? state)[]? queue = new (SendOrPostCallback d, object? state)[1];
+    private (SendOrPostCallback d, object? state)[]? executing = new (SendOrPostCallback d, object? state)[1];
     private int queueCount = 0;
-    volatile private bool isCompleted;
+    private bool isCompleted;
 
     internal BenchmarkDotNetSynchronizationContext(SynchronizationContext? previousContext)
     {
@@ -59,7 +59,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             ThrowIfDisposed();
 
             int index = queueCount;
-            if (++queueCount > queue.Length)
+            if (++queueCount > queue!.Length)
             {
                 Array.Resize(ref queue, queue.Length * 2);
             }
@@ -82,7 +82,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
             // Flush any remaining posted callbacks.
             count = queueCount;
             queueCount = 0;
-            executing = queue;
+            executing = queue!;
             queue = null;
         }
         this.executing = null;
@@ -121,7 +121,7 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
 
                 count = queueCount;
                 queueCount = 0;
-                executing = queue;
+                executing = queue!;
                 queue = this.executing;
 
                 if (count == 0)

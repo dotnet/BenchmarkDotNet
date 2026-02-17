@@ -8,8 +8,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class AppConfigGenerator

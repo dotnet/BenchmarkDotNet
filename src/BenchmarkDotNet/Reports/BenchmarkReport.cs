@@ -12,8 +12,6 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Models;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public sealed class BenchmarkReport

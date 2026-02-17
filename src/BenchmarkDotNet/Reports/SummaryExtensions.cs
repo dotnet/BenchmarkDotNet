@@ -6,8 +6,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Reports
 {
     public static class SummaryExtensions

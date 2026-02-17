@@ -16,10 +16,10 @@ internal static class DynamicAwaitHelper
             return (true, value);
         }
 
-        var getAwaiterMethod = valueType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance);
+        var getAwaiterMethod = valueType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!;
         var awaiterType = getAwaiterMethod.ReturnType;
-        var getResultMethod = awaiterType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance);
-        var result = await new DynamicAwaitable(getAwaiterMethod, awaiterType, getResultMethod, value);
+        var getResultMethod = awaiterType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!;
+        var result = await new DynamicAwaitable(getAwaiterMethod, awaiterType, getResultMethod, value!);
         return (getResultMethod.ReturnType != typeof(void), result);
     }
 
@@ -29,12 +29,12 @@ internal static class DynamicAwaitHelper
             => new(awaiterType, getResultMethod, getAwaiterMethod.Invoke(awaitable, null));
     }
 
-    private readonly struct DynamicAwaiter(Type awaiterType, MethodInfo getResultMethod, object awaiter) : ICriticalNotifyCompletion
+    private readonly struct DynamicAwaiter(Type awaiterType, MethodInfo getResultMethod, object? awaiter) : ICriticalNotifyCompletion
     {
         public bool IsCompleted
-            => awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance).GetMethod.Invoke(awaiter, null) is true;
+            => awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!.Invoke(awaiter, null) is true;
 
-        public object GetResult()
+        public object? GetResult()
             => getResultMethod.Invoke(awaiter, null);
 
         public void OnCompleted(Action continuation)

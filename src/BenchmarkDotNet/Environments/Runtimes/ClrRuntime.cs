@@ -4,8 +4,6 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Environments
 {
     public class ClrRuntime : Runtime, IEquatable<ClrRuntime>

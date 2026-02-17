@@ -9,8 +9,6 @@ using Perfolizer.Horology;
 
 // ReSharper disable UnusedMember.Global
 
-#nullable enable
-
 namespace BenchmarkDotNet.Exporters.Xml
 {
     internal class SummaryDto

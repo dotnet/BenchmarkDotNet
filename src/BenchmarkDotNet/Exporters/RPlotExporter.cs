@@ -10,8 +10,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Exporters
 {
     public class RPlotExporter : IExporter, IExporterDependencies

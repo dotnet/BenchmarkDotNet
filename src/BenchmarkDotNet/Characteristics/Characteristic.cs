@@ -2,8 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Characteristics
 {
     public abstract class Characteristic
@@ -96,7 +94,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public bool HasChildCharacteristics => IsCharacteristicObjectSubclass(CharacteristicType);
 
-        internal virtual object? ResolveValueCore(CharacteristicObject obj, object currentValue) =>
+        internal virtual object? ResolveValueCore(CharacteristicObject obj, object? currentValue) =>
             ReferenceEquals(currentValue, EmptyValue) ? FallbackValue : currentValue;
 
         public override string ToString() => Id;

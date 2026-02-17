@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions

@@ -7,8 +7,6 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
-#nullable enable
-
 internal static class WmicCpuInfoParser
 {
     /// <summary>

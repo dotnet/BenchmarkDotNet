@@ -6,8 +6,6 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.macOS;
 
-#nullable enable
-
 internal static class SysctlCpuInfoParser
 {
     private static class Sysctl

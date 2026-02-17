@@ -13,8 +13,6 @@ using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableCo
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
-#nullable enable
-
 partial class RunnableEmitter
 {
     // TODO: update this to support runtime-async.

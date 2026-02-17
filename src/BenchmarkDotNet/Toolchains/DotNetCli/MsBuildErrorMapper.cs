@@ -5,8 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     internal static class MsBuildErrorMapper

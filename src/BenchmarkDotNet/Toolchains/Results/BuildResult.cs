@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
-
-#nullable enable
 
 namespace BenchmarkDotNet.Toolchains.Results
 {
@@ -33,6 +32,6 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Failure");
 
-        internal bool TryToExplainFailureReason(out string? reason) => MsBuildErrorMapper.TryToExplainFailureReason(this, out reason);
+        internal bool TryToExplainFailureReason([NotNullWhen(true)] out string? reason) => MsBuildErrorMapper.TryToExplainFailureReason(this, out reason);
     }
 }

@@ -2,8 +2,6 @@
 using System.IO;
 using System.Reflection;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Helpers
 {
     internal static class ResourceHelper

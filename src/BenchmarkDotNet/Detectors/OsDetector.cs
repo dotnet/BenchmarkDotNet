@@ -10,8 +10,6 @@ using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using System.Runtime.Versioning;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Detectors;
 
 public class OsDetector

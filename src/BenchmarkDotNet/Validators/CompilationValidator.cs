@@ -8,8 +8,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Validators
 {
     public class CompilationValidator : IValidator

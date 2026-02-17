@@ -55,13 +55,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         private static Process CreateProcess(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
         {
             WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
-            string mainJs = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.js";
+            const string mainJs = "benchmark-main.mjs";
 
             var start = new ProcessStartInfo
             {
                 FileName = runtime.JavaScriptEngine,
                 Arguments = $"{runtime.JavaScriptEngineArguments} {mainJs} -- --run {artifactsPaths.ProgramName}.dll {args} ",
-                WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "AppBundle"),
+                WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "wwwroot"),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = false, // not supported by WASM!

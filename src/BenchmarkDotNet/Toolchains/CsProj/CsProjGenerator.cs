@@ -18,8 +18,6 @@ using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
@@ -45,10 +43,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         public string RuntimeFrameworkVersion { get; }
 
-        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion, bool isNetCore = true)
+        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion = "", bool isNetCore = true)
             : base(targetFrameworkMoniker, cliPath, packagesPath, isNetCore)
         {
-            RuntimeFrameworkVersion = runtimeFrameworkVersion;
+            RuntimeFrameworkVersion = runtimeFrameworkVersion.EnsureNotNull();
         }
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
@@ -74,10 +72,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             string projectFilePath = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, NullLogger.Instance).FullName;
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, projectFilePath, TargetFrameworkMoniker)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
+                .AppendLine($"call {CliPath} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -154,7 +152,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 CliPath,
                 gathererProject,
                 TargetFrameworkMoniker,
-                null,
+                arguments: "",
                 GenerateResult.Success(artifactsPaths, []),
                 logger,
                 buildPartition,
