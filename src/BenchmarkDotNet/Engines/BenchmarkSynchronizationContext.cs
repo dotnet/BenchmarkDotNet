@@ -110,19 +110,35 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         var spinner = new SpinWait();
         while (true)
         {
-            if (isCompleted)
-            {
-                return awaiter.GetResult();
-            }
-
             int count;
             (SendOrPostCallback d, object? state)[] executing;
             lock (syncRoot)
             {
+                if (isCompleted)
+                {
+                    return awaiter.GetResult();
+                }
+
                 count = queueCount;
                 queueCount = 0;
                 executing = queue;
                 queue = this.executing;
+
+                if (count == 0)
+                {
+                    if (spinner.NextSpinWillYield)
+                    {
+                        // Yield the thread and wait for completion or for a posted callback.
+                        // Thread-safety note: isCompleted and queueCount must be checked inside the lock body
+                        // before calling Monitor.Wait to avoid missing the pulse and waiting forever.
+                        Monitor.Wait(syncRoot);
+                        goto ResetAndContinue;
+                    }
+                    else
+                    {
+                        goto SpinAndContinue;
+                    }
+                }
             }
             this.executing = executing;
             for (int i = 0; i < count; ++i)
@@ -131,31 +147,13 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
                 executing[i] = default;
                 d(state);
             }
-            if (count > 0)
-            {
-                // Reset spinner after any posted callback is executed.
-                spinner = new();
-                continue;
-            }
 
-            if (!spinner.NextSpinWillYield)
-            {
-                spinner.SpinOnce();
-                continue;
-            }
-
-            // Yield the thread and wait for completion or for a posted callback.
-            lock (syncRoot)
-            {
-                // Check again inside the lock so we won't miss the pulse from a race condition and wait forever.
-                if (isCompleted)
-                {
-                    return awaiter.GetResult();
-                }
-                Monitor.Wait(syncRoot);
-            }
-            // Reset the spinner.
+        ResetAndContinue:
             spinner = new();
+            continue;
+
+        SpinAndContinue:
+            spinner.SpinOnce();
         }
     }
 
