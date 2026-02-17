@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests
             }
 
             [ParamsSource(nameof(Values))]
-            public object O { get; set; } = default!;
+            public required object O { get; set; }
 
             [Benchmark]
             public object FooBar() => O;

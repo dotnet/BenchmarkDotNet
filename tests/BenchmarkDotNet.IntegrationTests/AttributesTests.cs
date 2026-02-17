@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [CustomParams(ExpectedNumber)]
             public int Number;
 
-            public string Text = default!;
+            public required string Text;
 
             [CustomGlobalSetup]
             public void Setup()

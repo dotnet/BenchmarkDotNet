@@ -206,10 +206,10 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithComplexTypesReturnedFromSources
         {
             [ParamsSource(nameof(DictionaryAsParam))]
-            public Dictionary<int, string> DictionaryParamInstance = default!;
+            public required Dictionary<int, string> DictionaryParamInstance;
 
             [ParamsSource(nameof(SameButStatic))]
-            public Dictionary<int, string> DictionaryParamStatic = default!;
+            public required Dictionary<int, string> DictionaryParamStatic;
 
             [Benchmark]
             [ArgumentsSource(nameof(NonPrimitive))]
@@ -1072,10 +1072,10 @@ namespace BenchmarkDotNet.IntegrationTests
             public int ParamTwo { get; set; }
 
             [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeMethod))]
-            public Version ParamThree { get; set; } = default!;
+            public required Version ParamThree { get; set; }
 
             [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeProperty))]
-            public Version ParamFour { get; set; } = default!;
+            public required Version ParamFour { get; set; }
 
             [Benchmark]
             public void Test()
@@ -1146,7 +1146,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class Perf_Regex_Industry_RustLang_Sherlock
         {
             [Params(@"[""'][^""']{0,30}[?!.][""']")]
-            public string Pattern { get; set; } = default!;
+            public required string Pattern { get; set; }
 
             [Benchmark]
             public int Consume() => Pattern.Length;
@@ -1164,7 +1164,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetDisposables))]
-            public Disposable used = default!;
+            public required Disposable used;
 
             [Benchmark]
             public void CheckDisposed()

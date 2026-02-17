@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(StringValues))]
-            public string _ { get; set; }
+            public required string _ { get; set; }
 
             [Benchmark]
             public void Method() { }
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class PrivateClassWithPublicInterface
         {
-            public static IEnumerable<ITargetInterface> GetSource()
+            public static IEnumerable<ITargetInterface?> GetSource()
             {
                 yield return null;
                 yield return new NonPublicSource(1);
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetSource))]
-            public ITargetInterface ParamsTarget { get; set; }
+            public required ITargetInterface? ParamsTarget { get; set; }
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Data ?? 0;
@@ -101,16 +101,16 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class PrivateClassWithPublicInterface_Array
         {
-            public IEnumerable<ITargetInterface[]> GetSource()
+            public IEnumerable<ITargetInterface?[]?> GetSource()
             {
                 yield return null;
                 yield return Array.Empty<NonPublicSource>();
-                yield return new NonPublicSource[] { null! };
+                yield return new NonPublicSource?[] { null };
                 yield return new[] { new NonPublicSource(1), new NonPublicSource(2) };
             }
 
             [ParamsSource(nameof(GetSource))]
-            public ITargetInterface[] ParamsTarget { get; set; }
+            public required ITargetInterface[] ParamsTarget { get; set; }
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Sum(p => p?.Data ?? 0) ?? 0;
@@ -121,9 +121,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class PrivateClassWithPublicInterface_Enumerable
         {
-            public IEnumerable<IEnumerable<ITargetInterface>> GetSource()
+            public IEnumerable<IEnumerable<ITargetInterface?>?> GetSource()
             {
-                static IEnumerable<ITargetInterface> YieldNull() { yield return null; }
+                static IEnumerable<ITargetInterface?> YieldNull() { yield return null; }
                 yield return null;
                 yield return Enumerable.Empty<NonPublicSource>();
                 yield return YieldNull();
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetSource))]
-            public IEnumerable<ITargetInterface> ParamsTarget { get; set; }
+            public required IEnumerable<ITargetInterface?>? ParamsTarget { get; set; }
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Sum(p => p?.Data ?? 0) ?? 0;
@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class PrivateClassWithPublicInterface_AsObject
         {
-            public static IEnumerable<object> GetSource()
+            public static IEnumerable<object?> GetSource()
             {
                 yield return null;
                 yield return new NonPublicSource(1);
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetSource))]
-            public ITargetInterface ParamsTarget { get; set; }
+            public required ITargetInterface? ParamsTarget { get; set; }
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Data ?? 0;
@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Data { get; }
             public PublicSource(int data) => Data = data;
             // op_Implicit would be meaningless because codegen wouldn't have to do anything.
-            public static explicit operator TargetType(PublicSource @this) => @this != null ? new TargetType(@this.Data) : null;
+            public static explicit operator TargetType?(PublicSource @this) => @this != null ? new TargetType(@this.Data) : null;
             public override string ToString() => "src " + Data.ToString();
         }
 
@@ -177,15 +177,15 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class SourceWithExplicitCastToTarget
         {
-            public static IEnumerable<PublicSource> GetSource()
+            public static IEnumerable<PublicSource?> GetSource()
             {
-                yield return null!;
+                yield return null;
                 yield return new PublicSource(1);
                 yield return new PublicSource(2);
             }
 
             [ParamsSource(nameof(GetSource))]
-            public TargetType ParamsTarget { get; set; } = default!;
+            public required TargetType? ParamsTarget { get; set; }
 
             [Benchmark]
             public int Benchmark() => ParamsTarget?.Data ?? 0;

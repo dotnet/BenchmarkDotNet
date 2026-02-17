@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class InvalidFileNamesInParams
         {
             [Params("/\\@#$%")]
-            public string Field = default!;
+            public required string Field;
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine("// " + Field);
@@ -112,18 +112,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class CompileSpecialCharactersInString
         {
-            [Params("\0")] public string Null = default!;
-            [Params("\t")] public string Tab = default!;
-            [Params("\n")] public string NewLine = default!;
-            [Params("\\")] public string Slash = default!;
-            [Params("\"")] public string Quote = default!;
-            [Params("\u0061")] public string Unicode = default!;
-            [Params("{")] public string Bracket = default!;
+            [Params("\0")] public required string Null;
+            [Params("\t")] public required string Tab;
+            [Params("\n")] public required string NewLine;
+            [Params("\\")] public required string Slash;
+            [Params("\"")] public required string Quote;
+            [Params("\u0061")] public required string Unicode;
+            [Params("{")] public required string Bracket;
 
-            [Params("\n \0 \n")] public string Combo = default!;
+            [Params("\n \0 \n")] public required string Combo;
 
-            [Params("C:\\file1.txt")] public string Path1 = default!;
-            [Params(@"C:\file2.txt")] public string Path2 = default!;
+            [Params("C:\\file1.txt")] public required string Path1;
+            [Params(@"C:\file2.txt")] public required string Path2;
 
             [Benchmark]
             public void Benchmark()
@@ -166,7 +166,7 @@ namespace BenchmarkDotNet.IntegrationTests
             private const string Json = "{ \"message\": \"Hello, World!\" }";
 
             [Params(Json)]
-            public string Field;
+            public required string Field;
 
             [Benchmark]
             [Arguments(Json)]
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArray
         {
             [Params(new[] { 0, 1, 2 })]
-            public int[] Array = default!;
+            public required int[] Array;
 
             [Benchmark]
             public void AcceptingArray()

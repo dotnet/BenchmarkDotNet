@@ -266,16 +266,15 @@ namespace BenchmarkDotNet.IntegrationTests
             var typeBuilder = moduleBuilder.DefineType("MockType", TypeAttributes.Public);
             typeBuilder.CreateType();
 
-            Summary[] summaries = null!;
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
-                summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
                 Assert.Contains(GetAssemblylValidationError(assemblyBuilder), logger.GetLog());
             }
             else
             {
-                summaries = BenchmarkRunner.Run(assemblyBuilder, null, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, null, args);
                 var summary = summaries[0];
                 Assert.True(summary.HasCriticalValidationErrors);
                 Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());

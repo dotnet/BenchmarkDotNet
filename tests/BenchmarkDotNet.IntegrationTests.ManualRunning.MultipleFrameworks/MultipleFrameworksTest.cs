@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     {
         private const string TfmEnvVarName = "TfmEnvVarName";
 
-        public MultipleFrameworksTest(ITestOutputHelper output) :base(output)
+        public MultipleFrameworksTest(ITestOutputHelper output) : base(output)
         {
         }
 

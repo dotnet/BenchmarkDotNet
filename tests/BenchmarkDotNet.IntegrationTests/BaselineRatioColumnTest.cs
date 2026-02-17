@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Long different parameters with equal length but different values
             [Params("12345ThisIsALongParameter54321", "12345ThisIsARongParameter54321")]
-            public string LongStringParamProperty { get; set; } = default!;
+            public required string LongStringParamProperty { get; set; }
 
             [Benchmark(Baseline = true)]
             public void BenchmarkSlow() => Thread.Sleep(20);
