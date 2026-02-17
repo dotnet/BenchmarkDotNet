@@ -32,8 +32,8 @@ public abstract class SourceCode
 
 public sealed class Sharp : SourceCode
 {
-    public string Text { get; set; } = default!;
-    public string FilePath { get; set; } = default!;
+    public required string Text { get; set; }
+    public required string FilePath { get; set; }
     public int LineNumber { get; set; }
 }
 
