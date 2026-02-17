@@ -159,9 +159,9 @@ namespace BenchmarkDotNet.Tests
         public void StackOnlyTypesWithImplicitCastOperatorAreSupportedAsArguments()
         {
             Assert.True(typeof(Span<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 2, 3 }));
-            Assert.True(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<byte>()));
+            Assert.True(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<byte>() { Array = [] }));
 
-            Assert.False(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<bool>())); // different T
+            Assert.False(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<bool>() { Array = [] })); // different T
 
             Assert.False(typeof(List<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 3, 3 }));
         }
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests
 
         public class WithImplicitCastToStackOnlyStruct<T>
         {
-            public T[] Array = default!;
+            public required T[] Array;
 
             public static implicit operator StackOnlyStruct<T>(WithImplicitCastToStackOnlyStruct<T> instance)
                 => new StackOnlyStruct<T> { Span = instance.Array };
