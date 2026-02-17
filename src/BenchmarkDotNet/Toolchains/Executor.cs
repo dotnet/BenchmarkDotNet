@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
@@ -59,79 +56,72 @@ namespace BenchmarkDotNet.Toolchains
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            var tcplistener = new TcpListener(IPAddress.Loopback, port: 0);
-            try
+            using var tcplistener = new TcpListener();
+            var port = tcplistener.StartAndGetPort();
+
+            string args = benchmarkId.ToArguments(port, diagnoserRunMode);
+
+            using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
+            using ConsoleExitHandler consoleExitHandler = new(process, logger);
+            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+
+            List<string> results;
+            List<string> prefixedOutput;
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener))
             {
-                tcplistener.Start(1);
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
-                string args = benchmarkId.ToArguments(((IPEndPoint) tcplistener.LocalEndpoint).Port, diagnoserRunMode);
+                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
-                using ConsoleExitHandler consoleExitHandler = new(process, logger);
-                using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
-
-                List<string> results;
-                List<string> prefixedOutput;
-                using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener))
+                try
                 {
-                    diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
+                    process.Start();
+                }
+                catch (Win32Exception ex)
+                {
+                    logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
 
-                    logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-                    try
-                    {
-                        process.Start();
-                    }
-                    catch (Win32Exception ex)
-                    {
-                        logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
-
-                        return new ExecuteResult(true, null, null, [], [], [], launchIndex);
-                    }
-
-                    broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
-
-                    processOutputReader.BeginRead();
-
-                    process.EnsureHighPriority(logger);
-                    if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
-                    {
-                        process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
-                    }
-
-                    await broker.ProcessData();
-
-                    results = broker.Results;
-                    prefixedOutput = broker.PrefixedOutput;
+                    return new ExecuteResult(true, null, null, [], [], [], launchIndex);
                 }
 
-                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
-                {
-                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+                broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
 
-                    processOutputReader.CancelRead();
-                    consoleExitHandler.KillProcessTree();
-                }
-                else
+                processOutputReader.BeginRead();
+
+                process.EnsureHighPriority(logger);
+                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
                 {
-                    processOutputReader.StopRead();
+                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                if (results.Any(line => line.Contains("BadImageFormatException")))
-                    logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
+                await broker.ProcessData();
 
-                return new ExecuteResult(true,
-                    process.HasExited ? process.ExitCode : null,
-                    process.Id,
-                    results,
-                    prefixedOutput,
-                    processOutputReader.GetOutputLines(),
-                    launchIndex);
+                results = broker.Results;
+                prefixedOutput = broker.PrefixedOutput;
             }
-            finally
+
+            if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {
-                tcplistener.Stop();
+                logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+
+                processOutputReader.CancelRead();
+                consoleExitHandler.KillProcessTree();
             }
+            else
+            {
+                processOutputReader.StopRead();
+            }
+
+            if (results.Any(line => line.Contains("BadImageFormatException")))
+                logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
+
+            return new ExecuteResult(true,
+                process.HasExited ? process.ExitCode : null,
+                process.Id,
+                results,
+                prefixedOutput,
+                processOutputReader.GetOutputLines(),
+                launchIndex);
         }
 
         private static ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)

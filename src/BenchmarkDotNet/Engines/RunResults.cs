@@ -67,15 +67,15 @@ namespace BenchmarkDotNet.Engines
                 yield return measurement;
         }
 
-        public void Print(TextWriter outWriter)
+        internal void Print(IHost host)
         {
             foreach (var measurement in GetWorkloadResultMeasurements())
-                outWriter.WriteLine(measurement.ToString());
+                host.WriteLine(measurement.ToString());
 
             if (!GCStats.Equals(GcStats.Empty))
-                outWriter.WriteLine(GCStats.ToOutputLine());
+                host.WriteLine(GCStats.ToOutputLine());
 
-            outWriter.WriteLine();
+            host.WriteLine();
         }
 
         // TODO: improve

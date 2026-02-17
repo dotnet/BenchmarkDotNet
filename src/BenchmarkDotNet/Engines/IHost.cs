@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines;
 
@@ -11,8 +12,8 @@ public interface IHost : IDisposable
     void WriteLine();
     void WriteLine(string message);
 
-    void SendSignal(HostSignal hostSignal);
-    void SendError(string message);
+    ValueTask SendSignalAsync(HostSignal hostSignal);
 
+    void SendError(string message);
     void ReportResults(RunResults runResults);
 }

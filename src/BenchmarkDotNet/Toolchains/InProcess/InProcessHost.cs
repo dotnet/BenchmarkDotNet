@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -70,7 +70,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
-        public void SendSignal(HostSignal hostSignal) => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
+        public async ValueTask SendSignalAsync(HostSignal hostSignal)
+            => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
 
         public void SendError(string message) => logger.WriteLine(LogKind.Error, $"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
@@ -80,14 +81,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             RunResults = runResults;
 
-            using (var w = new StringWriter())
-            {
-                runResults.Print(w);
-                logger.Write(w.GetStringBuilder().ToString());
-            }
+            runResults.Print(this);
         }
 
-        // Keep in sync with Broker and WasmExecutor.
+        // Keep in sync with Broker.
         internal void HandleInProcessDiagnoserResults(BenchmarkCase benchmarkCase, CompositeInProcessDiagnoser compositeInProcessDiagnoser)
         {
             var linesEnumerator = inProcessDiagnoserLines.GetEnumerator();

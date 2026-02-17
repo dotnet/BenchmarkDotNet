@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
@@ -30,11 +31,8 @@ namespace BenchmarkDotNet.Running
 
         public override int GetHashCode() => Value;
 
-        public string ToArguments(Diagnosers.RunMode diagnoserRunMode)
-            => $"--benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --diagnoserRunMode {(int) diagnoserRunMode} --benchmarkId {Value}";
-
         public string ToArguments(int port, Diagnosers.RunMode diagnoserRunMode)
-            => $"{TcpHost.TcpPortDescriptor} {port} {ToArguments(diagnoserRunMode)}";
+            => $"{IpcHelper.PortDescriptor} {port} --benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --diagnoserRunMode {(int) diagnoserRunMode} --benchmarkId {Value}";
 
         public override string ToString() => Value.ToString();
 

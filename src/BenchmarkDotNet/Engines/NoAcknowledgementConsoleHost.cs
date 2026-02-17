@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Validators;
 
@@ -22,14 +23,14 @@ internal sealed class NoAcknowledgementConsoleHost : IHost
     public void WriteLine(string message)
         => outWriter.WriteLine(message);
 
-    public void SendSignal(HostSignal hostSignal)
+    public async ValueTask SendSignalAsync(HostSignal hostSignal)
         => WriteLine(Engine.Signals.ToMessage(hostSignal));
 
     public void SendError(string message)
         => WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
     public void ReportResults(RunResults runResults)
-        => runResults.Print(outWriter);
+        => runResults.Print(this);
 
     public void Dispose()
     {

@@ -11,40 +11,44 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     internal class WasmExecutor : IExecutor
     {
-        public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
-            var executeResult = !File.Exists(exePath)
-                ? ExecuteResult.CreateFailed()
-                : Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+            if (!File.Exists(exePath))
+            {
+                return ExecuteResult.CreateFailed();
+            }
+
+            return await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                 executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
                 executeParameters.DiagnoserRunMode);
-            return new ValueTask<ExecuteResult>(executeResult);
         }
 
-        private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+        private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Loggers.ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
+            using var webSocketListener = new WebSocketListener();
+            var port = await webSocketListener.StartAndGetPortAsync();
             try
             {
-                using Process process = CreateProcess(benchmarkCase, artifactsPaths, benchmarkId.ToArguments(diagnoserRunMode), resolver);
+                using Process process = CreateProcess(benchmarkCase, artifactsPaths, benchmarkId.ToArguments(port, diagnoserRunMode), resolver);
                 using ConsoleExitHandler consoleExitHandler = new(process, logger);
                 using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
-                return Execute(process, benchmarkCase, processOutputReader, logger, consoleExitHandler, launchIndex, compositeInProcessDiagnoser);
+                return await Execute(process, benchmarkCase, processOutputReader,
+                    benchmarkId, logger, consoleExitHandler, launchIndex, diagnoser,
+                    compositeInProcessDiagnoser, webSocketListener);
             }
             finally
             {
@@ -74,18 +78,34 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             return new Process() { StartInfo = start };
         }
 
-        private static ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
-            ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, CompositeInProcessDiagnoser compositeInProcessDiagnoser)
+        private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
+            BenchmarkId benchmarkId, Loggers.ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, IDiagnoser? diagnoser,
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser, WebSocketListener webSocketListener)
         {
-            logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-            process.Start();
-            processOutputReader.BeginRead();
-
-            process.EnsureHighPriority(logger);
-            if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+            List<string> results;
+            List<string> prefixedOutput;
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, webSocketListener))
             {
-                process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+
+                process.Start();
+
+                diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+
+                processOutputReader.BeginRead();
+
+                process.EnsureHighPriority(logger);
+                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+                {
+                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
+                }
+
+                await broker.ProcessData();
+
+                results = broker.Results;
+                prefixedOutput = broker.PrefixedOutput;
             }
 
             if (!process.WaitForExit(milliseconds: (int)TimeSpan.FromMinutes(10).TotalMilliseconds))
@@ -100,51 +120,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 processOutputReader.StopRead();
             }
 
-            ImmutableArray<string> outputLines = processOutputReader.GetOutputLines();
-            var prefixedLines = new List<string>();
-            var resultLines = new List<string>();
-            var outputEnumerator = outputLines.GetEnumerator();
-            while (outputEnumerator.MoveNext())
-            {
-                var line = outputEnumerator.Current;
-                if (!line.StartsWith("//"))
-                {
-                    resultLines.Add(line);
-                    continue;
-                }
-
-                prefixedLines.Add(line);
-
-                // Keep in sync with Broker and InProcessHost.
-                if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
-                {
-                    // Something like "// InProcessDiagnoser 0 1"
-                    string[] lineItems = line.Split(' ');
-                    int diagnoserIndex = int.Parse(lineItems[2]);
-                    int resultsLinesCount = int.Parse(lineItems[3]);
-                    var resultsStringBuilder = new StringBuilder();
-                    for (int i = 0; i < resultsLinesCount;)
-                    {
-                        // Strip the prepended "// InProcessDiagnoserResults ".
-                        bool movedNext = outputEnumerator.MoveNext();
-                        Debug.Assert(movedNext);
-                        line = outputEnumerator.Current.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
-                        resultsStringBuilder.Append(line);
-                        if (++i < resultsLinesCount)
-                        {
-                            resultsStringBuilder.AppendLine();
-                        }
-                    }
-                    compositeInProcessDiagnoser.DeserializeResults(diagnoserIndex, benchmarkCase, resultsStringBuilder.ToString());
-                }
-            }
-
             return new ExecuteResult(true,
                 process.HasExited ? process.ExitCode : null,
                 process.Id,
-                [.. resultLines],
-                [.. prefixedLines],
-                outputLines,
+                results,
+                prefixedOutput,
+                processOutputReader.GetOutputLines(),
                 launchIndex);
         }
     }

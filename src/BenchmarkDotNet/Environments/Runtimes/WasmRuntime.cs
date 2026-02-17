@@ -39,9 +39,6 @@ namespace BenchmarkDotNet.Environments
         /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
         public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, string wasmDataDir = "", RuntimeMoniker moniker = RuntimeMoniker.Wasm, bool isMonoRuntime = true) : base(moniker, msBuildMoniker, displayName)
         {
-            if (javaScriptEngine.IsNotBlank() && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
-                throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
-
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments;
             Aot = aot;

@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly Process process;
         private readonly CompositeInProcessDiagnoser compositeInProcessDiagnoser;
         private readonly CancellationTokenSource cancellationTokenSource = new();
-        private readonly TcpListener tcpListener;
+        private readonly IpcListener ipcListener;
 
         private enum Result
         {
@@ -31,13 +31,13 @@ namespace BenchmarkDotNet.Loggers
         }
 
         public Broker(ILogger logger, Process process, IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser,
-            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, TcpListener tcpListener)
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IpcListener ipcListener)
         {
             this.logger = logger;
             this.process = process;
             this.Diagnoser = diagnoser;
             this.compositeInProcessDiagnoser = compositeInProcessDiagnoser;
-            this.tcpListener = tcpListener;
+            this.ipcListener = ipcListener;
             DiagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             process.EnableRaisingEvents = true;
@@ -78,30 +78,11 @@ namespace BenchmarkDotNet.Loggers
 
             try
             {
-#if NET6_0_OR_GREATER
-                TcpClient client;
-                using var timeoutCts = new CancellationTokenSource(TcpHost.ConnectionTimeout);
-                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token, timeoutCts.Token);
-                try
-                {
-                    client = await tcpListener.AcceptTcpClientAsync(linkedCts.Token);
-                }
-                catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
-                {
-                    throw new TimeoutException($"The connection to the benchmark process timed out after {TcpHost.ConnectionTimeout}.");
-                }
-                using var _ = client;
-#else
-                using var client = await tcpListener.AcceptTcpClientAsync().WaitAsync(TcpHost.ConnectionTimeout, cancellationTokenSource.Token);
-#endif
-                using var stream = client.GetStream();
-                using CancelableStreamReader reader = new(stream, TcpHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
-                // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
-                using StreamWriter writer = new(stream, TcpHost.UTF8NoBOM, bufferSize: 1) { AutoFlush = true };
+                using var ipcConnection = await ipcListener.AcceptConnection(cancellationTokenSource.Token);
 
                 while (true)
                 {
-                    var line = await reader.ReadLineAsync(cancellationTokenSource.Token);
+                    var line = await ipcConnection.ReadLineAsync(cancellationTokenSource.Token);
 
                     if (line == null)
                         return Result.EndOfStream;
@@ -116,7 +97,7 @@ namespace BenchmarkDotNet.Loggers
                         continue;
                     }
 
-                    // Keep in sync with WasmExecutor and InProcessHost.
+                    // Keep in sync with InProcessHost.
 
                     // Handle line prefixed with "// InProcessDiagnoser "
                     if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
@@ -128,7 +109,7 @@ namespace BenchmarkDotNet.Loggers
                         var resultsStringBuilder = new StringBuilder();
                         for (int i = 0; i < resultsLinesCount;)
                         {
-                            line = await reader.ReadLineAsync(cancellationTokenSource.Token);
+                            line = await ipcConnection.ReadLineAsync(cancellationTokenSource.Token);
 
                             if (line == null)
                                 return Result.EndOfStream;
@@ -153,7 +134,7 @@ namespace BenchmarkDotNet.Loggers
                     {
                         Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
-                        writer.WriteLine(Engine.Signals.Acknowledgment);
+                        await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment);
 
                         if (signal == HostSignal.AfterAll)
                         {

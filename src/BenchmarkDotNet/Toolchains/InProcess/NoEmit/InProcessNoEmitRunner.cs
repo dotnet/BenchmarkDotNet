@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
-            host.BeforeAnythingElse();
+            await host.BeforeAnythingElseAsync();
 
             try
             {
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
             finally
             {
-                host.AfterAll();
+                await host.AfterAllAsync();
             }
         }
 

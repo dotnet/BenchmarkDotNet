@@ -19,11 +19,8 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     /// <summary>
     /// In order to run WasmTests locally, the following prerequisites are required:
-    /// * Install wasm-tools workload: `BenchmarkDotNet/build.cmd install-wasm-tools`
-    /// * Install npm
-    /// * Install v8: `npm install jsvu -g && jsvu --os=default --engines=v8`
-    /// * Add `$HOME/.jsvu/bin` to PATH
-    /// * Run tests using .NET SDK from `BenchmarkDotNet/.dotnet/`
+    /// * Install wasm-tools workload: `dotnet install-wasm-tools-net8`
+    /// * Install Node and add it to PATH
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
@@ -36,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet80, javaScriptEngineArguments: "--expose_wasm --module"))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, moniker: RuntimeMoniker.WasmNet80, javaScriptEngine: "node", javaScriptEngineArguments: ""))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, true);

@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Engines
             {
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    Host.BeforeMainRun();
+                    await Host.BeforeMainRunAsync();
                     await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun);
                 }
 
@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.Engines
 
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    Host.AfterMainRun();
+                    await Host.AfterMainRunAsync();
                     await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun);
                 }
             }
@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.Engines
 
                 await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
-                Host.SendSignal(HostSignal.BeforeExtraIteration);
+                await Host.SendSignalAsync(HostSignal.BeforeExtraIteration);
                 await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration);
 
                 // GC collect before measuring allocations.
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Engines
                 }
 
                 await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration);
-                Host.SendSignal(HostSignal.AfterExtraIteration);
+                await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
 
                 await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
 
