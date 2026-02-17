@@ -155,8 +155,8 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
                 ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the current was used
             Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
-            Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
-            Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
+            Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath?.FullName);
+            Assert.Equal(fakeRestorePackages, toolchain.RestorePath?.FullName);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.FullFrameworkOnly)]
@@ -194,8 +194,8 @@ namespace BenchmarkDotNet.Tests
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
             Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, generator.TargetFrameworkMoniker);
             Assert.Equal(fakeCoreRunPath, coreRunToolchain.SourceCoreRun.FullName);
-            Assert.Equal(fakeDotnetCliPath, coreRunToolchain.CustomDotNetCliPath.FullName);
-            Assert.Equal(fakeRestorePackages, coreRunToolchain.RestorePath.FullName);
+            Assert.Equal(fakeDotnetCliPath, coreRunToolchain.CustomDotNetCliPath?.FullName);
+            Assert.Equal(fakeRestorePackages, coreRunToolchain.RestorePath?.FullName);
 
             CsProjCoreToolchain coreToolchain = (CsProjCoreToolchain)runtimeJob.GetToolchain();
             generator = (DotNetCliGenerator)coreToolchain.Generator;

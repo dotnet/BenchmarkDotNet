@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private const int UnrollFactor = 16;
 
-        private IConfig CreateInProcessConfig(OutputLogger logger)
+        private IConfig CreateInProcessConfig(OutputLogger? logger)
         {
             return new ManualConfig()
                 .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))

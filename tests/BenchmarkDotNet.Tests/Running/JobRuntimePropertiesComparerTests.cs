@@ -102,13 +102,13 @@ namespace BenchmarkDotNet.Tests.Running
             var net5WindowsConfig1 = ManualConfig.Create(DefaultConfig.Instance)
                 .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.From(new Toolchains.DotNetCli.NetCoreAppSettings(
                     targetFrameworkMoniker: "net5.0-windows",
-                    runtimeFrameworkVersion: null,
+                    runtimeFrameworkVersion: null!,
                     name: ".NET 5.0"))));
             // a different INSTANCE of CsProjCoreToolchain that also targets "net5.0-windows"
             var net5WindowsConfig2 = ManualConfig.Create(DefaultConfig.Instance)
                 .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.From(new Toolchains.DotNetCli.NetCoreAppSettings(
                     targetFrameworkMoniker: "net5.0-windows",
-                    runtimeFrameworkVersion: null,
+                    runtimeFrameworkVersion: null!,
                     name: ".NET 5.0"))));
 
             var benchmarksNet5 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), net5Config);

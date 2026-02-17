@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
 
             sut.HandleIterationEvent(0, IterationMode.Overhead, 100); // start but no stop later on
 
-            Assert.Throws<InvalidOperationException>(() => sut.CalculateMetrics(null, Array.Empty<PreciseMachineCounter>()));
+            Assert.Throws<InvalidOperationException>(() => sut.CalculateMetrics(null!, Array.Empty<PreciseMachineCounter>()));
         }
 
         [Fact]
