@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             return sb;
         }
 
-        public override object PayloadValue(int index) => index == 0 ? BenchmarkName : null;
+        public override object? PayloadValue(int index) => index == 0 ? BenchmarkName : null;
 
         protected override void Dispatch() => target?.Invoke(this);
     }

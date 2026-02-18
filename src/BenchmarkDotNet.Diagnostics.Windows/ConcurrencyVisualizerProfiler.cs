@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             // we need to remember process Id because we loose it when the process exits
             if (signal == HostSignal.AfterAll)
-                benchmarkToProcessId[parameters.BenchmarkCase] = parameters.Process.Id;
+                benchmarkToProcessId[parameters.BenchmarkCase] = parameters.ProcessId;
             else if (signal == HostSignal.AfterProcessExit)
                 benchmarkToCvTraceFile[parameters.BenchmarkCase] = CreateCvTraceFile(parameters);
         }
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             kernelKeywords |= KernelTraceEventParser.Keywords.DiskFileIO | KernelTraceEventParser.Keywords.DiskIO | KernelTraceEventParser.Keywords.DiskIOInit;
             kernelKeywords |= KernelTraceEventParser.Keywords.FileIO | KernelTraceEventParser.Keywords.FileIOInit;
 
-            var providers = new (Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)[]
+            var providers = new (Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions? options)[]
             {
                 // following keywords come from decompiled CVCollectionService.exe
                 (ConcurrencyVisualizerMarkersId, TraceEventLevel.Verbose, EtwProfilerConfig.MatchAnyKeywords, new TraceEventProviderOptions { StacksEnabled = false }),

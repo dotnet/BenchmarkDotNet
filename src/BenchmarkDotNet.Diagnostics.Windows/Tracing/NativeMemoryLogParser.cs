@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             long nativeLeakSize = 0;
             long totalAllocation = 0;
 
-            heapParser.HeapTraceAlloc += delegate(HeapAllocTraceData data)
+            heapParser.HeapTraceAlloc += delegate (HeapAllocTraceData data)
             {
                 if (!start)
                 {
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     return;
                 }
 
-                var allocs = lastHeapAllocs;
+                var allocs = lastHeapAllocs!;
                 if (data.HeapHandle != lastHeapHandle)
                 {
                     allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
@@ -152,14 +152,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 }
             };
 
-            heapParser.HeapTraceFree += delegate(HeapFreeTraceData data)
+            heapParser.HeapTraceFree += delegate (HeapFreeTraceData data)
             {
                 if (!start)
                 {
                     return;
                 }
 
-                var allocs = lastHeapAllocs;
+                var allocs = lastHeapAllocs!;
                 if (data.HeapHandle != lastHeapHandle)
                 {
                     allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 }
             };
 
-            heapParser.HeapTraceReAlloc += delegate(HeapReallocTraceData data)
+            heapParser.HeapTraceReAlloc += delegate (HeapReallocTraceData data)
             {
                 if (!start)
                 {
@@ -187,7 +187,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     return;
                 }
 
-                var allocs = lastHeapAllocs;
+                var allocs = lastHeapAllocs!;
                 if (data.HeapHandle != lastHeapHandle)
                 {
                     allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
@@ -210,7 +210,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 }
             };
 
-            heapParser.HeapTraceDestroy += delegate(HeapTraceData data)
+            heapParser.HeapTraceDestroy += delegate (HeapTraceData data)
             {
                 if (!start)
                 {
@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 }
 
                 // Heap is dying, kill all objects in it.
-                var allocs = lastHeapAllocs;
+                var allocs = lastHeapAllocs!;
                 if (data.HeapHandle != lastHeapHandle)
                 {
                     allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
@@ -275,8 +275,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             };
         }
 
-        private static Dictionary<Address, long> CreateHeapCache(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps,
-            ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
+        private static Dictionary<Address, long> CreateHeapCache(
+            Address heapHandle,
+            Dictionary<Address, Dictionary<Address, long>> heaps,
+            ref Dictionary<Address, long>? lastHeapAllocs,
+            ref Address lastHeapHandle)
         {
             Dictionary<Address, long> ret;
 

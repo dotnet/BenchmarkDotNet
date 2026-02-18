@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
-        private string expectedNamespace;
+        private string expectedNamespace = default!;
 
         public TailCallDiagnoser() { }
 

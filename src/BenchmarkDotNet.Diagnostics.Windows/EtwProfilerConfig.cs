@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> IntervalSelectors { get; }
 
-        public IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> Providers { get; }
+        public IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions? options)> Providers { get; }
 
         public bool CreateHeapSession { get; }
 
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             KernelTraceEventParser.Keywords kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile,
             KernelTraceEventParser.Keywords kernelStackKeywords = KernelTraceEventParser.Keywords.Profile,
             IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>>? intervalSelectors = null,
-            IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)>? providers = null,
+            IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions? options)>? providers = null,
             bool createHeapSession = false)
         {
             CreateHeapSession = createHeapSession;
@@ -59,8 +59,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 { HardwareCounter.BranchMispredictions, _ => 1_000 },
                 { HardwareCounter.CacheMisses, _ => 1_000 }
             };
-            Providers = providers ?? new (Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)[]
-            {
+            Providers = providers ??
+            [
                 // following values come from xunit-performance, were selected by the .NET Runtime Team
                 (ClrTraceEventParser.ProviderGuid, TraceEventLevel.Verbose,
                     (ulong) (ClrTraceEventParser.Keywords.Exception
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                              | ClrTraceEventParser.Keywords.NGen),
                     new TraceEventProviderOptions { StacksEnabled = false }), // stacks are too expensive for our purposes
                 (new Guid("0866B2B8-5CEF-5DB9-2612-0C0FFD814A44"), TraceEventLevel.Informational, MatchAnyKeywords, null) // ArrayPool events
-            };
+            ];
         }
     }
 }

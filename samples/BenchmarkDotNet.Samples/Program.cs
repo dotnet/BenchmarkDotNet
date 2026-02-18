@@ -52,7 +52,7 @@ public class Program
         return config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
                      .AddExporter(MarkdownExporter.Default)
                      .AddValidator(DefaultConfig.Instance.GetValidators().ToArray())
-                     .WithArtifactsPath(DefaultConfig.Instance.ArtifactsPath);
+                     .WithArtifactsPath(DefaultConfig.Instance.ArtifactsPath!);
 #endif
     }
 }

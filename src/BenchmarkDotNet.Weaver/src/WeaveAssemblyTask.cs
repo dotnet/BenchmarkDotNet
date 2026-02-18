@@ -22,7 +22,7 @@ public sealed class WeaveAssemblyTask : Task
     /// The path of the target assembly.
     /// </summary>
     [Required]
-    public string TargetAssembly { get; set; }
+    public required string TargetAssembly { get; set; }
 
     /// <summary>
     /// Runs the weave assembly task.
@@ -98,7 +98,7 @@ public sealed class WeaveAssemblyTask : Task
     private static bool IsBenchmarkAttribute(CustomAttribute attribute)
     {
         // BenchmarkAttribute is unsealed, so we need to walk its hierarchy.
-        for (var attr = attribute.Constructor.DeclaringType; attr != null; attr = attr.Resolve()?.BaseType)
+        for (var attr = attribute.Constructor!.DeclaringType; attr != null; attr = attr.Resolve()?.BaseType)
         {
             if (attr.FullName == "BenchmarkDotNet.Attributes.BenchmarkAttribute")
             {
