@@ -24,6 +24,18 @@ jobs:
           Add-MpPreference -ExclusionPath $env:GITHUB_WORKSPACE
           Add-MpPreference -ExclusionPath $env:TEMP
       - uses: actions/checkout@v6
+      # Setup wasm
+      - name: Set up node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Set up v8
+        run: |
+          npm install jsvu -g
+          jsvu --os=win64 --engines=v8
+          Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
+      - name: Install wasm-tools workload
+        run: ./build.cmd install-wasm-tools
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -59,6 +71,18 @@ jobs:
           Add-MpPreference -ExclusionPath $env:GITHUB_WORKSPACE
           Add-MpPreference -ExclusionPath $env:TEMP
       - uses: actions/checkout@v6
+      # Setup wasm
+      - name: Set up node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Set up v8
+        run: |
+          npm install jsvu -g
+          jsvu --os=win64 --engines=v8
+          Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
+      - name: Install wasm-tools workload
+        run: ./build.cmd install-wasm-tools
       # Build and Test
       - name: Run task 'build'
         shell: cmd
