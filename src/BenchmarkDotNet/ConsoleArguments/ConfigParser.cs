@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 DisassemblerFilters = parseResult.GetValue(CommandLineOptions.DisassemblerFiltersOption) ?? Array.Empty<string>(),
                 DisassemblerDiff = parseResult.GetValue(CommandLineOptions.DisassemblerDiffOption),
                 Outliers = parseResult.GetValue(CommandLineOptions.OutliersOption),
-                WasmArgs = parseResult.GetValue(CommandLineOptions.WasmJavaScriptEngineArgumentsOption),
+                WasmJavaScriptEngineArguments = parseResult.GetValue(CommandLineOptions.WasmJavaScriptEngineArgumentsOption),
                 Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
                 DisplayAllStatistics = parseResult.GetValue(CommandLineOptions.DisplayAllStatisticsOption),
                 StatisticalTestThreshold = parseResult.GetValue(CommandLineOptions.StatisticalTestThresholdOption) ?? "",

@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "Sets the recursive depth for the disassembler. Default is 1.", DefaultValueFactory = _ => 1 };
 
         public static readonly Option<OutlierMode> OutliersOption = new("--outliers")
-        { Description = "Specifies outlier detection mode. Default is DontRemove.", DefaultValueFactory = _ => OutlierMode.DontRemove };
+        { Description = "Specifies outlier detection mode. Default is RemoveUpper.", DefaultValueFactory = _ => OutlierMode.RemoveUpper };
 
         public static readonly Option<string> WasmJavaScriptEngineArgumentsOption = new("--wasmArgs")
         { Description = "Arguments for the javascript engine. The default is \"--expose_wasm\"", DefaultValueFactory = _ => "--expose_wasm" };
@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool RunInProcess { get; set; }
         public DirectoryInfo? ArtifactsDirectory { get; set; }
         public OutlierMode Outliers { get; set; }
-        public string? WasmArgs { get; set; }
+        public string? WasmJavaScriptEngineArguments { get; set; }
         public int? Affinity { get; set; }
         public bool DisplayAllStatistics { get; set; }
         public IEnumerable<string> AllCategories { get; set; } = [];
@@ -218,7 +218,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         public IEnumerable<string> EnvironmentVariables { get; set; } = [];
         public bool MemoryRandomization { get; set; }
         public FileInfo? WasmJavascriptEngine { get; set; }
-        public string? WasmJavaScriptEngineArguments { get; set; }
         public string? CustomRuntimePack { get; set; }
         public FileInfo? AOTCompilerPath { get; set; }
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
