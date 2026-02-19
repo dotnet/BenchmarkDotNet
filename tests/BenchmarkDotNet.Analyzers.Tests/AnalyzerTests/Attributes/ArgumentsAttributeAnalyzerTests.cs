@@ -29,7 +29,7 @@ public class ArgumentsAttributeAnalyzerTests
                     {{emptyArgumentsAttributeUsage}}
                     public void {{benchmarkMethodName}}()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -97,7 +97,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{string.Join("]\n[", ArgumentAttributeUsages.Take(argumentAttributeUsagesListLength))}}]
                     public void BenchmarkMethod()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -113,13 +113,13 @@ public class ArgumentsAttributeAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass
                 {
                     {{string.Join("\n", ArgumentAttributeUsages.Take(argumentAttributeUsagesListLength).Select((a, i) => $"[{{|#{i}:{a}|}}]"))}}
                     public void BenchmarkMethod()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -159,7 +159,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [Benchmark]
                     public void BenchmarkMethod()
                     {
-                                                           
+
                     }
                 }
                 """;
@@ -207,7 +207,7 @@ public class ArgumentsAttributeAnalyzerTests
                     {{argumentsAttributeUsage}}
                     public void {{benchmarkMethodName}}(string a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -232,7 +232,7 @@ public class ArgumentsAttributeAnalyzerTests
                     {{argumentsAttributeUsage}}
                     public void {{benchmarkMethodName}}(string a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -384,7 +384,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [Benchmark]
                     public void BenchmarkMethod()
                     {
-                                                           
+
                     }
                 }
                 """;
@@ -408,7 +408,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
                     public void BenchmarkMethod(int a)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -435,7 +435,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "42")}}]
                     public void BenchmarkMethod(int a)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -460,7 +460,7 @@ public class ArgumentsAttributeAnalyzerTests
                     {{argumentsAttributeUsage}}
                     public void BenchmarkMethod(string a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -487,7 +487,7 @@ public class ArgumentsAttributeAnalyzerTests
                                                                                 """)}}]
                     public void BenchmarkMethod({{parameters}})
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -510,7 +510,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "dummy_literal, true")}}]
                     public void BenchmarkMethod(byte a, bool b)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -537,7 +537,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "typeof(int), typeof(dummy_literal)")}}]
                     public void BenchmarkMethod(System.Type a, System.Type b)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -567,7 +567,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
                     public void BenchmarkMethod({{valueAndType.Value2}} a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -597,7 +597,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
                     public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -618,7 +618,7 @@ public class ArgumentsAttributeAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 namespace DifferentNamespace;
 
                 public class BenchmarkClass
@@ -627,7 +627,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1")}}]
                     public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -648,7 +648,7 @@ public class ArgumentsAttributeAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using DifferentNamespace;
-                                                
+
                 using BenchmarkDotNet.Attributes;
 
                 public class BenchmarkClass
@@ -656,7 +656,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
                     public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -686,7 +686,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(arrayValuesContainerAttributeArgument, "DummyEnumInDifferentNamespace.Value1", $"DummyEnumInDifferentNamespace{(isNullable ? "?" : "")}")}}]
                     public void BenchmarkMethod(DummyEnumInDifferentNamespace{{(isNullable ? "?" : "")}} a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -708,7 +708,7 @@ public class ArgumentsAttributeAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 namespace DifferentNamespace;
 
                 public class BenchmarkClass
@@ -717,7 +717,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
                     public void BenchmarkMethod({{valueAndType.Value2}} a)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -737,7 +737,7 @@ public class ArgumentsAttributeAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using DifferentNamespace;
-                                                
+
                 using BenchmarkDotNet.Attributes;
 
                 public class BenchmarkClass
@@ -746,7 +746,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, valueAndType.Value1)}}]
                     public void BenchmarkMethod({{valueAndType.Value2}} a)
                     {
-                                                                                    
+
                     }
                 }
                 """;
@@ -774,7 +774,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{(explicitCast ? $"({integerValueAndType.Value2})" : "")}{integerValueAndType.Value1}")}}]
                     public void BenchmarkMethod({{integerValueAndType.Value2}} a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -825,7 +825,7 @@ public class ArgumentsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)};" : "")}}
-                                                
+
                     [Benchmark]
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)}}]
                     public void BenchmarkMethod({{valueAndType.Value2}} a)
@@ -860,7 +860,7 @@ public class ArgumentsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     {{(useLocalConstant ? $"private const {type}? _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
-                                                
+
                     [Benchmark]
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}]
                     public void BenchmarkMethod({{type}} a)
@@ -896,7 +896,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, value)}}]
                     public void BenchmarkMethod(int a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -921,7 +921,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "new[] { 0, 1, 2 }")}}]
                     public void BenchmarkMethod(System.Span<int> a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -947,7 +947,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "43, \"test2\"")}}]
                     public void BenchmarkMethod(unkown a, string b)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -977,7 +977,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{valueAndType.Value1}|}}")}}]
                     public void BenchmarkMethod({{expectedArgumentType}} a)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1007,7 +1007,7 @@ public class ArgumentsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)};" : "")}}
-                                                
+
                     [Benchmark]
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)}|}}")}}]
                     public void BenchmarkMethod({{expectedArgumentType}} a)
@@ -1073,7 +1073,7 @@ public class ArgumentsAttributeAnalyzerTests
                     [{{dummyAttributeUsage}}{{string.Format(scalarValuesContainerAttributeArgument, "{|#0:new[] { 0, 1, 2 }|}")}}]
                     public void BenchmarkMethod({{expectedArgumentType}} a)
                     {
-                                                    
+
                     }
                 }
                 """;
