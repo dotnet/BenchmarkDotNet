@@ -17,6 +17,7 @@ then run `build.cmd pack-weaver`.
     <DelaySign>false</DelaySign>
     <!-- Fix error NU5017: Cannot create a package that has no dependencies nor content. -->
     <IsPackable Condition="'$(IsFullPack)' == 'true'">false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +31,13 @@ then run `build.cmd pack-weaver`.
     <Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
     <Content Include="$(OutputPath)**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
     <None Remove="packages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <Import Project="..\..\build\common.targets" />

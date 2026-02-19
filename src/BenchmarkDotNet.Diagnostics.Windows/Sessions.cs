@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal override Session EnableProviders()
         {
-            var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe"));
+            var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process!.StartInfo.FileName, ".exe"));
             TraceEventSession.EnableWindowsHeapProvider(osHeapExe);
             return this;
         }

@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Samples
 
             WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net5.0");
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
-                targetFrameworkMoniker: "net5.0", runtimeFrameworkVersion: null, name: "Wasm",
+                targetFrameworkMoniker: "net5.0", runtimeFrameworkVersion: "", name: "Wasm",
                 customDotNetCliPath: cliPath);
             IToolchain toolChain = WasmToolchain.From(netCoreAppSettings);
 

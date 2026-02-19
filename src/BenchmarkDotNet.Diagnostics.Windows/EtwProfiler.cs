@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
         private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
-        private Session kernelSession, userSession, heapSession;
+        private Session kernelSession = default!;
+        private Session userSession = default!;
+        private Session heapSession = default!;
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public EtwProfiler() : this(new EtwProfilerConfig(performExtraBenchmarksRun: false)) { }

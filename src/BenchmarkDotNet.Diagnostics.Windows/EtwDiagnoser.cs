@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public virtual IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public virtual IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
-        protected TraceEventSession Session { get; private set; }
+        protected TraceEventSession Session { get; private set; } = default!;
 
         protected abstract ulong EventType { get; }
 
@@ -37,8 +37,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Clear();
 
-            BenchmarkToProcess.Add(parameters.BenchmarkCase, parameters.Process.Id);
-            StatsPerProcess.TryAdd(parameters.Process.Id, GetInitializedStats(parameters));
+            BenchmarkToProcess.Add(parameters.BenchmarkCase, parameters.ProcessId);
+            StatsPerProcess.TryAdd(parameters.ProcessId, GetInitializedStats(parameters));
 
             Session = CreateSession(parameters.BenchmarkCase);
 

@@ -31,7 +31,16 @@ namespace BenchmarkDotNet.Samples
 
             public int CompareTo(ComplexParam? other) => other == null ? 1 : Value.CompareTo(other.Value);
 
-            public int CompareTo(object obj) => obj is ComplexParam other ? CompareTo(other) : throw new ArgumentException();
+            public int CompareTo(object? obj)
+            {
+                if (obj == null)
+                    return 1;
+
+                if (obj is not ComplexParam other)
+                    throw new ArgumentException();
+
+                return CompareTo(other);
+            }
         }
     }
 }

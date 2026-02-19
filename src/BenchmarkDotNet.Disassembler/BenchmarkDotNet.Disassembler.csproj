@@ -8,6 +8,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <!-- This project is only used for debugging the disassembler, it's not included in any BenchmarkDotNet packages. -->
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>

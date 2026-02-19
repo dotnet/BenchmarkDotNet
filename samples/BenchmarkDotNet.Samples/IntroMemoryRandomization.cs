@@ -8,8 +8,8 @@ namespace BenchmarkDotNet.Samples
         [Params(512 * 4)]
         public int Size;
 
-        private int[] array;
-        private int[] destination;
+        private int[] array = default!;
+        private int[] destination = default!;
 
         [GlobalSetup]
         public void Setup()
