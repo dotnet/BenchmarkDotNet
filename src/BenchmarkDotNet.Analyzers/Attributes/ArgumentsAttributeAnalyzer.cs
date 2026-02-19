@@ -46,7 +46,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description)));
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_RequiresParameters_Description)));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
