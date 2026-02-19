@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
 #endif
 
             [Benchmark]
-            public object ReturnNullForReferenceType() => null;
+            public object? ReturnNullForReferenceType() => null;
 
             [Benchmark]
             public object ReturnNotNullForReferenceType() => new object();

@@ -65,7 +65,7 @@ public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
     private static int s_order;
 
     private BenchmarkSignal _signal;
-    private string _result;
+    private string _result = default!;
 
     public void Initialize(string? serializedConfig)
     {

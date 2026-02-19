@@ -41,8 +41,8 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value1", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -61,8 +61,8 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value2", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -81,8 +81,8 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value3", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -126,8 +126,8 @@ var summary = new Summary(
                                 new ParameterInstance(new ParameterDefinition("param3", false, ["Parameter 3"], true, typeof(string), 0 ), "value1", SummaryStyle.Default)
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -147,8 +147,8 @@ var summary = new Summary(
                                 new ParameterInstance(new ParameterDefinition("param2", false, ["Parameter 2"], true, typeof(string), 0 ), "value2", SummaryStyle.Default),
                                 new ParameterInstance(new ParameterDefinition("param3", false, ["Parameter 3"], true, typeof(string), 0 ), "value2", SummaryStyle.Default)                            ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -168,8 +168,8 @@ var summary = new Summary(
                                 new ParameterInstance(new ParameterDefinition("param2", false, ["Parameter 2"], true, typeof(string), 0 ), "value3", SummaryStyle.Default),
                                 new ParameterInstance(new ParameterDefinition("param3", false, ["Parameter 3"], true, typeof(string), 0 ), "value3", SummaryStyle.Default)                            ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -208,8 +208,8 @@ var summary = new Summary(
                             Job.Dry,
                             new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null,
-                        null,
+                        null!,
+                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -259,8 +259,8 @@ var summary = new Summary(
                                 Job.Dry,
                                 new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
                                 ImmutableConfigBuilder.Create(new ManualConfig())),
-                            null,
-                            null,
+                            null!,
+                            null!,
                             [
                                 new ExecuteResult([
                                     new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 1, 10.5)

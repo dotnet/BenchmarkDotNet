@@ -44,11 +44,11 @@ namespace BenchmarkDotNet.IntegrationTests
             Output.WriteLine("SnapshotDirectory:" + snapshotDirectory);
             var snapshots = Directory.EnumerateFiles(snapshotDirectory)
                 .Where(filePath => Path.GetExtension(filePath).Equals(".dmw", StringComparison.OrdinalIgnoreCase))
-                .Select(Path.GetFileName)
+                .Select(Path.GetFileName!)
                 .OrderBy(fileName => fileName)
                 .ToList();
             Output.WriteLine("Snapshots:");
-            foreach (string snapshot in snapshots)
+            foreach (var snapshot in snapshots)
                 Output.WriteLine("* " + snapshot);
 
             Assert.Equal(2, snapshots.Count);

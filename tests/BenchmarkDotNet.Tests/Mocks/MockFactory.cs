@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             string.Empty,
             string.Empty,
             TimeSpan.FromMinutes(1),
-            config.CultureInfo,
+            config.CultureInfo ?? DefaultCultureInfo.Instance,
             ImmutableArray<ValidationError>.Empty,
             ImmutableArray<IColumnHidingRule>.Empty,
             config.SummaryStyle);

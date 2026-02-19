@@ -199,7 +199,7 @@ namespace BenchmarkDotNet.Tests.Helpers
         public void LinuxOsReleaseHelperTest(string osReleaseContent, string expectedName)
         {
             string[] lines = osReleaseContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            string actualName = LinuxOsReleaseHelper.GetNameByOsRelease(lines);
+            string? actualName = LinuxOsReleaseHelper.GetNameByOsRelease(lines);
             Assert.Equal(expectedName, actualName);
         }
     }

@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
-            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+            var style = config.SummaryStyle!.WithZeroMetricValuesInContent();
 
             // act
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), double.NaN) };
-            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+            var style = config.SummaryStyle!.WithZeroMetricValuesInContent();
 
             // act
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
@@ -283,8 +283,8 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
             var table = new SummaryTable(summary);
 
-            var lockContentionCount = table.Columns.FirstOrDefault(c => c.Header == "Lock Contentions").Content;
-            var completedWorkItemCount = table.Columns.FirstOrDefault(c => c.Header == "Completed Work Items").Content;
+            var lockContentionCount = table.Columns.First(c => c.Header == "Lock Contentions").Content;
+            var completedWorkItemCount = table.Columns.First(c => c.Header == "Completed Work Items").Content;
 
             // assert
             Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
@@ -310,8 +310,8 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
             var table = new SummaryTable(summary);
 
-            var lockContentionCount = table.Columns.FirstOrDefault(c => c.Header == "Lock Contentions").Content;
-            var completedWorkItemCount = table.Columns.FirstOrDefault(c => c.Header == "Completed Work Items").Content;
+            var lockContentionCount = table.Columns.First(c => c.Header == "Lock Contentions").Content;
+            var completedWorkItemCount = table.Columns.First(c => c.Header == "Completed Work Items").Content;
 
             // assert
             Assert.Equal(new[] { "-", "-" }, lockContentionCount);

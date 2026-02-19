@@ -61,14 +61,14 @@ namespace BenchmarkDotNet.IntegrationTests
                     exporter.ExportToFiles(mockSummary, NullLogger.Instance);
                     Assert.Equal(2, exporter.ExportCount);
                 }
-                var savedFiles = Directory.EnumerateFiles(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath) + "*");
+                var savedFiles = Directory.EnumerateFiles(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath) + "*");
                 Assert.Equal(2, savedFiles.Count());
             }
             finally
             {
                 if (File.Exists(filePath))
                     File.Delete(filePath);
-                var otherFiles = Directory.EnumerateFiles(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath) + "*");
+                var otherFiles = Directory.EnumerateFiles(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath) + "*");
                 foreach (var file in otherFiles)
                     File.Delete(file);
             }
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Summary GetMockSummary(string resultsDirectoryPath, IConfig config, params Type[] typesWithBenchmarks)
+        private Summary GetMockSummary(string resultsDirectoryPath, IConfig? config, params Type[] typesWithBenchmarks)
         {
             return new Summary(
                 title: "bdn-test",
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private ImmutableArray<BenchmarkReport> CreateReports(Type[] types, IConfig? config = null)
             => CreateBenchmarks(types, config).Select(CreateReport).ToImmutableArray();
 
-        private BenchmarkCase[] CreateBenchmarks(Type[] types, IConfig config)
+        private BenchmarkCase[] CreateBenchmarks(Type[] types, IConfig? config)
         {
             return types.SelectMany(type => BenchmarkConverter.TypeToBenchmarks(type, config).BenchmarksCases).ToArray();
         }
@@ -156,10 +156,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             return new BenchmarkReport(success: true,
                                        benchmarkCase: benchmarkCase,
-                                       generateResult: null,
-                                       buildResult: null,
-                                       executeResults: null,
-                                       metrics: null);
+                                       generateResult: null!,
+                                       buildResult: null!,
+                                       executeResults: null!,
+                                       metrics: null!);
         }
     }
 

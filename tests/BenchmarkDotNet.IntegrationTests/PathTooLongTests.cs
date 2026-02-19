@@ -1,10 +1,15 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.XUnit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class PathTooLongTests : BenchmarkTestExecutor
     {
+        public PathTooLongTests(ITestOutputHelper output) : base(output)
+        {
+        }
+
         [FactEnvSpecific("Testing Windows long path limitation", EnvRequirement.WindowsOnly)]
         public void PathTooLongTest() =>
             CanExecute<

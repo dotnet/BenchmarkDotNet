@@ -62,7 +62,7 @@ namespace System.Buffers.Tests
 
         private static T IterateAll(T[] arr)
         {
-            T ret = default;
+            T ret = default!;
             foreach (T item in arr)
             {
                 ret = item;

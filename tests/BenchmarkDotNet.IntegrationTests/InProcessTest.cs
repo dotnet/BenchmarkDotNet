@@ -65,10 +65,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
         // Can't use ref returns in expression, so pass the MethodInfo directly instead.
         [Fact]
-        public void BenchmarkActionByRefTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefType)), UnrollFactor);
+        public void BenchmarkActionByRefTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefType))!, UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionByRefReadonlyValueTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefReadonlyType)), UnrollFactor);
+        public void BenchmarkActionByRefReadonlyValueTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefReadonlyType))!, UnrollFactor);
 
         [Fact]
         public void BenchmarkDifferentPlatformReturnsValidationError()

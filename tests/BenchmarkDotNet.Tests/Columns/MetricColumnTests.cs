@@ -43,10 +43,8 @@ namespace BenchmarkDotNet.Tests.Columns
                 new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
                 ImmutableConfigBuilder.Create(config));
             var metric = new Metric(LocalMetricDescriptor.TimeInstance, metricValue);
-            var benchmarkReport = new BenchmarkReport(true, benchmarkCase, null, null, null, new List<Metric>()
-            {
-                metric
-            });
+            var benchmarkReport = new BenchmarkReport(true, benchmarkCase, null!, null!, null, [metric]);
+
             return new Summary("", new[] { benchmarkReport }.ToImmutableArray(), HostEnvironmentInfo.GetCurrent(),
                 "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
         }
@@ -59,6 +57,10 @@ namespace BenchmarkDotNet.Tests.Columns
             private LocalMetricDescriptor(UnitType unitType)
             {
                 UnitType = unitType;
+
+                Legend = default!;
+                NumberFormat = default!;
+                Unit = default!;
             }
 
             public string Id { get; } = nameof(LocalMetricDescriptor);

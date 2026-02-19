@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
-            var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, null, "Wasm", aotCompilerMode: aotCompilerMode);
+            var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
 
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)

@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllocatingGlobalSetupAndCleanup
         {
-            private List<int> list;
+            private List<int> list = default!;
 
             [Benchmark] public void AllocateNothing() { }
 
@@ -261,7 +261,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // We cache the threads in GlobalSetup and reuse them for each benchmark invocation
             // to avoid measuring the cost of thread start and join, which varies across different runtimes.
-            private Thread[] threads;
+            private Thread[] threads = default!;
             private volatile bool keepRunning = true;
             private readonly Barrier barrier = new(ThreadsCount + 1);
             private readonly CountdownEvent countdownEvent = new(ThreadsCount);
@@ -414,9 +414,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             int GetSize(Type type)
             {
-                var sizeOf = typeof(Unsafe).GetTypeInfo().GetMethod(nameof(Unsafe.SizeOf));
+                var sizeOf = typeof(Unsafe).GetTypeInfo().GetMethod(nameof(Unsafe.SizeOf))!;
 
-                return (int)sizeOf.MakeGenericMethod(type).Invoke(null, null);
+                return (int)sizeOf.MakeGenericMethod(type).Invoke(null, null)!;
             }
 
             return typeof(T)

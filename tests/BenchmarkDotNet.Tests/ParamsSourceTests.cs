@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Tests
 
         public class ParamsSourceWithNull
         {
-            public static IEnumerable<object> Values()
+            public static IEnumerable<object?> Values()
             {
                 yield return null;
                 yield return ValueTuple.Create(10);
@@ -26,10 +26,10 @@ namespace BenchmarkDotNet.Tests
             }
 
             [ParamsSource(nameof(Values))]
-            public object O { get; set; }
+            public required object? O { get; set; }
 
             [Benchmark]
-            public object FooBar() => O;
+            public object? FooBar() => O;
         }
 
         // #2980

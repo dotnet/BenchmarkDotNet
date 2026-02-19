@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
                 && !OsDetector.IsMacOS()) // currently not supported
             {
-                yield return new object[]{ NativeAotToolchain.Net80 };
+                yield return new object[] { NativeAotToolchain.Net80 };
             }
             // TODO: Support InProcessEmitToolchain.Instance
             // yield return new object[] { InProcessEmitToolchain.Instance };
@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public void CompleteOneWorkItem()
             {
                 ManualResetEvent done = new ManualResetEvent(false);
-                ThreadPool.QueueUserWorkItem(m => (m as ManualResetEvent).Set(), done);
+                ThreadPool.QueueUserWorkItem(m => (m as ManualResetEvent)!.Set(), done);
                 done.WaitOne();
             }
 
@@ -113,8 +113,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             private readonly object guard = new object();
 
-            private ManualResetEvent lockTaken;
-            private ManualResetEvent failedToAcquire;
+            private ManualResetEvent lockTaken = default!;
+            private ManualResetEvent failedToAcquire = default!;
 
             [Benchmark]
             public void DoNothing() { }

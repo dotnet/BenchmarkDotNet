@@ -463,8 +463,8 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public void GenerateWarningWhenExporterDependencyAlreadyExistInConfig()
         {
-            System.Globalization.CultureInfo currentCulture = default;
-            System.Globalization.CultureInfo currentUICulture = default;
+            System.Globalization.CultureInfo? currentCulture = default;
+            System.Globalization.CultureInfo? currentUICulture = default;
             {
                 var ct = System.Threading.Thread.CurrentThread;
                 currentCulture = ct.CurrentCulture;

@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Tests.Builders
         private string benchmarkDotNetVersion = "0.10.x-mock";
         private Frequency chronometerFrequency = new Frequency(2531248);
         private string configuration = "CONFIGURATION";
-        private string? dotNetSdkVersion = "1.0.x.mock";
+        private string dotNetSdkVersion = "1.0.x.mock";
         private HardwareTimerKind hardwareTimerKind = HardwareTimerKind.Tsc;
         private bool hasAttachedDebugger = false;
         private bool hasRyuJit = true;
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests.Builders
 
         public HostEnvironmentInfoBuilder WithoutDotNetSdkVersion()
         {
-            dotNetSdkVersion = null;
+            dotNetSdkVersion = "";
             return this;
         }
 
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Tests.Builders
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
             string jitInfo, string jitModules, OsInfo os, CpuInfo cpu,
-            string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
+            string runtimeVersion, VirtualMachineHypervisor? virtualMachineHypervisor)
         {
             Architecture = architecture;
             BenchmarkDotNetVersion = benchmarkDotNetVersion;
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Tests.Builders
             Os = new Lazy<OsInfo>(() => os);
             Cpu = new Lazy<CpuInfo>(() => cpu);
             RuntimeVersion = runtimeVersion;
-            VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor>(() => virtualMachineHypervisor);
+            VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor?>(() => virtualMachineHypervisor);
         }
     }
 }
