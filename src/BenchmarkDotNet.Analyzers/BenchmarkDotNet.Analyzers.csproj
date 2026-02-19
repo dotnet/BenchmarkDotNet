@@ -14,7 +14,6 @@
     <DefineConstants Condition="'$(MccVersion)' >= '3.8'">$(DefineConstants);CODE_ANALYSIS_3_8</DefineConstants>
     <DefineConstants Condition="'$(MccVersion)' >= '4.8'">$(DefineConstants);CODE_ANALYSIS_4_8</DefineConstants>
     <DefineConstants Condition="'$(MccVersion)' >= '5.0'">$(DefineConstants);CODE_ANALYSIS_5_0</DefineConstants>
-    <!-- New equality comparison doesn't exist in v2.8, and we only use the default comparison anyway. -->
     <!-- Formatting in AnalyzerReleases.Unshipped.md -->
     <NoWarn>$(NoWarn);RS2007</NoWarn>
     <!-- Suppress false positives due to a bug in v3.8.0. -->
