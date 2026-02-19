@@ -16,9 +16,10 @@
     <DefineConstants Condition="'$(MccVersion)' >= '5.0'">$(DefineConstants);CODE_ANALYSIS_5_0</DefineConstants>
     <!-- New equality comparison doesn't exist in v2.8, and we only use the default comparison anyway. -->
     <!-- Formatting in AnalyzerReleases.Unshipped.md -->
-    <NoWarn>$(NoWarn);RS1024;RS2007</NoWarn>
+    <NoWarn>$(NoWarn);RS2007</NoWarn>
     <!-- Suppress false positives due to a bug in v3.8.0. -->
     <NoWarn Condition="'$(MccVersion)' == '3.8'">$(NoWarn);RS2002</NoWarn>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <!-- We multi-target for different compiler versions. https://github.com/dotnet/roslyn/discussions/81256#discussioncomment-14975130, https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md#versioning -->
