@@ -25,11 +25,14 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
-using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using BenchmarkDotNet.Toolchains.Mono;
 using Perfolizer.Metrology;
+using System.CommandLine;
+using System.CommandLine.Parsing;
+using System.Runtime.InteropServices;
+using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -73,24 +76,113 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public static (bool isSuccess, IConfig? config, CommandLineOptions? options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
-            (bool isSuccess, IConfig? config, CommandLineOptions? options) result = default;
-
             var (expandSuccess, expandedArgs) = ExpandResponseFile(args, logger);
-            if (!expandSuccess)
-            {
-                return (false, default, default);
-            }
-
+            if (!expandSuccess) return (false, default, default);
             args = expandedArgs;
-            using (var parser = CreateParser(logger))
-            {
-                parser
-                    .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig, args), options) : (false, default, default))
-                    .WithNotParsed(errors => result = (false, default, default));
-            }
 
-            return result;
+            var rootCommand = new RootCommand("BenchmarkDotNet Command Line options");
+
+            rootCommand.Add(CommandLineOptions.BaseJobOption);
+            rootCommand.Add(CommandLineOptions.RuntimesOption);
+            rootCommand.Add(CommandLineOptions.ExportersOption);
+            rootCommand.Add(CommandLineOptions.FiltersOption);
+            rootCommand.Add(CommandLineOptions.AllCategoriesOption);
+            rootCommand.Add(CommandLineOptions.AnyCategoriesOption);
+            rootCommand.Add(CommandLineOptions.AttributeNamesOption);
+            rootCommand.Add(CommandLineOptions.HiddenColumnsOption);
+            rootCommand.Add(CommandLineOptions.MemoryOption);
+            rootCommand.Add(CommandLineOptions.ThreadingOption);
+            rootCommand.Add(CommandLineOptions.ExceptionsOption);
+            rootCommand.Add(CommandLineOptions.DisassemblyOption);
+            rootCommand.Add(CommandLineOptions.DisassemblerDepthOption);
+            rootCommand.Add(CommandLineOptions.DisassemblerFiltersOption);
+            rootCommand.Add(CommandLineOptions.DisassemblerDiffOption);
+            rootCommand.Add(CommandLineOptions.ProfilerOption);
+            rootCommand.Add(CommandLineOptions.DisplayAllStatisticsOption);
+            rootCommand.Add(CommandLineOptions.StatisticalTestThresholdOption);
+            rootCommand.Add(CommandLineOptions.CoreRunPathsOption);
+            rootCommand.Add(CommandLineOptions.CliPathOption);
+            rootCommand.Add(CommandLineOptions.RestorePathOption);
+            rootCommand.Add(CommandLineOptions.ArtifactsDirectoryOption);
+            rootCommand.Add(CommandLineOptions.ClrVersionOption);
+            rootCommand.Add(CommandLineOptions.RunInProcessOption);
+            rootCommand.Add(CommandLineOptions.JoinOption);
+            rootCommand.Add(CommandLineOptions.KeepBenchmarkFilesOption);
+            rootCommand.Add(CommandLineOptions.DontOverwriteResultsOption);
+            rootCommand.Add(CommandLineOptions.StopOnFirstErrorOption);
+            rootCommand.Add(CommandLineOptions.DisableLogFileOption);
+            rootCommand.Add(CommandLineOptions.LogBuildOutputOption);
+            rootCommand.Add(CommandLineOptions.GenerateBinLogOption);
+            rootCommand.Add(CommandLineOptions.ApplesToApplesOption);
+            rootCommand.Add(CommandLineOptions.ResumeOption);
+            rootCommand.Add(CommandLineOptions.TimeoutOption);
+            rootCommand.Add(CommandLineOptions.LaunchCountOption);
+            rootCommand.Add(CommandLineOptions.WarmupCountOption);
+            rootCommand.Add(CommandLineOptions.IterationCountOption);
+            rootCommand.Add(CommandLineOptions.InvocationCountOption);
+            rootCommand.Add(CommandLineOptions.UnrollFactorOption);
+            rootCommand.Add(CommandLineOptions.RunOnceOption);
+            rootCommand.Add(CommandLineOptions.MemoryRandomizationOption);
+            rootCommand.Add(CommandLineOptions.NoForcedGCsOption);
+
+            var parseResult = rootCommand.Parse(args);
+
+            var options = new CommandLineOptions
+            {
+                BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
+                Runtimes = parseResult.GetValue(CommandLineOptions.RuntimesOption) ?? Array.Empty<string>(),
+                Exporters = parseResult.GetValue(CommandLineOptions.ExportersOption) ?? Array.Empty<string>(),
+                Filters = parseResult.GetValue(CommandLineOptions.FiltersOption) ?? Array.Empty<string>(),
+                AllCategories = parseResult.GetValue(CommandLineOptions.AllCategoriesOption) ?? Array.Empty<string>(),
+                AnyCategories = parseResult.GetValue(CommandLineOptions.AnyCategoriesOption) ?? Array.Empty<string>(),
+                AttributeNames = parseResult.GetValue(CommandLineOptions.AttributeNamesOption) ?? Array.Empty<string>(),
+                HiddenColumns = parseResult.GetValue(CommandLineOptions.HiddenColumnsOption) ?? Array.Empty<string>(),
+
+                UseMemoryDiagnoser = parseResult.GetValue(CommandLineOptions.MemoryOption),
+                UseThreadingDiagnoser = parseResult.GetValue(CommandLineOptions.ThreadingOption),
+                UseExceptionDiagnoser = parseResult.GetValue(CommandLineOptions.ExceptionsOption),
+                UseDisassemblyDiagnoser = parseResult.GetValue(CommandLineOptions.DisassemblyOption),
+                DisassemblerRecursiveDepth = parseResult.GetValue(CommandLineOptions.DisassemblerDepthOption),
+                DisassemblerFilters = parseResult.GetValue(CommandLineOptions.DisassemblerFiltersOption) ?? Array.Empty<string>(),
+                DisassemblerDiff = parseResult.GetValue(CommandLineOptions.DisassemblerDiffOption),
+                Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
+                DisplayAllStatistics = parseResult.GetValue(CommandLineOptions.DisplayAllStatisticsOption),
+                StatisticalTestThreshold = parseResult.GetValue(CommandLineOptions.StatisticalTestThresholdOption) ?? "",
+
+                CoreRunPaths = parseResult.GetValue(CommandLineOptions.CoreRunPathsOption) ?? Array.Empty<FileInfo>(),
+                CliPath = parseResult.GetValue(CommandLineOptions.CliPathOption),
+                RestorePath = parseResult.GetValue(CommandLineOptions.RestorePathOption) != null
+                        ? new DirectoryInfo(parseResult.GetValue(CommandLineOptions.RestorePathOption)!.FullName)
+                        : null,
+                ArtifactsDirectory = parseResult.GetValue(CommandLineOptions.ArtifactsDirectoryOption),
+                ClrVersion = parseResult.GetValue(CommandLineOptions.ClrVersionOption) ?? "",
+
+                RunInProcess = parseResult.GetValue(CommandLineOptions.RunInProcessOption),
+                Join = parseResult.GetValue(CommandLineOptions.JoinOption),
+                KeepBenchmarkFiles = parseResult.GetValue(CommandLineOptions.KeepBenchmarkFilesOption),
+                DontOverwriteResults = parseResult.GetValue(CommandLineOptions.DontOverwriteResultsOption),
+                StopOnFirstError = parseResult.GetValue(CommandLineOptions.StopOnFirstErrorOption),
+                DisableLogFile = parseResult.GetValue(CommandLineOptions.DisableLogFileOption),
+                LogBuildOutput = parseResult.GetValue(CommandLineOptions.LogBuildOutputOption),
+                GenerateMSBuildBinLog = parseResult.GetValue(CommandLineOptions.GenerateBinLogOption),
+                ApplesToApples = parseResult.GetValue(CommandLineOptions.ApplesToApplesOption),
+                Resume = parseResult.GetValue(CommandLineOptions.ResumeOption),
+                TimeOutInSeconds = parseResult.GetValue(CommandLineOptions.TimeoutOption),
+
+                LaunchCount = parseResult.GetValue(CommandLineOptions.LaunchCountOption),
+                WarmupIterationCount = parseResult.GetValue(CommandLineOptions.WarmupCountOption),
+                IterationCount = parseResult.GetValue(CommandLineOptions.IterationCountOption),
+                InvocationCount = parseResult.GetValue(CommandLineOptions.InvocationCountOption),
+                UnrollFactor = parseResult.GetValue(CommandLineOptions.UnrollFactorOption),
+                RunOncePerIteration = parseResult.GetValue(CommandLineOptions.RunOnceOption),
+                MemoryRandomization = parseResult.GetValue(CommandLineOptions.MemoryRandomizationOption),
+                NoForcedGCs = parseResult.GetValue(CommandLineOptions.NoForcedGCsOption)
+            };
+
+            bool isSuccess = Validate(options, logger);
+            return isSuccess
+                ? (true, CreateConfig(options, globalConfig, args), options)
+                : (false, default, default);
         }
 
         private static (bool Success, string[] ExpandedTokens) ExpandResponseFile(string[] args, ILogger logger)
@@ -193,42 +285,38 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return result;
             }
         }
-
         internal static bool TryUpdateArgs(string[] args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
         {
-            (bool isSuccess, CommandLineOptions? options) result = default;
+            var rootCommand = new RootCommand("BenchmarkDotNet Command Line options");
+            rootCommand.Add(CommandLineOptions.BaseJobOption);
 
-            ILogger logger = NullLogger.Instance;
-            using (var parser = CreateParser(logger))
+            var parseResult = rootCommand.Parse(args);
+            var options = new CommandLineOptions
             {
-                parser
-                    .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, options) : (false, default))
-                    .WithNotParsed(errors => result = (false, default));
+                BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? ""
+            };
 
-                if (!result.isSuccess)
-                {
-                    updatedArgs = null;
-                    return false;
-                }
-
-                updater(result.options!);
-
-                updatedArgs = parser.FormatCommandLine(result.options, settings => settings.SkipDefault = true).Split();
-                return true;
+            if (!Validate(options, NullLogger.Instance))
+            {
+                updatedArgs = null;
+                return false;
             }
+
+            updater(options);
+            updatedArgs = args;
+            return true;
         }
 
-        private static Parser CreateParser(ILogger logger)
-            => new Parser(settings =>
-            {
-                settings.CaseInsensitiveEnumValues = true;
-                settings.CaseSensitive = false;
-                settings.EnableDashDash = true;
-                settings.IgnoreUnknownArguments = false;
-                settings.HelpWriter = new LoggerWrapper(logger);
-                settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
-            });
+        // private static Parser CreateParser(ILogger logger)
+        //     => new Parser(settings =>
+        //     {
+        //         settings.CaseInsensitiveEnumValues = true;
+        //         settings.CaseSensitive = false;
+        //         settings.EnableDashDash = true;
+        //         settings.IgnoreUnknownArguments = false;
+        //         settings.HelpWriter = new LoggerWrapper(logger);
+        //         settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
+        //     });
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
