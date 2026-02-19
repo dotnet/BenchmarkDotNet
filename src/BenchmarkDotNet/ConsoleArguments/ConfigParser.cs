@@ -32,6 +32,7 @@ using Perfolizer.Metrology;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Runtime.InteropServices;
+using System.CommandLine.Invocation;
 using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -94,6 +95,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             rootCommand.Add(CommandLineOptions.ThreadingOption);
             rootCommand.Add(CommandLineOptions.ExceptionsOption);
             rootCommand.Add(CommandLineOptions.DisassemblyOption);
+            rootCommand.Add(CommandLineOptions.OutliersOption);
+            rootCommand.Add(CommandLineOptions.WasmJavaScriptEngineArgumentsOption);
             rootCommand.Add(CommandLineOptions.DisassemblerDepthOption);
             rootCommand.Add(CommandLineOptions.DisassemblerFiltersOption);
             rootCommand.Add(CommandLineOptions.DisassemblerDiffOption);
@@ -127,6 +130,12 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var parseResult = rootCommand.Parse(args);
 
+            if (parseResult.Errors.Any() || args.Any(a => a == "-h" || a == "--help" || a == "-?"))
+            {
+                parseResult.Invoke();
+                return (false, default, default);
+            }
+
             var options = new CommandLineOptions
             {
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
@@ -145,6 +154,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 DisassemblerRecursiveDepth = parseResult.GetValue(CommandLineOptions.DisassemblerDepthOption),
                 DisassemblerFilters = parseResult.GetValue(CommandLineOptions.DisassemblerFiltersOption) ?? Array.Empty<string>(),
                 DisassemblerDiff = parseResult.GetValue(CommandLineOptions.DisassemblerDiffOption),
+                Outliers = parseResult.GetValue(CommandLineOptions.OutliersOption),
+                WasmArgs = parseResult.GetValue(CommandLineOptions.WasmJavaScriptEngineArgumentsOption),
                 Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
                 DisplayAllStatistics = parseResult.GetValue(CommandLineOptions.DisplayAllStatisticsOption),
                 StatisticalTestThreshold = parseResult.GetValue(CommandLineOptions.StatisticalTestThresholdOption) ?? "",

@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "Dry/Short/Medium/Long or Default", DefaultValueFactory = _ => "Default" };
 
         public static readonly Option<string[]> RuntimesOption = new("--runtimes", "-r")
-        { Description = "Target framework monikers" };
+        { Description = "Target framework monikers for .NET Core and .NET. For Mono tool 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!" };
 
         public static readonly Option<string[]> ExportersOption = new("--exporters", "-e")
         { Description = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML" };
@@ -36,36 +36,42 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "Prints memory statistics" };
 
         public static readonly Option<DirectoryInfo> ArtifactsDirectoryOption = new("--artifacts", "-a")
-        { Description = "Path to artifacts directory" };
+        { Description = "Valid path to accessible directory" };
 
         public static readonly Option<bool> RunInProcessOption = new("--inProcess", "-i")
-        { Description = "Run in Process" };
+        { Description = "Run benchmarks in Process" };
 
-        public static readonly Option<bool> ThreadingOption = new("--threading")
+        public static readonly Option<bool> ThreadingOption = new("--threading", "-t")
         { Description = "Prints threading statistics" };
 
         public static readonly Option<bool> ExceptionsOption = new("--exceptions")
         { Description = "Prints exceptions statistics" };
 
-        public static readonly Option<bool> DisassemblyOption = new("--disassembly")
-        { Description = "Prints disassembly" };
+        public static readonly Option<bool> DisassemblyOption = new("--disasm", "-d")
+        { Description = "Gets disassembly of benchmarked code" };
 
-        public static readonly Option<int> DisassemblerDepthOption = new("--disassemblerDepth")
-        { Description = "Disassembler recursive depth", DefaultValueFactory = _ => 1 };
+        public static readonly Option<int> DisassemblerDepthOption = new("--disasmDepth")
+        { Description = "Sets the recursive depth for the disassembler. Default is 1.", DefaultValueFactory = _ => 1 };
 
-        public static readonly Option<string[]> DisassemblerFiltersOption = new("--disassemblerFilters")
-        { Description = "Disassembler filters" };
+        public static readonly Option<OutlierMode> OutliersOption = new("--outliers")
+        { Description = "Specifies outlier detection mode. Default is DontRemove.", DefaultValueFactory = _ => OutlierMode.DontRemove };
 
-        public static readonly Option<bool> DisassemblerDiffOption = new("--disassemblerDiff")
-        { Description = "Disassembler diff" };
+        public static readonly Option<string> WasmJavaScriptEngineArgumentsOption = new("--wasmArgs")
+        { Description = "Arguments for the javascript engine. The default is \"--expose_wasm\"", DefaultValueFactory = _ => "--expose_wasm" };
 
-        public static readonly Option<string> ProfilerOption = new("--profiler")
-        { Description = "Profiler (ETW, EventPipe, etc)" };
+        public static readonly Option<string[]> DisassemblerFiltersOption = new("--disasmFilter")
+        { Description = "Filters for the disassembler. Example: *Program*" };
+
+        public static readonly Option<bool> DisassemblerDiffOption = new("--disasmDiff")
+        { Description = "Generates diff reports for the disassembler." };
+
+        public static readonly Option<string> ProfilerOption = new("--profiler", "-p")
+        { Description = "Profiles benchmarked code. Allowed values: [EP, ETW, CV]" };
 
         public static readonly Option<bool> DisplayAllStatisticsOption = new("--allStats")
-        { Description = "Displays all statistics" };
+        { Description = "Displays all statistics (min, max & more)" };
 
-        public static readonly Option<string> StatisticalTestThresholdOption = new("--statisticalTest")
+        public static readonly Option<string> StatisticalTestThresholdOption = new("--statTest")
         { Description = "Statistical test threshold" };
 
         public static readonly Option<FileInfo[]> CoreRunPathsOption = new("--coreRun")
@@ -81,10 +87,10 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "CLR version" };
 
         public static readonly Option<bool> JoinOption = new("--join")
-        { Description = "Join summary" };
+        { Description = "Prints single summary for all benchmarks" };
 
         public static readonly Option<bool> KeepBenchmarkFilesOption = new("--keepFiles")
-        { Description = "Keep benchmark files" };
+        { Description = "Determines if all auto-generated files should be kept or removed after running the benchmarks." };
 
         public static readonly Option<bool> DontOverwriteResultsOption = new("--dontOverwrite")
         { Description = "Don't overwrite results" };
@@ -93,16 +99,16 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "Stop on first error" };
 
         public static readonly Option<bool> DisableLogFileOption = new("--disableLogFile")
-        { Description = "Disable log file" };
+        { Description = "Disables the log file" };
 
         public static readonly Option<bool> LogBuildOutputOption = new("--logBuildOutput")
-        { Description = "Log build output" };
+        { Description = "Logs build output" };
 
         public static readonly Option<bool> GenerateBinLogOption = new("--buildLog")
         { Description = "Generate MSBuild bin log" };
 
         public static readonly Option<bool> ApplesToApplesOption = new("--applesToApples")
-        { Description = "Apples to Apples" };
+        { Description = "Apples to apples" };
 
         public static readonly Option<bool> ResumeOption = new("--resume")
         { Description = "Resume" };
@@ -111,37 +117,37 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "Timeout in seconds" };
 
         public static readonly Option<int?> LaunchCountOption = new("--launchCount")
-        { Description = "Launch count" };
+        { Description = "How many times we should launch process with target benchmark. The default is 1." };
 
         public static readonly Option<int?> WarmupCountOption = new("--warmupCount")
-        { Description = "Warmup iteration count" };
+        { Description = "How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic." };
 
         public static readonly Option<int?> IterationCountOption = new("--iterationCount")
-        { Description = "Iteration count" };
+        { Description = "How many target iterations should be performed. If you set it, the minIterationCount and maxIterationCount are ignored. By default calculated by the heuristic." };
 
         public static readonly Option<long?> InvocationCountOption = new("--invocationCount")
-        { Description = "Invocation count" };
+        { Description = "Invocation count in a single iteration. By default calculated by the heuristic." };
 
         public static readonly Option<int?> UnrollFactorOption = new("--unrollFactor")
-        { Description = "Unroll factor" };
+        { Description = "How many times the benchmark method will be invoked per one iteration of a generated loop." };
 
         public static readonly Option<bool> RunOnceOption = new("--runOnce")
-        { Description = "Run once per iteration" };
+        { Description = "Run the benchmark exactly once per iteration." };
 
         public static readonly Option<bool> MemoryRandomizationOption = new("--memoryRandomization")
         { Description = "Memory randomization" };
 
         public static readonly Option<bool> NoForcedGCsOption = new("--noForcedGCs")
-        { Description = "No forced GCs" };
+        { Description = "Turns off forced garbage collections." };
 
         public static readonly Option<string[]> AllCategoriesOption = new("--allCategories")
-        { Description = "All Categories" };
+        { Description = "Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed." };
 
         public static readonly Option<string[]> AnyCategoriesOption = new("--anyCategories")
         { Description = "Any Categories" };
 
-        public static readonly Option<string[]> AttributeNamesOption = new("--attributeNames")
-        { Description = "Attribute Names" };
+        public static readonly Option<string[]> AttributeNamesOption = new("--attribute")
+        { Description = "Run all methods with given attribute (applied to class or method)" };
 
         public static readonly Option<string[]> HiddenColumnsOption = new("--hiddenColumns")
         { Description = "Hidden Columns" };
@@ -165,6 +171,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool RunInProcess { get; set; }
         public DirectoryInfo? ArtifactsDirectory { get; set; }
         public OutlierMode Outliers { get; set; }
+        public string? WasmArgs { get; set; }
         public int? Affinity { get; set; }
         public bool DisplayAllStatistics { get; set; }
         public IEnumerable<string> AllCategories { get; set; } = [];
