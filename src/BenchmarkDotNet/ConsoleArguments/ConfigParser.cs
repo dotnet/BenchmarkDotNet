@@ -307,17 +307,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        // private static Parser CreateParser(ILogger logger)
-        //     => new Parser(settings =>
-        //     {
-        //         settings.CaseInsensitiveEnumValues = true;
-        //         settings.CaseSensitive = false;
-        //         settings.EnableDashDash = true;
-        //         settings.IgnoreUnknownArguments = false;
-        //         settings.HelpWriter = new LoggerWrapper(logger);
-        //         settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
-        //     });
-
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
             if (options.BaseJob.IsBlank() || !AvailableJobs.ContainsKey(options.BaseJob))
