@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.ConsoleArguments
     public class CommandLineOptions
     {
         public static readonly Option<string> BaseJobOption = new("--job", "-j")
-        { Description = "Dry/Short/Medium/Long or Default" };
+        { Description = "Dry/Short/Medium/Long or Default", DefaultValueFactory = _ => "Default" };
 
         public static readonly Option<string[]> RuntimesOption = new("--runtimes", "-r")
         { Description = "Target framework monikers" };
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         { Description = "Prints disassembly" };
 
         public static readonly Option<int> DisassemblerDepthOption = new("--disassemblerDepth")
-        { Description = "Disassembler recursive depth" };
+        { Description = "Disassembler recursive depth", DefaultValueFactory = _ => 1 };
 
         public static readonly Option<string[]> DisassemblerFiltersOption = new("--disassemblerFilters")
         { Description = "Disassembler filters" };
@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public static readonly Option<string[]> HiddenColumnsOption = new("--hiddenColumns")
         { Description = "Hidden Columns" };
-        
+
         private const int DefaultDisassemblerRecursiveDepth = 1;
         private bool useDisassemblyDiagnoser;
         public string BaseJob { get; set; } = "";
