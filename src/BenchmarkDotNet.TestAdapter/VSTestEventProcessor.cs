@@ -15,8 +15,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-#nullable enable
-
 namespace BenchmarkDotNet.TestAdapter
 {
     /// <summary>
