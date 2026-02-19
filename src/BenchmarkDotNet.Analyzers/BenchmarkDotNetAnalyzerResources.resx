@@ -385,4 +385,7 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   <data name="Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat" xml:space="preserve">
     <value>Method {0} has no parameters</value>
   </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresParameters_Description" xml:space="preserve">
+    <value>The values passed to an [Arguments] must have parameter(s)</value>
+  </data>
 </root>

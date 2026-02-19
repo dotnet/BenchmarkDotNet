@@ -75,23 +75,23 @@ public class RunAnalyzerTests
 
             const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                     
+
                 public class {{classWithOneBenchmarkMethodName}}
                 {
                     [Benchmark]
                     public void BenchmarkMethod()
                     {
-                                                                     
+
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
-                                                                     
+
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -124,7 +124,7 @@ public class RunAnalyzerTests
 
             const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                     
+
                 public class {{classWithOneBenchmarkMethodName}} : BenchmarkClassAncestor1
                 {
                 }
@@ -152,15 +152,15 @@ public class RunAnalyzerTests
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -183,7 +183,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                                
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -220,15 +220,15 @@ public class RunAnalyzerTests
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -264,7 +264,7 @@ public class RunAnalyzerTests
 
             const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                     
+
                 public class {{classWithOneBenchmarkMethodName}} : BenchmarkClassAncestor1
                 {
                 }
@@ -295,15 +295,15 @@ public class RunAnalyzerTests
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -331,7 +331,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -367,10 +367,10 @@ public class RunAnalyzerTests
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod2()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -395,7 +395,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -409,7 +409,7 @@ public class RunAnalyzerTests
                 {
                     public void BenchmarkMethod()
                     {
-                                                                     
+
                     }
                 }
                 """;
@@ -446,17 +446,17 @@ public class RunAnalyzerTests
                     public static void Main(string[] args) {
                         BenchmarkRunner.Run{{invocationExpression}};
                     }
-                                                             
+
                     private class {{benchmarkClassName}} : BenchmarkClassAncestor1
                     {
                     }
-                                                             
+
                     private class BenchmarkClassAncestor1 : BenchmarkClassAncestor2
                     {
                         [Benchmark]
                         public void BenchmarkMethod()
                         {
-                                                             
+
                         }
                     }
                 }
@@ -464,7 +464,7 @@ public class RunAnalyzerTests
 
             const string benchmarkClassAncestor2Document = /* lang=c#-test */ """
                 using BenchmarkDotNet.Attributes;
-                                                                              
+
                 public class BenchmarkClassAncestor2
                 {
                 }
@@ -490,19 +490,19 @@ public class RunAnalyzerTests
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
                         BenchmarkRunner.Run{{invocationExpression}};
                     }
-                                                    
+
                     {{nonPublicClassAccessModifier}}class {{benchmarkClassName}}
                     {
                         [Benchmark]
                         public void BenchmarkMethod()
                         {
-                                                                                                                      
+
                         }
                     }
                 }
@@ -532,7 +532,7 @@ public class RunAnalyzerTests
                         BenchmarkRunner.Run{{invocationExpression}};
                     }
                 }
-                                                
+
                 file class {{benchmarkClassName}}
                 {
                     [Benchmark]
@@ -567,7 +567,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -578,13 +578,13 @@ public class RunAnalyzerTests
 
             const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 public sealed class {{benchmarkClassName}}
                 {
                     [Benchmark]
                     public void BenchmarkMethod()
                     {
-                                                                     
+
                     }
                 }
                 """;
@@ -609,7 +609,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -620,13 +620,13 @@ public class RunAnalyzerTests
 
             const string benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 public abstract class {{benchmarkClassName}}
                 {
                     [Benchmark]
                     public void BenchmarkMethod()
                     {
-                                                                     
+
                     }
                 }
                 """;
@@ -654,7 +654,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -669,14 +669,14 @@ public class RunAnalyzerTests
 
             var benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                              
+
                 {{genericTypeArgumentsAttributeUsages}}
                 public class BenchmarkClass<{{typeParameters}}> : BenchmarkClassAncestor1<{{typeParameters}}>
                 {
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                              
+
                     }
                 }
                 """;
@@ -684,19 +684,19 @@ public class RunAnalyzerTests
             var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
                 public {{abstractModifier}}class BenchmarkClassAncestor1<{{typeParameters}}> : BenchmarkClassAncestor2<{{typeParameters}}>
                 {
-                                                                           
+
                 }
                 """;
             var benchmarkClassAncestor2Document = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 public {{abstractModifier}}class BenchmarkClassAncestor2<{{typeParameters}}>
                 {
-                                                                       
+
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                                                                                             
+
                     }
                 }
                 """;
@@ -722,7 +722,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -733,10 +733,10 @@ public class RunAnalyzerTests
 
             var benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                              
+
                 public class {{benchmarkClassName}} : BenchmarkClassAncestor<{{string.Join(", ", GenericTypeArguments.Take(typeParametersListLength))}}>
                 {
-                                                                  
+
                 }
                 """;
             var benchmarkClassAncestorDocument = /* lang=c#-test */ $$"""
@@ -744,11 +744,11 @@ public class RunAnalyzerTests
 
                 public {{abstractModifier}}class BenchmarkClassAncestor<{{string.Join(", ", TypeParameters.Take(typeParametersListLength))}}>
                 {
-                                                                      
+
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                                                                                            
+
                     }
                 }
                 """;
@@ -798,15 +798,15 @@ public class RunAnalyzerTests
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -835,7 +835,7 @@ public class RunAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Running;
-                                               
+
                 public class Program
                 {
                     public static void Main(string[] args) {
@@ -846,13 +846,13 @@ public class RunAnalyzerTests
 
             var benchmarkClassDocument = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                              
+
                 public class {{benchmarkClassName}}<{{typeParameters}}> : BenchmarkClassAncestor1<{{typeParameters}}>
                 {
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                              
+
                     }
                 }
                 """;
@@ -860,7 +860,7 @@ public class RunAnalyzerTests
             var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
                 public {{abstractModifier}}class BenchmarkClassAncestor1<{{typeParameters}}> : BenchmarkClassAncestor2<{{typeParameters}}>
                 {
-                                                                           
+
                 }
                 """;
 
@@ -874,7 +874,7 @@ public class RunAnalyzerTests
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                                                                                             
+
                     }
                 }
                 """;

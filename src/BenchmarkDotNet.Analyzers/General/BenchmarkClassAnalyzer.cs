@@ -208,11 +208,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                             continue;
                         }
 
-                        if (attributeSyntaxTypeSymbol.Equals(benchmarkAttributeTypeSymbol))
+                        if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkAttributeTypeSymbol))
                         {
                             benchmarkAttributeUsages.Add(attributeSyntax);
                         }
-                        else if (attributeSyntaxTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol))
+                        else if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
                         {
                             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
                             {
@@ -355,7 +355,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                     {
                         if (benchmarkCategories.Count > 0 && benchmarkAttributeUsages[0].ArgumentList != null)
                         {
-                            foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList.Arguments)
+                            foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList!.Arguments)
                             {
                                 if (attributeArgumentSyntax.NameEquals != null && attributeArgumentSyntax.NameEquals.Name.Identifier.ValueText == "Baseline")
                                 {
@@ -381,7 +381,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                         {
                             if (benchmarkAttributeUsages[0].ArgumentList != null)
                             {
-                                foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList.Arguments)
+                                foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList!.Arguments)
                                 {
                                     if (attributeArgumentSyntax.NameEquals != null && attributeArgumentSyntax.NameEquals.Name.Identifier.ValueText == "Baseline")
                                     {
@@ -453,11 +453,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
                                 foreach (var attribute in methodAttributes)
                                 {
-                                    if (attribute.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
+                                    if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkAttributeTypeSymbol))
                                     {
                                         benchmarkAttributeUsages.Add(attribute);
                                     }
-                                    else if (attribute.AttributeClass.Equals(benchmarkCategoryAttributeTypeSymbol))
+                                    else if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkCategoryAttributeTypeSymbol))
                                     {
                                         foreach (var benchmarkCategoriesArray in attribute.ConstructorArguments)
                                         {
@@ -550,7 +550,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryAttributeTypeSymbol(context.Compilation);
 
         var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol))
+        if (SymbolEqualityComparer.Default.Equals(attributeTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
         {
             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
             {
