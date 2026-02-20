@@ -102,7 +102,8 @@ namespace BenchmarkDotNet.Portability
                     }
                 }
 
-                return $".NET Core (Mono) {versionString}";
+                string runtimeName = IsMono ? "Mono" : "CoreCLR";
+                return $".NET Core ({runtimeName}) {versionString}";
             }
             else if (IsOldMono)
             {
