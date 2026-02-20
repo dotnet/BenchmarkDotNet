@@ -90,8 +90,8 @@ namespace BenchmarkDotNet.Reports
 
         internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath,
             ImmutableArray<ValidationError>? validationErrors = null)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero,
-                DefaultCultureInfo.Instance, validationErrors ?? ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
+            => new Summary(title, [], HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero,
+                DefaultCultureInfo.Instance, validationErrors ?? [], []);
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(

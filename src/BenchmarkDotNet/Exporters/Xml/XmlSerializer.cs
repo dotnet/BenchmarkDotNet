@@ -161,8 +161,8 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         internal class XmlSerializerBuilder
         {
-            private readonly Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
-            private readonly HashSet<string> excludedPropertyNames = new HashSet<string>();
+            private readonly Dictionary<string, string> collectionItemNameMap = [];
+            private readonly HashSet<string> excludedPropertyNames = [];
 
             public Type Type { get; }
             public string RootName { get; private set; }

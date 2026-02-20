@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Validators
             }
 
             AwaitHelper.GetGetResultMethod(result.GetType())
-                ?.Invoke(null, new[] { result });
+                ?.Invoke(null, [result]);
         }
 
         private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Validators
 
                 try
                 {
-                    setter.Invoke(benchmarkTypeInstance, new[] { values.First() });
+                    setter.Invoke(benchmarkTypeInstance, [values.First()]);
                 }
                 catch (Exception ex)
                 {

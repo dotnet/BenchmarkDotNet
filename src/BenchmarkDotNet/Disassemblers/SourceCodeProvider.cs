@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal class SourceCodeProvider : IDisposable
     {
-        private readonly Dictionary<SourceFile, string[]> sourceFileCache = new Dictionary<SourceFile, string[]>();
-        private readonly Dictionary<SourceFile, string> sourceFilePathsCache = new Dictionary<SourceFile, string>();
-        private readonly Dictionary<PdbInfo, ManagedSymbolModule?> pdbReaders = new Dictionary<PdbInfo, ManagedSymbolModule?>();
+        private readonly Dictionary<SourceFile, string[]> sourceFileCache = [];
+        private readonly Dictionary<SourceFile, string> sourceFilePathsCache = [];
+        private readonly Dictionary<PdbInfo, ManagedSymbolModule?> pdbReaders = [];
         private readonly SymbolReader symbolReader = new SymbolReader(TextWriter.Null) { SymbolPath = SymbolPath.MicrosoftSymbolServerPath };
 
         public void Dispose()
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Disassemblers
                 }
                 else
                 {
-                    contents = wholeFileOrJustPath.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                    contents = wholeFileOrJustPath.Split([Environment.NewLine], StringSplitOptions.None);
                 }
 
                 sourceFileCache.Add(file, contents);

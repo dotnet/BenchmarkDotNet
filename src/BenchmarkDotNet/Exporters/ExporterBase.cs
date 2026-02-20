@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
                 }
             }
 
-            return new[] { filePath };
+            return [filePath];
         }
 
         public string GetArtifactFullName(Summary summary)

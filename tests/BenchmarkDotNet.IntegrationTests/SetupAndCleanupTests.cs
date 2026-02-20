@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private const string OutputDelimiter = "===========================================================";
 
-        private readonly string[] firstExpectedLogLines = {
+        private readonly string[] firstExpectedLogLines = [
             "// ### First Called: GlobalSetup",
 
             "// ### First Called: IterationSetup (1)", // MainWarmup1
@@ -47,9 +47,9 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### First Called: IterationCleanup (5)", // MainTarget3
 
             "// ### First Called: GlobalCleanup"
-        };
+        ];
 
-        private readonly string[] secondExpectedLogLines = {
+        private readonly string[] secondExpectedLogLines = [
             "// ### Second Called: GlobalSetup",
 
             "// ### Second Called: IterationSetup (1)", // MainWarmup1
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### Second Called: IterationCleanup (5)", // MainTarget3
 
             "// ### Second Called: GlobalCleanup"
-        };
+        ];
 
         public SetupAndCleanupTests(ITestOutputHelper output) : base(output) { }
 

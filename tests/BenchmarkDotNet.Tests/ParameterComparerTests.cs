@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class ParameterComparerTests
     {
-        private static readonly ParameterDefinition sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null!, 0);
+        private static readonly ParameterDefinition sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: [], isArgument: false, parameterType: null!, 0);
 
         [Fact]
         public void BasicComparisionTest()
@@ -16,18 +16,18 @@ namespace BenchmarkDotNet.Tests
 
             var originalData = new[]
             {
-                new ParameterInstances(new[]
-                {
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 5, summaryStyle: null!)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 1, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 3, null)
-                })
+                ])
             };
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
 
@@ -43,30 +43,30 @@ namespace BenchmarkDotNet.Tests
 
             var originalData = new[]
             {
-                new ParameterInstances(new[]
-                {
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 5, null),
                     new ParameterInstance(sharedDefinition, "z", null),
                     new ParameterInstance(sharedDefinition, 1.0, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 5, null),
                     new ParameterInstance(sharedDefinition, "a", null),
                     new ParameterInstance(sharedDefinition, 0.0, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 5, null),
                     new ParameterInstance(sharedDefinition, "a", null),
                     new ParameterInstance(sharedDefinition, 1.0, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 3, null),
                     new ParameterInstance(sharedDefinition, "a", null),
                     new ParameterInstance(sharedDefinition, 97.5, null)
-                })
+                ])
             };
 
             // We should sort by the parameters in order, i.e. first by 5/3, then if they match by "z"/"a"
@@ -96,22 +96,22 @@ namespace BenchmarkDotNet.Tests
 
             var originalData = new[]
             {
-                new ParameterInstances(new[]
-                {
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 100, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 1000, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 2000, null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, 500, null)
-                })
+                ])
             };
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
@@ -130,22 +130,22 @@ namespace BenchmarkDotNet.Tests
 
             var originalData = new[]
             {
-                new ParameterInstances(new[]
-                {
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, new ComplexParameter(1, "first"), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, new ComplexParameter(3, "third"), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, new ComplexParameter(2, "second"), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, new ComplexParameter(4, "fourth"), null)
-                })
+                ])
             };
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
@@ -163,22 +163,22 @@ namespace BenchmarkDotNet.Tests
             var comparer = ParameterComparer.Instance;
             var originalData = new[]
             {
-                new ParameterInstances(new[]
-                {
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 1), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 3), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 2), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 4), null)
-                })
+                ])
             };
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
@@ -195,22 +195,22 @@ namespace BenchmarkDotNet.Tests
             var comparer = ParameterComparer.Instance;
             var originalData = new[]
             {
-                new ParameterInstances(new[]
-                {
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 1), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 3), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 2), null)
-                }),
-                new ParameterInstances(new[]
-                {
+                ]),
+                new ParameterInstances(
+                [
                     new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 4), null)
-                })
+                ])
             };
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();

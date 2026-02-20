@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 logger.WriteLine("Generating");
                 Done = true;
-                return new GenerateResult(ArtifactsPaths.Empty, true, null, Array.Empty<string>());
+                return new GenerateResult(ArtifactsPaths.Empty, true, null, []);
             }
         }
 
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 executeParameters.Logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), executeParameters.LaunchIndex);
+                return new ExecuteResult(true, 0, default, [], [], [], executeParameters.LaunchIndex);
             }
         }
 

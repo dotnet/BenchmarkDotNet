@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Tests
                 EventLevel.Verbose,
                 (long) (ClrTraceEventParser.Keywords.Default | ClrTraceEventParser.Keywords.JitTracing));
 
-            var result = EventPipeProfiler.MapToProviders(EventPipeProfile.CpuSampling, new[] { userSettings });
+            var result = EventPipeProfiler.MapToProviders(EventPipeProfile.CpuSampling, [userSettings]);
 
             var final = result.Single(x => x.Name == userSettings.Name);
             Assert.Equal(userSettings.EventLevel, final.EventLevel);

@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public ParamSourceTests(ITestOutputHelper output) : base(output) { }
 
         public static IEnumerable<object[]> GetToolchains()
-            => new[]
-                {
-                    new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessEmitToolchain.Default },
-                };
+            =>
+                [
+                    [Job.Default.GetToolchain()],
+                    [InProcessEmitToolchain.Default],
+                ];
 
         [Fact]
         public void ParamSourceCanHandleStringWithSurrogates()
@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class OverrideProperty : OverridePropertyBase
         {
-            public override int[] GetSourceProperty => new int[] { 1, 2, 3 };
+            public override int[] GetSourceProperty => [1, 2, 3];
 
             [Benchmark]
             public int Benchmark() => ParamsTarget;
@@ -234,7 +234,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class OverrideMethod : OverrideMethodBase
         {
-            public override int[] GetSourceMethod() => new int[] { 1, 2, 3 };
+            public override int[] GetSourceMethod() => [1, 2, 3];
 
             [Benchmark]
             public int Benchmark() => ParamsTarget;

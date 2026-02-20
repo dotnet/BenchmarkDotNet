@@ -70,8 +70,8 @@ namespace BenchmarkDotNet.Running
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig? config, string[]? args)
         {
             var summaries = args == null
-                ? BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) })
-                : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args, config, false);
+                ? BenchmarkRunnerClean.Run([BenchmarkConverter.TypeToBenchmarks(type, config)])
+                : new BenchmarkSwitcher([type]).RunWithDirtyAssemblyResolveHelper(args, config, false);
 
             return summaries.SingleOrDefault()
                 ?? Summary.ValidationFailed($"No benchmarks found in type '{type.Name}'", string.Empty, string.Empty);

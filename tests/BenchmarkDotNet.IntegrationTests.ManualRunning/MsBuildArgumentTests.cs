@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithArguments(new Argument[] { new MsBuildArgument($"/p:CustomProp={setCustomProperty}") })
+                    .WithArguments([new MsBuildArgument($"/p:CustomProp={setCustomProperty}")])
                     .WithEnvironmentVariable(CustomPropEnvVarName, setCustomProperty.ToString())
                 );
             CanExecute<PropertyDefine>(config);
@@ -34,12 +34,12 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithArguments(new Argument[] { new MsBuildArgument($"/p:CustomProp={true}") })
+                    .WithArguments([new MsBuildArgument($"/p:CustomProp={true}")])
                     .WithEnvironmentVariable(CustomPropEnvVarName, true.ToString())
                 )
                 .AddJob(Job.Dry
                     .WithRuntime(NativeAotRuntime.Net80)
-                    .WithArguments(new Argument[] { new MsBuildArgument($"/p:CustomProp={true}") })
+                    .WithArguments([new MsBuildArgument($"/p:CustomProp={true}")])
                     .WithEnvironmentVariable(CustomPropEnvVarName, true.ToString())
                 )
                 .AddJob(Job.Dry

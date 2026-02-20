@@ -48,10 +48,9 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
-                        }),
+                        ]),
                     new BenchmarkReport(
                         success: true,
                         benchmarkCase: new BenchmarkCase(
@@ -68,10 +67,9 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
-                        }),
+                        ]),
                     new BenchmarkReport(
                         success: true,
                         benchmarkCase: new BenchmarkCase(
@@ -88,18 +86,17 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
-                        })
+                        ])
                 ],
                 HostEnvironmentInfo.GetCurrent(),
                 "",
                 "",
                 TimeSpan.Zero,
                 CultureInfo.InvariantCulture,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
 
             var logger = new AccumulationLogger();
 
@@ -133,10 +130,9 @@ var summary = new Summary(
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
-                        }),
+                        ]),
                     new BenchmarkReport(
                         success: true,
                         benchmarkCase: new BenchmarkCase(
@@ -154,10 +150,9 @@ var summary = new Summary(
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
-                        }),
+                        ]),
                     new BenchmarkReport(
                         success: true,
                         benchmarkCase: new BenchmarkCase(
@@ -175,18 +170,17 @@ var summary = new Summary(
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
-                        })
+                        ])
                 ],
                 HostEnvironmentInfo.GetCurrent(),
                 "",
                 "",
                 TimeSpan.Zero,
                 CultureInfo.InvariantCulture,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
             var logger = new AccumulationLogger();
 
             OpenMetricsExporter.Default.ExportToLog(summary, logger);
@@ -206,7 +200,7 @@ var summary = new Summary(
                         new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
-                            new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
+                            new ParameterInstances([]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
                         null!,
@@ -215,8 +209,7 @@ var summary = new Summary(
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
                             ])
                         ],
-                        new List<Metric>
-                        {
+                        [
                             new(new FakeMetricDescriptor("label_with_underscore", "label with underscore"), 42.0),
                             new(new FakeMetricDescriptor("label_with-dash", "label with dash"), 84.0),
                             new(new FakeMetricDescriptor("label with space", "label with space"), 126.0),
@@ -224,15 +217,15 @@ var summary = new Summary(
                             new(new FakeMetricDescriptor("label with special chars !@#$%^&*()", "label with special chars !@#$%^&*()"), 210.0),
                             new(new FakeMetricDescriptor("label with special !@#$%^&*() chars", "label with special !@#$%^&*() chars"), 210.0),
                             new(new FakeMetricDescriptor("label with special !@#$%^&*()chars in the middle", "label with special !@#$%^&*()chars in the middle"), 210.0)
-                        })
+                        ])
                 ],
                 HostEnvironmentInfo.GetCurrent(),
                 "",
                 "",
                 TimeSpan.Zero,
                 CultureInfo.InvariantCulture,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
             var logger = new AccumulationLogger();
 
             OpenMetricsExporter.Default.ExportToLog(summary, logger);
@@ -257,7 +250,7 @@ var summary = new Summary(
                             benchmarkCase: new BenchmarkCase(
                                 new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                                 Job.Dry,
-                                new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
+                                new ParameterInstances([]),
                                 ImmutableConfigBuilder.Create(new ManualConfig())),
                             null!,
                             null!,
@@ -266,15 +259,15 @@ var summary = new Summary(
                                     new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 1, 10.5)
                                 ])
                             ],
-                            new List<Metric>())
+                            [])
                     ],
                     HostEnvironmentInfo.GetCurrent(),
                     "",
                     "",
                     TimeSpan.Zero,
                     CultureInfo.InvariantCulture,
-                    ImmutableArray<ValidationError>.Empty,
-                    ImmutableArray<IColumnHidingRule>.Empty);
+                    [],
+                    []);
 
                 var logger = new AccumulationLogger();
 

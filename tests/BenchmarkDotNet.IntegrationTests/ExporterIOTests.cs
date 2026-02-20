@@ -123,14 +123,14 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             return new Summary(
                 title: "bdn-test",
-                reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks, config) : ImmutableArray<BenchmarkReport>.Empty,
+                reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks, config) : [],
                 hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
                 resultsDirectoryPath: resultsDirectoryPath,
                 logFilePath: string.Empty,
                 totalTime: System.TimeSpan.Zero,
                 cultureInfo: TestCultureInfo.Instance,
-                validationErrors: ImmutableArray<ValidationError>.Empty,
-                columnHidingRules: ImmutableArray<IColumnHidingRule>.Empty
+                validationErrors: [],
+                columnHidingRules: []
             );
         }
 

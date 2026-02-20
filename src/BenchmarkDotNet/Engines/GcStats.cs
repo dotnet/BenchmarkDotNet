@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Engines
             if (!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
 
-            var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split([' '], StringSplitOptions.RemoveEmptyEntries);
             if (!int.TryParse(measurementSplit[0], out int gen0)
                 || !int.TryParse(measurementSplit[1], out int gen1)
                 || !int.TryParse(measurementSplit[2], out int gen2)

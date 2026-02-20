@@ -26,11 +26,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public NativeMemoryProfiler() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
 
-        public IEnumerable<string> Ids => new[] { nameof(NativeMemoryProfiler) };
+        public IEnumerable<string> Ids => [nameof(NativeMemoryProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
         public void DisplayResults(ILogger resultLogger)
         {
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
             if (!etwProfiler.BenchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
-                return Enumerable.Empty<Metric>();
+                return [];
 
             return new NativeMemoryLogParser(traceFilePath, results.BenchmarkCase, logger, results.BuildResult.ArtifactsPaths.ProgramName).Parse();
         }

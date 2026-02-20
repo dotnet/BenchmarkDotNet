@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Columns
         [PublicAPI] public static readonly IColumnProvider Params = new ParamsColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Metrics = new MetricsColumnProvider();
 
-        public static readonly IColumnProvider[] Instance = { Descriptor, Job, Statistics, Params, Metrics };
+        public static readonly IColumnProvider[] Instance = [Descriptor, Job, Statistics, Params, Metrics];
 
         private class DescriptorColumnProvider : IColumnProvider
         {

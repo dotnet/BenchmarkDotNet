@@ -198,7 +198,7 @@ namespace BenchmarkDotNet.Tests.Helpers
                     """, "Zorin OS 15.2")]
         public void LinuxOsReleaseHelperTest(string osReleaseContent, string expectedName)
         {
-            string[] lines = osReleaseContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = osReleaseContent.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             string? actualName = LinuxOsReleaseHelper.GetNameByOsRelease(lines);
             Assert.Equal(expectedName, actualName);
         }

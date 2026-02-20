@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Running
                 hashCode.Add(job.Environment.LargeAddressAware);
                 hashCode.Add(job.Environment.Gc);
                 hashCode.Add(job.Infrastructure.BuildConfiguration);
-                foreach (var arg in job.Infrastructure.Arguments ?? Array.Empty<Argument>())
+                foreach (var arg in job.Infrastructure.Arguments ?? [])
                     hashCode.Add(arg);
                 return hashCode.ToHashCode();
             }

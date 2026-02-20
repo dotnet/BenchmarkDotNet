@@ -40,13 +40,13 @@ namespace BenchmarkDotNet.Tests.Columns
             var benchmarkCase = new BenchmarkCase(
                 new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                 Job.Dry,
-                new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
+                new ParameterInstances([]),
                 ImmutableConfigBuilder.Create(config));
             var metric = new Metric(LocalMetricDescriptor.TimeInstance, metricValue);
             var benchmarkReport = new BenchmarkReport(true, benchmarkCase, null!, null!, null, [metric]);
 
             return new Summary("", new[] { benchmarkReport }.ToImmutableArray(), HostEnvironmentInfo.GetCurrent(),
-                "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
+                "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, [], []);
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]

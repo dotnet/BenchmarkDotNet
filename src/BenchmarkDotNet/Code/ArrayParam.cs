@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Code
 
             var methodInfo = arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static)
                 ?? throw new InvalidOperationException($"{nameof(ForPrimitives)} not found");
-            return (IParam?)methodInfo.Invoke(null, new[]{ array});
+            return (IParam?)methodInfo.Invoke(null, [array]);
         }
     }
 }

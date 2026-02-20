@@ -15,10 +15,10 @@ namespace BenchmarkDotNet.Samples
         public int B;
 
         // public property
-        public IEnumerable<int> ValuesForA => new[] { 100, 200 };
+        public IEnumerable<int> ValuesForA => [100, 200];
 
         // public static method
-        public static IEnumerable<int> ValuesForB() => new[] { 10, 20 };
+        public static IEnumerable<int> ValuesForB() => [10, 20];
 
         // public field getting its params from a method in another type
         [ParamsSource(typeof(ParamsValues), nameof(ParamsValues.ValuesForC))]
@@ -30,6 +30,6 @@ namespace BenchmarkDotNet.Samples
 
     public static class ParamsValues
     {
-        public static IEnumerable<int> ValuesForC() => new[] { 1000, 2000 };
+        public static IEnumerable<int> ValuesForC() => [1000, 2000];
     }
 }

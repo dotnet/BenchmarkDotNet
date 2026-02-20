@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
         {
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: ["*WithCalls*"]));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.ColdStart));
 

@@ -229,7 +229,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
 
             Assert.Equal(2, exporters.Length);
-            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, exporters);
+            Assert.Equal([TestExporterDependency.Default, TestExporter.Default], exporters);
         }
 
         [Fact]
@@ -243,7 +243,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
 
             Assert.Equal(2, exporters.Length);
-            Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, exporters);
+            Assert.Equal([TestExporterDependency.Default, TestExporter.Default], exporters);
         }
 
         [Fact]
@@ -432,7 +432,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new[] { rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return [rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig()];
         }
 
         public class TestExporter : IExporter, IExporterDependencies
@@ -444,7 +444,7 @@ namespace BenchmarkDotNet.Tests.Configs
                 get { yield return TestExporterDependency.Default; }
             }
 
-            public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
+            public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => [];
 
             public string Name => nameof(TestExporter);
             public void ExportToLog(Summary summary, ILogger logger) { }
@@ -454,7 +454,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             public static readonly TestExporterDependency Default = new TestExporterDependency();
 
-            public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
+            public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => [];
 
             public string Name => nameof(TestExporterDependency);
             public void ExportToLog(Summary summary, ILogger logger) { }

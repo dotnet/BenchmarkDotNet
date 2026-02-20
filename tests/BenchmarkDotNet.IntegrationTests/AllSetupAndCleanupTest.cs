@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string IterationCleanupCalled = Prefix + "IterationCleanup";
         private const string BenchmarkCalled = Prefix + "Benchmark";
 
-        private readonly string[] expectedLogLines = {
+        private readonly string[] expectedLogLines = [
             "// ### Called: GlobalSetup",
 
             "// ### Called: IterationSetup (1)", // MainWarmup1
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### Called: IterationCleanup (5)", // MainTarget3
 
             "// ### Called: GlobalCleanup"
-        };
+        ];
 
         public AllSetupAndCleanupTest(ITestOutputHelper output) : base(output) { }
 

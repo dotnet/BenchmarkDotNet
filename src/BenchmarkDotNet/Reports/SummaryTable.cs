@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.Reports
 
             if (summary.HasCriticalValidationErrors)
             {
-                Columns = Array.Empty<SummaryTableColumn>();
+                Columns = [];
                 ColumnCount = 0;
-                FullHeader = Array.Empty<string>();
-                FullContent = Array.Empty<string[]>();
-                FullContentStartOfHighlightGroup = Array.Empty<bool>();
-                FullContentStartOfLogicalGroup = Array.Empty<bool>();
-                FullContentWithHeader = Array.Empty<string[]>();
-                IsDefault = Array.Empty<bool>();
+                FullHeader = [];
+                FullContent = [];
+                FullContentStartOfHighlightGroup = [];
+                FullContentStartOfLogicalGroup = [];
+                FullContentWithHeader = [];
+                IsDefault = [];
                 EffectiveSummaryStyle = summary.Style;
                 return;
             }

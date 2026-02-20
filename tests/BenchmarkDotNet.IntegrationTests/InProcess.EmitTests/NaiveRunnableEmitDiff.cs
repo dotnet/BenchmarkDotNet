@@ -19,16 +19,16 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             "System.Runtime.CompilerServices.RequiredMemberAttribute"
         ];
 
-        private static readonly HashSet<string> IgnoredAttributeTypeNames = new HashSet<string>()
-        {
+        private static readonly HashSet<string> IgnoredAttributeTypeNames =
+        [
             "System.Runtime.CompilerServices.CompilerGeneratedAttribute"
-        };
+        ];
 
-        private static readonly HashSet<string> IgnoredRunnableMethodNames = new HashSet<string>()
-        {
+        private static readonly HashSet<string> IgnoredRunnableMethodNames =
+        [
             "Run",
             ".ctor"
-        };
+        ];
 
         private static readonly IReadOnlyDictionary<OpCode, OpCode> AltOpCodes = new Dictionary<OpCode, OpCode>()
         {

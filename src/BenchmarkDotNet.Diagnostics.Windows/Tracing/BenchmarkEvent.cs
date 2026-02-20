@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             set => target = (Action<BenchmarkEvent>)value;
         }
 
-        public override string[] PayloadNames => payloadNames ?? (payloadNames = new[] { nameof(BenchmarkName) });
+        public override string[] PayloadNames => payloadNames ?? (payloadNames = [nameof(BenchmarkName)]);
 
         public override StringBuilder ToXml(StringBuilder sb)
         {

@@ -11,7 +11,7 @@ internal static class PowershellWmiCpuInfoParser
 {
     internal static CpuInfo Parse(string powershellWmiOutput)
     {
-        HashSet<string> processorModelNames = new HashSet<string>();
+        HashSet<string> processorModelNames = [];
 
         int physicalCoreCount = 0;
         int logicalCoreCount = 0;

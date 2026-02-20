@@ -21,8 +21,8 @@ namespace BenchmarkDotNet.Running
     public class BenchmarkSwitcher
     {
         private readonly IUserInteraction userInteraction = new UserInteraction();
-        private readonly List<Type> types = new List<Type>();
-        private readonly List<Assembly> assemblies = new List<Assembly>();
+        private readonly List<Type> types = [];
+        private readonly List<Assembly> assemblies = [];
 
         internal BenchmarkSwitcher(IUserInteraction userInteraction) => this.userInteraction = userInteraction;
 
@@ -55,8 +55,8 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
         {
-            args ??= Array.Empty<string>();
-            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" }))
+            args ??= [];
+            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = ["*"]))
                 args = updatedArgs;
 
             return Run(args, config);
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
         {
-            args ??= Array.Empty<string>();
+            args ??= [];
             if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => (options.Join, options.Filters) = (true, new[] { "*" })))
                 args = updatedArgs;
 
@@ -87,13 +87,13 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[]? args, IConfig? config, bool askUserForInput)
         {
-            var notNullArgs = args ?? Array.Empty<string>();
+            var notNullArgs = args ?? [];
             var notNullConfig = config ?? DefaultConfig.Instance;
 
             var logger = notNullConfig.GetNonNullCompositeLogger();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(notNullArgs, logger, notNullConfig);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
-                return Array.Empty<Summary>();
+                return [];
 
             if (args == null && Environment.GetCommandLineArgs().Length > 1) // The first element is the executable file name
                 logger.WriteLineHint("You haven't passed command line arguments to BenchmarkSwitcher.Run method. Running with default configuration.");
@@ -101,25 +101,25 @@ namespace BenchmarkDotNet.Running
             if (options!.PrintInformation)
             {
                 logger.WriteLine(HostEnvironmentInfo.GetInformation());
-                return Array.Empty<Summary>();
+                return [];
             }
 
             var effectiveConfig = ManualConfig.Union(notNullConfig, parsedConfig!);
 
             var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
-                return Array.Empty<Summary>();
+                return [];
 
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
                 userInteraction.PrintNoBenchmarksError(logger);
-                return Array.Empty<Summary>();
+                return [];
             }
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
                 PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
-                return Array.Empty<Summary>();
+                return [];
             }
 
             var benchmarksToFilter = options.UserProvidedFilters || !askUserForInput
@@ -136,7 +136,7 @@ namespace BenchmarkDotNet.Running
             if (filteredBenchmarks.IsEmpty())
             {
                 userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, options.Filters.ToArray());
-                return Array.Empty<Summary>();
+                return [];
             }
 
             return BenchmarkRunnerClean.Run(filteredBenchmarks);
@@ -160,18 +160,18 @@ namespace BenchmarkDotNet.Running
             if (jobs.Length <= 1)
             {
                 logger.WriteError("To use apples-to-apples comparison you must specify at least two Job objects.");
-                return Array.Empty<Summary>();
+                return [];
             }
             var baselineJob = jobs.SingleOrDefault(job => job.Meta.Baseline);
             if (baselineJob == default)
             {
                 logger.WriteError("To use apples-to-apples comparison you must specify exactly ONE baseline Job object.");
-                return Array.Empty<Summary>();
+                return [];
             }
             else if (jobs.Any(job => !job.Run.HasValue(RunMode.IterationCountCharacteristic)))
             {
                 logger.WriteError("To use apples-to-apples comparison you must specify the number of iterations in explicit way.");
-                return Array.Empty<Summary>();
+                return [];
             }
 
 #pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Running
             if (invocationCountBenchmarks.IsEmpty())
             {
                 userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, options.Filters.ToArray());
-                return Array.Empty<Summary>();
+                return [];
             }
 
             logger.WriteLineHeader("Each benchmark is going to be executed just once to get invocation counts.");

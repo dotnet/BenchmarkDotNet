@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public ValidatorsTest(ITestOutputHelper output) : base(output) { }
 
         private readonly IExporter[] AllKnownExportersThatSupportExportToLog =
-            {
+            [
                 MarkdownExporter.Atlassian,
                 MarkdownExporter.Console,
                 MarkdownExporter.Default,
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 PlainExporter.Default,
                 JsonExporter.Default,
                 XmlExporter.Default
-            };
+            ];
 
         [Fact]
         public void BenchmarkRunnerShouldNotFailOnCriticalValidationErrors()

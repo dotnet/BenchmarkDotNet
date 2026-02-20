@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 
         public void Print(IEnumerable<string> testNames, ILogger logger)
         {
-            List<Node> topLevelNodes = new List<Node>();
+            List<Node> topLevelNodes = [];
 
             foreach (string test in testNames)
             {

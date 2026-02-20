@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
-                selectedTypes.AddRange(GetMatching(allTypes, userInput.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)));
+                selectedTypes.AddRange(GetMatching(allTypes, userInput.Split([' '], StringSplitOptions.RemoveEmptyEntries)));
                 logger.WriteLine();
             }
 

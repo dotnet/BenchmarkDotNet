@@ -147,15 +147,15 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         {
             string? frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             if (frameworkAssembliesDirectory == null)
-                return Array.Empty<string>();
+                return [];
 
-            return new[]
-            {
+            return
+            [
                 Path.Combine(frameworkAssembliesDirectory, "mscorlib.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.Core.dll"),
                 Path.Combine(frameworkAssembliesDirectory, "System.Runtime.dll")
-            };
+            ];
         }
 
         private static AssemblyMetadata[] GetMissingReferences(Diagnostic[] compilationErrors)

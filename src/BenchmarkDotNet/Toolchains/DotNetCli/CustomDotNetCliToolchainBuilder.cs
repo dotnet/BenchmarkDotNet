@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public abstract class CustomDotNetCliToolchainBuilder
     {
-        protected readonly Dictionary<string, string> Feeds = new Dictionary<string, string>();
+        protected readonly Dictionary<string, string> Feeds = [];
 
         protected string? runtimeIdentifier;
         protected string? customDotNetCliPath;

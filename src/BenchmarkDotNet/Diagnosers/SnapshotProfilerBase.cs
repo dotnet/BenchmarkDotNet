@@ -74,7 +74,7 @@ public abstract class SnapshotProfilerBase : IProfiler
                 yield return new ValidationError(true, $"Runtime '{runtimeMoniker}' is not supported by dotMemory");
     }
 
-    public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => ImmutableArray<Metric>.Empty;
+    public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
     public void DisplayResults(ILogger logger)
     {

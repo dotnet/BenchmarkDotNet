@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Parameters
                     && (array[0]?.GetType() == firstParamType || (firstParamType != null && firstParamType.IsStackOnlyWithImplicitCast(array[0])))) // the benchmark that accepts an object[] as argument
                 {
                     return new ParameterInstances(
-                        new[] { Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle) });
+                        [Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle)]);
                 }
 
                 if (parameterDefinitions.Length > 1)
@@ -55,8 +55,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (parameterDefinitions.Length == 1)
             {
-                return new ParameterInstances(
-                    new[] { Create(parameterDefinitions, unwrappedValue, valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle) });
+                return new ParameterInstances([Create(parameterDefinitions, unwrappedValue, valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle)]);
             }
 
             throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
@@ -101,14 +100,15 @@ namespace BenchmarkDotNet.Parameters
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            MethodInfo? sourceAsMethodInfo =  source as MethodInfo;
+            MethodInfo? sourceAsMethodInfo = source as MethodInfo;
             PropertyInfo? sourceAsPropertyInfo = source as PropertyInfo;
 
             Type indexableType = typeof(IEnumerable<object[]>);
 
             string indexPostfix;
             if (sourceAsMethodInfo?.ReturnType == indexableType ||
-                sourceAsPropertyInfo?.GetMethod?.ReturnType == indexableType) {
+                sourceAsPropertyInfo?.GetMethod?.ReturnType == indexableType)
+            {
                 indexPostfix = $"[{argumentIndex}]";
             }
             else
