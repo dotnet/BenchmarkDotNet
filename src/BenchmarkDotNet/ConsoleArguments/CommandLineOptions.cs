@@ -241,7 +241,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             get => useDisassemblyDiagnoser || DisassemblerRecursiveDepth != DefaultDisassemblerRecursiveDepth || DisassemblerFilters.Any();
             set => useDisassemblyDiagnoser = value;
         }
-        public string? Profiler { get; set; }
+        public string Profiler { get; set; } = "";
         public IEnumerable<string> Filters { get; set; } = [];
         public IEnumerable<string> HiddenColumns { get; set; } = [];
         public bool RunInProcess { get; set; }
@@ -260,7 +260,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public DirectoryInfo? RestorePath { get; set; }
         public IReadOnlyList<FileInfo> CoreRunPaths { get; set; } = [];
         public FileInfo? MonoPath { get; set; }
-        public string? ClrVersion { get; set; }
+        public string ClrVersion { get; set; } = "";
         public string? ILCompilerVersion { get; set; }
         public DirectoryInfo? IlcPackages { get; set; }
         public int? LaunchCount { get; set; }
@@ -287,7 +287,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public int? TimeOutInSeconds { get; set; }
         public WakeLockType? WakeLock { get; set; }
         public bool StopOnFirstError { get; set; }
-        public string? StatisticalTestThreshold { get; set; }
+        public string StatisticalTestThreshold { get; set; } = "";
         public bool DisableLogFile { get; set; }
         public int? MaxParameterColumnWidth { get; set; }
         public IEnumerable<string> EnvironmentVariables { get; set; } = [];

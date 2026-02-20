@@ -81,81 +81,83 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (!expandSuccess) return (false, default, default);
             args = expandedArgs;
 
-            var rootCommand = new RootCommand("BenchmarkDotNet Command Line options");
-            rootCommand.TreatUnmatchedTokensAsErrors = false;
+            var rootCommand = new RootCommand("BenchmarkDotNet Command Line options")
+            {
+                CommandLineOptions.BaseJobOption,
+                CommandLineOptions.RuntimesOption,
+                CommandLineOptions.ExportersOption,
+                CommandLineOptions.MemoryOption,
+                CommandLineOptions.ThreadingOption,
+                CommandLineOptions.ExceptionsOption,
+                CommandLineOptions.DisassemblyOption,
+                CommandLineOptions.ProfilerOption,
+                CommandLineOptions.FiltersOption,
+                CommandLineOptions.HiddenColumnsOption,
+                CommandLineOptions.RunInProcessOption,
+                CommandLineOptions.ArtifactsDirectoryOption,
+                CommandLineOptions.OutliersOption,
+                CommandLineOptions.AffinityOption,
+                CommandLineOptions.DisplayAllStatisticsOption,
+                CommandLineOptions.AllCategoriesOption,
+                CommandLineOptions.AnyCategoriesOption,
+                CommandLineOptions.AttributeNamesOption,
+                CommandLineOptions.JoinOption,
+                CommandLineOptions.KeepBenchmarkFilesOption,
+                CommandLineOptions.DontOverwriteResultsOption,
+                CommandLineOptions.HardwareCountersOption,
+                CommandLineOptions.CliPathOption,
+                CommandLineOptions.RestorePathOption,
+                CommandLineOptions.CoreRunPathsOption,
+                CommandLineOptions.MonoPathOption,
+                CommandLineOptions.ClrVersionOption,
+                CommandLineOptions.ILCompilerVersionOption,
+                CommandLineOptions.IlcPackagesOption,
+                CommandLineOptions.LaunchCountOption,
+                CommandLineOptions.WarmupCountOption,
+                CommandLineOptions.MinWarmupCountOption,
+                CommandLineOptions.MaxWarmupCountOption,
+                CommandLineOptions.IterationTimeOption,
+                CommandLineOptions.IterationCountOption,
+                CommandLineOptions.MinIterationCountOption,
+                CommandLineOptions.MaxIterationCountOption,
+                CommandLineOptions.InvocationCountOption,
+                CommandLineOptions.UnrollFactorOption,
+                CommandLineOptions.RunStrategyOption,
+                CommandLineOptions.PlatformOption,
+                CommandLineOptions.RunOnceOption,
+                CommandLineOptions.PrintInformationOption,
+                CommandLineOptions.ApplesToApplesOption,
+                CommandLineOptions.ListBenchmarkCaseModeOption,
+                CommandLineOptions.DisassemblerDepthOption,
+                CommandLineOptions.DisassemblerFiltersOption,
+                CommandLineOptions.DisassemblerDiffOption,
+                CommandLineOptions.LogBuildOutputOption,
+                CommandLineOptions.GenerateBinLogOption,
+                CommandLineOptions.TimeoutOption,
+                CommandLineOptions.WakeLockOption,
+                CommandLineOptions.StopOnFirstErrorOption,
+                CommandLineOptions.StatisticalTestThresholdOption,
+                CommandLineOptions.DisableLogFileOption,
+                CommandLineOptions.MaxParameterColumnWidthOption,
+                CommandLineOptions.EnvironmentVariablesOption,
+                CommandLineOptions.MemoryRandomizationOption,
+                CommandLineOptions.WasmJavascriptEngineOption,
+                CommandLineOptions.WasmJavaScriptEngineArgumentsOption,
+                CommandLineOptions.CustomRuntimePackOption,
+                CommandLineOptions.AOTCompilerPathOption,
+                CommandLineOptions.AOTCompilerModeOption,
+                CommandLineOptions.WasmDataDirectoryOption,
+                CommandLineOptions.WasmCoreCLROption,
+                CommandLineOptions.NoForcedGCsOption,
+                CommandLineOptions.NoEvaluationOverheadOption,
+                CommandLineOptions.ResumeOption,
+            };
 
-            rootCommand.Add(CommandLineOptions.BaseJobOption);
-            rootCommand.Add(CommandLineOptions.RuntimesOption);
-            rootCommand.Add(CommandLineOptions.ExportersOption);
-            rootCommand.Add(CommandLineOptions.MemoryOption);
-            rootCommand.Add(CommandLineOptions.ThreadingOption);
-            rootCommand.Add(CommandLineOptions.ExceptionsOption);
-            rootCommand.Add(CommandLineOptions.DisassemblyOption);
-            rootCommand.Add(CommandLineOptions.ProfilerOption);
-            rootCommand.Add(CommandLineOptions.FiltersOption);
-            rootCommand.Add(CommandLineOptions.HiddenColumnsOption);
-            rootCommand.Add(CommandLineOptions.RunInProcessOption);
-            rootCommand.Add(CommandLineOptions.ArtifactsDirectoryOption);
-            rootCommand.Add(CommandLineOptions.OutliersOption);
-            rootCommand.Add(CommandLineOptions.AffinityOption);
-            rootCommand.Add(CommandLineOptions.DisplayAllStatisticsOption);
-            rootCommand.Add(CommandLineOptions.AllCategoriesOption);
-            rootCommand.Add(CommandLineOptions.AnyCategoriesOption);
-            rootCommand.Add(CommandLineOptions.AttributeNamesOption);
-            rootCommand.Add(CommandLineOptions.JoinOption);
-            rootCommand.Add(CommandLineOptions.KeepBenchmarkFilesOption);
-            rootCommand.Add(CommandLineOptions.DontOverwriteResultsOption);
-            rootCommand.Add(CommandLineOptions.HardwareCountersOption);
-            rootCommand.Add(CommandLineOptions.CliPathOption);
-            rootCommand.Add(CommandLineOptions.RestorePathOption);
-            rootCommand.Add(CommandLineOptions.CoreRunPathsOption);
-            rootCommand.Add(CommandLineOptions.MonoPathOption);
-            rootCommand.Add(CommandLineOptions.ClrVersionOption);
-            rootCommand.Add(CommandLineOptions.ILCompilerVersionOption);
-            rootCommand.Add(CommandLineOptions.IlcPackagesOption);
-            rootCommand.Add(CommandLineOptions.LaunchCountOption);
-            rootCommand.Add(CommandLineOptions.WarmupCountOption);
-            rootCommand.Add(CommandLineOptions.MinWarmupCountOption);
-            rootCommand.Add(CommandLineOptions.MaxWarmupCountOption);
-            rootCommand.Add(CommandLineOptions.IterationTimeOption);
-            rootCommand.Add(CommandLineOptions.IterationCountOption);
-            rootCommand.Add(CommandLineOptions.MinIterationCountOption);
-            rootCommand.Add(CommandLineOptions.MaxIterationCountOption);
-            rootCommand.Add(CommandLineOptions.InvocationCountOption);
-            rootCommand.Add(CommandLineOptions.UnrollFactorOption);
-            rootCommand.Add(CommandLineOptions.RunStrategyOption);
-            rootCommand.Add(CommandLineOptions.PlatformOption);
-            rootCommand.Add(CommandLineOptions.RunOnceOption);
-            rootCommand.Add(CommandLineOptions.PrintInformationOption);
-            rootCommand.Add(CommandLineOptions.ApplesToApplesOption);
-            rootCommand.Add(CommandLineOptions.ListBenchmarkCaseModeOption);
-            rootCommand.Add(CommandLineOptions.DisassemblerDepthOption);
-            rootCommand.Add(CommandLineOptions.DisassemblerFiltersOption);
-            rootCommand.Add(CommandLineOptions.DisassemblerDiffOption);
-            rootCommand.Add(CommandLineOptions.LogBuildOutputOption);
-            rootCommand.Add(CommandLineOptions.GenerateBinLogOption);
-            rootCommand.Add(CommandLineOptions.TimeoutOption);
-            rootCommand.Add(CommandLineOptions.WakeLockOption);
-            rootCommand.Add(CommandLineOptions.StopOnFirstErrorOption);
-            rootCommand.Add(CommandLineOptions.StatisticalTestThresholdOption);
-            rootCommand.Add(CommandLineOptions.DisableLogFileOption);
-            rootCommand.Add(CommandLineOptions.MaxParameterColumnWidthOption);
-            rootCommand.Add(CommandLineOptions.EnvironmentVariablesOption);
-            rootCommand.Add(CommandLineOptions.MemoryRandomizationOption);
-            rootCommand.Add(CommandLineOptions.WasmJavascriptEngineOption);
-            rootCommand.Add(CommandLineOptions.WasmJavaScriptEngineArgumentsOption);
-            rootCommand.Add(CommandLineOptions.CustomRuntimePackOption);
-            rootCommand.Add(CommandLineOptions.AOTCompilerPathOption);
-            rootCommand.Add(CommandLineOptions.AOTCompilerModeOption);
-            rootCommand.Add(CommandLineOptions.WasmDataDirectoryOption);
-            rootCommand.Add(CommandLineOptions.WasmCoreCLROption);
-            rootCommand.Add(CommandLineOptions.NoForcedGCsOption);
-            rootCommand.Add(CommandLineOptions.NoEvaluationOverheadOption);
-            rootCommand.Add(CommandLineOptions.ResumeOption);
+            rootCommand.TreatUnmatchedTokensAsErrors = false;
 
             var parseResult = rootCommand.Parse(args);
 
-            if (args.Any(a => a == "-h" || a == "--help" || a == "-?"))
+            if (args.Any(a => a == "-h" || a == "--help" || a == "-?" || a == "--version"))
             {
                 parseResult.Invoke();
                 return (false, default, default);
@@ -164,34 +166,34 @@ namespace BenchmarkDotNet.ConsoleArguments
             var options = new CommandLineOptions
             {
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
-                Runtimes = parseResult.GetValue(CommandLineOptions.RuntimesOption) ?? Array.Empty<string>(),
-                Exporters = parseResult.GetValue(CommandLineOptions.ExportersOption) ?? Array.Empty<string>(),
+                Runtimes = parseResult.GetValue(CommandLineOptions.RuntimesOption) ?? [],
+                Exporters = parseResult.GetValue(CommandLineOptions.ExportersOption) ?? [],
                 UseMemoryDiagnoser = parseResult.GetValue(CommandLineOptions.MemoryOption),
                 UseThreadingDiagnoser = parseResult.GetValue(CommandLineOptions.ThreadingOption),
                 UseExceptionDiagnoser = parseResult.GetValue(CommandLineOptions.ExceptionsOption),
                 UseDisassemblyDiagnoser = parseResult.GetValue(CommandLineOptions.DisassemblyOption),
-                Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption),
-                Filters = parseResult.GetValue(CommandLineOptions.FiltersOption) ?? Array.Empty<string>(),
-                HiddenColumns = parseResult.GetValue(CommandLineOptions.HiddenColumnsOption) ?? Array.Empty<string>(),
+                Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
+                Filters = parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [],
+                HiddenColumns = parseResult.GetValue(CommandLineOptions.HiddenColumnsOption) ?? [],
                 RunInProcess = parseResult.GetValue(CommandLineOptions.RunInProcessOption),
                 ArtifactsDirectory = parseResult.GetValue(CommandLineOptions.ArtifactsDirectoryOption),
                 Outliers = parseResult.GetValue(CommandLineOptions.OutliersOption),
                 Affinity = parseResult.GetValue(CommandLineOptions.AffinityOption),
                 DisplayAllStatistics = parseResult.GetValue(CommandLineOptions.DisplayAllStatisticsOption),
-                AllCategories = parseResult.GetValue(CommandLineOptions.AllCategoriesOption) ?? Array.Empty<string>(),
-                AnyCategories = parseResult.GetValue(CommandLineOptions.AnyCategoriesOption) ?? Array.Empty<string>(),
-                AttributeNames = parseResult.GetValue(CommandLineOptions.AttributeNamesOption) ?? Array.Empty<string>(),
+                AllCategories = parseResult.GetValue(CommandLineOptions.AllCategoriesOption) ?? [],
+                AnyCategories = parseResult.GetValue(CommandLineOptions.AnyCategoriesOption) ?? [],
+                AttributeNames = parseResult.GetValue(CommandLineOptions.AttributeNamesOption) ?? [],
                 Join = parseResult.GetValue(CommandLineOptions.JoinOption),
                 KeepBenchmarkFiles = parseResult.GetValue(CommandLineOptions.KeepBenchmarkFilesOption),
                 DontOverwriteResults = parseResult.GetValue(CommandLineOptions.DontOverwriteResultsOption),
-                HardwareCounters = parseResult.GetValue(CommandLineOptions.HardwareCountersOption) ?? Array.Empty<string>(),
+                HardwareCounters = parseResult.GetValue(CommandLineOptions.HardwareCountersOption) ?? [],
                 CliPath = parseResult.GetValue(CommandLineOptions.CliPathOption),
                 RestorePath = parseResult.GetValue(CommandLineOptions.RestorePathOption) != null
                     ? new DirectoryInfo(parseResult.GetValue(CommandLineOptions.RestorePathOption)!.FullName)
                     : null,
-                CoreRunPaths = parseResult.GetValue(CommandLineOptions.CoreRunPathsOption) ?? Array.Empty<FileInfo>(),
+                CoreRunPaths = parseResult.GetValue(CommandLineOptions.CoreRunPathsOption) ?? [],
                 MonoPath = parseResult.GetValue(CommandLineOptions.MonoPathOption),
-                ClrVersion = parseResult.GetValue(CommandLineOptions.ClrVersionOption),
+                ClrVersion = parseResult.GetValue(CommandLineOptions.ClrVersionOption) ?? "",
                 ILCompilerVersion = parseResult.GetValue(CommandLineOptions.ILCompilerVersionOption),
                 IlcPackages = parseResult.GetValue(CommandLineOptions.IlcPackagesOption),
                 LaunchCount = parseResult.GetValue(CommandLineOptions.LaunchCountOption),
@@ -211,17 +213,17 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ApplesToApples = parseResult.GetValue(CommandLineOptions.ApplesToApplesOption),
                 ListBenchmarkCaseMode = parseResult.GetValue(CommandLineOptions.ListBenchmarkCaseModeOption),
                 DisassemblerRecursiveDepth = parseResult.GetValue(CommandLineOptions.DisassemblerDepthOption),
-                DisassemblerFilters = parseResult.GetValue(CommandLineOptions.DisassemblerFiltersOption) ?? Array.Empty<string>(),
+                DisassemblerFilters = parseResult.GetValue(CommandLineOptions.DisassemblerFiltersOption) ?? [],
                 DisassemblerDiff = parseResult.GetValue(CommandLineOptions.DisassemblerDiffOption),
                 LogBuildOutput = parseResult.GetValue(CommandLineOptions.LogBuildOutputOption),
                 GenerateMSBuildBinLog = parseResult.GetValue(CommandLineOptions.GenerateBinLogOption),
                 TimeOutInSeconds = parseResult.GetValue(CommandLineOptions.TimeoutOption),
                 WakeLock = parseResult.GetValue(CommandLineOptions.WakeLockOption),
                 StopOnFirstError = parseResult.GetValue(CommandLineOptions.StopOnFirstErrorOption),
-                StatisticalTestThreshold = parseResult.GetValue(CommandLineOptions.StatisticalTestThresholdOption),
+                StatisticalTestThreshold = parseResult.GetValue(CommandLineOptions.StatisticalTestThresholdOption) ?? "",
                 DisableLogFile = parseResult.GetValue(CommandLineOptions.DisableLogFileOption),
                 MaxParameterColumnWidth = parseResult.GetValue(CommandLineOptions.MaxParameterColumnWidthOption),
-                EnvironmentVariables = parseResult.GetValue(CommandLineOptions.EnvironmentVariablesOption) ?? Array.Empty<string>(),
+                EnvironmentVariables = parseResult.GetValue(CommandLineOptions.EnvironmentVariablesOption) ?? [],
                 MemoryRandomization = parseResult.GetValue(CommandLineOptions.MemoryRandomizationOption),
                 WasmJavascriptEngine = parseResult.GetValue(CommandLineOptions.WasmJavascriptEngineOption),
                 WasmJavaScriptEngineArguments = parseResult.GetValue(CommandLineOptions.WasmJavaScriptEngineArgumentsOption),
