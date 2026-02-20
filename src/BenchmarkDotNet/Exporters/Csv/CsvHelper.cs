@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Exporters.Csv
     {
         private const string Quote = "\"";
         private const string TwoQuotes = "\"\"";
-        private static readonly char[] ForbiddenSymbols = { '\n', '\r', '"', ',' };
+        private static readonly char[] ForbiddenSymbols = ['\n', '\r', '"', ','];
 
         public static string Escape(string? value, string currentListSeparator)
         {

@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Type characteristics
-        private static readonly IReadOnlyList<Characteristic> EmptyCharacteristics = Array.Empty<Characteristic>();
+        private static readonly IReadOnlyList<Characteristic> EmptyCharacteristics = [];
 
         private static readonly ConcurrentDictionary<Type, IReadOnlyList<Characteristic>> ThisTypeCharacteristics =
             new ConcurrentDictionary<Type, IReadOnlyList<Characteristic>>();

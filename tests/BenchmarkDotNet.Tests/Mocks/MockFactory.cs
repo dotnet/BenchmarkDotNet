@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty,
+                [],
                 ImmutableArray.Create<IColumnHidingRule>(columHidingRules));
         }
 
@@ -51,14 +51,14 @@ namespace BenchmarkDotNet.Tests.Mocks
                     (index + 1) * median,
                     (index + 1) * max,
                     n,
-                    Array.Empty<Metric>())).ToImmutableArray(),
+                    [])).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
         }
 
         public static Summary CreateSummary(IConfig config) => new Summary(
@@ -69,8 +69,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             string.Empty,
             TimeSpan.FromMinutes(1),
             config.CultureInfo ?? DefaultCultureInfo.Instance,
-            ImmutableArray<ValidationError>.Empty,
-            ImmutableArray<IColumnHidingRule>.Empty,
+            [],
+            [],
             config.SummaryStyle);
 
 
@@ -85,8 +85,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             string.Empty,
             TimeSpan.FromMinutes(1),
             TestCultureInfo.Instance,
-            ImmutableArray<ValidationError>.Empty,
-            ImmutableArray<IColumnHidingRule>.Empty);
+            [],
+            []);
 
         public static Summary CreateSummary<TBenchmark>(IConfig config, bool hugeSd, Func<BenchmarkCase, Metric[]> metricsBuilder) => new Summary(
             "MockSummary",
@@ -96,8 +96,8 @@ namespace BenchmarkDotNet.Tests.Mocks
             string.Empty,
             TimeSpan.FromMinutes(1),
             TestCultureInfo.Instance,
-            ImmutableArray<ValidationError>.Empty,
-            ImmutableArray<IColumnHidingRule>.Empty);
+            [],
+            []);
 
         public static SummaryStyle CreateSummaryStyle(bool printUnitsInHeader = false, bool printUnitsInContent = true, bool printZeroValuesInContent = false,
             SizeUnit? sizeUnit = null, TimeUnit? timeUnit = null, TextJustification textColumnJustification = TextJustification.Left,
@@ -116,17 +116,17 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int n, double nanoseconds)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
             var measurements = Enumerable.Range(0, n)
                 .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index).ToString())
                 .ToList();
-            var executeResult = new ExecuteResult(true, 0, default, measurements, new[] { $"// Runtime=extra output line" }, Array.Empty<string>(), 1);
+            var executeResult = new ExecuteResult(true, 0, default, measurements, [$"// Runtime=extra output line"], [], 1);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], []);
         }
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = new List<Measurement>
@@ -144,12 +144,12 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static BenchmarkReport CreateReportWithBiasedDistribution(BenchmarkCase benchmarkCase, int min, int median, int max, int n, Metric[] metrics)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = from i in Enumerable.Range(0, Math.Max(1, n / 9))
-                               from m in isFoo ? new[]
-                               {
+                               from m in isFoo ?
+                               [
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, min), // 1
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, min + ((median - min) / 2) + 1), // 3
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, median), // 4
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 8, 1, median + ((max - median) / 2)), // 7
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 9, 1, max),    // 10
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 9, 1, max),    // 10
-                               } : new[]
+                               ] : new[]
                                {
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, min), // 1
                                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, min), // 1

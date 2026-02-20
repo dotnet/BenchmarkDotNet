@@ -48,11 +48,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public string ShortName => "EP";
 
-        public IEnumerable<string> Ids => new[] { nameof(EventPipeProfiler) };
+        public IEnumerable<string> Ids => [nameof(EventPipeProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
 
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 benchmarkToTraceFile[results.BenchmarkCase] = SpeedScopeExporter.Convert(traceFilePath, results.BenchmarkCase.Config.GetCompositeLogger());
 
-            return Array.Empty<Metric>();
+            return [];
         }
 
         public void DisplayResults(ILogger resultLogger)

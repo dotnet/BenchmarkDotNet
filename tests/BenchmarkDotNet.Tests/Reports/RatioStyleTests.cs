@@ -47,8 +47,8 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static readonly IDictionary<string, TestData> Data = new Dictionary<string, TestData>
         {
-            { "Percentage", new TestData(RatioStyle.Percentage, new[] { 100, 15, 115 }, 1, new[] { "baseline", "-85%", "+15%" }) },
-            { "Trend", new TestData(RatioStyle.Trend, new[] { 100, 15, 115 }, 1, new[] { "baseline", "6.84x faster", "1.15x slower" }) }
+            { "Percentage", new TestData(RatioStyle.Percentage, [100, 15, 115], 1, ["baseline", "-85%", "+15%"]) },
+            { "Trend", new TestData(RatioStyle.Trend, [100, 15, 115], 1, ["baseline", "6.84x faster", "1.15x slower"]) }
         };
 
         [UsedImplicitly]
@@ -93,8 +93,8 @@ namespace BenchmarkDotNet.Tests.Reports
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
             return summary;
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int measurementValue, int noise)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
             var measurements = new List<Measurement>
             {
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, measurementValue),

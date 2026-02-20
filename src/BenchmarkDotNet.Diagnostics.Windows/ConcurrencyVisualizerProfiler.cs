@@ -44,11 +44,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public string ShortName => "CV";
 
-        public IEnumerable<string> Ids => new[] { nameof(ConcurrencyVisualizerProfiler) };
+        public IEnumerable<string> Ids => [nameof(ConcurrencyVisualizerProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
         public void DisplayResults(ILogger logger)
         {

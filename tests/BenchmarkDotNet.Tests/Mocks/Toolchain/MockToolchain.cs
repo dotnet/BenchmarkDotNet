@@ -22,14 +22,14 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
         public IBuilder Builder => new MockBuilder();
         public IExecutor Executor { get; private set; }
         public bool IsInProcess => false;
-        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) => ImmutableArray<ValidationError>.Empty;
+        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) => [];
 
         public override string ToString() => GetType().Name;
 
         private class MockGenerator : IGenerator
         {
             public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-                => GenerateResult.Success(ArtifactsPaths.Empty, ImmutableArray<string>.Empty);
+                => GenerateResult.Success(ArtifactsPaths.Empty, []);
         }
 
         private class MockBuilder : IBuilder

@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Validators
                 }
                 catch (NotSupportedException)
                 {
-                    referencedAssemblies = Array.Empty<AssemblyName>();
+                    referencedAssemblies = [];
                 }
                 foreach (var referencedAssemblyName in referencedAssemblies)
                 {

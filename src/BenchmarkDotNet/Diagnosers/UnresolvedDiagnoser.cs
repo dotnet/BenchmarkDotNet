@@ -20,11 +20,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.None;
 
-        public IEnumerable<string> Ids => new string[] { nameof(UnresolvedDiagnoser) };
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<string> Ids => [nameof(UnresolvedDiagnoser)];
+        public IEnumerable<IExporter> Exporters => [];
+        public IEnumerable<IAnalyser> Analysers => [];
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
-        public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => [];
 
         public void DisplayResults(ILogger logger) => logger.WriteLineError(GetErrorMessage());
 

@@ -45,11 +45,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public string ShortName => "ETW";
 
-        public IEnumerable<string> Ids => new[] { nameof(EtwProfiler) };
+        public IEnumerable<string> Ids => [nameof(EtwProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => BuildPmcStats();
 
@@ -74,11 +74,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
             if (!benchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
-                return Array.Empty<Metric>();
+                return [];
 
             // currently TraceLogParser parsers the counters metrics only. So if there are no counters configured, it makes no sense to parse the file
             if (!benchmarkToCounters.TryGetValue(results.BenchmarkCase, out var counters) || counters.IsEmpty())
-                return Array.Empty<Metric>();
+                return [];
 
             return TraceLogParser.Parse(traceFilePath, counters);
         }

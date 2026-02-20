@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
             var summary = MockFactory.CreateSummary(typeof(MockFactory.MockBenchmarkClass));
             var results = summary.BenchmarksCases.ToImmutableDictionary(
                 bc => bc,
-                bc => new DisassemblyResult { Methods = new DisassembledMethod[0], Errors = new string[0] });
+                bc => new DisassemblyResult { Methods = [], Errors = [] });
             var exporter = new GithubMarkdownDisassemblyExporter(results, config);
 
             // Act
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
             var summary = MockFactory.CreateSummary(typeof(MockFactory.MockBenchmarkClass));
             var results = summary.BenchmarksCases.ToImmutableDictionary(
                 bc => bc,
-                bc => new DisassemblyResult { Methods = new DisassembledMethod[0], Errors = new string[0] });
+                bc => new DisassemblyResult { Methods = [], Errors = [] });
             var exporter = new GithubMarkdownDisassemblyExporter(results, config);
 
             // Act

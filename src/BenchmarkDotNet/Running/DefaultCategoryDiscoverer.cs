@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Running
                 attributes.AddRange(type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<BenchmarkCategoryAttribute>());
             }
             if (attributes.Count == 0)
-                return Array.Empty<string>();
+                return [];
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
     }

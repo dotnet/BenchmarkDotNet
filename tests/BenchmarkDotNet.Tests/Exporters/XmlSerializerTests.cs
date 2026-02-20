@@ -211,7 +211,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                     new MockCollectionItem("i1"),
                     new MockCollectionItem("i2"),
                 ];
-            public double[] DoubleArray { get; } = new double[] { 1, 2 };
+            public double[] DoubleArray { get; } = [1, 2];
         }
 
         private class SimpleItemSource

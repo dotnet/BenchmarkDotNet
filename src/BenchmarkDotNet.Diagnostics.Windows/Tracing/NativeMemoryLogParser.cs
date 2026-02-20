@@ -39,11 +39,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             this.logger = logger;
 
             moduleName = programName.ToLowerInvariant();
-            functionNames = new[]
-            {
+            functionNames =
+            [
                 nameof(EngineParameters.WorkloadActionUnroll),
                 nameof(EngineParameters.WorkloadActionNoUnroll)
-            };
+            ];
         }
 
         public IEnumerable<Metric> Parse()
@@ -240,7 +240,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             if (totalOperation == 0)
             {
                 logger.WriteLine($"Something went wrong. The trace file {etlFilePath} does not contain BenchmarkDotNet engine events.");
-                return Enumerable.Empty<Metric>();
+                return [];
             }
 
             var memoryAllocatedPerOperation = totalAllocation / totalOperation;
@@ -268,11 +268,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 logger.WriteLine($"Count of not deallocated object: {item.Count / totalOperation}");
             }
 
-            return new[]
-            {
+            return
+            [
                 new Metric(AllocatedNativeMemoryDescriptor.Instance, memoryAllocatedPerOperation),
                 new Metric(NativeMemoryLeakDescriptor.Instance, memoryLeakPerOperation)
-            };
+            ];
         }
 
         private static Dictionary<Address, long> CreateHeapCache(

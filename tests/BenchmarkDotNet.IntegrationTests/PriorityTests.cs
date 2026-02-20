@@ -71,10 +71,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { 1, 2 };
             }
 
-            public IEnumerable<int> NumberParams => new int[]
-            {
+            public IEnumerable<int> NumberParams =>
+            [
                 50
-            };
+            ];
         }
     }
 }

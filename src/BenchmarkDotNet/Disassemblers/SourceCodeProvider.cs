@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Disassemblers
                 }
                 else
                 {
-                    contents = wholeFileOrJustPath.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                    contents = wholeFileOrJustPath.Split([Environment.NewLine], StringSplitOptions.None);
                 }
 
                 sourceFileCache.Add(file, contents);

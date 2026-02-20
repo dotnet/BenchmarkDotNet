@@ -24,8 +24,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public virtual RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
 
-        public virtual IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        public virtual IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public virtual IEnumerable<IExporter> Exporters => [];
+        public virtual IEnumerable<IAnalyser> Analysers => [];
 
         protected TraceEventSession Session { get; private set; } = default!;
 

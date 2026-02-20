@@ -23,11 +23,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
-        public IEnumerable<string> Ids => new[] { DiagnoserId };
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<string> Ids => [DiagnoserId];
+        public IEnumerable<IExporter> Exporters => [];
+        public IEnumerable<IAnalyser> Analysers => [];
         public void DisplayResults(ILogger logger) { }
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
 
         // the action takes places in other process, and the values are gathered by Engine
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }

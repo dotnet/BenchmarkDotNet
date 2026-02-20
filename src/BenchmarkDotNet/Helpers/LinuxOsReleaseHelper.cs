@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Helpers
                 var values = new Dictionary<string, string>();
                 foreach (string line in lines)
                 {
-                    string[] parts = line.Split(new[] {'='}, 2);
+                    string[] parts = line.Split(['='], 2);
 
                     if (parts.Length == 2)
                     {
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Helpers
                 string? name = values.GetValueOrDefault("NAME");
                 string? version = values.GetValueOrDefault("VERSION");
 
-                string[] idsWithExtendedVersion = { "ubuntu", "linuxmint", "solus", "kali" };
+                string[] idsWithExtendedVersion = ["ubuntu", "linuxmint", "solus", "kali"];
                 if (id != null && idsWithExtendedVersion.Contains(id) && version.IsNotBlank() && name.IsNotBlank())
                     return name + " " + version;
 

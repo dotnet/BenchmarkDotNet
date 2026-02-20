@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class ReturningIEnumerableOfInt
         {
-            private IEnumerable<int> field = Enumerable.Empty<int>();
+            private IEnumerable<int> field = [];
 
             [Benchmark] public IEnumerable<int> Benchmark() => field;
             [Benchmark] public Task<IEnumerable<int>> BenchmarkTask() => Task.FromResult(field);
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class ReturningArray
         {
-            private int[] field = Array.Empty<int>();
+            private int[] field = [];
 
             [Benchmark] public int[] Benchmark() => field;
             [Benchmark] public Task<int[]> BenchmarkTask() => Task.FromResult(field);

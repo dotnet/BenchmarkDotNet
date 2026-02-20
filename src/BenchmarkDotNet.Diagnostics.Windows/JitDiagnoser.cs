@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop();
         }
 
-        public virtual IEnumerable<Metric> ProcessResults(DiagnoserResults results) => Array.Empty<Metric>();
+        public virtual IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {

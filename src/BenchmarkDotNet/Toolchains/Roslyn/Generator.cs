@@ -18,13 +18,13 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         [PublicAPI]
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            => new[]
-            {
+            =>
+            [
                 artifactsPaths.ProgramCodePath,
                 artifactsPaths.AppConfigPath,
                 artifactsPaths.BuildScriptFilePath,
                 artifactsPaths.ExecutablePath
-            };
+            ];
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
@@ -54,11 +54,10 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Concat(
-                    new[]
-                    {
+                    [
                         benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
                         typeof(BenchmarkCase).Assembly // BenchmarkDotNet
-                    })
+                    ])
                 .Distinct();
     }
 }

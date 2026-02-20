@@ -155,12 +155,12 @@ namespace BenchmarkDotNet.Order
         private class BenchmarkComparer : IComparer<BenchmarkCase>
         {
             private static readonly BenchmarkLogicalGroupRule[] DefaultOrder =
-            {
+            [
                 BenchmarkLogicalGroupRule.ByCategory,
                 BenchmarkLogicalGroupRule.ByParams,
                 BenchmarkLogicalGroupRule.ByJob,
                 BenchmarkLogicalGroupRule.ByMethod
-            };
+            ];
 
             private readonly IComparer<string[]> categoryComparer;
             private readonly IComparer<ParameterInstances> paramsComparer;

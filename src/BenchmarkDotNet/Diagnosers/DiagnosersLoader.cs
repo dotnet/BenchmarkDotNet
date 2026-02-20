@@ -68,29 +68,29 @@ namespace BenchmarkDotNet.Diagnosers
                         $"Does not match: {Path.GetFileName(benchmarkDotNetAssembly.Location)} version {benchmarkDotNetAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
 
-                    return Array.Empty<IDiagnoser>();
+                    return [];
                 }
 
-                return new[]
-                {
+                return
+                [
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.TailCallDiagnoser"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.JitStatsDiagnoser"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.ConcurrencyVisualizerProfiler"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.NativeMemoryProfiler")
-                };
+                ];
             }
             catch (Exception ex) when (ex is FileNotFoundException || ex is BadImageFormatException)
             {
                 // Return an array of UnresolvedDiagnoser objects when the assembly does not contain the requested diagnoser
-                return new[] { GetUnresolvedDiagnoser<IDiagnoser>() };
+                return [GetUnresolvedDiagnoser<IDiagnoser>()];
             }
             catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
             {
                 ConsoleLogger.Default.WriteLineError($"Error loading {WindowsDiagnosticAssemblyFileName}: {ex.GetType().Name} - {ex.Message}");
 
-                return Array.Empty<IDiagnoser>();
+                return [];
             }
         }
 

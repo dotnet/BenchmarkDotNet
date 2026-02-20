@@ -95,8 +95,8 @@ namespace BenchmarkDotNet.Tests.Exporters
                 "",
                 TimeSpan.Zero,
                 CultureInfo.InvariantCulture,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
 
             var logger = new AccumulationLogger();
 
@@ -179,8 +179,8 @@ var summary = new Summary(
                 "",
                 TimeSpan.Zero,
                 CultureInfo.InvariantCulture,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
             var logger = new AccumulationLogger();
 
             OpenMetricsExporter.Default.ExportToLog(summary, logger);
@@ -200,7 +200,7 @@ var summary = new Summary(
                         new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
-                            new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
+                            new ParameterInstances([]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
                         null!,
@@ -224,8 +224,8 @@ var summary = new Summary(
                 "",
                 TimeSpan.Zero,
                 CultureInfo.InvariantCulture,
-                ImmutableArray<ValidationError>.Empty,
-                ImmutableArray<IColumnHidingRule>.Empty);
+                [],
+                []);
             var logger = new AccumulationLogger();
 
             OpenMetricsExporter.Default.ExportToLog(summary, logger);
@@ -250,7 +250,7 @@ var summary = new Summary(
                             benchmarkCase: new BenchmarkCase(
                                 new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                                 Job.Dry,
-                                new ParameterInstances(ImmutableArray<ParameterInstance>.Empty),
+                                new ParameterInstances([]),
                                 ImmutableConfigBuilder.Create(new ManualConfig())),
                             null!,
                             null!,
@@ -266,8 +266,8 @@ var summary = new Summary(
                     "",
                     TimeSpan.Zero,
                     CultureInfo.InvariantCulture,
-                    ImmutableArray<ValidationError>.Empty,
-                    ImmutableArray<IColumnHidingRule>.Empty);
+                    [],
+                    []);
 
                 var logger = new AccumulationLogger();
 

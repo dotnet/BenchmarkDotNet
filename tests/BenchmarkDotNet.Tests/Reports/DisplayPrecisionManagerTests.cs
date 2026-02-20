@@ -36,18 +36,18 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static readonly Dictionary<string, TestData> TestDataItems = new Dictionary<string, TestData>
         {
-            { "Min=1000     ", new TestData(new[] { 1000.0 }, 1, 1, 2, 3, 4) },
-            { "Min= 100     ", new TestData(new[] { 0100.0 }, 1, 1, 2, 3, 4) },
-            { "Min=  10     ", new TestData(new[] { 010.00 }, 2, 2, 2, 3, 4) },
-            { "Min=   1     ", new TestData(new[] { 01.000 }, 3, 2, 3, 3, 4) },
-            { "Min=   0.1   ", new TestData(new[] { 0.1000 }, 4, 2, 3, 4, 4) },
-            { "Min=   0.01  ", new TestData(new[] { 0.0100 }, 4, 2, 3, 4, 4) },
-            { "Min=   0.001 ", new TestData(new[] { 0.0010 }, 4, 2, 3, 4, 4) },
-            { "Min=   0.0001", new TestData(new[] { 0.0001 }, 4, 2, 3, 4, 4) },
-            { "Min=   0.0000", new TestData(new[] { 0.0000 }, 1, 1, 2, 3, 4) },
-            { "Empty", new TestData(Array.Empty<double>(), 1, 1, 2, 3, 4) },
-            { "NaN", new TestData(new[] { double.NaN }, 1, 1, 2, 3, 4) },
-            { "Infinity", new TestData(new[] { double.PositiveInfinity }, 1, 1, 2, 3, 4) }
+            { "Min=1000     ", new TestData([1000.0], 1, 1, 2, 3, 4) },
+            { "Min= 100     ", new TestData([0100.0], 1, 1, 2, 3, 4) },
+            { "Min=  10     ", new TestData([010.00], 2, 2, 2, 3, 4) },
+            { "Min=   1     ", new TestData([01.000], 3, 2, 3, 3, 4) },
+            { "Min=   0.1   ", new TestData([0.1000], 4, 2, 3, 4, 4) },
+            { "Min=   0.01  ", new TestData([0.0100], 4, 2, 3, 4, 4) },
+            { "Min=   0.001 ", new TestData([0.0010], 4, 2, 3, 4, 4) },
+            { "Min=   0.0001", new TestData([0.0001], 4, 2, 3, 4, 4) },
+            { "Min=   0.0000", new TestData([0.0000], 1, 1, 2, 3, 4) },
+            { "Empty", new TestData([], 1, 1, 2, 3, 4) },
+            { "NaN", new TestData([double.NaN], 1, 1, 2, 3, 4) },
+            { "Infinity", new TestData([double.PositiveInfinity], 1, 1, 2, 3, 4) }
         };
 
         [UsedImplicitly]
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [InlineData(1, double.PositiveInfinity)]
         public void ClassicTest(int expected, double value)
         {
-            int actual = DisplayPrecisionManager.CalcPrecision(new[] { value });
+            int actual = DisplayPrecisionManager.CalcPrecision([value]);
             Assert.Equal(expected, actual);
         }
     }
