@@ -46,8 +46,22 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
-            // Microsoft.NET.Sdk.WebAssembly auto-defaults UseMonoRuntime=true.
-            string sdkName = runtime.IsMonoRuntime ? "Microsoft.NET.Sdk.WebAssembly" : "Microsoft.NET.Sdk";
+            string sdkName = "Microsoft.NET.Sdk.WebAssembly";
+
+            // For CoreCLR WASM:
+            // - UseMonoRuntime=false: resolves CoreCLR runtime pack instead of Mono
+            // - WasmBuildNative=false: avoids requiring wasm-tools workload
+            // - WasmEnableWebcil=false: CoreCLR doesn't support webcil format
+            string coreclrOverrides = runtime.IsMonoRuntime
+                ? string.Empty
+                : @"
+  <!-- CoreCLR overrides: use CoreCLR runtime instead of Mono -->
+  <PropertyGroup>
+    <UseMonoRuntime>false</UseMonoRuntime>
+    <WasmBuildNative>false</WasmBuildNative>
+    <WasmEnableWebcil>false</WasmEnableWebcil>
+  </PropertyGroup>
+";
 
             string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
@@ -60,14 +74,17 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 .Replace("$SDKNAME$", sdkName)
                 .Replace("$WASMDATADIR$", runtime.WasmDataDir)
                 .Replace("$TARGET$", CustomRuntimePack.IsNotBlank() ? "PublishWithCustomRuntimePack" : "Publish")
+                .Replace("$CORECLR_OVERRIDES$", coreclrOverrides)
             .ToString();
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
             // Place benchmark-main.mjs in wwwroot/ next to the generated csproj.
+            // Use CoreCLR-specific template that imports from parent directory (no _framework/)
             string projectWwwroot = Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "wwwroot");
             Directory.CreateDirectory(projectWwwroot);
-            File.WriteAllText(Path.Combine(projectWwwroot, MainJS), ResourceHelper.LoadTemplate(MainJS));
+            string templateName = runtime.IsMonoRuntime ? MainJS : "benchmark-main-coreclr.mjs";
+            File.WriteAllText(Path.Combine(projectWwwroot, MainJS), ResourceHelper.LoadTemplate(templateName));
 
             GatherReferences(buildPartition, artifactsPaths, logger);
         }

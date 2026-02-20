@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <Import Project="$(WasmPropsPath)" Condition="Exists($(WasmPropsPath))" />
-
+$CORECLR_OVERRIDES$
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RuntimeConfig>Release</RuntimeConfig>
