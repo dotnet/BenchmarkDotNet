@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static (bool Success, string[] ExpandedTokens) ExpandResponseFile(string[] args, ILogger logger)
         {
-            List<string> result = new();
+            List<string> result = [];
             foreach (var arg in args)
             {
                 if (arg.StartsWith("@"))

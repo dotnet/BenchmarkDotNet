@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public static readonly EventPipeProfiler Default = new EventPipeProfiler();
 
-        private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
+        private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = [];
         private readonly ImmutableHashSet<EventPipeProvider> eventPipeProviders;
         private readonly bool performExtraBenchmarksRun;
 

@@ -31,8 +31,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly PerfCollectProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
-        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new();
-        private readonly HashSet<string> cliPathWithSymbolsInstalled = new();
+        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = [];
+        private readonly HashSet<string> cliPathWithSymbolsInstalled = [];
         private FileInfo perfCollectFile = default!;
         private Process perfCollectProcess = default!;
 

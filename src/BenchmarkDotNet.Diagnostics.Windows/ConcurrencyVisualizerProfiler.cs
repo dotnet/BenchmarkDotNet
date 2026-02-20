@@ -33,8 +33,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private static readonly Guid ConcurrencyVisualizerMarkersId = new Guid("8D4925AB-505A-483b-A7E0-6F824A07A6F0"); // "ConcurrencyVisualizer.Markers";
 
         private readonly EtwProfiler etwProfiler;
-        private readonly Dictionary<BenchmarkCase, string> benchmarkToCvTraceFile = new Dictionary<BenchmarkCase, string>();
-        private readonly Dictionary<BenchmarkCase, int> benchmarkToProcessId = new Dictionary<BenchmarkCase, int>();
+        private readonly Dictionary<BenchmarkCase, string> benchmarkToCvTraceFile = [];
+        private readonly Dictionary<BenchmarkCase, int> benchmarkToProcessId = [];
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public ConcurrencyVisualizerProfiler() => etwProfiler = new EtwProfiler(CreateDefaultConfig());

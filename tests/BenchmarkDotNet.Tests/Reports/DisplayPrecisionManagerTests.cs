@@ -23,14 +23,14 @@ namespace BenchmarkDotNet.Tests.Reports
             public TestData(double[] values, int ppNull, int pp1, int pp2, int pp3, int pp4)
             {
                 Values = values;
-                Configurations = new List<(int? ParentPrecision, int ExpectedPrecision)>
-                {
+                Configurations =
+                [
                     (null, ppNull),
                     (1, pp1),
                     (2, pp2),
                     (3, pp3),
                     (4, pp4)
-                };
+                ];
             }
         }
 

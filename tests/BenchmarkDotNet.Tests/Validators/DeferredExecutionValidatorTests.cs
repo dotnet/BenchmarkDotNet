@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class ReturningDictionary
         {
-            private Dictionary<int, int> field = new Dictionary<int, int>();
+            private Dictionary<int, int> field = [];
 
             [Benchmark] public Dictionary<int, int> Benchmark() => field;
             [Benchmark] public Task<Dictionary<int, int>> BenchmarkTask() => Task.FromResult(field);

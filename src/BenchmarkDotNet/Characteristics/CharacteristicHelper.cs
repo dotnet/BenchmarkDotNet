@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             var result = new List<Characteristic>();
 
-            FillAllCharacteristicsCore(characteristicObjectType, result, new HashSet<Characteristic>());
+            FillAllCharacteristicsCore(characteristicObjectType, result, []);
 
             return result.ToArray();
         }

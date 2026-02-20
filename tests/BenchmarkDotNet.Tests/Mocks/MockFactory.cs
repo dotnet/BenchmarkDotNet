@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index).ToString())
                 .ToList();
             var executeResult = new ExecuteResult(true, 0, default, measurements, new[] { $"// Runtime=extra output line" }, Array.Empty<string>(), 1);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, Array.Empty<Metric>());
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], []);
         }
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
             var executeResult = new ExecuteResult(measurements, default);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], metrics);
         }
 
         private static BenchmarkReport CreateReportWithBiasedDistribution(BenchmarkCase benchmarkCase, int min, int median, int max, int n, Metric[] metrics)
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                                }
                                select m;
             var executeResult = new ExecuteResult(measurements.Take(n).ToList(), default);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], metrics);
         }
 
         [LongRunJob]

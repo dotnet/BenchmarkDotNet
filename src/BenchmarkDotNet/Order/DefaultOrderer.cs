@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Order
                 this.jobComparer = jobComparer;
                 this.paramsComparer = paramsComparer;
 
-                this.order = new List<BenchmarkLogicalGroupRule>();
+                this.order = [];
                 foreach (var rule in (order ?? []).Concat(DefaultOrder))
                     if (!this.order.Contains(rule))
                         this.order.Add(rule);

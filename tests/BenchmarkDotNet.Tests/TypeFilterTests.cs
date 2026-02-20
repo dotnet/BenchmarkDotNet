@@ -219,7 +219,7 @@ namespace BenchmarkDotNet.Tests
 
             var config = ConfigParser.Parse(args, nonNullLogger);
 
-            var runnableTypes = TypeFilter.GetTypesWithRunnableBenchmarks(types, Array.Empty<Assembly>(), nonNullLogger);
+            var runnableTypes = TypeFilter.GetTypesWithRunnableBenchmarks(types, [], nonNullLogger);
 
             return new HashSet<string>(TypeFilter.Filter(config.config!, runnableTypes.runnable)
                 .SelectMany(runInfo => runInfo.BenchmarksCases)

@@ -12,8 +12,8 @@ namespace BenchmarkDotNet.ConsoleArguments
     {
         // note This is a heuristic value, we suppose that user can make three or fewer typos.
         private static int PossibleTyposCount => 3;
-        private readonly HashSet<string> possibleBenchmarkNameFilters = new HashSet<string>();
-        private readonly HashSet<string> actualFullBenchmarkNames = new HashSet<string>();
+        private readonly HashSet<string> possibleBenchmarkNameFilters = [];
+        private readonly HashSet<string> actualFullBenchmarkNames = [];
 
         public CorrectionsSuggester(IReadOnlyList<Type> types)
         {

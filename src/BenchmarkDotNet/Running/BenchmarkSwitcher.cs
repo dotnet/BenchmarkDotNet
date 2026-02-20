@@ -21,8 +21,8 @@ namespace BenchmarkDotNet.Running
     public class BenchmarkSwitcher
     {
         private readonly IUserInteraction userInteraction = new UserInteraction();
-        private readonly List<Type> types = new List<Type>();
-        private readonly List<Assembly> assemblies = new List<Assembly>();
+        private readonly List<Type> types = [];
+        private readonly List<Assembly> assemblies = [];
 
         internal BenchmarkSwitcher(IUserInteraction userInteraction) => this.userInteraction = userInteraction;
 

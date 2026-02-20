@@ -20,12 +20,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             {
                 artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);
 
-                return GenerateResult.Success(artifactsPaths, new List<string>());
+                return GenerateResult.Success(artifactsPaths, []);
             }
             catch (Exception ex)
             {
                 logger.WriteLineError($"Failed to generate partition: {ex}");
-                return GenerateResult.Failure(artifactsPaths, new List<string>());
+                return GenerateResult.Failure(artifactsPaths, []);
             }
         }
 

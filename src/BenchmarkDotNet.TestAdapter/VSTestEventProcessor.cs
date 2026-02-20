@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.TestAdapter
         private readonly TestExecutionRecorderWrapper recorder;
         private readonly CancellationToken cancellationToken;
         private readonly Stopwatch runTimerStopwatch = new();
-        private readonly Dictionary<Guid, TestResult> testResults = new();
-        private readonly HashSet<Guid> sentTestResults = new();
+        private readonly Dictionary<Guid, TestResult> testResults = [];
+        private readonly HashSet<Guid> sentTestResults = [];
 
         public VsTestEventProcessor(
             List<TestCase> cases,
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.TestAdapter
             // If the error is not linked to a benchmark case, then set the error on all benchmarks
             var errorCases = validationError.BenchmarkCase == null
                 ? cases.Values.ToList()
-                : new List<TestCase> { cases[validationError.BenchmarkCase.GetTestCaseId()] };
+                : [cases[validationError.BenchmarkCase.GetTestCaseId()]];
             foreach (var testCase in errorCases)
             {
                 var testResult = GetOrCreateTestResult(testCase);

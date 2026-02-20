@@ -285,7 +285,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
             if (!heaps.TryGetValue(heapHandle, out ret))
             {
-                ret = new Dictionary<Address, long>();
+                ret = [];
                 heaps.Add(heapHandle, ret);
             }
 

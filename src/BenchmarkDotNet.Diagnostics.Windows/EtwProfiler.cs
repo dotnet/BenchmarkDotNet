@@ -38,8 +38,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             this.config = config;
             runMode = config.PerformExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
-            benchmarkToEtlFile = new Dictionary<BenchmarkCase, string>();
-            benchmarkToCounters = new Dictionary<BenchmarkCase, PreciseMachineCounter[]>();
+            benchmarkToEtlFile = [];
+            benchmarkToCounters = [];
             CreationTime = DateTime.Now;
         }
 

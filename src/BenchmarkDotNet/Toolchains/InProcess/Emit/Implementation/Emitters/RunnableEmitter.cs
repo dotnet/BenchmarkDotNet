@@ -333,7 +333,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private void InitForEmitRunnable(BenchmarkBuildInfo newBenchmark)
         {
             // Init current state
-            argFields = new List<ArgFieldInfo>();
+            argFields = [];
             benchmark = newBenchmark;
             jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(
                 RunMode.UnrollFactorCharacteristic,

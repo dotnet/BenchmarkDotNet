@@ -249,7 +249,7 @@ public class OpenMetricsExporter : ExporterBase
             return new OpenMetric(fullMetricName, help, type, "", labels, metric.Value.Value);
         }
 
-        private static readonly Dictionary<string, string> NormalizedLabelKeyCache = new();
+        private static readonly Dictionary<string, string> NormalizedLabelKeyCache = [];
         private static string NormalizeLabelKey(string key)
         {
             string normalized = new(key

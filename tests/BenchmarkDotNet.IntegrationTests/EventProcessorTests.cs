@@ -231,7 +231,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
             {
-                return GenerateResult.Failure(ArtifactsPaths.Empty, new List<string>(), new Exception("Generation Failed"));
+                return GenerateResult.Failure(ArtifactsPaths.Empty, [], new Exception("Generation Failed"));
             }
         }
 
@@ -249,7 +249,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 public IReadOnlyList<object> Args { get; }
             }
 
-            public List<EventData> Events { get; } = new List<EventData>();
+            public List<EventData> Events { get; } = [];
 
             public override void OnBuildComplete(BuildPartition buildPartition, BuildResult buildResult)
             {
