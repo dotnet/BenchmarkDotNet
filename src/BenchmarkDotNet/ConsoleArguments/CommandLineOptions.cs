@@ -204,7 +204,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
         public FileInfo? WasmJavascriptEngine { get; set; }
 
-        [Option("wasmArgs", Required = false, Default = "", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
+        [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
         public string? WasmJavaScriptEngineArguments { get; set; }
 
         [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]

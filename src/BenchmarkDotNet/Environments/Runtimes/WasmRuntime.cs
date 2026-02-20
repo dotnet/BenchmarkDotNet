@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Environments
         /// creates new instance of WasmRuntime
         /// </summary>
         /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
-        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. Empty by default.</param>
+        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. "--expose_wasm" by default</param>
         /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
         /// <param name="displayName">default: "Wasm"</param>
         /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>

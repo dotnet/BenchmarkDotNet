@@ -3,10 +3,7 @@
 
 import { dotnet } from './_framework/dotnet.js'
 
-// Get command line arguments: Node.js uses process.argv, v8 uses arguments/scriptArgs
-const args = typeof process !== 'undefined' ? process.argv.slice(2) : (typeof arguments !== 'undefined' ? [...arguments] : (typeof scriptArgs !== 'undefined' ? scriptArgs : []));
-
 await dotnet
     .withDiagnosticTracing(false)
-    .withApplicationArguments(...args)
+    .withApplicationArguments(...arguments)
     .run()
