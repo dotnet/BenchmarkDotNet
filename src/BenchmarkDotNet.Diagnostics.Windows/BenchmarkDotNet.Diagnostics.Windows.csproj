@@ -7,7 +7,6 @@
     <NoWarn>1701;1702;1705;1591;3001;3003;3002;3009</NoWarn>
     <AssemblyName>BenchmarkDotNet.Diagnostics.Windows</AssemblyName>
     <PackageId>BenchmarkDotNet.Diagnostics.Windows</PackageId>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
