@@ -80,11 +80,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
 
             // Place benchmark-main.mjs in wwwroot/ next to the generated csproj.
-            // Use CoreCLR-specific template that imports from parent directory (no _framework/)
             string projectWwwroot = Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "wwwroot");
             Directory.CreateDirectory(projectWwwroot);
-            string templateName = runtime.IsMonoRuntime ? MainJS : "benchmark-main-coreclr.mjs";
-            File.WriteAllText(Path.Combine(projectWwwroot, MainJS), ResourceHelper.LoadTemplate(templateName));
+            File.WriteAllText(Path.Combine(projectWwwroot, MainJS), ResourceHelper.LoadTemplate(MainJS));
 
             GatherReferences(buildPartition, artifactsPaths, logger);
         }
