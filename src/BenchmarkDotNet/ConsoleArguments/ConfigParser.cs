@@ -289,6 +289,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return (false, default, default);
             }
 
+            var invalidOptions = parseResult.UnmatchedTokens.Where(t => t.StartsWith("-") && t != "--").ToList();
+            if (invalidOptions.Any())
+                return (false, default, default);
+
             var options = new CommandLineOptions
             {
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
@@ -299,7 +303,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 UseExceptionDiagnoser = parseResult.GetValue(CommandLineOptions.ExceptionsOption),
                 UseDisassemblyDiagnoser = parseResult.GetValue(CommandLineOptions.DisassemblyOption),
                 Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
-                Filters = parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [],
+                Filters = (parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [])
+                            .Concat(parseResult.UnmatchedTokens.Where(t => !t.StartsWith("-") && t != "--"))
+                            .ToArray(),
                 HiddenColumns = parseResult.GetValue(CommandLineOptions.HiddenColumnsOption) ?? [],
                 RunInProcess = parseResult.GetValue(CommandLineOptions.RunInProcessOption),
                 ArtifactsDirectory = parseResult.GetValue(CommandLineOptions.ArtifactsDirectoryOption),
@@ -549,6 +555,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var parseResult = rootCommand.Parse(args);
 
+            var invalidOptions = parseResult.UnmatchedTokens.Where(t => t.StartsWith("-") && t != "--").ToList();
+
             var options = new CommandLineOptions
             {
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
@@ -559,7 +567,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 UseExceptionDiagnoser = parseResult.GetValue(CommandLineOptions.ExceptionsOption),
                 UseDisassemblyDiagnoser = parseResult.GetValue(CommandLineOptions.DisassemblyOption),
                 Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
-                Filters = parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [],
+                Filters = (parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [])
+                            .Concat(parseResult.UnmatchedTokens.Where(t => !t.StartsWith("-") && t != "--"))
+                            .ToArray(),
                 HiddenColumns = parseResult.GetValue(CommandLineOptions.HiddenColumnsOption) ?? [],
                 RunInProcess = parseResult.GetValue(CommandLineOptions.RunInProcessOption),
                 ArtifactsDirectory = parseResult.GetValue(CommandLineOptions.ArtifactsDirectoryOption),
@@ -623,7 +633,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 Resume = parseResult.GetValue(CommandLineOptions.ResumeOption),
             };
 
-            if (!Validate(options, NullLogger.Instance))
+            if (invalidOptions.Any() || !Validate(options, NullLogger.Instance))
             {
                 updatedArgs = null;
                 return false;
@@ -652,12 +662,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 result.Add(options.BaseJob);
             }
 
-            // --runtimes
-            if (options.Runtimes.Any())
-            {
-                result.Add("--runtimes");
-                result.AddRange(options.Runtimes);
-            }
 
             if (options.UseMemoryDiagnoser) result.Add("--memory");
             if (options.UseThreadingDiagnoser) result.Add("--threading");
@@ -681,6 +685,13 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.NoForcedGCs) result.Add("--noForcedGCs");
             if (options.NoEvaluationOverhead) result.Add("--noOverheadEvaluation");
             if (options.Resume) result.Add("--resume");
+
+            // --runtimes
+            if (options.Runtimes.Any())
+            {
+                result.Add("--runtimes");
+                result.AddRange(options.Runtimes);
+            }
 
             // strings
             if (options.Profiler.IsNotBlank())

@@ -305,5 +305,22 @@ namespace BenchmarkDotNet.ConsoleArguments
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         private static string Escape(string input) => UserInteractionHelper.EscapeCommandExample(input);
+
+        static CommandLineOptions()
+        {
+            // Allow space-separated arrays (e.g. --exporters html rplot)
+            RuntimesOption.AllowMultipleArgumentsPerToken = true;
+            ExportersOption.AllowMultipleArgumentsPerToken = true;
+            FiltersOption.AllowMultipleArgumentsPerToken = true;
+            AllCategoriesOption.AllowMultipleArgumentsPerToken = true;
+            AnyCategoriesOption.AllowMultipleArgumentsPerToken = true;
+            AttributeNamesOption.AllowMultipleArgumentsPerToken = true;
+            HiddenColumnsOption.AllowMultipleArgumentsPerToken = true;
+            HardwareCountersOption.AllowMultipleArgumentsPerToken = true;
+            EnvironmentVariablesOption.AllowMultipleArgumentsPerToken = true;
+            DisassemblerFiltersOption.AllowMultipleArgumentsPerToken = true;
+            CoreRunPathsOption.AllowMultipleArgumentsPerToken = true;
+        }
+
     }
 }
