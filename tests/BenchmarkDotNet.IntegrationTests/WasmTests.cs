@@ -83,7 +83,18 @@ namespace BenchmarkDotNet.IntegrationTests
             Directory.Delete(Path.GetDirectoryName(artefactsPaths.ProjectFilePath)!, true);
         }
 
-        private ManualConfig GetConfig(MonoAotCompilerMode aotCompilerMode, bool useMainJsTemplate = false, bool keepBenchmarkFiles = false)
+        [Fact]
+        public void WasmSupportsNode()
+        {
+            if (SkipTestRun())
+            {
+                return;
+            }
+
+            CanExecute<WasmBenchmark>(GetConfig(MonoAotCompilerMode.mini, javaScriptEngine: "node"));
+        }
+
+        private ManualConfig GetConfig(MonoAotCompilerMode aotCompilerMode, bool useMainJsTemplate = false, bool keepBenchmarkFiles = false, string javaScriptEngine = "v8")
         {
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
@@ -94,7 +105,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, "v8"))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings, mainJsTemplatePath)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, keepBenchmarkFiles)

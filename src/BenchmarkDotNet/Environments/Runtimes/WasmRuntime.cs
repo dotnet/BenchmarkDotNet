@@ -81,7 +81,11 @@ namespace BenchmarkDotNet.Environments
 
         private static string DefaultArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args)
         {
-            return $"{runtime.JavaScriptEngineArguments} --module {artifactsPaths.ExecutablePath} -- --run {artifactsPaths.ProgramName}.dll {args}";
+            return Path.GetFileNameWithoutExtension(runtime.JavaScriptEngine).ToLower() switch
+            {
+                "node" or "bun" => $"{runtime.JavaScriptEngineArguments} {artifactsPaths.ExecutablePath} -- --run {artifactsPaths.ProgramName}.dll {args}",
+                _ => $"{runtime.JavaScriptEngineArguments} --module {artifactsPaths.ExecutablePath} -- --run {artifactsPaths.ProgramName}.dll {args}",
+            };
         }
     }
 }
