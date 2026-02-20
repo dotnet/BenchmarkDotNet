@@ -12,15 +12,6 @@ namespace BenchmarkDotNet.Analyzers.General;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 {
-    internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule = new(
-        DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract,
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title)),
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat)),
-        "Usage",
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description)));
-
     internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeGenericRule = new(
         DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric,
         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title)),
@@ -92,7 +83,6 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
-        ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
         ClassWithGenericTypeArgumentsAttributeMustBeGenericRule,
         GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
         MethodMustBePublicRule,
@@ -149,11 +139,6 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         {
             foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
             {
-                if (classAbstractModifier.HasValue)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, genericTypeArgumentsAttribute.GetLocation()));
-                }
-
                 if (classDeclarationSyntax.TypeParameterList == null || classDeclarationSyntax.TypeParameterList.Parameters.Count == 0)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, genericTypeArgumentsAttribute.GetLocation()));

@@ -35,46 +35,6 @@ public class BenchmarkClassAnalyzerTests
         }
     }
 
-    public class ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-    {
-        public ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule) { }
-
-        [Theory, CombinatorialData]
-        public async Task Abstract_class_annotated_with_at_least_one_generictypearguments_attribute_should_trigger_diagnostic(
-            [CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
-            [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
-        {
-            const string benchmarkClassName = "BenchmarkClass";
-
-            var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[{{|#{0}:GenericTypeArguments(typeof(int))|}}]", genericTypeArgumentsAttributeUsageCount).Select((a, i) => string.Format(a, i));
-
-            var testCode = /* lang=c#-test */ $$"""
-                using BenchmarkDotNet.Attributes;
-
-                {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
-                public abstract class {{benchmarkClassName}}<TParameter>
-                {
-                    {{benchmarkAttributeUsage}}
-                    public void BenchmarkMethod()
-                    {
-
-                    }
-                }
-                """;
-
-            TestCode = testCode;
-
-            for (var i = 0; i < genericTypeArgumentsAttributeUsageCount; i++)
-            {
-                AddExpectedDiagnostic(i);
-            }
-
-            await RunAsync();
-        }
-
-        public static IEnumerable<string> BenchmarkAttributeUsagesEnumerableLocal => BenchmarkAttributeUsagesEnumerable;
-    }
-
     public class ClassWithGenericTypeArgumentsAttributeMustBeGeneric : AnalyzerTestFixture<BenchmarkClassAnalyzer>
     {
         public ClassWithGenericTypeArgumentsAttributeMustBeGeneric() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeGenericRule) { }
