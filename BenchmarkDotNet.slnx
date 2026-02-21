@@ -6,6 +6,7 @@
   <Folder Name="/samples/">
     <File Path="samples/Directory.Build.props" />
     <Project Path="samples/BenchmarkDotNet.Samples.FSharp/BenchmarkDotNet.Samples.FSharp.fsproj" />
+    <Project Path="samples/BenchmarkDotNet.Samples.Sandbox/BenchmarkDotNet.Samples.Sandbox.csproj" />
     <Project Path="samples/BenchmarkDotNet.Samples/BenchmarkDotNet.Samples.csproj" DefaultStartup="true" />
   </Folder>
   <Folder Name="/src/">
