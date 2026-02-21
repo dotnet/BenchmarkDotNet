@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "stackoverflow", new[] { MarkdownExporter.StackOverflow } },
                 { "github", new[] { MarkdownExporter.GitHub } },
                 { "plain", new[] { PlainExporter.Default } },
-                { "rplot", new[] { CsvMeasurementsExporter.Default, RPlotExporter.Default } }, // R Plots depends on having the full measurements available
+                { "rplot", new[] { CsvMeasurementsExporter.Default, RPlotExporter.Default } },
                 { "json", new[] { JsonExporter.Default } },
                 { "briefjson", new[] { JsonExporter.Brief } },
                 { "fulljson", new[] { JsonExporter.Full } },
@@ -76,11 +76,34 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
+        private static bool HasDuplicateOptions(string[] args)
+        {
+            var aliasToCanonical = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["-j"] = "--job",
+                ["-r"] = "--runtimes",
+                ["-e"] = "--exporters",
+                ["-m"] = "--memory",
+                ["-t"] = "--threading",
+                ["-d"] = "--disasm",
+                ["-p"] = "--profiler",
+                ["-f"] = "--filter",
+                ["-h"] = "--hide",
+                ["-i"] = "--inprocess",
+                ["-a"] = "--artifacts"
+            };
+
+            var options = args.Where(a => a.StartsWith("-") && a != "--")
+                              .Select(a => a.Split('=')[0].ToLowerInvariant())
+                              .Select(a => aliasToCanonical.TryGetValue(a, out var c) ? c : a);
+
+            return options.GroupBy(x => x).Any(g => g.Count() > 1);
+        }
+
         private static string[] NormalizeArgs(string[] args)
         {
             var aliasToCanonical = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                // short aliases
                 ["-j"] = "--job",
                 ["-r"] = "--runtimes",
                 ["-e"] = "--exporters",
@@ -212,6 +235,14 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public static (bool isSuccess, IConfig? config, CommandLineOptions? options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
+            args = args.Where(a => !string.IsNullOrWhiteSpace(a)).ToArray();
+
+            if (HasDuplicateOptions(args))
+            {
+                logger.WriteLineError("Duplicate options are not allowed.");
+                return (false, default, default);
+            }
+
             var (expandSuccess, expandedArgs) = ExpandResponseFile(args, logger);
             if (!expandSuccess) return (false, default, default);
             args = expandedArgs;
@@ -316,7 +347,11 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var invalidOptions = parseResult.UnmatchedTokens.Where(t => t.StartsWith("-") && t != "--").ToList();
             if (invalidOptions.Any())
+            {
+                foreach (var opt in invalidOptions)
+                    logger.WriteLineError($"Option '{opt.TrimStart('-')}' is unknown.");
                 return (false, default, default);
+            }
 
             var options = new CommandLineOptions
             {
@@ -501,8 +536,17 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return result;
             }
         }
+
         internal static bool TryUpdateArgs(string[] args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
         {
+            args = args.Where(a => !string.IsNullOrWhiteSpace(a)).ToArray();
+
+            if (HasDuplicateOptions(args))
+            {
+                updatedArgs = null;
+                return false;
+            }
+
             args = NormalizeArgs(args);
 
             string[] extraArgs = [];
@@ -514,77 +558,76 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             var rootCommand = new RootCommand("BenchmarkDotNet Command Line options")
-    {
-        CommandLineOptions.BaseJobOption,
-        CommandLineOptions.RuntimesOption,
-        CommandLineOptions.ExportersOption,
-        CommandLineOptions.MemoryOption,
-        CommandLineOptions.ThreadingOption,
-        CommandLineOptions.ExceptionsOption,
-        CommandLineOptions.DisassemblyOption,
-        CommandLineOptions.ProfilerOption,
-        CommandLineOptions.FiltersOption,
-        CommandLineOptions.HiddenColumnsOption,
-        CommandLineOptions.RunInProcessOption,
-        CommandLineOptions.ArtifactsDirectoryOption,
-        CommandLineOptions.OutliersOption,
-        CommandLineOptions.AffinityOption,
-        CommandLineOptions.DisplayAllStatisticsOption,
-        CommandLineOptions.AllCategoriesOption,
-        CommandLineOptions.AnyCategoriesOption,
-        CommandLineOptions.AttributeNamesOption,
-        CommandLineOptions.JoinOption,
-        CommandLineOptions.KeepBenchmarkFilesOption,
-        CommandLineOptions.DontOverwriteResultsOption,
-        CommandLineOptions.HardwareCountersOption,
-        CommandLineOptions.CliPathOption,
-        CommandLineOptions.RestorePathOption,
-        CommandLineOptions.CoreRunPathsOption,
-        CommandLineOptions.MonoPathOption,
-        CommandLineOptions.ClrVersionOption,
-        CommandLineOptions.ILCompilerVersionOption,
-        CommandLineOptions.IlcPackagesOption,
-        CommandLineOptions.LaunchCountOption,
-        CommandLineOptions.WarmupCountOption,
-        CommandLineOptions.MinWarmupCountOption,
-        CommandLineOptions.MaxWarmupCountOption,
-        CommandLineOptions.IterationTimeOption,
-        CommandLineOptions.IterationCountOption,
-        CommandLineOptions.MinIterationCountOption,
-        CommandLineOptions.MaxIterationCountOption,
-        CommandLineOptions.InvocationCountOption,
-        CommandLineOptions.UnrollFactorOption,
-        CommandLineOptions.RunStrategyOption,
-        CommandLineOptions.PlatformOption,
-        CommandLineOptions.RunOnceOption,
-        CommandLineOptions.PrintInformationOption,
-        CommandLineOptions.ApplesToApplesOption,
-        CommandLineOptions.ListBenchmarkCaseModeOption,
-        CommandLineOptions.DisassemblerDepthOption,
-        CommandLineOptions.DisassemblerFiltersOption,
-        CommandLineOptions.DisassemblerDiffOption,
-        CommandLineOptions.LogBuildOutputOption,
-        CommandLineOptions.GenerateBinLogOption,
-        CommandLineOptions.TimeoutOption,
-        CommandLineOptions.WakeLockOption,
-        CommandLineOptions.StopOnFirstErrorOption,
-        CommandLineOptions.StatisticalTestThresholdOption,
-        CommandLineOptions.DisableLogFileOption,
-        CommandLineOptions.MaxParameterColumnWidthOption,
-        CommandLineOptions.EnvironmentVariablesOption,
-        CommandLineOptions.MemoryRandomizationOption,
-        CommandLineOptions.WasmJavascriptEngineOption,
-        CommandLineOptions.WasmJavaScriptEngineArgumentsOption,
-        CommandLineOptions.CustomRuntimePackOption,
-        CommandLineOptions.AOTCompilerPathOption,
-        CommandLineOptions.AOTCompilerModeOption,
-        CommandLineOptions.WasmDataDirectoryOption,
-        CommandLineOptions.WasmCoreCLROption,
-        CommandLineOptions.NoForcedGCsOption,
-        CommandLineOptions.NoEvaluationOverheadOption,
-        CommandLineOptions.ResumeOption,
-    };
-
+            {
+                CommandLineOptions.BaseJobOption,
+                CommandLineOptions.RuntimesOption,
+                CommandLineOptions.ExportersOption,
+                CommandLineOptions.MemoryOption,
+                CommandLineOptions.ThreadingOption,
+                CommandLineOptions.ExceptionsOption,
+                CommandLineOptions.DisassemblyOption,
+                CommandLineOptions.ProfilerOption,
+                CommandLineOptions.FiltersOption,
+                CommandLineOptions.HiddenColumnsOption,
+                CommandLineOptions.RunInProcessOption,
+                CommandLineOptions.ArtifactsDirectoryOption,
+                CommandLineOptions.OutliersOption,
+                CommandLineOptions.AffinityOption,
+                CommandLineOptions.DisplayAllStatisticsOption,
+                CommandLineOptions.AllCategoriesOption,
+                CommandLineOptions.AnyCategoriesOption,
+                CommandLineOptions.AttributeNamesOption,
+                CommandLineOptions.JoinOption,
+                CommandLineOptions.KeepBenchmarkFilesOption,
+                CommandLineOptions.DontOverwriteResultsOption,
+                CommandLineOptions.HardwareCountersOption,
+                CommandLineOptions.CliPathOption,
+                CommandLineOptions.RestorePathOption,
+                CommandLineOptions.CoreRunPathsOption,
+                CommandLineOptions.MonoPathOption,
+                CommandLineOptions.ClrVersionOption,
+                CommandLineOptions.ILCompilerVersionOption,
+                CommandLineOptions.IlcPackagesOption,
+                CommandLineOptions.LaunchCountOption,
+                CommandLineOptions.WarmupCountOption,
+                CommandLineOptions.MinWarmupCountOption,
+                CommandLineOptions.MaxWarmupCountOption,
+                CommandLineOptions.IterationTimeOption,
+                CommandLineOptions.IterationCountOption,
+                CommandLineOptions.MinIterationCountOption,
+                CommandLineOptions.MaxIterationCountOption,
+                CommandLineOptions.InvocationCountOption,
+                CommandLineOptions.UnrollFactorOption,
+                CommandLineOptions.RunStrategyOption,
+                CommandLineOptions.PlatformOption,
+                CommandLineOptions.RunOnceOption,
+                CommandLineOptions.PrintInformationOption,
+                CommandLineOptions.ApplesToApplesOption,
+                CommandLineOptions.ListBenchmarkCaseModeOption,
+                CommandLineOptions.DisassemblerDepthOption,
+                CommandLineOptions.DisassemblerFiltersOption,
+                CommandLineOptions.DisassemblerDiffOption,
+                CommandLineOptions.LogBuildOutputOption,
+                CommandLineOptions.GenerateBinLogOption,
+                CommandLineOptions.TimeoutOption,
+                CommandLineOptions.WakeLockOption,
+                CommandLineOptions.StopOnFirstErrorOption,
+                CommandLineOptions.StatisticalTestThresholdOption,
+                CommandLineOptions.DisableLogFileOption,
+                CommandLineOptions.MaxParameterColumnWidthOption,
+                CommandLineOptions.EnvironmentVariablesOption,
+                CommandLineOptions.MemoryRandomizationOption,
+                CommandLineOptions.WasmJavascriptEngineOption,
+                CommandLineOptions.WasmJavaScriptEngineArgumentsOption,
+                CommandLineOptions.CustomRuntimePackOption,
+                CommandLineOptions.AOTCompilerPathOption,
+                CommandLineOptions.AOTCompilerModeOption,
+                CommandLineOptions.WasmDataDirectoryOption,
+                CommandLineOptions.WasmCoreCLROption,
+                CommandLineOptions.NoForcedGCsOption,
+                CommandLineOptions.NoEvaluationOverheadOption,
+                CommandLineOptions.ResumeOption,
+            };
 
             var parseResult = rootCommand.Parse(args);
 
@@ -683,7 +726,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             var result = new List<string>();
 
-            // --filter (no default)
             if (options.Filters.Any())
             {
                 result.Add("--filter");
@@ -695,7 +737,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 result.Add("--job");
                 result.Add(options.BaseJob);
             }
-
 
             if (options.UseMemoryDiagnoser) result.Add("--memory");
             if (options.UseThreadingDiagnoser) result.Add("--threading");
@@ -720,14 +761,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.NoEvaluationOverhead) result.Add("--noOverheadEvaluation");
             if (options.Resume) result.Add("--resume");
 
-            // --runtimes
             if (options.Runtimes.Any())
             {
                 result.Add("--runtimes");
                 result.AddRange(options.Runtimes);
             }
 
-            // strings
             if (options.Profiler.IsNotBlank())
             { result.Add("--profiler"); result.Add(options.Profiler); }
 
@@ -747,7 +786,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 && options.WasmJavaScriptEngineArguments != "--expose_wasm")
             { result.Add("--wasmArgs"); result.Add(options.WasmJavaScriptEngineArguments); }
 
-            // collections
             if (options.Exporters.Any())
             { result.Add("--exporters"); result.AddRange(options.Exporters); }
 
@@ -772,7 +810,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.EnvironmentVariables.Any())
             { result.Add("--envVars"); result.AddRange(options.EnvironmentVariables); }
 
-            // nullable ints/long
             if (options.LaunchCount.HasValue)
             { result.Add("--launchCount"); result.Add(options.LaunchCount.Value.ToString()); }
 
@@ -833,7 +870,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.AOTCompilerMode != MonoAotCompilerMode.mini)
             { result.Add("--AOTCompilerMode"); result.Add(options.AOTCompilerMode.ToString()); }
 
-            // files/directories
             if (options.ArtifactsDirectory != null)
             { result.Add("--artifacts"); result.Add(options.ArtifactsDirectory.FullName); }
 
@@ -964,9 +1000,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            var expanded = Expand(baseJob.UnfreezeCopy(), options, args).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            var expanded = Expand(baseJob.UnfreezeCopy(), options, args).ToArray();
             if (expanded.Length > 1)
-                expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
+                expanded[0] = expanded[0].AsBaseline();
             config.AddJob(expanded);
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.AddJob(baseJob);
@@ -1035,7 +1071,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static Job GetBaseJob(CommandLineOptions options, IConfig? globalConfig)
         {
             var baseJob =
-                globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault) // global config might define single custom Default job
+                globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault)
                 ?? AvailableJobs[options.BaseJob.ToLowerInvariant()];
 
             if (baseJob != Job.Dry && options.Outliers != OutlierMode.RemoveUpper)
@@ -1075,9 +1111,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
             if (options.NoEvaluationOverhead)
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
                 baseJob = baseJob.WithEvaluateOverhead(false);
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618
 
             if (options.EnvironmentVariables.Any())
             {
@@ -1088,12 +1124,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }).ToArray());
             }
 
-            if (AvailableJobs.Values.Contains(baseJob)) // no custom settings
+            if (AvailableJobs.Values.Contains(baseJob))
                 return baseJob;
 
             return baseJob
-                .AsDefault(false) // after applying all settings from console args the base job is not default anymore
-                .AsMutator(); // we mark it as mutator so it will be applied to other jobs defined via attributes and merged later in GetRunnableJobs method
+                .AsDefault(false)
+                .AsMutator();
         }
 
         private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options, string[] args)
@@ -1105,7 +1141,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             else if (options.ClrVersion.IsNotBlank())
             {
                 var runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion);
-                yield return baseJob.WithRuntime(runtime).WithId(runtime.Name); // local builds of .NET Runtime
+                yield return baseJob.WithRuntime(runtime).WithId(runtime.Name);
             }
             else if (options.CliPath != null && options.Runtimes.IsEmpty() && options.CoreRunPaths.IsEmpty())
             {
@@ -1113,28 +1149,26 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
             else
             {
-                // in case both --runtimes and --corerun are specified, the first one is returned first and becomes a baseline job
                 string? first = args.FirstOrDefault(arg =>
                     arg.Equals("--runtimes", StringComparison.OrdinalIgnoreCase)
                     || arg.Equals("-r", StringComparison.OrdinalIgnoreCase)
-
                     || arg.Equals("--corerun", StringComparison.OrdinalIgnoreCase));
 
                 if (first is null || first.Equals("--corerun", StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var coreRunPath in options.CoreRunPaths)
-                        yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
+                        yield return CreateCoreRunJob(baseJob, options, coreRunPath);
 
-                    foreach (string runtime in options.Runtimes) // known runtimes
+                    foreach (string runtime in options.Runtimes)
                         yield return CreateJobForGivenRuntime(baseJob, runtime, options);
                 }
                 else
                 {
-                    foreach (string runtime in options.Runtimes) // known runtimes
+                    foreach (string runtime in options.Runtimes)
                         yield return CreateJobForGivenRuntime(baseJob, runtime, options);
 
                     foreach (var coreRunPath in options.CoreRunPaths)
-                        yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
+                        yield return CreateCoreRunJob(baseJob, options, coreRunPath);
                 }
             }
         }
@@ -1196,61 +1230,45 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
-
                 case RuntimeMoniker.NativeAot70:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
-
                 case RuntimeMoniker.NativeAot80:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
-
                 case RuntimeMoniker.NativeAot90:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json");
-
                 case RuntimeMoniker.NativeAot10_0:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json");
-
                 case RuntimeMoniker.NativeAot11_0:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json");
 
                 case RuntimeMoniker.WasmNet80:
                     return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
-
                 case RuntimeMoniker.WasmNet90:
                     return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
-
                 case RuntimeMoniker.WasmNet10_0:
                     return MakeWasmJob(baseJob, options, "net10.0", runtimeMoniker);
-
                 case RuntimeMoniker.WasmNet11_0:
                     return MakeWasmJob(baseJob, options, "net11.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0", runtimeMoniker);
-
                 case RuntimeMoniker.MonoAOTLLVMNet60:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net6.0", runtimeMoniker);
-
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0", runtimeMoniker);
-
                 case RuntimeMoniker.MonoAOTLLVMNet80:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net8.0", runtimeMoniker);
-
                 case RuntimeMoniker.MonoAOTLLVMNet90:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net9.0", runtimeMoniker);
-
                 case RuntimeMoniker.MonoAOTLLVMNet10_0:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net10.0", runtimeMoniker);
-
                 case RuntimeMoniker.MonoAOTLLVMNet11_0:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net11.0", runtimeMoniker);
 
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
-
                 case RuntimeMoniker.Mono70:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
-
                 case RuntimeMoniker.Mono80:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
 
@@ -1308,11 +1326,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                 moniker: moniker);
 
             var toolChain = MonoAotLLVMToolChain.From(
-            new NetCoreAppSettings(
-                targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
-                runtimeFrameworkVersion: "",
-                name: monoAotLLVMRuntime.Name,
-                options: options));
+                new NetCoreAppSettings(
+                    targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
+                    runtimeFrameworkVersion: "",
+                    name: monoAotLLVMRuntime.Name,
+                    options: options));
 
             return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain).WithId(monoAotLLVMRuntime.Name);
         }
@@ -1320,11 +1338,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static Job CreateR2RJob(Job baseJob, CommandLineOptions options, Runtime runtime)
         {
             var toolChain = R2RToolchain.From(
-            new NetCoreAppSettings(
-                targetFrameworkMoniker: runtime.MsBuildMoniker,
-                runtimeFrameworkVersion: "",
-                name: runtime.Name,
-                options: options));
+                new NetCoreAppSettings(
+                    targetFrameworkMoniker: runtime.MsBuildMoniker,
+                    runtimeFrameworkVersion: "",
+                    name: runtime.Name,
+                    options: options));
 
             return baseJob.WithRuntime(runtime).WithToolchain(toolChain).WithId(runtime.Name);
         }
@@ -1371,7 +1389,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     targetFrameworkMoniker:
                         RuntimeInformation.IsNetCore
                             ? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker
-                            : CoreRuntime.Latest.MsBuildMoniker, // use most recent tfm, as the toolchain is being used only by dotnet/runtime contributors
+                            : CoreRuntime.Latest.MsBuildMoniker,
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath,
                     displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));
@@ -1385,18 +1403,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         name: RuntimeInformation.GetCurrentRuntime().Name,
                         options: options)));
 
-        /// <summary>
-        /// we have a limited amount of space when printing the output to the console, so we try to keep things small and simple
-        ///
-        /// for following paths:
-        ///  C:\Projects\coreclr_upstream\bin\tests\Windows_NT.x64.Release\Tests\Core_Root\CoreRun.exe
-        ///  C:\Projects\coreclr_upstream\bin\tests\Windows_NT.x64.Release\Tests\Core_Root_beforeMyChanges\CoreRun.exe
-        ///
-        /// we get:
-        ///
-        /// \Core_Root\CoreRun.exe
-        /// \Core_Root_beforeMyChanges\CoreRun.exe
-        /// </summary>
         private static string GetCoreRunToolchainDisplayName(IReadOnlyList<FileInfo> paths, FileInfo coreRunPath)
         {
             if (paths.Count <= 1)
@@ -1430,7 +1436,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 runtime = runtime.Substring(0, index);
             }
 
-            // Monikers older than Net 10 don't use any version delimiter, newer monikers use _ delimiter.
             if (Enum.TryParse(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker))
             {
                 return true;
