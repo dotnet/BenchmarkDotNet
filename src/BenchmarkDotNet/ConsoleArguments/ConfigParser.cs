@@ -340,11 +340,19 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 foreach (var error in parseResult.Errors)
                 {
-                    logger.WriteLineError(error.Message);
+                    string msg = error.Message;
+
+                    var badArg = args.FirstOrDefault(a => a.StartsWith("-") && msg.Contains(a));
+
+                    if (badArg != null)
+                    {
+                        msg = $"Option '{badArg.TrimStart('-')}' is unknown.";
+                    }
+
+                    logger.WriteLineError(msg);
                 }
                 return (false, default, default);
             }
-
             var invalidOptions = parseResult.UnmatchedTokens.Where(t => t.StartsWith("-") && t != "--").ToList();
             if (invalidOptions.Any())
             {
