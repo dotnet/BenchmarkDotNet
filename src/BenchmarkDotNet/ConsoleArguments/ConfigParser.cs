@@ -186,10 +186,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                     if (aliasToCanonical.TryGetValue(key, out var canonical))
                         key = canonical;
 
-                    if (key.Equals("--counters", StringComparison.OrdinalIgnoreCase) && value != null && value.Contains('+'))
+                    if (key.Equals("--counters", StringComparison.OrdinalIgnoreCase))
                     {
                         result.Add(key);
-                        result.AddRange(value.Split('+'));
+                        if (value != null)
+                        {
+                            result.AddRange(value.Split('+'));
+                        }
+                        else if (i + 1 < args.Length && !args[i + 1].StartsWith("-") && args[i + 1].Contains('+'))
+                        {
+                            i++;
+                            result.AddRange(args[i].Split('+'));
+                        }
                         continue;
                     }
 
@@ -201,12 +209,22 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             return result.ToArray();
         }
+
         public static (bool isSuccess, IConfig? config, CommandLineOptions? options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
             var (expandSuccess, expandedArgs) = ExpandResponseFile(args, logger);
             if (!expandSuccess) return (false, default, default);
             args = expandedArgs;
             args = NormalizeArgs(args);
+
+            string[] extraArgs = [];
+            var dashDashIndex = Array.IndexOf(args, "--");
+            if (dashDashIndex >= 0)
+            {
+                extraArgs = args.Skip(dashDashIndex + 1).ToArray();
+                args = args.Take(dashDashIndex).ToArray();
+            }
+
             var rootCommand = new RootCommand("BenchmarkDotNet Command Line options")
             {
                 CommandLineOptions.BaseJobOption,
@@ -279,13 +297,20 @@ namespace BenchmarkDotNet.ConsoleArguments
                 CommandLineOptions.ResumeOption,
             };
 
-            rootCommand.TreatUnmatchedTokensAsErrors = false;
-
             var parseResult = rootCommand.Parse(args);
 
             if (args.Any(a => a == "-h" || a == "--help" || a == "-?" || a == "--version"))
             {
                 parseResult.Invoke();
+                return (false, default, default);
+            }
+
+            if (parseResult.Errors.Any())
+            {
+                foreach (var error in parseResult.Errors)
+                {
+                    logger.WriteLineError(error.Message);
+                }
                 return (false, default, default);
             }
 
@@ -295,6 +320,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var options = new CommandLineOptions
             {
+                ExtraArguments = extraArgs,
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
                 Runtimes = parseResult.GetValue(CommandLineOptions.RuntimesOption) ?? [],
                 Exporters = parseResult.GetValue(CommandLineOptions.ExportersOption) ?? [],
@@ -479,6 +505,14 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             args = NormalizeArgs(args);
 
+            string[] extraArgs = [];
+            var dashDashIndex = Array.IndexOf(args, "--");
+            if (dashDashIndex >= 0)
+            {
+                extraArgs = args.Skip(dashDashIndex + 1).ToArray();
+                args = args.Take(dashDashIndex).ToArray();
+            }
+
             var rootCommand = new RootCommand("BenchmarkDotNet Command Line options")
     {
         CommandLineOptions.BaseJobOption,
@@ -551,7 +585,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         CommandLineOptions.ResumeOption,
     };
 
-            rootCommand.TreatUnmatchedTokensAsErrors = false;
 
             var parseResult = rootCommand.Parse(args);
 
@@ -559,6 +592,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var options = new CommandLineOptions
             {
+                ExtraArguments = extraArgs,
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
                 Runtimes = parseResult.GetValue(CommandLineOptions.RuntimesOption) ?? [],
                 Exporters = parseResult.GetValue(CommandLineOptions.ExportersOption) ?? [],
@@ -1327,18 +1361,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new AnyCategoriesFilter(options.AnyCategories.ToArray());
             if (options.AttributeNames.Any())
                 yield return new AttributesFilter(options.AttributeNames.ToArray());
-        }
-
-        private static int GetMaximumDisplayWidth()
-        {
-            try
-            {
-                return Console.WindowWidth;
-            }
-            catch (IOException)
-            {
-                return MinimumDisplayWidth;
-            }
         }
 
         private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options, FileInfo coreRunPath)

@@ -302,6 +302,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool NoForcedGCs { get; set; }
         public bool NoEvaluationOverhead { get; set; }
         public bool Resume { get; set; }
+        public string[] ExtraArguments { get; set; } = [];
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         private static string Escape(string input) => UserInteractionHelper.EscapeCommandExample(input);
@@ -320,6 +321,27 @@ namespace BenchmarkDotNet.ConsoleArguments
             EnvironmentVariablesOption.AllowMultipleArgumentsPerToken = true;
             DisassemblerFiltersOption.AllowMultipleArgumentsPerToken = true;
             CoreRunPathsOption.AllowMultipleArgumentsPerToken = true;
+
+            void AddUnrecognizedValidator(Option option)
+            {
+                option.Validators.Add(result =>
+                {
+                    foreach (var token in result.Tokens.Where(t => t.Value.StartsWith("-", StringComparison.Ordinal)))
+                        result.AddError($"Unrecognized option: {token.Value}");
+                });
+            }
+
+            AddUnrecognizedValidator(RuntimesOption);
+            AddUnrecognizedValidator(ExportersOption);
+            AddUnrecognizedValidator(FiltersOption);
+            AddUnrecognizedValidator(AllCategoriesOption);
+            AddUnrecognizedValidator(AnyCategoriesOption);
+            AddUnrecognizedValidator(AttributeNamesOption);
+            AddUnrecognizedValidator(HiddenColumnsOption);
+            AddUnrecognizedValidator(HardwareCountersOption);
+            AddUnrecognizedValidator(EnvironmentVariablesOption);
+            AddUnrecognizedValidator(DisassemblerFiltersOption);
+            AddUnrecognizedValidator(CoreRunPathsOption);
         }
 
     }
