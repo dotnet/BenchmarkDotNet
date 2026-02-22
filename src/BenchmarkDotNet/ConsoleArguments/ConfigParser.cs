@@ -342,7 +342,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (args.Any(a => a == "-h" || a == "--help" || a == "-?" || a == "--version"))
             {
                 using var invariantUICultureScope = Helpers.CultureInfoHelper.CreateInvariantUICultureScope();
-                parseResult.Invoke();
+                using var writer = new StringWriter();
+                parseResult.Invoke(new InvocationConfiguration { Output = writer });
+                logger.Write(writer.ToString());
                 return (false, default, default);
             }
 
