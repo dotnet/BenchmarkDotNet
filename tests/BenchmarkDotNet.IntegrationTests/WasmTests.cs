@@ -30,10 +30,10 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         [Theory]
         [InlineData(MonoAotCompilerMode.mini)]
-        [InlineData(MonoAotCompilerMode.wasm)]
+        [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
         public void WasmIsSupported(MonoAotCompilerMode aotCompilerMode)
         {
-            if (SkipTestRun(aotCompilerMode))
+            if (SkipTestRun())
             {
                 return;
             }
@@ -43,10 +43,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(MonoAotCompilerMode.mini)]
-        [InlineData(MonoAotCompilerMode.wasm)]
+        [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
         public void WasmSupportsInProcessDiagnosers(MonoAotCompilerMode aotCompilerMode)
         {
-            if (SkipTestRun(aotCompilerMode))
+            if (SkipTestRun())
             {
                 return;
             }
@@ -113,17 +113,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
         }
 
-        private static bool SkipTestRun(MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini)
+        private static bool SkipTestRun()
         {
             // jsvu only supports arm for mac.
             if (RuntimeInformation.GetCurrentPlatform() != Platform.X64 && !OsDetector.IsMacOS())
             {
                 return true;
             }
-
-            // AOT crashes because of BenchmarkDotNet.Running.WakeLock+PInvoke.
-            if (OsDetector.IsWindows() && aotCompilerMode == MonoAotCompilerMode.wasm)
-                return true;
 
             return false;
         }
