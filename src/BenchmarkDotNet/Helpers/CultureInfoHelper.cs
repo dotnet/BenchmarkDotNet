@@ -1,32 +1,31 @@
 using System;
 using System.Globalization;
 
-namespace BenchmarkDotNet.Helpers
+namespace BenchmarkDotNet.Helpers;
+
+internal static class CultureInfoHelper
 {
-    internal static class CultureInfoHelper
+    public static IDisposable CreateInvariantUICultureScope()
+        => new InvariantUICultureScope();
+
+    private class InvariantUICultureScope : IDisposable
     {
-        public static IDisposable CreateInvariantUICultureScope()
-            => new InvariantUICultureScope();
+        private readonly int savedThreadId;
+        private readonly CultureInfo savedCultureInfo;
 
-        private class InvariantUICultureScope : IDisposable
+        public InvariantUICultureScope()
         {
-            private readonly int savedThreadId;
-            private readonly CultureInfo savedCultureInfo;
+            savedThreadId = Environment.CurrentManagedThreadId;
+            savedCultureInfo = CultureInfo.CurrentUICulture;
 
-            public InvariantUICultureScope()
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+        }
+
+        public void Dispose()
+        {
+            if (Environment.CurrentManagedThreadId == savedThreadId)
             {
-                savedThreadId = Environment.CurrentManagedThreadId;
-                savedCultureInfo = CultureInfo.CurrentUICulture;
-
-                CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-            }
-
-            public void Dispose()
-            {
-                if (Environment.CurrentManagedThreadId == savedThreadId)
-                {
-                    CultureInfo.CurrentUICulture = savedCultureInfo;
-                }
+                CultureInfo.CurrentUICulture = savedCultureInfo;
             }
         }
     }
