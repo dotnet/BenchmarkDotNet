@@ -267,7 +267,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `-h, --hide`                Hides columns by name
 * `-i, --inProcess`           (Default: false) Run benchmarks in Process
 * `-a, --artifacts`           Valid path to accessible directory
-* `--outliers`                (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll
+* `--outliers`                (Default: RemoveUpper) `DontRemove`/`RemoveUpper`/`RemoveLower`/`RemoveAll`
 * `--affinity`                Affinity mask to set for the benchmark process
 * `--allStats`                (Default: false) Displays all statistics (min, max & more)
 * `--allCategories`           Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
@@ -281,7 +281,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--packages`                The directory to restore packages to (optional).
 * `--coreRun`                 Path(s) to CoreRun (optional).
 * `--monoPath`                Optional path to Mono which should be used for running benchmarks.
-* `--clrVersion`              Optional version of private CLR build used as the value of COMPLUS_Version env var.
+* `--clrVersion`              Optional version of private CLR build used as the value of `COMPLUS_Version` env var.
 * `--ilCompilerVersion`       Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
 * `--ilcPackages`             Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'
 * `--launchCount`             How many times we should launch process with target benchmark. The default is 1.
@@ -304,12 +304,12 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--disasmFilter`            Glob patterns applied to full method signatures by the the disassembler.
 * `--disasmDiff`              (Default: false) Generates diff reports for the disassembler.
 * `--logBuildOutput`          Log Build output.
-* `--generateBinLog`          Generate msbuild binlog for builds
+* `--generateBinLog`          Generate msbuild `binlog` for builds
 * `--buildTimeout`            Build timeout in seconds.
 * `--wakeLock`                Prevents the system from entering sleep or turning off the display. None/System/Display.
 * `--stopOnFirstError`        (Default: false) Stop on first error.
 * `--statisticalTest`         Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s
-* `--disableLogFile`          Disables the logfile.
+* `--disableLogFile`          Disables the `logfile`.
 * `--maxWidth`                Max parameter column width, the default is 20.
 * `--envVars`                 Colon separated environment variables (key:value)
 * `--memoryRandomization`     Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.
