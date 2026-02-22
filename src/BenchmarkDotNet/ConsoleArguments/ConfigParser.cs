@@ -76,7 +76,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        internal static Argument<string[]> ImplicitFiltersArgument { get; } = new Argument<string[]>("implicitFilters") { Arity = ArgumentArity.ZeroOrMore };
 
         private static RootCommand? _rootCommand;
         internal static RootCommand RootCommand
@@ -158,7 +157,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         CommandLineOptions.NoEvaluationOverheadOption,
                         CommandLineOptions.ResumeOption,
                     };
-                    _rootCommand.Add(ImplicitFiltersArgument);
                 }
                 return _rootCommand;
             }
@@ -388,7 +386,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 UseDisassemblyDiagnoser = parseResult.GetValue(CommandLineOptions.DisassemblyOption),
                 Profiler = parseResult.GetValue(CommandLineOptions.ProfilerOption) ?? "",
                 Filters = (parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [])
-                            .Concat(parseResult.GetValue(ImplicitFiltersArgument) ?? [])
+                            .Concat(parseResult.UnmatchedTokens.Where(t => !t.StartsWith("-")))
                             .ToArray(),
                 HiddenColumns = parseResult.GetValue(CommandLineOptions.HiddenColumnsOption) ?? [],
                 RunInProcess = parseResult.GetValue(CommandLineOptions.RunInProcessOption),
@@ -595,7 +593,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ExtraArguments = extraArgs,
                 BaseJob = parseResult.GetValue(CommandLineOptions.BaseJobOption) ?? "",
                 Filters = (parseResult.GetValue(CommandLineOptions.FiltersOption) ?? [])
-                            .Concat(parseResult.GetValue(ImplicitFiltersArgument) ?? [])
+                            .Concat(parseResult.UnmatchedTokens.Where(t => !t.StartsWith("-")))
                             .ToArray(),
             };
 
