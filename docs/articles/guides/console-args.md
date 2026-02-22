@@ -214,37 +214,114 @@ Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks 
 dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5%
 ```
 
+## Example Usages
+
+* Use Job.ShortRun for running the benchmarks:  
+    `-d -j short`
+* Run benchmarks in process:  
+    `-d -i`
+* Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.:
+    `--disasm --runtimes net472 net8.0 Mono`
+* Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.:
+    `--disasm --runtimes netcoreapp3.1 net6.0 net8.0`
+* Use MemoryDiagnoser to get GC stats:
+    `-d -m`
+* Use DisassemblyDiagnoser to get disassembly:
+    `-d`
+* Use HardwareCountersDiagnoser to get hardware counter info:
+    `--counters CacheMisses+InstructionRetired --disasm`
+* Run all benchmarks exactly once:
+    `-d -f * -j Dry`
+* Run all benchmarks from System.Memory namespace:
+    `-d -f System.Memory*`
+* Run all benchmarks from ClassA and ClassB using type names:
+    `-d -f ClassA ClassB`
+* Run all benchmarks from ClassA and ClassB using patterns:
+    `-d -f *.ClassA.* *.ClassB.*`
+* Run all benchmarks called `BenchmarkName` and show the results in single summary:
+    `--disasm --filter *.BenchmarkName --join`
+* Run selected benchmarks once per iteration:
+    `--disasm --runOncePerIteration`
+* Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations:
+    `--disasm --invocationCount 100 --iterationCount 5 --warmupCount 1`
+* Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations:
+    `--disasm --iterationTime 250 --maxIterationCount 15 --minIterationCount 9`
+* Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET Core 6.0 will be baseline because it was provided as first.:
+    `--disasm --filter * --runtimes net6.0 net8.0 --statisticalTest 5%`
+* Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2':
+    `--disasm --envVars ENV_VAR_KEY_1:value_1 ENV_VAR_KEY_2:value_2`
+* Hide Mean and Ratio columns (use double quotes for multi-word columns: "Alloc Ratio"):
+    `-d -h Mean Ratio`
+
 ## More
 
-* `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default.
-* `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML.
-* `-i`, `--inProcess` (default: false) run benchmarks in the same process, without spawning child process per benchmark.
-* `-a`, `--artifacts` valid path to an accessible directory where output artifacts will be stored.
-* `--outliers` (default: RemoveUpper) `DontRemove`/`RemoveUpper`/`RemoveLower`/`RemoveAll`.
-* `--affinity` affinity mask to set for the benchmark process.
-* `--allStats` (default: false) Displays all statistics (min, max & more).
-* `--allCategories` categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed.
-* `--attribute` run all methods with given attribute (applied to class or method).
-* `--monoPath` optional path to Mono which should be used for running benchmarks.
-* `--cli` path to dotnet cli (optional).
-* `--packages` the directory to restore packages to (optional).
-* `--coreRun` path(s) to CoreRun (optional).
-* `--ilcPackages` path to ILCompiler for NativeAOT.
-* `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
-* `--stopOnFirstError` stop on first error.
-* `--help` display this help screen.
-* `--version` display version information.
-* `--keepFiles` (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.
-* `--noOverwrite` (default: false) determines if the exported result files should not be overwritten.
-* `--disableLogFile` disables the log file.
-* `--maxWidth` max parameter column width, the default is 20.
-* `--envVars` colon separated environment variables (key:value).
-* `--strategy` the RunStrategy that should be used. Throughput/ColdStart/Monitoring.
-* `--platform` the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.
-* `--runOncePerIteration` run the benchmark exactly once per iteration.
-* `--buildTimeout` build timeout in seconds.
-* `--wakeLock` prevents the system from entering sleep or turning off the display. None/System/Display.
-* `--wasmEngine` full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
-* `--wasmMainJS` path to the test-main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"
-* `--expose_wasm` arguments for the JavaScript engine used by Wasm toolchain.
-* `--customRuntimePack` specify the path to a custom runtime pack. Only used for wasm currently.
+* `-j`, `--job`               (Default: Default) Dry/Short/Medium/Long or Default
+* `-r`, `--runtimes`          Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!
+* `-e`, `--exporters`         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML
+* `-m`, `--memory`            (Default: false) Prints memory statistics
+* `-t`, `--threading`         (Default: false) Prints threading statistics
+* `--exceptions`              (Default: false) Prints exception statistics
+* `-d, --disasm`              (Default: false) Gets disassembly of benchmarked code
+* `-p, --profiler`            Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory
+* `-f, --filter`              Glob patterns
+* `-h, --hide`                Hides columns by name
+* `-i, --inProcess`           (Default: false) Run benchmarks in Process
+* `-a, --artifacts`           Valid path to accessible directory
+* `--outliers`                (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll
+* `--affinity`                Affinity mask to set for the benchmark process
+* `--allStats`                (Default: false) Displays all statistics (min, max & more)
+* `--allCategories`           Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
+* `--anyCategories`           Any Categories to run
+* `--attribute`               Run all methods with given attribute (applied to class or method)
+* `--join`                    (Default: false) Prints single table with results for all benchmarks
+* `--keepFiles`               (Default: false) Determines if all auto-generated files should be kept or removed after running the benchmarks.
+* `--noOverwrite`             (Default: false) Determines if the exported result files should not be overwritten (be default they are overwritten).
+* `--counters`                Hardware Counters
+* `--cli`                     Path to dotnet cli (optional).
+* `--packages`                The directory to restore packages to (optional).
+* `--coreRun`                 Path(s) to CoreRun (optional).
+* `--monoPath`                Optional path to Mono which should be used for running benchmarks.
+* `--clrVersion`              Optional version of private CLR build used as the value of COMPLUS_Version env var.
+* `--ilCompilerVersion`       Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
+* `--ilcPackages`             Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'
+* `--launchCount`             How many times we should launch process with target benchmark. The default is 1.
+* `--warmupCount`             How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.
+* `--minWarmupCount`          Minimum count of warmup iterations that should be performed. The default is 6.
+* `--maxWarmupCount`          Maximum count of warmup iterations that should be performed. The default is 50.
+* `--iterationTime`           Desired time of execution of an iteration in milliseconds. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default
+* `--iterationCount`          How many target iterations should be performed. By default calculated by the heuristic.
+* `--minIterationCount`       Minimum number of iterations to run. The default is 15.
+* `--maxIterationCount`       Maximum number of iterations to run. The default is 100.
+* `--invocationCount`         Invocation count in a single iteration. By default calculated by the heuristic.
+* `--unrollFactor`            How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default
+* `--strategy`                The RunStrategy that should be used. Throughput/ColdStart/Monitoring.
+* `--platform`                The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.
+* `--runOncePerIteration`     (Default: false) Run the benchmark exactly once per iteration.
+* `--info`                    (Default: false) Print environment information.
+* `--apples`                  (Default: false) Runs apples-to-apples comparison for specified Jobs.
+* `--list`                    (Default: Disabled) Prints all of the available benchmark names. Flat/Tree
+* `--disasmDepth`             (Default: 1) Sets the recursive depth for the disassembler.
+* `--disasmFilter`            Glob patterns applied to full method signatures by the the disassembler.
+* `--disasmDiff`              (Default: false) Generates diff reports for the disassembler.
+* `--logBuildOutput`          Log Build output.
+* `--generateBinLog`          Generate msbuild binlog for builds
+* `--buildTimeout`            Build timeout in seconds.
+* `--wakeLock`                Prevents the system from entering sleep or turning off the display. None/System/Display.
+* `--stopOnFirstError`        (Default: false) Stop on first error.
+* `--statisticalTest`         Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s
+* `--disableLogFile`          Disables the logfile.
+* `--maxWidth`                Max parameter column width, the default is 20.
+* `--envVars`                 Colon separated environment variables (key:value)
+* `--memoryRandomization`     Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.
+* `--wasmEngine`              Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
+* `--wasmArgs`                (Default: --expose_wasm) Arguments for the javascript engine used by Wasm toolchain.
+* `--customRuntimePack`       Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.
+* `--AOTCompilerPath`         Path to Mono AOT compiler, used for MonoAotLLVM.
+* `--AOTCompilerMode`         (Default: mini) Mono AOT compiler mode, either 'mini' or 'llvm'
+* `--wasmDataDir`             Wasm data directory
+* `--wasmCoreCLR`             (Default: false) Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.
+* `--noForcedGCs`             Specifying would not forcefully induce any GCs.
+* `--noOverheadEvaluation`    Specifying would not run the evaluation overhead iterations.
+* `--resume`                  (Default: false) Continue the execution if the last run was stopped.
+* `--help`                    Display this help screen.
+* `--version`                 Display version information.
