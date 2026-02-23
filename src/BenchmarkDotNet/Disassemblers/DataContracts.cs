@@ -227,7 +227,7 @@ internal sealed class State
         Runtime = runtime;
         Todo = new Queue<MethodInfo>();
         HandledMethods = new HashSet<ClrMethod>(new ClrMethodComparer());
-        AddressToNameMapping = new Dictionary<ulong, string>();
+        AddressToNameMapping = [];
         RuntimeVersion = ParseVersion(targetFrameworkMoniker);
     }
 

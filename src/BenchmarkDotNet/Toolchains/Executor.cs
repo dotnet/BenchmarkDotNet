@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.Toolchains
         {
             var arguments = job.HasValue(InfrastructureMode.ArgumentsCharacteristic)
                 ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver)!.OfType<MonoArgument>().ToArray()
-                : Array.Empty<MonoArgument>();
+                : [];
 
             // from mono --help: "Usage is: mono [options] program [program-options]"
             var builder = new StringBuilder(30);

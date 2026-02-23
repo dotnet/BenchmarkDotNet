@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             this.filterByNamespace = true;
         }
 
-        public override IEnumerable<string> Ids => new[] { nameof(InliningDiagnoser) };
+        public override IEnumerable<string> Ids => [nameof(InliningDiagnoser)];
 
         public string ShortName => "inlining";
 

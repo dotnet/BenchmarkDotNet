@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {
     public class TraceLogParser
     {
-        private readonly Dictionary<int, ProcessMetrics> processIdToData = new Dictionary<int, ProcessMetrics>();
-        private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
+        private readonly Dictionary<int, ProcessMetrics> processIdToData = [];
+        private readonly Dictionary<int, int> profileSourceIdToInterval = [];
 
         public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
         {
@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         private readonly List<double> workloadTimestamps = new List<double>(20);
         private long? totalOperationsPerIteration;
 
-        private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = new List<(double timeStamp, ulong instructionPointer, int profileSource)>();
+        private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = [];
 
         public bool HasBenchmarkEvents => overheadTimestamps.Any() || workloadTimestamps.Any();
 
@@ -228,7 +228,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         {
             StartTimestamp = startTimestamp;
             StopTimestamp = stopTimestamp;
-            ProfileSourceIdToCount = new Dictionary<int, ulong>();
+            ProfileSourceIdToCount = [];
         }
 
         public bool TryHandle(double timeStamp, int profileSource, int interval)

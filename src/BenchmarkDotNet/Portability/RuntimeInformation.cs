@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Portability
                         if (bracket1 != -1 && bracket2 != -1)
                         {
                             string comment = version.Substring(bracket1 + 1, bracket2 - bracket1 - 1);
-                            var commentParts = comment.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            var commentParts = comment.Split([' '], StringSplitOptions.RemoveEmptyEntries);
                             if (commentParts.Length > 2)
                                 version = version.Substring(0, bracket1) + "(" + commentParts[0] + " " + commentParts[1] + ")";
                         }

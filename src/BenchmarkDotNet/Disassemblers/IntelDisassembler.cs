@@ -18,14 +18,14 @@ namespace BenchmarkDotNet.Disassemblers
             // jmp    QWORD PTR [rip + DATA_SLOT(CallCountingStub, TargetForMethod)]
             // LOCAL_LABEL(CountReachedZero):
             // jmp    QWORD PTR [rip + DATA_SLOT(CallCountingStub, TargetForThresholdReached)]
-            internal readonly byte[] callCountingStubTemplate = new byte[10] { 0x48, 0x8b, 0x05, 0xf9, 0x0f, 0x00, 0x00, 0x66, 0xff, 0x08 };
+            internal readonly byte[] callCountingStubTemplate = [0x48, 0x8b, 0x05, 0xf9, 0x0f, 0x00, 0x00, 0x66, 0xff, 0x08];
             // mov    r10, [rip + DATA_SLOT(StubPrecode, MethodDesc)]
             // jmp    [rip + DATA_SLOT(StubPrecode, Target)]
-            internal readonly byte[] stubPrecodeTemplate = new byte[13] { 0x4c, 0x8b, 0x15, 0xf9, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfb, 0x0f, 0x00, 0x00 };
+            internal readonly byte[] stubPrecodeTemplate = [0x4c, 0x8b, 0x15, 0xf9, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfb, 0x0f, 0x00, 0x00];
             // jmp    [rip + DATA_SLOT(FixupPrecode, Target)]
             // mov    r10, [rip + DATA_SLOT(FixupPrecode, MethodDesc)]
             // jmp    [rip + DATA_SLOT(FixupPrecode, PrecodeFixupThunk)]
-            internal readonly byte[] fixupPrecodeTemplate = new byte[19] { 0xff, 0x25, 0xfa, 0x0f, 0x00, 0x00, 0x4c, 0x8b, 0x15, 0xfb, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfd, 0x0f, 0x00, 0x00 };
+            internal readonly byte[] fixupPrecodeTemplate = [0xff, 0x25, 0xfa, 0x0f, 0x00, 0x00, 0x4c, 0x8b, 0x15, 0xfb, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfd, 0x0f, 0x00, 0x00];
             internal readonly ulong stubPageSize;
 
             internal RuntimeSpecificData(State state)
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = new();
+        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = [];
 
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {

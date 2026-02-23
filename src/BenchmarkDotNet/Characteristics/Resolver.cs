@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Characteristics
 {
     public class Resolver : IResolver
     {
-        private readonly Dictionary<Characteristic, Func<CharacteristicObject, object?>> resolvers = new Dictionary<Characteristic, Func<CharacteristicObject, object?>>();
+        private readonly Dictionary<Characteristic, Func<CharacteristicObject, object?>> resolvers = [];
 
         protected void Register<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, Func<T?> resolver) =>
             resolvers[characteristic] = obj => resolver();

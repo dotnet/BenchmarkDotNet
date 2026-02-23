@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.Samples
 
                 AddJob(Job.Default
                     .WithRuntime(MonoRuntime.Default)
-                    .WithArguments(new[] { new MonoArgument("--optimize=inline") })
+                    .WithArguments([new MonoArgument("--optimize=inline")])
                     .WithId("Inlining enabled"));
                 AddJob(Job.Default
                     .WithRuntime(MonoRuntime.Default)
-                    .WithArguments(new[] { new MonoArgument("--optimize=-inline") })
+                    .WithArguments([new MonoArgument("--optimize=-inline")])
                     .WithId("Inlining disabled"));
             }
         }

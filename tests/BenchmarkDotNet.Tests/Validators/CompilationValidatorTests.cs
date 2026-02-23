@@ -21,15 +21,14 @@ namespace BenchmarkDotNet.Tests.Validators
 
             var config = new ManualConfig().CreateImmutableConfig();
             var parameters = new ValidationParameters(
-                new[]
-                {
+                [
                     BenchmarkCase.Create(
                         new Descriptor(typeof(CompilationValidatorTests), method.Method),
                         Job.Dry,
                         ParameterInstances.Empty,
                         config
                         )
-                }, config);
+                ], config);
 
             var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
@@ -45,14 +44,13 @@ namespace BenchmarkDotNet.Tests.Validators
 
             var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
             var parameters = new ValidationParameters(
-                new[]
-                {
+                [
                     BenchmarkCase.Create(
                         new Descriptor(typeof(CompilationValidatorTests), method.Method),
                         Job.Dry,
                         ParameterInstances.Empty,
                         config)
-                }, config);
+                ], config);
 
             var errors = CompilationValidator.FailOnError.Validate(parameters).Select(e => e.Message);
 
@@ -123,7 +121,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var dynamicMethod = new DynamicMethod(
                 name,
                 returnType: typeof(T),
-                parameterTypes: new[] { typeof(T) });
+                parameterTypes: [typeof(T)]);
 
             var cilGenerator = dynamicMethod.GetILGenerator();
             cilGenerator.Emit(OpCodes.Ldarg_0); // load the argument

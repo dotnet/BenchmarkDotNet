@@ -12,8 +12,8 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal static class AppConfigGenerator
     {
-        private static readonly HashSet<string> JobRuntimeSettings = new HashSet<string>
-        {
+        private static readonly HashSet<string> JobRuntimeSettings =
+        [
             "useLegacyJit",
             "gcConcurrent",
             "gcServer",
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains
             "GCHeapCount",
             "GCNoAffinitize",
             "GCHeapAffinitizeMask"
-        };
+        ];
 
         internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
         {

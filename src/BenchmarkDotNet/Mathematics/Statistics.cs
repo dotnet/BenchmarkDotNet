@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Mathematics
             switch (outlierMode)
             {
                 case OutlierMode.DontRemove:
-                    return Array.Empty<double>();
+                    return [];
                 case OutlierMode.RemoveUpper:
                     return UpperOutliers;
                 case OutlierMode.RemoveLower:
