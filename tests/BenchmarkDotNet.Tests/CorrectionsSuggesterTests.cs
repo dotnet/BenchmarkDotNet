@@ -37,8 +37,7 @@ namespace BenchmarkDotNet.Tests
                 "NamespaceB.MyClassB.MethodB",
                 "NamespaceB.MyClassB.MethodC",
                 "NamespaceB.NamespaceC.MyClassC.MethodC"
-            ]
-            , suggestedNames);
+            ], suggestedNames);
         }
 
         [Fact]
