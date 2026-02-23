@@ -720,37 +720,7 @@ namespace BenchmarkDotNet.Analyzers {
                 return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A benchmark class annotated with a [GenericTypeArguments] attribute must be non-abstract.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_De" +
-                        "scription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attribute [GenericTypeArguments] can only be applied to a non-abstract class.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Me" +
-                        "ssageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Benchmark classes annotated with the [GenericTypeArguments] attribute must be non-abstract.
-        /// </summary>
-        internal static string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title {
-            get {
-                return ResourceManager.GetString("General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Ti" +
-                        "tle", resourceCulture);
-            }
-        }
-        
+      
         /// <summary>
         ///   Looks up a localized string similar to The number of type arguments passed to a [GenericTypeArguments] attribute must match the number of type parameters on the targeted benchmark class.
         /// </summary>
