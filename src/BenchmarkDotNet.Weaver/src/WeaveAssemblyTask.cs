@@ -98,7 +98,7 @@ public sealed class WeaveAssemblyTask : Task
     private static bool IsBenchmarkAttribute(CustomAttribute attribute)
     {
         // BenchmarkAttribute is unsealed, so we need to walk its hierarchy.
-        for (var attr = attribute.Constructor!.DeclaringType; attr != null; attr = attr.Resolve()?.BaseType)
+        for (var attr = attribute.Constructor!.DeclaringType; attr != null; attr = attr.Resolve(attr.ContextModule?.RuntimeContext)?.BaseType)
         {
             if (attr.FullName == "BenchmarkDotNet.Attributes.BenchmarkAttribute")
             {
