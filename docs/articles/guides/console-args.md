@@ -217,41 +217,41 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 ## Example Usages
 
 * Use Job.ShortRun for running the benchmarks:  
-    `-d -j short`
+    `-j short`
 * Run benchmarks in process:  
-    `-d -i`
+    `-i`
 * Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.:
-    `--disasm --runtimes net472 net8.0 Mono`
-* Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.:
-    `--disasm --runtimes netcoreapp3.1 net6.0 net8.0`
+    `--runtimes net472 net8.0 Mono`
+* Run benchmarks for .NET 8.0 and .NET 10.0. .NET 8.0 will be baseline because it was first.:
+    `--runtimes net8.0 net10.0`
 * Use MemoryDiagnoser to get GC stats:
-    `-d -m`
+    `-m`
 * Use DisassemblyDiagnoser to get disassembly:
     `-d`
 * Use HardwareCountersDiagnoser to get hardware counter info:
-    `--counters CacheMisses+InstructionRetired --disasm`
+    `--counters CacheMisses+InstructionRetired`
 * Run all benchmarks exactly once:
-    `-d -f * -j Dry`
+    `-f * -j Dry`
 * Run all benchmarks from System.Memory namespace:
-    `-d -f System.Memory*`
+    `-f System.Memory*`
 * Run all benchmarks from ClassA and ClassB using type names:
-    `-d -f ClassA ClassB`
+    `-f ClassA ClassB`
 * Run all benchmarks from ClassA and ClassB using patterns:
-    `-d -f *.ClassA.* *.ClassB.*`
+    `-f *.ClassA.* *.ClassB.*`
 * Run all benchmarks called `BenchmarkName` and show the results in single summary:
-    `--disasm --filter *.BenchmarkName --join`
+    `--filter *.BenchmarkName --join`
 * Run selected benchmarks once per iteration:
-    `--disasm --runOncePerIteration`
+    `--runOncePerIteration`
 * Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations:
-    `--disasm --invocationCount 100 --iterationCount 5 --warmupCount 1`
+    `--invocationCount 100 --iterationCount 5 --warmupCount 1`
 * Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations:
-    `--disasm --iterationTime 250 --maxIterationCount 15 --minIterationCount 9`
+    `--iterationTime 250 --maxIterationCount 15 --minIterationCount 9`
 * Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET Core 6.0 will be baseline because it was provided as first.:
-    `--disasm --filter * --runtimes net6.0 net8.0 --statisticalTest 5%`
+    `--filter * --runtimes net6.0 net8.0 --statisticalTest 5%`
 * Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2':
-    `--disasm --envVars ENV_VAR_KEY_1:value_1 ENV_VAR_KEY_2:value_2`
+    `--envVars ENV_VAR_KEY_1:value_1 ENV_VAR_KEY_2:value_2`
 * Hide Mean and Ratio columns (use double quotes for multi-word columns: "Alloc Ratio"):
-    `-d -h Mean Ratio`
+    `-h Mean Ratio`
 
 ## More
 
