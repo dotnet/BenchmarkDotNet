@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Running
 
         private static string? FormatDescription(string? description)
         {
-            char[] specialSymbols = { ' ', '\'', '[', ']' };
+            char[] specialSymbols = [' ', '\'', '[', ']'];
             return description != null && specialSymbols.Any(description.Contains)
                 ? "'" + description + "'"
                 : description;

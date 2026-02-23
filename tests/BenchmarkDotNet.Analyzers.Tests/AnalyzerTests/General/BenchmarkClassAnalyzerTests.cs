@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.AnalyzerTests.General;
+
 public class BenchmarkClassAnalyzerTests
 {
     public class General : AnalyzerTestFixture<BenchmarkClassAnalyzer>
@@ -32,46 +33,6 @@ public class BenchmarkClassAnalyzerTests
 
             await RunAsync();
         }
-    }
-
-    public class ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract : AnalyzerTestFixture<BenchmarkClassAnalyzer>
-    {
-        public ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract() : base(BenchmarkClassAnalyzer.ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule) { }
-
-        [Theory, CombinatorialData]
-        public async Task Abstract_class_annotated_with_at_least_one_generictypearguments_attribute_should_trigger_diagnostic(
-            [CombinatorialRange(1, 2)] int genericTypeArgumentsAttributeUsageCount,
-            [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
-        {
-            const string benchmarkClassName = "BenchmarkClass";
-
-            var genericTypeArgumentsAttributeUsages = Enumerable.Repeat("[{{|#{0}:GenericTypeArguments(typeof(int))|}}]", genericTypeArgumentsAttributeUsageCount).Select((a, i) => string.Format(a, i));
-
-            var testCode = /* lang=c#-test */ $$"""
-                using BenchmarkDotNet.Attributes;
-
-                {{string.Join("\n", genericTypeArgumentsAttributeUsages)}}
-                public abstract class {{benchmarkClassName}}<TParameter>
-                {
-                    {{benchmarkAttributeUsage}}
-                    public void BenchmarkMethod()
-                    {
-
-                    }
-                }
-                """;
-
-            TestCode = testCode;
-
-            for (var i = 0; i < genericTypeArgumentsAttributeUsageCount; i++)
-            {
-                AddExpectedDiagnostic(i);
-            }
-
-            await RunAsync();
-        }
-
-        public static IEnumerable<string> BenchmarkAttributeUsagesEnumerableLocal => BenchmarkAttributeUsagesEnumerable;
     }
 
     public class ClassWithGenericTypeArgumentsAttributeMustBeGeneric : AnalyzerTestFixture<BenchmarkClassAnalyzer>
@@ -288,10 +249,10 @@ public class BenchmarkClassAnalyzerTests
                     {
 
                     }
-                                                           
+
                     public void NonBenchmarkMethod()
                     {
-                                                           
+
                     }
                 }
                 """;
@@ -336,13 +297,13 @@ public class BenchmarkClassAnalyzerTests
         {
             const string testCode = /* lang=c#-test */ """
                 using BenchmarkDotNet.Attributes;
-                                                       
+
                 public class BenchmarkClass
                 {
                     [Benchmark]
                     public void NonGenericBenchmarkMethod()
                     {
-                                                       
+
                     }
                 }
                 """;
@@ -421,10 +382,10 @@ public class BenchmarkClassAnalyzerTests
                     {
 
                     }
-                                                           
+
                     public void NonBenchmarkMethod()
                     {
-                                                           
+
                     }
                 }
                 """;
@@ -441,13 +402,13 @@ public class BenchmarkClassAnalyzerTests
 
             const string testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                       
+
                 public {|#0:static|} class {{benchmarkClassName}}
                 {
                     [Benchmark]
                     public static void BenchmarkMethod()
                     {
-                                                       
+
                     }
                 }
                 """;
@@ -474,7 +435,7 @@ public class BenchmarkClassAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 [assembly: BenchmarkDotNet.Attributes.BenchmarkCategory({{(useConstantFromOtherClass ? "Constants.Value" : "\"test\"")}})]
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                 }
@@ -484,17 +445,17 @@ public class BenchmarkClassAnalyzerTests
 
             var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 {{benchmarkCategoryAttributeUsage}}
                 public {{abstractModifier}}class BenchmarkClassAncestor1
                 {
                     {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "\"test\"")};" : "")}}
-                                                                       
+
                     {{benchmarkCategoryAttributeUsage}}
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                           
+
                     }
                 }
                 """;
@@ -514,7 +475,7 @@ public class BenchmarkClassAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 [assembly: BenchmarkDotNet.Attributes.BenchmarkCategory{{emptyBenchmarkCategoryAttributeArgument}}]
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                 }
@@ -522,7 +483,7 @@ public class BenchmarkClassAnalyzerTests
 
             var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 [BenchmarkCategory{{emptyBenchmarkCategoryAttributeArgument}}]
                 public {{abstractModifier}}class BenchmarkClassAncestor1
                 {
@@ -530,7 +491,7 @@ public class BenchmarkClassAnalyzerTests
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                           
+
                     }
                 }
                 """;
@@ -559,7 +520,7 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 [assembly: BenchmarkDotNet.Attributes.BenchmarkCategory({{assemblyLevelAttributeValues}})]
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                 }
@@ -574,7 +535,7 @@ public class BenchmarkClassAnalyzerTests
 
             var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 [BenchmarkCategory({{classAndMethodAttributeLevelValues}})]
                 public {{abstractModifier}}class BenchmarkClassAncestor1
                 {
@@ -582,12 +543,12 @@ public class BenchmarkClassAnalyzerTests
                                             private const string _xNull = {(useConstantsFromOtherClass ? "Constants.Value1" : "null")};
                                             private const string _xValue = {(useConstantsFromOtherClass ? "Constants.Value2" : "\"test\"")};
                                             """ : "")}}
-                                                                       
+
                     [BenchmarkCategory({{classAndMethodAttributeLevelValues}})]
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                           
+
                     }
                 }
                 """;
@@ -608,7 +569,7 @@ public class BenchmarkClassAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 [assembly: BenchmarkDotNet.Attributes.BenchmarkCategory({|#0:{{(useConstantFromOtherClass ? "Constants.Value" : "null")}}|})]
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                 }
@@ -616,17 +577,17 @@ public class BenchmarkClassAnalyzerTests
 
             var benchmarkClassAncestor1Document = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                                       
+
                 [BenchmarkCategory({|#1:{{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}|})]
                 public {{abstractModifier}}class BenchmarkClassAncestor1
                 {
                     {{(useLocalConstant ? $"private const string _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
-                                                                       
+
                     [BenchmarkCategory({|#2:{{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}}|})]
                     {{benchmarkAttributeUsage}}
                     public void BenchmarkMethod()
                     {
-                                                                           
+
                     }
                 }
                 """;
@@ -668,24 +629,24 @@ public class BenchmarkClassAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")};
                                             """ : "")}}
-                                                
+
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xTrue" : useConstantsFromOtherClass ? "Constants.Value1" : "true")}})]
                     public void BaselineBenchmarkMethod()
                     {
-                                                
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -708,21 +669,21 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor3
                 {
                     {{(useLocalConstants ? $"private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")};" : "")}}
-                                                                       
+
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xFalse" : useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")}})]
                     public void NonBaselineBenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -752,24 +713,24 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     {{baselineBenchmarkAttributeUsages}}
                     public void BaselineBenchmarkMethod()
                     {
-                                                
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -792,21 +753,21 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor3
                 {
                     {{(useLocalConstants ? $"private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};" : "")}}
-                                                                       
+
                     {{baselineBenchmarkAttributeUsages}}
                     public void NonBaselineBenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -835,17 +796,17 @@ public class BenchmarkClassAnalyzerTests
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstant ? $"private const bool _xFalse = {(useConstantFromOtherClass ? "Constants.Value" : useInvalidFalseValue ? "dummy" : "false")};" : "")}}
-                                                
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod1()
                     {
 
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -891,23 +852,23 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     [BenchmarkCategory({{string.Format(valuesContainer, """
                                                                         null, "test", null, "TEST", "test2"
                                                                         """)}})]
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
 
                     [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
                     [BenchmarkCategory({{string.Format(valuesContainer, """
@@ -919,32 +880,32 @@ public class BenchmarkClassAnalyzerTests
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -961,7 +922,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
                     [BenchmarkCategory({{string.Format(valuesContainer, """
                                                                         "test", null
@@ -998,49 +959,49 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     {{string.Format(baselineBenchmarkAttributeUsageWithLocationMarker, 0)}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     {{(useDuplicateInSameClass ? string.Format(baselineBenchmarkAttributeUsageWithLocationMarker, 1) : "")}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1057,7 +1018,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod3()
                     {
@@ -1096,51 +1057,51 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     {{emptyBenchmarkCategoryAttributeUsages}}
                     {{string.Format(baselineBenchmarkAttributeUsageWithLocationMarker, 0)}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     {{emptyBenchmarkCategoryAttributeUsages}}
                     {{(useDuplicateInSameClass ? string.Format(baselineBenchmarkAttributeUsageWithLocationMarker, 1) : "")}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1157,7 +1118,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     {{emptyBenchmarkCategoryAttributeUsages}}
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod3()
@@ -1205,24 +1166,24 @@ public class BenchmarkClassAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")};
                                             """ : "")}}
-                                                
+
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xTrue" : useConstantsFromOtherClass ? "Constants.Value1" : "true")}})]
                     public void BaselineBenchmarkMethod()
                     {
-                                                
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1245,21 +1206,21 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor3
                 {
                     {{(useLocalConstants ? $"private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")};" : "")}}
-                                                                       
+
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xFalse" : useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")}})]
                     public void NonBaselineBenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     public void BenchmarkMethod2()
                     {
 
                     }
-                                                                           
+
                     private void BenchmarkMethod3()
                     {
-                                                                                                                                                  
+
                     }
                 }
                 """;
@@ -1284,58 +1245,58 @@ public class BenchmarkClassAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")};
                                             """ : "")}}
-                                                
+
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xTrue" : useConstantsFromOtherClass ? "Constants.Value1" : "true")}})]
                     public void BaselineBenchmarkMethod()
                     {
-                                                
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xTrue" : useConstantsFromOtherClass ? "Constants.Value1" : "true")}})]
                     public void BaselineBenchmarkMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category2")]
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xTrue" : useConstantsFromOtherClass ? "Constants.Value1" : "true")}})]
                     public void BaselineBenchmarkMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xFalse" : useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")}})]
                     public void BaselineBenchmarkMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category2")]
                     [Benchmark]
                     public void BaselineBenchmarkMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                    
+
                     }
-                                                    
+
                     [Benchmark(Baseline = {{(useLocalConstants ? "_xFalse" : useConstantsFromOtherClass ? "Constants.Value2" : useInvalidFalseValue ? "dummy" : "false")}})]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1382,17 +1343,17 @@ public class BenchmarkClassAnalyzerTests
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstant ? $"private const bool _xFalse = {(useConstantFromOtherClass ? "Constants.Value" : useInvalidFalseValue ? "dummy" : "false")};" : "")}}
-                                                
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod1()
                     {
 
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1438,49 +1399,49 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     {{(useDuplicateInSameClass ? baselineBenchmarkAttributeUsage : "")}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1497,7 +1458,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod3()
                     {
@@ -1528,51 +1489,51 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     {{emptyBenchmarkCategoryAttributeUsages}}
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     {{emptyBenchmarkCategoryAttributeUsages}}
                     {{(useDuplicateInSameClass ? baselineBenchmarkAttributeUsage : "")}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1589,7 +1550,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     {{emptyBenchmarkCategoryAttributeUsages}}
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod3()
@@ -1621,21 +1582,21 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     [BenchmarkCategory({{string.Format(valuesContainer, $"""
                                                                             null, {invalidCategoryStringValue}, null, "TEST", "test2"
                                                                             """)}})]
                     {{baselineBenchmarkAttributeUsage}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
 
                     [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
@@ -1648,32 +1609,32 @@ public class BenchmarkClassAnalyzerTests
                     {{(useDuplicateInSameClass ? baselineBenchmarkAttributeUsage : "")}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1690,7 +1651,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
                     [BenchmarkCategory({{string.Format(valuesContainer, $"{invalidCategoryStringValue}, null")}})]
                     [BenchmarkCategory({{string.Format(valuesContainer, """
@@ -1727,23 +1688,23 @@ public class BenchmarkClassAnalyzerTests
 
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass : BenchmarkClassAncestor1
                 {
                     {{(useLocalConstants ? $"""
                                             private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};
                                             private const bool _xFalse = {(useConstantsFromOtherClass ? "Constants.Value2" : "false")};
                                             """ : "")}}
-                                                
+
                     [BenchmarkCategory({{string.Format(valuesContainer, """
                                                                         null, "test", null, "TEST", "test2"
                                                                         """)}})]
                     {{string.Format(baselineBenchmarkAttributeUsageWithLocationMarker, 0)}}
                     public void BaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
                     [BenchmarkCategory({{string.Format(valuesContainer, """
                                                                         "test", null
@@ -1754,32 +1715,32 @@ public class BenchmarkClassAnalyzerTests
                     {{(useDuplicateInSameClass ? string.Format(baselineBenchmarkAttributeUsageWithLocationMarker, 1) : "")}}
                     public void BaselineBenchmarkMethod2()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod1()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [BenchmarkCategory("Category1")]
                     public void DummyMethod()
                     {
-                                                                                                        
+
                     }
-                                                    
+
                     [Benchmark]
                     public void NonBaselineBenchmarkMethod2()
                     {
-                                                    
+
                     }
-                                                    
+
                     {{nonBaselineBenchmarkAttributeUsage}}
                     public void NonBaselineBenchmarkMethod3()
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -1796,7 +1757,7 @@ public class BenchmarkClassAnalyzerTests
                 public {{abstractModifier}}class BenchmarkClassAncestor2
                 {
                     {{(useLocalConstants ? $"private const bool _xTrue = {(useConstantsFromOtherClass ? "Constants.Value1" : "true")};" : "")}}
-                                                                       
+
                     [BenchmarkCategory({{string.Format(valuesContainer, "null, null")}})]
                     [BenchmarkCategory({{string.Format(valuesContainer, """
                                                                         "test", null

@@ -368,7 +368,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
             };
 
 
-            return new[] { versionAnnotation };
+            return [versionAnnotation];
         }
 
         private class ChartStats

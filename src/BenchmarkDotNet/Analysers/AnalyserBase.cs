@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Analysers
                     yield return conclusion;
         }
 
-        [PublicAPI] protected virtual IEnumerable<Conclusion> AnalyseSummary(Summary summary) => Enumerable.Empty<Conclusion>();
-        [PublicAPI] protected virtual IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary) => Enumerable.Empty<Conclusion>();
+        [PublicAPI] protected virtual IEnumerable<Conclusion> AnalyseSummary(Summary summary) => [];
+        [PublicAPI] protected virtual IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary) => [];
 
         protected Conclusion CreateHint(string message, BenchmarkReport? report = null, bool mergeable = true)
             => Conclusion.CreateHint(Id, message, report, mergeable);

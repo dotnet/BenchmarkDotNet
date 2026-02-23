@@ -17,7 +17,6 @@ then run `build.cmd pack-weaver`.
     <DelaySign>false</DelaySign>
     <!-- Fix error NU5017: Cannot create a package that has no dependencies nor content. -->
     <IsPackable Condition="'$(IsFullPack)' == 'true'">false</IsPackable>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

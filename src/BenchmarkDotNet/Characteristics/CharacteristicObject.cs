@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Characteristics
         protected CharacteristicObject()
         {
             Owner = null;
-            sharedValues = new Dictionary<Characteristic, object>();
+            sharedValues = [];
         }
 
         protected CharacteristicObject(string id) : this()
@@ -281,7 +281,7 @@ namespace BenchmarkDotNet.Characteristics
             var oldValues = sharedValues;
 
             Owner = null;
-            sharedValues = new Dictionary<Characteristic, object>();
+            sharedValues = [];
             frozen = false;
 
             oldValues.Remove(thisCharacteristic);

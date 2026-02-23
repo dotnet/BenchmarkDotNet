@@ -263,7 +263,7 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         /// <param name="job">The original job</param>
         /// <returns>The new job which doesn't have any environment variables</returns>
-        public static Job WithoutEnvironmentVariables(this Job job) => job.WithEnvironmentVariables(Array.Empty<EnvironmentVariable>());
+        public static Job WithoutEnvironmentVariables(this Job job) => job.WithEnvironmentVariables([]);
 
         public static Job WithArguments(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 

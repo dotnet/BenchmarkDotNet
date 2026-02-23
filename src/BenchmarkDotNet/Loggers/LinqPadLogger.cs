@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Loggers
             write(WithStyle(text, "color:" + GetColor(logKind) + ";font-family:Consolas,'Lucida Console','Courier New',monospace"));
 
         private object WithStyle(object data, string htmlStyle) =>
-            withStyle.Invoke(null, new[] { data, htmlStyle })!;
+            withStyle.Invoke(null, [data, htmlStyle])!;
 
         private string GetColor(LogKind logKind) =>
             colorScheme.TryGetValue(logKind, out var color) ? color : DefaultColor;

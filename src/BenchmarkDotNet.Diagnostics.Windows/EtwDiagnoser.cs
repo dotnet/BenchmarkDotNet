@@ -19,13 +19,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     public abstract class EtwDiagnoser<TStats> : DisposeAtProcessTermination where TStats : new()
     {
         internal readonly LogCapture Logger = new LogCapture();
-        protected readonly Dictionary<BenchmarkCase, int> BenchmarkToProcess = new Dictionary<BenchmarkCase, int>();
-        protected readonly ConcurrentDictionary<int, TStats> StatsPerProcess = new ConcurrentDictionary<int, TStats>();
+        protected readonly Dictionary<BenchmarkCase, int> BenchmarkToProcess = [];
+        protected readonly ConcurrentDictionary<int, TStats> StatsPerProcess = [];
 
         public virtual RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
 
-        public virtual IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        public virtual IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public virtual IEnumerable<IExporter> Exporters => [];
+        public virtual IEnumerable<IAnalyser> Analysers => [];
 
         protected TraceEventSession Session { get; private set; } = default!;
 

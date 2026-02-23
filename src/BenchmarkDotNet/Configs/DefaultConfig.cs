@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Configs
     public class DefaultConfig : IConfig
     {
         public static readonly IConfig Instance = new DefaultConfig();
-        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+        private readonly static Conclusion[] emptyConclusion = [];
 
         private DefaultConfig()
         {
@@ -112,18 +112,18 @@ namespace BenchmarkDotNet.Configs
 
         public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
-        public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
+        public IEnumerable<Job> GetJobs() => [];
 
-        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
+        public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => [];
 
-        public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
+        public IEnumerable<IDiagnoser> GetDiagnosers() => [];
 
-        public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
+        public IEnumerable<HardwareCounter> GetHardwareCounters() => [];
 
-        public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+        public IEnumerable<IFilter> GetFilters() => [];
 
-        public IEnumerable<EventProcessor> GetEventProcessors() => Array.Empty<EventProcessor>();
+        public IEnumerable<EventProcessor> GetEventProcessors() => [];
 
-        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => [];
     }
 }

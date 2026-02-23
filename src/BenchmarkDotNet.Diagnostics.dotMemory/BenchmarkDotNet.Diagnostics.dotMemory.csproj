@@ -6,7 +6,6 @@
         <AssemblyTitle>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyTitle>
         <AssemblyName>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyName>
         <PackageId>BenchmarkDotNet.Diagnostics.dotMemory</PackageId>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

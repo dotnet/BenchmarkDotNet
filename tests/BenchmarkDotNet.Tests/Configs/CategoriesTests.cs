@@ -102,11 +102,11 @@ namespace BenchmarkDotNet.Tests.Configs
             {
                 public string[] GetCategories(MethodInfo method)
                 {
-                    return new[]
-                    {
+                    return
+                    [
                         "PermanentCategory",
                         method.Name.Substring(0, 1)
-                    };
+                    ];
                 }
             }
 

@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void SimpleConfigAlternativeVersionParsedCorrectly()
         {
-            var config = ConfigParser.Parse(new[] { "--job=Dry" }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["--job=Dry"], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -73,13 +73,13 @@ namespace BenchmarkDotNet.Tests
             const int iterationTime = 250;
             const int iterationCount = 20;
 
-            var config = ConfigParser.Parse(new[]
-            {
+            var config = ConfigParser.Parse(
+            [
                 "--LaunchCount", launchCount.ToString(),
                 "--warmupCount", warmupCount.ToString(),
                 "--iterationTime", iterationTime.ToString(),
                 "--iterationCount", iterationCount.ToString()
-            }, new OutputLogger(Output)).config;
+            ], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             var job = config.GetJobs().Single();
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanEasilyRequestToRunTheBenchmarkOncePerIteration()
         {
-            var configEasy = ConfigParser.Parse(new[] { "--runOncePerIteration" }, new OutputLogger(Output)).config;
+            var configEasy = ConfigParser.Parse(["--runOncePerIteration"], new OutputLogger(Output)).config;
 
             Assert.NotNull(configEasy);
             var easyJob = configEasy.GetJobs().Single();
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanChooseStrategy()
         {
-            var configEasy = ConfigParser.Parse(new[] { "--strategy", "ColdStart" }, new OutputLogger(Output)).config;
+            var configEasy = ConfigParser.Parse(["--strategy", "ColdStart"], new OutputLogger(Output)).config;
 
             Assert.NotNull(configEasy);
             var job = configEasy.GetJobs().Single();
@@ -118,13 +118,13 @@ namespace BenchmarkDotNet.Tests
             EnvRequirement.DotNetCoreOnly)]
         public void UnknownConfigMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--unknown"], new OutputLogger(Output)).isSuccess);
         }
 
         [Fact]
         public void EmptyArgsMeansConfigWithoutJobs()
         {
-            var config = ConfigParser.Parse(Array.Empty<string>(), new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse([], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Empty(config.GetJobs());
@@ -135,8 +135,8 @@ namespace BenchmarkDotNet.Tests
         {
             string nonExistingFile = Path.Combine(Path.GetTempPath(), "veryUniqueFileName.exe");
 
-            Assert.False(ConfigParser.Parse(new[] { "--cli", nonExistingFile }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] { "--coreRun", nonExistingFile }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--cli", nonExistingFile], new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--coreRun", nonExistingFile], new OutputLogger(Output)).isSuccess);
         }
 
         [FactEnvSpecific("Detecting current version of .NET Core works only for .NET Core processes", EnvRequirement.DotNetCoreOnly)]
@@ -226,7 +226,7 @@ namespace BenchmarkDotNet.Tests
             const string runtime2 = "net6.0";
             string fakePath1 = typeof(object).Assembly.Location;
             string fakePath2 = typeof(FactAttribute).Assembly.Location;
-            var config = ConfigParser.Parse(new[] { "--coreRun", fakePath1, fakePath2, "--runtimes", runtime1, runtime2 }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["--coreRun", fakePath1, fakePath2, "--runtimes", runtime1, runtime2], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Equal(4, config.GetJobs().Count());
@@ -240,7 +240,7 @@ namespace BenchmarkDotNet.Tests
             var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
             var fakeCoreRunPath_2 = typeof(ConfigParserTests).Assembly.Location;
 
-            var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath_1, fakeCoreRunPath_2 }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["--job=Dry", "--coreRun", fakeCoreRunPath_1, fakeCoreRunPath_2], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             var jobs = config.GetJobs().ToArray();
@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.Tests
         public void MonoPathParsedCorrectly()
         {
             var fakeMonoPath = typeof(object).Assembly.Location;
-            var config = ConfigParser.Parse(new[] { "-r", "mono", "--monoPath", fakeMonoPath }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "mono", "--monoPath", fakeMonoPath], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -264,7 +264,7 @@ namespace BenchmarkDotNet.Tests
         public void ClrVersionParsedCorrectly()
         {
             const string clrVersion = "secret";
-            var config = ConfigParser.Parse(new[] { "--clrVersion", clrVersion }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["--clrVersion", clrVersion], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -275,7 +275,7 @@ namespace BenchmarkDotNet.Tests
         public void IlCompilerPathParsedCorrectly()
         {
             var fakePath = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
-            var config = ConfigParser.Parse(new[] { "-r", "nativeaot60", "--ilcPackages", fakePath.FullName }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "nativeaot60", "--ilcPackages", fakePath.FullName], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -301,7 +301,7 @@ namespace BenchmarkDotNet.Tests
         public void DotNetCliParsedCorrectly(string tfm, bool isCore)
         {
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
-            var config = ConfigParser.Parse(new[] { "-r", tfm, "--cli", fakeDotnetCliPath }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", tfm, "--cli", fakeDotnetCliPath], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -349,7 +349,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WhenConfigOptionsFlagsAreNotSpecifiedTheyAreNotSet()
         {
-            var config = ConfigParser.Parse(Array.Empty<string>(), new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse([], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Equal(ConfigOptions.Default, config.Options);
@@ -359,7 +359,7 @@ namespace BenchmarkDotNet.Tests
         public void PackagesPathParsedCorrectly()
         {
             var fakeRestoreDirectory = new FileInfo(typeof(object).Assembly.Location).Directory!.FullName;
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1", "--packages", fakeRestoreDirectory }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "netcoreapp3.1", "--packages", fakeRestoreDirectory], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -372,7 +372,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyBuildTimeout()
         {
             const int timeoutInSeconds = 10;
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1", "--buildTimeout", timeoutInSeconds.ToString() }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "netcoreapp3.1", "--buildTimeout", timeoutInSeconds.ToString()], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -384,7 +384,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WhenUserDoesNotSpecifyTimeoutTheDefaultValueIsUsed()
         {
-            var config = ConfigParser.Parse(new[] { "-r", "netcoreapp3.1" }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "netcoreapp3.1"], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -421,7 +421,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net481")]
         public void NetFrameworkMonikerParsedCorrectly(string tfm)
         {
-            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", tfm], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -447,7 +447,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net11.0")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
-            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", tfm], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -461,7 +461,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net5.0-ios")]
         public void PlatformSpecificMonikersAreSupported(string msBuildMoniker)
         {
-            var config = ConfigParser.Parse(new[] { "-r", msBuildMoniker }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", msBuildMoniker], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -526,7 +526,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanParseHardwareCounters()
         {
-            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}" },
+            var config = ConfigParser.Parse(["--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"],
                 new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
@@ -538,13 +538,13 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void InvalidHardwareCounterNameMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] { "--counters", "WRONG_NAME" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--counters", "WRONG_NAME"], new OutputLogger(Output)).isSuccess);
         }
 
         [Fact]
         public void TooManyHardwareCounterNameMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] { "--counters", "Timer+TotalIssues+BranchInstructions+CacheMisses" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--counters", "Timer+TotalIssues+BranchInstructions+CacheMisses"], new OutputLogger(Output)).isSuccess);
         }
 
         [Fact]
@@ -552,7 +552,7 @@ namespace BenchmarkDotNet.Tests
         {
             const int depth = 123;
 
-            var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString() }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["--disasm", "--disasmDepth", depth.ToString()], new OutputLogger(Output)).config;
             Assert.NotNull(config);
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
@@ -563,8 +563,8 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WhenCustomDisassemblerSettingsAreProvidedItsEnabledByDefault()
         {
-            Verify(new[] { "--disasmDepth", "2" });
-            Verify(new[] { "--disasmFilter", "*" });
+            Verify(["--disasmDepth", "2"]);
+            Verify(["--disasmFilter", "*"]);
 
             void Verify(string[] args)
             {
@@ -577,7 +577,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanParseInfo()
         {
-            var config = ConfigParser.Parse(new[] { "--info" }, new OutputLogger(Output)).options;
+            var config = ConfigParser.Parse(["--info"], new OutputLogger(Output)).options;
 
             Assert.NotNull(config);
             Assert.True(config.PrintInformation);
@@ -591,7 +591,7 @@ namespace BenchmarkDotNet.Tests
                     .WithWarmupCount(1)
                     .AsDefault());
 
-            var parsedConfig = ConfigParser.Parse(new[] { "--warmupCount", "2" }, new OutputLogger(Output), globalConfig).config;
+            var parsedConfig = ConfigParser.Parse(["--warmupCount", "2"], new OutputLogger(Output), globalConfig).config;
 
             Assert.NotNull(parsedConfig);
             Assert.Equal(2, parsedConfig.GetJobs().Single().Run.WarmupCount);
@@ -609,7 +609,7 @@ namespace BenchmarkDotNet.Tests
             Assert.NotNull(globalConfig.SummaryStyle);
             Assert.NotEqual(customValue, globalConfig.SummaryStyle.MaxParameterColumnWidth);
 
-            var parsedConfig = ConfigParser.Parse(new[] { "--maxWidth", customValue.ToString() }, new OutputLogger(Output), globalConfig).config;
+            var parsedConfig = ConfigParser.Parse(["--maxWidth", customValue.ToString()], new OutputLogger(Output), globalConfig).config;
             Assert.NotNull(parsedConfig);
             Assert.NotNull(parsedConfig.SummaryStyle);
             Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParameterColumnWidth);
@@ -621,7 +621,7 @@ namespace BenchmarkDotNet.Tests
             const string key = "A_VERY_NICE_ENV_VAR";
             const string value = "enabled";
 
-            var parsedConfig = ConfigParser.Parse(new[] { "--envVars", $"{key}:{value}" }, new OutputLogger(Output)).config;
+            var parsedConfig = ConfigParser.Parse(["--envVars", $"{key}:{value}"], new OutputLogger(Output)).config;
             Assert.NotNull(parsedConfig);
 
             var job = parsedConfig.GetJobs().Single();
@@ -640,7 +640,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(Platform.LoongArch64)]
         public void UserCanSpecifyProcessPlatform(Platform platform)
         {
-            var parsedConfig = ConfigParser.Parse(new[] { "--platform", platform.ToString() }, new OutputLogger(Output)).config;
+            var parsedConfig = ConfigParser.Parse(["--platform", platform.ToString()], new OutputLogger(Output)).config;
             Assert.NotNull(parsedConfig);
 
             var job = parsedConfig.GetJobs().Single();
@@ -653,13 +653,13 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void InvalidEnvVarAreRecognized()
         {
-            Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(["--envVars", "INVALID_NO_SEPARATOR"], new OutputLogger(Output)).isSuccess);
         }
 
         [Fact]
         public void UserCanSpecifyNoForceGCs()
         {
-            var parsedConfiguration = ConfigParser.Parse(new[] { "--noForcedGCs" }, new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--noForcedGCs"], new OutputLogger(Output));
             Assert.NotNull(parsedConfiguration.config);
             Assert.True(parsedConfiguration.isSuccess);
 
@@ -672,7 +672,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UsersCanSpecifyWithoutOverheadEvalution()
         {
-            var parsedConfiguration = ConfigParser.Parse(new[] { "--noOverheadEvaluation" }, new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--noOverheadEvaluation"], new OutputLogger(Output));
             Assert.NotNull(parsedConfiguration.config);
             Assert.True(parsedConfiguration.isSuccess);
 
@@ -685,7 +685,7 @@ namespace BenchmarkDotNet.Tests
         [Fact(Skip = "This should be handled somehow at CommandLineParser level. See https://github.com/commandlineparser/commandline/pull/892")]
         public void UserCanSpecifyWasmArgs()
         {
-            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module" }, new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module"], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             Assert.NotNull(parsedConfiguration.config);
             var jobs = parsedConfiguration.config.GetJobs();
@@ -699,7 +699,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanSpecifyWasmArgsUsingEquals()
         {
-            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module" }, new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module"], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             Assert.NotNull(parsedConfiguration.config);
             var jobs = parsedConfiguration.config.GetJobs();
@@ -714,12 +714,12 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyWasmArgsViaResponseFile()
         {
             var tempResponseFile = Path.GetRandomFileName();
-            File.WriteAllLines(tempResponseFile, new[]
-            {
+            File.WriteAllLines(tempResponseFile,
+            [
                 "--runtimes wasmnet80",
                 "--wasmArgs \"--expose_wasm --module\""
-            });
-            var parsedConfiguration = ConfigParser.Parse(new[] { $"@{tempResponseFile}" }, new OutputLogger(Output));
+            ]);
+            var parsedConfiguration = ConfigParser.Parse([$"@{tempResponseFile}"], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             Assert.NotNull(parsedConfiguration.config);
             var jobs = parsedConfiguration.config.GetJobs();
@@ -741,7 +741,7 @@ namespace BenchmarkDotNet.Tests
         public void CheckUpdateValidArgs(string strArgs, string expected)
         {
             var args = strArgs.Split();
-            _ = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+            _ = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = ["*"]);
 
             Assert.Equal(expected.Split(), updatedArgs);
         }
@@ -752,7 +752,7 @@ namespace BenchmarkDotNet.Tests
         public void CheckUpdateInvalidArgs(string strArgs)
         {
             var args = strArgs.Split();
-            bool isSuccess = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+            bool isSuccess = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = ["*"]);
 
             Assert.Null(updatedArgs);
             Assert.False(isSuccess);

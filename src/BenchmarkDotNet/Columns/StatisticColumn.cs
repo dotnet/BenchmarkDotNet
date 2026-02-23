@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Columns
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, level).Margin, Priority.Additional);
 
 
-        public static readonly IColumn[] AllStatistics = { Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max };
+        public static readonly IColumn[] AllStatistics = [Mean, StdErr, StdDev, OperationsPerSecond, Min, Q1, Median, Q3, Max];
 
         private readonly Func<Statistics, double> calc;
         public string Id => nameof(StatisticColumn) + "." + ColumnName;

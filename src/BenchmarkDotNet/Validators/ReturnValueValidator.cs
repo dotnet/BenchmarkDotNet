@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Validators
                     return false;
 
                 var method = equatableInterface.GetMethod(nameof(IEquatable<object>.Equals), BindingFlags.Public | BindingFlags.Instance);
-                return (bool?)method?.Invoke(x, new[] { y }) ?? false;
+                return (bool?)method?.Invoke(x, [y]) ?? false;
             }
 
             private bool CompareStructural(object x, object y)

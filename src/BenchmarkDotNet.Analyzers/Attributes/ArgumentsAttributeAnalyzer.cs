@@ -46,7 +46,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_MustHaveMatchingValueType_Description)));
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_RequiresParameters_Description)));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
@@ -95,15 +95,15 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         var argumentsSourceAttributes = new List<AttributeData>();
         foreach (var attr in methodSymbol.GetAttributes())
         {
-            if (attr.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
+            if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, benchmarkAttributeTypeSymbol))
             {
                 hasBenchmarkAttribute = true;
             }
-            else if (attr.AttributeClass.Equals(argumentsAttributeTypeSymbol))
+            else if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, argumentsAttributeTypeSymbol))
             {
                 argumentsAttributes.Add(attr);
             }
-            else if (attr.AttributeClass.Equals(argumentsSourceAttributeTypeSymbol))
+            else if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, argumentsSourceAttributeTypeSymbol))
             {
                 argumentsSourceAttributes.Add(attr);
             }
@@ -150,10 +150,10 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                 }
                 else
                 {
-                    var syntax = (AttributeSyntax) attr.ApplicationSyntaxReference.GetSyntax();
+                    var syntax = (AttributeSyntax)attr.ApplicationSyntaxReference!.GetSyntax();
                     AnalyzeAssignableValueType(
                         attr.ConstructorArguments[0],
-                        syntax.ArgumentList.Arguments[0].Expression,
+                        syntax.ArgumentList!.Arguments[0].Expression,
                         methodSymbol.Parameters[0].Type
                     );
                 }
@@ -200,7 +200,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                     expression.GetLocation(),
                     expression.ToString(),
                     parameterType.ToDisplayString(),
-                    value.IsNull ? "null" : value.Type.ToDisplayString())
+                    value.IsNull ? "null" : value.Type!.ToDisplayString())
                 );
             }
         }

@@ -16,11 +16,11 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ValuesReturnedByBenchmarkTest(ITestOutputHelper output) : base(output) { }
 
-        public static IEnumerable<object[]> GetToolchains() => new[]
-        {
-            new object[] { Job.Default.GetToolchain() },
-            new object[] { InProcessEmitToolchain.Default },
-        };
+        public static IEnumerable<object[]> GetToolchains() =>
+        [
+            [Job.Default.GetToolchain()],
+            [InProcessEmitToolchain.Default],
+        ];
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void AnyValueCanBeReturned(IToolchain toolchain) => CanExecute<ValuesReturnedByBenchmark>(ManualConfig.CreateEmpty().AddJob(Job.Dry.WithToolchain(toolchain)));
@@ -79,10 +79,10 @@ namespace BenchmarkDotNet.IntegrationTests
             public ref readonly ReadOnlyStruct ReturnReadOnlyStructByReadonlyRef() => ref readOnlyStructField;
 
             [Benchmark]
-            public Span<byte> ReturnStackOnlyType() => new Span<byte>(Array.Empty<byte>());
+            public Span<byte> ReturnStackOnlyType() => new Span<byte>([]);
 
             [Benchmark]
-            public ImmutableArray<int> TypeFromNetStandardNuGetPackage() => ImmutableArray<int>.Empty;
+            public ImmutableArray<int> TypeFromNetStandardNuGetPackage() => [];
 
             [Benchmark]
             public ValueTuple<int> TypeInTwoDlls() => new ValueTuple<int>();

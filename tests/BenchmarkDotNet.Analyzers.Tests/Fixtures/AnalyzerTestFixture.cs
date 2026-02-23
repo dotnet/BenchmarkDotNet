@@ -187,7 +187,7 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
 
             public class DummyAttribute : Attribute
             {
-                                                
+
             }
             """
         );

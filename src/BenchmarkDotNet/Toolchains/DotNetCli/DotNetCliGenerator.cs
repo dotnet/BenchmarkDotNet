@@ -12,9 +12,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
-        private static readonly string[] ProjectExtensions = { ".csproj", ".fsproj", ".vbroj" };
+        private static readonly string[] ProjectExtensions = [".csproj", ".fsproj", ".vbroj"];
 
-        private static readonly string[] SolutionExtensions = { ".sln", ".slnx" };
+        private static readonly string[] SolutionExtensions = [".sln", ".slnx"];
 
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            => new[] { artifactsPaths.BuildArtifactsDirectoryPath };
+            => [artifactsPaths.BuildArtifactsDirectoryPath];
 
         protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
         {

@@ -206,17 +206,17 @@ namespace BenchmarkDotNet.Tests.Exporters
             public double DoubleNumber { get; } = double.MaxValue;
             public long LongNumber { get; } = long.MaxValue;
             public string Name { get; } = "Source";
-            public IEnumerable<MockCollectionItem> Items { get; }
-                = new List<MockCollectionItem>
-                {
-                    new MockCollectionItem("i1"), new MockCollectionItem("i2")
-                };
-            public double[] DoubleArray { get; } = new double[] { 1, 2 };
+            public IEnumerable<MockCollectionItem> Items { get; } =
+                [
+                    new MockCollectionItem("i1"),
+                    new MockCollectionItem("i2"),
+                ];
+            public double[] DoubleArray { get; } = [1, 2];
         }
 
         private class SimpleItemSource
         {
-            public IEnumerable<string> Items { get; } = new List<string> { "s1", "s2" };
+            public IEnumerable<string> Items { get; } = ["s1", "s2"];
         }
 
         private class UnwriteableCollectionSource

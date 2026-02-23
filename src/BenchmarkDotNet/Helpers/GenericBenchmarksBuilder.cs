@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Helpers
             if (typeArguments.Any())
                 return BuildGenericTypes(type, typeArguments);
 
-            return new (bool isSuccess, Type result)[] { (true,  type) };
+            return [(true,  type)];
         }
 
         private static IEnumerable<(bool isSuccess, Type result)> BuildGenericTypes(Type type, IEnumerable<Type[]> typeArguments)

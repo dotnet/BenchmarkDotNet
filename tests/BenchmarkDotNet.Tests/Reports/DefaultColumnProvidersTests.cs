@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [InlineData(true, "Mean, Error, Median, StdDev, Ratio, RatioSD")]
         public void DefaultStatisticsColumnsTest(bool hugeSd, string expectedColumnNames)
         {
-            var summary = CreateSummary(hugeSd, Array.Empty<Metric>());
+            var summary = CreateSummary(hugeSd, []);
             var columns = DefaultColumnProviders.Statistics.GetColumns(summary).ToList();
             string columnNames = string.Join(", ", columns.Select(c => c.ColumnName));
             output.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");

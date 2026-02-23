@@ -155,12 +155,12 @@ namespace BenchmarkDotNet.Order
         private class BenchmarkComparer : IComparer<BenchmarkCase>
         {
             private static readonly BenchmarkLogicalGroupRule[] DefaultOrder =
-            {
+            [
                 BenchmarkLogicalGroupRule.ByCategory,
                 BenchmarkLogicalGroupRule.ByParams,
                 BenchmarkLogicalGroupRule.ByJob,
                 BenchmarkLogicalGroupRule.ByMethod
-            };
+            ];
 
             private readonly IComparer<string[]> categoryComparer;
             private readonly IComparer<ParameterInstances> paramsComparer;
@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Order
                 this.jobComparer = jobComparer;
                 this.paramsComparer = paramsComparer;
 
-                this.order = new List<BenchmarkLogicalGroupRule>();
+                this.order = [];
                 foreach (var rule in (order ?? []).Concat(DefaultOrder))
                     if (!this.order.Contains(rule))
                         this.order.Add(rule);

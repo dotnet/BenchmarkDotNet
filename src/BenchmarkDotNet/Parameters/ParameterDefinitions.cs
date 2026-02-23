@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Parameters
 
         public ParameterDefinitions(IReadOnlyList<ParameterDefinition> items) => Items = items;
 
-        public IReadOnlyList<ParameterInstances> Expand(SummaryStyle summaryStyle) => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items, summaryStyle);
+        public IReadOnlyList<ParameterInstances> Expand(SummaryStyle summaryStyle) => Expand([new ParameterInstances(new List<ParameterInstance>())], Items, summaryStyle);
 
         private static IReadOnlyList<ParameterInstances> Expand(IReadOnlyList<ParameterInstances> instancesList, IReadOnlyList<ParameterDefinition> definitions, SummaryStyle summaryStyle)
         {

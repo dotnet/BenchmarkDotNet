@@ -14,7 +14,6 @@
     <GenerateProgramFile>false</GenerateProgramFile>
     <!-- Disable parallel tests between TargetFrameworks -->
     <TestTfmsInParallel>false</TestTfmsInParallel>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Reflection" />
