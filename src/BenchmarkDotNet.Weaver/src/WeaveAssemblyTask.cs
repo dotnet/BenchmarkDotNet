@@ -45,14 +45,9 @@ public sealed class WeaveAssemblyTask : Task
         bool benchmarkMethodsImplAdjusted = false;
         try
         {
-            var module = ModuleDefinition.FromFile(TargetAssembly);
-            var runtimeContext = module.RuntimeContext!;
-            runtimeContext = new(
-                runtimeContext.TargetRuntime,
-                new ReferencePathAssemblyResolver(runtimeContext, ReferencePaths),
-                runtimeContext.RuntimeCorLib,
-                runtimeContext.DefaultReaderParameters
-            );
+            var module = ModuleDefinition.FromFile(TargetAssembly, createRuntimeContext: false);
+            var runtimeContext = new RuntimeContext(module.OriginalTargetRuntime, new ReferencePathAssemblyResolver(ReferencePaths));
+            runtimeContext.AddAssembly(module.Assembly!);
 
             foreach (var type in module.GetAllTypes())
             {
