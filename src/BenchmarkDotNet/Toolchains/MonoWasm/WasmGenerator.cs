@@ -101,6 +101,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "wwwroot", "main.js");
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "browser-wasm");
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "publish");
     }
 }
