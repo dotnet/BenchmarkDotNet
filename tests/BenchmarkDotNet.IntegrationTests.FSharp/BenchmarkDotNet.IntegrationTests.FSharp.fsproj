@@ -11,8 +11,8 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.300" />
-    <PackageReference Update="System.ValueTuple" Version="4.6.1" />
+    <PackageReference Update="FSharp.Core" Version="10.0.103" />
+    <PackageReference Update="System.ValueTuple" Version="4.6.2" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>
