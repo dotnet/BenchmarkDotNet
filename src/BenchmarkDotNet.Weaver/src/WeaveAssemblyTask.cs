@@ -25,6 +25,12 @@ public sealed class WeaveAssemblyTask : Task
     public required string TargetAssembly { get; set; }
 
     /// <summary>
+    /// The reference paths to search for assembly resolution.
+    /// </summary>
+    [Required]
+    public required string[] ReferencePaths { get; set; }
+
+    /// <summary>
     /// Runs the weave assembly task.
     /// </summary>
     /// <returns><see langword="true"/> if successful; <see langword="false"/> otherwise.</returns>
@@ -32,15 +38,16 @@ public sealed class WeaveAssemblyTask : Task
     {
         if (!File.Exists(TargetAssembly))
         {
-            Log.LogError($"Assembly not found: {TargetAssembly}");
+            Log.LogError($"TargetAssembly does not exist: {TargetAssembly}");
             return false;
         }
-
 
         bool benchmarkMethodsImplAdjusted = false;
         try
         {
-            var module = ModuleDefinition.FromFile(TargetAssembly);
+            var module = ModuleDefinition.FromFile(TargetAssembly, createRuntimeContext: false);
+            var runtimeContext = new RuntimeContext(module.OriginalTargetRuntime, new ReferencePathAssemblyResolver(ReferencePaths));
+            runtimeContext.AddAssembly(module.Assembly!);
 
             foreach (var type in module.GetAllTypes())
             {
@@ -52,7 +59,7 @@ public sealed class WeaveAssemblyTask : Task
 
                 foreach (var method in type.Methods)
                 {
-                    if (method.CustomAttributes.Any(IsBenchmarkAttribute))
+                    if (method.CustomAttributes.Any(a => IsBenchmarkAttribute(a, runtimeContext)))
                     {
                         var oldImpl = method.ImplAttributes;
                         // Remove AggressiveInlining and add NoInlining.
@@ -95,10 +102,10 @@ public sealed class WeaveAssemblyTask : Task
         return true;
     }
 
-    private static bool IsBenchmarkAttribute(CustomAttribute attribute)
+    private static bool IsBenchmarkAttribute(CustomAttribute attribute, RuntimeContext runtimeContext)
     {
         // BenchmarkAttribute is unsealed, so we need to walk its hierarchy.
-        for (var attr = attribute.Constructor!.DeclaringType; attr != null; attr = attr.Resolve()?.BaseType)
+        for (var attr = attribute.Constructor!.DeclaringType; attr != null; attr = attr.Resolve(runtimeContext).BaseType)
         {
             if (attr.FullName == "BenchmarkDotNet.Attributes.BenchmarkAttribute")
             {
