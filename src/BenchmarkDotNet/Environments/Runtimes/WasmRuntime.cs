@@ -27,6 +27,11 @@ namespace BenchmarkDotNet.Environments
         public bool IsMonoRuntime { get; }
 
         /// <summary>
+        /// Maximum time in minutes to wait for a single benchmark process to finish before force killing it. Default is 10 minutes.
+        /// </summary>
+        public int ProcessTimeoutMinutes { get; }
+
+        /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
         /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
@@ -37,6 +42,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="wasmDataDir">Specifies a wasm data directory surfaced as $(WasmDataDir) for the project</param>
         /// <param name="moniker">Runtime moniker</param>
         /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
+        /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
         public WasmRuntime(
             string msBuildMoniker = "net8.0",
             string displayName = "Wasm",
@@ -45,7 +51,8 @@ namespace BenchmarkDotNet.Environments
             bool aot = false,
             string wasmDataDir = "",
             RuntimeMoniker moniker = RuntimeMoniker.WasmNet80,
-            bool isMonoRuntime = true)
+            bool isMonoRuntime = true,
+            int processTimeoutMinutes = 10)
             : base(moniker, msBuildMoniker, displayName)
         {
             if (javaScriptEngine.IsNotBlank() && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
@@ -56,6 +63,7 @@ namespace BenchmarkDotNet.Environments
             Aot = aot;
             WasmDataDir = wasmDataDir;
             IsMonoRuntime = isMonoRuntime;
+            ProcessTimeoutMinutes = processTimeoutMinutes;
         }
 
         public override bool Equals(object? obj)
