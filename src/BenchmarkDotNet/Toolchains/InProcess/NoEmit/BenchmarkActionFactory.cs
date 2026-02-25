@@ -26,8 +26,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             // targetMethod must not be null here. Because it's checked by PrepareInstanceAndResultType.
             // Following null check is added to suppress nullable annotation errors.
-            if (targetMethod == null)
-                throw new ArgumentNullException(nameof(targetMethod));
+            ArgumentNullException.ThrowIfNull(targetMethod);
 
             if (resultType == typeof(void*))
                 return new BenchmarkActionVoidPointer(resultInstance, targetMethod, unrollFactor);

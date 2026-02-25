@@ -10,9 +10,6 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public SimpleXmlWriter(TextWriter writer, bool indent)
         {
-            if (writer == null)
-                throw new ArgumentNullException(nameof(writer));
-
             this.writer = XmlWriter.Create(writer, new XmlWriterSettings { Indent = indent });
         }
 

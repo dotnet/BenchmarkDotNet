@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Loggers
         public static Dictionary<LogKind, ConsoleColor> CreateGrayScheme()
         {
             var colorScheme = new Dictionary<LogKind, ConsoleColor>();
-            foreach (var logKind in Enum.GetValues(typeof(LogKind)).Cast<LogKind>())
+            foreach (var logKind in Enum.GetValues<LogKind>())
                 colorScheme[logKind] = ConsoleColor.Gray;
             return colorScheme;
         }

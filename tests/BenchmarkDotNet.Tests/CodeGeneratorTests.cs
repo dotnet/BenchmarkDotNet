@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class CodeGeneratorTests
     {
-        public static TheoryData<CodeGenBenchmarkRunCallType> CodeGenBenchmarkRunCallTypes => [.. (CodeGenBenchmarkRunCallType[]) Enum.GetValues(typeof(CodeGenBenchmarkRunCallType))];
+        public static TheoryData<CodeGenBenchmarkRunCallType> CodeGenBenchmarkRunCallTypes => [.. Enum.GetValues<CodeGenBenchmarkRunCallType>()];
 
         [Theory]
         [MemberData(nameof(CodeGenBenchmarkRunCallTypes))]

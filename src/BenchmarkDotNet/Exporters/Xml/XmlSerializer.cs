@@ -31,8 +31,10 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public void Serialize(IXmlWriter newWriter, object source)
         {
-            if (source == null || source.GetType() != type)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
+
+            if (source.GetType() != type)
+                throw new ArgumentException(nameof(source));
 
             writer = newWriter ?? throw new ArgumentNullException(nameof(newWriter));
 
@@ -171,8 +173,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
             public XmlSerializerBuilder(Type type)
             {
-                if (type == null)
-                    throw new ArgumentNullException(nameof(type));
+                ArgumentNullException.ThrowIfNull(type);
 
                 Type = type;
                 RootName = type.Name;
