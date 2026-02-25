@@ -73,7 +73,7 @@ In addition, we can still make use of this boolean output to indicate
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="0.13.12" />
+    <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="0.15.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
   </ItemGroup>
 
@@ -82,12 +82,12 @@ In addition, we can still make use of this boolean output to indicate
 
 * **Step 3.** Make sure that your IDE supports VSTest integration.  
   In Visual Studio, everything works out of the box.
-  In Rider/R# 2023.3, the VSTest integration should be activated:
+  In Rider/R#, the VSTest integration might need to be activated:
   * Go to the "Unit Testing" settings page.
     * Rider: Settings -> Build, Execution, Deployment -> Unit Testing -> VSTest
     * R#: Extensions -> ReSharper -> Options -> Tools -> Unit Testing -> Test Frameworks -> VSTest
   * Make sure that the "Enable VSTest adapter support" checkbox is checked.
-  In future versions of Rider, this should be enabled by default.
+  In recent versions of Rider, this may be enabled by default.
 * **Step 4.** Switch to the `Release` configuration.  
   As mentioned above, the TestAdapter is not able to discover and run benchmarks with optimizations disabled (by design).
 * **Step 5.** Build the project.  
