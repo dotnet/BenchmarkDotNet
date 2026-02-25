@@ -38,7 +38,7 @@ public class DisassemblerModelSerializationTests
             model,
             options => options
                 .IncludingInternalFields()
-                .ComparingByMembers(typeof(ClrMdArgs)) // Required to use Excluding for struct type. See: https://github.com/fluentassertions/fluentassertions/issues/937
+                .ComparingByMembers<ClrMdArgs>() // Required to use Excluding for struct type. See: https://github.com/fluentassertions/fluentassertions/issues/937
                 .Excluding(x => x.ProcessId)
                 .Excluding(x => x.TypeName));
     }

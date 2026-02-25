@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
+using System;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -39,8 +40,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     return instance == null ? OverheadStatic : OverheadInstance;
                 }
                 return method.IsStatic
-                    ? (Action) method.CreateDelegate(typeof(Action))
-                    : (Action) method.CreateDelegate(typeof(Action), instance);
+                    ? method.CreateDelegate<Action>()
+                    : method.CreateDelegate<Action>(instance);
             }
 
             protected static TDelegate Unroll<TDelegate>(TDelegate callback, int unrollFactor)

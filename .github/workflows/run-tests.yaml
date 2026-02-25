@@ -40,6 +40,12 @@ jobs:
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
+      - name: Run task 'unit-tests'
+        shell: cmd
+        run: ./build.cmd unit-tests -e
+      - name: Run task 'analyzer-tests'
+        shell: cmd
+        run: ./build.cmd analyzer-tests -e
       - name: Run task 'in-tests-core'
         shell: cmd
         run: ./build.cmd in-tests-core -e

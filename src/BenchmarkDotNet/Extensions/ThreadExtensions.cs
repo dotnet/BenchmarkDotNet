@@ -17,11 +17,6 @@ namespace BenchmarkDotNet.Extensions
             ThreadPriority priority,
             ILogger logger)
         {
-            if (thread == null)
-                throw new ArgumentNullException(nameof(thread));
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
-
             try
             {
                 thread.Priority = priority;

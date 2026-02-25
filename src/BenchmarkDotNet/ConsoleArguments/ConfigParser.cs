@@ -710,7 +710,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 javaScriptEngine: options.WasmJavaScriptEngine,
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
-                isMonoRuntime: !options.WasmCoreCLR,
+                runtimeFlavor: options.WasmRuntimeFlavor,
                 processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(

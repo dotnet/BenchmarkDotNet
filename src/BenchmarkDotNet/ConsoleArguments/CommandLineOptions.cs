@@ -219,8 +219,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
-        [Option("wasmCoreCLR", Required = false, Default = false, HelpText = "Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.")]
-        public bool WasmCoreCLR { get; set; }
+        [Option("wasmRuntimeFlavor", Required = false, Default = Environments.RuntimeFlavor.Mono, HelpText = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.")]
+        public Environments.RuntimeFlavor WasmRuntimeFlavor { get; set; }
 
         [Option("wasmProcessTimeout", Required = false, Default = 10, HelpText = "Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.")]
         public int WasmProcessTimeoutMinutes { get; set; }

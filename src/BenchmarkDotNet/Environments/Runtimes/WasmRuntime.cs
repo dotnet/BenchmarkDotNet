@@ -24,11 +24,11 @@ namespace BenchmarkDotNet.Environments
         public override bool IsAOT { get; }
 
         /// <summary>
-        /// When true (default), the generated project uses Microsoft.NET.Sdk.WebAssembly which sets UseMonoRuntime=true
-        /// and resolves the Mono runtime pack (Microsoft.NETCore.App.Runtime.Mono.browser-wasm). When false, the generated
-        /// project uses Microsoft.NET.Sdk which resolves the CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm).
+        /// Specifies the runtime flavor used for WASM benchmarks. <see cref="Environments.RuntimeFlavor.Mono"/> (default) resolves the
+        /// Mono runtime pack (Microsoft.NETCore.App.Runtime.Mono.browser-wasm); <see cref="Environments.RuntimeFlavor.CoreCLR"/> resolves
+        /// the CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm).
         /// </summary>
-        public bool IsMonoRuntime { get; }
+        public RuntimeFlavor RuntimeFlavor { get; }
 
         /// <summary>
         /// Maximum time in minutes to wait for a single benchmark process to finish before force killing it. Default is 10 minutes.
@@ -43,8 +43,8 @@ namespace BenchmarkDotNet.Environments
         /// <param name="displayName">display name</param>
         /// <param name="aot">Specifies whether AOT or Interpreter project should be generated.</param>
         /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks.</param>
-        /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
         /// <param name="javaScriptEngineArguments">Arguments for the javascript engine.</param>
+        /// <param name="runtimeFlavor">Runtime flavor to use: Mono (default) or CoreCLR.</param>
         /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
         /// <param name="javaScriptEngineArgumentFormatter">Allows to format or customize the arguments passed to the javascript engine.</param>
         public WasmRuntime(
@@ -53,8 +53,8 @@ namespace BenchmarkDotNet.Environments
             string displayName,
             bool aot,
             string? javaScriptEngine,
-            bool isMonoRuntime = true,
             string? javaScriptEngineArguments = "",
+            RuntimeFlavor runtimeFlavor = RuntimeFlavor.Mono,
             int processTimeoutMinutes = 10,
             ArgumentFormatter? javaScriptEngineArgumentFormatter = null) : base(moniker, msBuildMoniker, displayName)
         {
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Environments
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments ?? "";
             JavaScriptEngineArgumentFormatter = javaScriptEngineArgumentFormatter ?? DefaultArgumentFormatter;
-            IsMonoRuntime = isMonoRuntime;
+            RuntimeFlavor = runtimeFlavor;
             IsAOT = aot;
             ProcessTimeoutMinutes = processTimeoutMinutes;
         }
@@ -83,10 +83,19 @@ namespace BenchmarkDotNet.Environments
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime? other)
-            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.IsAOT == IsAOT && other.IsMonoRuntime == IsMonoRuntime;
+        {
+            return other != null
+                && base.Equals(other)
+                && other.JavaScriptEngine == JavaScriptEngine
+                && other.JavaScriptEngineArguments == JavaScriptEngineArguments
+                && other.JavaScriptEngineArgumentFormatter == JavaScriptEngineArgumentFormatter
+                && other.IsAOT == IsAOT
+                && other.ProcessTimeoutMinutes == ProcessTimeoutMinutes
+                && other.RuntimeFlavor == RuntimeFlavor;
+        }
 
         public override int GetHashCode()
-            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, IsAOT, IsMonoRuntime);
+            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, JavaScriptEngineArgumentFormatter, IsAOT, RuntimeFlavor, ProcessTimeoutMinutes);
 
         private static string DefaultArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args)
         {
