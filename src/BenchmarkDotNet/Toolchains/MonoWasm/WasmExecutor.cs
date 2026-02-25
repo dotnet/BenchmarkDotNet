@@ -88,9 +88,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
             }
 
-            if (!process.WaitForExit(milliseconds: (int)TimeSpan.FromMinutes(10).TotalMilliseconds))
+            WasmRuntime wasmRuntime = (WasmRuntime)benchmarkCase.GetRuntime();
+            int timeoutMinutes = wasmRuntime.ProcessTimeoutMinutes;
+            if (!process.WaitForExit(milliseconds: (int)TimeSpan.FromMinutes(timeoutMinutes).TotalMilliseconds))
             {
-                logger.WriteLineInfo("// The benchmarking process did not finish within 10 minutes, it's going to get force killed now.");
+                logger.WriteLineInfo($"// The benchmarking process did not finish within {timeoutMinutes} minutes, it's going to get force killed now.");
 
                 processOutputReader.CancelRead();
                 consoleExitHandler.KillProcessTree();

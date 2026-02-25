@@ -31,6 +31,11 @@ namespace BenchmarkDotNet.Environments
         public bool IsMonoRuntime { get; }
 
         /// <summary>
+        /// Maximum time in minutes to wait for a single benchmark process to finish before force killing it. Default is 10 minutes.
+        /// </summary>
+        public int ProcessTimeoutMinutes { get; }
+
+        /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
         /// <param name="msBuildMoniker">moniker</param>
@@ -40,6 +45,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks.</param>
         /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
         /// <param name="javaScriptEngineArguments">Arguments for the javascript engine.</param>
+        /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
         /// <param name="javaScriptEngineArgumentFormatter">Allows to format or customize the arguments passed to the javascript engine.</param>
         public WasmRuntime(
             string msBuildMoniker,
@@ -49,6 +55,7 @@ namespace BenchmarkDotNet.Environments
             string? javaScriptEngine,
             bool isMonoRuntime = true,
             string? javaScriptEngineArguments = "",
+            int processTimeoutMinutes = 10,
             ArgumentFormatter? javaScriptEngineArgumentFormatter = null) : base(moniker, msBuildMoniker, displayName)
         {
             // Resolve path for windows because we can't use ProcessStartInfo.UseShellExecute while redirecting std out in the executor.
@@ -60,6 +67,7 @@ namespace BenchmarkDotNet.Environments
             JavaScriptEngineArgumentFormatter = javaScriptEngineArgumentFormatter ?? DefaultArgumentFormatter;
             IsMonoRuntime = isMonoRuntime;
             IsAOT = aot;
+            ProcessTimeoutMinutes = processTimeoutMinutes;
         }
 
         private WasmRuntime() : base(RuntimeMoniker.WasmNet80, "Wasm", "Wasm")
@@ -67,6 +75,7 @@ namespace BenchmarkDotNet.Environments
             IsAOT = RuntimeInformation.IsAot;
             JavaScriptEngine = "";
             JavaScriptEngineArguments = "";
+            ProcessTimeoutMinutes = 10;
             JavaScriptEngineArgumentFormatter = DefaultArgumentFormatter;
         }
 

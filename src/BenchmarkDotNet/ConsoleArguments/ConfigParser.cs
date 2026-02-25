@@ -710,16 +710,14 @@ namespace BenchmarkDotNet.ConsoleArguments
                 javaScriptEngine: options.WasmJavaScriptEngine,
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
-                isMonoRuntime: !options.WasmCoreCLR);
+                isMonoRuntime: !options.WasmCoreCLR,
+                processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
                 runtimeFrameworkVersion: "",
                 name: wasmRuntime.Name,
-                customDotNetCliPath: options.CliPath?.FullName ?? "",
-                packagesPath: options.RestorePath?.FullName ?? "",
-                customRuntimePack: options.CustomRuntimePack ?? "",
-                aotCompilerMode: options.AOTCompilerMode), options.WasmMainJsTemplate?.FullName);
+                options: options), options.WasmMainJsTemplate?.FullName);
 
             return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain).WithId(wasmRuntime.Name);
         }
