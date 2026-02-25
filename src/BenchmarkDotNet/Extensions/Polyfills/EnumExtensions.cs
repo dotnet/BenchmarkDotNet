@@ -1,4 +1,4 @@
-﻿#if NETFRAMEWORK || NETSTANDARD2_0
+﻿#if NETSTANDARD2_0
 namespace System;
 
 internal static partial class EnumExtensions
