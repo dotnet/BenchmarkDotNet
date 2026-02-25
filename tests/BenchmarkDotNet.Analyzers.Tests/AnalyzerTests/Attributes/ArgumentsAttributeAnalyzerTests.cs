@@ -245,7 +245,7 @@ public class ArgumentsAttributeAnalyzerTests
 
         public static TheoryData<string> ArgumentsAttributeUsages()
         {
-            return [.. GenerateData()];
+            return [.. GenerateData().Distinct()];
 
             static IEnumerable<string> GenerateData()
             {
