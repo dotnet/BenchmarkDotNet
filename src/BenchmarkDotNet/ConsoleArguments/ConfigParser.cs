@@ -706,7 +706,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 aot: wasmAot,
                 wasmDataDir: options.WasmDataDirectory?.FullName ?? "",
                 moniker: moniker,
-                isMonoRuntime: !options.WasmCoreCLR);
+                isMonoRuntime: !options.WasmCoreCLR,
+                processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
