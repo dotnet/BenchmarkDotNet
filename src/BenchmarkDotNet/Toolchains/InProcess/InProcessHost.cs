@@ -29,10 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="diagnoser">Diagnosers, if attached.</param>
         public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser? diagnoser)
         {
-            if (benchmarkCase == null)
-                throw new ArgumentNullException(nameof(benchmarkCase));
-
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.logger = logger;
             this.diagnoser = diagnoser;
             Config = benchmarkCase.Config;
 

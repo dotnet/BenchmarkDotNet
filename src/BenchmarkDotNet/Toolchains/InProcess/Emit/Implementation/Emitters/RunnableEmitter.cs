@@ -196,9 +196,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ILGenerator ilBuilder,
             bool forceDirectCall)
         {
-            if (targetMethod == null)
-                throw new ArgumentNullException(nameof(targetMethod));
-
             /*
                 // call for instance void
                 // GlobalSetup();
@@ -274,11 +271,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private RunnableEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder)
         {
-            if (buildPartition == null)
-                throw new ArgumentNullException(nameof(buildPartition));
-            if (moduleBuilder == null)
-                throw new ArgumentNullException(nameof(moduleBuilder));
-
             this.buildPartition = buildPartition;
             this.moduleBuilder = moduleBuilder;
         }
@@ -288,9 +280,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         // ReSharper disable once UnusedMethodReturnValue.Local
         private Type EmitRunnableCore(BenchmarkBuildInfo newBenchmark)
         {
-            if (newBenchmark == null)
-                throw new ArgumentNullException(nameof(newBenchmark));
-
             InitForEmitRunnable(newBenchmark);
 
             // 1. Emit fields
@@ -761,9 +750,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ILGenerator ilBuilder,
             ConsumableTypeInfo returnTypeInfo)
         {
-            if (targetMethod == null)
-                throw new ArgumentNullException(nameof(targetMethod));
-
             if (returnTypeInfo.WorkloadMethodReturnType == typeof(void))
             {
                 ilBuilder.Emit(OpCodes.Ldarg_0);
