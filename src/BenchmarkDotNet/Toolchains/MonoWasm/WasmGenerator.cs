@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             // - UseMonoRuntime=false: resolves CoreCLR runtime pack instead of Mono
             // - WasmBuildNative=false: avoids requiring wasm-tools workload
             // - WasmEnableWebcil=false: CoreCLR doesn't support webcil format
-            string coreclrOverrides = runtime.IsMonoRuntime
+            string coreclrOverrides = runtime.RuntimeFlavor == RuntimeFlavor.Mono
                 ? string.Empty
                 : @"
   <!-- CoreCLR overrides: use CoreCLR runtime instead of Mono -->

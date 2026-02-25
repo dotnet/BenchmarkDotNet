@@ -20,11 +20,11 @@ namespace BenchmarkDotNet.Environments
         public string WasmDataDir { get; }
 
         /// <summary>
-        /// When true (default), the generated project uses Microsoft.NET.Sdk.WebAssembly which sets UseMonoRuntime=true
-        /// and resolves the Mono runtime pack (Microsoft.NETCore.App.Runtime.Mono.browser-wasm). When false, the generated
-        /// project uses Microsoft.NET.Sdk which resolves the CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm).
+        /// Specifies the runtime flavor used for WASM benchmarks. <see cref="Environments.RuntimeFlavor.Mono"/> (default) resolves the
+        /// Mono runtime pack (Microsoft.NETCore.App.Runtime.Mono.browser-wasm); <see cref="Environments.RuntimeFlavor.CoreCLR"/> resolves
+        /// the CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm).
         /// </summary>
-        public bool IsMonoRuntime { get; }
+        public RuntimeFlavor RuntimeFlavor { get; }
 
         /// <summary>
         /// Maximum time in minutes to wait for a single benchmark process to finish before force killing it. Default is 10 minutes.
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>
         /// <param name="wasmDataDir">Specifies a wasm data directory surfaced as $(WasmDataDir) for the project</param>
         /// <param name="moniker">Runtime moniker</param>
-        /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
+        /// <param name="runtimeFlavor">Runtime flavor to use: Mono (default) or CoreCLR.</param>
         /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
         public WasmRuntime(
             string msBuildMoniker = "net8.0",
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Environments
             bool aot = false,
             string wasmDataDir = "",
             RuntimeMoniker moniker = RuntimeMoniker.WasmNet80,
-            bool isMonoRuntime = true,
+            RuntimeFlavor runtimeFlavor = RuntimeFlavor.Mono,
             int processTimeoutMinutes = 10)
             : base(moniker, msBuildMoniker, displayName)
         {
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Environments
             JavaScriptEngineArguments = javaScriptEngineArguments;
             Aot = aot;
             WasmDataDir = wasmDataDir;
-            IsMonoRuntime = isMonoRuntime;
+            RuntimeFlavor = runtimeFlavor;
             ProcessTimeoutMinutes = processTimeoutMinutes;
         }
 
@@ -70,9 +70,9 @@ namespace BenchmarkDotNet.Environments
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime? other)
-            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.IsMonoRuntime == IsMonoRuntime;
+            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.RuntimeFlavor == RuntimeFlavor;
 
         public override int GetHashCode()
-            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, Aot, IsMonoRuntime);
+            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, Aot, RuntimeFlavor);
     }
 }

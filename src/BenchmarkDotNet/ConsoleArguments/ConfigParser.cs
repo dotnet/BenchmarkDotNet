@@ -449,7 +449,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 baseJob = baseJob.WithEnvironmentVariables(options.EnvironmentVariables.Select(text =>
                 {
-                    var separated = text.Split([EnvVarKeyValueSeparator], 2);
+                    var separated = text.Split(new[] { EnvVarKeyValueSeparator }, 2);
                     return new EnvironmentVariable(separated[0], separated[1]);
                 }).ToArray());
             }
@@ -706,7 +706,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 aot: wasmAot,
                 wasmDataDir: options.WasmDataDirectory?.FullName ?? "",
                 moniker: moniker,
-                isMonoRuntime: !options.WasmCoreCLR,
+                runtimeFlavor: options.WasmCoreCLR ? RuntimeFlavor.CoreCLR : RuntimeFlavor.Mono,
                 processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(
