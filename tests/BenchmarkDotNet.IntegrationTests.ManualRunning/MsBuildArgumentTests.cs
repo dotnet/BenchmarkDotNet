@@ -30,6 +30,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         }
 
         [Fact]
+
+        public void MsBuildProperty_ShouldWrapMultipleValuesInQuotes()
+        {
+            var arg = new MsBuildProperty("DefineConstants", "FOO", "BAR");
+            Assert.Equal("/p:DefineConstants=\"FOO;BAR\"", arg.TextRepresentation);
+        }
+        [Fact]
         public void MultipleProcessesAreBuiltWithCorrectProperties()
         {
             var config = ManualConfig.CreateEmpty()
