@@ -742,8 +742,8 @@ namespace BenchmarkDotNet.Tests
             Assert.True(parsedConfiguration.isSuccess);
             var job = parsedConfiguration.config!.GetJobs().Single();
 
-            var toolchain = Assert.IsType<WasmToolchain>(job.Infrastructure.Toolchain);
-            Assert.EndsWith("dummyFile.js", toolchain.MainJsTemplatePath);
+            var runtime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+            Assert.Equal("dummyFile.js", runtime.MainJsTemplate?.Name);
         }
 
         [Theory]

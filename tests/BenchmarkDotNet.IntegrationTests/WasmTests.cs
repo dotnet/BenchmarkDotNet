@@ -100,13 +100,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
 
-            var mainJsTemplatePath = useMainJsTemplate ? Path.Combine("wwwroot", "custom-main.mjs") : null;
+            var mainJsTemplate = useMainJsTemplate ? new FileInfo(Path.Combine("wwwroot", "custom-main.mjs")) : null;
 
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine))
-                    .WithToolchain(WasmToolchain.From(netCoreAppSettings, mainJsTemplatePath)))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine, mainJsTemplate: mainJsTemplate))
+                    .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, keepBenchmarkFiles)
                 .WithOption(ConfigOptions.LogBuildOutput, true)

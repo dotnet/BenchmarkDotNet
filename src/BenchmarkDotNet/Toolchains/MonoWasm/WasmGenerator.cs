@@ -13,13 +13,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     public class WasmGenerator : CsProjGenerator
     {
         private readonly string CustomRuntimePack;
-        private readonly string? MainJsTemplatePath;
 
-        public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot, string? mainJsTemplatePath)
+        public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)
             : base(targetFrameworkMoniker, cliPath, packagesPath)
         {
             CustomRuntimePack = customRuntimePack;
-            MainJsTemplatePath = mainJsTemplatePath;
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
         }
 
@@ -39,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 GenerateProjectFile(buildPartition, artifactsPaths, aot: false, logger: logger, targetMainJsPath);
             }
 
-            GenerateMainJS(buildPartition, targetMainJsPath);
+            GenerateMainJS(buildPartition, ((WasmRuntime)buildPartition.Runtime).MainJsTemplate, targetMainJsPath);
         }
 
         protected void GenerateProjectFile(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, bool aot, ILogger logger, string targetMainJsPath)
@@ -88,11 +86,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             GatherReferences(buildPartition, artifactsPaths, logger);
         }
 
-        protected void GenerateMainJS(BuildPartition buildPartition, string targetMainJsPath)
+        protected void GenerateMainJS(BuildPartition buildPartition, FileInfo? mainJsTemplate, string targetMainJsPath)
         {
-            string content = MainJsTemplatePath is null
+            string content = mainJsTemplate is null
                 ? ResourceHelper.LoadTemplate("benchmark-main.mjs")
-                : File.ReadAllText(Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation)!, MainJsTemplatePath));
+                : File.ReadAllText(mainJsTemplate.FullName);
 
             targetMainJsPath.EnsureFolderExists();
             File.WriteAllText(targetMainJsPath, content);

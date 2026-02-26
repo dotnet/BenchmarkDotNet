@@ -250,8 +250,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{options.AOTCompilerPath}\" does NOT exist. It MUST be provided.");
                 }
-                // TODO: find a better way to check this.
-                else if (runtimeMoniker == RuntimeMoniker.WasmNet80 || runtimeMoniker == RuntimeMoniker.WasmNet90 || runtimeMoniker == RuntimeMoniker.WasmNet10_0 || runtimeMoniker == RuntimeMoniker.WasmNet11_0)
+                else if (runtimeMoniker >= RuntimeMoniker.WasmNet80 && runtimeMoniker < RuntimeMoniker.MonoAOTLLVM)
                 {
                     if (!ProcessHelper.TryResolveExecutableInPath(options.WasmJavaScriptEngine, out _))
                     {
@@ -707,17 +706,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                 msBuildMoniker: msBuildMoniker,
                 moniker: moniker,
                 displayName: "Wasm",
-                javaScriptEngine: options.WasmJavaScriptEngine,
+                javaScriptEngine: options.WasmJavaScriptEngine ?? "",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
                 runtimeFlavor: options.WasmRuntimeFlavor,
+                mainJsTemplate: options.WasmMainJsTemplate,
                 processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
                 runtimeFrameworkVersion: "",
                 name: wasmRuntime.Name,
-                options: options), options.WasmMainJsTemplate?.FullName);
+                options: options));
 
             return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain).WithId(wasmRuntime.Name);
         }

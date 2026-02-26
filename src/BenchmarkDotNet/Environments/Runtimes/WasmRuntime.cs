@@ -35,6 +35,8 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public int ProcessTimeoutMinutes { get; }
 
+        public FileInfo? MainJsTemplate { get; set; }
+
         /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
@@ -52,14 +54,15 @@ namespace BenchmarkDotNet.Environments
             RuntimeMoniker moniker,
             string displayName,
             bool aot,
-            string? javaScriptEngine,
+            string javaScriptEngine,
             string? javaScriptEngineArguments = "",
             RuntimeFlavor runtimeFlavor = RuntimeFlavor.Mono,
             int processTimeoutMinutes = 10,
+            FileInfo? mainJsTemplate = null,
             ArgumentFormatter? javaScriptEngineArgumentFormatter = null) : base(moniker, msBuildMoniker, displayName)
         {
             // Resolve path for windows because we can't use ProcessStartInfo.UseShellExecute while redirecting std out in the executor.
-            if (!ProcessHelper.TryResolveExecutableInPath(javaScriptEngine, out javaScriptEngine))
+            if (!ProcessHelper.TryResolveExecutableInPath(javaScriptEngine, out javaScriptEngine!))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" does NOT exist");
 
             JavaScriptEngine = javaScriptEngine;
@@ -68,6 +71,7 @@ namespace BenchmarkDotNet.Environments
             RuntimeFlavor = runtimeFlavor;
             IsAOT = aot;
             ProcessTimeoutMinutes = processTimeoutMinutes;
+            MainJsTemplate = mainJsTemplate;
         }
 
         private WasmRuntime() : base(RuntimeMoniker.WasmNet80, "Wasm", "Wasm")

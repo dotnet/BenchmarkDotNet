@@ -12,14 +12,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     {
         private string CustomDotNetCliPath { get; }
 
-        internal string? MainJsTemplatePath { get; }
-
-
-        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath, string? mainJsTemplatePath)
+        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor)
         {
             CustomDotNetCliPath = customDotNetCliPath;
-            MainJsTemplatePath = mainJsTemplatePath;
         }
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -36,14 +32,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         }
 
         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings netCoreAppSettings, string? mainJsTemplatePath = null)
+        public static IToolchain From(NetCoreAppSettings netCoreAppSettings)
         {
             var generator = new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
                                 netCoreAppSettings.CustomDotNetCliPath,
                                 netCoreAppSettings.PackagesPath,
                                 netCoreAppSettings.CustomRuntimePack,
-                                netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm,
-                                mainJsTemplatePath);
+                                netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm);
 
             var cliBuilder = new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                                  netCoreAppSettings.CustomDotNetCliPath,
@@ -51,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             var executor = new WasmExecutor();
 
-            return new WasmToolchain(netCoreAppSettings.Name, generator, cliBuilder, executor, netCoreAppSettings.CustomDotNetCliPath, mainJsTemplatePath);
+            return new WasmToolchain(netCoreAppSettings.Name, generator, cliBuilder, executor, netCoreAppSettings.CustomDotNetCliPath);
         }
     }
 }
