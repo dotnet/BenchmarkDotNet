@@ -48,6 +48,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="javaScriptEngineArguments">Arguments for the javascript engine.</param>
         /// <param name="runtimeFlavor">Runtime flavor to use: Mono (default) or CoreCLR.</param>
         /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
+        /// <param name="mainJsTemplate">Optional custom template for the generated main.js file. If not provided, a default template will be used.</param>
         /// <param name="javaScriptEngineArgumentFormatter">Allows to format or customize the arguments passed to the javascript engine.</param>
         public WasmRuntime(
             string msBuildMoniker,
