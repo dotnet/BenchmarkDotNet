@@ -48,6 +48,27 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             CanExecute<PropertyDefine>(config);
         }
 
+        [Fact]
+        public void EscapesSemicolonInDefineConstants()
+        {
+            var arg = new MsBuildArgument("/p:DefineConstants=TEST1;TEST2");
+            Assert.Equal("/p:DefineConstants=TEST1%3BTEST2", arg.ToString());
+        }
+
+        [Fact]
+        public void EscapesPercentSign()
+        {
+            var arg = new MsBuildArgument("/p:SomeValue=100%");
+            Assert.Equal("/p:SomeValue=100%25", arg.ToString());
+        }
+
+        [Fact]
+        public void DoesNotDoubleEscapeAlreadyEscapedPercent()
+        {
+            var arg = new MsBuildArgument("/p:SomeValue=100%25", false);
+            Assert.Equal("/p:SomeValue=100%25", arg.ToString());
+        }
+
         public class PropertyDefine
         {
             private const bool customPropWasSet =
