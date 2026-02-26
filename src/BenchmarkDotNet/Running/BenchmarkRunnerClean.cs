@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Running
 
                 eventProcessor.OnStartValidationStage();
 
-                compositeLogger.WriteLineInfo("// Validating benchmarks:");
+                compositeLogger.WriteLineHeader("// ***** Validating benchmarks *****");
 
                 var (supportedBenchmarks, validationErrors) = GetSupportedBenchmarks(benchmarkRunInfos, resolver);
 
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Running
 
                 int totalBenchmarkCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 int benchmarksToRunCount = totalBenchmarkCount - (idToResume + 1); // ids are indexed from 0
-                compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
+                compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start *****");
                 compositeLogger.WriteLineHeader($"// ***** Found {totalBenchmarkCount} benchmark(s) in total *****");
                 var globalChronometer = Chronometer.Start();
 
@@ -312,7 +312,7 @@ namespace BenchmarkDotNet.Running
         {
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
 
-            logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
+            logger.WriteLineHeader("// ***** BenchmarkRunner: Finish *****");
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Export *");
@@ -386,7 +386,7 @@ namespace BenchmarkDotNet.Running
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
-            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
+            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start *****");
 
             var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
 
@@ -409,12 +409,12 @@ namespace BenchmarkDotNet.Running
 
             var afterParallelBuild = globalChronometer.GetElapsed();
 
-            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeParallelBuild, afterParallelBuild)}   *****");
+            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeParallelBuild, afterParallelBuild)} *****");
 
             if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
                 return buildResults;
 
-            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
+            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build *****");
 
             foreach (var buildPartition in buildPartitions)
             {
@@ -429,7 +429,7 @@ namespace BenchmarkDotNet.Running
 
             var afterSequentialBuild = globalChronometer.GetElapsed();
 
-            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)}   *****");
+            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)} *****");
 
             return buildResults;
         }
@@ -831,7 +831,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineInfo($"// Benchmark {validationError.BenchmarkCase.DisplayInfo}");
                 }
 
-                logger.WriteLineError($"//    * {validationError.Message}");
+                logger.WriteLineError(validationError.Message);
                 logger.WriteLine();
             }
         }
