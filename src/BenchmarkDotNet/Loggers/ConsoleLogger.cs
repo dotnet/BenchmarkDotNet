@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Loggers
             new Dictionary<LogKind, ConsoleColor>
             {
                 { LogKind.Default, ConsoleColor.Gray },
-                { LogKind.Help, ConsoleColor.DarkGreen },
+                { LogKind.Help, ConsoleColor.Green },
                 { LogKind.Header, ConsoleColor.Magenta },
                 { LogKind.Result, ConsoleColor.DarkCyan },
                 { LogKind.Statistic, ConsoleColor.Cyan },
