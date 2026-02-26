@@ -33,20 +33,17 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings netCoreAppSettings)
-        {
-            var generator = new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
-                                netCoreAppSettings.CustomDotNetCliPath,
-                                netCoreAppSettings.PackagesPath,
-                                netCoreAppSettings.CustomRuntimePack,
-                                netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm);
-
-            var cliBuilder = new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
-                                 netCoreAppSettings.CustomDotNetCliPath,
-                                 logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm);
-
-            var executor = new WasmExecutor();
-
-            return new WasmToolchain(netCoreAppSettings.Name, generator, cliBuilder, executor, netCoreAppSettings.CustomDotNetCliPath);
-        }
+            => new WasmToolchain(netCoreAppSettings.Name,
+                    new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
+                        netCoreAppSettings.CustomDotNetCliPath,
+                        netCoreAppSettings.PackagesPath,
+                        netCoreAppSettings.CustomRuntimePack,
+                        netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
+                    new DotNetCliPublisher(netCoreAppSettings.TargetFrameworkMoniker,
+                        netCoreAppSettings.CustomDotNetCliPath,
+                        // aot builds can be very slow
+                        logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
+                    new WasmExecutor(),
+                    netCoreAppSettings.CustomDotNetCliPath);
     }
 }
