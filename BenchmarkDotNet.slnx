@@ -13,6 +13,7 @@
     <Project Path="src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.dotMemory/BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.dotTrace/BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
+    <Project Path="src/BenchmarkDotNet.Diagnostics.Energy/BenchmarkDotNet.Diagnostics.Energy.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <Project Path="src/BenchmarkDotNet.Disassembler/BenchmarkDotNet.Disassembler.csproj" />
     <Project Path="src/BenchmarkDotNet.Exporters.Plotting/BenchmarkDotNet.Exporters.Plotting.csproj" />
