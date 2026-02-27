@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class EnergyDiagnoser : IDiagnoser
     {
-        private EnergyCounter[] _counters;
+        private EnergyCounter[]? _counters;
 
         private bool _validationFailed = false;
 
