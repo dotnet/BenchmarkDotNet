@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             DirectoryInfo? restorePath = null,
             string displayName = "CoreRun")
         {
-            if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));
-            if (!coreRun.Exists) throw new FileNotFoundException("Provided CoreRun path does not exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
+            if (!coreRun.Exists)
+                throw new FileNotFoundException("Provided CoreRun path does not exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
 
             SourceCoreRun = coreRun;
             CopyCoreRun = createCopy ? GetShadowCopyPath(coreRun) : coreRun;

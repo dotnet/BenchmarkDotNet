@@ -29,8 +29,6 @@ namespace BenchmarkDotNet.Engines
 
         internal Engine(EngineParameters engineParameters)
         {
-            if (engineParameters == null) throw new ArgumentNullException(nameof(engineParameters));
-
             // EngineParameters properties are mutable, so we copy/freeze them all.
             var job = engineParameters.TargetJob ?? throw new ArgumentNullException(nameof(EngineParameters.TargetJob));
             Parameters = new()

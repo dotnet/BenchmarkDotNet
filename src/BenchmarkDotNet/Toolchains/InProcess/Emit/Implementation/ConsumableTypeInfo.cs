@@ -10,9 +10,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
     {
         public ConsumableTypeInfo(Type methodReturnType)
         {
-            if (methodReturnType == null)
-                throw new ArgumentNullException(nameof(methodReturnType));
-
             OriginMethodReturnType = methodReturnType;
 
             // Only support (Value)Task for parity with other toolchains (and so we can use AwaitHelper).

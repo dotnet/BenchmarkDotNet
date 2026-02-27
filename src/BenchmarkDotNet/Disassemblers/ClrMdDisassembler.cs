@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.Disassemblers
         private DisassembledMethod[] Disassemble(ClrMdArgs args, State state)
         {
             var result = new List<DisassembledMethod>();
-            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), args.Syntax);
+            DisassemblySyntax syntax = Enum.Parse<DisassemblySyntax>(args.Syntax);
 
             using var sourceCodeProvider = new SourceCodeProvider();
             while (state.Todo.Count != 0)

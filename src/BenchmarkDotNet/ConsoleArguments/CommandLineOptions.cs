@@ -298,7 +298,14 @@ namespace BenchmarkDotNet.ConsoleArguments
         public FileInfo? AOTCompilerPath { get; set; }
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
         public DirectoryInfo? WasmDataDirectory { get; set; }
-        public bool WasmCoreCLR { get; set; }
+
+        [Option("wasmRuntimeFlavor", Required = false, Default = Environments.RuntimeFlavor.Mono, HelpText = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.")]
+        public Environments.RuntimeFlavor WasmRuntimeFlavor { get; set; }
+
+        [Option("wasmProcessTimeout", Required = false, Default = 10, HelpText = "Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.")]
+        public int WasmProcessTimeoutMinutes { get; set; }
+
+        [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }
         public bool NoEvaluationOverhead { get; set; }
         public bool Resume { get; set; }
@@ -324,13 +331,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             void AddUnrecognizedValidator(Option option)
             {
-<<<<<<< feature/issue-1016-system-commandline
-                option.Validators.Add(result =>
-                {
-                    foreach (var token in result.Tokens.Where(t => t.Value.StartsWith("-", StringComparison.Ordinal)))
-                        result.AddError($"Unrecognized option: {token.Value}");
-                });
-=======
                 var shortName = new UnParserSettings { PreferShortName = true };
                 var longName = new UnParserSettings { PreferShortName = false };
 
@@ -354,7 +354,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
                     new CommandLineOptions { EnvironmentVariables = ["ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2"] });
                 yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = ["Mean", "Ratio"], });
->>>>>>> master
             }
 
             AddUnrecognizedValidator(RuntimesOption);

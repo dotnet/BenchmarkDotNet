@@ -389,9 +389,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(nameof(CreateMatrix))]
             public void Test(int[][] array)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
-
                 for (int i = 0; i < 10; i++)
                     for (int j = 0; j < i; j++)
                         if (array[i][j] != i)
@@ -437,9 +434,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(nameof(GetInputData))]
             public bool ValueTupleCompareNoOpt(ref Generic<int, string> byRef)
             {
-                if (byRef == null)
-                    throw new ArgumentNullException(nameof(byRef));
-
                 if (byRef.Item1 != 3 || byRef.Item2 != "red")
                     throw new ArgumentException("Wrong values");
 

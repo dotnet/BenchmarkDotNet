@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Reports
         private static Measurement Error() => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0);
 
         private static readonly int IterationInfoNameMaxWidth
-            = Enum.GetNames(typeof(IterationMode)).Max(text => text.Length) + Enum.GetNames(typeof(IterationStage)).Max(text => text.Length);
+            = Enum.GetNames<IterationMode>().Max(text => text.Length) + Enum.GetNames<IterationStage>().Max(text => text.Length);
 
         public IterationMode IterationMode { get; }
 
