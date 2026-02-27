@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Diagnostics.Energy;
 
 namespace BenchmarkDotNet.Attributes
 {

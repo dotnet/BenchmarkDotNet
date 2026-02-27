@@ -4,6 +4,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;net462</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);1591</NoWarn>
 	<AssemblyName>BenchmarkDotNet.Diagnostics.Energy</AssemblyName>
 	<PackageId>BenchmarkDotNet.Diagnostics.Energy</PackageId>
   </PropertyGroup>
