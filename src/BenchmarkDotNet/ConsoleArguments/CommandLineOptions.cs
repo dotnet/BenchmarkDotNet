@@ -213,7 +213,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("AOTCompilerPath", Required = false, HelpText = "Path to Mono AOT compiler, used for MonoAotLLVM.")]
         public FileInfo? AOTCompilerPath { get; set; }
 
-        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
+        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini', 'llvm', or 'wasm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
         [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]

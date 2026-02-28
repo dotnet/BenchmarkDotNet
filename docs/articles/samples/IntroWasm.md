@@ -4,11 +4,15 @@ uid: BenchmarkDotNet.Samples.IntroWasm
 
 ## Sample: IntroWasm
 
-WasmToolchain uses a local Mono Runtime build to run the benchmarks compiled as WebAssembly using V8 JavaScript Engine. 
+`WasmToolchain` builds benchmarks as WebAssembly and runs them under a JavaScript engine (V8 by default).
+
+It is supported only on Unix.
+
+If you hit `NETSDK1147` (missing workload), install the required workload (for example: `dotnet workload install wasm-tools`).
 
 ### Source code
 
-[!code-csharp[IntroInProcess.cs](../../../samples/BenchmarkDotNet.Samples/IntroWasm.cs)]
+[!code-csharp[IntroWasm.cs](../../../samples/BenchmarkDotNet.Samples/IntroWasm.cs)]
 
 ### Links
 
