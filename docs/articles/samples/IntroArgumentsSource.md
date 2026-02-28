@@ -20,13 +20,17 @@ The source may be instance or static. If the source is not in the same type as t
 ### Output
 
 ```markdown
-| Method |  x |  y |      Mean |     Error |    StdDev |
-|------- |--- |--- |----------:|----------:|----------:|
-|    Pow |  1 |  1 |  9.360 ns | 0.0190 ns | 0.0149 ns |
-|    Pow |  2 |  2 | 40.624 ns | 0.3413 ns | 0.3192 ns |
-|    Pow |  4 |  4 | 40.537 ns | 0.0560 ns | 0.0524 ns |
-|    Pow | 10 | 10 | 40.395 ns | 0.3274 ns | 0.3063 ns |
+| Method         | time              |  x |  y |            Mean |          Error |         StdDev |
+|--------------- |------------------ |--- |--- |----------------:|---------------:|---------------:|
+| SingleArgument | 00:00:00.0100000 |  ? |  ? |  15,780,658.9 ns |   53,493.3 ns |   50,037.7 ns |
+| SingleArgument | 00:00:00.1000000 |  ? |  ? | 110,181,308.0 ns |  517,614.4 ns |  484,176.8 ns |
+| ManyArguments  |                ? |  1 |  1 |           3.135 ns |       0.0852 ns |       0.1326 ns |
+| ManyArguments  |                ? |  2 |  2 |          13.571 ns |       0.2180 ns |       0.1933 ns |
+| ManyArguments  |                ? |  4 |  4 |          13.478 ns |       0.2188 ns |       0.1940 ns |
+| ManyArguments  |                ? | 10 | 10 |          13.471 ns |       0.2294 ns |       0.2034 ns |
 ```
+
+> `?` is displayed when a column is not applicable for the given benchmark (e.g., `x`/`y` for `SingleArgument`, `time` for `ManyArguments`).
 
 ### Another example
 
