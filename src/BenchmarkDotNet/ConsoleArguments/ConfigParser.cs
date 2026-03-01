@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -18,22 +13,24 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains.R2R;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.R2R;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
-using BenchmarkDotNet.Toolchains.Mono;
 using Perfolizer.Metrology;
+using System;
+using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Parsing;
-using System.Runtime.InteropServices;
-using System.CommandLine.Invocation;
-using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Text;
 using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -153,6 +150,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.NoForcedGCsOption,
                     CommandLineOptions.NoEvaluationOverheadOption,
                     CommandLineOptions.ResumeOption,
+                    CommandLineOptions.WasmRuntimeFlavorOption,
+                    CommandLineOptions.WasmProcessTimeoutMinutesOption,
                 };
             }
         }
@@ -449,6 +448,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 NoForcedGCs = parseResult.GetValue(CommandLineOptions.NoForcedGCsOption),
                 NoEvaluationOverhead = parseResult.GetValue(CommandLineOptions.NoEvaluationOverheadOption),
                 Resume = parseResult.GetValue(CommandLineOptions.ResumeOption),
+                WasmRuntimeFlavor = parseResult.GetValue(CommandLineOptions.WasmRuntimeFlavorOption),
+                WasmProcessTimeoutMinutes = parseResult.GetValue(CommandLineOptions.WasmProcessTimeoutMinutesOption),
             };
 
             bool isSuccess = Validate(options, logger);
@@ -657,6 +658,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 NoForcedGCs = parseResult.GetValue(CommandLineOptions.NoForcedGCsOption),
                 NoEvaluationOverhead = parseResult.GetValue(CommandLineOptions.NoEvaluationOverheadOption),
                 Resume = parseResult.GetValue(CommandLineOptions.ResumeOption),
+                WasmRuntimeFlavor = parseResult.GetValue(CommandLineOptions.WasmRuntimeFlavorOption),
+                WasmProcessTimeoutMinutes = parseResult.GetValue(CommandLineOptions.WasmProcessTimeoutMinutesOption),
             };
 
             if (invalidOptions.Any() || !Validate(options, NullLogger.Instance))

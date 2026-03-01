@@ -1,19 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.CommandLine;
-using System.IO;
-using System.Linq;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Helpers;
-using Perfolizer.Mathematics.OutlierDetection;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using Perfolizer.Mathematics.OutlierDetection;
+using System;
+using System.Collections.Generic;
+using System.CommandLine;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -229,6 +226,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         public static readonly Option<bool> ResumeOption = new("--resume")
         { Description = "Continue the execution if the last run was stopped." };
 
+        public static readonly Option<Environments.RuntimeFlavor> WasmRuntimeFlavorOption = new("--wasmRuntimeFlavor")
+        { Description = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.", DefaultValueFactory = _ => Environments.RuntimeFlavor.Mono };
+
+        public static readonly Option<int> WasmProcessTimeoutMinutesOption = new("--wasmProcessTimeout")
+        { Description = "Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.", DefaultValueFactory = _ => 10 };
+
+
         // Properties
         public string BaseJob { get; set; } = "";
         public IEnumerable<string> Runtimes { get; set; } = [];
@@ -298,14 +302,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         public FileInfo? AOTCompilerPath { get; set; }
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
         public DirectoryInfo? WasmDataDirectory { get; set; }
-
-        [Option("wasmRuntimeFlavor", Required = false, Default = Environments.RuntimeFlavor.Mono, HelpText = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.")]
+        public bool WasmCoreCLR { get; set; }
         public Environments.RuntimeFlavor WasmRuntimeFlavor { get; set; }
-
-        [Option("wasmProcessTimeout", Required = false, Default = 10, HelpText = "Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.")]
         public int WasmProcessTimeoutMinutes { get; set; }
-
-        [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }
         public bool NoEvaluationOverhead { get; set; }
         public bool Resume { get; set; }
@@ -316,7 +315,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         static CommandLineOptions()
         {
-            // Allow space-separated arrays (e.g. --exporters html rplot)
             RuntimesOption.AllowMultipleArgumentsPerToken = true;
             ExportersOption.AllowMultipleArgumentsPerToken = true;
             FiltersOption.AllowMultipleArgumentsPerToken = true;
@@ -331,29 +329,11 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             void AddUnrecognizedValidator(Option option)
             {
-                var shortName = new UnParserSettings { PreferShortName = true };
-                var longName = new UnParserSettings { PreferShortName = false };
-
-                yield return new Example("Use Job.ShortRun for running the benchmarks", shortName, new CommandLineOptions { BaseJob = "short" });
-                yield return new Example("Run benchmarks in process", shortName, new CommandLineOptions { RunInProcess = true });
-                yield return new Example("Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = ["net472", "net8.0", "Mono"] });
-                yield return new Example("Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = ["netcoreapp3.1", "net6.0", "net8.0"] });
-                yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
-                yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = [nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired)] });
-                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = [Escape("*")] });
-                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = [Escape("System.Memory*")] });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = ["ClassA", "ClassB"] });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = [Escape("*.ClassA.*"), Escape("*.ClassB.*")] });
-                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = [Escape("*.BenchmarkName")] });
-                yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
-                yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
-                yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
-                yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET Core 6.0 will be baseline because it was provided as first.", longName,
-                    new CommandLineOptions { Filters = ["*"], Runtimes = ["net6.0", "net8.0"], StatisticalTestThreshold = "5%" });
-                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
-                    new CommandLineOptions { EnvironmentVariables = ["ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2"] });
-                yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = ["Mean", "Ratio"], });
+                option.Validators.Add(result =>
+                {
+                    foreach (var token in result.Tokens.Where(t => t.Value.StartsWith("-", StringComparison.Ordinal)))
+                        result.AddError($"Unrecognized option: {token.Value}");
+                });
             }
 
             AddUnrecognizedValidator(RuntimesOption);
@@ -368,6 +348,5 @@ namespace BenchmarkDotNet.ConsoleArguments
             AddUnrecognizedValidator(DisassemblerFiltersOption);
             AddUnrecognizedValidator(CoreRunPathsOption);
         }
-
     }
 }
