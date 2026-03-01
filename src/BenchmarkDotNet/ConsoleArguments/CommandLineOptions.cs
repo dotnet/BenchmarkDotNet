@@ -207,7 +207,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("wasmArgs", Required = false, HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
         public string? WasmJavaScriptEngineArguments { get; set; }
 
-        [Option("wasmMainJsTemplate", Required = false, HelpText = "Path to main.js template.")]
+        [Option("wasmMainJsTemplate", Required = false, HelpText = "Path to main.mjs template.")]
         public FileInfo? WasmMainJsTemplate { get; set; }
 
         [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
