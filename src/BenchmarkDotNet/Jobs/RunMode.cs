@@ -29,9 +29,8 @@ namespace BenchmarkDotNet.Jobs
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
             LaunchCount = 1,
-            WarmupCount = 1,
             IterationCount = 1,
-            RunStrategy = RunStrategy.ColdStart,
+            RunStrategy = RunStrategy.ColdStart, // WarmupStage is not invoked when using RunStrategy.ColdStart.
             UnrollFactor = 1
         }.Freeze();
 
