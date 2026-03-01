@@ -30,6 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         [Theory]
         [InlineData(MonoAotCompilerMode.mini)]
+        // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
         public void WasmIsSupported(MonoAotCompilerMode aotCompilerMode)
         {
@@ -43,6 +44,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(MonoAotCompilerMode.mini)]
+        // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
         public void WasmSupportsInProcessDiagnosers(MonoAotCompilerMode aotCompilerMode)
         {

@@ -23,7 +23,7 @@ function getAppArgs() {
     if (globalThis.arguments !== undefined)
         return globalThis.arguments;
 
-    // spdermonkey
+    // spidermonkey
     if (globalThis.scriptArgs !== undefined)
         return globalThis.scriptArgs;
 
