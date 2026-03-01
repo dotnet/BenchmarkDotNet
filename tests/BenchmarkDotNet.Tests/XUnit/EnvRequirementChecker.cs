@@ -17,6 +17,7 @@ public static class EnvRequirementChecker
         EnvRequirement.NonWindows => !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? null : "Non-Windows test",
         EnvRequirement.NonWindowsArm => !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || !IsArm() ? null : "Non-Windows+Arm test",
         EnvRequirement.NonLinux => !RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? null : "Non-Linux test",
+        EnvRequirement.NonLinuxArm => !RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || !IsArm() ? null : "Non-Linux+Arm test",
         EnvRequirement.FullFrameworkOnly => BdnRuntimeInformation.IsFullFramework ? null : "Full .NET Framework-only test",
         EnvRequirement.NonFullFramework => !BdnRuntimeInformation.IsFullFramework ? null : "Non-Full .NET Framework test",
         EnvRequirement.DotNetCoreOnly => BdnRuntimeInformation.IsNetCore ? null : ".NET/.NET Core-only test",

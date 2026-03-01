@@ -10,6 +10,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
@@ -19,11 +20,14 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.Mono;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using Xunit;
 using Xunit.Abstractions;
-using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -45,10 +49,19 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AccurateAllocations
         {
-            [Benchmark] public byte[] EightBytesArray() => new byte[8];
-            [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
+            public class Empty { }
 
-            [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
+            [Benchmark]
+            public byte[] EightBytesArray() => new byte[8];
+
+            [Benchmark]
+            public byte[] SixtyFourBytesArray() => new byte[64];
+
+            [Benchmark]
+            public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
+
+            [Benchmark]
+            public Empty AllocateEmptyObject() => new Empty();
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -84,6 +97,30 @@ namespace BenchmarkDotNet.IntegrationTests
         public void MemoryDiagnoserSupportsModernMono()
         {
             MemoryDiagnoserIsAccurate(MonoToolchain.Mono80);
+        }
+
+        [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
+        [InlineData(MonoAotCompilerMode.mini)]
+        // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
+        [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
+        public void MemoryDiagnoserSupportsMonoWasm(MonoAotCompilerMode aotCompilerMode)
+        {
+            var ptrSize = sizeof(Int32); // We can't rely on IntPtr.Size, since we run on a different platform. Wasm is currently 32bit.
+            long objectAllocationOverhead = ptrSize * 2; // pointer to method table + object header word
+            long arraySizeOverhead = ptrSize * 2; // bounds + max_length
+
+            var netCoreAppSettings = new NetCoreAppSettings("net8.0", runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
+
+            var runtime = new WasmRuntime(
+                netCoreAppSettings.TargetFrameworkMoniker, RuntimeMoniker.WasmNet80,
+                "Wasm", aotCompilerMode == MonoAotCompilerMode.wasm, "v8");
+
+            AssertAllocations(WasmToolchain.From(netCoreAppSettings), typeof(AccurateAllocations), new Dictionary<string, long>
+            {
+                { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.AllocateEmptyObject), objectAllocationOverhead },
+            }, runtime: runtime);
         }
 
         public class AllocatingGlobalSetupAndCleanup
@@ -322,9 +359,10 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, bool disableTieredJit = true, int iterationCount = 1)
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators,
+            bool disableTieredJit = true, int iterationCount = 1, Runtime? runtime = null)
         {
-            var config = CreateConfig(toolchain, disableTieredJit, iterationCount);
+            var config = CreateConfig(toolchain, runtime, disableTieredJit, iterationCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -361,6 +399,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig(IToolchain toolchain,
+            Runtime? runtime,
             // Tiered JIT can allocate some memory on a background thread, let's disable it by default to make our tests less flaky (#1542).
             // This was mostly fixed in net7.0, but tiered jit thread is not guaranteed to not allocate, so we disable it just in case.
             bool disableTieredJit = true,
@@ -382,6 +421,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithEnvironmentVariable(Engines.Engine.UnitTestBlockFinalizerEnvKey, Engines.Engine.UnitTestBlockFinalizerEnvValue)
                 .WithToolchain(toolchain);
 #pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
+
+            if (runtime is not null)
+            {
+                job = job.WithRuntime(runtime);
+            }
+
             return ManualConfig.CreateEmpty()
                 .AddJob(disableTieredJit
                     ? job.WithEnvironmentVariables(
