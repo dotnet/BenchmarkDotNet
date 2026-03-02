@@ -59,6 +59,10 @@ namespace BenchmarkDotNet.Diagnosers
             if (_validationFailed)
                 return;
 
+            Debug.Assert(_counters != null);
+            if (_counters == null)
+                throw new Exception("Unexpected: _counters == null");
+
             if (signal == HostSignal.BeforeActualRun)
             {
                 for (int i = 0; i < _counters.Length; i++)
