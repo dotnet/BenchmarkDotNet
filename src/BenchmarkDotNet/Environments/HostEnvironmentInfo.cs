@@ -100,9 +100,6 @@ namespace BenchmarkDotNet.Environments
 
             yield return Cpu.Value.ToFullBrandName();
 
-            if (PhysicalMemory.Value != null)
-                yield return $"Memory: {PhysicalMemory.Value.ToFormattedString()}";
-
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
             {
                 string frequency = PerfolizerMeasurementFormatter.Instance.Format(
@@ -115,6 +112,9 @@ namespace BenchmarkDotNet.Environments
                 string timer = HardwareTimerKind.ToString().ToUpper();
                 yield return $"Frequency: {frequency}, Resolution: {resolution}, Timer: {timer}";
             }
+
+            if (PhysicalMemory.Value != null)
+                yield return $"Memory: {PhysicalMemory.Value.ToFormattedString()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
             {
