@@ -69,8 +69,7 @@ namespace BenchmarkDotNet.Environments
         // TODO: Join with OsInfo
         public Lazy<VirtualMachineHypervisor?> VirtualMachineHypervisor { get; protected set; }
 
-        private readonly Lazy<PhysicalMemoryInfo?> physicalMemory = new Lazy<PhysicalMemoryInfo?>(SystemMemory.GetPhysicalMemory);
-        public PhysicalMemoryInfo? PhysicalMemory => physicalMemory.Value;
+        public Lazy<PhysicalMemoryInfo?> PhysicalMemory { get; protected set; }
 
         protected HostEnvironmentInfo()
         {
@@ -83,6 +82,7 @@ namespace BenchmarkDotNet.Environments
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor?>(RuntimeInformation.GetVirtualMachineHypervisor);
             Os = new Lazy<OsInfo>(OsDetector.GetOs);
             Cpu = new Lazy<CpuInfo>(() => CpuDetector.CrossPlatform.Detect() ?? CpuInfo.Unknown);
+            PhysicalMemory = new Lazy<PhysicalMemoryInfo?>(SystemMemory.GetPhysicalMemory);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => current ??= new HostEnvironmentInfo();
@@ -98,11 +98,10 @@ namespace BenchmarkDotNet.Environments
             else
                 yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()}";
 
-            string cpuInfo = Cpu.Value.ToFullBrandName();
-            if (PhysicalMemory != null)
-                yield return $"{cpuInfo}, {PhysicalMemory.ToFormattedString()} RAM";
-            else
-                yield return cpuInfo;
+            yield return Cpu.Value.ToFullBrandName();
+
+            if (PhysicalMemory.Value != null)
+                yield return $"Memory: {PhysicalMemory.Value.ToFormattedString()}";
 
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
             {

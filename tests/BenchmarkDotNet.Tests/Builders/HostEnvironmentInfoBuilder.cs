@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests.Builders
         {
             return new MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
                 dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC,
-                jitInfo, jitModules, os, cpu, runtimeVersion, virtualMachineHypervisor);
+                jitInfo, jitModules, os, cpu, runtimeVersion, virtualMachineHypervisor, null);
         }
     }
 
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Tests.Builders
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
             string jitInfo, string jitModules, OsInfo os, CpuInfo cpu,
-            string runtimeVersion, VirtualMachineHypervisor? virtualMachineHypervisor)
+            string runtimeVersion, VirtualMachineHypervisor? virtualMachineHypervisor, PhysicalMemoryInfo? physicalMemory = null)
         {
             Architecture = architecture;
             BenchmarkDotNetVersion = benchmarkDotNetVersion;
@@ -88,6 +88,7 @@ namespace BenchmarkDotNet.Tests.Builders
             Cpu = new Lazy<CpuInfo>(() => cpu);
             RuntimeVersion = runtimeVersion;
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor?>(() => virtualMachineHypervisor);
+            PhysicalMemory = new Lazy<PhysicalMemoryInfo?>(() => physicalMemory);
         }
     }
 }
