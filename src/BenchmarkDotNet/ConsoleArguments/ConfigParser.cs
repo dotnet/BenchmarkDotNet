@@ -469,7 +469,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (options.RunInProcess)
             {
-                yield return Attributes.InProcessAttribute.GetJob(Attributes.InProcessToolchainType.Auto, true);
+                yield return Attributes.InProcessAttribute.GetJob(baseJob, Attributes.InProcessToolchainType.Auto, true);
             }
             else if (options.ClrVersion.IsNotBlank())
             {

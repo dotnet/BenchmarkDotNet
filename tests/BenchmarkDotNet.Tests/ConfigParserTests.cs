@@ -1,8 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
+using AwesomeAssertions;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
@@ -20,7 +19,7 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using Perfolizer.Horology;
 using Xunit;
@@ -113,6 +112,18 @@ namespace BenchmarkDotNet.Tests
             var job = configEasy.GetJobs().Single();
 
             Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
+        }
+
+        [Fact]
+        public void UserCanChooseInProcessAndStrategyMonitoring()
+        {
+            var configEasy = ConfigParser.Parse(["--inProcess", "--strategy", "Monitoring"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(configEasy);
+            var job = configEasy.GetJobs().Single();
+
+            job.GetToolchain().Should().BeOfType<InProcessEmitToolchain>();
+            job.Run.RunStrategy.Should().Be(RunStrategy.Monitoring);
         }
 
         [FactEnvSpecific(
