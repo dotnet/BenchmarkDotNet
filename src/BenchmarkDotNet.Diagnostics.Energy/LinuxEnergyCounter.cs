@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 string fileContents = File.ReadAllText(_energyPath);
                 bool good = long.Parse(fileContents) > 0;
-                return (true, string.Empty);
+                return (good, string.Empty);
             }
             catch (Exception e)
             {
