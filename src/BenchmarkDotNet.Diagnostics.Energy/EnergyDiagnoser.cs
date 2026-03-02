@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
-            if (_validationFailed)
+            if (_validationFailed || _counters == null)
                 yield break;
 
             long operations = diagnoserResults.Measurements.Where(m => m.IterationStage == IterationStage.Actual).Sum(m => m.Operations);
