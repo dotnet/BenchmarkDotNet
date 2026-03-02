@@ -156,10 +156,18 @@ namespace BenchmarkDotNet.Environments
                 {
                     string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
+
+                    long pageSize = 4096;
+                    var pageSizeMatch = Regex.Match(output, @"page size of (\d+) bytes");
+                    if (pageSizeMatch.Success && long.TryParse(pageSizeMatch.Groups[1].Value, out long parsedPageSize))
+                    {
+                        pageSize = parsedPageSize;
+                    }
+
                     var match = Regex.Match(output, @"Pages free:\s+(\d+)");
                     if (match.Success && long.TryParse(match.Groups[1].Value, out long pagesFree))
                     {
-                        available = pagesFree * 4096;
+                        available = pagesFree * pageSize;
                     }
                 }
             }
