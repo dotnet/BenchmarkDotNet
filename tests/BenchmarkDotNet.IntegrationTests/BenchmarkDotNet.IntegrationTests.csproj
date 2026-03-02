@@ -18,6 +18,7 @@
     <Content Include="xunit.runner.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
     <!-- Disable EventSource to stabilize MemoryDiagnoserTests. https://github.com/dotnet/BenchmarkDotNet/pull/2562#issuecomment-2081317379 -->
     <RuntimeHostConfigurationOption Include="System.Diagnostics.Tracing.EventSource.IsSupported" Value="false" />
   </ItemGroup>

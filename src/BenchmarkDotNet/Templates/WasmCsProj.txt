@@ -3,8 +3,7 @@
     <OriginalCSProjPath>$CSPROJPATH$</OriginalCSProjPath>
     <WasmPropsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.props'))</WasmPropsPath>
     <WasmTargetsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.targets'))</WasmTargetsPath>
-    <WasmDataDir>$WASMDATADIR$</WasmDataDir>
-    <WasmDataDir Condition="'$(WasmDataDir)' != ''">$([MSBuild]::NormalizeDirectory($(WasmDataDir)))</WasmDataDir>
+    <WasmMainJSPath>$MAINJS$</WasmMainJSPath>
   </PropertyGroup>
 
   <Import Project="$(WasmPropsPath)" Condition="Exists($(WasmPropsPath))" />

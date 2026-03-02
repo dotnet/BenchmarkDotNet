@@ -13,7 +13,7 @@ on:
           - windows-latest
           - ubuntu-latest
           - macos-latest
-          - windows-11-arm          
+          - windows-11-arm
           - ubuntu-24.04-arm
           - macos-15-intel
       project:
@@ -50,11 +50,33 @@ jobs:
     timeout-minutes: 60 # Explicitly set timeout. When wrong input parameter is passed. It may continue to run until it times out (Default:360 minutes))
     steps:
       - uses: actions/checkout@v4
-      
+
       # Setup
       - name: Setup
         run: |
           mkdir artifacts
+
+      - name: Install workloads
+        run: |
+          dotnet workload install wasm-tools
+          dotnet workload install wasm-tools-net8
+
+      - name: Set up node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Set up v8
+        shell: pwsh
+        run: |
+          npm install jsvu -g
+          jsvu --os=default --engines=v8
+
+          $homeDir = $env:HOME
+          if (-not $homeDir) {
+              $homeDir = $env:USERPROFILE
+          }
+
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $homeDir ".jsvu/bin")
 
       # Build
       - name: Run build
