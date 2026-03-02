@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
@@ -13,9 +10,12 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using Perfolizer.Helpers;
 using Perfolizer.Horology;
-using Perfolizer.Models;
 using Perfolizer.Metrology;
-using BenchmarkDotNet.Extensions;
+using Perfolizer.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -69,6 +69,9 @@ namespace BenchmarkDotNet.Environments
         // TODO: Join with OsInfo
         public Lazy<VirtualMachineHypervisor?> VirtualMachineHypervisor { get; protected set; }
 
+        private readonly Lazy<PhysicalMemoryInfo?> physicalMemory = new Lazy<PhysicalMemoryInfo?>(SystemMemory.GetPhysicalMemory);
+        public PhysicalMemoryInfo? PhysicalMemory => physicalMemory.Value;
+
         protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = BenchmarkDotNetInfo.Instance.BrandVersion;
@@ -95,7 +98,12 @@ namespace BenchmarkDotNet.Environments
             else
                 yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()}";
 
-            yield return Cpu.Value.ToFullBrandName();
+            string cpuInfo = Cpu.Value.ToFullBrandName();
+            if (PhysicalMemory != null)
+                yield return $"{cpuInfo}, {PhysicalMemory.ToFormattedString()} RAM";
+            else
+                yield return cpuInfo;
+
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
             {
                 string frequency = PerfolizerMeasurementFormatter.Instance.Format(
