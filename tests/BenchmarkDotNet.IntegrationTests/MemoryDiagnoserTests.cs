@@ -49,19 +49,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AccurateAllocations
         {
-            public class Empty { }
+            [Benchmark] public byte[] EightBytesArray() => new byte[8];
+            [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
 
-            [Benchmark]
-            public byte[] EightBytesArray() => new byte[8];
-
-            [Benchmark]
-            public byte[] SixtyFourBytesArray() => new byte[64];
-
-            [Benchmark]
-            public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
-
-            [Benchmark]
-            public Empty AllocateEmptyObject() => new Empty();
+            [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
@@ -106,8 +97,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void MemoryDiagnoserSupportsMonoWasm(MonoAotCompilerMode aotCompilerMode)
         {
             var ptrSize = sizeof(Int32); // We can't rely on IntPtr.Size, since we run on a different platform. Wasm is currently 32bit.
-            long objectAllocationOverhead = ptrSize * 2; // pointer to method table + object header word
-            long arraySizeOverhead = ptrSize * 2; // bounds + max_length
+            var objectAllocationOverhead = ptrSize * 2; // pointer to method table + object header word
+            var arraySizeOverhead = ptrSize * 2; // bounds + max_length
+            var intTaskSize = 40; // We can't use CalculateRequiredSpace for AllocateTask since it calculates the size with IntPtr.Size.
 
             var netCoreAppSettings = new NetCoreAppSettings("net8.0", runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
 
@@ -119,7 +111,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.AllocateEmptyObject), objectAllocationOverhead },
+                { nameof(AccurateAllocations.AllocateTask), intTaskSize },
             }, runtime: runtime);
         }
 
