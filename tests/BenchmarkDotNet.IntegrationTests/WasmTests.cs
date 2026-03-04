@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
@@ -28,31 +27,23 @@ namespace BenchmarkDotNet.IntegrationTests
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        [Theory]
+        private const string JsvuSkipReason = "JSVU does not support ARM on Windows or Linux";
+
+        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
         [InlineData(MonoAotCompilerMode.mini)]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
         public void WasmIsSupported(MonoAotCompilerMode aotCompilerMode)
         {
-            if (SkipTestRun())
-            {
-                return;
-            }
-
             CanExecute<WasmBenchmark>(GetConfig(aotCompilerMode));
         }
 
-        [Theory]
+        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
         [InlineData(MonoAotCompilerMode.mini)]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
         public void WasmSupportsInProcessDiagnosers(MonoAotCompilerMode aotCompilerMode)
         {
-            if (SkipTestRun())
-            {
-                return;
-            }
-
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
@@ -69,14 +60,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
+        [FactEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
         public void WasmSupportsCustomMainJs()
         {
-            if (SkipTestRun())
-            {
-                return;
-            }
-
             var summary = CanExecute<WasmBenchmark>(GetConfig(MonoAotCompilerMode.mini, true, true));
 
             var artefactsPaths = summary.Reports.Single().GenerateResult.ArtifactsPaths;
@@ -85,14 +71,9 @@ namespace BenchmarkDotNet.IntegrationTests
             Directory.Delete(Path.GetDirectoryName(artefactsPaths.ProjectFilePath)!, true);
         }
 
-        [Fact]
+        [FactEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
         public void WasmSupportsNode()
         {
-            if (SkipTestRun())
-            {
-                return;
-            }
-
             CanExecute<WasmBenchmark>(GetConfig(MonoAotCompilerMode.mini, javaScriptEngine: "node"));
         }
 
@@ -113,17 +94,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, keepBenchmarkFiles)
                 .WithOption(ConfigOptions.LogBuildOutput, true)
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
-        }
-
-        private static bool SkipTestRun()
-        {
-            // jsvu only supports arm for mac.
-            if (RuntimeInformation.GetCurrentPlatform() != Platform.X64 && !OsDetector.IsMacOS())
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public class WasmBenchmark

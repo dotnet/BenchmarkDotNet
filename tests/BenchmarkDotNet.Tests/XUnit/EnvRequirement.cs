@@ -6,6 +6,7 @@ public enum EnvRequirement
     NonWindows,
     NonWindowsArm,
     NonLinux,
+    NonLinuxArm,
     FullFrameworkOnly,
     NonFullFramework,
     DotNetCoreOnly,

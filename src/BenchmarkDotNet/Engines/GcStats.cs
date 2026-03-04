@@ -141,10 +141,6 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
         private static long? GetAllocatedBytes()
         {
-            // we have no tests for WASM and don't want to risk introducing a new bug (https://github.com/dotnet/BenchmarkDotNet/issues/2226)
-            if (RuntimeInformation.IsWasm)
-                return null;
-
             // Do NOT call GC.Collect() here, as it causes finalizers to run and possibly allocate. https://github.com/dotnet/runtime/issues/101536#issuecomment-2077533242
             // Instead, we call it before we start the measurement in the Engine.
 #if NET6_0_OR_GREATER
