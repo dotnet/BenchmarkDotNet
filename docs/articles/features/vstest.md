@@ -72,10 +72,10 @@ In addition, we can still make use of this boolean output to indicate
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
-	  <ItemGroup>
-	    <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="0.16.0" />
-	    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-	  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="0.16.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+  </ItemGroup>
 
 </Project>
 ```
