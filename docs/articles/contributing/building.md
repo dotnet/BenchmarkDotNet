@@ -17,7 +17,7 @@ Once all the necessary tools are in place, building is trivial. Simply open solu
 The build currently depends on the following prerequisites:
 
 - Windows:
-  - PowerShell version 5 or higher
+  - PowerShell Core
   - MSBuild version 15.1 or higher
   - .NET Framework 4.6 or higher
 
