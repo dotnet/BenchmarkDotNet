@@ -6,7 +6,7 @@ uid: BenchmarkDotNet.Samples.IntroWasm
 
 `WasmToolchain` builds benchmarks as WebAssembly and runs them under a JavaScript engine (V8 by default).
 
-It is supported only on Unix.
+It is supported on Windows, Linux, and macOS.
 
 If you hit `NETSDK1147` (missing workload), install the required workload (for example: `dotnet workload install wasm-tools`).
 
