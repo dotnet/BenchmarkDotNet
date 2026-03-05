@@ -5,6 +5,8 @@
     <IsPackable>false</IsPackable>
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>BenchmarkDotNet.Analyzers</PackageId>
+    <AnalyzerLanguage>cs</AnalyzerLanguage>
+    <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <!-- Default version used by local builds. This is overridden by the build script. -->
