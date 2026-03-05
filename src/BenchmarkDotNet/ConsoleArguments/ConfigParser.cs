@@ -736,6 +736,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static int GetMaximumDisplayWidth()
         {
+            if (Console.IsOutputRedirected)
+                return MinimumDisplayWidth;
+
             try
             {
                 return Console.WindowWidth;
