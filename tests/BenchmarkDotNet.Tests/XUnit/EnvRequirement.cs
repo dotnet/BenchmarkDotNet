@@ -10,5 +10,6 @@ public enum EnvRequirement
     FullFrameworkOnly,
     NonFullFramework,
     DotNetCoreOnly,
-    NeedsPrivilegedProcess
+    NeedsPrivilegedProcess,
+    MonoAotLlvmToolchain
 }
