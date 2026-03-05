@@ -36,7 +36,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
+                if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, attributeTypeSymbol))
                 {
                     return true;
                 }
@@ -56,7 +56,7 @@ internal static class AnalyzerHelper
             return false;
         }
 
-        return attributeList.Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(attributeTypeSymbol));
+        return attributeList.Any(ad => SymbolEqualityComparer.Default.Equals(ad.AttributeClass, attributeTypeSymbol));
     }
 
     public static ImmutableArray<AttributeSyntax> GetAttributes(string attributeName, Compilation compilation, SyntaxList<AttributeListSyntax> attributeLists, SemanticModel semanticModel)
@@ -81,7 +81,7 @@ internal static class AnalyzerHelper
                     continue;
                 }
 
-                if (attributeSyntaxTypeSymbol.Equals(attributeTypeSymbol))
+                if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, attributeTypeSymbol))
                 {
                     attributesBuilder.Add(attributeSyntax);
                 }
@@ -118,7 +118,8 @@ internal static class AnalyzerHelper
     }
 
     public static Location GetLocation(this AttributeData attributeData)
-        => attributeData.ApplicationSyntaxReference.SyntaxTree.GetLocation(attributeData.ApplicationSyntaxReference.Span);
+        => attributeData.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attributeData.ApplicationSyntaxReference.Span)
+            ?? Location.None;
 
     public static bool IsAssignable(TypedConstant constant, ExpressionSyntax expression, ITypeSymbol targetType, Compilation compilation)
     {
@@ -165,8 +166,8 @@ internal static class AnalyzerHelper
     {
         Debug.Assert(index >= 0);
         // Properties must come after constructor arguments, so we don't need to worry about it here.
-        var attrSyntax = (AttributeSyntax) attributeData.ApplicationSyntaxReference.GetSyntax();
-        var args = attrSyntax.ArgumentList.Arguments;
+        var attrSyntax = (AttributeSyntax)attributeData.ApplicationSyntaxReference!.GetSyntax();
+        var args = attrSyntax.ArgumentList!.Arguments;
         Debug.Assert(args is { Count: > 0 });
         var maybeArrayExpression = args[0].Expression;
 
@@ -174,7 +175,7 @@ internal static class AnalyzerHelper
         if (maybeArrayExpression is CollectionExpressionSyntax collectionExpressionSyntax)
         {
             Debug.Assert(index < collectionExpressionSyntax.Elements.Count);
-            return ((ExpressionElementSyntax) collectionExpressionSyntax.Elements[index]).Expression;
+            return ((ExpressionElementSyntax)collectionExpressionSyntax.Elements[index]).Expression;
         }
 #endif
 

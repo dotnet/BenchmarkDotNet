@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("\r\n  http://test.com/  \r\n", " http://test.com/")]
         public void AppendArgumentMakesSureOneSpaceBeforeObjectArgument(string? input, string expectedOutput)
         {
-            Uri uri = input != null ? new Uri(input) : null; // Use Uri for our object type since that is what is used in code
+            Uri? uri = input != null ? new Uri(input) : null; // Use Uri for our object type since that is what is used in code
             var stringBuilder = new StringBuilder();
             var result = stringBuilder.AppendArgument(uri).ToString();
 

@@ -54,9 +54,9 @@ namespace BenchmarkDotNet.Tests.Configs
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public void InvalidVariables()
         {
-            Assert.Throws<ArgumentNullException>(() => new EnvironmentVariable(null, "x"));
-            Assert.Throws<ArgumentNullException>(() => new EnvironmentVariable("x", null));
-            Assert.Throws<ArgumentNullException>(() => new EnvironmentVariable(null, null));
+            Assert.Throws<ArgumentNullException>(() => new EnvironmentVariable(null!, "x"));
+            Assert.Throws<ArgumentNullException>(() => new EnvironmentVariable("x", null!));
+            Assert.Throws<ArgumentNullException>(() => new EnvironmentVariable(null!, null!));
         }
 
         [Fact]

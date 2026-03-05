@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.Validators
 
                 try
                 {
-                    setter.Invoke(benchmarkTypeInstance, new[] { values.First() });
+                    setter.Invoke(benchmarkTypeInstance, [values.First()]);
                 }
                 catch (Exception ex)
                 {

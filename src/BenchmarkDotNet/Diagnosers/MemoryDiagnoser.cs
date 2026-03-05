@@ -24,9 +24,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
-        public IEnumerable<string> Ids => new[] { DiagnoserId };
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<string> Ids => [DiagnoserId];
+        public IEnumerable<IExporter> Exporters => [];
+        public IEnumerable<IAnalyser> Analysers => [];
         public void DisplayResults(ILogger logger) { }
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
 

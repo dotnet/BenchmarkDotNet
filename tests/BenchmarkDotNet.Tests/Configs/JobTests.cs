@@ -332,7 +332,7 @@ namespace BenchmarkDotNet.Tests.Configs
                         }
                     });
             AssertProperties(set1, "LaunchCount=2, Platform=X86");
-            Assert.Equal(Platform.X86, Job.EnvironmentCharacteristic[set1].Platform);
+            Assert.Equal(Platform.X86, Job.EnvironmentCharacteristic[set1]!.Platform);
             Assert.True(set1.HasValue(Job.EnvironmentCharacteristic));
             Assert.Equal(Platform.X86, EnvironmentMode.PlatformCharacteristic[set1]);
 

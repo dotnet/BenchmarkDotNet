@@ -4,8 +4,6 @@ using BenchmarkDotNet.Jobs;
 using System;
 using Xunit;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Tests
 {
     public class CharacteristicPresenterTests

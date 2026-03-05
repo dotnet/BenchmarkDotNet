@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "net123.0")]
         public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
         {
-            Assert.True(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName, out Version version));
+            Assert.True(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName, out var version));
 
             var runtime = CoreRuntime.FromVersion(version);
 
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("just wrong")]
         public void TryGetVersionFromFrameworkNameHandlesInvalidInput(string? frameworkName)
         {
-            Assert.False(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName, out _));
+            Assert.False(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName!, out _));
         }
 
         [Theory]
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(RuntimeMoniker.NotRecognized, "net123.0", "Microsoft .NET Core", "123.0.0-future")]
         public void TryGetVersionFromProductInfoHandlesValidInput(RuntimeMoniker expectedTfm, string expectedMsBuildMoniker, string productName, string productVersion)
         {
-            Assert.True(CoreRuntime.TryGetVersionFromProductInfo(productVersion, productName, out Version version));
+            Assert.True(CoreRuntime.TryGetVersionFromProductInfo(productVersion, productName, out var version));
 
             var runtime = CoreRuntime.FromVersion(version);
 
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("Microsoft .NET Framework", "4.6.26614.01 @BuiltBy: dlab14-DDVSOWINAGE018 @Commit: a536e7eec55c538c94639cefe295aa672996bf9b")] // this is an actual output for 2.0 but it simply does not contain enough info
         public void TryGetVersionFromProductInfoHandlesInvalidInput(string? productName, string? productVersion)
         {
-            Assert.False(CoreRuntime.TryGetVersionFromProductInfo(productVersion, productName, out _));
+            Assert.False(CoreRuntime.TryGetVersionFromProductInfo(productVersion!, productName!, out _));
         }
 
         public static IEnumerable<object[]> FromNetCoreAppVersionHandlesValidInputArguments()
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Tests
         [MemberData(nameof(FromNetCoreAppVersionHandlesValidInputArguments))]
         public void TryGetVersionFromRuntimeDirectoryHandlesValidInput(string runtimeDirectory, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
         {
-            Assert.True(CoreRuntime.TryGetVersionFromRuntimeDirectory(runtimeDirectory, out Version version));
+            Assert.True(CoreRuntime.TryGetVersionFromRuntimeDirectory(runtimeDirectory, out var version));
 
             var runtime = CoreRuntime.FromVersion(version);
 
@@ -98,10 +98,10 @@ namespace BenchmarkDotNet.Tests
 
         public static IEnumerable<object[]> TryGetVersionFromRuntimeDirectoryInvalidInputArguments()
         {
-            yield return new object[] { null };
-            yield return new object[] { string.Empty };
-            yield return new object[] { Path.Combine(Path.GetTempPath(), "publish") };
-            yield return new object[] { Path.Combine(Path.GetTempPath(), "publish") + Path.DirectorySeparatorChar };
+            yield return [null!];
+            yield return [string.Empty];
+            yield return [Path.Combine(Path.GetTempPath(), "publish")];
+            yield return [Path.Combine(Path.GetTempPath(), "publish") + Path.DirectorySeparatorChar];
         }
 
         [Theory]

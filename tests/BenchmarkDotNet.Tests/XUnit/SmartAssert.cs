@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Tests.XUnit
             if (expected.Count != actual.Count)
                 throw CreateException("Length mismatch");
             for (int i = 0; i < expected.Count; i++)
-                if (!expected[i].Equals(actual[i]))
+                if (!Equals(expected[i], actual[i]))
                     throw CreateException($"Element mismatch (index={i})");
         }
     }

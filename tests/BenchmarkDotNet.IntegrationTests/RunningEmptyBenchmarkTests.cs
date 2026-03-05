@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// </summary>
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void GenericTypeWithoutBenchmarkAttribute_ThrowsValidationError_WhenNoBenchmarkAttribute(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void GenericTypeWithBenchmarkAttribute_RunsSuccessfully(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// </summary>
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void TypeWithoutBenchmarkAttribute_ThrowsValidationError_WhenNoBenchmarkAttribute(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void TypeWithBenchmarkAttribute_RunsSuccessfully(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
@@ -129,12 +129,12 @@ namespace BenchmarkDotNet.IntegrationTests
         /// </summary>
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void TypesWithoutBenchmarkAttribute_ThrowsValidationError_WhenNoBenchmarkAttribute(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(new[] { typeof(EmptyBenchmark), typeof(EmptyBenchmark2) }, config, args);
+            var summaries = BenchmarkRunner.Run([typeof(EmptyBenchmark), typeof(EmptyBenchmark2)], config, args);
             if (args != null)
             {
                 Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
@@ -155,12 +155,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void TypesWithBenchmarkAttribute_RunsSuccessfully(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(new[] { typeof(NotEmptyBenchmark) }, config, args);
+            var summaries = BenchmarkRunner.Run([typeof(NotEmptyBenchmark)], config, args);
             var summary = summaries[0];
             Assert.False(summary.HasCriticalValidationErrors);
             Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
@@ -201,10 +201,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(new[] {
+            var summaries = BenchmarkRunner.Run([
                 BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), config),
                 BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark2), config)
-            });
+            ]);
             var summary = summaries[0];
             Assert.True(summary.HasCriticalValidationErrors);
             Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), config) });
+            var summaries = BenchmarkRunner.Run([BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), config)]);
             var summary = summaries[0];
             Assert.False(summary.HasCriticalValidationErrors);
             Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
@@ -229,12 +229,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void MixedTypes_ThrowsValidationError_WhenNoBenchmarkAttribute(string[]? args)
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(new[] { typeof(EmptyBenchmark), typeof(NotEmptyBenchmark) }, config, args);
+            var summaries = BenchmarkRunner.Run([typeof(EmptyBenchmark), typeof(NotEmptyBenchmark)], config, args);
             if (args != null)
             {
                 Assert.Contains(GetExpandedValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
@@ -254,7 +254,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void AssemblyWithoutBenchmarks_ThrowsValidationError_WhenNoBenchmarksFound(string[]? args)
         {
 
@@ -266,16 +266,15 @@ namespace BenchmarkDotNet.IntegrationTests
             var typeBuilder = moduleBuilder.DefineType("MockType", TypeAttributes.Public);
             typeBuilder.CreateType();
 
-            Summary[] summaries = null;
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
-                summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
                 Assert.Contains(GetAssemblylValidationError(assemblyBuilder), logger.GetLog());
             }
             else
             {
-                summaries = BenchmarkRunner.Run(assemblyBuilder, null, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, null, args);
                 var summary = summaries[0];
                 Assert.True(summary.HasCriticalValidationErrors);
                 Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());
@@ -284,7 +283,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData(new object[] { new string[] { " " } })]
+        [InlineData([new string[] { " " }])]
         public void AssemblyWithBenchmarks_RunsSuccessfully_WhenBenchmarkAttributePresent(string[]? args)
         {
             // Skip test on .NET Framework 4.6.2
@@ -305,24 +304,23 @@ namespace BenchmarkDotNet.IntegrationTests
             ilGenerator.Emit(OpCodes.Ret); // Just return from the method
 
             benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
-                typeof(BenchmarkAttribute).GetConstructor([typeof(int), typeof(string)]),
+                typeof(BenchmarkAttribute).GetConstructor([typeof(int), typeof(string)])!,
                 [0, ""]));
             // Assembly weaver does not run on assemblies created with AssemblyBuilder, so we need to apply NoInlining manually.
             benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
-                typeof(MethodImplAttribute).GetConstructor([typeof(MethodImplOptions)]),
+                typeof(MethodImplAttribute).GetConstructor([typeof(MethodImplOptions)])!,
                 [MethodImplOptions.NoInlining]));
             benchmarkTypeBuilder.CreateType();
 
-            Summary[] summaries = null;
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
-                summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
                 Assert.DoesNotContain(GetAssemblylValidationError(assemblyBuilder), logger.GetLog());
             }
             else
             {
-                summaries = BenchmarkRunner.Run(assemblyBuilder);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder);
                 var summary = summaries[0];
                 Assert.False(summary.HasCriticalValidationErrors);
                 Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());
@@ -345,21 +343,19 @@ namespace BenchmarkDotNet.IntegrationTests
             var ilGenerator = benchmarkMethod.GetILGenerator();
             ilGenerator.Emit(OpCodes.Ret); // Just return from the method
 
-            var benchmarkAttributeCtor = typeof(BenchmarkAttribute).GetConstructor(new[] { typeof(int), typeof(string) });
+            var benchmarkAttributeCtor = typeof(BenchmarkAttribute).GetConstructor([typeof(int), typeof(string)]);
             if (benchmarkAttributeCtor == null)
                 throw new InvalidOperationException("Could not find BenchmarkAttribute constructor");
             benchmarkMethod.SetCustomAttribute(new CustomAttributeBuilder(
                 benchmarkAttributeCtor,
-                new object[] { 0, "" }));
+                [0, ""]));
             benchmarkTypeBuilder.CreateType();
-
-            Summary[] summaries = null;
 
             GetConfigWithLogger(out var logger, out var config);
 
             config.AddFilter(new NameFilter(name => name != "Benchmark")); // Filter out only benchmark method on MockBenchmark
 
-            summaries = BenchmarkRunner.Run(assemblyBuilder, config);
+            var summaries = BenchmarkRunner.Run(assemblyBuilder, config);
             Assert.DoesNotContain(GetValidationErrorForType(benchmarkTypeBuilder), logger.GetLog());
             Assert.Contains(GetExporterNoBenchmarksError(), logger.GetLog());
         }

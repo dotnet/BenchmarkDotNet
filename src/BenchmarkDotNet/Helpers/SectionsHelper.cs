@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Helpers
         public static Dictionary<string, string> ParseSection(string? content, char separator)
         {
             var values = new Dictionary<string, string>();
-            var list = content?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var list = content?.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             if (list != null)
                 foreach (string line in list)
                     if (line.IndexOf(separator) != -1)

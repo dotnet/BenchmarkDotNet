@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Samples
 #pragma warning restore CA1416
 
         private const int Size = 20; // Greater value could cause System.OutOfMemoryException for test with memory leaks.
-        private int ArraySize = Size * Marshal.SizeOf(typeof(int));
+        private int ArraySize = Size * Marshal.SizeOf<int>();
 
         [Benchmark]
         public unsafe void AllocHGlobal()

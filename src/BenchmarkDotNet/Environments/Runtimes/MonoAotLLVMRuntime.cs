@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Environments
         internal static readonly MonoAotLLVMRuntime Default = new MonoAotLLVMRuntime();
 
         public FileInfo AOTCompilerPath { get; }
-        public MonoAotCompilerMode AOTCompilerMode { get;  }
+        public MonoAotCompilerMode AOTCompilerMode { get; }
 
         public override bool IsAOT => true;
 
@@ -23,8 +23,8 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public MonoAotLLVMRuntime(FileInfo? aotCompilerPath, MonoAotCompilerMode aotCompilerMode, string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM", RuntimeMoniker moniker = RuntimeMoniker.MonoAOTLLVM) : base(moniker, msBuildMoniker, displayName)
         {
-            if (aotCompilerPath == null)
-                throw new ArgumentNullException(paramName: nameof(aotCompilerPath));
+            ArgumentNullException.ThrowIfNull(aotCompilerPath);
+
             if (aotCompilerPath.IsNotNullButDoesNotExist())
                 throw new FileNotFoundException($"Provided {nameof(aotCompilerPath)} file: \"{aotCompilerPath.FullName}\" doest NOT exist");
 

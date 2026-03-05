@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -15,6 +14,7 @@ namespace BenchmarkDotNet.Helpers
     {
         private const int WindowsOldPathLimit = 260;
         private const int CommonSenseLimit = 1024; // for benchmarks that use args like "new string('a', 200_000)"
+        private const int MaxFileNameLength = 255;
 
         internal static string GetTraceFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
@@ -25,13 +25,15 @@ namespace BenchmarkDotNet.Helpers
         {
             string nameNoLimit = GetFilePathNoLimits(details, subfolder, creationTime, fileExtension);
 
+            string fileNameOnly = Path.GetFileName(nameNoLimit);
+
             // long paths can be enabled on Windows but it does not mean that everything is going to work fine..
             // so we always use 260 as limit on Windows
             int limit = OsDetector.IsWindows()
                 ? WindowsOldPathLimit - reserve
                 : CommonSenseLimit;
 
-            if (nameNoLimit.Length <= limit)
+            if (nameNoLimit.Length <= limit && fileNameOnly.Length <= MaxFileNameLength)
             {
                 return nameNoLimit;
             }

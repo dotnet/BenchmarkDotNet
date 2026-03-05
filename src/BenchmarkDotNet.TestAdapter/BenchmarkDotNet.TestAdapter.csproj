@@ -6,7 +6,6 @@
     <AssemblyName>BenchmarkDotNet.TestAdapter</AssemblyName>
     <PackageId>BenchmarkDotNet.TestAdapter</PackageId>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <!-- Use minimum supported LTSC version of Visual Studio 2022 -->

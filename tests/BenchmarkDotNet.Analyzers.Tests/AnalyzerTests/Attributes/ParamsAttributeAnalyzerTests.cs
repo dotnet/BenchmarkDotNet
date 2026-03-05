@@ -474,7 +474,7 @@ public class ParamsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)};" : "")}}
-                                                
+
                     [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1!)}})]
                     public {{valueAndType.Value2}} {{fieldOrPropertyDeclaration}}
                 }
@@ -507,7 +507,7 @@ public class ParamsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     {{(useLocalConstant ? $"private const {type}? _x = {(useConstantFromOtherClass ? "Constants.Value" : "null")};" : "")}}
-                                                
+
                     [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : "null")}})]
                     public {{type}}? {{fieldOrPropertyDeclaration}}
                 }
@@ -691,7 +691,7 @@ public class ParamsAttributeAnalyzerTests
                 public class BenchmarkClass
                 {
                     {{(useLocalConstant ? $"private const {valueAndType.Value2} _x = {(useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)};" : "")}}
-                                                
+
                     [{{dummyAttributeUsage}}Params({{string.Format(scalarValuesContainerAttributeArgument, $"{{|#0:{(useLocalConstant ? "_x" : useConstantFromOtherClass ? "Constants.Value" : valueAndType.Value1)}|}}")}})]
                     public {{expectedFieldOrPropertyType}} {{fieldOrPropertyDeclaration}}
                 }

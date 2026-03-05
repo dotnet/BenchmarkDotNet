@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
-        private string expectedNamespace;
+        private string expectedNamespace = default!;
 
         public TailCallDiagnoser() { }
 
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             this.filterByNamespace = filterByNamespace;
         }
 
-        public override IEnumerable<string> Ids => new[] { nameof(TailCallDiagnoser) };
+        public override IEnumerable<string> Ids => [nameof(TailCallDiagnoser)];
 
         public string ShortName => "tail";
 

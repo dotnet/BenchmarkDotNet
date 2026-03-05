@@ -23,7 +23,7 @@
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsNotAsErrors>NU1900</WarningsNotAsErrors>
-    <Nullable>annotations</Nullable>
+    <Nullable>enable</Nullable>
     <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
@@ -60,7 +60,7 @@
 
   <PropertyGroup>
     <!-- Increment this when the BenchmarkDotNet.Weaver package needs to be re-packed. -->
-    <WeaverVersionSuffix>-2</WeaverVersionSuffix>
+    <WeaverVersionSuffix>-3</WeaverVersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>

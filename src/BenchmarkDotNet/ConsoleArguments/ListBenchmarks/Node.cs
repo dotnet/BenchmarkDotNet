@@ -6,6 +6,6 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
     {
         public required string Name { get; init; }
 
-        public List<Node> Children { get; } = new List<Node>();
+        public List<Node> Children { get; } = [];
     }
 }

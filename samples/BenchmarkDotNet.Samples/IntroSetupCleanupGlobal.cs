@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Samples
         [Params(10, 100, 1000)]
         public int N;
 
-        private int[] data;
+        private int[] data = default!;
 
         [GlobalSetup]
         public void GlobalSetup()

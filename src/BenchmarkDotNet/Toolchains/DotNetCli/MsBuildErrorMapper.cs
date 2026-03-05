@@ -9,8 +9,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     internal static class MsBuildErrorMapper
     {
-        private static readonly (Regex regex, Func<Match, string> translation)[] Rules = new (Regex rule, Func<Match, string> translation)[]
-        {
+        private static readonly (Regex regex, Func<Match, string> translation)[] Rules =
+        [
             (
                 new Regex("warning NU1702: ProjectReference '(.*)' was resolved using '(.*)' instead of the project target framework '(.*)'. This project may not be fully compatible with your project.",
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
                 match => $"The current .NET SDK does not support targeting {match.Groups[1]}. You need to install it or pass the path to dotnet cli via the `--cli` console line argument."
             ),
-        };
+        ];
 
         internal static bool TryToExplainFailureReason(BuildResult buildResult, [NotNullWhen(true)] out string? reason)
         {

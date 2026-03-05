@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class JitStatsDiagnoser : JitDiagnoser<JitStats>, IProfiler
     {
-        public override IEnumerable<string> Ids => new[] { nameof(JitStatsDiagnoser) };
+        public override IEnumerable<string> Ids => [nameof(JitStatsDiagnoser)];
 
         public string ShortName => "jit";
 

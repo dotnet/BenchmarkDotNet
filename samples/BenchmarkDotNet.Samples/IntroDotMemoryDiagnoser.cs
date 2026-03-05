@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.Samples
         [Params(1024)]
         public int Size;
 
-        private byte[] dataArray;
-        private IEnumerable<byte> dataEnumerable;
+        private byte[] dataArray = default!;
+        private IEnumerable<byte> dataEnumerable = default!;
 
         [GlobalSetup]
         public void Setup()

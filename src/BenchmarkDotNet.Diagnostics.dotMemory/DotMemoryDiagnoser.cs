@@ -100,10 +100,6 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
             case RuntimeMoniker.NativeAot90:
             case RuntimeMoniker.NativeAot10_0:
             case RuntimeMoniker.NativeAot11_0:
-            case RuntimeMoniker.Wasm:
-            case RuntimeMoniker.WasmNet50:
-            case RuntimeMoniker.WasmNet60:
-            case RuntimeMoniker.WasmNet70:
             case RuntimeMoniker.WasmNet80:
             case RuntimeMoniker.WasmNet90:
             case RuntimeMoniker.WasmNet10_0:

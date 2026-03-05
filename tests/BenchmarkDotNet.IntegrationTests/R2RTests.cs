@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var toolchain = R2RToolchain.From(
                 new NetCoreAppSettings(
                     targetFrameworkMoniker: GetTargetFrameworkMoniker(),
-                    runtimeFrameworkVersion: null,
+                    runtimeFrameworkVersion: null!,
                     name: "R2RTest"));
 
             return ManualConfig.CreateEmpty()

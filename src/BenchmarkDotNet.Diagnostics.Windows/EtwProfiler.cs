@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
         private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
-        private Session kernelSession, userSession, heapSession;
+        private Session kernelSession = default!;
+        private Session userSession = default!;
+        private Session heapSession = default!;
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public EtwProfiler() : this(new EtwProfilerConfig(performExtraBenchmarksRun: false)) { }
@@ -36,18 +38,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             this.config = config;
             runMode = config.PerformExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
-            benchmarkToEtlFile = new Dictionary<BenchmarkCase, string>();
-            benchmarkToCounters = new Dictionary<BenchmarkCase, PreciseMachineCounter[]>();
+            benchmarkToEtlFile = [];
+            benchmarkToCounters = [];
             CreationTime = DateTime.Now;
         }
 
         public string ShortName => "ETW";
 
-        public IEnumerable<string> Ids => new[] { nameof(EtwProfiler) };
+        public IEnumerable<string> Ids => [nameof(EtwProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => BuildPmcStats();
 
@@ -72,11 +74,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
             if (!benchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
-                return Array.Empty<Metric>();
+                return [];
 
             // currently TraceLogParser parsers the counters metrics only. So if there are no counters configured, it makes no sense to parse the file
             if (!benchmarkToCounters.TryGetValue(results.BenchmarkCase, out var counters) || counters.IsEmpty())
-                return Array.Empty<Metric>();
+                return [];
 
             return TraceLogParser.Parse(traceFilePath, counters);
         }

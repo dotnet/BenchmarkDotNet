@@ -7,7 +7,6 @@ public static class DiagnosticIds
     public const string BenchmarkRunner_Run_TypeArgumentClassMustBeUnsealed = "BDN1002";
     public const string BenchmarkRunner_Run_TypeArgumentClassMustBeNonAbstract = "BDN1003";
     public const string BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute = "BDN1004";
-    public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract = "BDN1100";
     public const string General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric = "BDN1101";
     public const string General_BenchmarkClass_GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCount = "BDN1102";
     public const string General_BenchmarkClass_MethodMustBePublic = "BDN1103";

@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests
         {
             var benchmarkCase  = BenchmarkConverter.TypeToBenchmarks(typeof(TypeWithBenchmarks)).BenchmarksCases.Single();
 
-            var filter = new GlobFilter(new[] { pattern });
+            var filter = new GlobFilter([pattern]);
 
             Assert.Equal(expected, filter.Predicate(benchmarkCase));
         }
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests
         {
             var benchmarkCases = BenchmarkConverter.TypeToBenchmarks(typeof(TypeWithBenchmarksAndParams)).BenchmarksCases;
 
-            var filter = new GlobFilter(new[] { pattern });
+            var filter = new GlobFilter([pattern]);
 
             Assert.Equal(expectedBenchmarks, benchmarkCases.Where(benchmarkCase => filter.Predicate(benchmarkCase)).Count());
         }

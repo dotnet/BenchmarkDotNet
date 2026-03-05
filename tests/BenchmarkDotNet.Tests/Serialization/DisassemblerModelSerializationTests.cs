@@ -38,7 +38,7 @@ public class DisassemblerModelSerializationTests
             model,
             options => options
                 .IncludingInternalFields()
-                .ComparingByMembers(typeof(ClrMdArgs)) // Required to use Excluding for struct type. See: https://github.com/fluentassertions/fluentassertions/issues/937
+                .ComparingByMembers<ClrMdArgs>() // Required to use Excluding for struct type. See: https://github.com/fluentassertions/fluentassertions/issues/937
                 .Excluding(x => x.ProcessId)
                 .Excluding(x => x.TypeName));
     }
@@ -141,10 +141,12 @@ public class DisassemblerModelSerializationTests
         json.Should().NotBe("{}");
 
         // Compare properties (Except  for`Instruction.Details.Operands` property that )
+        result.Should().NotBeNull();
+        result.Instruction.Should().NotBeNull();
         result.Instruction.ToString().Should().Be("ldr w1, [sp, #8]");
 
         result.Should()
-              .BeEquivalentTo(model, options => options.Excluding(x => x.Instruction.Details.Operands));
+              .BeEquivalentTo(model, options => options.Excluding(x => x.Instruction!.Details.Operands));
     }
 
     [Fact]

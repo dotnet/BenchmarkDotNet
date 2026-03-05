@@ -41,17 +41,17 @@ chmarkDotNet_Samples_CPU_Cpu_Atomics_NoLock:
 
             var expected = new DisassemblyResult()
             {
-                Methods = new[]
-                {
+                Methods =
+                [
                     new DisassembledMethod()
                     {
                         Name = "NoLock",
-                        Maps = new[]
-                        {
+                        Maps =
+                        [
                             new Map()
                             {
-                                SourceCodes = new MonoCode[]
-                                {
+                                SourceCodes =
+                                [
                                     new MonoCode { Text = "subq\t$0x8, %rsp" },
 
                                     new MonoCode { Text = "movq\t%r15, (%rsp)" },
@@ -73,11 +73,11 @@ chmarkDotNet_Samples_CPU_Cpu_Atomics_NoLock:
                                     new MonoCode { Text = "movq\t(%rsp), %r15" },
                                     new MonoCode { Text = "addq\t$0x8, %rsp" },
                                     new MonoCode { Text = "retq" }
-                                }
+                                ]
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             };
 
             Check(input, expected, "NoLock");
@@ -143,17 +143,17 @@ Disassembly of section .text:
 
             var expected = new DisassemblyResult()
             {
-                Methods = new[]
-                {
+                Methods =
+                [
                     new DisassembledMethod()
                     {
                         Name = "NoLock",
-                        Maps = new[]
-                        {
+                        Maps =
+                        [
                             new Map()
                             {
-                                SourceCodes = new SourceCode[]
-                                {
+                                SourceCodes =
+                                [
                                     new MonoCode { Text = "sub    $0x28,%rsp" },
                                     new MonoCode { Text = "mov    %rsi,(%rsp)" },
                                     new MonoCode { Text = "mov    %r14,0x8(%rsp)" },
@@ -183,11 +183,11 @@ Disassembly of section .text:
                                     new MonoCode { Text = "mov    0x10(%rsp),%r15" },
                                     new MonoCode { Text = "add    $0x28,%rsp" },
                                     new MonoCode { Text = "retq" },
-                                }
+                                ]
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             };
 
             Check(input, expected, "NoLock");
@@ -213,13 +213,13 @@ operable program or batch file.
 
             var expected = new DisassemblyResult
             {
-                Methods = new[]
-                {
+                Methods =
+                [
                     new DisassembledMethod
                     {
                         Name = "Foo",
-                        Maps = new[]
-                        {
+                        Maps =
+                        [
                             new Map
                             {
                                 SourceCodes = input
@@ -228,15 +228,15 @@ operable program or batch file.
                                     .Select(line => new MonoCode{ Text = line })
                                     .ToArray()
                             }
-                        }
+                        ]
                     }
-                },
-                Errors = new[]
-                {
+                ],
+                Errors =
+                [
                     @"It's impossible to get Mono disasm because you don't have some required tools:
 'as' is not recognized as an internal or external command
 'x86_64-w64-mingw32-objdump.exe' is not recognized as an internal or external command"
-                }
+                ]
             };
 
             Check(input, expected, "Foo");
@@ -249,13 +249,13 @@ operable program or batch file.
 
             var expected = new DisassemblyResult
             {
-                Methods = new[]
-                {
+                Methods =
+                [
                     new DisassembledMethod
                     {
                         Name = "Foo",
-                        Maps = new[]
-                        {
+                        Maps =
+                        [
                             new Map
                             {
                                 SourceCodes = input
@@ -264,13 +264,13 @@ operable program or batch file.
                                     .Select(line => new MonoCode { Text = line })
                                     .ToArray()
                             }
-                        }
+                        ]
                     }
-                },
-                Errors = new[]
-                {
+                ],
+                Errors =
+                [
                     @"It's impossible to find assembly instructions in the mono output"
-                }
+                ]
             };
 
             Check(input, expected, "Foo");
@@ -280,7 +280,7 @@ operable program or batch file.
         private static void Check(string input, DisassemblyResult expected, string methodName)
         {
             var disassemblyResult = MonoDisassembler.OutputParser.Parse(
-                input.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None),
+                input.Split(["\r\n", "\n"], StringSplitOptions.None),
                 methodName, commandLine: string.Empty);
 
             Assert.Equal(expected.Methods.Single().Name, disassemblyResult.Methods.Single().Name);

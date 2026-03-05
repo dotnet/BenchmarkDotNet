@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Tests.Validators
             [Benchmark]
             public void Foo() { }
 
-            public static IEnumerable<bool> Source() => new[] { false, true };
+            public static IEnumerable<bool> Source() => [false, true];
         }
 
 #pragma warning disable BDN1205

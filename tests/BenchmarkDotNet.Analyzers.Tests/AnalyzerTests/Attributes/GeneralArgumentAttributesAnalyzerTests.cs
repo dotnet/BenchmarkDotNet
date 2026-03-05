@@ -22,14 +22,14 @@ public class GeneralArgumentAttributesAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using BenchmarkDotNet.Attributes;
-                                                
+
                 public class BenchmarkClass
                 {
                     [Benchmark]
                     [{{attributeUsage}}]
                     public void BenchmarkMethod(int a, string b)
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -50,7 +50,7 @@ public class GeneralArgumentAttributesAnalyzerTests
                 {
                     public void BenchmarkMethod({{string.Join(", ", Parameters.Take(parametersListLength))}})
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -75,7 +75,7 @@ public class GeneralArgumentAttributesAnalyzerTests
                     [ArgumentsSource("test")]
                     public void {{benchmarkMethodName}}({|#0:{{string.Join(", ", Parameters.Take(parametersListLength))}}|})
                     {
-                                                    
+
                     }
                 }
                 """;
@@ -99,7 +99,7 @@ public class GeneralArgumentAttributesAnalyzerTests
                     [Benchmark]
                     public void {{benchmarkMethodName}}({|#0:{{string.Join(", ", Parameters.Take(parametersListLength))}}|})
                     {
-                                                    
+
                     }
                 }
                 """;

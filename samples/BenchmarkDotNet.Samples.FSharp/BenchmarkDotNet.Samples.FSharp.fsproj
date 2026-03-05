@@ -20,8 +20,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.101" />
-    <PackageReference Update="System.ValueTuple" Version="4.6.1" />
+    <PackageReference Update="FSharp.Core" Version="10.0.103" />
+    <PackageReference Update="System.ValueTuple" Version="4.6.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
   </ItemGroup>
 

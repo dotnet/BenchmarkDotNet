@@ -31,8 +31,10 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         public void Serialize(IXmlWriter newWriter, object source)
         {
-            if (source == null || source.GetType() != type)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
+
+            if (source.GetType() != type)
+                throw new ArgumentException(nameof(source));
 
             writer = newWriter ?? throw new ArgumentNullException(nameof(newWriter));
 
@@ -161,8 +163,8 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         internal class XmlSerializerBuilder
         {
-            private readonly Dictionary<string, string> collectionItemNameMap = new Dictionary<string, string>();
-            private readonly HashSet<string> excludedPropertyNames = new HashSet<string>();
+            private readonly Dictionary<string, string> collectionItemNameMap = [];
+            private readonly HashSet<string> excludedPropertyNames = [];
 
             public Type Type { get; }
             public string RootName { get; private set; }
@@ -171,8 +173,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
             public XmlSerializerBuilder(Type type)
             {
-                if (type == null)
-                    throw new ArgumentNullException(nameof(type));
+                ArgumentNullException.ThrowIfNull(type);
 
                 Type = type;
                 RootName = type.Name;

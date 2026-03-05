@@ -1,7 +1,5 @@
 ﻿using System;
 
-#nullable enable
-
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]

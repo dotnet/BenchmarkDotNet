@@ -58,11 +58,6 @@ namespace BenchmarkDotNet.Extensions
             ProcessPriorityClass priority,
             ILogger logger)
         {
-            if (process == null)
-                throw new ArgumentNullException(nameof(process));
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
-
             try
             {
                 process.PriorityClass = priority;
@@ -82,11 +77,6 @@ namespace BenchmarkDotNet.Extensions
             IntPtr processorAffinity,
             ILogger logger)
         {
-            if (process == null)
-                throw new ArgumentNullException(nameof(process));
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
-
             if (!OsDetector.IsWindows() && !OsDetector.IsLinux())
                 return false;
 
@@ -106,9 +96,6 @@ namespace BenchmarkDotNet.Extensions
 
         public static IntPtr? TryGetAffinity(this Process process)
         {
-            if (process == null)
-                throw new ArgumentNullException(nameof(process));
-
             if (!OsDetector.IsWindows() && !OsDetector.IsLinux())
                 return null;
 

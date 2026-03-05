@@ -11,7 +11,7 @@ public class FactEnvSpecificAttribute : FactAttribute
 
     public FactEnvSpecificAttribute(string reason, params EnvRequirement[] requirements)
     {
-        string skip = EnvRequirementChecker.GetSkip(requirements);
+        string? skip = EnvRequirementChecker.GetSkip(requirements);
         if (skip != null)
             Skip = $"{skip} ({reason})";
     }

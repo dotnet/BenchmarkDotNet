@@ -201,11 +201,14 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("memoryRandomization", Required = false, HelpText = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.")]
         public bool MemoryRandomization { get; set; }
 
-        [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
-        public FileInfo? WasmJavascriptEngine { get; set; }
+        [Option("wasmEngine", Required = false, HelpText = "Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.", Default = "v8")]
+        public string? WasmJavaScriptEngine { get; set; } = "v8";
 
-        [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
+        [Option("wasmArgs", Required = false, HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
         public string? WasmJavaScriptEngineArguments { get; set; }
+
+        [Option("wasmMainJsTemplate", Required = false, HelpText = "Path to main.mjs template.")]
+        public FileInfo? WasmMainJsTemplate { get; set; }
 
         [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
         public string? CustomRuntimePack { get; set; }
@@ -216,11 +219,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
-        [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
-        public DirectoryInfo? WasmDataDirectory { get; set; }
+        [Option("wasmRuntimeFlavor", Required = false, Default = Environments.RuntimeFlavor.Mono, HelpText = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.")]
+        public Environments.RuntimeFlavor WasmRuntimeFlavor { get; set; }
 
-        [Option("wasmCoreCLR", Required = false, Default = false, HelpText = "Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.")]
-        public bool WasmCoreCLR { get; set; }
+        [Option("wasmProcessTimeout", Required = false, Default = 10, HelpText = "Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.")]
+        public int WasmProcessTimeoutMinutes { get; set; }
 
         [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }
@@ -244,24 +247,24 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 yield return new Example("Use Job.ShortRun for running the benchmarks", shortName, new CommandLineOptions { BaseJob = "short" });
                 yield return new Example("Run benchmarks in process", shortName, new CommandLineOptions { RunInProcess = true });
-                yield return new Example("Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "net472", "net8.0", "Mono" } });
-                yield return new Example("Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "netcoreapp3.1", "net6.0", "net8.0" } });
+                yield return new Example("Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = ["net472", "net8.0", "Mono"] });
+                yield return new Example("Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = ["netcoreapp3.1", "net6.0", "net8.0"] });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new[] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
-                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { Escape("*") } });
-                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { Escape("System.Memory*") } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = new[] { Escape("*.ClassA.*"), Escape("*.ClassB.*") } });
-                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { Escape("*.BenchmarkName") } });
+                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = [nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired)] });
+                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = [Escape("*")] });
+                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = [Escape("System.Memory*")] });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = ["ClassA", "ClassB"] });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = [Escape("*.ClassA.*"), Escape("*.ClassB.*")] });
+                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = [Escape("*.BenchmarkName")] });
                 yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
                 yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET Core 6.0 will be baseline because it was provided as first.", longName,
-                    new CommandLineOptions { Filters = new[] { "*"}, Runtimes = new[] { "net6.0", "net8.0" }, StatisticalTestThreshold = "5%" });
+                    new CommandLineOptions { Filters = ["*"], Runtimes = ["net6.0", "net8.0"], StatisticalTestThreshold = "5%" });
                 yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
-                    new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
-                yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = new[] { "Mean", "Ratio" }, });
+                    new CommandLineOptions { EnvironmentVariables = ["ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2"] });
+                yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = ["Mean", "Ratio"], });
             }
         }
 

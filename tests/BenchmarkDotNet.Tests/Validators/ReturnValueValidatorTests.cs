@@ -149,10 +149,10 @@ namespace BenchmarkDotNet.Tests.Validators
         public class ConsistentCollectionReturnType
         {
             [Benchmark]
-            public List<int> Foo() => new List<int> { 1, 2, 3 };
+            public List<int> Foo() => [1, 2, 3];
 
             [Benchmark]
-            public int[] Bar() => new[] { 1, 2, 3 };
+            public int[] Bar() => [1, 2, 3];
         }
 
         [Fact]
@@ -162,10 +162,10 @@ namespace BenchmarkDotNet.Tests.Validators
         public class InconsistentCollectionReturnType
         {
             [Benchmark]
-            public List<int> Foo() => new List<int> { 1, 2, 3 };
+            public List<int> Foo() => [1, 2, 3];
 
             [Benchmark]
-            public int[] Bar() => new[] { 1, 42, 3 };
+            public int[] Bar() => [1, 42, 3];
         }
 
         [Fact]
@@ -222,18 +222,18 @@ namespace BenchmarkDotNet.Tests.Validators
 
         public class CustomEquatableA : IEquatable<CustomEquatableB>
         {
-            public bool Equals(CustomEquatableB other) => other != null;
+            public bool Equals(CustomEquatableB? other) => other != null;
 
-            public override bool Equals(object obj) => false; // Intentionally bad implementation
+            public override bool Equals(object? obj) => false; // Intentionally bad implementation
 
             public override int GetHashCode() => 0;
         }
 
         public class CustomEquatableB : IEquatable<CustomEquatableA>
         {
-            public bool Equals(CustomEquatableA other) => other != null;
+            public bool Equals(CustomEquatableA? other) => other != null;
 
-            public override bool Equals(object obj) => false; // Intentionally bad implementation
+            public override bool Equals(object? obj) => false; // Intentionally bad implementation
 
             public override int GetHashCode() => 0;
         }

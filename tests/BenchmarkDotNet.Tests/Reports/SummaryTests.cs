@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateFailureReport(BenchmarkCase benchmark)
         {
-            GenerateResult generateResult = GenerateResult.Failure(ArtifactsPaths.Empty, Array.Empty<string>());
+            GenerateResult generateResult = GenerateResult.Failure(ArtifactsPaths.Empty, []);
             BuildResult buildResult = BuildResult.Failure(generateResult, string.Empty);
             // Null may be legitimately passed as metrics to BenchmarkReport ctor here:
             // https://github.com/dotnet/BenchmarkDotNet/blob/89255c9fceb1b27c475a93d08c152349be4199e9/src/BenchmarkDotNet/Running/BenchmarkRunner.cs#L197
@@ -64,16 +64,16 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateSuccessReport(BenchmarkCase benchmark)
         {
-            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>());
+            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, []);
             BuildResult buildResult = BuildResult.Success(generateResult);
             var metrics = new[] { new Metric(new FakeMetricDescriptor(), Math.E) };
-            return new BenchmarkReport(true, benchmark, generateResult, buildResult, Array.Empty<ExecuteResult>(), metrics);
+            return new BenchmarkReport(true, benchmark, generateResult, buildResult, [], metrics);
         }
 
         private static Summary CreateSummary(IList<BenchmarkReport> reports)
         {
             HostEnvironmentInfo hostEnvironmentInfo = new HostEnvironmentInfoBuilder().Build();
-            return new Summary("MockSummary", reports.ToImmutableArray(), hostEnvironmentInfo, string.Empty, string.Empty, TimeSpan.FromMinutes(1.0), TestCultureInfo.Instance, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
+            return new Summary("MockSummary", reports.ToImmutableArray(), hostEnvironmentInfo, string.Empty, string.Empty, TimeSpan.FromMinutes(1.0), TestCultureInfo.Instance, [], []);
         }
 
         public class MockBenchmarkClass

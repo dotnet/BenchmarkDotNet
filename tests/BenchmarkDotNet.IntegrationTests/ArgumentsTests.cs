@@ -18,11 +18,11 @@ namespace BenchmarkDotNet.IntegrationTests
     public class ArgumentsTests : BenchmarkTestExecutor
     {
         public static IEnumerable<object[]> GetToolchains()
-            => new[]
-                {
-                    new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessEmitToolchain.Default },
-                };
+            =>
+                [
+                    [Job.Default.GetToolchain()],
+                    [InProcessEmitToolchain.Default],
+                ];
 
         public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OneNonPrimitiveType))]
             public void OneNonPrimitiveType(Version version)
             {
-                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                int[] versionNumbers = [version.Major, version.Minor, version.MinorRevision, version.Build];
                 if (versionNumbers.Distinct().Count() != 4)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.TwoNonPrimitiveTypes))]
             public void TwoNonPrimitiveTypes(Version version, DateTime dateTime)
             {
-                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                int[] versionNumbers = [version.Major, version.Minor, version.MinorRevision, version.Build];
                 if (versionNumbers.Distinct().Count() != 4)
                     throw new InvalidOperationException("Incorrect values were passed");
 
@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(typeof(ExternalClassWithArgumentsSource), nameof(ExternalClassWithArgumentsSource.OnePrimitiveAndOneNonPrimitive))]
             public void OnePrimitiveAndOneNonPrimitive(Version version, int number)
             {
-                int[] versionNumbers = { version.Major, version.Minor, version.MinorRevision, version.Build };
+                int[] versionNumbers = [version.Major, version.Minor, version.MinorRevision, version.Build];
                 if (versionNumbers.Distinct().Count() != 4)
                     throw new InvalidOperationException("Incorrect values were passed");
 
@@ -206,10 +206,10 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithComplexTypesReturnedFromSources
         {
             [ParamsSource(nameof(DictionaryAsParam))]
-            public Dictionary<int, string> DictionaryParamInstance;
+            public required Dictionary<int, string> DictionaryParamInstance;
 
             [ParamsSource(nameof(SameButStatic))]
-            public Dictionary<int, string> DictionaryParamStatic;
+            public required Dictionary<int, string> DictionaryParamStatic;
 
             [Benchmark]
             [ArgumentsSource(nameof(NonPrimitive))]
@@ -238,9 +238,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 yield return new object[] { new SomeClass(Enumerable.Range(0, 1000).ToArray()), new SomeStruct(1000) };
             }
 
-            public IEnumerable<object> DictionaryAsParam => new object[] { new Dictionary<int, string>() { { 1234, "it's an instance getter" } } };
+            public IEnumerable<object> DictionaryAsParam => [new Dictionary<int, string>() { { 1234, "it's an instance getter" } }];
 
-            public static IEnumerable<object> SameButStatic => new object[] { new Dictionary<int, string>() { { 1234, "it's a static getter" } } };
+            public static IEnumerable<object> SameButStatic => [new Dictionary<int, string>() { { 1234, "it's a static getter" } }];
 
             public class SomeClass
             {
@@ -389,9 +389,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(nameof(CreateMatrix))]
             public void Test(int[][] array)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
-
                 for (int i = 0; i < 10; i++)
                     for (int j = 0; j < i; j++)
                         if (array[i][j] != i)
@@ -437,9 +434,6 @@ namespace BenchmarkDotNet.IntegrationTests
             [ArgumentsSource(nameof(GetInputData))]
             public bool ValueTupleCompareNoOpt(ref Generic<int, string> byRef)
             {
-                if (byRef == null)
-                    throw new ArgumentNullException(nameof(byRef));
-
                 if (byRef.Item1 != 3 || byRef.Item2 != "red")
                     throw new ArgumentException("Wrong values");
 
@@ -458,7 +452,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithArrayOfStringAsArgument
         {
             [Benchmark]
-            [Arguments(new object[1] { new string[0] })]
+            [Arguments([new string[0]])]
             // arguments accept "params object[]", when we pass just a string[] it's recognized as an array of params
             public void TypeReflectionArrayGetType(object anArray)
             {
@@ -1072,10 +1066,10 @@ namespace BenchmarkDotNet.IntegrationTests
             public int ParamTwo { get; set; }
 
             [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeMethod))]
-            public Version ParamThree { get; set; }
+            public required Version ParamThree { get; set; }
 
             [ParamsSource(typeof(ExternalClassWithParamsSource), nameof(ExternalClassWithParamsSource.NonPrimitiveTypeProperty))]
-            public Version ParamFour { get; set; }
+            public required Version ParamFour { get; set; }
 
             [Benchmark]
             public void Test()
@@ -1146,7 +1140,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class Perf_Regex_Industry_RustLang_Sherlock
         {
             [Params(@"[""'][^""']{0,30}[?!.][""']")]
-            public string Pattern { get; set; }
+            public required string Pattern { get; set; }
 
             [Benchmark]
             public int Consume() => Pattern.Length;
@@ -1164,7 +1158,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [ParamsSource(nameof(GetDisposables))]
-            public Disposable used;
+            public required Disposable used;
 
             [Benchmark]
             public void CheckDisposed()
@@ -1202,7 +1196,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig> furtherConfigure = null)
+        private Reports.Summary CanExecute<T>(IToolchain toolchain, Func<IConfig, IConfig>? furtherConfigure = null)
         {
             var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
 

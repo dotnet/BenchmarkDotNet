@@ -31,8 +31,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly PerfCollectProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
-        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new();
-        private readonly HashSet<string> cliPathWithSymbolsInstalled = new();
+        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = [];
+        private readonly HashSet<string> cliPathWithSymbolsInstalled = [];
         private FileInfo perfCollectFile = default!;
         private Process perfCollectProcess = default!;
 
@@ -41,13 +41,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         public string ShortName => "perf";
 
-        public IEnumerable<string> Ids => new[] { nameof(PerfCollectProfiler) };
+        public IEnumerable<string> Ids => [nameof(PerfCollectProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
-        public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => Array.Empty<Metric>();
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => config.RunMode;
 

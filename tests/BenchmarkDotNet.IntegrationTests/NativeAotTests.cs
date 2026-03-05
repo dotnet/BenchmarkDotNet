@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!RuntimeInformation.IsNativeAOT)
                 throw new Exception("This is NOT NativeAOT");
 #if NET6_0_OR_GREATER
-            if (System.Runtime.Intrinsics.X86.Avx2.IsSupported != bool.Parse(Environment.GetEnvironmentVariable(EnvVarKey)))
+            if (System.Runtime.Intrinsics.X86.Avx2.IsSupported != bool.Parse(Environment.GetEnvironmentVariable(EnvVarKey)!))
                 throw new Exception("Unexpected Instruction Set");
 #endif
         }

@@ -33,8 +33,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private static readonly Guid ConcurrencyVisualizerMarkersId = new Guid("8D4925AB-505A-483b-A7E0-6F824A07A6F0"); // "ConcurrencyVisualizer.Markers";
 
         private readonly EtwProfiler etwProfiler;
-        private readonly Dictionary<BenchmarkCase, string> benchmarkToCvTraceFile = new Dictionary<BenchmarkCase, string>();
-        private readonly Dictionary<BenchmarkCase, int> benchmarkToProcessId = new Dictionary<BenchmarkCase, int>();
+        private readonly Dictionary<BenchmarkCase, string> benchmarkToCvTraceFile = [];
+        private readonly Dictionary<BenchmarkCase, int> benchmarkToProcessId = [];
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public ConcurrencyVisualizerProfiler() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
@@ -44,11 +44,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public string ShortName => "CV";
 
-        public IEnumerable<string> Ids => new[] { nameof(ConcurrencyVisualizerProfiler) };
+        public IEnumerable<string> Ids => [nameof(ConcurrencyVisualizerProfiler)];
 
-        public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
+        public IEnumerable<IExporter> Exporters => [];
 
-        public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public IEnumerable<IAnalyser> Analysers => [];
 
         public void DisplayResults(ILogger logger)
         {
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             // we need to remember process Id because we loose it when the process exits
             if (signal == HostSignal.AfterAll)
-                benchmarkToProcessId[parameters.BenchmarkCase] = parameters.Process.Id;
+                benchmarkToProcessId[parameters.BenchmarkCase] = parameters.ProcessId;
             else if (signal == HostSignal.AfterProcessExit)
                 benchmarkToCvTraceFile[parameters.BenchmarkCase] = CreateCvTraceFile(parameters);
         }
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             kernelKeywords |= KernelTraceEventParser.Keywords.DiskFileIO | KernelTraceEventParser.Keywords.DiskIO | KernelTraceEventParser.Keywords.DiskIOInit;
             kernelKeywords |= KernelTraceEventParser.Keywords.FileIO | KernelTraceEventParser.Keywords.FileIOInit;
 
-            var providers = new (Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)[]
+            var providers = new (Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions? options)[]
             {
                 // following keywords come from decompiled CVCollectionService.exe
                 (ConcurrencyVisualizerMarkersId, TraceEventLevel.Verbose, EtwProfilerConfig.MatchAnyKeywords, new TraceEventProviderOptions { StacksEnabled = false }),

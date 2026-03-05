@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.Disassemblers
         private DisassembledMethod[] Disassemble(ClrMdArgs args, State state)
         {
             var result = new List<DisassembledMethod>();
-            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), args.Syntax);
+            DisassemblySyntax syntax = Enum.Parse<DisassemblySyntax>(args.Syntax);
 
             using var sourceCodeProvider = new SourceCodeProvider();
             while (state.Todo.Count != 0)
@@ -220,7 +220,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             Map[] maps = args.PrintSource
                 ? codes.GroupBy(code => code.InstructionPointer).OrderBy(group => group.Key).Select(group => new Map() { SourceCodes = group.ToArray() }).ToArray()
-                : new[] { new Map() { SourceCodes = codes.ToArray() } };
+                : [new Map() { SourceCodes = codes.ToArray() }];
 
             return new DisassembledMethod
             {
@@ -262,12 +262,11 @@ namespace BenchmarkDotNet.Disassemblers
             if (hotColdInfo.HotSize > 0 && hotColdInfo.HotStart > 0)
             {
                 return hotColdInfo.ColdSize <= 0
-                    ? new[] { new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 } }
-                    : new[]
-                      {
-                            new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
-                            new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
-                      };
+                    ? [new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 }]
+                    : [
+                          new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
+                          new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
+                      ];
             }
 
             return method.ILOffsetMap

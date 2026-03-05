@@ -42,21 +42,21 @@ public class WakeLockTests : BenchmarkTestExecutor
     [InlineData(WakeLockType.Display)]
     public void WakeLockIsWindowsOnly(WakeLockType wakeLockType)
     {
-        using IDisposable wakeLock = WakeLock.Request(wakeLockType, "dummy", logger);
+        using var wakeLock = WakeLock.Request(wakeLockType, "dummy", logger);
         Assert.Null(wakeLock);
     }
 
     [FactEnvSpecific(EnvRequirement.WindowsOnly)]
     public void WakeLockSleepOrDisplayIsAllowed()
     {
-        using IDisposable wakeLock = WakeLock.Request(WakeLockType.None, "dummy", logger);
+        using var wakeLock = WakeLock.Request(WakeLockType.None, "dummy", logger);
         Assert.Null(wakeLock);
     }
 
     [FactEnvSpecific(EnvRequirement.WindowsOnly, EnvRequirement.NeedsPrivilegedProcess)]
     public void WakeLockRequireSystem()
     {
-        using (IDisposable wakeLock = WakeLock.Request(WakeLockType.System, "WakeLockTests", logger))
+        using (var wakeLock = WakeLock.Request(WakeLockType.System, "WakeLockTests", logger))
         {
             Assert.NotNull(wakeLock);
             Assert.Equal("SYSTEM", GetPowerRequests("WakeLockTests"));
@@ -67,7 +67,7 @@ public class WakeLockTests : BenchmarkTestExecutor
     [FactEnvSpecific(EnvRequirement.WindowsOnly, EnvRequirement.NeedsPrivilegedProcess)]
     public void WakeLockRequireDisplay()
     {
-        using (IDisposable wakeLock = WakeLock.Request(WakeLockType.Display, "WakeLockTests", logger))
+        using (var wakeLock = WakeLock.Request(WakeLockType.Display, "WakeLockTests", logger))
         {
             Assert.NotNull(wakeLock);
             Assert.Equal("DISPLAY, SYSTEM", GetPowerRequests("WakeLockTests"));
@@ -96,7 +96,7 @@ public class WakeLockTests : BenchmarkTestExecutor
         using EventWaitHandle
             ping = new EventWaitHandle(false, EventResetMode.AutoReset, PingEventName),
             pong = new EventWaitHandle(false, EventResetMode.AutoReset, PongEventName);
-        string pwrRequests = null;
+        string? pwrRequests = null;
         Task task = WaitForBenchmarkRunningAndGetPowerRequests();
         _ = CanExecute(type, fullValidation: false);
         await task;
@@ -135,10 +135,10 @@ public class WakeLockTests : BenchmarkTestExecutor
 
     private string GetPowerRequests(string? expectedReason = null)
     {
-        string pwrRequests = ProcessHelper.RunAndReadOutput("powercfg", "/requests");
+        string pwrRequests = ProcessHelper.RunAndReadOutput("powercfg", "/requests")!;
         Output.WriteLine(pwrRequests); // Useful to analyse failing tests.
-        string fileName = Process.GetCurrentProcess().MainModule.FileName;
-        string mustEndWith = fileName.Substring(Path.GetPathRoot(fileName).Length);
+        string fileName = Process.GetCurrentProcess()!.MainModule!.FileName;
+        string mustEndWith = fileName.Substring(Path.GetPathRoot(fileName)!.Length);
 
         return string.Join(", ",
             from pr in PowerRequestsParser.Parse(pwrRequests)
@@ -152,12 +152,12 @@ public class WakeLockTests : BenchmarkTestExecutor
     private Task AsTask(WaitHandle waitHandle, TimeSpan timeout)
     {
         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        RegisteredWaitHandle rwh = null;
+        RegisteredWaitHandle? rwh = null;
         rwh = ThreadPool.RegisterWaitForSingleObject(
             waitHandle,
-            (object state, bool timedOut) =>
+            (object? state, bool timedOut) =>
             {
-                rwh.Unregister(null);
+                rwh?.Unregister(null);
                 if (timedOut)
                 {
                     tcs.SetException(new TimeoutException());

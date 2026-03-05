@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Characteristics
         protected CharacteristicObject()
         {
             Owner = null;
-            sharedValues = new Dictionary<Characteristic, object>();
+            sharedValues = [];
         }
 
         protected CharacteristicObject(string id) : this()
@@ -258,9 +258,6 @@ namespace BenchmarkDotNet.Characteristics
 
         private void SetOwnerCore(CharacteristicObject newOwner)
         {
-            if (newOwner == null)
-                throw new ArgumentNullException(nameof(newOwner));
-
             AssertNotFrozen();
             newOwner.AssertIsNonFrozenRoot();
 
@@ -281,7 +278,7 @@ namespace BenchmarkDotNet.Characteristics
             var oldValues = sharedValues;
 
             Owner = null;
-            sharedValues = new Dictionary<Characteristic, object>();
+            sharedValues = [];
             frozen = false;
 
             oldValues.Remove(thisCharacteristic);
@@ -297,8 +294,6 @@ namespace BenchmarkDotNet.Characteristics
 
         private void AttachToOwner(CharacteristicObject newOwner, Characteristic thisCharacteristic)
         {
-            if (newOwner == null)
-                throw new ArgumentNullException(nameof(newOwner));
             if (IsPropertyBag)
                 throw new InvalidOperationException(
                     $"The property bag {this} cannot be used as characteristic's value.");

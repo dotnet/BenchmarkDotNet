@@ -69,14 +69,14 @@ namespace BenchmarkDotNet.Characteristics
         {
             private const string Separator = "; ";
             private static readonly CharacteristicPresenter CharacteristicPresenter = CharacteristicPresenter.SourceCodePresenter;
-            private static readonly HashSet<Type> NonExportableTypes = new HashSet<Type>
-            {
+            private static readonly HashSet<Type> NonExportableTypes =
+            [
                 typeof(IToolchain), // there is no need to set toolchain in child process, it was causing parameterless ctor requirement for all IToolchain implementations
                 typeof(IReadOnlyCollection<HardwareCounter>), // we don't need to export this array to child process
                 typeof(IReadOnlyList<Argument>),
                 typeof(IReadOnlyList<EnvironmentVariable>),
                 typeof(Runtime) // there is no need to set runtime in child process, it was causing parameterless ctor requirement for all Runtime implementations
-            };
+            ];
 
             public override string ToPresentation(CharacteristicObject obj)
                 => string.Join(Separator,

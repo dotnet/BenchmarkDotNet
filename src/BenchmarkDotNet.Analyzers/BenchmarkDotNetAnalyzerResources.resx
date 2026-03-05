@@ -135,14 +135,8 @@
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Description" xml:space="preserve">
     <value>A benchmark class must be an instance class</value>
   </data>
-  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description" xml:space="preserve">
-    <value>A benchmark class annotated with a [GenericTypeArguments] attribute must be non-abstract</value>
-  </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_MessageFormat" xml:space="preserve">
     <value>Benchmark class '{0}' cannot be static</value>
-  </data>
-  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat" xml:space="preserve">
-    <value>Attribute [GenericTypeArguments] can only be applied to a non-abstract class</value>
   </data>
   <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_MessageFormat" xml:space="preserve">
     <value>Referenced generic benchmark class '{0}' has no [GenericTypeArguments] attribute(s)</value>
@@ -152,9 +146,6 @@
   </data>
   <data name="General_BenchmarkClass_ClassMustBeNonStatic_Title" xml:space="preserve">
     <value>Benchmark classes must be non-static</value>
-  </data>
-  <data name="General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title" xml:space="preserve">
-    <value>Benchmark classes annotated with the [GenericTypeArguments] attribute must be non-abstract</value>
   </data>
   <data name="BenchmarkRunner_Run_GenericTypeArgumentClassMustBeAnnotatedWithAGenericTypeArgumentsAttribute_Title" xml:space="preserve">
     <value>Generic benchmark classes must be annotated with at least one [GenericTypeArguments] attribute</value>
@@ -384,5 +375,8 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   </data>
   <data name="Attributes_ArgumentsAttribute_RequiresParameters_MessageFormat" xml:space="preserve">
     <value>Method {0} has no parameters</value>
+  </data>
+  <data name="Attributes_ArgumentsAttribute_RequiresParameters_Description" xml:space="preserve">
+    <value>The values passed to an [Arguments] must have parameter(s)</value>
   </data>
 </root>

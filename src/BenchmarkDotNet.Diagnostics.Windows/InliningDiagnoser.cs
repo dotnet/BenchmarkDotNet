@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
         private readonly string[]? allowedNamespaces = null;
-        private string defaultNamespace;
+        private string defaultNamespace = default!;
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public InliningDiagnoser() { }
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             this.filterByNamespace = true;
         }
 
-        public override IEnumerable<string> Ids => new[] { nameof(InliningDiagnoser) };
+        public override IEnumerable<string> Ids => [nameof(InliningDiagnoser)];
 
         public string ShortName => "inlining";
 

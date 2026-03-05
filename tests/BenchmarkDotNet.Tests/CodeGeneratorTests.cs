@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class CodeGeneratorTests
     {
-        public static TheoryData<CodeGenBenchmarkRunCallType> CodeGenBenchmarkRunCallTypes => [.. (CodeGenBenchmarkRunCallType[]) Enum.GetValues(typeof(CodeGenBenchmarkRunCallType))];
+        public static TheoryData<CodeGenBenchmarkRunCallType> CodeGenBenchmarkRunCallTypes => [.. Enum.GetValues<CodeGenBenchmarkRunCallType>()];
 
         [Theory]
         [MemberData(nameof(CodeGenBenchmarkRunCallTypes))]
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Tests
                     .Single(method => method.Name == nameof(AsyncVoidMethod));
 
             var target = new Descriptor(typeof(CodeGeneratorTests), asyncVoidMethod);
-            var benchmark = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
+            var benchmark = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, ManualConfig.CreateEmpty().CreateImmutableConfig());
 
             Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(
                 [new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([]))],
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests
                     .Single(method => method.Name == nameof(FineMethod));
 
             var target = new Descriptor(typeof(CodeGeneratorTests), fineMethod);
-            var benchmark = BenchmarkCase.Create(target, Job.Default, new ParameterInstances(Array.Empty<ParameterInstance>()), ManualConfig.CreateEmpty().CreateImmutableConfig());
+            var benchmark = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, ManualConfig.CreateEmpty().CreateImmutableConfig());
 
             var generatedSourceFile = CodeGenerator.Generate(new BuildPartition(
                 [new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([]))],
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Tests
 
             using (StringReader stringReader = new StringReader(generatedSourceFile))
             {
-                string line;
+                string? line;
                 while ((line = stringReader.ReadLine()) != null && !line.StartsWith("namespace"))
                 {
                     Assert.False(line.Trim().StartsWith("using"), line);

@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Configs
         {
             // if user did not provide any loggers, we use the ConsoleLogger to somehow show the errors to the user
             if (config == null || !config.GetLoggers().Any())
-                return new CompositeLogger(ImmutableHashSet.Create(ConsoleLogger.Default));
+                return new CompositeLogger([ConsoleLogger.Default]);
 
             return new CompositeLogger(config.GetLoggers().ToImmutableHashSet());
         }

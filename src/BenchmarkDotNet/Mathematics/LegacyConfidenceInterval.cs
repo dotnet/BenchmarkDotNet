@@ -107,8 +107,7 @@ public static class ConfidenceLevelExtensions
     }
 
     private static Dictionary<LegacyConfidenceLevel, (int value, int length)> CreateConfidenceLevelMapping()
-        => Enum.GetValues(typeof(LegacyConfidenceLevel))
-            .Cast<LegacyConfidenceLevel>()
+        => Enum.GetValues<LegacyConfidenceLevel>()
             .ToDictionary(
                 confidenceLevel => confidenceLevel,
                 confidenceLevel =>

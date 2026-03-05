@@ -30,10 +30,10 @@ namespace BenchmarkDotNet.Samples
 
                 public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary) =>
                     from benchmark in benchmarksCase
-                    orderby summary[benchmark].ResultStatistics.Mean
+                    orderby summary[benchmark]?.ResultStatistics?.Mean
                     select benchmark;
 
-                public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
+                public string? GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
 
                 public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase) =>
                     benchmarkCase.Job.DisplayInfo + "_" + benchmarkCase.Parameters.DisplayInfo;

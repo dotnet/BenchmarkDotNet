@@ -14,21 +14,22 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains.R2R;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.R2R;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
-using BenchmarkDotNet.Toolchains.Mono;
 using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -95,7 +96,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static (bool Success, string[] ExpandedTokens) ExpandResponseFile(string[] args, ILogger logger)
         {
-            List<string> result = new();
+            List<string> result = [];
             foreach (var arg in args)
             {
                 if (arg.StartsWith("@"))
@@ -249,6 +250,14 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{options.AOTCompilerPath}\" does NOT exist. It MUST be provided.");
                 }
+                else if (runtimeMoniker >= RuntimeMoniker.WasmNet80 && runtimeMoniker < RuntimeMoniker.MonoAOTLLVM)
+                {
+                    if (!ProcessHelper.TryResolveExecutableInPath(options.WasmJavaScriptEngine, out _))
+                    {
+                        logger.WriteLineError($"The provided {nameof(options.WasmJavaScriptEngine)} \"{options.WasmJavaScriptEngine}\" does NOT exist.");
+                        return false;
+                    }
+                }
             }
 
             foreach (string exporter in options.Exporters)
@@ -282,12 +291,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
-                return false;
-            }
-
-            if (options.WasmJavascriptEngine.IsNotNullButDoesNotExist())
-            {
-                logger.WriteLineError($"The provided {nameof(options.WasmJavascriptEngine)} \"{options.WasmJavascriptEngine}\" does NOT exist.");
                 return false;
             }
 
@@ -449,7 +452,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 baseJob = baseJob.WithEnvironmentVariables(options.EnvironmentVariables.Select(text =>
                 {
-                    var separated = text.Split(new[] { EnvVarKeyValueSeparator }, 2);
+                    var separated = text.Split([EnvVarKeyValueSeparator], 2);
                     return new EnvironmentVariable(separated[0], separated[1]);
                 }).ToArray());
             }
@@ -466,7 +469,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (options.RunInProcess)
             {
-                yield return Attributes.InProcessAttribute.GetJob(Attributes.InProcessToolchainType.Auto, true);
+                yield return Attributes.InProcessAttribute.GetJob(baseJob, Attributes.InProcessToolchainType.Auto, true);
             }
             else if (options.ClrVersion.IsNotBlank())
             {
@@ -577,18 +580,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.NativeAot11_0:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json");
-
-                case RuntimeMoniker.Wasm:
-                    return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
-
-                case RuntimeMoniker.WasmNet50:
-                    return MakeWasmJob(baseJob, options, "net5.0", runtimeMoniker);
-
-                case RuntimeMoniker.WasmNet60:
-                    return MakeWasmJob(baseJob, options, "net6.0", runtimeMoniker);
-
-                case RuntimeMoniker.WasmNet70:
-                    return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
 
                 case RuntimeMoniker.WasmNet80:
                     return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
@@ -713,12 +704,14 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var wasmRuntime = new WasmRuntime(
                 msBuildMoniker: msBuildMoniker,
-                javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
-                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments ?? "",
-                aot: wasmAot,
-                wasmDataDir: options.WasmDataDirectory?.FullName ?? "",
                 moniker: moniker,
-                isMonoRuntime: !options.WasmCoreCLR);
+                displayName: "Wasm",
+                javaScriptEngine: options.WasmJavaScriptEngine ?? "",
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
+                aot: wasmAot,
+                runtimeFlavor: options.WasmRuntimeFlavor,
+                mainJsTemplate: options.WasmMainJsTemplate,
+                processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,

@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     if (process == null)
                     {
-                        return Enumerable.Empty<Version>();
+                        return [];
                     }
 
                     var output = process.StandardOutput.ReadToEnd();
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Validators
 
                     if (process.ExitCode == 0)
                     {
-                        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
                         var versions = new List<Version>(lines.Count());
                         foreach (var line in lines)
@@ -111,13 +111,13 @@ namespace BenchmarkDotNet.Validators
                     }
                     else
                     {
-                        return Enumerable.Empty<Version>();
+                        return [];
                     }
                 }
             }
             catch (Win32Exception) // dotnet CLI is not installed or not found in the path.
             {
-                return Enumerable.Empty<Version>();
+                return [];
             }
         }
 

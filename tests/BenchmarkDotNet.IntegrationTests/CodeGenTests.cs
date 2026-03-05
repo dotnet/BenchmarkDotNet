@@ -29,7 +29,6 @@ public class CodeGenTests(ITestOutputHelper output) : BenchmarkTestExecutor(outp
         CanExecute<BenchmarkManyTypes>(config);
     }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public class BenchmarkManyTypes
     {
         private static void AssertAggressiveOptimization()
@@ -42,7 +41,7 @@ public class CodeGenTests(ITestOutputHelper output) : BenchmarkTestExecutor(outp
                 var stacktrace = new StackTrace(false);
                 for (int i = 0; i < stacktrace.FrameCount; i++)
                 {
-                    var benchmarkType = stacktrace.GetFrame(i).GetMethod().DeclaringType;
+                    var benchmarkType = stacktrace.GetFrame(i)!.GetMethod()!.DeclaringType!;
                     do
                     {
                         if (benchmarkType.Name.StartsWith("Runnable_"))
@@ -94,7 +93,7 @@ public class CodeGenTests(ITestOutputHelper output) : BenchmarkTestExecutor(outp
         public async ValueTask ReturnValueTaskAsync() => AssertAggressiveOptimization();
 
         [Benchmark]
-        public string ReturnRefType()
+        public string? ReturnRefType()
         {
             AssertAggressiveOptimization();
             return default;
@@ -108,7 +107,7 @@ public class CodeGenTests(ITestOutputHelper output) : BenchmarkTestExecutor(outp
         }
 
         [Benchmark]
-        public async Task<string> ReturnTaskOfTAsync()
+        public async Task<string?> ReturnTaskOfTAsync()
         {
             AssertAggressiveOptimization();
             return default;
@@ -144,5 +143,4 @@ public class CodeGenTests(ITestOutputHelper output) : BenchmarkTestExecutor(outp
             return default;
         }
     }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

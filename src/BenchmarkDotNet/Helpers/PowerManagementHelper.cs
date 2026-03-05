@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Helpers
                 if (res != SuccessCode)
                     return null;
 
-                return (Guid?)Marshal.PtrToStructure(activeGuidPtr, typeof(Guid));
+                return Marshal.PtrToStructure<Guid>(activeGuidPtr);
             }
         }
 
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Helpers
 
         internal static bool Set(Guid newPolicy)
         {
-           return PowerSetActiveScheme(IntPtr.Zero, ref newPolicy) == 0;
+            return PowerSetActiveScheme(IntPtr.Zero, ref newPolicy) == 0;
         }
 
         [DllImport("powrprof.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]

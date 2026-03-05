@@ -15,8 +15,8 @@ namespace BenchmarkDotNet.IntegrationTests
         void IValueTaskSource.GetResult(short token) => _core.GetResult(token);
         ValueTaskSourceStatus IValueTaskSource<T>.GetStatus(short token) => _core.GetStatus(token);
         ValueTaskSourceStatus IValueTaskSource.GetStatus(short token) => _core.GetStatus(token);
-        void IValueTaskSource<T>.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
-        void IValueTaskSource.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
+        void IValueTaskSource<T>.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
+        void IValueTaskSource.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
         public void Reset() => _core.Reset();
         public short Token => _core.Version;
         public void SetResult(T result) => _core.SetResult(result);
@@ -32,8 +32,8 @@ namespace BenchmarkDotNet.IntegrationTests
         // Always return pending state so OnCompleted will be called.
         ValueTaskSourceStatus IValueTaskSource<T>.GetStatus(short token) => ValueTaskSourceStatus.Pending;
         ValueTaskSourceStatus IValueTaskSource.GetStatus(short token) => ValueTaskSourceStatus.Pending;
-        void IValueTaskSource<T>.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
-        void IValueTaskSource.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
+        void IValueTaskSource<T>.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
+        void IValueTaskSource.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
         public void Reset() => _core.Reset();
         public short Token => _core.Version;
         public void SetResult(T result) => _core.SetResult(result);
@@ -49,13 +49,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = CanExecute<TaskDelayMethods>();
 
             foreach (var report in summary.Reports)
-            foreach (var measurement in report.AllMeasurements)
-            {
-                double actual = measurement.Nanoseconds;
-                const double minExpected = TaskDelayMethods.NanosecondsDelay - TaskDelayMethods.MaxTaskDelayResolutionInNanoseconds;
-                string name = report.BenchmarkCase.Descriptor.GetFilterName();
-                Assert.True(actual > minExpected, $"{name} has not been awaited, took {actual}ns, while it should take more than {minExpected}ns");
-            }
+                foreach (var measurement in report.AllMeasurements)
+                {
+                    double actual = measurement.Nanoseconds;
+                    const double minExpected = TaskDelayMethods.NanosecondsDelay - TaskDelayMethods.MaxTaskDelayResolutionInNanoseconds;
+                    string name = report.BenchmarkCase.Descriptor.GetFilterName();
+                    Assert.True(actual > minExpected, $"{name} has not been awaited, took {actual}ns, while it should take more than {minExpected}ns");
+                }
         }
 
         [Fact]

@@ -9,7 +9,6 @@
     <RootNamespace>BenchmarkDotNet</RootNamespace>
     <!-- needed for docfx xref resolver -->
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>

@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Tests.Analysers
         public void SimpleMessageTest(int actualOutliers, int allOutliers, string expectedMessage)
         {
             string actualMessage = OutliersAnalyser.GetMessage(
-                new double[actualOutliers], new double[allOutliers], Array.Empty<double>(), Array.Empty<double>(), TestCultureInfo.Instance);
+                new double[actualOutliers], new double[allOutliers], [], [], TestCultureInfo.Instance);
             Assert.Equal(expectedMessage, actualMessage);
         }
 

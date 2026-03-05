@@ -22,8 +22,8 @@ namespace BenchmarkDotNet.Tests.Columns
         {
             var summary = MockRunner.Run<BenchmarkClass>(output, name => name switch
             {
-                "Foo" => new double[] { 2, 2, 2 },
-                "Bar" => new double[] { 4, 4, 4 },
+                "Foo" => [2, 2, 2],
+                "Bar" => [4, 4, 4],
                 _ => throw new InvalidOperationException()
             });
 

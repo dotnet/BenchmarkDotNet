@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyName>BenchmarkDotNet.Analyzers.Tests</AssemblyName>
     <TargetFrameworks>net462;net8.0;net10.0</TargetFrameworks>
-    <Nullable>enable</Nullable>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>

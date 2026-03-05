@@ -12,15 +12,6 @@ namespace BenchmarkDotNet.Analyzers.General;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 {
-    internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule = new(
-        DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract,
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Title)),
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_MessageFormat)),
-        "Usage",
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeNonAbstract_Description)));
-
     internal static readonly DiagnosticDescriptor ClassWithGenericTypeArgumentsAttributeMustBeGenericRule = new(
         DiagnosticIds.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric,
         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_ClassWithGenericTypeArgumentsAttributeMustBeGeneric_Title)),
@@ -92,7 +83,6 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
-        ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule,
         ClassWithGenericTypeArgumentsAttributeMustBeGenericRule,
         GenericTypeArgumentsAttributeMustHaveMatchingTypeParameterCountRule,
         MethodMustBePublicRule,
@@ -149,11 +139,6 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         {
             foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
             {
-                if (classAbstractModifier.HasValue)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeNonAbstractRule, genericTypeArgumentsAttribute.GetLocation()));
-                }
-
                 if (classDeclarationSyntax.TypeParameterList == null || classDeclarationSyntax.TypeParameterList.Parameters.Count == 0)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, genericTypeArgumentsAttribute.GetLocation()));
@@ -208,11 +193,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                             continue;
                         }
 
-                        if (attributeSyntaxTypeSymbol.Equals(benchmarkAttributeTypeSymbol))
+                        if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkAttributeTypeSymbol))
                         {
                             benchmarkAttributeUsages.Add(attributeSyntax);
                         }
-                        else if (attributeSyntaxTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol))
+                        else if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
                         {
                             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
                             {
@@ -355,7 +340,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                     {
                         if (benchmarkCategories.Count > 0 && benchmarkAttributeUsages[0].ArgumentList != null)
                         {
-                            foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList.Arguments)
+                            foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList!.Arguments)
                             {
                                 if (attributeArgumentSyntax.NameEquals != null && attributeArgumentSyntax.NameEquals.Name.Identifier.ValueText == "Baseline")
                                 {
@@ -381,7 +366,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                         {
                             if (benchmarkAttributeUsages[0].ArgumentList != null)
                             {
-                                foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList.Arguments)
+                                foreach (var attributeArgumentSyntax in benchmarkAttributeUsages[0].ArgumentList!.Arguments)
                                 {
                                     if (attributeArgumentSyntax.NameEquals != null && attributeArgumentSyntax.NameEquals.Name.Identifier.ValueText == "Baseline")
                                     {
@@ -453,11 +438,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
                                 foreach (var attribute in methodAttributes)
                                 {
-                                    if (attribute.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
+                                    if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkAttributeTypeSymbol))
                                     {
                                         benchmarkAttributeUsages.Add(attribute);
                                     }
-                                    else if (attribute.AttributeClass.Equals(benchmarkCategoryAttributeTypeSymbol))
+                                    else if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkCategoryAttributeTypeSymbol))
                                     {
                                         foreach (var benchmarkCategoriesArray in attribute.ConstructorArguments)
                                         {
@@ -550,7 +535,7 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryAttributeTypeSymbol(context.Compilation);
 
         var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (attributeTypeSymbol != null && attributeTypeSymbol.Equals(benchmarkCategoryAttributeTypeSymbol))
+        if (SymbolEqualityComparer.Default.Equals(attributeTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
         {
             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
             {

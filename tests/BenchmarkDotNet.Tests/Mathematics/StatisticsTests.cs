@@ -51,7 +51,7 @@ public class StatisticsTests(ITestOutputHelper output)
         AssertEqual(1, summary.Max);
         AssertEqual(0, summary.InterquartileRange);
         AssertEqual(0, summary.StandardDeviation);
-        AssertEqual(Array.Empty<double>(), summary.AllOutliers);
+        AssertEqual([], summary.AllOutliers);
         AssertEqual(1, summary.Percentiles.P0);
         AssertEqual(1, summary.Percentiles.P25);
         AssertEqual(1, summary.Percentiles.P50);
@@ -75,7 +75,7 @@ public class StatisticsTests(ITestOutputHelper output)
         AssertEqual(2, summary.Max);
         AssertEqual(0.5, summary.InterquartileRange);
         AssertEqual(0.70711, summary.StandardDeviation, AbsoluteEqualityComparer.E4);
-        AssertEqual(Array.Empty<double>(), summary.AllOutliers);
+        AssertEqual([], summary.AllOutliers);
         AssertEqual(1, summary.Percentiles.P0);
         AssertEqual(1.25, summary.Percentiles.P25);
         AssertEqual(1.5, summary.Percentiles.P50);
@@ -99,7 +99,7 @@ public class StatisticsTests(ITestOutputHelper output)
         AssertEqual(4, summary.Max);
         AssertEqual(1.5, summary.InterquartileRange);
         AssertEqual(1.52753, summary.StandardDeviation, AbsoluteEqualityComparer.E4);
-        AssertEqual(Array.Empty<double>(), summary.AllOutliers);
+        AssertEqual([], summary.AllOutliers);
         AssertEqual(1, summary.Percentiles.P0);
         AssertEqual(1.5, summary.Percentiles.P25);
         AssertEqual(2, summary.Percentiles.P50);
@@ -123,7 +123,7 @@ public class StatisticsTests(ITestOutputHelper output)
         AssertEqual(64, summary.Max);
         AssertEqual(21, summary.InterquartileRange);
         AssertEqual(22.9378, summary.StandardDeviation, AbsoluteEqualityComparer.E4);
-        AssertEqual(new[] { 64.0 }, summary.AllOutliers);
+        AssertEqual([64.0], summary.AllOutliers);
         AssertEqual(1, summary.Percentiles.P0);
         AssertEqual(3, summary.Percentiles.P25);
         AssertEqual(8, summary.Percentiles.P50);
@@ -137,9 +137,9 @@ public class StatisticsTests(ITestOutputHelper output)
     {
         var summary = new Statistics(1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 10, 10.1);
         Print(summary);
-        AssertEqual(new[] { 10, 10.1 }, summary.AllOutliers);
-        AssertEqual(new[] { 10, 10.1 }, summary.UpperOutliers);
-        AssertEqual(Array.Empty<double>(), summary.LowerOutliers);
+        AssertEqual([10, 10.1], summary.AllOutliers);
+        AssertEqual([10, 10.1], summary.UpperOutliers);
+        AssertEqual([], summary.LowerOutliers);
     }
 
     [Fact]

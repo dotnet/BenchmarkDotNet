@@ -61,7 +61,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
     private void Analyze(SymbolAnalysisContext context)
     {
-        ITypeSymbol fieldOrPropertyType = context.Symbol switch
+        ITypeSymbol? fieldOrPropertyType = context.Symbol switch
         {
             IFieldSymbol fieldSymbol => fieldSymbol.Type,
             IPropertySymbol propertySymbol => propertySymbol.Type,
@@ -74,7 +74,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
         var paramsAttributeTypeSymbol = GetParamsAttributeTypeSymbol(context.Compilation);
         var attrs = context.Symbol.GetAttributes();
-        var paramsAttributes = attrs.Where(attr => attr.AttributeClass.Equals(paramsAttributeTypeSymbol)).ToImmutableArray();
+        var paramsAttributes = attrs.Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, paramsAttributeTypeSymbol)).ToImmutableArray();
         if (paramsAttributes.Length != 1)
         {
             // Don't analyze zero or multiple [Params] (multiple is not legal and already handled by GeneralParameterAttributesAnalyzer).
@@ -93,10 +93,10 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
         // [Params(null)]
         if (attr.ConstructorArguments[0].IsNull)
         {
-            var syntax = (AttributeSyntax) attr.ApplicationSyntaxReference.GetSyntax();
+            var syntax = (AttributeSyntax)attr.ApplicationSyntaxReference!.GetSyntax();
             AnalyzeAssignableValueType(
                 attr.ConstructorArguments[0],
-                syntax.ArgumentList.Arguments[0].Expression,
+                syntax.ArgumentList!.Arguments[0].Expression,
                 fieldOrPropertyType
             );
             return;
@@ -140,7 +140,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
                     expression.GetLocation(),
                     expression.ToString(),
                     parameterType.ToDisplayString(),
-                    value.IsNull ? "null" : value.Type.ToDisplayString())
+                    value.IsNull ? "null" : value.Type!.ToDisplayString())
                 );
             }
         }

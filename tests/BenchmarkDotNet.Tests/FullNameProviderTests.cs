@@ -198,7 +198,7 @@ namespace BenchmarkDotNet.Tests
     public class SimpleGeneric<T>
     {
         [Benchmark]
-        public T Method() => default(T);
+        public T Method() => default!;
     }
 
     public class WithCrazyUnicodeCharacters

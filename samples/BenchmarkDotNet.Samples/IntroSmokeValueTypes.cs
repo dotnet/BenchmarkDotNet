@@ -22,10 +22,10 @@ public class IntroSmokeValueTypes
     [Benchmark] public EmptyStruct ReturnEmptyStruct() => new EmptyStruct();
 
     [Benchmark] public ValueTuple<int> ReturnGenericStructOfValueType() => new ValueTuple<int>(0);
-    [Benchmark] public ValueTuple<object> ReturnGenericStructOfReferenceType() => new ValueTuple<object>(null);
+    [Benchmark] public ValueTuple<object?> ReturnGenericStructOfReferenceType() => new ValueTuple<object?>(null);
 
     [Benchmark] public ValueTask<int> ReturnValueTaskOfValueType() => new ValueTask<int>(0);
-    [Benchmark] public ValueTask<object> ReturnValueTaskOfReferenceType() => new ValueTask<object>(result: null);
+    [Benchmark] public ValueTask<object?> ReturnValueTaskOfReferenceType() => new ValueTask<object?>(result: null);
 
     [Benchmark] public byte ReturnByte() => 0;
     public struct Byte1 { public byte _1; }

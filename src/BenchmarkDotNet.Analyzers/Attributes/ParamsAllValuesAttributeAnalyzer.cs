@@ -60,7 +60,7 @@ public class ParamsAllValuesAttributeAnalyzer : DiagnosticAnalyzer
         var paramsAllValuesAttributeTypeSymbol = GetParamsAllValuesAttributeTypeSymbol(context.Compilation);
 
         var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (attributeSyntaxTypeSymbol == null || !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol))
+        if (!SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsAllValuesAttributeTypeSymbol))
         {
             return;
         }
@@ -111,7 +111,7 @@ public class ParamsAllValuesAttributeAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
-            if (fieldOrPropertyTypeSymbol.GetAttributes().Any(ad => ad.AttributeClass != null && ad.AttributeClass.Equals(flagsAttributeTypeSymbol)))
+            if (fieldOrPropertyTypeSymbol.GetAttributes().Any(ad => SymbolEqualityComparer.Default.Equals(ad.AttributeClass, flagsAttributeTypeSymbol)))
             {
                 context.ReportDiagnostic(Diagnostic.Create(NotAllowedOnFlagsEnumPropertyOrFieldTypeRule, fieldOrPropertyTypeSyntax.GetLocation(), fieldOrPropertyTypeSymbol.ToString()));
             }

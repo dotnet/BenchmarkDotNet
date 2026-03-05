@@ -49,8 +49,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         [PublicAPI]
         public NativeAotToolchainBuilder UseLocalBuild(DirectoryInfo ilcPackages)
         {
-            if (ilcPackages == null) throw new ArgumentNullException(nameof(ilcPackages));
-            if (!ilcPackages.Exists) throw new DirectoryNotFoundException($"{ilcPackages} provided as {nameof(ilcPackages)} does NOT exist");
+            if (!ilcPackages.Exists) 
+                throw new DirectoryNotFoundException($"{ilcPackages} provided as {nameof(ilcPackages)} does NOT exist");
 
             Feeds["local"] = ilcPackages.FullName;
             ilCompilerVersion = "11.0.0-dev";

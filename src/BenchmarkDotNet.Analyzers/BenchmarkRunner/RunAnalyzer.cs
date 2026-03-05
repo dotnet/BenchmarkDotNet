@@ -108,7 +108,7 @@ public class RunAnalyzer : DiagnosticAnalyzer
         var classMemberAccessTypeSymbol = context.SemanticModel.GetTypeInfo(identifierNameSyntax).Type;
         if (classMemberAccessTypeSymbol is null
             || classMemberAccessTypeSymbol.TypeKind == TypeKind.Error
-            || !classMemberAccessTypeSymbol.Equals(benchmarkRunnerTypeSymbol))
+            || !SymbolEqualityComparer.Default.Equals(classMemberAccessTypeSymbol, benchmarkRunnerTypeSymbol))
         {
             return;
         }
@@ -202,7 +202,7 @@ public class RunAnalyzer : DiagnosticAnalyzer
                         {
                             if (attributeData.AttributeClass != null)
                             {
-                                if (attributeData.AttributeClass.Equals(benchmarkAttributeTypeSymbol))
+                                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, benchmarkAttributeTypeSymbol))
                                 {
                                     return true;
                                 }

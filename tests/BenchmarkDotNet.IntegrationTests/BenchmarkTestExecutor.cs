@@ -19,10 +19,6 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         protected readonly ITestOutputHelper Output;
 
-        public BenchmarkTestExecutor()
-        {
-        }
-
         protected BenchmarkTestExecutor(ITestOutputHelper output)
         {
             Output = output;

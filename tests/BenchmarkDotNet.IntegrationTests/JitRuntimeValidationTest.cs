@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit };
             yield return new object[] { Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit };
-            yield return new object[] { Jit.RyuJit, RuntimeInformation.GetCurrentPlatform(), null };
+            yield return new object[] { Jit.RyuJit, RuntimeInformation.GetCurrentPlatform(), null! };
         }
 
         [Theory]

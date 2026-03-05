@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 logOutput: false);
 
             string sdkPath = Execute(cliCommand)
-                .StandardOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .StandardOutput.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => line.EndsWith("/sdk]")) // sth like "  3.1.423 [/usr/share/dotnet/sdk]
                 .Select(line => line.Split('[')[1])
                 .Distinct()

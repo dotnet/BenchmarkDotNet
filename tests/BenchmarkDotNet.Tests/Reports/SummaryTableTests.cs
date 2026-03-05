@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
-            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+            var style = config.SummaryStyle!.WithZeroMetricValuesInContent();
 
             // act
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Tests.Reports
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
             var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), double.NaN) };
-            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+            var style = config.SummaryStyle!.WithZeroMetricValuesInContent();
 
             // act
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
@@ -163,15 +163,15 @@ namespace BenchmarkDotNet.Tests.Reports
                 if (!firstMetricsUsed)
                 {
                     firstMetricsUsed = true;
-                    return new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+                    return [new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0)];
                 }
-                return System.Array.Empty<Metric>();
+                return [];
             });
             var table = new SummaryTable(summary);
             var actual = table.Columns.First(c => c.Header == "metric1").Content;
 
             // assert
-            Assert.Equal(new[] { "-", "NA" }, actual);
+            Assert.Equal(["-", "NA"], actual);
         }
 
         #region Issue #2673
@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var actual = table.Columns.First(c => c.Header == "Exceptions").Content;
 
             // assert
-            Assert.Equal(new[] { "5.0000", "5.0000" }, actual);
+            Assert.Equal(["5.0000", "5.0000"], actual);
         }
 
         [Fact]
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var actual = table.Columns.First(c => c.Header == "Exceptions").Content;
 
             // assert
-            Assert.Equal(new[] { "-", "-" }, actual);
+            Assert.Equal(["-", "-"], actual);
         }
 
         [Fact]
@@ -238,7 +238,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var actual = table.Columns.First(c => c.Header == "Exceptions").Content;
 
             // assert
-            Assert.Equal(new[] { "5.0000", "5.0000" }, actual);
+            Assert.Equal(["5.0000", "5.0000"], actual);
         }
 
         [Fact]
@@ -283,12 +283,12 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
             var table = new SummaryTable(summary);
 
-            var lockContentionCount = table.Columns.FirstOrDefault(c => c.Header == "Lock Contentions").Content;
-            var completedWorkItemCount = table.Columns.FirstOrDefault(c => c.Header == "Completed Work Items").Content;
+            var lockContentionCount = table.Columns.First(c => c.Header == "Lock Contentions").Content;
+            var completedWorkItemCount = table.Columns.First(c => c.Header == "Completed Work Items").Content;
 
             // assert
-            Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
-            Assert.Equal(new[] { "5.0000", "5.0000" }, completedWorkItemCount);
+            Assert.Equal(["5.0000", "5.0000"], lockContentionCount);
+            Assert.Equal(["5.0000", "5.0000"], completedWorkItemCount);
         }
 
         [Fact]
@@ -310,12 +310,12 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
             var table = new SummaryTable(summary);
 
-            var lockContentionCount = table.Columns.FirstOrDefault(c => c.Header == "Lock Contentions").Content;
-            var completedWorkItemCount = table.Columns.FirstOrDefault(c => c.Header == "Completed Work Items").Content;
+            var lockContentionCount = table.Columns.First(c => c.Header == "Lock Contentions").Content;
+            var completedWorkItemCount = table.Columns.First(c => c.Header == "Completed Work Items").Content;
 
             // assert
-            Assert.Equal(new[] { "-", "-" }, lockContentionCount);
-            Assert.Equal(new[] { "-", "-" }, completedWorkItemCount);
+            Assert.Equal(["-", "-"], lockContentionCount);
+            Assert.Equal(["-", "-"], completedWorkItemCount);
         }
 
         [Fact]
@@ -342,7 +342,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
             // assert
             Assert.Null(lockContentionCount);
-            Assert.Equal(new[] { "-", "-" }, completedWorkItemCount);
+            Assert.Equal(["-", "-"], completedWorkItemCount!);
         }
 
         [Fact]
@@ -368,8 +368,8 @@ namespace BenchmarkDotNet.Tests.Reports
             string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
 
             // assert
-            Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
-            Assert.Equal(new[] { "5.0000", "5.0000" }, completedWorkItemCount);
+            Assert.Equal(["5.0000", "5.0000"], lockContentionCount!);
+            Assert.Equal(["5.0000", "5.0000"], completedWorkItemCount!);
         }
 
         [Fact]
@@ -396,7 +396,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
             // assert
             Assert.Null(completedWorkItemCount);
-            Assert.Equal(new[] { "-", "-" }, lockContentionCount);
+            Assert.Equal(["-", "-"], lockContentionCount!);
         }
 
         [Fact]
@@ -422,8 +422,8 @@ namespace BenchmarkDotNet.Tests.Reports
             string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
 
             // assert
-            Assert.Equal(new[] { "5.0000", "5.0000" }, lockContentionCount);
-            Assert.Equal(new[] { "5.0000", "5.0000" }, completedWorkItemCount);
+            Assert.Equal(["5.0000", "5.0000"], lockContentionCount!);
+            Assert.Equal(["5.0000", "5.0000"], completedWorkItemCount!);
         }
 
         [Fact]
@@ -475,8 +475,8 @@ namespace BenchmarkDotNet.Tests.Reports
             string[]? completedWorkItemCount = table.Columns?.FirstOrDefault(c => c.Header == "Completed Work Items")?.Content ?? null;
 
             // assert
-            Assert.Equal(new[] { "-", "-" }, lockContentionCount);
-            Assert.Equal(new[] { "-", "-" }, completedWorkItemCount);
+            Assert.Equal(["-", "-"], lockContentionCount!);
+            Assert.Equal(["-", "-"], completedWorkItemCount!);
         }
         #endregion
     }

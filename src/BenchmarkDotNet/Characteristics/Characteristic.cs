@@ -56,12 +56,7 @@ namespace BenchmarkDotNet.Characteristics
             bool ignoreOnApply,
             bool dontShowInSummary = false)
         {
-            if (string.IsNullOrEmpty(id))
-                throw new ArgumentNullException(nameof(id));
-            if (characteristicType == null)
-                throw new ArgumentNullException(nameof(characteristicType));
-            if (declaringType == null)
-                throw new ArgumentNullException(nameof(declaringType));
+            ArgumentException.ThrowIfNullOrEmpty(id);
 
             Id = id;
             CharacteristicType = characteristicType;

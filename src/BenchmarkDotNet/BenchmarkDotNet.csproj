@@ -11,7 +11,6 @@
     <RootNamespace>BenchmarkDotNet</RootNamespace>
     <!-- needed for docfx xref resolver -->
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
@@ -24,14 +23,14 @@
     <PackageReference Include="deniszykov.WebSocketListener" Version="4.2.18" />
     <PackageReference Include="Gee.External.Capstone" Version="2.3.0" />
     <PackageReference Include="Iced" Version="1.21.0" />
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="3.1.512801" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="3.1.525101" />
     <PackageReference Include="Perfolizer" Version="[0.6.6]" />
-    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.28" PrivateAssets="contentfiles;analyzers" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.30" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-    <PackageReference Include="System.Management" Version="10.0.1" />
-    <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.1" />
-    <PackageReference Include="System.Text.Json" Version="10.0.1" />
+    <PackageReference Include="System.Management" Version="10.0.3" />
+    <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.3" />
+    <PackageReference Include="System.Text.Json" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />

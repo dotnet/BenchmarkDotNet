@@ -12,7 +12,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
     public class DotMemoryTests : BenchmarkTestExecutor
     {
@@ -30,8 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = new ManualConfig().AddJob(
             [
                 Job.Dry.WithId("ExternalProcess"),
-                // TODO: Add InProcessEmitToolchain job when flaky test issue is resolved https://github.com/dotnet/BenchmarkDotNet/issues/2950
-                //Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithId("InProcess"),
+                Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithId("InProcess"),
             ]
             );
             string snapshotDirectory = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "snapshots");
@@ -44,11 +43,11 @@ namespace BenchmarkDotNet.IntegrationTests
             Output.WriteLine("SnapshotDirectory:" + snapshotDirectory);
             var snapshots = Directory.EnumerateFiles(snapshotDirectory)
                 .Where(filePath => Path.GetExtension(filePath).Equals(".dmw", StringComparison.OrdinalIgnoreCase))
-                .Select(Path.GetFileName)
+                .Select(Path.GetFileName!)
                 .OrderBy(fileName => fileName)
                 .ToList();
             Output.WriteLine("Snapshots:");
-            foreach (string snapshot in snapshots)
+            foreach (var snapshot in snapshots)
                 Output.WriteLine("* " + snapshot);
 
             Assert.Equal(2, snapshots.Count);

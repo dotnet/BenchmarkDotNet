@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                             $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
 
                     var callInstance = setter.IsStatic ? null : instance;
-                    setter.Invoke(callInstance, new[] { parameter.Value });
+                    setter.Invoke(callInstance, [parameter.Value]);
                 }
             }
         }

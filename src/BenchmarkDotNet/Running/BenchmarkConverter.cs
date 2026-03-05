@@ -221,12 +221,12 @@ namespace BenchmarkDotNet.Running
             int priority = argumentsAttributes.Select(attribute => attribute.Priority).Sum();
 
             var parameterDefinitions = benchmark.GetParameters()
-                .Select(parameter => new ParameterDefinition(parameter.Name!, false, Array.Empty<object>(), true, parameter.ParameterType, priority))
+                .Select(parameter => new ParameterDefinition(parameter.Name!, false, [], true, parameter.ParameterType, priority))
                 .ToArray();
 
             if (parameterDefinitions.IsEmpty())
             {
-                yield return new ParameterInstances(Array.Empty<ParameterInstance>());
+                yield return new ParameterInstances([]);
                 yield break;
             }
 

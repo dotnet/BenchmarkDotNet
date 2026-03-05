@@ -1,13 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Environments
 {
     public class WasmRuntime : Runtime, IEquatable<WasmRuntime>
     {
+        public delegate string ArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args);
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         internal static readonly WasmRuntime Default = new WasmRuntime();
 
@@ -15,44 +19,96 @@ namespace BenchmarkDotNet.Environments
 
         public string JavaScriptEngineArguments { get; }
 
-        public bool Aot { get; }
+        public ArgumentFormatter JavaScriptEngineArgumentFormatter { get; }
 
-        public string WasmDataDir { get; }
+        public override bool IsAOT { get; }
 
         /// <summary>
-        /// When true (default), the generated project uses Microsoft.NET.Sdk.WebAssembly which sets UseMonoRuntime=true
-        /// and resolves the Mono runtime pack (Microsoft.NETCore.App.Runtime.Mono.browser-wasm). When false, the generated
-        /// project uses Microsoft.NET.Sdk which resolves the CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm).
+        /// Specifies the runtime flavor used for WASM benchmarks. <see cref="Environments.RuntimeFlavor.Mono"/> (default) resolves the
+        /// Mono runtime pack (Microsoft.NETCore.App.Runtime.Mono.browser-wasm); <see cref="Environments.RuntimeFlavor.CoreCLR"/> resolves
+        /// the CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm).
         /// </summary>
-        public bool IsMonoRuntime { get; }
+        public RuntimeFlavor RuntimeFlavor { get; }
+
+        /// <summary>
+        /// Maximum time in minutes to wait for a single benchmark process to finish before force killing it. Default is 10 minutes.
+        /// </summary>
+        public int ProcessTimeoutMinutes { get; }
+
+        public FileInfo? MainJsTemplate { get; set; }
 
         /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
-        /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
-        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. "--expose_wasm" by default</param>
-        /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
-        /// <param name="displayName">default: "Wasm"</param>
-        /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>
-        /// <param name="wasmDataDir">Specifies a wasm data directory surfaced as $(WasmDataDir) for the project</param>
+        /// <param name="msBuildMoniker">moniker</param>
         /// <param name="moniker">Runtime moniker</param>
-        /// <param name="isMonoRuntime">When true (default), use Mono runtime pack; when false, use CoreCLR runtime pack.</param>
-        public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, string wasmDataDir = "", RuntimeMoniker moniker = RuntimeMoniker.Wasm, bool isMonoRuntime = true) : base(moniker, msBuildMoniker, displayName)
+        /// <param name="displayName">display name</param>
+        /// <param name="aot">Specifies whether AOT or Interpreter project should be generated.</param>
+        /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks.</param>
+        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine.</param>
+        /// <param name="runtimeFlavor">Runtime flavor to use: Mono (default) or CoreCLR.</param>
+        /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
+        /// <param name="mainJsTemplate">Optional custom template for the generated main.mjs file. If not provided, a default template will be used.</param>
+        /// <param name="javaScriptEngineArgumentFormatter">Allows to format or customize the arguments passed to the javascript engine.</param>
+        public WasmRuntime(
+            string msBuildMoniker,
+            RuntimeMoniker moniker,
+            string displayName,
+            bool aot,
+            string javaScriptEngine,
+            string? javaScriptEngineArguments = "",
+            RuntimeFlavor runtimeFlavor = RuntimeFlavor.Mono,
+            int processTimeoutMinutes = 10,
+            FileInfo? mainJsTemplate = null,
+            ArgumentFormatter? javaScriptEngineArgumentFormatter = null) : base(moniker, msBuildMoniker, displayName)
         {
+            // Resolve path for windows because we can't use ProcessStartInfo.UseShellExecute while redirecting std out in the executor.
+            if (!ProcessHelper.TryResolveExecutableInPath(javaScriptEngine, out javaScriptEngine!))
+                throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" does NOT exist");
+
             JavaScriptEngine = javaScriptEngine;
-            JavaScriptEngineArguments = javaScriptEngineArguments;
-            Aot = aot;
-            WasmDataDir = wasmDataDir;
-            IsMonoRuntime = isMonoRuntime;
+            JavaScriptEngineArguments = javaScriptEngineArguments ?? "";
+            JavaScriptEngineArgumentFormatter = javaScriptEngineArgumentFormatter ?? DefaultArgumentFormatter;
+            RuntimeFlavor = runtimeFlavor;
+            IsAOT = aot;
+            ProcessTimeoutMinutes = processTimeoutMinutes;
+            MainJsTemplate = mainJsTemplate;
+        }
+
+        private WasmRuntime() : base(RuntimeMoniker.WasmNet80, "Wasm", "Wasm")
+        {
+            IsAOT = RuntimeInformation.IsAot;
+            JavaScriptEngine = "";
+            JavaScriptEngineArguments = "";
+            ProcessTimeoutMinutes = 10;
+            JavaScriptEngineArgumentFormatter = DefaultArgumentFormatter;
         }
 
         public override bool Equals(object? obj)
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime? other)
-            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.IsMonoRuntime == IsMonoRuntime;
+        {
+            return other != null
+                && base.Equals(other)
+                && other.JavaScriptEngine == JavaScriptEngine
+                && other.JavaScriptEngineArguments == JavaScriptEngineArguments
+                && other.JavaScriptEngineArgumentFormatter == JavaScriptEngineArgumentFormatter
+                && other.IsAOT == IsAOT
+                && other.ProcessTimeoutMinutes == ProcessTimeoutMinutes
+                && other.RuntimeFlavor == RuntimeFlavor;
+        }
 
         public override int GetHashCode()
-            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, Aot, IsMonoRuntime);
+            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, JavaScriptEngineArgumentFormatter, IsAOT, RuntimeFlavor, ProcessTimeoutMinutes);
+
+        private static string DefaultArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args)
+        {
+            return Path.GetFileNameWithoutExtension(runtime.JavaScriptEngine).ToLower() switch
+            {
+                "node" or "bun" => $"{runtime.JavaScriptEngineArguments} {artifactsPaths.ExecutablePath} -- --run {artifactsPaths.ProgramName}.dll {args}",
+                _ => $"{runtime.JavaScriptEngineArguments} --module {artifactsPaths.ExecutablePath} -- --run {artifactsPaths.ProgramName}.dll {args}",
+            };
+        }
     }
 }

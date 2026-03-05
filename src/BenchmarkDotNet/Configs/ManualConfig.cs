@@ -23,20 +23,20 @@ namespace BenchmarkDotNet.Configs
 {
     public class ManualConfig : IConfig
     {
-        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+        private readonly static Conclusion[] emptyConclusion = [];
 
-        private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
-        private readonly List<IExporter> exporters = new List<IExporter>();
-        private readonly List<ILogger> loggers = new List<ILogger>();
-        private readonly List<IDiagnoser> diagnosers = new List<IDiagnoser>();
-        private readonly List<IAnalyser> analysers = new List<IAnalyser>();
-        private readonly List<IValidator> validators = new List<IValidator>();
-        private readonly List<Job> jobs = new List<Job>();
-        private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
-        private readonly List<IFilter> filters = new List<IFilter>();
-        private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
-        private readonly List<EventProcessor> eventProcessors = new List<EventProcessor>();
-        private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
+        private readonly List<IColumnProvider> columnProviders = [];
+        private readonly List<IExporter> exporters = [];
+        private readonly List<ILogger> loggers = [];
+        private readonly List<IDiagnoser> diagnosers = [];
+        private readonly List<IAnalyser> analysers = [];
+        private readonly List<IValidator> validators = [];
+        private readonly List<Job> jobs = [];
+        private readonly HashSet<HardwareCounter> hardwareCounters = [];
+        private readonly List<IFilter> filters = [];
+        private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = [];
+        private readonly List<EventProcessor> eventProcessors = [];
+        private readonly List<IColumnHidingRule> columnHidingRules = [];
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;

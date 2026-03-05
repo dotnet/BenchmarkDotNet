@@ -138,9 +138,9 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         if (attributeSyntaxTypeSymbol == null
             || attributeSyntaxTypeSymbol.TypeKind == TypeKind.Error
             ||
-                   (!attributeSyntaxTypeSymbol.Equals(paramsAttributeTypeSymbol)
-                 && !attributeSyntaxTypeSymbol.Equals(paramsSourceAttributeTypeSymbol)
-                 && !attributeSyntaxTypeSymbol.Equals(paramsAllValuesAttributeTypeSymbol)))
+                   (!SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsAttributeTypeSymbol)
+                 && !SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsSourceAttributeTypeSymbol)
+                 && !SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsAllValuesAttributeTypeSymbol)))
         {
             return;
         }
@@ -153,10 +153,10 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
 
         ImmutableArray<AttributeSyntax> declaredAttributes;
         bool fieldOrPropertyIsPublic;
-        Location fieldConstModifierLocation = null;
-        Location fieldReadonlyModifierLocation = null;
+        Location? fieldConstModifierLocation = null;
+        Location? fieldReadonlyModifierLocation = null;
         string fieldOrPropertyIdentifier;
-        Location propertyInitAccessorKeywordLocation = null;
+        Location? propertyInitAccessorKeywordLocation = null;
         Location fieldOrPropertyIdentifierLocation;
         bool propertyIsMissingAssignableSetter = false;
         DiagnosticDescriptor fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule;
@@ -186,11 +186,11 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
 
 #if CODE_ANALYSIS_3_8
             var propertyInitAccessorIndex = propertyDeclarationSyntax.AccessorList?.Accessors.IndexOf(SyntaxKind.InitAccessorDeclaration);
-            propertyInitAccessorKeywordLocation = propertyInitAccessorIndex >= 0 ? propertyDeclarationSyntax.AccessorList.Accessors[propertyInitAccessorIndex.Value].Keyword.GetLocation() : null;
+            propertyInitAccessorKeywordLocation = propertyInitAccessorIndex >= 0 ? propertyDeclarationSyntax.AccessorList!.Accessors[propertyInitAccessorIndex.Value].Keyword.GetLocation() : null;
 #endif
 
             var propertySetAccessorIndex = propertyDeclarationSyntax.AccessorList?.Accessors.IndexOf(SyntaxKind.SetAccessorDeclaration);
-            propertyIsMissingAssignableSetter = !propertySetAccessorIndex.HasValue || propertySetAccessorIndex.Value < 0 || propertyDeclarationSyntax.AccessorList.Accessors[propertySetAccessorIndex.Value].Modifiers.Any();
+            propertyIsMissingAssignableSetter = !propertySetAccessorIndex.HasValue || propertySetAccessorIndex.Value < 0 || propertyDeclarationSyntax.AccessorList!.Accessors[propertySetAccessorIndex.Value].Modifiers.Any();
 
             fieldOrPropertyIdentifierLocation = propertyDeclarationSyntax.Identifier.GetLocation();
             fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule = MutuallyExclusiveOnPropertyRule;
@@ -203,9 +203,9 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
 
         AnalyzeFieldOrPropertySymbol(
             context,
-            paramsAttributeTypeSymbol,
-            paramsSourceAttributeTypeSymbol,
-            paramsAllValuesAttributeTypeSymbol,
+            paramsAttributeTypeSymbol!,
+            paramsSourceAttributeTypeSymbol!,
+            paramsAllValuesAttributeTypeSymbol!,
             declaredAttributes,
             fieldOrPropertyIsPublic,
             fieldConstModifierLocation,
@@ -222,9 +222,9 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeFieldOrPropertySymbol(
         SyntaxNodeAnalysisContext context,
-        INamedTypeSymbol? paramsAttributeTypeSymbol,
-        INamedTypeSymbol? paramsSourceAttributeTypeSymbol,
-        INamedTypeSymbol? paramsAllValuesAttributeTypeSymbol,
+        INamedTypeSymbol paramsAttributeTypeSymbol,
+        INamedTypeSymbol paramsSourceAttributeTypeSymbol,
+        INamedTypeSymbol paramsAllValuesAttributeTypeSymbol,
         ImmutableArray<AttributeSyntax> declaredAttributes,
         bool fieldOrPropertyIsPublic,
         Location? fieldConstModifierLocation,
@@ -238,14 +238,14 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         AttributeSyntax attributeSyntax,
         SyntaxNode attributeTarget)
     {
-        ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols = new INamedTypeSymbol[]
-        {
+        ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols =
+        [
             paramsAttributeTypeSymbol,
             paramsSourceAttributeTypeSymbol,
             paramsAllValuesAttributeTypeSymbol
-        }.ToImmutableArray();
+        ];
 
-        var parameterAttributeTypeSymbols = new HashSet<INamedTypeSymbol>();
+        var parameterAttributeTypeSymbols = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var declaredAttributeSyntax in declaredAttributes)
         {
@@ -254,7 +254,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var applicableParameterAttributeTypeSymbol in applicableParameterAttributeTypeSymbols)
                 {
-                    if (declaredAttributeTypeSymbol.Equals(applicableParameterAttributeTypeSymbol))
+                    if (SymbolEqualityComparer.Default.Equals(declaredAttributeTypeSymbol, applicableParameterAttributeTypeSymbol))
                     {
                         if (!parameterAttributeTypeSymbols.Add(applicableParameterAttributeTypeSymbol))
                         {
@@ -406,7 +406,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var referencedMember = targetType.GetMembers(sourceName).FirstOrDefault();
+        var referencedMember = targetType.GetMembers(sourceName!).FirstOrDefault();
         if (referencedMember is IPropertySymbol propertySymbol
             && propertySymbol.SetMethod != null
             && propertySymbol.GetMethod == null)

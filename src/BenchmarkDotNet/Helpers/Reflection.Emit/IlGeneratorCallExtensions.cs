@@ -48,8 +48,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             */
             if (methodToCall.DeclaringType.IsValueType)
             {
-                if (optionalLocalThis == null)
-                    throw new ArgumentNullException(nameof(optionalLocalThis));
+                ArgumentNullException.ThrowIfNull(optionalLocalThis);
 
                 ilBuilder.EmitStloc(optionalLocalThis);
                 EmitCallCore(ilBuilder, optionalLocalThis, methodToCall, argLocals, forceDirectCall);
@@ -88,8 +87,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             }
             else if (methodToCall.DeclaringType.IsValueType)
             {
-                if (optionalLocalThis == null)
-                    throw new ArgumentNullException(nameof(optionalLocalThis));
+                ArgumentNullException.ThrowIfNull(optionalLocalThis);
 
                 ilBuilder.EmitLdloca(optionalLocalThis);
                 ilBuilder.EmitLdLocals(argLocals);

@@ -1,17 +1,18 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
-using Xunit;
-using BenchmarkDotNet.Extensions;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Xml;
+using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -61,7 +62,7 @@ namespace BenchmarkDotNet.Tests
         [AssertionMethod]
         private void AssertParsedSdkName(string csProjContent, string targetFrameworkMoniker, string expectedSdkValue, bool isNetCore)
         {
-            var sut = new CsProjGenerator(targetFrameworkMoniker, null, null, null, isNetCore);
+            var sut = new CsProjGenerator(targetFrameworkMoniker, "", "", "", isNetCore);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(csProjContent);
@@ -87,7 +88,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", "", "", "", true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(withUseWpfTrue);
@@ -109,7 +110,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var propsFilePath = Path.Combine(TestAssemblyFileInfo.DirectoryName, "test.props");
+            var propsFilePath = Path.Combine(TestAssemblyFileInfo.DirectoryName!, "test.props");
             File.WriteAllText(propsFilePath, imported);
 
             string importingAbsolutePath = $@"
@@ -117,7 +118,7 @@ namespace BenchmarkDotNet.Tests
   <Import Project=""{propsFilePath}"" />
 </Project>";
 
-            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", "", "", "", true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(importingAbsolutePath);
@@ -141,7 +142,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var propsFilePath = Path.Combine(TestAssemblyFileInfo.DirectoryName, "test.props");
+            var propsFilePath = Path.Combine(TestAssemblyFileInfo.DirectoryName!, "test.props");
             File.WriteAllText(propsFilePath, imported);
 
             string importingRelativePath = $@"
@@ -149,7 +150,7 @@ namespace BenchmarkDotNet.Tests
   <Import Project="".{Path.DirectorySeparatorChar}test.props"" />
 </Project>";
 
-            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", "", "", "", true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(importingRelativePath);
@@ -171,7 +172,7 @@ namespace BenchmarkDotNet.Tests
 {runtimeHostConfigurationOptionChunk}
 </Project>";
 
-            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", "", "", "", true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(source);
@@ -191,7 +192,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var sut = new CsProjGenerator("netcoreapp3.1", null, null, null, true);
+            var sut = new CsProjGenerator("netcoreapp3.1", "", "", "", true);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(withWarningsAsErrors);
@@ -215,10 +216,10 @@ namespace BenchmarkDotNet.Tests
             var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).First();
 
             var target = new Descriptor(assemblyType, MockFactory.MockMethodInfo);
-            var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, config);
+            var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999, new([])) };
-            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", null, null, null, true);
+            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", "", "", "", true);
             string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
             string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
@@ -230,13 +231,13 @@ namespace BenchmarkDotNet.Tests
         {
             const string programName = "testProgram";
             var target = new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo);
-            var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
+            var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([])) };
-            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", null, null, null, true);
+            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", "", "", "", true);
             var buildPartition = new BuildPartition(benchmarks, new Resolver());
             string binariesPath = projectGenerator.ResolvePathForBinaries(buildPartition, programName);
 
-            string expectedPath = Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation), programName);
+            string expectedPath = Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation)!, programName);
             Assert.Equal(expectedPath, binariesPath);
         }
 
