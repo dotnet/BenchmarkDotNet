@@ -1,4 +1,3 @@
-
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class ReferencesTests : BenchmarkTestExecutor
