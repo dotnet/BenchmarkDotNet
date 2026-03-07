@@ -9,14 +9,14 @@ namespace BenchmarkDotNet.IntegrationTests;
 
 public class RunAsyncTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public static TheoryData<IToolchain> GetToolchains() =>
+    public static TheoryData<IToolchain> GetToolchains() => new(
     [
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
-    ];
+    ]);
 
     [Theory]
     [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
