@@ -5,6 +5,7 @@ using BenchmarkDotNet.Diagnostics.dotMemory;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
