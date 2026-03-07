@@ -20,7 +20,7 @@
     },
     "--list": {
       "commandName": "Project",
-      "commandLineArgs": "--list"
+      "commandLineArgs": "--list Flat"
     },
     "--info": {
       "commandName": "Project",
