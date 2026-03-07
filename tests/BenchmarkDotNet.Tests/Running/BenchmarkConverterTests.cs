@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Tests.Running
             var info = BenchmarkConverter.TypeToBenchmarks(
                     typeof(WithMutator),
                     DefaultConfig.Instance
-                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net462))
+                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net472))
                         .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80)));
 
             Assert.Equal(2, info.BenchmarksCases.Length);
