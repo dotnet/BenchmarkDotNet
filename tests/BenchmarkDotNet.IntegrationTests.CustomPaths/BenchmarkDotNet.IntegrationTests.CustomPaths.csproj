@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.CustomPaths</AssemblyTitle>
     <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.CustomPaths</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.CustomPaths</PackageId>
