@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -15,6 +17,7 @@ namespace BenchmarkDotNet.Loggers
 
         private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromSeconds(1);
         private readonly AutoResetEvent outputFinishEvent, errorFinishEvent;
+        private readonly Channel<string> outputChannel;
         private readonly ConcurrentQueue<string> output, error;
 
         private long status;
@@ -33,6 +36,7 @@ namespace BenchmarkDotNet.Loggers
             error = new ConcurrentQueue<string>();
             outputFinishEvent = new AutoResetEvent(false);
             errorFinishEvent = new AutoResetEvent(false);
+            outputChannel = Channel.CreateUnbounded<string>();
             status = (long)Status.Created;
             this.logOutput = logOutput;
             this.logger = logger ?? NullLogger.Instance;
@@ -87,6 +91,18 @@ namespace BenchmarkDotNet.Loggers
             Detach();
         }
 
+        internal async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await outputChannel.Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (ChannelClosedException)
+            {
+                return null;
+            }
+        }
+
         internal ImmutableArray<string> GetOutputLines() => ReturnIfStopped(() => output.ToImmutableArray());
 
         internal ImmutableArray<string> GetErrorLines() => ReturnIfStopped(() => error.ToImmutableArray());
@@ -120,6 +136,7 @@ namespace BenchmarkDotNet.Loggers
                 if (!string.IsNullOrEmpty(e.Data))
                 {
                     output.Enqueue(e.Data);
+                    outputChannel.Writer.TryWrite(e.Data);
 
                     if (logOutput)
                     {
@@ -128,7 +145,10 @@ namespace BenchmarkDotNet.Loggers
                 }
             }
             else // 'e.Data == null' means EOF
+            {
+                outputChannel.Writer.Complete();
                 outputFinishEvent.Set();
+            }
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)

@@ -34,6 +34,9 @@ namespace BenchmarkDotNet.Running
         public string ToArguments(int port, Diagnosers.RunMode diagnoserRunMode)
             => $"{IpcHelper.PortDescriptor} {port} --benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --diagnoserRunMode {(int) diagnoserRunMode} --benchmarkId {Value}";
 
+        public string ToArguments(string ipcDirectory, Diagnosers.RunMode diagnoserRunMode)
+            => $"{IpcHelper.DirDescriptor} {ipcDirectory.EscapeCommandLine()} --benchmarkName {FullBenchmarkName.EscapeCommandLine()} --job {JobId.EscapeCommandLine()} --diagnoserRunMode {(int) diagnoserRunMode} --benchmarkId {Value}";
+
         public override string ToString() => Value.ToString();
 
         private static string GetBenchmarkName(BenchmarkCase benchmark)

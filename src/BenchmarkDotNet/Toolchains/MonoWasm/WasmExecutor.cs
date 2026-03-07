@@ -19,6 +19,18 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     internal class WasmExecutor : IExecutor
     {
+        private sealed class ProcessListener(IpcListener listener, Process process) : IDisposable
+        {
+            public IpcListener Listener { get; } = listener;
+            public Process Process { get; } = process;
+
+            public void Dispose()
+            {
+                Process.Dispose();
+                Listener.Dispose();
+            }
+        }
+
         public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
@@ -33,22 +45,83 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 executeParameters.DiagnoserRunMode);
         }
 
+        private static async ValueTask<bool> ProbeWebSocketSupportAsync(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, IResolver resolver)
+        {
+            // Check if the JavaScript runtime supports WebSocket
+            using var probeProcess = CreateProcess(benchmarkCase, artifactsPaths, "--getSupportsWebSocket", resolver);
+            probeProcess.Start();
+
+            string output = await probeProcess.StandardOutput.ReadToEndAsync();
+            probeProcess.WaitForExit();
+
+            // Parse output for "supportsWebSocket: true" or "supportsWebSocket: false"
+            foreach (string line in output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (line.StartsWith("supportsWebSocket:", StringComparison.Ordinal))
+                {
+                    string value = line["supportsWebSocket:".Length..].Trim();
+                    return bool.TryParse(value, out bool result) && result;
+                }
+            }
+
+            // Default to file-based IPC if probe fails
+            return false;
+        }
+
+        private static async ValueTask<ProcessListener> CreateProcessListenerAsync(
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ArtifactsPaths artifactsPaths,
+            IResolver resolver, Diagnosers.RunMode diagnoserRunMode)
+        {
+            WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
+
+            bool useWebSocket = runtime.IpcType == WasmIpcType.Auto
+                // Probe the JavaScript runtime to check if it supports WebSocket
+                ? await ProbeWebSocketSupportAsync(benchmarkCase, artifactsPaths, resolver)
+                : runtime.IpcType == WasmIpcType.WebSocket;
+
+            IpcListener listener;
+            string args;
+
+            if (useWebSocket)
+            {
+                var webSocketListener = new WebSocketListener();
+                var port = await webSocketListener.StartAndGetPortAsync();
+                listener = webSocketListener;
+                args = benchmarkId.ToArguments(port, diagnoserRunMode);
+            }
+            else
+            {
+                // File-based IPC for shell engines (v8/d8, SpiderMonkey, etc.)
+                var fileStdOutListener = new FileStdOutListener(artifactsPaths.BuildArtifactsDirectoryPath);
+                listener = fileStdOutListener;
+                args = benchmarkId.ToArguments(fileStdOutListener.GetIpcDirectory(), diagnoserRunMode);
+            }
+
+            Process process = CreateProcess(benchmarkCase, artifactsPaths, args, resolver);
+
+            return new ProcessListener(listener, process);
+        }
+
         private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Loggers.ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode)
         {
-            using var webSocketListener = new WebSocketListener();
-            var port = await webSocketListener.StartAndGetPortAsync();
+            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode);
             try
             {
-                using Process process = CreateProcess(benchmarkCase, artifactsPaths, benchmarkId.ToArguments(port, diagnoserRunMode), resolver);
-                using ConsoleExitHandler consoleExitHandler = new(process, logger);
-                using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+                using ConsoleExitHandler consoleExitHandler = new(processListener.Process, logger);
+                bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
+                using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: false);
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
-                return await Execute(process, benchmarkCase, processOutputReader,
+                if (isFileBasedIpc)
+                {
+                    ((FileStdOutListener) processListener.Listener).AttachProcessOutputReader(processOutputReader);
+                }
+
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId));
+                return await Execute(processListener.Process, benchmarkCase, processOutputReader,
                     benchmarkId, logger, consoleExitHandler, launchIndex, diagnoser,
-                    compositeInProcessDiagnoser, webSocketListener);
+                    compositeInProcessDiagnoser, processListener.Listener);
             }
             finally
             {
@@ -79,11 +152,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
             BenchmarkId benchmarkId, Loggers.ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, IDiagnoser? diagnoser,
-            CompositeInProcessDiagnoser compositeInProcessDiagnoser, WebSocketListener webSocketListener)
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener)
         {
             List<string> results;
             List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, webSocketListener))
+            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, ipcListener))
             {
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
