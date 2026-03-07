@@ -1,5 +1,6 @@
 #if NETFRAMEWORK
 using BenchmarkDotNet.IntegrationTests.CustomPaths;
+using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

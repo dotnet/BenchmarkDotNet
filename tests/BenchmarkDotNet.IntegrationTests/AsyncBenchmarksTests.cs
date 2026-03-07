@@ -1,8 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using System.Threading.Tasks.Sources;
 
 namespace BenchmarkDotNet.IntegrationTests

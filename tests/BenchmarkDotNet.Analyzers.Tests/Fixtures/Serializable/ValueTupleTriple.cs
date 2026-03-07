@@ -1,5 +1,3 @@
-using Xunit.Abstractions;
-
 namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
 
 public class ValueTupleTriple<T1, T2, T3> : IXunitSerializable
