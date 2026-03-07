@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</AssemblyTitle>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.DisabledOptimizations</PackageId>
