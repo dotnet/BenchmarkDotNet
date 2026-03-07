@@ -1,3 +1,5 @@
+using Xunit.Sdk;
+
 namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
 
 public class ValueTupleDouble<T1, T2> : IXunitSerializable
