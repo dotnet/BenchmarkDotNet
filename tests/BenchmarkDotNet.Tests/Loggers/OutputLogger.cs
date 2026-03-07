@@ -1,6 +1,6 @@
-﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Loggers;
 using System.Runtime.CompilerServices;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace BenchmarkDotNet.Tests.Loggers
 {

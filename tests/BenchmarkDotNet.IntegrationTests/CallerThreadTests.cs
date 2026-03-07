@@ -14,7 +14,6 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;
 

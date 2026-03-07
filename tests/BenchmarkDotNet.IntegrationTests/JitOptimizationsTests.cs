@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

@@ -8,7 +8,6 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Reports
 {

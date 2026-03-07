@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Detectors.Cpu.macOS;
 using Perfolizer.Models;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 

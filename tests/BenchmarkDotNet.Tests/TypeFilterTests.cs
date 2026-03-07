@@ -5,7 +5,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests;
 using BenchmarkDotNet.Tests.Loggers;
 using JetBrains.Annotations;
-using Xunit.Abstractions;
 using TypeFilter = BenchmarkDotNet.Running.TypeFilter;
 
 namespace BenchmarkDotNet.Tests
