@@ -6,6 +6,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
+using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
