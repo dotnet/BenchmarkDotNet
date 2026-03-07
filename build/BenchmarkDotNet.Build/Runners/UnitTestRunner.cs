@@ -44,7 +44,16 @@ public class UnitTestRunner(BuildContext context)
             EnvironmentVariables =
             {
                 ["Platform"] = "" // force the tool to not look for the .dll in platform-specific directory
-            }
+            },
+            PathType = DotNetTestPathType.Auto,
+            ArgumentCustomization = args
+                => args.Append("--report-xunit-trx")
+                    .AppendSwitchQuoted("--report-xunit-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
+                    .Append("--no-ansi")
+                    .AppendSwitch("--output", "Detailed")
+                    .AppendSwitch("--show-stdout", "Failed")
+                    .Append("--diagnostic")
+                    .AppendSwitch("--diagnostic-verbosity", "Trace")
         };
         return settings;
     }

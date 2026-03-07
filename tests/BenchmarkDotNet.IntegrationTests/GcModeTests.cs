@@ -1,7 +1,8 @@
-using System.Runtime;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using System.Runtime;
+
 #if NETFRAMEWORK
 using BenchmarkDotNet.Environments;
 #endif
