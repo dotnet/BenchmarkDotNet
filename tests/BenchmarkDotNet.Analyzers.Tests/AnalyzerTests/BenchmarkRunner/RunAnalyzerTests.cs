@@ -548,7 +548,7 @@ public class RunAnalyzerTests
         }
 
         public static IEnumerable<string> NonPublicClassAccessModifiersExceptFile
-            => new NonPublicClassAccessModifiersTheoryData().Where<string>(m => m != "file ");
+            => new NonPublicClassAccessModifiersTheoryData().Where(m => m.Data != "file ").Select(x => x.Data);
     }
 
     public class TypeArgumentClassMustBeUnsealed : AnalyzerTestFixture<RunAnalyzer>
