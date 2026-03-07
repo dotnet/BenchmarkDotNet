@@ -1,3 +1,4 @@
+using Xunit;
 using Xunit.Sdk;
 
 namespace BenchmarkDotNet.Tests.XUnit;
