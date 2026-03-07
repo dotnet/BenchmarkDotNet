@@ -5,7 +5,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Diagnostics;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

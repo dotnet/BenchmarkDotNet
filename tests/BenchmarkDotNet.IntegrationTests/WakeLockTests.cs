@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
@@ -6,7 +6,6 @@ using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Diagnostics;
 using System.Runtime.Versioning;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;
 

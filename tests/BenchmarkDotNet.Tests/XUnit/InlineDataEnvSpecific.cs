@@ -1,5 +1,6 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace BenchmarkDotNet.Tests.XUnit;
 

@@ -3,7 +3,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

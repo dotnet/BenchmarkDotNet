@@ -12,7 +12,6 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using System.Collections.Immutable;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Reports
 {

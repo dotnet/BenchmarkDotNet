@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -12,7 +12,6 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
