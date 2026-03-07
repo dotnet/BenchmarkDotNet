@@ -17,7 +17,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class InProcessTest : BenchmarkTestExecutor
