@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.XUnit;
@@ -14,5 +15,10 @@ public class FactEnvSpecificAttribute : FactAttribute
         string? skip = EnvRequirementChecker.GetSkip(requirements);
         if (skip != null)
             Skip = $"{skip} ({reason})";
+    }
+
+    public FactEnvSpecificAttribute([CallerFilePath] string? sourceFilePath = null, [CallerLineNumber] int sourceLineNumber = -1)
+        : base(sourceFilePath, sourceLineNumber)
+    {
     }
 }

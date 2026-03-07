@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.XUnit;
@@ -14,5 +15,10 @@ public class TheoryEnvSpecificAttribute : TheoryAttribute
         string? skip = EnvRequirementChecker.GetSkip(requirements);
         if (skip != null)
             Skip = $"{skip} ({reason})";
+    }
+
+    public TheoryEnvSpecificAttribute([CallerFilePath] string? sourceFilePath = null, [CallerLineNumber] int sourceLineNumber = -1)
+        : base(sourceFilePath, sourceLineNumber)
+    {
     }
 }
