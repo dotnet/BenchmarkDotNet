@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.AnalyzerTests.Attributes;
+
 public class GeneralParameterAttributesAnalyzerTests
 {
     public class MutuallyExclusiveOnField : AnalyzerTestFixture<GeneralParameterAttributesAnalyzer>
@@ -158,7 +159,7 @@ public class GeneralParameterAttributesAnalyzerTests
         }
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static TheoryData<string, int, int[]> DuplicateSameParameterAttributeUsages
             => DuplicateSameAttributeUsagesTheoryData;
@@ -320,7 +321,7 @@ public class GeneralParameterAttributesAnalyzerTests
             await RunAsync();
         }
 
-        public static TheoryData<string> UniqueParameterAttributeUsages => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+        public static TheoryData<string> UniqueParameterAttributeUsages => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static TheoryData<string, int, int[]> DuplicateSameParameterAttributeUsages => DuplicateSameAttributeUsagesTheoryData;
 
@@ -479,21 +480,19 @@ public class GeneralParameterAttributesAnalyzerTests
             => CombinationsGenerator.CombineArguments(DuplicateParameterAttributeUsageCounts, NonPublicClassMemberAccessModifiers);
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes
-            => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
+            => UniqueParameterAttributesTheoryData.Select(tdr => (tdr.Data.Item1, tdr.Data.Item2));
 
         public static IEnumerable<string> NonPublicClassMemberAccessModifiers
-#pragma warning disable IDE0028 // Simplify collection initialization
-            => new NonPublicClassMemberAccessModifiersTheoryData();
-#pragma warning restore IDE0028 // Simplify collection initialization
+            => new NonPublicClassMemberAccessModifiersTheoryData().Select(x => x.Data);
 
         public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages
-            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int) tdr[1], (tdr[2] as int[])!));
+            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => (tdr.Data.Item1, tdr.Data.Item2, tdr.Data.Item3));
 
         public static IEnumerable<int[]> DuplicateParameterAttributeUsageCounts
-            => DuplicateAttributeUsageCountsTheoryData;
+            => DuplicateAttributeUsageCountsTheoryData.Select(x => x.Data);
     }
 
     public class PropertyMustBePublic : AnalyzerTestFixture<GeneralParameterAttributesAnalyzer>
@@ -648,18 +647,16 @@ public class GeneralParameterAttributesAnalyzerTests
             => CombinationsGenerator.CombineArguments(DuplicateParameterAttributeUsageCounts, NonPublicClassMemberAccessModifiers);
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes
-            => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
+            => UniqueParameterAttributesTheoryData.Select(tdr => (tdr.Data.Item1, tdr.Data.Item2));
 
         public static IEnumerable<string> NonPublicClassMemberAccessModifiers
-#pragma warning disable IDE0028 // Simplify collection initialization
-            => new NonPublicClassMemberAccessModifiersTheoryData();
-#pragma warning restore IDE0028 // Simplify collection initialization
+            => new NonPublicClassMemberAccessModifiersTheoryData().Select(x => x.Data);
 
         public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages
-            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int) tdr[1], (tdr[2] as int[])!));
+            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => (tdr.Data.Item1, tdr.Data.Item2, tdr.Data.Item3));
 
         public static TheoryData<int[]> DuplicateParameterAttributeUsageCounts
             => DuplicateAttributeUsageCountsTheoryData;
@@ -813,7 +810,7 @@ public class GeneralParameterAttributesAnalyzerTests
         }
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static TheoryData<string, string> UniqueParameterAttributes
             => UniqueParameterAttributesTheoryData;
@@ -951,7 +948,7 @@ public class GeneralParameterAttributesAnalyzerTests
         }
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static TheoryData<string, string> UniqueParameterAttributes
             => UniqueParameterAttributesTheoryData;
@@ -1113,7 +1110,7 @@ public class GeneralParameterAttributesAnalyzerTests
         }
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static TheoryData<string, string> UniqueParameterAttributes
             => UniqueParameterAttributesTheoryData;
@@ -1278,20 +1275,20 @@ public class GeneralParameterAttributesAnalyzerTests
             => CombinationsGenerator.CombineArguments(DuplicateParameterAttributeUsageCounts, NonPublicPropertySetters());
 
         public static TheoryData<string> UniqueParameterAttributeUsages
-            => [.. UniqueParameterAttributesTheoryData.Select(tdr => (tdr[1] as string)!)];
+            => [.. UniqueParameterAttributesTheoryData.Select(tdr => tdr.Data.Item2)];
 
         public static IEnumerable<(string AttributeName, string AttributeUsage)> UniqueParameterAttributes
-            => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
+            => UniqueParameterAttributesTheoryData.Select(tdr => (tdr.Data.Item1, tdr.Data.Item2));
 
         public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages
-            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int) tdr[1], (tdr[2] as int[])!));
+            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => (tdr.Data.Item1, tdr.Data.Item2, tdr.Data.Item3));
 
         public static TheoryData<int[]> DuplicateParameterAttributeUsageCounts
             => DuplicateAttributeUsageCountsTheoryData;
 
         public static IEnumerable<string> NonPublicPropertySetters()
             => new NonPublicPropertySetterAccessModifiersTheoryData()
-            .Select<string, string>(m => $"{{ get; {m} set; }}")
+            .Select(m => $"{{ get; {m.Data} set; }}")
             .Concat(["{ get; }", "=> 0;"]);
 
         public static TheoryData<string> NonPublicPropertySettersTheoryData()
@@ -1441,7 +1438,7 @@ public class GeneralParameterAttributesAnalyzerTests
             await RunAsync();
         }
     }
-    
+
     public static TheoryData<string, string> UniqueParameterAttributesTheoryData
         => new()
         {
@@ -1486,7 +1483,7 @@ public class GeneralParameterAttributesAnalyzerTests
     private static ReadOnlyCollection<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> GenerateDuplicateSameAttributeUsageCombinations(TheoryData<string, string> uniqueAttributeUsages)
     {
         var uniqueAttributeUsagesList = uniqueAttributeUsages
-            .Select(tdr => (tdr[1] as string)!)
+            .Select(tdr => tdr.Data.Item2)
             .ToList()
             .AsReadOnly();
 
