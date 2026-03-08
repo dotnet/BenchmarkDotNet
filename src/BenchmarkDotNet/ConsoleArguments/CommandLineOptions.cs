@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("AOTCompilerPath", Required = false, HelpText = "Path to Mono AOT compiler, used for MonoAotLLVM.")]
         public FileInfo? AOTCompilerPath { get; set; }
 
-        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
+        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini', 'llvm', or 'wasm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
         [Option("wasmRuntimeFlavor", Required = false, Default = Environments.RuntimeFlavor.Mono, HelpText = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.")]
