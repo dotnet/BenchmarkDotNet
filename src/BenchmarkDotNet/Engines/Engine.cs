@@ -67,14 +67,14 @@ namespace BenchmarkDotNet.Engines
             Host.CancellationToken.ThrowIfCancellationRequested();
 
             await Parameters.GlobalSetupAction.Invoke();
-            bool didThrow = false;
+            bool didThrowNonCancelation = false;
             try
             {
                 return await RunCore();
             }
-            catch
+            catch (Exception e)
             {
-                didThrow = true;
+                didThrowNonCancelation = e is not OperationCanceledException;
                 throw;
             }
             finally
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Engines
                     await Parameters.GlobalCleanupAction.Invoke();
                 }
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
-                catch (Exception e) when (didThrow)
+                catch (Exception e) when (didThrowNonCancelation && e is not OperationCanceledException)
                 {
                     Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                 }
@@ -123,6 +123,7 @@ namespace BenchmarkDotNet.Engines
                     bool randomizeMemory = iterationData.mode == IterationMode.Workload && MemoryRandomization;
 
                     await iterationData.setupAction();
+                    bool didThrowNonCancelation = false;
                     ClockSpan clockSpan;
                     try
                     {
@@ -141,9 +142,22 @@ namespace BenchmarkDotNet.Engines
                         if (EngineEventSource.Log.IsEnabled())
                             EngineEventSource.Log.IterationStop(iterationData.mode, iterationData.stage, totalOperations);
                     }
+                    catch (Exception e)
+                    {
+                        didThrowNonCancelation = e is not OperationCanceledException;
+                        throw;
+                    }
                     finally
                     {
-                        await iterationData.cleanupAction();
+                        try
+                        {
+                            await iterationData.cleanupAction();
+                        }
+                        // We only catch if the benchmark threw to not overwrite the exception. #1045
+                        catch (Exception e) when (didThrowNonCancelation && e is not OperationCanceledException)
+                        {
+                            Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
+                        }
                     }
                     await YieldAndThrowIfCancellationRequested();
 
