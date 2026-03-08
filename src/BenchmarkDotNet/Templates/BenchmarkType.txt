@@ -18,7 +18,7 @@
             host.WriteLine();
 
             global::System.Collections.Generic.IEnumerable<BenchmarkDotNet.Validators.ValidationError> errors = global::BenchmarkDotNet.Validators.BenchmarkProcessValidator.Validate(job, instance);
-            if (await global::BenchmarkDotNet.Validators.ValidationErrorReporter.ReportIfAnyAsync(errors, host))
+            if (global::BenchmarkDotNet.Validators.ValidationErrorReporter.ReportIfAny(errors, host))
                 return;
 
             global::BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler compositeInProcessDiagnoserHandler = new global::BenchmarkDotNet.Diagnosers.CompositeInProcessDiagnoserHandler(
@@ -31,10 +31,10 @@
             );
             if (diagnoserRunMode == global::BenchmarkDotNet.Diagnosers.RunMode.SeparateLogic)
             {
-                await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.SeparateLogic);
+                compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.SeparateLogic);
                 return;
             }
-            await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine);
+            compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine);
 
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
@@ -58,7 +58,7 @@
             host.ReportResults(results); // printing costs memory, do this after runs
 
             instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
-            await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.AfterEngine);
+            compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.AfterEngine);
         }
 
         [global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]

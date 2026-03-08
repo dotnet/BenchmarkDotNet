@@ -116,10 +116,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             };
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool exiting)
         {
             TraceEventSession.Dispose();
-            base.Dispose();
+            base.Dispose(exiting);
         }
 
         internal abstract Session EnableProviders();

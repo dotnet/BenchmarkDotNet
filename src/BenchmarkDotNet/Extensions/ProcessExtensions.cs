@@ -217,16 +217,15 @@ namespace BenchmarkDotNet.Extensions
                 EnableRaisingEvents = true
             };
             using var processOutputReader = new AsyncProcessOutputReader(process, readStandardError: false);
-            using var consoleExitHandler = new ConsoleExitHandler(process, NullLogger.Instance);
+            using var processCleanupHelper = new ProcessCleanupHelper(process, NullLogger.Instance);
 
             process.Start();
             processOutputReader.BeginRead();
 
-            bool isSuccess = process.WaitForExit((int)timeout.TotalMilliseconds);
-            if (!isSuccess)
+            if (!process.WaitForExit((int) timeout.TotalMilliseconds))
             {
                 processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
+                processCleanupHelper.KillProcessTree();
 
                 return (process.HasExited ? process.ExitCode : -1, "");
             }

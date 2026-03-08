@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 host.WriteLine();
 
                 var errors = BenchmarkProcessValidator.Validate(job, instance);
-                if (await ValidationErrorReporter.ReportIfAnyAsync(errors, host))
+                if (ValidationErrorReporter.ReportIfAny(errors, host))
                     return;
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
@@ -144,10 +144,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 );
                 if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
                 {
-                    await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic);
+                    compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
                     return;
                 }
-                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine);
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
 
                 var engineParameters = new EngineParameters
                 {
@@ -178,7 +178,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     .RunAsync();
                 host.ReportResults(results); // printing costs memory, do this after runs
 
-                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine);
+                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
             }
         }
     }

@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     await Host.BeforeMainRunAsync();
-                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun);
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
@@ -121,23 +121,35 @@ namespace BenchmarkDotNet.Engines
                     bool randomizeMemory = iterationData.mode == IterationMode.Workload && MemoryRandomization;
 
                     await iterationData.setupAction();
+                    ClockSpan clockSpan;
+                    try
+                    {
+                        await YieldAndThrowIfCancellationRequested();
 
-                    GcCollect();
+                        GcCollect();
 
-                    if (EngineEventSource.Log.IsEnabled())
-                        EngineEventSource.Log.IterationStart(iterationData.mode, iterationData.stage, totalOperations);
+                        if (EngineEventSource.Log.IsEnabled())
+                            EngineEventSource.Log.IterationStart(iterationData.mode, iterationData.stage, totalOperations);
 
-                    var clockSpan = randomizeMemory
-                        ? await MeasureWithRandomStack(iterationData.workloadAction, invokeCount / unrollFactor)
-                        : await iterationData.workloadAction(invokeCount / unrollFactor, Clock);
+                        clockSpan = randomizeMemory
+                            ? await MeasureWithRandomStack(iterationData.workloadAction, invokeCount / unrollFactor)
+                            : await iterationData.workloadAction(invokeCount / unrollFactor, Clock);
+                        await Host.Yield();
 
-                    if (EngineEventSource.Log.IsEnabled())
-                        EngineEventSource.Log.IterationStop(iterationData.mode, iterationData.stage, totalOperations);
-
-                    await iterationData.cleanupAction();
+                        if (EngineEventSource.Log.IsEnabled())
+                            EngineEventSource.Log.IterationStop(iterationData.mode, iterationData.stage, totalOperations);
+                    }
+                    finally
+                    {
+                        await iterationData.cleanupAction();
+                    }
+                    await YieldAndThrowIfCancellationRequested();
 
                     if (randomizeMemory)
+                    {
                         await RandomizeManagedHeapMemory();
+                        await YieldAndThrowIfCancellationRequested();
+                    }
 
                     GcCollect();
 
@@ -155,7 +167,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     await Host.AfterMainRunAsync();
-                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun);
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
                 }
             }
 
@@ -169,7 +181,7 @@ namespace BenchmarkDotNet.Engines
                 await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
                 await Host.SendSignalAsync(HostSignal.BeforeExtraIteration);
-                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration);
+                Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeExtraIteration);
 
                 // GC collect before measuring allocations.
                 ForceGcCollect();
@@ -181,15 +193,20 @@ namespace BenchmarkDotNet.Engines
 
                 GcStats gcStats;
                 ClockSpan clockSpan;
-                using (FinalizerBlocker.MaybeStart())
+                try
                 {
-                    (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
+                    using (FinalizerBlocker.MaybeStart())
+                    {
+                        (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
+                    }
+
+                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
+                    await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
                 }
-
-                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration);
-                await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
-
-                await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
+                finally
+                {
+                    await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
+                }
 
                 var totalOperations = extraIterationData.invokeCount * Parameters.OperationsPerInvoke;
                 var measurement = new Measurement(0, IterationMode.Workload, IterationStage.Extra, 1, totalOperations, clockSpan.GetNanoseconds());
@@ -204,6 +221,13 @@ namespace BenchmarkDotNet.Engines
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
             return new RunResults(measurements, outlierMode, workGcHasDone);
+        }
+
+        private async ValueTask YieldAndThrowIfCancellationRequested()
+        {
+            // If this is running in wasm, yield back to JS so that it can detect cancellation.
+            await Host.Yield();
+            Host.CancellationToken.ThrowIfCancellationRequested();
         }
 
         // This is in a separate method, because stackalloc can affect code alignment,

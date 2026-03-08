@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Helpers
                 processStartInfo.Environment[variable.Key] = variable.Value;
 
             using (var process = new Process { StartInfo = processStartInfo })
-            using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
+            using (new ProcessCleanupHelper(process, logger ?? NullLogger.Instance))
             {
                 try
                 {
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Helpers
 
             using (var process = new Process { StartInfo = processStartInfo })
             using (var outputReader = new AsyncProcessOutputReader(process))
-            using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
+            using (new ProcessCleanupHelper(process, logger ?? NullLogger.Instance))
             {
                 process.Start();
 

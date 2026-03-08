@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+            public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
             {
                 executeParameters.Logger.WriteLine("Executing");
                 Done = true;

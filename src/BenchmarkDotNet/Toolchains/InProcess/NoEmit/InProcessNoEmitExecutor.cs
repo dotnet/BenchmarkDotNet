@@ -16,9 +16,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     internal class InProcessNoEmitExecutor(bool executeOnSeparateThread) : IExecutor
     {
-        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
-            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.Logger, executeParameters.Diagnoser);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.Logger, executeParameters.Diagnoser, cancellationToken);
 
             int exitCode = -1;
             if (executeOnSeparateThread)

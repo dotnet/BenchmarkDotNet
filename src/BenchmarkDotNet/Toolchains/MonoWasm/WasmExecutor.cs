@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             }
         }
 
-        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
@@ -42,17 +43,31 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             return await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                 executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
-                executeParameters.DiagnoserRunMode);
+                executeParameters.DiagnoserRunMode, cancellationToken);
         }
 
-        private static async ValueTask<bool> ProbeWebSocketSupportAsync(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, IResolver resolver)
+        private static async ValueTask<bool> ProbeWebSocketSupportAsync(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, IResolver resolver, CancellationToken cancellationToken)
         {
             // Check if the JavaScript runtime supports WebSocket
             using var probeProcess = CreateProcess(benchmarkCase, artifactsPaths, "--getSupportsWebSocket", resolver);
             probeProcess.Start();
 
-            string output = await probeProcess.StandardOutput.ReadToEndAsync();
-            probeProcess.WaitForExit();
+            string output;
+            try
+            {
+#if NET7_0_OR_GREATER
+                output = await probeProcess.StandardOutput.ReadToEndAsync(cancellationToken);
+#else
+                output = await probeProcess.StandardOutput.ReadToEndAsync().WaitAsync(cancellationToken);
+#endif
+            }
+            finally
+            {
+                if (!probeProcess.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    probeProcess.KillTree();
+                }
+            }
 
             // Parse output for "supportsWebSocket: true" or "supportsWebSocket: false"
             foreach (string line in output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
@@ -70,13 +85,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         private static async ValueTask<ProcessListener> CreateProcessListenerAsync(
             BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ArtifactsPaths artifactsPaths,
-            IResolver resolver, Diagnosers.RunMode diagnoserRunMode)
+            IResolver resolver, Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
             WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
 
             bool useWebSocket = runtime.IpcType == WasmIpcType.Auto
                 // Probe the JavaScript runtime to check if it supports WebSocket
-                ? await ProbeWebSocketSupportAsync(benchmarkCase, artifactsPaths, resolver)
+                ? await ProbeWebSocketSupportAsync(benchmarkCase, artifactsPaths, resolver, cancellationToken)
                 : runtime.IpcType == WasmIpcType.WebSocket;
 
             IpcListener listener;
@@ -104,12 +119,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Loggers.ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
-            Diagnosers.RunMode diagnoserRunMode)
+            Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
-            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode);
+            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken);
             try
             {
-                using ConsoleExitHandler consoleExitHandler = new(processListener.Process, logger);
+                using ProcessCleanupHelper processCleanupHelper = new(processListener.Process, logger);
                 bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
                 using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: false);
 
@@ -120,8 +135,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId));
                 return await Execute(processListener.Process, benchmarkCase, processOutputReader,
-                    benchmarkId, logger, consoleExitHandler, launchIndex, diagnoser,
-                    compositeInProcessDiagnoser, processListener.Listener);
+                    benchmarkId, logger, processCleanupHelper, launchIndex, diagnoser,
+                    compositeInProcessDiagnoser, processListener.Listener, cancellationToken);
             }
             finally
             {
@@ -151,13 +166,16 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         }
 
         private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
-            BenchmarkId benchmarkId, Loggers.ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, IDiagnoser? diagnoser,
-            CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener)
+            BenchmarkId benchmarkId, Loggers.ILogger logger, ProcessCleanupHelper processCleanupHelper, int launchIndex, IDiagnoser? diagnoser,
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener, CancellationToken cancellationToken)
         {
+            WasmRuntime wasmRuntime = (WasmRuntime) benchmarkCase.GetRuntime();
             List<string> results;
             List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, ipcListener))
+            try
             {
+                using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, ipcListener);
+
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
@@ -174,24 +192,26 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                await broker.ProcessData();
+                await broker.ProcessData(cancellationToken)
+                    .AsTask()
+                    .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes));
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
             }
-
-            WasmRuntime wasmRuntime = (WasmRuntime)benchmarkCase.GetRuntime();
-            int timeoutMinutes = wasmRuntime.ProcessTimeoutMinutes;
-            if (!process.WaitForExit(milliseconds: (int)TimeSpan.FromMinutes(timeoutMinutes).TotalMilliseconds))
+            finally
             {
-                logger.WriteLineInfo($"// The benchmarking process did not finish within {timeoutMinutes} minutes, it's going to get force killed now.");
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
-            }
-            else
-            {
-                processOutputReader.StopRead();
+                    processOutputReader.CancelRead();
+                    processCleanupHelper.KillProcessTree();
+                }
+                else
+                {
+                    processOutputReader.StopRead();
+                }
             }
 
             return new ExecuteResult(true,

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
 
@@ -10,7 +9,7 @@ public static class ValidationErrorReporter
 {
     public const string ConsoleErrorPrefix = "// ERROR: ";
 
-    public static async ValueTask<bool> ReportIfAnyAsync(IEnumerable<ValidationError> validationErrors, IHost host)
+    public static bool ReportIfAny(IEnumerable<ValidationError> validationErrors, IHost host)
     {
         bool hasErrors = false;
         foreach (var validationError in validationErrors)

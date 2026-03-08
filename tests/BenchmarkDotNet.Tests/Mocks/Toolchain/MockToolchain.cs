@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
@@ -37,7 +38,7 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 
         private class MockExecutor(Func<BenchmarkCase, List<Measurement>> measurer) : IExecutor
         {
-            public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters) => new(new ExecuteResult(measurer(executeParameters.BenchmarkCase)));
+            public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken) => new(new ExecuteResult(measurer(executeParameters.BenchmarkCase)));
         }
     }
 }

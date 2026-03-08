@@ -75,14 +75,14 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool exiting)
         {
             if (IsEnabled)
             {
                 Console.Title = oldConsoleTitle;
                 IsEnabled = false;
             }
-            base.Dispose();
+            base.Dispose(exiting);
         }
     }
 }

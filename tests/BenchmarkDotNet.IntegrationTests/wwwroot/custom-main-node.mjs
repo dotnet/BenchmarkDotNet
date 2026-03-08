@@ -21,39 +21,45 @@ class WebSocketTransport {
     constructor(url) {
         this.url = url;
         this.ws = null;
+        this.onmessage = null;
         this.onerror = null;
         this.onclose = null;
-
-        this._openPromise = this.#init();
     }
 
-    async #init() {
+    async initialize() {
         // Create WebSocket instance (Node.js)
         const { WebSocket } = await import("ws");
         this.ws = new WebSocket(this.url);
 
         // Setup event handlers (Node.js API)
         return new Promise((resolve, reject) => {
-            this.ws.on("open", () => {
+            const handleOpen = () => {
                 console.log("IPC WebSocket connected");
                 resolve();
-            });
+            };
 
-            this.ws.on("error", (err) => {
+            const handleError = (err) => {
                 console.error("IPC WebSocket error:", err);
                 this.onerror?.(err);
                 reject(err);
-            });
+            };
 
-            this.ws.on("close", (code, reason) => {
+            const handleClose = (code, reason) => {
                 console.log("IPC WebSocket closed");
                 this.onclose?.({ code, reason });
-            });
-        });
-    }
+            };
 
-    async waitUntilOpen() {
-        return this._openPromise;
+            const handleMessage = (data) => {
+                const message = data.toString();
+                // Forward message to handler
+                this.onmessage?.(message);
+            };
+
+            this.ws.on("open", handleOpen);
+            this.ws.on("error", handleError);
+            this.ws.on("close", handleClose);
+            this.ws.on("message", handleMessage);
+        });
     }
 
     send(msg) {
@@ -64,21 +70,8 @@ class WebSocketTransport {
         }
     }
 
-    async sendSignal(msg) {
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                reject(new Error('Timeout waiting for signal acknowledgment'));
-            }, 60000);
-
-            const handleMessage = (data) => {
-                clearTimeout(timeout);
-                this.ws.off("message", handleMessage);
-                resolve(data.toString());
-            };
-
-            this.ws.on("message", handleMessage);
-            this.send(msg);
-        });
+    sendSignal(msg) {
+        this.send(msg);
     }
 
     close() {
@@ -91,7 +84,6 @@ let transport = null;
 const wsUrl = `ws://localhost:${ipcPort}/child`;
 console.log("[CUSTOM-TEMPLATE-WEBSOCKET] Using WebSocket IPC:", wsUrl);
 transport = new WebSocketTransport(wsUrl);
-await transport.waitUntilOpen();
 
 const { setModuleImports, getAssemblyExports } = await dotnet
     .withDiagnosticTracing(false)
@@ -99,19 +91,23 @@ const { setModuleImports, getAssemblyExports } = await dotnet
     .create();
 
 const exports = await getAssemblyExports("BenchmarkDotNet");
+const jsHostExports = exports.BenchmarkDotNet.Engines.JsHost;
 
 setModuleImports("ipc", {
     sendToParent: msg => {
         transport.send(msg);
     },
     sendSignalToParent: msg => {
-        transport.sendSignal(msg).then(ack => {
-            exports.BenchmarkDotNet.Engines.JsHost.OnSignalAcknowledged(ack);
-        }).catch(err => {
-            console.error("Signal acknowledgment error:", err);
-        });
+        transport.sendSignal(msg);
     }
 });
+
+// Set up message handler - forward all messages to C#
+transport.onmessage = (message) => {
+    jsHostExports.ReceiveMessage(message);
+};
+
+await transport.initialize();
 
 try {
     await dotnet.run();

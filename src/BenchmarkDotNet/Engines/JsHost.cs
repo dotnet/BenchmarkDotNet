@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines;
@@ -15,7 +16,8 @@ namespace BenchmarkDotNet.Engines;
 // Must be public for JSExport, but should not be used directly by users.
 public sealed partial class JsHost : IHost
 {
-    private static TaskCompletionSource<string>? signalAckTaskSource;
+    private static readonly CancellationTokenSource s_cancellationTokenSource = new();
+    private static TaskCompletionSource<string>? s_signalAckTaskSource;
 
     [JSImport("sendToParent", "ipc")]
     static partial void SendMessage(string message);
@@ -24,12 +26,20 @@ public sealed partial class JsHost : IHost
     static partial void SendSignal(string message);
 
     [JSExport]
-    public static void OnSignalAcknowledged(string acknowledgment)
+    public static void ReceiveMessage(string message)
     {
-        var source = signalAckTaskSource;
-        signalAckTaskSource = null;
-        source?.SetResult(acknowledgment);
+        if (message == "CANCEL")
+        {
+            s_cancellationTokenSource.Cancel();
+            return;
+        }
+
+        var source = s_signalAckTaskSource;
+        s_signalAckTaskSource = null;
+        source?.SetResult(message);
     }
+
+    public CancellationToken CancellationToken => s_cancellationTokenSource.Token;
 
     public void Dispose() { }
 
@@ -39,15 +49,21 @@ public sealed partial class JsHost : IHost
     public void WriteLine(string message)
         => SendMessage(message);
 
+    public void SendError(string message)
+        => SendMessage($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
+
+    public void ReportResults(RunResults runResults)
+        => runResults.Print(this);
+
     public async ValueTask SendSignalAsync(HostSignal hostSignal)
     {
-        if (signalAckTaskSource is not null)
+        if (s_signalAckTaskSource is not null)
         {
             throw new InvalidOperationException("JsHost.SendSignalAsync does not support concurrent calls.");
         }
 
         var source = new TaskCompletionSource<string>();
-        signalAckTaskSource = source;
+        s_signalAckTaskSource = source;
 
         if (hostSignal == HostSignal.AfterAll)
         {
@@ -66,10 +82,7 @@ public sealed partial class JsHost : IHost
         }
     }
 
-    public void SendError(string message)
-        => SendMessage($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
-
-    public void ReportResults(RunResults runResults)
-        => runResults.Print(this);
+    // Yield back to JS.
+    public async ValueTask Yield() => await Task.Yield();
 }
 #endif

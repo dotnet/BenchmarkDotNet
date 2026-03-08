@@ -94,11 +94,9 @@ class WebSocketTransport {
         this.onmessage = null;
         this.onerror = null;
         this.onclose = null;
-
-        this._openPromise = this.#init();
     }
 
-    async #init() {
+    async initialize() {
         // Try native WebSocket first, then try importing ws module
         if (typeof WebSocket !== "undefined") {
             this.ws = new WebSocket(this.url);
@@ -131,20 +129,27 @@ class WebSocketTransport {
                 this.onclose?.(closeInfo);
             };
 
+            const handleMessage = (dataOrEvent) => {
+                const message = useEventListeners
+                    ? (typeof dataOrEvent.data === "string" ? dataOrEvent.data : dataOrEvent.data.toString())
+                    : dataOrEvent.toString();
+
+                // Forward message to handler
+                this.onmessage?.(message);
+            };
+
             if (useEventListeners) {
                 this.ws.addEventListener("open", handleOpen);
                 this.ws.addEventListener("error", handleError);
                 this.ws.addEventListener("close", handleClose);
+                this.ws.addEventListener("message", handleMessage);
             } else {
                 this.ws.on("open", handleOpen);
                 this.ws.on("error", handleError);
                 this.ws.on("close", handleClose);
+                this.ws.on("message", handleMessage);
             }
         });
-    }
-
-    async waitUntilOpen() {
-        return this._openPromise;
     }
 
     send(msg) {
@@ -155,37 +160,8 @@ class WebSocketTransport {
         }
     }
 
-    async sendSignal(msg) {
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                reject(new Error('Timeout waiting for signal acknowledgment'));
-            }, 60000);
-
-            const useEventListeners = typeof this.ws.addEventListener === "function";
-
-            const handleMessage = (dataOrEvent) => {
-                clearTimeout(timeout);
-                const ack = useEventListeners
-                    ? (typeof dataOrEvent.data === "string" ? dataOrEvent.data : dataOrEvent.data.toString())
-                    : dataOrEvent.toString();
-
-                if (useEventListeners) {
-                    this.ws.removeEventListener("message", handleMessage);
-                } else {
-                    this.ws.off("message", handleMessage);
-                }
-
-                resolve(ack);
-            };
-
-            if (useEventListeners) {
-                this.ws.addEventListener("message", handleMessage);
-            } else {
-                this.ws.on("message", handleMessage);
-            }
-
-            this.send(msg);
-        });
+    sendSignal(msg) {
+        this.send(msg);
     }
 
     close() {
@@ -200,23 +176,44 @@ class FileStdOutTransport {
         this.onmessage = null;
         this.onerror = null;
         this.onclose = null;
-        this._openPromise = Promise.resolve();
+        this.cancellationCheckInterval = null;
     }
 
-    async waitUntilOpen() {
-        return this._openPromise;
+    async initialize() {
+        // File-based transport is immediately ready
+        // Start cancellation checking
+        if (this.onmessage && typeof setInterval !== "undefined" && !this.cancellationCheckInterval) {
+            this.cancellationCheckInterval = setInterval(() => {
+                this.checkCancellation();
+            }, 10);
+        }
+    }
+
+    checkCancellation() {
+        const cancelFile = `${this.ipcDirectory}/cancel.txt`;
+        try {
+            const content = read(cancelFile);
+            if (content !== undefined && content !== null) {
+                this.onmessage?.("CANCEL");
+                return true;
+            }
+        } catch (e) {
+            // File doesn't exist - not cancelled
+        }
+        return false;
     }
 
     send(msg) {
         // Send message to parent via stdout
         console.log(msg);
+        this.checkCancellation();
     }
 
-    async sendSignal(msg) {
+    sendSignal(msg) {
         // Send signal message to parent via stdout
         console.log(msg);
 
-        // Wait for acknowledgment file
+        // Wait for acknowledgment file in background
         const ackFile = `${this.ipcDirectory}/ack-${this.ackCounter++}.txt`;
         const maxAttempts = 6000; // Poll for up to 60 seconds
         const sleepMs = 10;
@@ -240,25 +237,38 @@ class FileStdOutTransport {
             }
         };
 
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
-            try {
-                // Try to read the acknowledgment file
-                const ackContent = read(ackFile);
-                if (ackContent !== undefined && ackContent !== null && ackContent !== "") {
-                    return ackContent.trim();
+        // Poll for acknowledgment asynchronously and forward through onmessage
+        (async () => {
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                // Check for cancellation while waiting
+                if (this.checkCancellation()) {
+                    return; // Exit early if cancelled
                 }
-            } catch (e) {
-                // File doesn't exist yet, continue polling
+
+                try {
+                    // Try to read the acknowledgment file
+                    const ackContent = read(ackFile);
+                    if (ackContent !== undefined && ackContent !== null && ackContent !== "") {
+                        // Forward acknowledgment through onmessage handler
+                        this.onmessage?.(ackContent.trim());
+                        return;
+                    }
+                } catch (e) {
+                    // File doesn't exist yet, continue polling
+                }
+
+                await sleep(sleepMs);
             }
 
-            await sleep(sleepMs);
-        }
-
-        throw new Error(`Timeout waiting for acknowledgment file: ${ackFile}`);
+            console.error(`Timeout waiting for acknowledgment file: ${ackFile}`);
+        })();
     }
 
     close() {
-        // Nothing to close for file-based IPC
+        if (this.cancellationCheckInterval) {
+            clearInterval(this.cancellationCheckInterval);
+            this.cancellationCheckInterval = null;
+        }
     }
 }
 
@@ -271,12 +281,10 @@ if (ipcEnabled) {
             const wsUrl = `ws://localhost:${ipcPort}/child`;
             console.log("Using WebSocket IPC:", wsUrl);
             transport = new WebSocketTransport(wsUrl);
-            await transport.waitUntilOpen();
         } else if (ipcDir !== null) {
             // File-based IPC (typically for shell engines: v8/d8, SpiderMonkey, WSH/Chakra)
             console.log("Using file-based IPC:", ipcDir);
             transport = new FileStdOutTransport(ipcDir);
-            await transport.waitUntilOpen();
         }
     } catch (error) {
         console.error("Failed to initialize IPC:", error);
@@ -293,19 +301,22 @@ const { setModuleImports, getAssemblyExports } = await dotnet
 
 if (ipcEnabled && transport) {
     const exports = await getAssemblyExports("BenchmarkDotNet");
+    const jsHostExports = exports.BenchmarkDotNet.Engines.JsHost;
 
     setModuleImports("ipc", {
         sendToParent: msg => {
             transport.send(msg);
         },
         sendSignalToParent: msg => {
-            transport.sendSignal(msg).then(ack => {
-                exports.BenchmarkDotNet.Engines.JsHost.OnSignalAcknowledged(ack);
-            }).catch(err => {
-                console.error("Signal acknowledgment error:", err);
-            });
+            transport.sendSignal(msg);
         }
     });
+
+    transport.onmessage = (message) => {
+        jsHostExports.ReceiveMessage(message);
+    };
+
+    await transport.initialize();
 }
 
 try {

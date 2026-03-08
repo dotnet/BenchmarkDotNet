@@ -30,7 +30,6 @@ internal sealed class TcpConnection : IpcConnection
     internal override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
         => await reader.ReadLineAsync(cancellationToken);
 
-    internal override async ValueTask WriteLineAsync(string line)
-        // Write sync because this is only used to send short messages to the child process.
+    internal override void WriteLine(string line)
         => writer.WriteLine(line);
 }

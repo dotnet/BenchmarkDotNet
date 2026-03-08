@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
@@ -24,10 +25,7 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class Executor : IExecutor
     {
-        /// <summary>
-        /// Out-of-process executor executes synchronously. 
-        /// </summary>
-        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
@@ -35,16 +33,16 @@ namespace BenchmarkDotNet.Toolchains
                 ? ExecuteResult.CreateFailed()
                 : await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
-                    executeParameters.DiagnoserRunMode);
+                    executeParameters.DiagnoserRunMode, cancellationToken);
         }
 
         private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
-            Diagnosers.RunMode diagnoserRunMode)
+            Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
             try
             {
-                return await ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode);
+                return await ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode, cancellationToken);
             }
             finally
             {
@@ -54,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains
 
         private static async ValueTask<ExecuteResult> ExecuteCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
-            Diagnosers.RunMode diagnoserRunMode)
+            Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
             using var tcplistener = new TcpListener();
             var port = tcplistener.StartAndGetPort();
@@ -62,13 +60,15 @@ namespace BenchmarkDotNet.Toolchains
             string args = benchmarkId.ToArguments(port, diagnoserRunMode);
 
             using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
-            using ConsoleExitHandler consoleExitHandler = new(process, logger);
+            using ProcessCleanupHelper processCleanupHelper = new(process, logger);
             using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
 
             List<string> results;
             List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener))
+            try
             {
+                using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener);
+
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
@@ -94,22 +94,24 @@ namespace BenchmarkDotNet.Toolchains
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                await broker.ProcessData();
+                await broker.ProcessData(cancellationToken);
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
             }
-
-            if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+            finally
             {
-                logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
-            }
-            else
-            {
-                processOutputReader.StopRead();
+                    processOutputReader.CancelRead();
+                    processCleanupHelper.KillProcessTree();
+                }
+                else
+                {
+                    processOutputReader.StopRead();
+                }
             }
 
             if (results.Any(line => line.Contains("BadImageFormatException")))

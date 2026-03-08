@@ -73,7 +73,7 @@ internal static class InProcessEmitRunner
         host.WriteLine();
 
         var errors = BenchmarkProcessValidator.Validate(job, instance);
-        if (await ValidationErrorReporter.ReportIfAnyAsync(errors, host))
+        if (ValidationErrorReporter.ReportIfAny(errors, host))
             return;
 
         var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
@@ -87,10 +87,10 @@ internal static class InProcessEmitRunner
         );
         if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
         {
-            await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic);
+            compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
             return;
         }
-        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine);
+        compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
 
         var engineParameters = new EngineParameters()
         {
@@ -118,7 +118,7 @@ internal static class InProcessEmitRunner
 
         runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
 
-        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine);
+        compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
     }
 
     private static void FillMembers(object instance, BenchmarkCase benchmarkCase)

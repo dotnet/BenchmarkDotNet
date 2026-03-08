@@ -21,18 +21,21 @@ internal sealed class FileStdOutConnection(AsyncProcessOutputReader processOutpu
         return await processOutputReader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    internal override async ValueTask WriteLineAsync(string line)
+    internal override void WriteLine(string line)
     {
+        if (line == "CANCEL")
+        {
+            // mjs checks for file existence, so we just write an empty file.
+            File.WriteAllBytes(Path.Combine(ipcDirectory, "cancel.txt"), []);
+            return;
+        }
+
         // Write acknowledgment to a file that the child can read
         var ackFile = Path.Combine(ipcDirectory, $"ack-{ackCounter++}.txt");
 
         // Write to temp file first, then move (atomic operation)
         var tempFile = ackFile + ".tmp";
-#if NETSTANDARD2_0
-        await Task.Run(() => File.WriteAllText(tempFile, line, Encoding.UTF8));
-#else
-        await File.WriteAllTextAsync(tempFile, line, Encoding.UTF8);
-#endif
+        File.WriteAllText(tempFile, line, Encoding.UTF8);
         File.Move(tempFile, ackFile);
     }
 }

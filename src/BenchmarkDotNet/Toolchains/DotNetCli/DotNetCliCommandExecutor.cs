@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
-            using (new ConsoleExitHandler(process, parameters.Logger))
+            using (new ProcessCleanupHelper(process, parameters.Logger))
             {
                 parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) })
-            using (new ConsoleExitHandler(process, NullLogger.Instance))
+            using (new ProcessCleanupHelper(process, NullLogger.Instance))
             {
                 try
                 {

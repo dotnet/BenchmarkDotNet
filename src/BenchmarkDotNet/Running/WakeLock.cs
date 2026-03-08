@@ -45,7 +45,7 @@ internal partial class WakeLock
             }
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool exiting)
         {
             if (safePowerHandle != null)
             {
@@ -63,7 +63,7 @@ internal partial class WakeLock
                 }
                 safePowerHandle.Dispose();
             }
-            base.Dispose();
+            base.Dispose(exiting);
         }
     }
 }

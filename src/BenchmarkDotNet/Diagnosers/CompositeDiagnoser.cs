@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class CompositeInProcessDiagnoserHandler(IReadOnlyList<InProcessDiagnoserRouter> routers, IHost host, RunMode runMode, InProcessDiagnoserActionArgs parameters)
     {
-        public async ValueTask HandleAsync(BenchmarkSignal signal)
+        public void Handle(BenchmarkSignal signal)
         {
             if (runMode == RunMode.None)
             {

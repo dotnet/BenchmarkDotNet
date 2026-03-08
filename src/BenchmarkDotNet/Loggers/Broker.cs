@@ -8,8 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -62,23 +60,42 @@ namespace BenchmarkDotNet.Loggers
         private void OnProcessExited(object? sender, EventArgs e)
             => Dispose();
 
-        internal async ValueTask ProcessData()
+        internal async ValueTask ProcessData(CancellationToken cancellationToken)
         {
-            var result = await ProcessDataCore();
+            var result = await ProcessDataCore(cancellationToken);
             if (result != Result.Success)
             {
                 logger.WriteLineError($"ProcessData operation is interrupted by {result}.");
             }
         }
 
-        private async ValueTask<Result> ProcessDataCore()
+        private async ValueTask<Result> ProcessDataCore(CancellationToken cancellationToken)
         {
             if (process.HasExited || cancellationTokenSource.IsCancellationRequested)
                 return Result.EarlyProcessExit;
 
             try
             {
-                using var ipcConnection = await ipcListener.AcceptConnection(cancellationTokenSource.Token);
+                IpcConnection ipcConnection;
+                using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token))
+                {
+                    ipcConnection = await ipcListener.AcceptConnection(linkedCts.Token);
+                }
+
+                using var ic = ipcConnection;
+#if NETCOREAPP3_0_OR_GREATER
+                using var registration = cancellationToken.UnsafeRegister(_ => Cancel(), null);
+#else
+                using var registration = cancellationToken.Register(Cancel, false);
+#endif
+
+                void Cancel()
+                {
+                    lock (ipcConnection)
+                    {
+                        ipcConnection.WriteLine("CANCEL");
+                    }
+                }
 
                 while (true)
                 {
@@ -134,7 +151,10 @@ namespace BenchmarkDotNet.Loggers
                     {
                         Diagnoser?.Handle(signal, DiagnoserActionParameters);
 
-                        await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment);
+                        lock (ipcConnection)
+                        {
+                            ipcConnection.WriteLine(Engine.Signals.Acknowledgment);
+                        }
 
                         if (signal == HostSignal.AfterAll)
                         {

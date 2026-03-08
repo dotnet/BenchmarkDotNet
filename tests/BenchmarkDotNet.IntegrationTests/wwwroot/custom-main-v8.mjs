@@ -18,20 +18,47 @@ class FileStdOutTransport {
     constructor(ipcDirectory) {
         this.ipcDirectory = ipcDirectory;
         this.ackCounter = 0;
+        this.onmessage = null;
         this.onerror = null;
         this.onclose = null;
+        this.cancellationCheckInterval = null;
+    }
+
+    async initialize() {
+        // File-based transport is immediately ready
+        // Start cancellation checking
+        if (this.onmessage && typeof setInterval !== "undefined" && !this.cancellationCheckInterval) {
+            this.cancellationCheckInterval = setInterval(() => {
+                this.checkCancellation();
+            }, 10);
+        }
+    }
+
+    checkCancellation() {
+        const cancelFile = `${this.ipcDirectory}/cancel.txt`;
+        try {
+            const content = read(cancelFile);
+            if (content !== undefined && content !== null) {
+                this.onmessage?.("CANCEL");
+                return true;
+            }
+        } catch (e) {
+            // File doesn't exist - not cancelled
+        }
+        return false;
     }
 
     send(msg) {
         // Send message to parent via stdout
         console.log(msg);
+        this.checkCancellation();
     }
 
-    async sendSignal(msg) {
+    sendSignal(msg) {
         // Send signal message to parent via stdout
         console.log(msg);
 
-        // Wait for acknowledgment file
+        // Wait for acknowledgment file in background
         const ackFile = `${this.ipcDirectory}/ack-${this.ackCounter++}.txt`;
         const maxAttempts = 6000; // Poll for up to 60 seconds
         const sleepMs = 10;
@@ -45,21 +72,38 @@ class FileStdOutTransport {
             return Promise.resolve();
         };
 
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
-            try {
-                // Try to read the acknowledgment file
-                const ackContent = read(ackFile);
-                if (ackContent !== undefined && ackContent !== null && ackContent !== "") {
-                    return ackContent.trim();
+        // Poll for acknowledgment asynchronously and forward through onmessage
+        (async () => {
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                // Check for cancellation while waiting
+                if (this.checkCancellation()) {
+                    return; // Exit early if cancelled
                 }
-            } catch (e) {
-                // File doesn't exist yet, continue polling
+
+                try {
+                    // Try to read the acknowledgment file
+                    const ackContent = read(ackFile);
+                    if (ackContent !== undefined && ackContent !== null && ackContent !== "") {
+                        // Forward acknowledgment through onmessage handler
+                        this.onmessage?.(ackContent.trim());
+                        return;
+                    }
+                } catch (e) {
+                    // File doesn't exist yet, continue polling
+                }
+
+                await sleep(sleepMs);
             }
 
-            await sleep(sleepMs);
-        }
+            console.error(`Timeout waiting for acknowledgment file: ${ackFile}`);
+        })();
+    }
 
-        throw new Error(`Timeout waiting for acknowledgment file: ${ackFile}`);
+    close() {
+        if (this.cancellationCheckInterval) {
+            clearInterval(this.cancellationCheckInterval);
+            this.cancellationCheckInterval = null;
+        }
     }
 }
 
@@ -74,18 +118,26 @@ const { setModuleImports, getAssemblyExports } = await dotnet
     .create();
 
 const exports = await getAssemblyExports("BenchmarkDotNet");
+const jsHostExports = exports.BenchmarkDotNet.Engines.JsHost;
 
 setModuleImports("ipc", {
     sendToParent: msg => {
         transport.send(msg);
     },
     sendSignalToParent: msg => {
-        transport.sendSignal(msg).then(ack => {
-            exports.BenchmarkDotNet.Engines.JsHost.OnSignalAcknowledged(ack);
-        }).catch(err => {
-            console.error("Signal acknowledgment error:", err);
-        });
+        transport.sendSignal(msg);
     }
 });
 
-await dotnet.run();
+// Set up message handler - forward all messages to C#
+transport.onmessage = (message) => {
+    jsHostExports.ReceiveMessage(message);
+};
+
+await transport.initialize();
+
+try {
+    await dotnet.run();
+} finally {
+    transport?.close();
+}
