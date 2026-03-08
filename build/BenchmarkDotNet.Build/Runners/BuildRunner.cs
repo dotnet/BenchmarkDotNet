@@ -136,6 +136,16 @@ public class BuildRunner
                 Verbosity = context.BuildVerbosity,
                 ArgumentCustomization = args => args.Append($"-p:MccVersion={version}")
             });
+
+            context.DotNetBuild(context.CodeFixersProjectFile.FullPath, new DotNetBuildSettings
+            {
+                NoRestore = true,
+                DiagnosticOutput = true,
+                MSBuildSettings = context.MsBuildSettingsBuild,
+                Configuration = context.BuildConfiguration,
+                Verbosity = context.BuildVerbosity,
+                ArgumentCustomization = args => args.Append($"-p:MccVersion={version}")
+            });
         }
     }
 

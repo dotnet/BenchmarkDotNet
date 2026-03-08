@@ -14,6 +14,7 @@
   <Folder Name="/src/">
     <Project Path="src/BenchmarkDotNet.Analyzers/BenchmarkDotNet.Analyzers.csproj" />
     <Project Path="src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj" />
+    <Project Path="src/BenchmarkDotNet.CodeFixers/BenchmarkDotNet.CodeFixers.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.dotMemory/BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.dotTrace/BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj" />

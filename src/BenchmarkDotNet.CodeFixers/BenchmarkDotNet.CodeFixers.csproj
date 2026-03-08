@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <PackageId>BenchmarkDotNet.CodeFixers</PackageId>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <MccVersion>5.0</MccVersion>
+    <OutputPath>bin\$(Configuration)\roslyn$(MccVersion)\cs</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants Condition="'$(MccVersion)' >= '3.8'">$(DefineConstants);CODE_ANALYSIS_3_8</DefineConstants>
+    <DefineConstants Condition="'$(MccVersion)' >= '4.8'">$(DefineConstants);CODE_ANALYSIS_4_8</DefineConstants>
+    <DefineConstants Condition="'$(MccVersion)' >= '5.0'">$(DefineConstants);CODE_ANALYSIS_5_0</DefineConstants>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- C# 7.3 (min version we support) -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="[2.8.0]" Condition="'$(MccVersion)' == '2.8'" />
+    <!-- C# 9 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="[3.8.0]" Condition="'$(MccVersion)' == '3.8'" />
+    <!-- C# 12 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="[4.8.0]" Condition="'$(MccVersion)' == '4.8'" />
+    <!-- C# 14 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="[5.0.0,)" Condition="'$(MccVersion)' == '5.0'" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
+</Project>
