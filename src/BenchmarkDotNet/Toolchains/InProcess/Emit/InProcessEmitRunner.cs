@@ -3,6 +3,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using System;
@@ -44,7 +45,7 @@ internal static class InProcessEmitRunner
 
             return -1;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             host.WriteLine();
             host.WriteLine(ex.ToString());
@@ -61,7 +62,7 @@ internal static class InProcessEmitRunner
         var benchmarkCase = parameters.BenchmarkCase;
 
         var instance = Activator.CreateInstance(runnableType)!;
-        FillMembers(instance, benchmarkCase);
+        FillMembers(instance, benchmarkCase, host.CancellationToken);
 
         host.WriteLine();
         foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
@@ -121,7 +122,7 @@ internal static class InProcessEmitRunner
         compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
     }
 
-    private static void FillMembers(object instance, BenchmarkCase benchmarkCase)
+    private static void FillMembers(object instance, BenchmarkCase benchmarkCase, System.Threading.CancellationToken cancellationToken)
     {
         var argIndex = 0;
         foreach (var argInfo in benchmarkCase.Descriptor.WorkloadMethod.GetParameters())
@@ -135,6 +136,33 @@ internal static class InProcessEmitRunner
             if (!paramInfo.IsArgument)
             {
                 SetParameter(instance, paramInfo);
+            }
+        }
+
+        // Inject CancellationToken into properties/fields marked with [BenchmarkCancellation]
+        var targetType = benchmarkCase.Descriptor.Type;
+
+        foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        {
+            if (property.PropertyType == typeof(System.Threading.CancellationToken) &&
+                property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+            {
+                var setter = property.GetSetMethod();
+                if (setter != null)
+                {
+                    var callInstance = setter.IsStatic ? null : instance;
+                    setter.Invoke(callInstance, [cancellationToken]);
+                }
+            }
+        }
+
+        foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        {
+            if (field.FieldType == typeof(System.Threading.CancellationToken) &&
+                field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+            {
+                var callInstance = field.IsStatic ? null : instance;
+                field.SetValue(callInstance, cancellationToken);
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -54,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 return -1;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 host.WriteLine();
                 host.WriteLine(ex.ToString());
@@ -66,17 +67,20 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
         }
 
-        /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
+        /// <summary>Fills the properties/fields of the instance used to run the benchmark.</summary>
         /// <param name="instance">The instance.</param>
         /// <param name="benchmarkCase">The benchmark.</param>
-        internal static void FillMembers(object instance, BenchmarkCase benchmarkCase)
+        /// <param name="cancellationToken">The cancellation token to inject into members marked with [BenchmarkCancellation].</param>
+        internal static void FillMembers(object instance, BenchmarkCase benchmarkCase, CancellationToken cancellationToken)
         {
+            var targetType = benchmarkCase.Descriptor.Type;
+
+            // Fill parameter values
             foreach (var parameter in benchmarkCase.Parameters.Items)
             {
                 var flags = BindingFlags.Public;
                 flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
 
-                var targetType = benchmarkCase.Descriptor.Type;
                 var paramProperty = targetType.GetProperty(parameter.Name, flags);
 
                 if (paramProperty == null)
@@ -100,6 +104,31 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     setter.Invoke(callInstance, [parameter.Value]);
                 }
             }
+
+            // Inject CancellationToken into properties/fields marked with [BenchmarkCancellation]
+            foreach (var property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            {
+                if (property.PropertyType == typeof(CancellationToken) &&
+                    property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+                {
+                    var setter = property.GetSetMethod();
+                    if (setter != null)
+                    {
+                        var callInstance = setter.IsStatic ? null : instance;
+                        setter.Invoke(callInstance, [cancellationToken]);
+                    }
+                }
+            }
+
+            foreach (var field in targetType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            {
+                if (field.FieldType == typeof(CancellationToken) &&
+                    field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+                {
+                    var callInstance = field.IsStatic ? null : instance;
+                    field.SetValue(callInstance, cancellationToken);
+                }
+            }
         }
 
         [UsedImplicitly]
@@ -121,7 +150,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
                 var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance);
 
-                FillMembers(instance, benchmarkCase);
+                FillMembers(instance, benchmarkCase, host.CancellationToken);
 
                 host.WriteLine();
                 foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())

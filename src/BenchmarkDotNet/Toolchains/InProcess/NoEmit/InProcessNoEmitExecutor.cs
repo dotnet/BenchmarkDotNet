@@ -24,7 +24,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             if (executeOnSeparateThread)
             {
                 var taskCompletionSource = new TaskCompletionSource<int>();
-                var runThread = new Thread(async () => taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters)));
+                var runThread = new Thread(async () =>
+                {
+                    try
+                    {
+                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters));
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        taskCompletionSource.SetCanceled();
+                    }
+                    catch (Exception ex)
+                    {
+                        taskCompletionSource.SetException(ex);
+                    }
+                });
 
                 if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any()
                     && OsDetector.IsWindows())
@@ -70,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 exitCode = await InProcessNoEmitRunner.Run(host, parameters);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
             }

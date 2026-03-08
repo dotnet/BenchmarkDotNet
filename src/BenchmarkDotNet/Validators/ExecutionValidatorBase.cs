@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
@@ -20,7 +22,10 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
-        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+            => ValidateAsyncCore(validationParameters);
+
+        private async IAsyncEnumerable<ValidationError> ValidateAsyncCore(ValidationParameters validationParameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var errors = new List<ValidationError>();
 
@@ -41,12 +46,17 @@ namespace BenchmarkDotNet.Validators
                     continue;
                 }
 
+                if (!TryToSetCancellationToken(benchmarkTypeInstance, cancellationToken, errors))
+                {
+                    continue;
+                }
+
                 if (!await TryToCallGlobalSetup(benchmarkTypeInstance, errors))
                 {
                     continue;
                 }
 
-                await ExecuteBenchmarksAsync(benchmarkTypeInstance, typeGroup, errors);
+                await ExecuteBenchmarksAsync(benchmarkTypeInstance, typeGroup, errors, cancellationToken);
 
                 await TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
             }
@@ -231,6 +241,76 @@ namespace BenchmarkDotNet.Validators
             return true;
         }
 
+        private bool TryToSetCancellationToken(object benchmarkTypeInstance, CancellationToken cancellationToken, List<ValidationError> errors)
+        {
+            var targetType = benchmarkTypeInstance.GetType();
+
+            // Inject CancellationToken into properties marked with [BenchmarkCancellation]
+            foreach (var property in targetType.GetAllProperties())
+            {
+                if (property.PropertyType == typeof(CancellationToken) &&
+                    property.IsDefined(typeof(BenchmarkCancellationAttribute), inherit: false))
+                {
+                    var setter = property.GetSetMethod();
+                    if (setter == null || !setter.IsPublic)
+                    {
+                        errors.Add(new ValidationError(
+                            TreatsWarningsAsErrors,
+                            $"Properties marked with [BenchmarkCancellation] must have public setter, {property.Name} of {targetType.Name} has not"));
+
+                        return false;
+                    }
+
+                    try
+                    {
+                        var callInstance = setter.IsStatic ? null : benchmarkTypeInstance;
+                        setter.Invoke(callInstance, [cancellationToken]);
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(new ValidationError(
+                            TreatsWarningsAsErrors,
+                            $"Failed to set {property.Name} of {targetType.Name} to CancellationToken, exception was: {GetDisplayExceptionMessage(ex)}"));
+
+                        return false;
+                    }
+                }
+            }
+
+            // Inject CancellationToken into fields marked with [BenchmarkCancellation]
+            foreach (var field in targetType.GetAllFields())
+            {
+                if (field.FieldType == typeof(CancellationToken) &&
+                    field.IsDefined(typeof(BenchmarkCancellationAttribute), inherit: false))
+                {
+                    if (!field.IsPublic)
+                    {
+                        errors.Add(new ValidationError(
+                            TreatsWarningsAsErrors,
+                            $"Fields marked with [BenchmarkCancellation] must be public, {field.Name} of {targetType.Name} is not"));
+
+                        return false;
+                    }
+
+                    try
+                    {
+                        var callInstance = field.IsStatic ? null : benchmarkTypeInstance;
+                        field.SetValue(callInstance, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(new ValidationError(
+                            TreatsWarningsAsErrors,
+                            $"Failed to set {field.Name} of {targetType.Name} to CancellationToken, exception was: {GetDisplayExceptionMessage(ex)}"));
+
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         protected static string GetDisplayExceptionMessage(Exception ex)
         {
             if (ex is TargetInvocationException targetInvocationException)
@@ -239,6 +319,6 @@ namespace BenchmarkDotNet.Validators
             return ex?.Message ?? "Unknown error";
         }
 
-        protected abstract ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors);
+        protected abstract ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors, CancellationToken cancellationToken);
     }
 }

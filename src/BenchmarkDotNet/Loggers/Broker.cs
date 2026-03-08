@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.Loggers
         internal async ValueTask ProcessData(CancellationToken cancellationToken)
         {
             var result = await ProcessDataCore(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             if (result != Result.Success)
             {
                 logger.WriteLineError($"ProcessData operation is interrupted by {result}.");

@@ -64,6 +64,8 @@ namespace BenchmarkDotNet.Engines
 
         public async ValueTask<RunResults> RunAsync()
         {
+            Host.CancellationToken.ThrowIfCancellationRequested();
+
             await Parameters.GlobalSetupAction.Invoke();
             bool didThrow = false;
             try

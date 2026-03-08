@@ -38,6 +38,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
+                    .Replace("$CancellationTokenAssignment$", GetCancellationTokenAssignment(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareFieldsContainer$", GetDeclareFieldsContainer(benchmark, buildInfo.Id, extraFields))
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
@@ -136,6 +137,41 @@ namespace BenchmarkDotNet.Code
                 benchmarkCase.Parameters.Items
                     .Where(parameter => !parameter.IsArgument)
                     .Select(parameter => $"{(parameter.IsStatic ? benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName() : "base")}.{parameter.Name} = {parameter.ToSourceCode()};"));
+
+        internal static string GetCancellationTokenAssignment(BenchmarkCase benchmarkCase)
+        {
+            var targetType = benchmarkCase.Descriptor.Type;
+            var cancellationTokenMembers = new System.Collections.Generic.List<string>();
+            var typeFullName = targetType.GetCorrectCSharpTypeName();
+
+            // Check properties
+            foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+            {
+                if (property.PropertyType == typeof(System.Threading.CancellationToken) &&
+                    property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false) &&
+                    property.CanWrite &&
+                    property.GetSetMethod() is { } setter)
+                {
+                    var target = setter.IsStatic ? typeFullName : "base";
+                    cancellationTokenMembers.Add($"            {target}.{property.Name} = cancellationToken;");
+                }
+            }
+
+            // Check fields
+            foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+            {
+                if (field.FieldType == typeof(System.Threading.CancellationToken) &&
+                    field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+                {
+                    var target = field.IsStatic ? typeFullName : "base";
+                    cancellationTokenMembers.Add($"            {target}.{field.Name} = cancellationToken;");
+                }
+            }
+
+            return cancellationTokenMembers.Count > 0
+                ? string.Join(System.Environment.NewLine, cancellationTokenMembers) + System.Environment.NewLine
+                : string.Empty;
+        }
 
         private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
