@@ -96,10 +96,17 @@ public class AsyncBenchmarkCodeFixProvider : CodeFixProvider
             // Inserting after an existing member - add blank line by replacing
             // the TRAILING trivia of the previous member with exactly two newlines
             var previousMember = members[insertionIndex - 1];
+
+            // Detect the existing end-of-line trivia style (LF vs CRLF)
+            var existingEolTrivia = previousMember.GetTrailingTrivia()
+                .FirstOrDefault(t => t.IsKind(SyntaxKind.EndOfLineTrivia));
+
+            var eolTrivia = existingEolTrivia != default
+                ? existingEolTrivia
+                : SyntaxFactory.CarriageReturnLineFeed;
+
             var previousMemberWithBlankLine = previousMember.WithTrailingTrivia(
-                SyntaxFactory.TriviaList(
-                    SyntaxFactory.CarriageReturnLineFeed,
-                    SyntaxFactory.CarriageReturnLineFeed));
+                SyntaxFactory.TriviaList(eolTrivia, eolTrivia));
 
             membersToUpdate = members.Replace(previousMember, previousMemberWithBlankLine);
         }
