@@ -24,11 +24,12 @@ namespace BenchmarkDotNet.IntegrationTests
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        private const string JsvuSkipReason = "JSVU does not support ARM on Windows or Linux";
+        private const string V8SkipReason = "JSVU does not support ARM on Windows or Linux";
+        private const string NodeSkipReason = "https://github.com/deniszykov/WebSocketListener/issues/68";
 
-        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        [InlineData(MonoAotCompilerMode.mini, "v8")]
-        [InlineData(MonoAotCompilerMode.mini, "node")]
+        [Theory]
+        [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "node"], NodeSkipReason, [EnvRequirement.NonFullFramework])]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, "v8", Skip = "AOT is broken")]
         [InlineData(MonoAotCompilerMode.wasm, "node", Skip = "AOT is broken")]
@@ -37,9 +38,9 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WasmBenchmark>(GetConfig(aotCompilerMode, javaScriptEngine));
         }
 
-        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        [InlineData(MonoAotCompilerMode.mini, "v8")]
-        [InlineData(MonoAotCompilerMode.mini, "node")]
+        [Theory]
+        [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "node"], NodeSkipReason, [EnvRequirement.NonFullFramework])]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, "v8", Skip = "AOT is broken")]
         [InlineData(MonoAotCompilerMode.wasm, "node", Skip = "AOT is broken")]
@@ -61,9 +62,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        [InlineData("v8", "custom-main-v8.mjs", WasmIpcType.FileStdOut)]
-        [InlineData("node", "custom-main-node.mjs", WasmIpcType.WebSocket)]
+        [Theory]
+        [InlineDataEnvSpecific(["v8", "custom-main-v8.mjs", WasmIpcType.FileStdOut], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineDataEnvSpecific(["node", "custom-main-node.mjs", WasmIpcType.WebSocket], NodeSkipReason, [EnvRequirement.NonFullFramework])]
         public void WasmSupportsCustomMainJs(string javaScriptEngine, string customMainJs, WasmIpcType ipcType)
         {
             var mainJsTemplate = new FileInfo(Path.Combine("wwwroot", customMainJs));
