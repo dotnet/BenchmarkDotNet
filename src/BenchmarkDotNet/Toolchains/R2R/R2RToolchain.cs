@@ -27,11 +27,9 @@ namespace BenchmarkDotNet.Toolchains.R2R
         [PublicAPI]
         public static new IToolchain From(NetCoreAppSettings settings)
         {
-            // .NET 11+ requires PublishReadyToRun and RuntimeIdentifier to be passed during restore
+            // .NET requires PublishReadyToRun to be passed during restore
             // so that the correct R2R crossgen2 packages are resolved (see https://github.com/dotnet/sdk/issues/20701).
-            string extraArguments = settings.TargetFrameworkMoniker == "net11.0"
-                ? $"/p:PublishReadyToRun=true /p:RuntimeIdentifier={CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier()}"
-                : "";
+            string extraArguments = "/p:PublishReadyToRun=true";
 
             return new R2RToolchain(settings.Name,
                 new R2RGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.CustomRuntimePack, settings.AOTCompilerPath),
