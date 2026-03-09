@@ -124,7 +124,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
 
     [Theory]
     [InlineDataEnvSpecific("v8", "JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-    [InlineDataEnvSpecific("node", "https://github.com/deniszykov/WebSocketListener/issues/68", [EnvRequirement.NonFullFramework])]
+    [InlineData("node")]
     public async Task RunWithCancellationTokenIsCancelled_Wasm(string javaScriptEngine)
     {
         var cts = new CancellationTokenSource();
