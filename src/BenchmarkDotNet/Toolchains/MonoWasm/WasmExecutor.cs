@@ -100,9 +100,18 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             if (useWebSocket)
             {
                 var webSocketListener = new WebSocketListener();
-                var port = await webSocketListener.StartAndGetPortAsync();
-                listener = webSocketListener;
-                args = benchmarkId.ToArguments(port, diagnoserRunMode);
+                try
+                {
+                    var port = await webSocketListener.StartAndGetPortAsync();
+                    listener = webSocketListener;
+                    args = benchmarkId.ToArguments(port, diagnoserRunMode);
+                }
+                catch
+                {
+                    // Ensure WebSocketListener is disposed if we fail after creating it
+                    webSocketListener.Dispose();
+                    throw;
+                }
             }
             else
             {
@@ -112,7 +121,17 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 args = benchmarkId.ToArguments(fileStdOutListener.GetIpcDirectory(), diagnoserRunMode);
             }
 
-            Process process = CreateProcess(benchmarkCase, artifactsPaths, args, resolver);
+            Process process;
+            try
+            {
+                process = CreateProcess(benchmarkCase, artifactsPaths, args, resolver);
+            }
+            catch
+            {
+                // Ensure listener is disposed if process creation fails
+                listener.Dispose();
+                throw;
+            }
 
             return new ProcessListener(listener, process);
         }
