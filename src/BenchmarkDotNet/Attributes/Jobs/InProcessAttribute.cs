@@ -19,7 +19,10 @@ public class InProcessAttribute(
     bool executeOnSeparateThread = true)
     : JobConfigBaseAttribute(GetJob(toolchainType, executeOnSeparateThread))
 {
-    internal static Job GetJob(InProcessToolchainType toolchainType, bool executeOnSeparateThread)
+    private static Job GetJob(InProcessToolchainType toolchainType, bool executeOnSeparateThread)
+        => GetJob(Job.Default, toolchainType, executeOnSeparateThread);
+
+    internal static Job GetJob(Job baseJob, InProcessToolchainType toolchainType, bool executeOnSeparateThread)
     {
         if (toolchainType == InProcessToolchainType.Auto)
         {
@@ -27,8 +30,9 @@ public class InProcessAttribute(
                 ? InProcessToolchainType.NoEmit
                 : InProcessToolchainType.Emit;
         }
+
         return toolchainType == InProcessToolchainType.Emit
-            ? Job.Default.WithToolchain(new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }))
-            : Job.Default.WithToolchain(new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }));
+            ? baseJob.WithToolchain(new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }))
+            : baseJob.WithToolchain(new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }));
     }
 }

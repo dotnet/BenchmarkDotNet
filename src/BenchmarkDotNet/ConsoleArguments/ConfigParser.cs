@@ -9,6 +9,7 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -871,6 +872,14 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{options.AOTCompilerPath}\" does NOT exist. It MUST be provided.");
                 }
+                else if (runtimeMoniker >= RuntimeMoniker.WasmNet80 && runtimeMoniker < RuntimeMoniker.MonoAOTLLVM)
+                {
+                    if (!ProcessHelper.TryResolveExecutableInPath(options.WasmJavaScriptEngine, out _))
+                    {
+                        logger.WriteLineError($"The provided {nameof(options.WasmJavaScriptEngine)} \"{options.WasmJavaScriptEngine}\" does NOT exist.");
+                        return false;
+                    }
+                }
             }
 
             foreach (string exporter in options.Exporters)
@@ -904,12 +913,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
-                return false;
-            }
-
-            if (options.WasmJavascriptEngine.IsNotNullButDoesNotExist())
-            {
-                logger.WriteLineError($"The provided {nameof(options.WasmJavascriptEngine)} \"{options.WasmJavascriptEngine}\" does NOT exist.");
                 return false;
             }
 
@@ -1088,7 +1091,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (options.RunInProcess)
             {
-                yield return Attributes.InProcessAttribute.GetJob(Attributes.InProcessToolchainType.Auto, true);
+                yield return Attributes.InProcessAttribute.GetJob(baseJob, Attributes.InProcessToolchainType.Auto, true);
             }
             else if (options.ClrVersion.IsNotBlank())
             {
@@ -1305,12 +1308,13 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var wasmRuntime = new WasmRuntime(
                 msBuildMoniker: msBuildMoniker,
-                javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
-                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments ?? "",
-                aot: wasmAot,
-                wasmDataDir: options.WasmDataDirectory?.FullName ?? "",
                 moniker: moniker,
+                displayName: "Wasm",
+                javaScriptEngine: options.WasmJavaScriptEngine ?? "",
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
+                aot: wasmAot,
                 runtimeFlavor: options.WasmRuntimeFlavor,
+                mainJsTemplate: options.WasmMainJsTemplate,
                 processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
 
             var toolChain = WasmToolchain.From(new NetCoreAppSettings(

@@ -1,0 +1,164 @@
+name: generate-coverage-report
+run-name: Generate coverage coverage report  ${{ github.event.head_commit.message }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_integration_tests:
+        type: boolean
+        description: Set `true` to skip integration tests.
+        default: true
+        
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.inputs.skip_integration_tests }}-${{ github.head_ref || github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  collect-coverage:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: pwsh
+    strategy:
+      matrix:
+        # Note: ARM64 on linux/macos are not supported.
+        # https://github.com/microsoft/codecoverage/blob/main/docs/supported-os.md
+        os: [windows-latest, ubuntu-latest, macos-15-intel, windows-11-arm]
+    steps:
+      - uses: actions/checkout@v6
+
+      # Ensure DOTNET_ROOT environment variable set on macos-15-intel 
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x  
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage
+
+      - name: Run task 'build'
+        run: dotnet build BenchmarkDotNet.slnx -c Release
+
+      - name: Start dotnet-coverage with background server mode
+        run: dotnet coverage collect --session-id bdn_coverage --settings tests/CodeCoverage.config --server-mode --background
+
+      - name: Collect Code Coverage
+        run: |
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Tests -c Release --no-build --framework net8.0"
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Analyzers.Tests  -c Release --no-build --framework net8.0"
+
+      - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
+        if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
+        run: |
+          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net8.0 --filter "(FullyQualifiedName!~DotMemoryTests) & (FullyQualifiedName!~DotTraceTests) & (FullyQualifiedName!~WasmIsSupported) & (FullyQualifiedName!~WasmSupportsInProcessDiagnosers)"'
+
+      - name: Shutdown dotnet-coverage server.
+        run: dotnet coverage shutdown bdn_coverage --timeout 60000
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-${{ matrix.os }}
+          path: "**/*.cobertura.xml"
+
+  collect-coverage-netfx:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage
+
+      - name: Run task 'build'
+        run: dotnet build BenchmarkDotNet.slnx -c Release
+
+      - name: Start dotnet-coverage with background server mode
+        run: dotnet coverage collect --session-id bdn_coverage --settings tests/CodeCoverage.config --server-mode --background
+
+      - name: Collect Code Coverage
+        run: |
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Tests -c Release --no-build --framework net462"
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Analyzers.Tests  -c Release --no-build --framework net462"
+
+      - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
+        if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
+        run: |
+          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net462 --filter "(FullyQualifiedName!~DotMemoryTests) & (FullyQualifiedName!~DotTraceTests) & (FullyQualifiedName!~WasmIsSupported) & (FullyQualifiedName!~WasmSupportsInProcessDiagnosers)"'
+
+      - name: Shutdown dotnet-coverage server.
+        run: dotnet coverage shutdown bdn_coverage --timeout 60000
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-windows-netfx
+          path: "**/*.cobertura.xml"
+
+  generate-coverage-report:
+    needs: [collect-coverage, collect-coverage-netfx]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v6
+        with:
+          path: coverage
+
+      - name: Upload raw coverage data
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage
+          path: coverage
+
+      - name: Rewrite file path map to absolute path
+        run: |
+          $baseSourcePath = Get-Location
+          $files =  [IO.Directory]::GetFiles("coverage", "coverage.cobertura.xml", [IO.SearchOption]::AllDirectories)
+          foreach($file in $files)
+          {
+            $content = [IO.File]::ReadAllText($file).Replace("/_/", [Environment]::CurrentDirectory + '/')
+            [IO.File]::WriteAllText($file, $content)
+          }
+
+      - name: Install ReportGenerator as global tool
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Geterate reports
+        run: |
+          reportgenerator `
+            -reports:"coverage/**/coverage.cobertura.xml" `
+            -targetdir:"coverage_report/reports" `
+            -reporttypes:"Html;MarkdownSummaryGithub"
+
+      - name: Create index.html
+        run: |
+          $html = @"
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=reports/index.html">
+            <title>Redirect</title>
+          </head>
+          <body>
+            <p>If you are not redirected automatically, <a href="reports/index.html">click here</a>.</p>
+          </body>
+          </html>
+          "@
+          [IO.File]::WriteAllText("coverage_report/index.html", $html)
+
+      - name: Write coverage summary
+        run: |
+          $markdown = Get-Content coverage_report/reports/SummaryGithub.md -Raw
+          Write-Output $markdown >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload HTML report files
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage_report
+          path: coverage_report

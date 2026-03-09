@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/samples/">
+    <Project Path="BenchmarkDotNet.Samples.Maui/BenchmarkDotNet.Samples.Maui.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="../src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj" />
+    <Project Path="../src/BenchmarkDotNet/BenchmarkDotNet.csproj" />
+  </Folder>
+</Solution>

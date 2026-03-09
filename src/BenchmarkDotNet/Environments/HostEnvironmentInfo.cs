@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
@@ -13,9 +10,12 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using Perfolizer.Helpers;
 using Perfolizer.Horology;
-using Perfolizer.Models;
 using Perfolizer.Metrology;
-using BenchmarkDotNet.Extensions;
+using Perfolizer.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -69,6 +69,8 @@ namespace BenchmarkDotNet.Environments
         // TODO: Join with OsInfo
         public Lazy<VirtualMachineHypervisor?> VirtualMachineHypervisor { get; protected set; }
 
+        public Lazy<PhysicalMemoryInfo?> PhysicalMemory { get; protected set; }
+
         protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = BenchmarkDotNetInfo.Instance.BrandVersion;
@@ -80,6 +82,7 @@ namespace BenchmarkDotNet.Environments
             VirtualMachineHypervisor = new Lazy<VirtualMachineHypervisor?>(RuntimeInformation.GetVirtualMachineHypervisor);
             Os = new Lazy<OsInfo>(OsDetector.GetOs);
             Cpu = new Lazy<CpuInfo>(() => CpuDetector.CrossPlatform.Detect() ?? CpuInfo.Unknown);
+            PhysicalMemory = new Lazy<PhysicalMemoryInfo?>(SystemMemory.GetPhysicalMemory);
         }
 
         public new static HostEnvironmentInfo GetCurrent() => current ??= new HostEnvironmentInfo();
@@ -96,6 +99,7 @@ namespace BenchmarkDotNet.Environments
                 yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {Os.Value.ToBrandString()}";
 
             yield return Cpu.Value.ToFullBrandName();
+
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
             {
                 string frequency = PerfolizerMeasurementFormatter.Instance.Format(
@@ -108,6 +112,9 @@ namespace BenchmarkDotNet.Environments
                 string timer = HardwareTimerKind.ToString().ToUpper();
                 yield return $"Frequency: {frequency}, Resolution: {resolution}, Timer: {timer}";
             }
+
+            if (PhysicalMemory.Value != null)
+                yield return $"Memory: {PhysicalMemory.Value.ToFormattedString()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
             {

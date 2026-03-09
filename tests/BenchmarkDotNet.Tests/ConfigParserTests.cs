@@ -1,28 +1,29 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using System.Reflection;
+using AwesomeAssertions;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.NativeAot;
+using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
-using BenchmarkDotNet.Portability;
-using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -111,6 +112,18 @@ namespace BenchmarkDotNet.Tests
             var job = configEasy.GetJobs().Single();
 
             Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
+        }
+
+        [Fact]
+        public void UserCanChooseInProcessAndStrategyMonitoring()
+        {
+            var configEasy = ConfigParser.Parse(["--inProcess", "--strategy", "Monitoring"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(configEasy);
+            var job = configEasy.GetJobs().Single();
+
+            job.GetToolchain().Should().BeOfType<InProcessEmitToolchain>();
+            job.Run.RunStrategy.Should().Be(RunStrategy.Monitoring);
         }
 
         [FactEnvSpecific(
@@ -685,7 +698,7 @@ namespace BenchmarkDotNet.Tests
         [Fact(Skip = "This should be handled somehow at CommandLineParser level. See https://github.com/commandlineparser/commandline/pull/892")]
         public void UserCanSpecifyWasmArgs()
         {
-            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module"], new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmArgs", "--expose_wasm --module", GetDummyWasmEngine()], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             Assert.NotNull(parsedConfiguration.config);
             var jobs = parsedConfiguration.config.GetJobs();
@@ -699,7 +712,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanSpecifyWasmArgsUsingEquals()
         {
-            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module"], new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module" , GetDummyWasmEngine()], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             Assert.NotNull(parsedConfiguration.config);
             var jobs = parsedConfiguration.config.GetJobs();
@@ -717,7 +730,8 @@ namespace BenchmarkDotNet.Tests
             File.WriteAllLines(tempResponseFile,
             [
                 "--runtimes wasmnet80",
-                "--wasmArgs \"--expose_wasm --module\""
+                "--wasmArgs \"--expose_wasm --module\"",
+                GetDummyWasmEngine()
             ]);
             var parsedConfiguration = ConfigParser.Parse([$"@{tempResponseFile}"], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
@@ -730,6 +744,17 @@ namespace BenchmarkDotNet.Tests
                 // if https://github.com/commandlineparser/commandline/pull/892 lands
                 Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
             }
+        }
+
+        [Fact]
+        public void UserCanSpecifyWasmMainJsTemplate()
+        {
+            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmMainJsTemplate", "./dummyFile.js", GetDummyWasmEngine()], new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var job = parsedConfiguration.config!.GetJobs().Single();
+
+            var runtime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+            Assert.Equal("dummyFile.js", runtime.MainJsTemplate?.Name);
         }
 
         [Theory]
@@ -756,6 +781,12 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Null(updatedArgs);
             Assert.False(isSuccess);
+        }
+
+        private string GetDummyWasmEngine()
+        {
+            // We know, that this file exists, that's enough.
+            return $"--wasmEngine={Assembly.GetExecutingAssembly().Location}";
         }
     }
 }

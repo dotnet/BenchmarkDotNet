@@ -5,21 +5,21 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Diagnostics.dotMemory;
+using BenchmarkDotNet.Diagnostics.dotTrace;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
-    public class DotMemoryTests : BenchmarkTestExecutor
+    public class DotTraceTests : BenchmarkTestExecutor
     {
-        public DotMemoryTests(ITestOutputHelper output) : base(output) { }
+        public DotTraceTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void DotMemorySmokeTest()
+        public void DotTraceSmokeTest()
         {
             if (!OsDetector.IsWindows() && RuntimeInformation.IsMono)
             {
@@ -30,8 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = new ManualConfig().AddJob(
             [
                 Job.Dry.WithId("ExternalProcess"),
-                // TODO: Add InProcessEmitToolchain job when flaky test issue is resolved https://github.com/dotnet/BenchmarkDotNet/issues/2950
-                //Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithId("InProcess"),
+                Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithId("InProcess")
             ]
             );
             string snapshotDirectory = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "snapshots");
@@ -43,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Output.WriteLine("---------------------------------------------");
             Output.WriteLine("SnapshotDirectory:" + snapshotDirectory);
             var snapshots = Directory.EnumerateFiles(snapshotDirectory)
-                .Where(filePath => Path.GetExtension(filePath).Equals(".dmw", StringComparison.OrdinalIgnoreCase))
+                .Where(filePath => Path.GetExtension(filePath).Equals(".dtp", StringComparison.OrdinalIgnoreCase))
                 .Select(Path.GetFileName!)
                 .OrderBy(fileName => fileName)
                 .ToList();
@@ -51,27 +50,18 @@ namespace BenchmarkDotNet.IntegrationTests
             foreach (var snapshot in snapshots)
                 Output.WriteLine("* " + snapshot);
 
-            Assert.Equal(2, snapshots.Count);
-            // Assert.Equal(4, snapshots.Count);
+            Assert.Single(snapshots);
+            // Assert.Equal(2, snapshots.Count);
         }
 
-        [DotMemoryDiagnoser]
+        [DotTraceDiagnoser]
         public class Benchmarks
         {
             [Benchmark]
-            public int Foo0()
+            public int Foo()
             {
                 var list = new List<object>();
-                for (int i = 0; i < 1000; i++)
-                    list.Add(new object());
-                return list.Count;
-            }
-
-            [Benchmark]
-            public int Foo1()
-            {
-                var list = new List<object>();
-                for (int i = 0; i < 1000; i++)
+                for (int i = 0; i < 1000000; i++)
                     list.Add(new object());
                 return list.Count;
             }

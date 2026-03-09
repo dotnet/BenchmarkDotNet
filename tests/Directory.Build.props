@@ -4,6 +4,11 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Set SolutionDir property to suppress warning that raised by Verify.Xunit solution discovery feature. -->
+    <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))</SolutionDir>
+  </PropertyGroup>
+
   <!-- ProjectReferences are not transitive, so we need to directly include the analyzers for all test projects. -->
   <ItemGroup Condition="'$(AssemblyName)' != 'BenchmarkDotNet.Analyzers.Tests'">
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
