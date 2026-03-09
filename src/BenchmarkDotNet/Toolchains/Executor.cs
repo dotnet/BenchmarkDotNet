@@ -65,6 +65,7 @@ namespace BenchmarkDotNet.Toolchains
 
             List<string> results;
             List<string> prefixedOutput;
+            bool processOutputStarted = false;
             try
             {
                 using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener);
@@ -87,6 +88,7 @@ namespace BenchmarkDotNet.Toolchains
                 broker.Diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
 
                 processOutputReader.BeginRead();
+                processOutputStarted = true;
 
                 process.EnsureHighPriority(logger);
                 if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
@@ -101,16 +103,19 @@ namespace BenchmarkDotNet.Toolchains
             }
             finally
             {
-                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (processOutputStarted)
                 {
-                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+                    if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                    {
+                        logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 
-                    processOutputReader.CancelRead();
-                    processCleanupHelper.KillProcessTree();
-                }
-                else
-                {
-                    processOutputReader.StopRead();
+                        processOutputReader.CancelRead();
+                        processCleanupHelper.KillProcessTree();
+                    }
+                    else
+                    {
+                        processOutputReader.StopRead();
+                    }
                 }
             }
 

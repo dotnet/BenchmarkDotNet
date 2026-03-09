@@ -86,6 +86,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using ProcessCleanupHelper processCleanupHelper = new(process, logger);
             using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
 
+            bool processOutputStarted = false;
             List<string> results;
             List<string> prefixedOutput;
             try
@@ -101,6 +102,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
 
                 processOutputReader.BeginRead();
+                processOutputStarted = true;
 
                 process.EnsureHighPriority(logger);
                 if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
@@ -115,16 +117,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
             finally
             {
-                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (processOutputStarted)
                 {
-                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+                    if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                    {
+                        logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
-                    processOutputReader.CancelRead();
-                    processCleanupHelper.KillProcessTree();
-                }
-                else
-                {
-                    processOutputReader.StopRead();
+                        processOutputReader.CancelRead();
+                        processCleanupHelper.KillProcessTree();
+                    }
+                    else
+                    {
+                        processOutputReader.StopRead();
+                    }
                 }
             }
 
