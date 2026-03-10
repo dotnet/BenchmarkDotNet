@@ -58,7 +58,8 @@
 
   <!-- The purpose of this project is to publish the app with r2r composite using a custom runtime pack and a custom crossgen2, built locally -->
 
-  <Target Name="TrickRuntimePackLocation" AfterTargets="ProcessFrameworkReferences">
+  <Target Name="TrickRuntimePackLocation" AfterTargets="ProcessFrameworkReferences"
+          Condition="'$RUNTIMEPACK$' != '' And '$CROSSGEN2PACK$' != ''">
     <ItemGroup>
       <RuntimePack>
         <PackageDirectory>$RUNTIMEPACK$</PackageDirectory>

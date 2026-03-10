@@ -26,17 +26,11 @@ namespace BenchmarkDotNet.Toolchains.R2R
 
         [PublicAPI]
         public static new IToolchain From(NetCoreAppSettings settings)
-        {
-            // .NET requires PublishReadyToRun to be passed during restore
-            // so that the correct R2R crossgen2 packages are resolved (see https://github.com/dotnet/sdk/issues/20701).
-            string extraArguments = "/p:PublishReadyToRun=true";
-
-            return new R2RToolchain(settings.Name,
+            => new R2RToolchain(settings.Name,
                 new R2RGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.CustomRuntimePack, settings.AOTCompilerPath),
-                new DotNetCliPublisher(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, extraArguments),
+                new DotNetCliPublisher(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath),
                 new Executor(),
                 settings.CustomDotNetCliPath);
-        }
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {
