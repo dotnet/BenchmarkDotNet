@@ -20,7 +20,9 @@ namespace BenchmarkDotNet.IntegrationTests
     /// <summary>
     /// In order to run WasmTests locally, the following prerequisites are required:
     /// * Install wasm-tools workload: `dotnet install-wasm-tools-net8`
-    /// * Install Node and add it to PATH
+    /// * Install Node.js and add it to PATH
+    /// * Install v8: `npm install jsvu -g && jsvu --os=default --engines=v8`
+    /// * Add `$HOME/.jsvu/bin` to PATH
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
