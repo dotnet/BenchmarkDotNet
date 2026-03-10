@@ -146,7 +146,7 @@ public class AnalyzerTestsTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
-[TaskDescription("Run integration tests using .NET Framework 4.6.2+ (slow)")]
+[TaskDescription("Run integration tests using .NET Framework 4.7.2 (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
 {
@@ -154,7 +154,7 @@ public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
 
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
-    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net462");
+    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net472");
 
     public HelpInfo GetHelp() => new();
 }
