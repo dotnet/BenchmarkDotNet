@@ -276,9 +276,19 @@ namespace BenchmarkDotNet.Running
                         if (!benchmark.Job.GetToolchain().IsInProcess)
                         {
                             logger.WriteLine();
-                            logger.WriteLineError("// BenchmarkDotNet has failed to build the auto-generated boilerplate code.");
-                            logger.WriteLineError($"// It can be found in {buildResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
-                            logger.WriteLineError("// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html");
+                            logger.WriteLineError($"// BenchmarkDotNet has failed to build the auto-generated boilerplate code.");
+
+                            if (config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
+                            {
+                                logger.WriteLineError($"// It can be found in {buildResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+                            }
+                            else
+                            {
+                                artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+                                logger.WriteLineError($"// Re-run benchmark with --keepFiles option to confirm auto-generated project files.");
+                            }
+
+                            logger.WriteLineError($"// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html");
                         }
 
                         if (config.Options.IsSet(ConfigOptions.StopOnFirstError) || allBuildsHaveFailed)
