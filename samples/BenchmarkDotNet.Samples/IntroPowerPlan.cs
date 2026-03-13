@@ -7,6 +7,7 @@ using System;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroPowerPlan
     {
         private class Config : ManualConfig

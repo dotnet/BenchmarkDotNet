@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
     [DryJob]
+    [UseLocalJobOnly]
     [RankColumn]
     public class IntroOrderManual
     {

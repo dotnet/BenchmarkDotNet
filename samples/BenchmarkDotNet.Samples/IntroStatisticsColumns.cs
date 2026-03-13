@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 namespace BenchmarkDotNet.Samples
 {
     [MediumRunJob, SkewnessColumn, KurtosisColumn]
+    [UseLocalJobOnly]
     public class IntroStatisticsColumns
     {
         private const int N = 10000;

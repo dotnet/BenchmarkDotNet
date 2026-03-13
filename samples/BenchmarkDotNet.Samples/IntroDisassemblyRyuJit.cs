@@ -5,6 +5,7 @@ namespace BenchmarkDotNet.Samples
 {
     [DisassemblyDiagnoser(printSource: true)]
     [RyuJitX64Job]
+    [UseLocalJobOnly]
     public class IntroDisassemblyRyuJit
     {
         private int[] field = Enumerable.Range(0, 100).ToArray();

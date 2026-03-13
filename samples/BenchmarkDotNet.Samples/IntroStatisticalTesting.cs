@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
     [StatisticalTestColumn("500us")]
     [StatisticalTestColumn("3%")]
     [SimpleJob(warmupCount: 0, iterationCount: 5)]
+    [UseLocalJobOnly]
     public class IntroStatisticalTesting
     {
         [Benchmark] public void Sleep50() => Thread.Sleep(50);

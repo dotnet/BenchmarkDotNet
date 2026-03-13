@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Samples
 {
     // Using percentiles for adequate timings representation
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     [SimpleJob(RunStrategy.ColdStart, launchCount: 4,
         warmupCount: 3, iterationCount: 20, id: "MyJob")]
     public class IntroPercentiles

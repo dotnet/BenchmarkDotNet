@@ -6,6 +6,7 @@ using BenchmarkDotNet.Engines;
 namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RunStrategy.ColdStart, iterationCount: 5)]
+    [UseLocalJobOnly]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class IntroColdStart
     {

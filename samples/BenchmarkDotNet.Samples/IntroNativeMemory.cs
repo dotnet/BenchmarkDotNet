@@ -8,6 +8,7 @@ using BenchmarkDotNet.Filters;
 namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
+    [UseLocalJobOnly]
     [NativeMemoryProfiler]
     [MemoryDiagnoser]
     public class IntroNativeMemory

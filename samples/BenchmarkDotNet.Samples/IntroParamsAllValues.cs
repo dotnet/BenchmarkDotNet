@@ -4,6 +4,7 @@ using System.Threading;
 namespace BenchmarkDotNet.Samples
 {
     [DryJob]
+    [UseLocalJobOnly]
     public class IntroParamsAllValues
     {
         public enum CustomEnum
