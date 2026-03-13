@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RunStrategy.Monitoring, launchCount: 0,
         warmupCount: 0, iterationCount: 1)]
+    [UseLocalJobOnly]
     public class IntroSetupCleanupTarget
     {
         [GlobalSetup(Target = nameof(BenchmarkA))]

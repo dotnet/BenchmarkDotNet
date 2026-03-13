@@ -8,6 +8,7 @@ using BenchmarkDotNet.Running;
 namespace BenchmarkDotNet.Samples
 {
     [DryJob]
+    [UseLocalJobOnly]
     [CategoriesColumn]
     [CustomCategoryDiscoverer]
     public class IntroCategoryDiscoverer

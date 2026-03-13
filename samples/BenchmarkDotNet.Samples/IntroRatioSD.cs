@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Samples
     [Outliers(OutlierMode.DontRemove)]
     // Skip jitting, pilot, warmup; measure 10 iterations
     [SimpleJob(RunStrategy.Monitoring, iterationCount: 10, invocationCount: 1)]
+    [UseLocalJobOnly]
     public class IntroRatioSD
     {
         private int counter;

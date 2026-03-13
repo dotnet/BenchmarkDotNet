@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 namespace BenchmarkDotNet.Samples
 {
     [DryJob]
+    [UseLocalJobOnly]
     [CategoriesColumn]
     [BenchmarkCategory("Awesome")]
     [AnyCategoriesFilter("A", "1")]

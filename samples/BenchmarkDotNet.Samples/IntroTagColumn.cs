@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Samples
 {
     // You can add custom tags per each method using Columns
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroTagColumn
     {
         private class Config : ManualConfig

@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Samples
     // *** Attribute style ***
 
     [DryJob]
+    [UseLocalJobOnly]
     [JsonExporterAttribute.Brief]
     [JsonExporterAttribute.Full]
     [JsonExporterAttribute.BriefCompressed]

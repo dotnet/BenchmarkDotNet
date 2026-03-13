@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RunStrategy.Monitoring, launchCount: 1,
         warmupCount: 2, iterationCount: 3)]
+    [UseLocalJobOnly]
     public class IntroSetupCleanupIteration
     {
         private int setupCounter;

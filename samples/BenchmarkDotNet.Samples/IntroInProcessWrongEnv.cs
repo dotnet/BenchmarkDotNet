@@ -11,6 +11,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]
     public class IntroInProcessWrongEnv

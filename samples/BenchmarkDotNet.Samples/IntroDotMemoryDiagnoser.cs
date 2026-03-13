@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Samples
     [DotMemoryDiagnoser]
     [SimpleJob] // external-process execution
     [InProcess] // in-process execution
+    [UseLocalJobOnly]
     public class IntroDotMemoryDiagnoser
     {
         [Params(1024)]

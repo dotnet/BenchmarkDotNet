@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared, jobOrderPolicy: JobOrderPolicy.Numeric)]
     [DryJob]
+    [UseLocalJobOnly]
     public class IntroOrderAttr
     {
         [Params(1, 2, 3)]
