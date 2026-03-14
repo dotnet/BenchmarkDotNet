@@ -5,6 +5,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -16,7 +18,7 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal sealed class MonoDisassembler
     {
-        internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
+        internal async Task<DisassemblyResult> Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono, CancellationToken cancellationToken)
         {
             Debug.Assert(!RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");
 
@@ -29,7 +31,8 @@ namespace BenchmarkDotNet.Disassemblers
             string monoPath = mono.CustomPath.IsNotBlank() ? mono.CustomPath : "mono";
             string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
 
-            var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
+            var (_, output) = await ProcessHelper.RunAndReadOutputLineByLineAsync(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
 
             return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);

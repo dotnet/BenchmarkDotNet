@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Loggers
             EarlyProcessExit,
         }
 
-        public Broker(ILogger logger, Process process, IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser,
+        public Broker(ILogger logger, Process process, IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser,
             BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IpcListener ipcListener)
         {
             this.logger = logger;
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Loggers
             process.Exited += OnProcessExited;
         }
 
-        internal IDiagnoser? Diagnoser { get; }
+        internal IDiagnoser Diagnoser { get; }
 
         internal DiagnoserActionParameters DiagnoserActionParameters { get; }
 
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Loggers
                     // Handle HostSignal data
                     if (Engine.Signals.TryGetSignal(line, out var signal))
                     {
-                        Diagnoser?.Handle(signal, DiagnoserActionParameters);
+                        await Diagnoser.HandleAsync(signal, DiagnoserActionParameters, cancellationToken);
 
                         lock (ipcConnection)
                         {

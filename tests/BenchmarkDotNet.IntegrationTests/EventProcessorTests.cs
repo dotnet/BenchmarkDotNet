@@ -13,6 +13,8 @@ using BenchmarkDotNet.Validators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -229,10 +231,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllFailsGenerator : IGenerator
         {
-            public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-            {
-                return GenerateResult.Failure(ArtifactsPaths.Empty, [], new Exception("Generation Failed"));
-            }
+            public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+                => new(GenerateResult.Failure(ArtifactsPaths.Empty, [], new Exception("Generation Failed")));
         }
 
         public class LoggingEventProcessor : EventProcessor

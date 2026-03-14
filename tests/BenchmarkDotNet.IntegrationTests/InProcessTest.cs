@@ -322,6 +322,39 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
 
+        [Fact]
+        public void InProcessNoEmitRunsOnCallerThreadWhenConfigured()
+        {
+            var callerThreadId = Thread.CurrentThread.ManagedThreadId;
+            SameThreadBenchmarkNoEmit.CallerThreadId = callerThreadId;
+            SameThreadBenchmarkNoEmit.BenchmarkThreadId = -1;
+
+            var config = new ManualConfig()
+                .AddJob(Job.Dry
+                    .WithToolchain(new InProcessNoEmitToolchain(new InProcessNoEmitSettings { ExecuteOnSeparateThread = false }))
+                    .WithInvocationCount(UnrollFactor)
+                    .WithUnrollFactor(UnrollFactor))
+                .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
+                .AddColumnProvider(DefaultColumnProviders.Instance);
+
+            CanExecute<SameThreadBenchmarkNoEmit>(config);
+
+            Assert.Equal(callerThreadId, SameThreadBenchmarkNoEmit.BenchmarkThreadId);
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+        public class SameThreadBenchmarkNoEmit
+        {
+            public static int CallerThreadId;
+            public static int BenchmarkThreadId;
+
+            [Benchmark]
+            public void Benchmark()
+            {
+                BenchmarkThreadId = Thread.CurrentThread.ManagedThreadId;
+            }
+        }
+
 #if NET8_0_OR_GREATER
         [Fact]
         public void ParamsSupportRequiredProperty()

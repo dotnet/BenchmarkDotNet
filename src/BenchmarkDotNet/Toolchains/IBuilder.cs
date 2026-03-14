@@ -1,11 +1,12 @@
 ﻿using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace BenchmarkDotNet.Toolchains
+namespace BenchmarkDotNet.Toolchains;
+
+public interface IBuilder
 {
-    public interface IBuilder
-    {
-        BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger);
-    }
+    ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken);
 }

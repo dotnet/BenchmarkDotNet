@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         }
 
         private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Loggers.ILogger logger, ArtifactsPaths artifactsPaths,
-            IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
+            IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
             using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken);
@@ -152,14 +152,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     ((FileStdOutListener) processListener.Listener).AttachProcessOutputReader(processOutputReader);
                 }
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId));
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken);
                 return await Execute(processListener.Process, benchmarkCase, processOutputReader,
                     benchmarkId, logger, processCleanupHelper, launchIndex, diagnoser,
                     compositeInProcessDiagnoser, processListener.Listener, cancellationToken);
             }
             finally
             {
-                diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
+                await diagnoser.HandleAsync(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken);
             }
         }
 
@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         }
 
         private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
-            BenchmarkId benchmarkId, Loggers.ILogger logger, ProcessCleanupHelper processCleanupHelper, int launchIndex, IDiagnoser? diagnoser,
+            BenchmarkId benchmarkId, Loggers.ILogger logger, ProcessCleanupHelper processCleanupHelper, int launchIndex, IDiagnoser diagnoser,
             CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener, CancellationToken cancellationToken)
         {
             WasmRuntime wasmRuntime = (WasmRuntime) benchmarkCase.GetRuntime();
@@ -197,11 +197,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken);
 
                 process.Start();
 
-                diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken);
 
                 processOutputReader.BeginRead();
 
@@ -229,7 +229,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 }
                 else
                 {
-                    processOutputReader.StopRead();
+                    await processOutputReader.StopReadAsync();
                 }
             }
 

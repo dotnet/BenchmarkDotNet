@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
@@ -26,7 +28,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
-        protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
@@ -37,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-            string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
+            string content = new StringBuilder(await ResourceHelper.LoadTemplateAsync("MonoAOTLLVMCsProj.txt", cancellationToken).ConfigureAwait(false))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)
@@ -51,9 +53,9 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 .Replace("$USELLVM$", useLLVM)
                 .ToString();
 
-            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+            await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
 
-            GatherReferences(buildPartition, artifactsPaths, logger);
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         protected override string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)

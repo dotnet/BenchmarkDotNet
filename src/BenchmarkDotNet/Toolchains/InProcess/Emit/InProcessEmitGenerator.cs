@@ -3,17 +3,15 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitGenerator : IGenerator
     {
-        public GenerateResult GenerateProject(
-            BuildPartition buildPartition,
-            ILogger logger,
-            string rootArtifactsFolderPath)
+        public async ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
         {
             var artifactsPaths = ArtifactsPaths.Empty;
             try

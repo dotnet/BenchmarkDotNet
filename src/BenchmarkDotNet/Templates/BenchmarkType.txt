@@ -31,10 +31,10 @@
             );
             if (diagnoserRunMode == global::BenchmarkDotNet.Diagnosers.RunMode.SeparateLogic)
             {
-                compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.SeparateLogic);
+                await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.SeparateLogic, host.CancellationToken);
                 return;
             }
-            compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine);
+            await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine, host.CancellationToken);
 
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
@@ -58,7 +58,7 @@
             host.ReportResults(results); // printing costs memory, do this after runs
 
             instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)
-            compositeInProcessDiagnoserHandler.Handle(global::BenchmarkDotNet.Engines.BenchmarkSignal.AfterEngine);
+            await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.AfterEngine, host.CancellationToken);
         }
 
         [global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]

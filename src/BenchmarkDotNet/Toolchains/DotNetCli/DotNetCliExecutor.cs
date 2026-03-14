@@ -51,9 +51,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
             finally
             {
-                executeParameters.Diagnoser?.Handle(
+                await executeParameters.Diagnoser.HandleAsync(
                     HostSignal.AfterProcessExit,
-                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
+                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId),
+                    cancellationToken
+                );
             }
         }
 
@@ -61,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             BenchmarkId benchmarkId,
             ILogger logger,
             ArtifactsPaths artifactsPaths,
-            IDiagnoser? diagnoser,
+            IDiagnoser diagnoser,
             CompositeInProcessDiagnoser compositeInProcessDiagnoser,
             string executableName,
             IResolver resolver,
@@ -95,11 +97,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(false);
 
                 process.Start();
 
-                diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(false);
 
                 processOutputReader.BeginRead();
                 processOutputStarted = true;
@@ -128,7 +130,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     }
                     else
                     {
-                        processOutputReader.StopRead();
+                        await processOutputReader.StopReadAsync().ConfigureAwait(false);
                     }
                 }
             }

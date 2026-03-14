@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
@@ -23,7 +25,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<string> Ids => [nameof(UnresolvedDiagnoser)];
         public IEnumerable<IExporter> Exporters => [];
         public IEnumerable<IAnalyser> Analysers => [];
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
+        public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
         public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => [];
 
         public void DisplayResults(ILogger logger) => logger.WriteLineError(GetErrorMessage());

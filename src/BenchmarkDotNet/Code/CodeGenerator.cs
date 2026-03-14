@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
@@ -20,12 +22,13 @@ namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(BuildPartition buildPartition, CodeGenEntryPointType entryPointType, CodeGenBenchmarkRunCallType benchmarkRunCallType)
+        internal static async ValueTask<string> GenerateAsync(BuildPartition buildPartition, CodeGenEntryPointType entryPointType, CodeGenBenchmarkRunCallType benchmarkRunCallType, CancellationToken cancellationToken)
         {
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
             var benchmarksCode = new List<string>(buildPartition.Benchmarks.Length);
 
+            string benchmarkTypeTemplate = await ResourceHelper.LoadTemplateAsync("BenchmarkType.txt", cancellationToken).ConfigureAwait(false);
             foreach (var buildInfo in buildPartition.Benchmarks)
             {
                 var benchmark = buildInfo.BenchmarkCase;
@@ -34,7 +37,7 @@ namespace BenchmarkDotNet.Code
                 var extraFields = declarationsProvider.GetExtraFields();
 
                 string benchmarkTypeCode = declarationsProvider
-                    .ReplaceTemplate(new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkType.txt")))
+                    .ReplaceTemplate(new SmartStringBuilder(benchmarkTypeTemplate))
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
@@ -53,7 +56,7 @@ namespace BenchmarkDotNet.Code
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
+            string benchmarkProgramContent = new SmartStringBuilder(await ResourceHelper.LoadTemplateAsync("BenchmarkProgram.txt", cancellationToken).ConfigureAwait(false))
                 .Replace("$EntryPoint$", GetEntryPoint(buildPartition, entryPointType, useShadowCopy, shadowCopyFolderPath))
                 .Replace("$BenchmarkRunCall$", GetBenchmarkRunCall(buildPartition, benchmarkRunCallType))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))

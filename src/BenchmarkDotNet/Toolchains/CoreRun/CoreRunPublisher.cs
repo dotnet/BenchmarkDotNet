@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -11,9 +13,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunPublisher(string tfm, FileInfo coreRun, FileInfo? customDotNetCliPath = null) : DotNetCliPublisher(tfm, customDotNetCliPath?.FullName ?? "")
     {
-        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public override async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {
-            var buildResult = base.Build(generateResult, buildPartition, logger);
+            var buildResult = await base.BuildAsync(generateResult, buildPartition, logger, cancellationToken).ConfigureAwait(false);
 
             if (buildResult.IsBuildSuccess)
                 UpdateDuplicatedDependencies(buildResult.ArtifactsPaths, logger);

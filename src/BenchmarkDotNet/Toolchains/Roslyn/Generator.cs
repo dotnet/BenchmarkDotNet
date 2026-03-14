@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
@@ -24,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             artifactsPaths.ExecutablePath
         ];
 
-        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        protected override async ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             string prefix = OsDetector.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
@@ -42,9 +44,11 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 
-            File.WriteAllText(
+            await File.WriteAllTextAsync(
                 artifactsPaths.BuildScriptFilePath,
-                prefix + string.Join(" ", list));
+                prefix + string.Join(" ", list),
+                cancellationToken
+            ).ConfigureAwait(false);
         }
 
         internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase)

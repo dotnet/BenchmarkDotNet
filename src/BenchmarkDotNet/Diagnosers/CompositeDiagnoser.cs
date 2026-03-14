@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -18,6 +17,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
+    [AggressivelyOptimizeMethods]
     public sealed class CompositeDiagnoser : IDiagnoser
     {
         internal readonly ImmutableHashSet<IDiagnoser> diagnosers;
@@ -37,11 +37,13 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers
             => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
-        [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public async ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             foreach (var diagnoser in diagnosers)
-                diagnoser.Handle(signal, parameters);
+            {
+                // Do not use ConfigureAwait(false) here so that all diagnosers will be handled on the original context.
+                await diagnoser.HandleAsync(signal, parameters, cancellationToken);
+            }
         }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
@@ -77,7 +79,7 @@ namespace BenchmarkDotNet.Diagnosers
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class CompositeInProcessDiagnoserHandler(IReadOnlyList<InProcessDiagnoserRouter> routers, IHost host, RunMode runMode, InProcessDiagnoserActionArgs parameters)
     {
-        public void Handle(BenchmarkSignal signal)
+        public async ValueTask HandleAsync(BenchmarkSignal signal, CancellationToken cancellationToken)
         {
             if (runMode == RunMode.None)
             {
@@ -88,7 +90,8 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 if (router.ShouldHandle(runMode))
                 {
-                    router.handler.Handle(signal, parameters);
+                    // Do not use ConfigureAwait(false) here so that all handlers will be handled on the original context.
+                    await router.handler.HandleAsync(signal, parameters, cancellationToken);
                 }
             }
 
@@ -107,7 +110,7 @@ namespace BenchmarkDotNet.Diagnosers
                 var results = router.handler.SerializeResults();
                 // Send header with the diagnoser index for routing, and line count of payload (user handler may include newlines in their serialized results).
                 // Ideally we would simply use results.Length, write it directly to host, then the host reads the exact count of chars.
-                // But WasmExecutor does not use Broker, and reads all output, so we need to instead use line count and prepend every line with CompositeInProcessDiagnoser.ResultsKey.
+                // But WasmExecutor using StdOut does not support direct writes without newlines, so we need to instead use line count and prepend every line with CompositeInProcessDiagnoser.ResultsKey.
                 var resultsLines = results.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
                 host.WriteLine($"{CompositeInProcessDiagnoser.HeaderKey} {router.index} {resultsLines.Length}");
                 foreach (var line in resultsLines)

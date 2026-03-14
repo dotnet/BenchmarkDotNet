@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Diagnostics.Windows.Tracing;
@@ -62,13 +63,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => HardwareCounters.Validate(validationParameters, mandatory: false).ToAsyncEnumerable();
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             // it's crucial to start the trace before the process starts and stop it after the benchmarked process stops to have all of the necessary events in the trace file!
             if (signal == HostSignal.BeforeProcessStart)
                 Start(parameters);
             else if (signal == HostSignal.AfterProcessExit)
                 Stop(parameters);
+            return new();
         }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)

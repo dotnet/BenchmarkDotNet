@@ -4,7 +4,10 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Helpers
@@ -48,8 +51,9 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        internal static (int exitCode, ImmutableArray<string> output) RunAndReadOutputLineByLine(string fileName, string arguments = "", string workingDirectory = "",
-            Dictionary<string, string>? environmentVariables = null, bool includeErrors = false, ILogger? logger = null)
+        internal static async ValueTask<(int exitCode, ImmutableArray<string> output)> RunAndReadOutputLineByLineAsync(string fileName, string arguments = "", string workingDirectory = "",
+            Dictionary<string, string>? environmentVariables = null, bool includeErrors = false, ILogger? logger = null,
+            CancellationToken cancellationToken = default)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -63,24 +67,25 @@ namespace BenchmarkDotNet.Helpers
             };
 
             foreach (var environmentVariable in environmentVariables ?? [])
-                processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
-
-            using (var process = new Process { StartInfo = processStartInfo })
-            using (var outputReader = new AsyncProcessOutputReader(process))
-            using (new ProcessCleanupHelper(process, logger ?? NullLogger.Instance))
             {
-                process.Start();
-
-                outputReader.BeginRead();
-
-                process.WaitForExit();
-
-                outputReader.StopRead();
-
-                var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
-
-                return (process.ExitCode, output);
+                processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
             }
+
+            using var process = new Process { StartInfo = processStartInfo };
+            using var outputReader = new AsyncProcessOutputReader(process);
+            using var _ = new ProcessCleanupHelper(process, logger ?? NullLogger.Instance);
+
+            process.Start();
+
+            outputReader.BeginRead();
+
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+
+            await outputReader.StopReadAsync().ConfigureAwait(false);
+
+            var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
+
+            return (process.ExitCode, output);
         }
 
         internal static bool TestCommandExists(string commandName, string arguments = "--version")

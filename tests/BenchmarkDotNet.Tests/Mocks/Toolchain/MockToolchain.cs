@@ -27,13 +27,14 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 
         private class MockGenerator : IGenerator
         {
-            public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-                => GenerateResult.Success(ArtifactsPaths.Empty, []);
+            public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+                => new(GenerateResult.Success(ArtifactsPaths.Empty, []));
         }
 
         private class MockBuilder : IBuilder
         {
-            public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger) => BuildResult.Success(generateResult);
+            public ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+                => new(BuildResult.Success(generateResult));
         }
 
         private class MockExecutor(Func<BenchmarkCase, List<Measurement>> measurer) : IExecutor

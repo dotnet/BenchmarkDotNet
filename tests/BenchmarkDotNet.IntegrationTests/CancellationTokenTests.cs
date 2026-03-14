@@ -179,12 +179,13 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => AsyncEnumerable.Empty<ValidationError>();
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             if (signal == HostSignal.BeforeAnythingElse)
             {
                 cts.Cancel();
             }
+            return new();
         }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];

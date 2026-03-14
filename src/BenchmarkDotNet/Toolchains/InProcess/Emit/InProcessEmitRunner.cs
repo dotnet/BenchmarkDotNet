@@ -88,10 +88,10 @@ internal static class InProcessEmitRunner
         );
         if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
         {
-            compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+            await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken);
             return;
         }
-        compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken);
 
         var engineParameters = new EngineParameters()
         {
@@ -119,7 +119,7 @@ internal static class InProcessEmitRunner
 
         runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
 
-        compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken);
     }
 
     private static void FillMembers(object instance, BenchmarkCase benchmarkCase, System.Threading.CancellationToken cancellationToken)

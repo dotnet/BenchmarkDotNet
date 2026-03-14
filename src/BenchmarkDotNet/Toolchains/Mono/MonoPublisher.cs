@@ -2,13 +2,16 @@
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Results;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.Mono;
 
 public class MonoPublisher(string tfm, string customDotNetCliPath) : DotNetCliPublisher(tfm, customDotNetCliPath)
 {
-    public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-        => new DotNetCliCommand(
+    public override async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+    {
+        var result = await new DotNetCliCommand(
             CustomDotNetCliPath,
             generateResult.ArtifactsPaths.ProjectFilePath,
             TargetFrameworkMoniker,
@@ -18,7 +21,11 @@ public class MonoPublisher(string tfm, string customDotNetCliPath) : DotNetCliPu
             buildPartition,
             [],
             buildPartition.Timeout
-        ).Publish().ToBuildResult(generateResult);
+        )
+            .PublishAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return result.ToBuildResult(generateResult);
+    }
 
     private static string GetExtraArguments()
     {

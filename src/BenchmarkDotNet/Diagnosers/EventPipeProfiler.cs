@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
@@ -69,22 +70,26 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public async ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
-            if (signal != HostSignal.BeforeAnythingElse)
-                return;
+            if (signal == HostSignal.BeforeAnythingElse)
+            {
+                var diagnosticsClient = new DiagnosticsClient(parameters.ProcessId);
 
-            var diagnosticsClient = new DiagnosticsClient(parameters.ProcessId);
+                EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
 
-            EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
+                var fileName = ArtifactFileNameHelper.GetTraceFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
+                benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
-            var fileName = ArtifactFileNameHelper.GetTraceFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
-            benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
-
-            collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, parameters.Config.GetCompositeLogger()));
+                collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, parameters.Config.GetCompositeLogger(), cancellationToken), cancellationToken);
+            }
+            else if (signal == HostSignal.AfterAll)
+            {
+                await collectingTask.ConfigureAwait(false);
+            }
         }
 
-        private static void CopyEventStreamToFile(EventPipeSession session, string fileName, ILogger logger)
+        private static async Task CopyEventStreamToFile(EventPipeSession session, string fileName, ILogger logger, CancellationToken cancellationToken)
         {
             try
             {
@@ -94,12 +99,12 @@ namespace BenchmarkDotNet.Diagnosers
                     byte[] buffer = new byte[16 * 1024];
                     int bytesRead = 0;
 
-                    while ((bytesRead = session.EventStream.Read(buffer, 0, buffer.Length)) > 0)
+                    while ((bytesRead = await session.EventStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
                     {
-                        fs.Write(buffer, 0, bytesRead);
+                        await fs.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
                     }
 
-                    fs.Flush();
+                    await fs.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -110,8 +115,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            Task.WaitAll(collectingTask);
-
             if (benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 benchmarkToTraceFile[results.BenchmarkCase] = SpeedScopeExporter.Convert(traceFilePath, results.BenchmarkCase.Config.GetCompositeLogger());
 

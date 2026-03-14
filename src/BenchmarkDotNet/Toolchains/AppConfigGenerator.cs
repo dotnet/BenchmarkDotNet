@@ -1,8 +1,9 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Xml;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -24,128 +25,129 @@ namespace BenchmarkDotNet.Toolchains
             "GCHeapAffinitizeMask"
         ];
 
-        internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
+        internal static async ValueTask GenerateAsync(Job job, TextReader source, TextWriter destination, IResolver resolver, CancellationToken cancellationToken)
         {
-            var xmlDocument = new XmlDocument();
-
-            XmlNode configurationElement;
+            XDocument doc;
+            XElement configurationElement;
 
             if (source == TextReader.Null)
             {
-                // Create a new configuration node.
-                configurationElement = xmlDocument.CreateNode(XmlNodeType.Element, "configuration", string.Empty);
-                xmlDocument.AppendChild(configurationElement);
+                configurationElement = new XElement("configuration");
+                doc = new XDocument(new XDeclaration("1.0", "UTF-8", null), configurationElement);
             }
             else
             {
-                // Try to get configuration node from specified TextReader.
-                using var xmlReader = XmlReader.Create(source);
-                configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
+                doc = GetOrCreateDocument(source, out configurationElement);
             }
 
-            var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
+            var runtimeElement = GetOrCreateRuntimeElement(configurationElement);
 
             ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
             ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
 
-            GenerateJitSettings(xmlDocument, runtimeElement, job.Environment);
-            GenerateGCSettings(xmlDocument, runtimeElement, job.Environment.Gc, resolver);
+            GenerateJitSettings(runtimeElement, job.Environment);
+            GenerateGCSettings(runtimeElement, job.Environment.Gc, resolver);
 
-            xmlDocument.Save(destination);
+#if NETSTANDARD2_0
+            doc.Save(destination, SaveOptions.DisableFormatting);
+#else
+            await doc.SaveAsync(destination, SaveOptions.DisableFormatting, cancellationToken);
+#endif
         }
 
-        private static XmlNode GetOrCreateConfigurationElement(XmlDocument xmlDocument, XmlReader xmlReader)
+        private static XDocument GetOrCreateDocument(TextReader source, out XElement configurationElement)
         {
             try
             {
-                xmlDocument.Load(xmlReader);
-                var configurationNode = xmlDocument.SelectSingleNode("/configuration");
-                if (configurationNode != null)
-                    return configurationNode;
-            }
-            catch (XmlException)
-            {
-                // Failed to load XML content.
-            }
-
-            // If the XML is invalid or configuration node is not exists. Create a new configuration element
-            return xmlDocument.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "configuration", string.Empty))!;
-        }
-
-        private static XmlNode GetOrCreateRuntimeElement(XmlDocument xmlDocument, XmlNode configurationElement)
-        {
-            return configurationElement.SelectSingleNode("runtime")
-                   ?? configurationElement.AppendChild(xmlDocument.CreateNode(XmlNodeType.Element, "runtime", string.Empty))!;
-        }
-
-        private static void ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(XmlNode runtimeElement)
-        {
-            foreach (XmlNode runtimeSetting in runtimeElement.ChildNodes)
-            {
-                if (JobRuntimeSettings.Contains(runtimeSetting.Name))
+                var doc = XDocument.Load(source);
+                var configNode = doc.Element("configuration");
+                if (configNode != null)
                 {
-                    runtimeElement.RemoveChild(runtimeSetting);
+                    configurationElement = configNode;
+                    return doc;
+                }
+
+                // Document loaded but no <configuration> element
+                configurationElement = new XElement("configuration");
+                doc.Add(configurationElement);
+                return doc;
+            }
+            catch (System.Xml.XmlException)
+            {
+                // Failed to load XML content, create a new document
+                configurationElement = new XElement("configuration");
+                return new XDocument(new XDeclaration("1.0", "UTF-8", null), configurationElement);
+            }
+        }
+
+        private static XElement GetOrCreateRuntimeElement(XElement configurationElement)
+        {
+            return configurationElement.Element("runtime")
+                   ?? AddAndReturn(configurationElement, new XElement("runtime"));
+        }
+
+        private static XElement AddAndReturn(XElement parent, XElement child)
+        {
+            parent.Add(child);
+            return child;
+        }
+
+        private static void ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(XElement runtimeElement)
+        {
+            // Collect elements to remove first to avoid modifying collection during iteration.
+            List<XElement>? toRemove = null;
+            foreach (var child in runtimeElement.Elements())
+            {
+                if (JobRuntimeSettings.Contains(child.Name.LocalName))
+                {
+                    toRemove ??= new List<XElement>();
+                    toRemove.Add(child);
                 }
             }
+            toRemove?.ForEach(e => e.Remove());
         }
 
-        private static void ClearStartupSettingsForCustomClr(XmlNode configurationElement, Runtime? runtime)
+        private static void ClearStartupSettingsForCustomClr(XElement configurationElement, Runtime? runtime)
         {
             if (!(runtime is ClrRuntime clrRuntime) || clrRuntime.Version.IsBlank())
                 return;
 
-            foreach (XmlNode configurationChild in configurationElement.ChildNodes)
+            List<XElement>? toRemove = null;
+            foreach (var child in configurationElement.Elements("startup"))
             {
-                if (configurationChild.Name == "startup")
-                {
-                    configurationElement.RemoveChild(configurationChild);
-                }
+                toRemove ??= new List<XElement>();
+                toRemove.Add(child);
             }
+            toRemove?.ForEach(e => e.Remove());
         }
 
-        private static void GenerateJitSettings(XmlDocument xmlDocument, XmlNode runtimeElement, EnvironmentMode environmentMode)
+        private static void GenerateJitSettings(XElement runtimeElement, EnvironmentMode environmentMode)
         {
             if (environmentMode.HasValue(EnvironmentMode.JitCharacteristic))
             {
                 string useLegacyJit = environmentMode.Jit.ToConfig();
-                CreateNodeWithAttribute(xmlDocument, runtimeElement, "useLegacyJit", "enabled", useLegacyJit);
+                runtimeElement.Add(new XElement("useLegacyJit", new XAttribute("enabled", useLegacyJit)));
             }
         }
 
-        private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GcMode gcMode, IResolver resolver)
+        private static void GenerateGCSettings(XElement runtimeElement, GcMode gcMode, IResolver resolver)
         {
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase());
+            Debug.Assert(JobRuntimeSettings.Contains("gcConcurrent"));
+            Debug.Assert(JobRuntimeSettings.Contains("gcServer"));
+
+            runtimeElement.Add(new XElement("gcConcurrent", new XAttribute("enabled", gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase())));
+            runtimeElement.Add(new XElement("gcServer", new XAttribute("enabled", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase())));
 
             if (gcMode.HasValue(GcMode.CpuGroupsCharacteristic))
-                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver).ToLowerCase());
+                runtimeElement.Add(new XElement("GCCpuGroup", new XAttribute("enabled", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver).ToLowerCase())));
             if (gcMode.HasValue(GcMode.AllowVeryLargeObjectsCharacteristic))
-                CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver).ToLowerCase());
+                runtimeElement.Add(new XElement("gcAllowVeryLargeObjects", new XAttribute("enabled", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver).ToLowerCase())));
             if (gcMode.HasValue(GcMode.NoAffinitizeCharacteristic))
-                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCNoAffinitize", "enabled", gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver).ToLowerCase());
+                runtimeElement.Add(new XElement("GCNoAffinitize", new XAttribute("enabled", gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver).ToLowerCase())));
             if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
-                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCHeapAffinitizeMask", "enabled", gcMode.ResolveValue(GcMode.HeapAffinitizeMaskCharacteristic, resolver).ToString());
+                runtimeElement.Add(new XElement("GCHeapAffinitizeMask", new XAttribute("enabled", gcMode.ResolveValue(GcMode.HeapAffinitizeMaskCharacteristic, resolver).ToString())));
             if (gcMode.HasValue(GcMode.HeapCountCharacteristic))
-                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCHeapCount", "enabled", gcMode.ResolveValue(GcMode.HeapCountCharacteristic, resolver).ToString());
-        }
-
-        private static void CreateNodeWithAttribute(
-            XmlDocument document,
-            XmlNode parentNode,
-            string nodeName,
-            string attributeName,
-            string attributeValue)
-        {
-            Debug.Assert(JobRuntimeSettings.Contains(nodeName), "Please add the new setting to the JobRuntimeSettings list");
-
-            var node = document.CreateNode(XmlNodeType.Element, nodeName, string.Empty);
-            var attribute = document.CreateAttribute(attributeName);
-            attribute.Value = attributeValue;
-            if (node.Attributes == null)
-                throw new NullReferenceException(nameof(node.Attributes));
-            node.Attributes.SetNamedItem(attribute);
-
-            parentNode.AppendChild(node);
+                runtimeElement.Add(new XElement("GCHeapCount", new XAttribute("enabled", gcMode.ResolveValue(GcMode.HeapCountCharacteristic, resolver).ToString())));
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -22,26 +24,29 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             BenchmarkRunCallType = aot ? Code.CodeGenBenchmarkRunCallType.Direct : Code.CodeGenBenchmarkRunCallType.Reflection;
         }
 
-        protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
             var targetMainJsPath = GetExecutablePath(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "");
 
             if (buildPartition.Runtime.IsAOT)
             {
-                GenerateProjectFile(buildPartition, artifactsPaths, aot: true, logger, targetMainJsPath);
+                await GenerateProjectFileAsync(buildPartition, artifactsPaths, aot: true, logger, targetMainJsPath, cancellationToken).ConfigureAwait(false);
 
                 var linkDescriptionFileName = "WasmLinkerDescription.xml";
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, linkDescriptionFileName), ResourceHelper.LoadTemplate(linkDescriptionFileName));
+                await File.WriteAllTextAsync(
+                    Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, linkDescriptionFileName),
+                    await ResourceHelper.LoadTemplateAsync(linkDescriptionFileName, cancellationToken).ConfigureAwait(false),
+                    cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                GenerateProjectFile(buildPartition, artifactsPaths, aot: false, logger: logger, targetMainJsPath);
+                await GenerateProjectFileAsync(buildPartition, artifactsPaths, aot: false, logger: logger, targetMainJsPath, cancellationToken).ConfigureAwait(false);
             }
 
-            GenerateMainJS(buildPartition, ((WasmRuntime)buildPartition.Runtime).MainJsTemplate, targetMainJsPath);
+            await GenerateMainJS(((WasmRuntime)buildPartition.Runtime).MainJsTemplate, targetMainJsPath, cancellationToken).ConfigureAwait(false);
         }
 
-        protected void GenerateProjectFile(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, bool aot, ILogger logger, string targetMainJsPath)
+        protected async ValueTask GenerateProjectFileAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, bool aot, ILogger logger, string targetMainJsPath, CancellationToken cancellationToken)
         {
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
@@ -59,16 +64,17 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             // - WasmEnableWebcil=false: CoreCLR doesn't support webcil format
             string coreclrOverrides = runtime.RuntimeFlavor == RuntimeFlavor.Mono
                 ? string.Empty
-                : @"
-  <!-- CoreCLR overrides: use CoreCLR runtime instead of Mono -->
-  <PropertyGroup>
-    <UseMonoRuntime>false</UseMonoRuntime>
-    <WasmBuildNative>false</WasmBuildNative>
-    <WasmEnableWebcil>false</WasmEnableWebcil>
-  </PropertyGroup>
-";
+                : """
+                  <!-- CoreCLR overrides: use CoreCLR runtime instead of Mono -->
+                  <PropertyGroup>
+                    <UseMonoRuntime>false</UseMonoRuntime>
+                    <WasmBuildNative>false</WasmBuildNative>
+                    <WasmEnableWebcil>false</WasmEnableWebcil>
+                  </PropertyGroup>
 
-            string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
+                """;
+
+            string content = new StringBuilder(await ResourceHelper.LoadTemplateAsync("WasmCsProj.txt", cancellationToken).ConfigureAwait(false))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$RUN_AOT$", aot.ToString().ToLower())
@@ -82,19 +88,19 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 .Replace("$CORECLR_OVERRIDES$", coreclrOverrides)
             .ToString();
 
-            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+            await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
 
-            GatherReferences(buildPartition, artifactsPaths, logger);
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
-        protected void GenerateMainJS(BuildPartition buildPartition, FileInfo? mainJsTemplate, string targetMainJsPath)
+        protected async ValueTask GenerateMainJS(FileInfo? mainJsTemplate, string targetMainJsPath, CancellationToken cancellationToken)
         {
             string content = mainJsTemplate is null
-                ? ResourceHelper.LoadTemplate("benchmark-main.mjs")
-                : File.ReadAllText(mainJsTemplate.FullName);
+                ? await ResourceHelper.LoadTemplateAsync("benchmark-main.mjs", cancellationToken).ConfigureAwait(false)
+                : await File.ReadAllTextAsync(mainJsTemplate.FullName, cancellationToken).ConfigureAwait(false);
 
             targetMainJsPath.EnsureFolderExists();
-            File.WriteAllText(targetMainJsPath, content);
+            await File.WriteAllTextAsync(targetMainJsPath, content, cancellationToken).ConfigureAwait(false);
         }
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "wwwroot", "main.mjs");

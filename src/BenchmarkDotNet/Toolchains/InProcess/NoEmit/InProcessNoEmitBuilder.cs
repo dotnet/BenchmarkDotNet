@@ -1,17 +1,13 @@
 ﻿using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
+
+internal class InProcessNoEmitBuilder : IBuilder
 {
-    /// <summary>
-    /// In process (no emit) toolchain builder
-    /// </summary>
-    /// <seealso cref="BenchmarkDotNet.Toolchains.IBuilder" />
-    public class InProcessNoEmitBuilder : IBuilder
-    {
-        /// <summary>always returns success</summary>
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-            => BuildResult.Success(generateResult);
-    }
+    public ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+        => new(BuildResult.Success(generateResult));
 }

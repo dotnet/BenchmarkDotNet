@@ -17,11 +17,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     internal sealed class InProcessHost : IHost
     {
         private readonly ILogger logger;
-        private readonly IDiagnoser? diagnoser;
+        private readonly IDiagnoser diagnoser;
         private readonly DiagnoserActionParameters? diagnoserActionParameters;
         private readonly List<string> inProcessDiagnoserLines = [];
 
-        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser? diagnoser, CancellationToken cancellationToken)
+        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser, CancellationToken cancellationToken)
         {
             this.logger = logger;
             this.diagnoser = diagnoser;
@@ -66,8 +66,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             runResults.Print(this);
         }
 
-        public async ValueTask SendSignalAsync(HostSignal hostSignal)
-            => diagnoser?.Handle(hostSignal, diagnoserActionParameters!);
+        public ValueTask SendSignalAsync(HostSignal hostSignal)
+            => diagnoser.HandleAsync(hostSignal, diagnoserActionParameters!, CancellationToken);
 
         public ValueTask Yield() => new();
 

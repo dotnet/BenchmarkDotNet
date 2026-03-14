@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,22 +99,16 @@ namespace BenchmarkDotNet.Running
                 .ToArray();
             var parallelBuildPartitions = buildPartitions.Except(sequentialBuildPartitions).ToArray();
 
-            var buildResults = new Dictionary<BuildPartition, BuildResult>();
-            if (parallelBuildPartitions.Length > 0)
-            {
-                var results = BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, in globalChronometer, eventProcessor);
-                foreach (var kvp in results)
-                {
-                    buildResults.Add(kvp.Key, kvp.Value);
-                }
-            }
+            Dictionary<BuildPartition, BuildResult> buildResults = parallelBuildPartitions.Length > 0
+                ? await BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, globalChronometer, eventProcessor, cancellationToken)
+                : [];
 
             if (sequentialBuildPartitions.Length > 0)
             {
-                var results = BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, in globalChronometer, eventProcessor);
-                foreach (var kvp in results)
+                await foreach (var (buildPartition, buildResult) in
+                    BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, globalChronometer, eventProcessor, cancellationToken))
                 {
-                    buildResults.Add(kvp.Key, kvp.Value);
+                    buildResults.Add(buildPartition, buildResult);
                 }
             }
 
@@ -388,7 +383,13 @@ namespace BenchmarkDotNet.Running
                 .SelectMany(benchmark => benchmark.Config.GetCompositeValidator().ValidateAsync(new ValidationParameters(benchmark.BenchmarksCases, benchmark.Config)))
                 .ToArrayAsync();
 
-        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
+        private static async ValueTask<Dictionary<BuildPartition, BuildResult>> BuildInParallel(
+            ILogger logger,
+            string rootArtifactsFolderPath,
+            BuildPartition[] buildPartitions,
+            StartedClock globalChronometer,
+            EventProcessor eventProcessor,
+            CancellationToken cancellationToken)
         {
             logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
@@ -396,19 +397,20 @@ namespace BenchmarkDotNet.Running
 
             var beforeParallelBuild = globalChronometer.GetElapsed();
 
-            var buildResults = buildPartitions
-                .AsParallel()
-                .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
-                .AsSequential() // Ensure that build completion events are processed sequentially
-                .Select(build =>
-                {
-                    // If the generation was successful, but the build was not, we will try building sequentially
-                    // so don't send the OnBuildComplete event yet.
-                    if (buildPartitions.Length <= 1 || !build.Result.IsGenerateSuccess || build.Result.IsBuildSuccess)
-                        eventProcessor.OnBuildComplete(build.Partition, build.Result);
+            async Task<(BuildPartition Partition, BuildResult Result)> BuildAsync(BuildPartition buildPartition)
+            {
+                // Do not use ConfigureAwait(false) so that the eventProcessor event will be raised on the original context.
+                var result = await Task.Run(async () => await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken), cancellationToken);
 
-                    return build;
-                })
+                // If the generation was successful, but the build was not, we will try building sequentially
+                // so don't send the OnBuildComplete event yet.
+                if (buildPartitions.Length <= 1 || !result.IsGenerateSuccess || result.IsBuildSuccess)
+                    eventProcessor.OnBuildComplete(buildPartition, result);
+
+                return (buildPartition, result);
+            }
+
+            var buildResults = (await Task.WhenAll(buildPartitions.Select(BuildAsync)))
                 .ToDictionary(build => build.Partition, build => build.Result);
 
             var afterParallelBuild = globalChronometer.GetElapsed();
@@ -425,7 +427,7 @@ namespace BenchmarkDotNet.Running
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
                 {
                     if (!buildResults[buildPartition].TryToExplainFailureReason(out _))
-                        buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+                        buildResults[buildPartition] = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken);
 
                     eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
                 }
@@ -438,34 +440,39 @@ namespace BenchmarkDotNet.Running
             return buildResults;
         }
 
-        private static Dictionary<BuildPartition, BuildResult> BuildSequential(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
+        private static async IAsyncEnumerable<(BuildPartition BuildPartition, BuildResult BuildResult)> BuildSequential(
+            ILogger logger,
+            string rootArtifactsFolderPath,
+            BuildPartition[] buildPartitions,
+            StartedClock globalChronometer,
+            EventProcessor eventProcessor,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Sequential: Start   *****");
 
             var beforeBuild = globalChronometer.GetElapsed();
 
-            var buildResults = new Dictionary<BuildPartition, BuildResult>();
             foreach (var buildPartition in buildPartitions)
             {
-                buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, logger);
-                eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
+                // Do not use ConfigureAwait(false) so that the eventProcessor event will be raised on the original context.
+                var result = await Build(buildPartition, rootArtifactsFolderPath, logger, cancellationToken);
+                eventProcessor.OnBuildComplete(buildPartition, result);
+                yield return (buildPartition, result);
             }
 
             var afterBuild = globalChronometer.GetElapsed();
 
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeBuild, afterBuild)}   *****");
-
-            return buildResults;
         }
 
         private static string GetFormattedDifference(ClockSpan before, ClockSpan after)
                 => (after.GetTimeSpan() - before.GetTimeSpan()).ToFormattedTotalTime(DefaultCultureInfo.Instance);
 
-        private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
+        private static async ValueTask<BuildResult> Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger, CancellationToken cancellationToken)
         {
             var toolchain = buildPartition.RepresentativeBenchmarkCase.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
 
-            var generateResult = toolchain.Generator.GenerateProject(buildPartition, buildLogger, rootArtifactsFolderPath);
+            var generateResult = await toolchain.Generator.GenerateProjectAsync(buildPartition, buildLogger, rootArtifactsFolderPath, cancellationToken).ConfigureAwait(false);
 
             try
             {
@@ -476,7 +483,7 @@ namespace BenchmarkDotNet.Running
                         : BuildResult.Failure(generateResult, errorMessage: "");
                 }
 
-                return toolchain.Builder.Build(generateResult, buildPartition, buildLogger);
+                return await toolchain.Builder.BuildAsync(generateResult, buildPartition, buildLogger, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -596,7 +603,7 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
-                separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
+                await separateLogicCompositeDiagnoser.HandleAsync(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken);
 
                 if (compositeInProcessDiagnoser.InProcessDiagnosers.Any(d => d.GetRunMode(benchmarkCase) == Diagnosers.RunMode.SeparateLogic))
                 {

@@ -173,10 +173,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 );
                 if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
                 {
-                    compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.SeparateLogic);
+                    await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken);
                     return;
                 }
-                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeEngine);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken);
 
                 var engineParameters = new EngineParameters
                 {
@@ -207,7 +207,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     .RunAsync();
                 host.ReportResults(results); // printing costs memory, do this after runs
 
-                compositeInProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterEngine);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken);
             }
         }
     }

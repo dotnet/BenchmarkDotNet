@@ -20,6 +20,9 @@ internal sealed class CancelableStreamReader : IDisposable
     public ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
         => _defaultReader.ReadLineAsync(cancellationToken);
 
+    public Task<string> ReadToEndAsync(CancellationToken cancellationToken)
+        => _defaultReader.ReadToEndAsync(cancellationToken);
+
     public void Dispose()
         => _defaultReader.Dispose();
 #else
@@ -106,6 +109,25 @@ internal sealed class CancelableStreamReader : IDisposable
                 _charLen = 0;
             }
         }
+    }
+
+    public async Task<string> ReadToEndAsync(CancellationToken cancellationToken)
+    {
+        StringBuilder sb = new();
+        while (true)
+        {
+            // Drain any chars already decoded in the buffer.
+            if (_charPos < _charLen)
+            {
+                sb.Append(_charBuffer, _charPos, _charLen - _charPos);
+                _charPos = _charLen;
+            }
+
+            // Read more from the stream.
+            if (await ReadBufferAsync(cancellationToken).ConfigureAwait(false) == 0)
+                break;
+        }
+        return sb.ToString();
     }
 
     public async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)

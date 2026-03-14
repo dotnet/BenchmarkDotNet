@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -20,41 +22,53 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public static class DotNetCliCommandExecutor
     {
-        internal static readonly Lazy<string> DefaultDotNetCliPath = new Lazy<string>(GetDefaultDotNetCliPath);
+        internal static readonly Lazy<string> DefaultDotNetCliPath = new(GetDefaultDotNetCliPath);
 
         [PublicAPI]
-        public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
+        public static async Task<DotNetCliCommandResult> ExecuteAsync(DotNetCliCommand parameters, CancellationToken cancellationToken)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
-            using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
-            using (new ProcessCleanupHelper(process, parameters.Logger))
+            var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
+            var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger);
+            using var _ = new ProcessCleanupHelper(process, parameters.Logger);
+
+            parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
+            var stopwatch = Stopwatch.StartNew();
+
+            process.Start();
+            outputReader.BeginRead();
+
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeoutCts.CancelAfter(parameters.Timeout);
+            try
             {
-                parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-                var stopwatch = Stopwatch.StartNew();
-
-                process.Start();
-                outputReader.BeginRead();
-
-                if (!process.WaitForExit((int)parameters.Timeout.TotalMilliseconds))
+                await process.WaitForExitAsync(timeoutCts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    parameters.Logger.WriteLineError($"// command took longer than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
-
                     outputReader.CancelRead();
                     process.KillTree();
-
-                    return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
+                    throw;
                 }
 
-                stopwatch.Stop();
-                outputReader.StopRead();
+                parameters.Logger.WriteLineError($"// command took longer than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
 
-                parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
+                outputReader.CancelRead();
+                process.KillTree();
 
-                return process.ExitCode <= 0
-                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())
-                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
+                return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
             }
+
+            stopwatch.Stop();
+            await outputReader.StopReadAsync().ConfigureAwait(false);
+
+            parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
+
+            return process.ExitCode <= 0
+                ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())
+                : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
         }
 
         internal static string GetDotNetSdkVersion()
@@ -157,7 +171,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static string GetSdkPath(string cliPath)
+        internal static async Task<string> GetSdkPathAsync(string cliPath, CancellationToken cancellationToken)
         {
             DotNetCliCommand cliCommand = new(
                 cliPath: cliPath,
@@ -171,14 +185,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 timeout: TimeSpan.FromMinutes(1),
                 logOutput: false);
 
-            string sdkPath = Execute(cliCommand)
+            string sdkPath = (await ExecuteAsync(cliCommand, cancellationToken).ConfigureAwait(false))
                 .StandardOutput.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => line.EndsWith("/sdk]")) // sth like "  3.1.423 [/usr/share/dotnet/sdk]
                 .Select(line => line.Split('[')[1])
                 .Distinct()
                 .Single(); // I assume there will be only one such folder
 
-            return sdkPath.Substring(0, sdkPath.Length - 1); // remove trailing `]`
+            return sdkPath[..^1]; // remove trailing `]`
         }
     }
 }

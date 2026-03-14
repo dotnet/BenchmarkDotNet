@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -38,7 +40,7 @@ namespace BenchmarkDotNet.Diagnosers
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraIteration;
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
+        public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
@@ -79,7 +81,7 @@ namespace BenchmarkDotNet.Diagnosers
         private long exceptionsCount;
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
+        ValueTask IInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken)
         {
             switch (signal)
             {
@@ -90,6 +92,7 @@ namespace BenchmarkDotNet.Diagnosers
                     AppDomain.CurrentDomain.FirstChanceException -= OnFirstChanceException;
                     break;
             }
+            return new();
         }
 
         void IInProcessDiagnoserHandler.Initialize(string? serializedConfig) { }

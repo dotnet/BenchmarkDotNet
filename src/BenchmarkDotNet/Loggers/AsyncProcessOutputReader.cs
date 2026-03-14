@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly bool logOutput, readStandardError;
 
         private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromSeconds(1);
-        private readonly AutoResetEvent outputFinishEvent, errorFinishEvent;
+        private readonly TaskCompletionSource<object?> stdOutFinishTcs, errorFinishTcs;
         private readonly Channel<string> outputChannel;
         private readonly ConcurrentQueue<string> output, error;
 
@@ -34,8 +35,8 @@ namespace BenchmarkDotNet.Loggers
             this.process = process;
             output = new ConcurrentQueue<string>();
             error = new ConcurrentQueue<string>();
-            outputFinishEvent = new AutoResetEvent(false);
-            errorFinishEvent = new AutoResetEvent(false);
+            stdOutFinishTcs = new();
+            errorFinishTcs = new();
             outputChannel = Channel.CreateUnbounded<string>();
             status = (long)Status.Created;
             this.logOutput = logOutput;
@@ -48,9 +49,6 @@ namespace BenchmarkDotNet.Loggers
             Interlocked.Exchange(ref status, (long)Status.Disposed);
 
             Detach();
-
-            outputFinishEvent.Dispose();
-            errorFinishEvent.Dispose();
         }
 
         internal void BeginRead()
@@ -79,14 +77,14 @@ namespace BenchmarkDotNet.Loggers
             Detach();
         }
 
-        internal void StopRead()
+        internal async ValueTask StopReadAsync()
         {
             if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
 
-            outputFinishEvent.WaitOne(FinishEventTimeout);
+            await stdOutFinishTcs.Task.WaitAsync(FinishEventTimeout).ConfigureAwait(false);
             if (readStandardError)
-                errorFinishEvent.WaitOne(FinishEventTimeout);
+                await errorFinishTcs.Task.WaitAsync(FinishEventTimeout).ConfigureAwait(false);
 
             Detach();
         }
@@ -147,7 +145,7 @@ namespace BenchmarkDotNet.Loggers
             else // 'e.Data == null' means EOF
             {
                 outputChannel.Writer.Complete();
-                outputFinishEvent.Set();
+                stdOutFinishTcs.SetResult(null);
             }
         }
 
@@ -166,7 +164,7 @@ namespace BenchmarkDotNet.Loggers
                 }
             }
             else // 'e.Data == null' means EOF
-                errorFinishEvent.Set();
+                errorFinishTcs.SetResult(null);
         }
 
         private T ReturnIfStopped<T>(Func<T> getter)

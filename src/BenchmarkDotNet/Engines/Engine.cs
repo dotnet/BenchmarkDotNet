@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     await Host.BeforeMainRunAsync();
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeActualRun);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun, Host.CancellationToken);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.Engines
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     await Host.AfterMainRunAsync();
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterActualRun);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun, Host.CancellationToken);
                 }
             }
 
@@ -197,7 +197,7 @@ namespace BenchmarkDotNet.Engines
                 await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
                 await Host.SendSignalAsync(HostSignal.BeforeExtraIteration);
-                Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.BeforeExtraIteration);
+                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration, Host.CancellationToken);
 
                 // GC collect before measuring allocations.
                 ForceGcCollect();
@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.Engines
                         (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
                     }
 
-                    Parameters.InProcessDiagnoserHandler.Handle(BenchmarkSignal.AfterExtraIteration);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration, Host.CancellationToken);
                     await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
                 }
                 finally
