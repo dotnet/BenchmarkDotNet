@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Helpers
     /// X in the upper right of Window.
     /// </para>
     /// <para>
-    /// Usage: Derive your clas that changes system state of this class. Revert system state in
-    /// override of <see cref="Dispose"/> implementation.
+    /// Usage: Derive your class that changes system state of this class. Revert system state in
+    /// override of <see cref="Dispose(bool)"/> implementation.
     /// Use your class in C#'s using statement, to ensure system state is reverted in normal situations.
     /// This class ensures your override is also called at process 'abort'.
     /// </para>
@@ -28,15 +28,15 @@ namespace BenchmarkDotNet.Helpers
     /// </remarks>
     public abstract class DisposeAtProcessTermination : IDisposable
     {
-        private static readonly bool ConsoleSupportsCancelKeyPress
-            = !(OsDetector.IsAndroid() || OsDetector.IsIOS() || OsDetector.IsTvOS() || Portability.RuntimeInformation.IsWasm);
+        // Cancel key presses are not supported by .NET or do not exist for these platforms.
+        internal static readonly bool ConsoleSupportsCancelKeyPress =
+            !(OsDetector.IsAndroid() || OsDetector.IsIOS() || OsDetector.IsTvOS() || Portability.RuntimeInformation.IsWasm);
 
         protected DisposeAtProcessTermination()
         {
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
             if (ConsoleSupportsCancelKeyPress)
             {
-                // Cancel key presses are not supported by .NET or do not exist for these
                 Console.CancelKeyPress += OnCancelKeyPress;
             }
 
@@ -48,21 +48,22 @@ namespace BenchmarkDotNet.Helpers
         /// Called when the user presses Ctrl-C or Ctrl-Break.
         /// </summary>
         private void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
-        {
-            if (!e.Cancel) { Dispose(); }
-        }
+            => Dispose(!e.Cancel);
 
         /// <summary>
         /// Called when the user clicks on the X in the upper right corner to close the Benchmark's Window.
         /// </summary>
-        private void OnProcessExit(object? sender, EventArgs e) => Dispose();
+        private void OnProcessExit(object? sender, EventArgs e)
+            => Dispose(true);
 
-        public virtual void Dispose()
+        public void Dispose()
+            => Dispose(false);
+
+        protected virtual void Dispose(bool exiting)
         {
             AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
             if (ConsoleSupportsCancelKeyPress)
             {
-                // Cancel key presses are not supported by .NET or do not exist for these
                 Console.CancelKeyPress -= OnCancelKeyPress;
             }
         }

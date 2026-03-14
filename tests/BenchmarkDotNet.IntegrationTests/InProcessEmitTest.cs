@@ -195,6 +195,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
+            public CustomAwaitable InvokeOnceCustomAwaitable()
+            {
+                Interlocked.Increment(ref Counter);
+                return new();
+            }
+
+            [Benchmark]
             public static void InvokeOnceStaticVoid()
             {
                 Interlocked.Increment(ref Counter);
@@ -242,6 +249,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
             }
+
+            [Benchmark]
+            public static CustomAwaitable InvokeOnceStaticCustomAwaitable()
+            {
+                Interlocked.Increment(ref Counter);
+                return new();
+            }
         }
 
         [Theory]
@@ -249,6 +263,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(GlobalSetupCleanupTask))]
         [InlineData(typeof(GlobalSetupCleanupValueTask))]
         [InlineData(typeof(GlobalSetupCleanupValueTaskSource))]
+        [InlineData(typeof(GlobalSetupCleanupCustomAwaitable))]
         public void InProcessEmitToolchainSupportsSetupAndCleanup(Type benchmarkType)
         {
             var logger = new OutputLogger(Output);
@@ -365,6 +380,62 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        public class GlobalSetupCleanupCustomAwaitable
+        {
+            [GlobalSetup]
+            public static CustomAwaitable GlobalSetup()
+            {
+                Interlocked.Increment(ref Counters.SetupCounter);
+                return new();
+            }
+
+            [GlobalCleanup]
+            public CustomAwaitable GlobalCleanup()
+            {
+                Interlocked.Increment(ref Counters.CleanupCounter);
+                return new();
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counters.BenchmarkCounter);
+            }
+        }
+
+
+        [Fact]
+        public void InProcessEmitRunsOnCallerThreadWhenConfigured()
+        {
+            var callerThreadId = Thread.CurrentThread.ManagedThreadId;
+            SameThreadBenchmarkEmit.CallerThreadId = callerThreadId;
+            SameThreadBenchmarkEmit.BenchmarkThreadId = -1;
+
+            var config = new ManualConfig()
+                .AddJob(Job.Dry
+                    .WithToolchain(new InProcessEmitToolchain(new InProcessEmitSettings { ExecuteOnSeparateThread = false }))
+                    .WithInvocationCount(UnrollFactor)
+                    .WithUnrollFactor(UnrollFactor))
+                .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
+                .AddColumnProvider(DefaultColumnProviders.Instance);
+
+            CanExecute<SameThreadBenchmarkEmit>(config);
+
+            Assert.Equal(callerThreadId, SameThreadBenchmarkEmit.BenchmarkThreadId);
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+        public class SameThreadBenchmarkEmit
+        {
+            public static int CallerThreadId;
+            public static int BenchmarkThreadId;
+
+            [Benchmark]
+            public void Benchmark()
+            {
+                BenchmarkThreadId = Thread.CurrentThread.ManagedThreadId;
+            }
+        }
 
 #if NET8_0_OR_GREATER
         [Fact]

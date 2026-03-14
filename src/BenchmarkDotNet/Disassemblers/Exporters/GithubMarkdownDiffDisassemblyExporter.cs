@@ -97,7 +97,9 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         {
             try
             {
-                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}");
+                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLineAsync("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}")
+                    // TODO: refactor IExporter to support async and remove this blocking call
+                    .AsTask().GetAwaiter().GetResult();
 
                 bool canRead = false;
 

@@ -2,9 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -17,16 +18,15 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             => Path.GetDirectoryName(buildPartition.AssemblyLocation)!;
 
         [PublicAPI]
-        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            =>
-            [
-                artifactsPaths.ProgramCodePath,
-                artifactsPaths.AppConfigPath,
-                artifactsPaths.BuildScriptFilePath,
-                artifactsPaths.ExecutablePath
-            ];
+        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths) =>
+        [
+            artifactsPaths.ProgramCodePath,
+            artifactsPaths.AppConfigPath,
+            artifactsPaths.BuildScriptFilePath,
+            artifactsPaths.ExecutablePath
+        ];
 
-        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        protected override async ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             string prefix = OsDetector.IsWindows() ? "" : "#!/bin/bash\n";
             var list = new List<string>();
@@ -44,9 +44,11 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 
-            File.WriteAllText(
+            await File.WriteAllTextAsync(
                 artifactsPaths.BuildScriptFilePath,
-                prefix + string.Join(" ", list));
+                prefix + string.Join(" ", list),
+                cancellationToken
+            ).ConfigureAwait(false);
         }
 
         internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase)
@@ -54,10 +56,12 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Concat(
-                    [
-                        benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(BenchmarkCase).Assembly // BenchmarkDotNet
-                    ])
+                [
+                    benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
+                    typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
+                    typeof(System.Threading.Tasks.ValueTask).Assembly, // TaskExtensions
+                    typeof(Perfolizer.Horology.IClock).Assembly // Perfolizer
+                ])
                 .Distinct();
     }
 }

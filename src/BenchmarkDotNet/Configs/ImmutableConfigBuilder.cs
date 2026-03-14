@@ -30,7 +30,8 @@ namespace BenchmarkDotNet.Configs
             JitOptimizationsValidator.DontFailOnError,
             DeferredExecutionValidator.DontFailOnError,
             ParamsAllValuesValidator.FailOnError,
-            ParamsValidator.FailOnError
+            ParamsValidator.FailOnError,
+            BenchmarkCancellationValidator.FailOnError
         };
 
         /// <summary>

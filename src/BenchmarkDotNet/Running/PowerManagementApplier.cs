@@ -27,10 +27,10 @@ namespace BenchmarkDotNet.Running
 
         internal PowerManagementApplier(ILogger logger) => this.logger = logger;
 
-        public override void Dispose()
+        protected override void Dispose(bool exiting)
         {
             ApplyUserPowerPlan();
-            base.Dispose();
+            base.Dispose(exiting);
         }
 
         internal static Guid Map(PowerPlan value) => PowerPlansDict[value];

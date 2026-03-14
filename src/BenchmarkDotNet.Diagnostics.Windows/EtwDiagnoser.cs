@@ -79,10 +79,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             Dispose();
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool exiting)
         {
             Session?.Dispose();
-            base.Dispose();
+            base.Dispose(exiting);
         }
 
         private void Clear()

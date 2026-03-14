@@ -22,17 +22,17 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         }
 
         [PublicAPI]
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver))
             {
                 yield return validationError;
             }
 
-            if (!RuntimeInformation.IsFullFramework)
+            if (!(RuntimeInformation.IsFullFramework || RuntimeInformation.IsOldMono))
             {
                 yield return new ValidationError(true,
-                    "The Roslyn toolchain is only supported on .NET Framework",
+                    "The Roslyn toolchain is only supported on .NET Framework and legacy Mono",
                     benchmarkCase);
             }
 

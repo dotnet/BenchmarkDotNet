@@ -379,4 +379,58 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   <data name="Attributes_ArgumentsAttribute_RequiresParameters_Description" xml:space="preserve">
     <value>The values passed to an [Arguments] must have parameter(s)</value>
   </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_Title" xml:space="preserve">
+    <value>Fields or properties annotated with [BenchmarkCancellation] must be of type CancellationToken</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_MessageFormat" xml:space="preserve">
+    <value>Field or property '{0}' annotated with [BenchmarkCancellation] is of type '{1}' but must be of type 'System.Threading.CancellationToken'</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_Description" xml:space="preserve">
+    <value>The [BenchmarkCancellation] attribute can only be applied to fields or properties of type System.Threading.CancellationToken</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_Title" xml:space="preserve">
+    <value>Fields annotated with [BenchmarkCancellation] must be public</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_MessageFormat" xml:space="preserve">
+    <value>Field '{0}' annotated with [{1}] must be public</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_Description" xml:space="preserve">
+    <value>The [BenchmarkCancellation] attribute requires the field to be public so BenchmarkDotNet can inject the cancellation token</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_Title" xml:space="preserve">
+    <value>Properties annotated with [BenchmarkCancellation] must be public</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_MessageFormat" xml:space="preserve">
+    <value>Property '{0}' annotated with [{1}] must be public</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_Description" xml:space="preserve">
+    <value>The [BenchmarkCancellation] attribute requires the property to be public so BenchmarkDotNet can inject the cancellation token</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_Title" xml:space="preserve">
+    <value>[BenchmarkCancellation] attribute is not valid on readonly fields</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_MessageFormat" xml:space="preserve">
+    <value>Field '{0}' annotated with [{1}] cannot be readonly</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_Description" xml:space="preserve">
+    <value>The [BenchmarkCancellation] attribute cannot be applied to readonly fields because BenchmarkDotNet needs to set the field value at runtime</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_Title" xml:space="preserve">
+    <value>Properties annotated with [BenchmarkCancellation] must have a public setter</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_MessageFormat" xml:space="preserve">
+    <value>Property '{0}' annotated with [{1}] must have a public setter</value>
+  </data>
+  <data name="Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_Description" xml:space="preserve">
+    <value>The [BenchmarkCancellation] attribute requires a public setter so BenchmarkDotNet can inject the cancellation token. Init-only setters are supported.</value>
+  </data>
+  <data name="General_AsyncBenchmark_ShouldHaveCancellationToken_Title" xml:space="preserve">
+    <value>Async benchmarks should have a [BenchmarkCancellation] property for cancellation support</value>
+  </data>
+  <data name="General_AsyncBenchmark_ShouldHaveCancellationToken_MessageFormat" xml:space="preserve">
+    <value>Class '{0}' contains async benchmark methods but no [BenchmarkCancellation] property. Consider adding a public CancellationToken property with [BenchmarkCancellation] attribute to support benchmark cancellation.</value>
+  </data>
+  <data name="General_AsyncBenchmark_ShouldHaveCancellationToken_Description" xml:space="preserve">
+    <value>Async benchmark methods should check for cancellation to allow graceful termination. Add a public property 'public CancellationToken CancellationToken { get; set; }' annotated with [BenchmarkCancellation] to enable this functionality.</value>
+  </data>
 </root>

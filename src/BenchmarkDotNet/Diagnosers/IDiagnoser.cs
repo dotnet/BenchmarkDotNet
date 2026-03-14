@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -20,13 +22,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         RunMode GetRunMode(BenchmarkCase benchmarkCase);
 
-        void Handle(HostSignal signal, DiagnoserActionParameters parameters);
+        ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken);
 
         IEnumerable<Metric> ProcessResults(DiagnoserResults results);
 
         void DisplayResults(ILogger logger);
 
-        IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
+        IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters);
     }
 
     public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser
@@ -68,7 +70,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// <summary>
         /// Handles the signal from the benchmark.
         /// </summary>
-        void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args);
+        ValueTask HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken);
 
         /// <summary>
         /// Serializes the results to be sent back to the host <see cref="IInProcessDiagnoser"/>.

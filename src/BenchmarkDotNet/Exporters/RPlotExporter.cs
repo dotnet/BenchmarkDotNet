@@ -72,7 +72,8 @@ namespace BenchmarkDotNet.Exporters
                 if (process.ExitCode != 0)
                     throw new ApplicationException($"Process {rscriptPath} has exited with code {process.ExitCode}");
 
-                reader.StopRead();
+                // TODO: refactor IExporter to support async
+                reader.StopReadAsync().AsTask().GetAwaiter().GetResult();
                 File.WriteAllLines(logFullPath, reader.GetOutputLines());
                 File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }

@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
@@ -24,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.R2R
             BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
-        protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
@@ -33,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.R2R
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-            string content = new StringBuilder(ResourceHelper.LoadTemplate("R2RCsProj.txt"))
+            string content = new StringBuilder(await ResourceHelper.LoadTemplateAsync("R2RCsProj.txt", cancellationToken).ConfigureAwait(false))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)
@@ -46,9 +48,9 @@ namespace BenchmarkDotNet.Toolchains.R2R
                 .Replace("$RUNTIMEIDENTIFIER$", CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
                 .ToString();
 
-            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+            await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
 
-            GatherReferences(buildPartition, artifactsPaths, logger);
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;

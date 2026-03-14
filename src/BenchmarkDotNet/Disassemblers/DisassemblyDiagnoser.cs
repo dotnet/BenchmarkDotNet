@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -91,7 +93,7 @@ namespace BenchmarkDotNet.Diagnosers
                 tfm: benchmarkCase.Job.Environment.GetRuntime().MsBuildMoniker
             );
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public async ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             var benchmark = parameters.BenchmarkCase;
             bool isInProcess = parameters.BenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain.IsInProcess;
@@ -104,7 +106,8 @@ namespace BenchmarkDotNet.Diagnosers
                     );
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
-                    results.Add(benchmark, monoDisassembler.Disassemble(benchmark, (MonoRuntime)benchmark.Job.Environment.Runtime!));
+                    var result = await monoDisassembler.Disassemble(benchmark, (MonoRuntime) benchmark.Job.Environment.Runtime!, cancellationToken).ConfigureAwait(false);
+                    results.Add(benchmark, result);
                     break;
             }
         }
@@ -115,7 +118,7 @@ namespace BenchmarkDotNet.Diagnosers
                     ? "Disassembled benchmarks got exported to \".\\BenchmarkDotNet.Artifacts\\results\\*asm.md\""
                     : "No benchmarks were disassembled");
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             var currentPlatform = RuntimeInformation.GetCurrentPlatform();
             if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64))
@@ -272,17 +275,18 @@ namespace BenchmarkDotNet.Diagnosers
             _clrMdArgs = BdnJsonSerializer.Deserialize<ClrMdArgs>(serializedConfig!);
         }
 
-        void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
+        ValueTask IInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken)
         {
             if (signal != BenchmarkSignal.AfterEngine)
             {
-                return;
+                return new();
             }
 
             var clrMdArgs = _clrMdArgs;
             clrMdArgs.ProcessId = Process.GetCurrentProcess().Id;
             clrMdArgs.TypeName = args.BenchmarkInstance.GetType().FullName!;
             _result = DisassemblyDiagnoser.GetClrMdDisassembler().AttachAndDisassemble(clrMdArgs);
+            return new();
         }
 
         string IInProcessDiagnoserHandler.SerializeResults()

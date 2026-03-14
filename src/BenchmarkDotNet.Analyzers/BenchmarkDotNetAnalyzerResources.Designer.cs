@@ -860,5 +860,171 @@ namespace BenchmarkDotNet.Analyzers {
                         "itle", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fields or properties annotated with [BenchmarkCancellation] must be of type CancellationToken.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_Title {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Field or property '{0}' annotated with [BenchmarkCancellation] is of type '{1}' but must be of type 'System.Threading.CancellationToken'.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_MessageFor" +
+                        "mat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The [BenchmarkCancellation] attribute can only be applied to fields or properties of type System.Threading.CancellationToken.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_Description {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType_Description" +
+                        "", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fields annotated with [BenchmarkCancellation] must be public.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_Title {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Field '{0}' annotated with [{1}] must be public.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The [BenchmarkCancellation] attribute requires the field to be public so BenchmarkDotNet can inject the cancellation token.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_Description {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_FieldMustBePublic_Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Properties annotated with [BenchmarkCancellation] must be public.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_Title {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Property '{0}' annotated with [{1}] must be public.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The [BenchmarkCancellation] attribute requires the property to be public so BenchmarkDotNet can inject the cancellation token.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_Description {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic_Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to [BenchmarkCancellation] attribute is not valid on readonly fields.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_Title {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Field '{0}' annotated with [{1}] cannot be readonly.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The [BenchmarkCancellation] attribute cannot be applied to readonly fields because BenchmarkDotNet needs to set the field value at runtime.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_Description {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField_Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Properties annotated with [BenchmarkCancellation] must have a public setter.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_Title {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Property '{0}' annotated with [{1}] must have a public setter.
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_MessageFor" +
+                        "mat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The [BenchmarkCancellation] attribute requires a public setter so BenchmarkDotNet can inject the cancellation token. Init-only setters are supported..
+        /// </summary>
+        internal static string Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_Description {
+            get {
+                return ResourceManager.GetString("Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter_Descriptio" +
+                        "n", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Async benchmarks should have a [BenchmarkCancellation] property for cancellation support.
+        /// </summary>
+        internal static string General_AsyncBenchmark_ShouldHaveCancellationToken_Title {
+            get {
+                return ResourceManager.GetString("General_AsyncBenchmark_ShouldHaveCancellationToken_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Class '{0}' contains async benchmark methods but no [BenchmarkCancellation] property. Consider adding a public CancellationToken property with [BenchmarkCancellation] attribute to support benchmark cancellation..
+        /// </summary>
+        internal static string General_AsyncBenchmark_ShouldHaveCancellationToken_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_AsyncBenchmark_ShouldHaveCancellationToken_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Async benchmark methods should check for cancellation to allow graceful termination. Add a public property 'public CancellationToken CancellationToken { get; set; }' annotated with [BenchmarkCancellation] to enable this functionality..
+        /// </summary>
+        internal static string General_AsyncBenchmark_ShouldHaveCancellationToken_Description {
+            get {
+                return ResourceManager.GetString("General_AsyncBenchmark_ShouldHaveCancellationToken_Description", resourceCulture);
+            }
+        }
     }
 }

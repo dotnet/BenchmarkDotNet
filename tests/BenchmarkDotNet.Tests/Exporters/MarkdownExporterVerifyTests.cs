@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         [Theory]
         [MemberData(nameof(GetGroupBenchmarkTypes))]
-        public Task GroupExporterTest(Type benchmarkType)
+        public async Task GroupExporterTest(Type benchmarkType)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -45,15 +45,15 @@ namespace BenchmarkDotNet.Tests.Exporters
             exporter.ExportToLog(summary, logger);
 
             var validator = BaselineValidator.FailOnError;
-            var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToList();
+            var errors = await validator.ValidateAsync(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToArrayAsync();
             logger.WriteLine();
-            logger.WriteLine("Errors: " + errors.Count);
+            logger.WriteLine("Errors: " + errors.Length);
             foreach (var error in errors)
                 logger.WriteLineError("* " + error.Message);
 
             var settings = VerifyHelper.Create();
             settings.UseTextForParameters(benchmarkType.Name);
-            return Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(logger.GetLog(), settings);
         }
 
         public void Dispose() => Thread.CurrentThread.CurrentCulture = initCulture;

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -29,8 +31,8 @@ public class DotNetCliPublisher : IBuilder
         LogOutput = logOutput;
     }
 
-    public virtual BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-        => new DotNetCliCommand(
+    public virtual ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+        => new(new DotNetCliCommand(
             CustomDotNetCliPath,
             generateResult.ArtifactsPaths.ProjectFilePath,
             TargetFrameworkMoniker,
@@ -41,5 +43,6 @@ public class DotNetCliPublisher : IBuilder
             EnvironmentVariables,
             buildPartition.Timeout,
             logOutput: LogOutput
-        ).RestoreThenBuildThenPublish();
+        )
+        .RestoreThenBuildThenPublishAsync(cancellationToken));
 }

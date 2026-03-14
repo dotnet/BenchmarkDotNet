@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -22,17 +22,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public abstract IEnumerable<string> Ids { get; }
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             if (signal == HostSignal.BeforeAnythingElse)
                 Start(parameters);
             else if (signal == HostSignal.AfterAll)
                 Stop();
+            return new();
         }
 
         public virtual IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             if (!OsDetector.IsWindows())
             {

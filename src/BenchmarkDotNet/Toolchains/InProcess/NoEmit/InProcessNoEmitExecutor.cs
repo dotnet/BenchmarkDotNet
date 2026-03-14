@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -15,14 +16,29 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     internal class InProcessNoEmitExecutor(bool executeOnSeparateThread) : IExecutor
     {
-        public ExecuteResult Execute(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
-            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.Logger, executeParameters.Diagnoser);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.Logger, executeParameters.Diagnoser, cancellationToken);
 
             int exitCode = -1;
             if (executeOnSeparateThread)
             {
-                var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
+                var taskCompletionSource = new TaskCompletionSource<int>();
+                var runThread = new Thread(async () =>
+                {
+                    try
+                    {
+                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters));
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        taskCompletionSource.SetCanceled();
+                    }
+                    catch (Exception ex)
+                    {
+                        taskCompletionSource.SetException(ex);
+                    }
+                });
 
                 if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any()
                     && OsDetector.IsWindows())
@@ -33,11 +49,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 runThread.IsBackground = true;
 
                 runThread.Start();
-                runThread.Join();
+
+                exitCode = await taskCompletionSource.Task;
             }
             else
             {
-                exitCode = ExecuteCore(host, executeParameters);
+                exitCode = await ExecuteCore(host, executeParameters);
             }
 
             host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
@@ -45,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             return ExecuteResult.FromRunResults(host.RunResults, exitCode);
         }
 
-        private int ExecuteCore(IHost host, ExecuteParameters parameters)
+        private async ValueTask<int> ExecuteCore(IHost host, ExecuteParameters parameters)
         {
             int exitCode = -1;
             var process = Process.GetCurrentProcess();
@@ -65,9 +82,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = InProcessNoEmitRunner.Run(host, parameters);
+                exitCode = await InProcessNoEmitRunner.Run(host, parameters);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
             }

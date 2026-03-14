@@ -6,7 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -67,7 +70,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker);
 
-        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        protected override ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             string projectFilePath = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, NullLogger.Instance).FullName;
 
@@ -78,24 +81,26 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .AppendLine($"call {CliPath} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
                 .ToString();
 
-            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
+            return new(File.WriteAllTextAsync(artifactsPaths.BuildScriptFilePath, content, cancellationToken));
         }
 
-        [SuppressMessage("ReSharper", "StringLiteralTypo")] // R# complains about $variables$
-        protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
-            File.WriteAllText(artifactsPaths.ProjectFilePath,
-                GenerateBuildProject(buildPartition, artifactsPaths, logger)
-            );
+            await File.WriteAllTextAsync(
+                artifactsPaths.ProjectFilePath,
+                await GenerateBuildProject(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false),
+                cancellationToken
+            )
+                .ConfigureAwait(false);
 
             // Integration tests are built without dependencies, so we skip gathering dlls.
             if (!buildPartition.ForcedNoDependenciesForIntegrationTests)
             {
-                GatherReferences(buildPartition, artifactsPaths, logger);
+                await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        private string GenerateBuildProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        private async ValueTask<string> GenerateBuildProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
@@ -104,7 +109,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             xmlDoc.Load(projectFile.FullName);
             var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-            return new StringBuilder(ResourceHelper.LoadTemplate("CsProj.txt"))
+            return new StringBuilder(await ResourceHelper.LoadTemplateAsync("CsProj.txt", cancellationToken).ConfigureAwait(false))
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)
@@ -119,22 +124,28 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         private static string GetDllGathererPath(string filePath)
             => Path.Combine(Path.GetDirectoryName(filePath)!, $"DllGatherer{Path.GetExtension(filePath)}");
 
-        protected void GatherReferences(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected async ValueTask GatherReferencesAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
             // Create a project using the default template to build the original project for all necessary runtime dlls.
             // We can't just build the original project directly because it could be a library project, so we need an exe project to reference it.
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(GenerateBuildProject(buildPartition, artifactsPaths, logger));
-            var projectElement = xmlDoc.DocumentElement!;
+            var doc = XDocument.Parse(await GenerateBuildProject(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false));
 
             // Replace the default C# file with an empty Main method to satisfy the exe build.
-            var compileNode = projectElement.SelectSingleNode("ItemGroup/Compile")!;
+            var compileNode = doc.Root!.Descendants("Compile").First();
             string emptyMainFile = GetDllGathererPath(artifactsPaths.ProgramCodePath);
-            compileNode.Attributes!["Include"]!.Value = emptyMainFile;
+            compileNode.SetAttributeValue("Include", emptyMainFile);
             string gathererProject = GetDllGathererPath(artifactsPaths.ProjectFilePath);
-            xmlDoc.Save(gathererProject);
 
-            File.WriteAllText(emptyMainFile, """
+            using (var gathererStream = File.Create(gathererProject))
+            {
+#if NETSTANDARD2_0
+                doc.Save(gathererStream, SaveOptions.None);
+#else
+                await doc.SaveAsync(gathererStream, SaveOptions.None, cancellationToken).ConfigureAwait(false);
+#endif
+            }
+
+            await File.WriteAllTextAsync(emptyMainFile, """
                 namespace BenchmarkDotNet.Autogenerated
                 {
                     public class UniqueProgramName
@@ -145,10 +156,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                         }
                     }
                 }
-                """);
+                """, cancellationToken).ConfigureAwait(false);
 
             // Build the original project then reference all of the built dlls.
-            BuildResult buildResult = new DotNetCliCommand(
+            BuildResult buildResult = await new DotNetCliCommand(
                 CliPath,
                 gathererProject,
                 TargetFrameworkMoniker,
@@ -158,7 +169,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 buildPartition,
                 [],
                 buildPartition.Timeout
-            ).RestoreThenBuild();
+            )
+                .RestoreThenBuildAsync(cancellationToken)
+                .ConfigureAwait(false);
 
             if (!buildResult.IsBuildSuccess)
             {
@@ -173,24 +186,24 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // Delete the dll from the gatherer project to prevent duplicate references.
             File.Delete(Path.Combine(artifactsPaths.BinariesDirectoryPath, $"{artifactsPaths.ProgramName}.dll"));
 
-            xmlDoc = new XmlDocument();
-            xmlDoc.Load(artifactsPaths.ProjectFilePath);
-            projectElement = xmlDoc.DocumentElement!;
-            var itemGroup = xmlDoc.CreateElement("ItemGroup");
-            projectElement.AppendChild(itemGroup);
+            doc = XDocument.Load(artifactsPaths.ProjectFilePath);
+            var itemGroup = new XElement("ItemGroup");
+            doc.Root!.Add(itemGroup);
             foreach (var assemblyFile in Directory.GetFiles(artifactsPaths.BinariesDirectoryPath, "*.dll"))
             {
-                var referenceElement = xmlDoc.CreateElement("Reference");
-                itemGroup.AppendChild(referenceElement);
-                referenceElement.SetAttribute("Include", Path.GetFileNameWithoutExtension(assemblyFile));
-                var hintPath = xmlDoc.CreateElement("HintPath");
-                referenceElement.AppendChild(hintPath);
-                var locationNode = xmlDoc.CreateTextNode(assemblyFile);
-                hintPath.AppendChild(locationNode);
-                // TODO: Add Aliases here for extern alias #2289
+                itemGroup.Add(new XElement("Reference",
+                    new XAttribute("Include", Path.GetFileNameWithoutExtension(assemblyFile)),
+                    new XElement("HintPath", assemblyFile)
+                    // TODO: Add Aliases here for extern alias #2289
+                ));
             }
 
-            xmlDoc.Save(artifactsPaths.ProjectFilePath);
+            using var projectStream = File.Create(artifactsPaths.ProjectFilePath);
+#if NETSTANDARD2_0
+            doc.Save(projectStream, SaveOptions.None);
+#else
+            await doc.SaveAsync(projectStream, SaveOptions.None, cancellationToken).ConfigureAwait(false);
+#endif
         }
 
         /// <summary>

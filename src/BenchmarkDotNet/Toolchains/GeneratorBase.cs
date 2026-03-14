@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
@@ -15,23 +17,27 @@ namespace BenchmarkDotNet.Toolchains
     [PublicAPI]
     public abstract class GeneratorBase : IGenerator
     {
+        /// <inheritdoc cref="CodeGenEntryPointType"/>
+        public CodeGenEntryPointType EntryPointType { get; init; }
+
         /// <inheritdoc cref="CodeGenBenchmarkRunCallType"/>
         public CodeGenBenchmarkRunCallType BenchmarkRunCallType { get; init; }
 
-        public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
+        public async ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
         {
             var artifactsPaths = ArtifactsPaths.Empty;
             try
             {
                 artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);
 
+                // There is no async file copy API, so we just do it synchronously. We are likely on a ThreadPool thread here anyway if this generator is ran in parallel.
                 CopyAllRequiredFiles(artifactsPaths);
 
-                GenerateCode(buildPartition, artifactsPaths);
-                GenerateAppConfig(buildPartition, artifactsPaths);
-                GenerateNuGetConfig(artifactsPaths);
-                GenerateProject(buildPartition, artifactsPaths, logger);
-                GenerateBuildScript(buildPartition, artifactsPaths);
+                await GenerateCodeAsync(buildPartition, artifactsPaths, cancellationToken).ConfigureAwait(false);
+                await GenerateAppConfigAsync(buildPartition, artifactsPaths, cancellationToken).ConfigureAwait(false);
+                await GenerateNuGetConfigAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
+                await GenerateProjectAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+                await GenerateBuildScriptAsync(buildPartition, artifactsPaths, cancellationToken).ConfigureAwait(false);
 
                 return GenerateResult.Success(artifactsPaths, GetArtifactsToCleanup(artifactsPaths));
             }
@@ -84,17 +90,17 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// generates NuGet.Config file to make sure that BDN is using the right NuGet feeds
         /// </summary>
-        [PublicAPI] protected virtual void GenerateNuGetConfig(ArtifactsPaths artifactsPaths) { }
+        [PublicAPI] protected virtual ValueTask GenerateNuGetConfigAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken) => new();
 
         /// <summary>
         /// generates .csproj file with a reference to the project with benchmarks
         /// </summary>
-        [PublicAPI] protected virtual void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) { }
+        [PublicAPI] protected virtual ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken) => new();
 
         /// <summary>
         /// generates a script can be used when debugging compilation issues
         /// </summary>
-        [PublicAPI] protected abstract void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths);
+        [PublicAPI] protected abstract ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken);
 
         /// <summary>
         /// returns a path to the folder where NuGet packages should be restored
@@ -104,24 +110,27 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// generates an app.config file next to the executable with benchmarks
         /// </summary>
-        [PublicAPI] protected virtual void GenerateAppConfig(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        [PublicAPI] protected virtual async ValueTask GenerateAppConfigAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
-            string sourcePath = buildPartition.AssemblyLocation + ".config";
+            string sourcePath = $"{buildPartition.AssemblyLocation}.config";
             artifactsPaths.AppConfigPath.EnsureFolderExists();
 
-            using (var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null)
-            using (var destination = new StreamWriter(File.Create(artifactsPaths.AppConfigPath), Encoding.UTF8))
-            {
-                AppConfigGenerator.Generate(buildPartition.RepresentativeBenchmarkCase.Job, source, destination, buildPartition.Resolver);
-            }
+            using var source = File.Exists(sourcePath) ? new StreamReader(File.OpenRead(sourcePath)) : TextReader.Null;
+            using var destination = new StreamWriter(File.Create(artifactsPaths.AppConfigPath), Encoding.UTF8);
+            await AppConfigGenerator.GenerateAsync(buildPartition.RepresentativeBenchmarkCase.Job, source, destination, buildPartition.Resolver, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
         /// generates the C# source code with all required boilerplate.
         /// <remarks>You most probably do NOT need to override this method!!</remarks>
         /// </summary>
-        [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
-            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition, BenchmarkRunCallType));
+        [PublicAPI]
+        protected virtual async ValueTask GenerateCodeAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
+            => await File.WriteAllTextAsync(
+                artifactsPaths.ProgramCodePath,
+                await CodeGenerator.GenerateAsync(buildPartition, EntryPointType, BenchmarkRunCallType, cancellationToken).ConfigureAwait(false),
+                cancellationToken)
+                .ConfigureAwait(false);
 
         protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 

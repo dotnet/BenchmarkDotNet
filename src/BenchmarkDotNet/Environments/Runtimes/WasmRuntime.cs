@@ -5,6 +5,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -35,6 +36,12 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public int ProcessTimeoutMinutes { get; }
 
+        /// <summary>
+        /// Specifies the IPC mechanism to use. Default is <see cref="WasmIpcType.Auto"/> which automatically detects
+        /// based on the JavaScript engine name.
+        /// </summary>
+        public WasmIpcType IpcType { get; }
+
         public FileInfo? MainJsTemplate { get; set; }
 
         /// <summary>
@@ -49,6 +56,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="runtimeFlavor">Runtime flavor to use: Mono (default) or CoreCLR.</param>
         /// <param name="processTimeoutMinutes">Maximum time in minutes to wait for a single benchmark process to finish. Default is 10.</param>
         /// <param name="mainJsTemplate">Optional custom template for the generated main.mjs file. If not provided, a default template will be used.</param>
+        /// <param name="ipcType">IPC mechanism to use. Default is Auto which detects based on JavaScript engine.</param>
         /// <param name="javaScriptEngineArgumentFormatter">Allows to format or customize the arguments passed to the javascript engine.</param>
         public WasmRuntime(
             string msBuildMoniker,
@@ -60,6 +68,7 @@ namespace BenchmarkDotNet.Environments
             RuntimeFlavor runtimeFlavor = RuntimeFlavor.Mono,
             int processTimeoutMinutes = 10,
             FileInfo? mainJsTemplate = null,
+            WasmIpcType ipcType = WasmIpcType.Auto,
             ArgumentFormatter? javaScriptEngineArgumentFormatter = null) : base(moniker, msBuildMoniker, displayName)
         {
             // Resolve path for windows because we can't use ProcessStartInfo.UseShellExecute while redirecting std out in the executor.
@@ -72,6 +81,7 @@ namespace BenchmarkDotNet.Environments
             RuntimeFlavor = runtimeFlavor;
             IsAOT = aot;
             ProcessTimeoutMinutes = processTimeoutMinutes;
+            IpcType = ipcType;
             MainJsTemplate = mainJsTemplate;
         }
 
@@ -81,6 +91,7 @@ namespace BenchmarkDotNet.Environments
             JavaScriptEngine = "";
             JavaScriptEngineArguments = "";
             ProcessTimeoutMinutes = 10;
+            IpcType = WasmIpcType.Auto;
             JavaScriptEngineArgumentFormatter = DefaultArgumentFormatter;
         }
 
@@ -96,11 +107,12 @@ namespace BenchmarkDotNet.Environments
                 && other.JavaScriptEngineArgumentFormatter == JavaScriptEngineArgumentFormatter
                 && other.IsAOT == IsAOT
                 && other.ProcessTimeoutMinutes == ProcessTimeoutMinutes
-                && other.RuntimeFlavor == RuntimeFlavor;
+                && other.RuntimeFlavor == RuntimeFlavor
+                && other.IpcType == IpcType;
         }
 
         public override int GetHashCode()
-            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, JavaScriptEngineArgumentFormatter, IsAOT, RuntimeFlavor, ProcessTimeoutMinutes);
+            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, JavaScriptEngineArgumentFormatter, IsAOT, RuntimeFlavor, ProcessTimeoutMinutes, IpcType);
 
         private static string DefaultArgumentFormatter(WasmRuntime runtime, ArtifactsPaths artifactsPaths, string args)
         {

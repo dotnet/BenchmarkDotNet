@@ -80,9 +80,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         public static string GetExtraArguments(string runtimeIdentifier) => $"-r {runtimeIdentifier}";
 
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var error in base.Validate(benchmarkCase, resolver))
+            await foreach (var error in base.ValidateAsync(benchmarkCase, resolver))
             {
                 yield return error;
             }

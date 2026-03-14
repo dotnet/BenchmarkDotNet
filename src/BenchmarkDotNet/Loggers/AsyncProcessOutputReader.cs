@@ -1,9 +1,12 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -14,7 +17,8 @@ namespace BenchmarkDotNet.Loggers
         private readonly bool logOutput, readStandardError;
 
         private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromSeconds(1);
-        private readonly AutoResetEvent outputFinishEvent, errorFinishEvent;
+        private readonly TaskCompletionSource<object?> stdOutFinishTcs, errorFinishTcs;
+        private readonly Channel<string> outputChannel;
         private readonly ConcurrentQueue<string> output, error;
 
         private long status;
@@ -31,8 +35,9 @@ namespace BenchmarkDotNet.Loggers
             this.process = process;
             output = new ConcurrentQueue<string>();
             error = new ConcurrentQueue<string>();
-            outputFinishEvent = new AutoResetEvent(false);
-            errorFinishEvent = new AutoResetEvent(false);
+            stdOutFinishTcs = new();
+            errorFinishTcs = new();
+            outputChannel = Channel.CreateUnbounded<string>();
             status = (long)Status.Created;
             this.logOutput = logOutput;
             this.logger = logger ?? NullLogger.Instance;
@@ -44,9 +49,6 @@ namespace BenchmarkDotNet.Loggers
             Interlocked.Exchange(ref status, (long)Status.Disposed);
 
             Detach();
-
-            outputFinishEvent.Dispose();
-            errorFinishEvent.Dispose();
         }
 
         internal void BeginRead()
@@ -75,16 +77,28 @@ namespace BenchmarkDotNet.Loggers
             Detach();
         }
 
-        internal void StopRead()
+        internal async ValueTask StopReadAsync()
         {
             if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
 
-            outputFinishEvent.WaitOne(FinishEventTimeout);
+            await stdOutFinishTcs.Task.WaitAsync(FinishEventTimeout).ConfigureAwait(false);
             if (readStandardError)
-                errorFinishEvent.WaitOne(FinishEventTimeout);
+                await errorFinishTcs.Task.WaitAsync(FinishEventTimeout).ConfigureAwait(false);
 
             Detach();
+        }
+
+        internal async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await outputChannel.Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (ChannelClosedException)
+            {
+                return null;
+            }
         }
 
         internal ImmutableArray<string> GetOutputLines() => ReturnIfStopped(() => output.ToImmutableArray());
@@ -120,6 +134,7 @@ namespace BenchmarkDotNet.Loggers
                 if (!string.IsNullOrEmpty(e.Data))
                 {
                     output.Enqueue(e.Data);
+                    outputChannel.Writer.TryWrite(e.Data);
 
                     if (logOutput)
                     {
@@ -128,7 +143,10 @@ namespace BenchmarkDotNet.Loggers
                 }
             }
             else // 'e.Data == null' means EOF
-                outputFinishEvent.Set();
+            {
+                outputChannel.Writer.Complete();
+                stdOutFinishTcs.SetResult(null);
+            }
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)
@@ -146,7 +164,7 @@ namespace BenchmarkDotNet.Loggers
                 }
             }
             else // 'e.Data == null' means EOF
-                errorFinishEvent.Set();
+                errorFinishTcs.SetResult(null);
         }
 
         private T ReturnIfStopped<T>(Func<T> getter)

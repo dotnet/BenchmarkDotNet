@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Validators
         {
             var targetRuntime = benchmark.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? benchmark.Job.Environment.Runtime!
-                : ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.WorkloadMethod.DeclaringType!.Assembly);
+                : ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.Type.Assembly);
             var requiredSdkVersion = targetRuntime.RuntimeMoniker.GetRuntimeVersion();
 
             var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();

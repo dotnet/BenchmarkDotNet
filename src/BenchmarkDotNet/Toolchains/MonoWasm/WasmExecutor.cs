@@ -11,16 +11,28 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     internal class WasmExecutor : IExecutor
     {
-        public ExecuteResult Execute(ExecuteParameters executeParameters)
+        private sealed class ProcessListener(IpcListener listener, Process process) : IDisposable
+        {
+            public IpcListener Listener { get; } = listener;
+            public Process Process { get; } = process;
+
+            public void Dispose()
+            {
+                Process.Dispose();
+                Listener.Dispose();
+            }
+        }
+
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
 
@@ -29,27 +41,125 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 return ExecuteResult.CreateFailed();
             }
 
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+            return await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                 executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
-                executeParameters.DiagnoserRunMode);
+                executeParameters.DiagnoserRunMode, cancellationToken);
         }
 
-        private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
-            IDiagnoser? diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
-            Diagnosers.RunMode diagnoserRunMode)
+        private static async ValueTask<bool> ProbeWebSocketSupportAsync(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, IResolver resolver, CancellationToken cancellationToken)
         {
+            // Check if the JavaScript runtime supports WebSocket
+            using var probeProcess = CreateProcess(benchmarkCase, artifactsPaths, "--getSupportsWebSocket", resolver);
+            probeProcess.Start();
+
+            string output;
             try
             {
-                using Process process = CreateProcess(benchmarkCase, artifactsPaths, benchmarkId.ToArguments(diagnoserRunMode), resolver);
-                using ConsoleExitHandler consoleExitHandler = new(process, logger);
-                using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
-
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
-                return Execute(process, benchmarkCase, processOutputReader, logger, consoleExitHandler, launchIndex, compositeInProcessDiagnoser);
+#if NET7_0_OR_GREATER
+                output = await probeProcess.StandardOutput.ReadToEndAsync(cancellationToken);
+#else
+                output = await probeProcess.StandardOutput.ReadToEndAsync().WaitAsync(cancellationToken);
+#endif
             }
             finally
             {
-                diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
+                if (!probeProcess.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    probeProcess.KillTree();
+                }
+            }
+
+            // Parse output for "supportsWebSocket: true" or "supportsWebSocket: false"
+            foreach (string line in output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (line.StartsWith("supportsWebSocket:", StringComparison.Ordinal))
+                {
+                    string value = line["supportsWebSocket:".Length..].Trim();
+                    return bool.TryParse(value, out bool result) && result;
+                }
+            }
+
+            // Default to file-based IPC if probe fails
+            return false;
+        }
+
+        private static async ValueTask<ProcessListener> CreateProcessListenerAsync(
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ArtifactsPaths artifactsPaths,
+            IResolver resolver, Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
+        {
+            WasmRuntime runtime = (WasmRuntime)benchmarkCase.GetRuntime();
+
+            bool useWebSocket = runtime.IpcType == WasmIpcType.Auto
+                // Probe the JavaScript runtime to check if it supports WebSocket
+                ? await ProbeWebSocketSupportAsync(benchmarkCase, artifactsPaths, resolver, cancellationToken)
+                : runtime.IpcType == WasmIpcType.WebSocket;
+
+            IpcListener listener;
+            string args;
+
+            if (useWebSocket)
+            {
+                var webSocketListener = new WebSocketListener();
+                try
+                {
+                    var port = await webSocketListener.StartAndGetPortAsync();
+                    listener = webSocketListener;
+                    args = benchmarkId.ToArguments(port, diagnoserRunMode);
+                }
+                catch
+                {
+                    // Ensure WebSocketListener is disposed if we fail after creating it
+                    webSocketListener.Dispose();
+                    throw;
+                }
+            }
+            else
+            {
+                // File-based IPC for shell engines (v8/d8, SpiderMonkey, etc.)
+                var fileStdOutListener = new FileStdOutListener(artifactsPaths.BuildArtifactsDirectoryPath);
+                listener = fileStdOutListener;
+                args = benchmarkId.ToArguments(fileStdOutListener.GetIpcDirectory(), diagnoserRunMode);
+            }
+
+            Process process;
+            try
+            {
+                process = CreateProcess(benchmarkCase, artifactsPaths, args, resolver);
+            }
+            catch
+            {
+                // Ensure listener is disposed if process creation fails
+                listener.Dispose();
+                throw;
+            }
+
+            return new ProcessListener(listener, process);
+        }
+
+        private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Loggers.ILogger logger, ArtifactsPaths artifactsPaths,
+            IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
+            Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
+        {
+            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken);
+            try
+            {
+                using ProcessCleanupHelper processCleanupHelper = new(processListener.Process, logger);
+                bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
+                using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: false);
+
+                if (isFileBasedIpc)
+                {
+                    ((FileStdOutListener) processListener.Listener).AttachProcessOutputReader(processOutputReader);
+                }
+
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken);
+                return await Execute(processListener.Process, benchmarkCase, processOutputReader,
+                    benchmarkId, logger, processCleanupHelper, launchIndex, diagnoser,
+                    compositeInProcessDiagnoser, processListener.Listener, cancellationToken);
+            }
+            finally
+            {
+                await diagnoser.HandleAsync(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken);
             }
         }
 
@@ -74,79 +184,61 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             return new Process() { StartInfo = start };
         }
 
-        private static ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
-            ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, CompositeInProcessDiagnoser compositeInProcessDiagnoser)
+        private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
+            BenchmarkId benchmarkId, Loggers.ILogger logger, ProcessCleanupHelper processCleanupHelper, int launchIndex, IDiagnoser diagnoser,
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener, CancellationToken cancellationToken)
         {
-            logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-            process.Start();
-            processOutputReader.BeginRead();
-
-            process.EnsureHighPriority(logger);
-            if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
+            WasmRuntime wasmRuntime = (WasmRuntime) benchmarkCase.GetRuntime();
+            List<string> results;
+            List<string> prefixedOutput;
+            try
             {
-                process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
-            }
+                using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, ipcListener);
 
-            WasmRuntime wasmRuntime = (WasmRuntime)benchmarkCase.GetRuntime();
-            int timeoutMinutes = wasmRuntime.ProcessTimeoutMinutes;
-            if (!process.WaitForExit(milliseconds: (int)TimeSpan.FromMinutes(timeoutMinutes).TotalMilliseconds))
-            {
-                logger.WriteLineInfo($"// The benchmarking process did not finish within {timeoutMinutes} minutes, it's going to get force killed now.");
+                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
-            }
-            else
-            {
-                processOutputReader.StopRead();
-            }
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken);
 
-            ImmutableArray<string> outputLines = processOutputReader.GetOutputLines();
-            var prefixedLines = new List<string>();
-            var resultLines = new List<string>();
-            var outputEnumerator = outputLines.GetEnumerator();
-            while (outputEnumerator.MoveNext())
-            {
-                var line = outputEnumerator.Current;
-                if (!line.StartsWith("//"))
+                process.Start();
+
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken);
+
+                processOutputReader.BeginRead();
+
+                process.EnsureHighPriority(logger);
+                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
                 {
-                    resultLines.Add(line);
-                    continue;
+                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                prefixedLines.Add(line);
+                await broker.ProcessData(cancellationToken)
+                    .AsTask()
+                    .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes));
 
-                // Keep in sync with Broker and InProcessHost.
-                if (line.StartsWith(CompositeInProcessDiagnoser.HeaderKey))
+                results = broker.Results;
+                prefixedOutput = broker.PrefixedOutput;
+            }
+            finally
+            {
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
-                    // Something like "// InProcessDiagnoser 0 1"
-                    string[] lineItems = line.Split(' ');
-                    int diagnoserIndex = int.Parse(lineItems[2]);
-                    int resultsLinesCount = int.Parse(lineItems[3]);
-                    var resultsStringBuilder = new StringBuilder();
-                    for (int i = 0; i < resultsLinesCount;)
-                    {
-                        // Strip the prepended "// InProcessDiagnoserResults ".
-                        bool movedNext = outputEnumerator.MoveNext();
-                        Debug.Assert(movedNext);
-                        line = outputEnumerator.Current.Substring(CompositeInProcessDiagnoser.ResultsKey.Length + 1);
-                        resultsStringBuilder.Append(line);
-                        if (++i < resultsLinesCount)
-                        {
-                            resultsStringBuilder.AppendLine();
-                        }
-                    }
-                    compositeInProcessDiagnoser.DeserializeResults(diagnoserIndex, benchmarkCase, resultsStringBuilder.ToString());
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+
+                    processOutputReader.CancelRead();
+                    processCleanupHelper.KillProcessTree();
+                }
+                else
+                {
+                    await processOutputReader.StopReadAsync();
                 }
             }
 
             return new ExecuteResult(true,
                 process.HasExited ? process.ExitCode : null,
                 process.Id,
-                [.. resultLines],
-                [.. prefixedLines],
-                outputLines,
+                results,
+                prefixedOutput,
+                processOutputReader.GetOutputLines(),
                 launchIndex);
         }
     }
