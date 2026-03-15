@@ -150,11 +150,19 @@ namespace BenchmarkDotNet.Loggers
                     // Handle HostSignal data
                     if (Engine.Signals.TryGetSignal(line, out var signal))
                     {
-                        await Diagnoser.HandleAsync(signal, DiagnoserActionParameters, cancellationToken);
-
-                        lock (ipcConnection)
+                        try
                         {
-                            ipcConnection.WriteLine(Engine.Signals.Acknowledgment);
+                            await Diagnoser.HandleAsync(signal, DiagnoserActionParameters, cancellationToken);
+                        }
+                        // If the benchmark was canceled, the child process may still be waiting for an acknowledgement,
+                        // because it sends the AfterAll signal in a finally block, and we need to allow the process to exit gracefully,
+                        // so we send the acknowledgement always.
+                        finally
+                        {
+                            lock (ipcConnection)
+                            {
+                                ipcConnection.WriteLine(Engine.Signals.Acknowledgment);
+                            }
                         }
 
                         if (signal == HostSignal.AfterAll)

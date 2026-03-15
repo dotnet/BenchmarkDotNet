@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -43,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 return 0;
             }
-            catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
+            catch (Exception oom) when (ExceptionHelper.IsOom(oom))
             {
                 host.WriteLine();
                 host.WriteLine("OutOfMemoryException!");
@@ -55,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 return -1;
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            catch (Exception ex) when (!ExceptionHelper.IsCancelation(ex))
             {
                 host.WriteLine();
                 host.WriteLine(ex.ToString());

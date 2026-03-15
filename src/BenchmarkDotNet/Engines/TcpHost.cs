@@ -43,17 +43,17 @@ internal sealed class TcpHost : IHost
                 break;
             }
 
-            var source = acknowledgmentSource;
-            acknowledgmentSource = null;
-
             if (message == "CANCEL")
             {
                 cancellationTokenSource.Cancel();
-                source?.SetCanceled();
-                break;
+                // When the benchmark process is canceled, it still sends the final AfterAll signal back to the host in a finally block,
+                // and awaits the acknowledgment, so we need to continue receiving messages until the stream is closed.
+                continue;
             }
 
-            source?.SetResult(message);
+            var source = acknowledgmentSource!;
+            acknowledgmentSource = null;
+            source.SetResult(message);
         }
     }
 

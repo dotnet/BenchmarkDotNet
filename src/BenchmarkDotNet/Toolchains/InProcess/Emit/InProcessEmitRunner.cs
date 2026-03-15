@@ -1,14 +1,13 @@
 ﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
@@ -33,7 +32,7 @@ internal static class InProcessEmitRunner
 
             return 0;
         }
-        catch (Exception oom) when (oom is OutOfMemoryException || oom is TargetInvocationException reflection && reflection.InnerException is OutOfMemoryException)
+        catch (Exception oom) when (ExceptionHelper.IsOom(oom))
         {
             host.WriteLine();
             host.WriteLine("OutOfMemoryException!");
@@ -45,7 +44,7 @@ internal static class InProcessEmitRunner
 
             return -1;
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (!ExceptionHelper.IsCancelation(ex))
         {
             host.WriteLine();
             host.WriteLine(ex.ToString());
