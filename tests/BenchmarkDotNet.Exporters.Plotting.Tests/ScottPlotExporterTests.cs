@@ -1,9 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
 using System;
 using System.Diagnostics.CodeAnalysis;
