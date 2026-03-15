@@ -48,7 +48,12 @@ namespace BenchmarkDotNet.Helpers
         /// Called when the user presses Ctrl-C or Ctrl-Break.
         /// </summary>
         private void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
-            => Dispose(!e.Cancel);
+        {
+            if (!e.Cancel)
+            {
+                Dispose(true);
+            }
+        }
 
         /// <summary>
         /// Called when the user clicks on the X in the upper right corner to close the Benchmark's Window.
