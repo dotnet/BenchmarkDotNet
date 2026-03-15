@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 using ProcessCleanupHelper processCleanupHelper = new(processListener.Process, logger);
                 bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
-                using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: false);
+                using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: false, channelStandardOutput: isFileBasedIpc);
 
                 if (isFileBasedIpc)
                 {
@@ -211,9 +211,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
+#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods
                 await broker.ProcessData(cancellationToken)
                     .AsTask()
                     .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes));
+#pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;

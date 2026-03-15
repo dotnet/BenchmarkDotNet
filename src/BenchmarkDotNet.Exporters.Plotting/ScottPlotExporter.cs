@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
@@ -79,23 +82,9 @@ namespace BenchmarkDotNet.Exporters.Plotting
         public bool IncludeBoxPlot { get; set; }
 
         /// <summary>
-        /// Not supported.
+        /// Exports plots to .png files.
         /// </summary>
-        /// <param name="summary">This parameter is not used.</param>
-        /// <param name="logger">This parameter is not used.</param>
-        /// <exception cref="NotSupportedException"></exception>
-        public void ExportToLog(Summary summary, ILogger logger)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Exports plots to .png file.
-        /// </summary>
-        /// <param name="summary">The summary to be exported.</param>
-        /// <param name="consoleLogger">Logger to output to.</param>
-        /// <returns>The file paths of every plot exported.</returns>
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
+        public ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
         {
             var title = summary.Title;
             var version = BenchmarkDotNetInfo.Instance.BrandTitle;
@@ -120,25 +109,27 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 if (this.IncludeBarPlot)
                 {
                     // <BenchmarkName>-barplot.png
-                    yield return CreateBarPlot(
+                    var filePath = CreateBarPlot(
                         $"{title} - {benchmarkName}",
                         Path.Combine(summary.ResultsDirectoryPath, $"{title}-{benchmarkName}-barplot.png"),
                         $"Time ({timeUnit})",
                         "Target",
                         timeStats,
                         annotations);
+                    logger.WriteLineInfo($"  {filePath.GetBaseName(Directory.GetCurrentDirectory())}");
                 }
 
                 if (this.IncludeBoxPlot)
                 {
                     // <BenchmarkName>-boxplot.png
-                    yield return CreateBoxPlot(
+                    var filePath = CreateBoxPlot(
                         $"{title} - {benchmarkName}",
                         Path.Combine(summary.ResultsDirectoryPath, $"{title}-{benchmarkName}-boxplot.png"),
                         $"Time ({timeUnit})",
                         "Target",
                         timeStats,
                         annotations);
+                    logger.WriteLineInfo($"  {filePath.GetBaseName(Directory.GetCurrentDirectory())}");
                 }
 
                 /* TODO: Rest of the RPlotExporter plots.
@@ -148,6 +139,8 @@ namespace BenchmarkDotNet.Exporters.Plotting
                 <BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png
                 <BenchmarkName>-<MethodName>-<JobName>-timelineSmooth.png*/
             }
+
+            return new();
         }
 
         /// <summary>

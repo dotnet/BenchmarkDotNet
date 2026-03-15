@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -16,9 +18,17 @@ namespace BenchmarkDotNet.Exporters
         protected virtual string FileNameSuffix => string.Empty;
         protected virtual string FileCaption => "report";
 
-        public abstract void ExportToLog(Summary summary, ILogger logger);
+        // This will execute synchronously (because ILogger doesn't support async),
+        // but it's needed to re-use the logic for both file and logger export to avoid code duplication on every implementation.
+        internal async ValueTask ExportToLogAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
+        {
+            var writer = new LoggerWriter(logger);
+            await ExportAsync(summary, writer, cancellationToken).ConfigureAwait(false);
+        }
 
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
+        protected abstract ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken);
+
+        public async ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
         {
             string fileName = GetFileName(summary);
             string filePath = GetArtifactFullName(summary);
@@ -32,20 +42,16 @@ namespace BenchmarkDotNet.Exporters
                 {
                     string uniqueString = DateTime.Now.ToString("yyyyMMdd-HHmmss");
                     string alternativeFilePath = $"{Path.Combine(summary.ResultsDirectoryPath, fileName)}-{FileCaption}{FileNameSuffix}-{uniqueString}.{FileExtension}";
-                    consoleLogger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
+                    logger.WriteLineError($"Could not overwrite file {filePath}. Exporting to {alternativeFilePath}");
                     filePath = alternativeFilePath;
                 }
             }
 
-            using (var stream = new StreamWriter(filePath, append: false))
-            {
-                using (var streamLogger = new StreamLogger(stream))
-                {
-                    ExportToLog(summary, streamLogger);
-                }
-            }
+            using var fileStream = File.Create(filePath);
+            using var writer = new CancelableStreamWriter(fileStream);
+            await ExportAsync(summary, writer, cancellationToken).ConfigureAwait(false);
 
-            return [filePath];
+            logger.WriteLineInfo($"  {filePath.GetBaseName(Directory.GetCurrentDirectory())}");
         }
 
         public string GetArtifactFullName(Summary summary)

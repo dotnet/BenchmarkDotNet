@@ -18,12 +18,15 @@ namespace BenchmarkDotNet.Loggers
 
         private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromSeconds(1);
         private readonly TaskCompletionSource<object?> stdOutFinishTcs, errorFinishTcs;
-        private readonly Channel<string> outputChannel;
-        private readonly ConcurrentQueue<string> output, error;
+        private readonly Channel<string>? outputChannel;
+        private readonly ConcurrentQueue<string>? output;
+        private readonly ConcurrentQueue<string> error;
 
         private long status;
 
-        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger? logger = null, bool readStandardError = true)
+        public Channel<string>? OutputChannel => outputChannel;
+
+        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger? logger = null, bool readStandardError = true, bool cacheStandardOutput = true, bool channelStandardOutput = false)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
@@ -33,11 +36,11 @@ namespace BenchmarkDotNet.Loggers
                 throw new ArgumentException($"{nameof(logger)} cannot be null when {nameof(logOutput)} is true");
 
             this.process = process;
-            output = new ConcurrentQueue<string>();
+            output = cacheStandardOutput ? new ConcurrentQueue<string>() : null;
             error = new ConcurrentQueue<string>();
             stdOutFinishTcs = new();
             errorFinishTcs = new();
-            outputChannel = Channel.CreateUnbounded<string>();
+            outputChannel = channelStandardOutput ? Channel.CreateUnbounded<string>() : null;
             status = (long)Status.Created;
             this.logOutput = logOutput;
             this.logger = logger ?? NullLogger.Instance;
@@ -89,11 +92,14 @@ namespace BenchmarkDotNet.Loggers
             Detach();
         }
 
+        /// <summary>
+        /// This must have been created with channelStandardOutput = true
+        /// </summary>
         internal async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
         {
             try
             {
-                return await outputChannel.Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+                return await OutputChannel!.Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (ChannelClosedException)
             {
@@ -101,13 +107,22 @@ namespace BenchmarkDotNet.Loggers
             }
         }
 
-        internal ImmutableArray<string> GetOutputLines() => ReturnIfStopped(() => output.ToImmutableArray());
+        /// <summary>
+        /// This must have been created with cacheStandardOutput = true
+        /// </summary>
+        internal ImmutableArray<string> GetOutputLines() => ReturnIfStopped(() => output!.ToImmutableArray());
 
         internal ImmutableArray<string> GetErrorLines() => ReturnIfStopped(() => error.ToImmutableArray());
 
-        internal ImmutableArray<string> GetOutputAndErrorLines() => ReturnIfStopped(() => output.Concat(error).ToImmutableArray());
+        /// <summary>
+        /// This must have been created with cacheStandardOutput = true
+        /// </summary>
+        internal ImmutableArray<string> GetOutputAndErrorLines() => ReturnIfStopped(() => output!.Concat(error).ToImmutableArray());
 
-        internal string GetOutputText() => ReturnIfStopped(() => string.Join(Environment.NewLine, output));
+        /// <summary>
+        /// This must have been created with cacheStandardOutput = true
+        /// </summary>
+        internal string GetOutputText() => ReturnIfStopped(() => string.Join(Environment.NewLine, output!));
 
         internal string GetErrorText() => ReturnIfStopped(() => string.Join(Environment.NewLine, error));
 
@@ -133,8 +148,8 @@ namespace BenchmarkDotNet.Loggers
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
-                    output.Enqueue(e.Data);
-                    outputChannel.Writer.TryWrite(e.Data);
+                    output?.Enqueue(e.Data);
+                    OutputChannel?.Writer.TryWrite(e.Data);
 
                     if (logOutput)
                     {
@@ -144,7 +159,7 @@ namespace BenchmarkDotNet.Loggers
             }
             else // 'e.Data == null' means EOF
             {
-                outputChannel.Writer.Complete();
+                OutputChannel?.Writer.Complete();
                 stdOutFinishTcs.SetResult(null);
             }
         }

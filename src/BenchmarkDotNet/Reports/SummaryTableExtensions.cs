@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
@@ -13,7 +15,7 @@ namespace BenchmarkDotNet.Reports
         [ThreadStatic]
         private static StringBuilder? sharedBuffer;
 
-        public static void PrintCommonColumns(this SummaryTable table, ILogger logger)
+        public static async ValueTask PrintCommonColumnsAsync(this SummaryTable table, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             var commonColumns = table.Columns.Where(c => c.IsCommon).ToArray();
             if (commonColumns.Any())
@@ -21,35 +23,35 @@ namespace BenchmarkDotNet.Reports
                 int paramsOnLine = 0;
                 foreach (var column in commonColumns)
                 {
-                    logger.WriteInfo($"{column.Header}={column.Content[0]}  ");
+                    await writer.WriteAsync($"{column.Header}={column.Content[0]}  ", LogKind.Info, cancellationToken);
                     paramsOnLine++;
                     if (paramsOnLine == 3)
                     {
-                        logger.WriteLine();
+                        await writer.WriteLineAsync(cancellationToken);
                         paramsOnLine = 0;
                     }
                 }
                 if (paramsOnLine != 0)
-                    logger.WriteLine();
+                    await writer.WriteLineAsync(cancellationToken);
             }
         }
 
-        public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
+        public static async ValueTask PrintLineAsync(this SummaryTable table, string[] line, StreamOrLoggerWriter writer, string leftDel, string rightDel, CancellationToken cancellationToken)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
                 if (table.Columns[columnIndex].NeedToShow)
                 {
-                    logger.WriteStatistic(BuildStandardText(table, line, leftDel, rightDel, columnIndex));
+                    await writer.WriteAsync(BuildStandardText(table, line, leftDel, rightDel, columnIndex), LogKind.Statistic, cancellationToken);
                 }
             }
 
-            logger.WriteLine();
+            await writer.WriteLineAsync(cancellationToken);
         }
 
-        public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel,
+        public static async ValueTask PrintLineAsync(this SummaryTable table, string[] line, StreamOrLoggerWriter writer, string leftDel, string rightDel,
             bool highlightRow, bool startOfGroup, MarkdownExporter.MarkdownHighlightStrategy startOfGroupHighlightStrategy, string boldMarkupFormat,
-            bool escapeHtml)
+            bool escapeHtml, CancellationToken cancellationToken)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
@@ -64,20 +66,14 @@ namespace BenchmarkDotNet.Reports
                 if (escapeHtml)
                     text = text.HtmlEncode();
 
-                if (highlightRow) // write the row in an alternative color
-                {
-                    logger.WriteHeader(text);
-                }
-                else
-                {
-                    logger.WriteStatistic(text);
-                }
+                // write the row in an alternative color
+                await writer.WriteAsync(text, highlightRow ? LogKind.Header : LogKind.Statistic, cancellationToken);
             }
 
             if (startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Marker)
-                logger.Write(highlightRow ? LogKind.Header : LogKind.Statistic, " ^"); //
+                await writer.WriteAsync(" ^", highlightRow ? LogKind.Header : LogKind.Statistic, cancellationToken);
 
-            logger.WriteLine();
+            await writer.WriteLineAsync(cancellationToken);
         }
 
         private static string BuildStandardText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)

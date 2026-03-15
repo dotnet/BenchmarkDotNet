@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -14,17 +16,36 @@ namespace BenchmarkDotNet.Exporters
         {
         }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
-            logger.WriteLine("....");
+            await writer.WriteLineAsync("....", cancellationToken).ConfigureAwait(false);
             foreach (string infoLine in summary.HostEnvironmentInfo.ToFormattedString())
             {
-                logger.WriteLineInfo(infoLine);
+                await writer.WriteLineAsync(infoLine, LogKind.Info, cancellationToken).ConfigureAwait(false);
             }
-            logger.WriteLineInfo(summary.AllRuntimes);
-            logger.WriteLine();
+            await writer.WriteLineAsync(summary.AllRuntimes, LogKind.Info, cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
 
-            PrintTable(summary.Table, logger);
+            var table = summary.Table;
+            if (table.FullContent.Length == 0)
+            {
+                await writer.WriteLineAsync("[WARNING]", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("====", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("There are no benchmarks found ", LogKind.Error, cancellationToken);
+                await writer.WriteLineAsync("====", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            await table.PrintCommonColumnsAsync(writer, cancellationToken);
+            await writer.WriteLineAsync("....", cancellationToken).ConfigureAwait(false);
+
+            await writer.WriteLineAsync("[options=\"header\"]", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("|===", cancellationToken).ConfigureAwait(false);
+            await table.PrintLineAsync(table.FullHeader, writer, "|", string.Empty, cancellationToken).ConfigureAwait(false);
+            foreach (var line in table.FullContent)
+                await table.PrintLineAsync(line, writer, "|", string.Empty, cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("|===", cancellationToken).ConfigureAwait(false);
 
             var benchmarksWithTroubles = summary.Reports
                 .Where(r => !r.GetResultRuns().Any())
@@ -33,37 +54,14 @@ namespace BenchmarkDotNet.Exporters
 
             if (benchmarksWithTroubles.Count > 0)
             {
-                logger.WriteLine();
-                logger.WriteLine("[WARNING]");
-                logger.WriteLineError(".Benchmarks with issues");
-                logger.WriteLine("====");
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("[WARNING]", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync(".Benchmarks with issues", LogKind.Error, cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("====", cancellationToken).ConfigureAwait(false);
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
-                    logger.WriteLineError("* " + benchmarkWithTroubles.DisplayInfo);
-                logger.WriteLine("====");
+                    await writer.WriteLineAsync($"* {benchmarkWithTroubles.DisplayInfo}", LogKind.Error, cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("====", cancellationToken).ConfigureAwait(false);
             }
-        }
-
-        private static void PrintTable(SummaryTable table, ILogger logger)
-        {
-            if (table.FullContent.Length == 0)
-            {
-                logger.WriteLine("[WARNING]");
-                logger.WriteLine("====");
-                logger.WriteLineError("There are no benchmarks found ");
-                logger.WriteLine("====");
-                logger.WriteLine();
-                return;
-            }
-
-            table.PrintCommonColumns(logger);
-            logger.WriteLine("....");
-
-            logger.WriteLine("[options=\"header\"]");
-            logger.WriteLine("|===");
-            table.PrintLine(table.FullHeader, logger, "|", string.Empty);
-            foreach (var line in table.FullContent)
-                table.PrintLine(line, logger, "|", string.Empty);
-            logger.WriteLine("|===");
         }
     }
 }

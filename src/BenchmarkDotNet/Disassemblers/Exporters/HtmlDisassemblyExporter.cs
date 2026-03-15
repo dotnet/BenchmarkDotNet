@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -27,40 +29,40 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "html";
         protected override string FileCaption => "asm";
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
-            logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' /><head>");
-            logger.WriteLine($"<title>Pretty Output of DisassemblyDiagnoser for {summary.Title}</title>");
-            logger.WriteLine(InstructionPointerExporter.CssStyle);
-            logger.WriteLine(@"
+            await writer.WriteLineAsync("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' /><head>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync($"<title>Pretty Output of DisassemblyDiagnoser for {summary.Title}</title>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(InstructionPointerExporter.CssStyle, cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(@"
 <style type='text/css'>
     td.label:hover { cursor: pointer; background-color: yellow !important; }
     td.highlighted { background-color: yellow !important; }
-</style></head><body>");
-            logger.WriteLine("<script src=\"https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js\"></script>");
-            logger.WriteLine($"<script>{HighlightingLabelsScript.Value}</script>");
+</style></head><body>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<script src=\"https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js\"></script>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync($"<script>{HighlightingLabelsScript.Value}</script>", cancellationToken).ConfigureAwait(false);
 
             int referenceIndex = 0;
 
             foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
-                Export(logger, summary, results[benchmarkCase], benchmarkCase, ref referenceIndex);
+                referenceIndex = await Export(writer, summary, results[benchmarkCase], benchmarkCase, referenceIndex, cancellationToken).ConfigureAwait(false);
             }
 
-            logger.WriteLine("</body></html>");
+            await writer.WriteLineAsync("</body></html>", cancellationToken).ConfigureAwait(false);
         }
 
-        private void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, ref int referenceIndex)
+        private async ValueTask<int> Export(StreamOrLoggerWriter writer, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, int referenceIndex, CancellationToken cancellationToken)
         {
-            logger.WriteLine($"<h2>{summary[benchmarkCase]!.GetRuntimeInfo()}</h2>");
-            logger.WriteLine($"<h3>Job: {benchmarkCase.Job.DisplayInfo}</h3>");
-            logger.WriteLine("<table><tbody>");
+            await writer.WriteLineAsync($"<h2>{summary[benchmarkCase]!.GetRuntimeInfo()}</h2>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync($"<h3>Job: {benchmarkCase.Job.DisplayInfo}</h3>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<table><tbody>", cancellationToken).ConfigureAwait(false);
 
             int methodIndex = 0;
             foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
             {
                 referenceIndex++;
-                logger.WriteLine($"<tr><th colspan=\"2\" style=\"text-align: left;\">{method.Name}</th><th></th></tr>");
+                await writer.WriteLineAsync($"<tr><th colspan=\"2\" style=\"text-align: left;\">{method.Name}</th><th></th></tr>", cancellationToken).ConfigureAwait(false);
 
                 var pretty = DisassemblyPrettifier.Prettify(method, disassemblyResult, config, $"M{methodIndex++:00}");
 
@@ -71,40 +73,42 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     {
                         even = !even;
 
-                        logger.WriteLine($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">");
-                        logger.WriteLine($"<td id=\"{referenceIndex}_{label.Id}\" class=\"label\" data-label=\"{referenceIndex}_{label.TextRepresentation}\"><pre><code>{label.TextRepresentation}</pre></code></td>");
-                        logger.WriteLine("<td>&nbsp;</td></tr>");
+                        await writer.WriteLineAsync($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">", cancellationToken).ConfigureAwait(false);
+                        await writer.WriteLineAsync($"<td id=\"{referenceIndex}_{label.Id}\" class=\"label\" data-label=\"{referenceIndex}_{label.TextRepresentation}\"><pre><code>{label.TextRepresentation}</pre></code></td>", cancellationToken).ConfigureAwait(false);
+                        await writer.WriteLineAsync("<td>&nbsp;</td></tr>", cancellationToken).ConfigureAwait(false);
 
                         continue;
                     }
 
-                    logger.WriteLine($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">");
-                    logger.Write("<td></td>");
+                    await writer.WriteLineAsync($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">", cancellationToken).ConfigureAwait(false);
+                    await writer.WriteAsync("<td></td>", cancellationToken).ConfigureAwait(false);
 
                     if (element is DisassemblyPrettifier.Reference reference)
-                        logger.WriteLine($"<td id=\"{referenceIndex}\" class=\"reference\" data-reference=\"{referenceIndex}_{reference.Id}\"><a href=\"#{referenceIndex}_{reference.Id}\"><pre><code>{reference.TextRepresentation}</pre></code></a></td>");
+                        await writer.WriteLineAsync($"<td id=\"{referenceIndex}\" class=\"reference\" data-reference=\"{referenceIndex}_{reference.Id}\"><a href=\"#{referenceIndex}_{reference.Id}\"><pre><code>{reference.TextRepresentation}</pre></code></a></td>", cancellationToken).ConfigureAwait(false);
                     else
-                        logger.WriteLine($"<td><pre><code>{element.TextRepresentation}</pre></code></td>");
+                        await writer.WriteLineAsync($"<td><pre><code>{element.TextRepresentation}</pre></code></td>", cancellationToken).ConfigureAwait(false);
 
-                    logger.Write("</tr>");
+                    await writer.WriteAsync("</tr>", cancellationToken).ConfigureAwait(false);
                 }
 
-                logger.WriteLine("<tr><td colspan=\"{2}\">&nbsp;</td></tr>");
+                await writer.WriteLineAsync("<tr><td colspan=\"{2}\">&nbsp;</td></tr>", cancellationToken).ConfigureAwait(false);
             }
 
             foreach (var withProblems in disassemblyResult.Methods
                 .Where(method => method.Problem.IsNotBlank())
                 .GroupBy(method => method.Problem))
             {
-                logger.WriteLine($"<tr><td colspan=\"{2}\"><b>{withProblems.Key}</b></td></tr>");
+                await writer.WriteLineAsync($"<tr><td colspan=\"{2}\"><b>{withProblems.Key}</b></td></tr>", cancellationToken).ConfigureAwait(false);
                 foreach (var withProblem in withProblems)
                 {
-                    logger.WriteLine($"<tr><td colspan=\"{2}\">{withProblem.Name}</td></tr>");
+                    await writer.WriteLineAsync($"<tr><td colspan=\"{2}\">{withProblem.Name}</td></tr>", cancellationToken).ConfigureAwait(false);
                 }
-                logger.WriteLine("<tr><td colspan=\"{2}\"></td></tr>");
+                await writer.WriteLineAsync("<tr><td colspan=\"{2}\"></td></tr>", cancellationToken).ConfigureAwait(false);
             }
 
-            logger.WriteLine("</tbody></table>");
+            await writer.WriteLineAsync("</tbody></table>", cancellationToken).ConfigureAwait(false);
+
+            return referenceIndex;
         }
     }
 }

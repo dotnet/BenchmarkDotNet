@@ -14,6 +14,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ScottPlot" Version="5.0.55" />
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet\Extensions\StringAndTextExtensions.cs" Link="StringAndTextExtensions.cs" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>

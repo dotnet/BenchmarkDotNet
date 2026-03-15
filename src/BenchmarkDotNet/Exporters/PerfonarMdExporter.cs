@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -12,10 +14,10 @@ internal class PerfonarMdExporter : ExporterBase
 {
     protected override string FileExtension => "perfonar.md";
 
-    public override void ExportToLog(Summary summary, ILogger logger)
+    protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
     {
         var table = new PerfonarTable(summary.ToPerfonar(), summary.GetDefaultTableConfig());
         string markdown = table.ToMarkdown(new PerfonarTableStyle());
-        logger.WriteLine(markdown);
+        await writer.WriteLineAsync(markdown, cancellationToken).ConfigureAwait(false);
     }
 }

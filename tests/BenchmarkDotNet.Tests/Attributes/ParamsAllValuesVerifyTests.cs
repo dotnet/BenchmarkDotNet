@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Tests.Attributes
 
             var exporter = MarkdownExporter.Mock;
             var summary = MockFactory.CreateSummary(benchmarkType);
-            exporter.ExportToLog(summary, logger);
+            await ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var validator = ParamsAllValuesValidator.FailOnError;
             var errors = await validator.ValidateAsync(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToArrayAsync();

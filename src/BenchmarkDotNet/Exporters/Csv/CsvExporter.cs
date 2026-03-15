@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Loggers;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
@@ -19,7 +21,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             this.style = style;
         }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             string realSeparator = separator.ToRealSeparator();
             var exportStyle = (style ?? summary.Style).WithZeroMetricValuesInContent();
@@ -27,15 +29,15 @@ namespace BenchmarkDotNet.Exporters.Csv
             {
                 for (int i = 0; i < line.Length;)
                 {
-                    logger.Write(CsvHelper.Escape(line[i], realSeparator));
+                    await writer.WriteAsync(CsvHelper.Escape(line[i], realSeparator), cancellationToken).ConfigureAwait(false);
 
                     if (++i < line.Length)
                     {
-                        logger.Write(realSeparator);
+                        await writer.WriteAsync(realSeparator, cancellationToken).ConfigureAwait(false);
                     }
                 }
 
-                logger.WriteLine();
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
             }
         }
     }

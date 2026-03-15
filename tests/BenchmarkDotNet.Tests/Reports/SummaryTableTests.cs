@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -28,7 +29,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var config = DefaultConfig.Instance;
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
-            MarkdownExporter.Default.ExportToLog(summary, logger);
+            ((ExporterBase)MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
             return table;
         }

@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Running
                     eventProcessor.OnEndRunBenchmarksInType(benchmarkRunInfo.Type, summary);
 
                     if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
-                        PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
+                        await PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary, cancellationToken).ConfigureAwait(false);
 
                     LogTotalTime(compositeLogger, summary.TotalTime, summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
                     compositeLogger.WriteLine();
@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Running
                 {
                     var joinedSummary = Summary.Join(results, runsChronometer.GetElapsed());
 
-                    PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary);
+                    await PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary, cancellationToken).ConfigureAwait(false);
 
                     results.Clear();
                     results.Add(joinedSummary);
@@ -311,7 +311,7 @@ namespace BenchmarkDotNet.Running
             );
         }
 
-        private static void PrintSummary(ILogger logger, ImmutableConfig config, Summary summary)
+        private static async ValueTask PrintSummary(ILogger logger, ImmutableConfig config, Summary summary, CancellationToken cancellationToken)
         {
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
 
@@ -320,19 +320,16 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Export *");
             string currentDirectory = Directory.GetCurrentDirectory();
-            foreach (string file in config.GetCompositeExporter().ExportToFiles(summary, logger))
-            {
-                logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
-            }
+            await config.GetCompositeExporter().ExportAsync(summary, logger, cancellationToken).ConfigureAwait(false);
 
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Detailed results *");
 
-            BenchmarkReportExporter.Default.ExportToLog(summary, logger);
+            await ((ExporterBase) BenchmarkReportExporter.Default).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(false);
 
             logger.WriteLineHeader("// * Summary *");
-            MarkdownExporter.Console.ExportToLog(summary, logger);
+            await ((ExporterBase) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(false);
 
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());

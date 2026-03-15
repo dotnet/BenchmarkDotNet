@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
@@ -22,7 +24,7 @@ public class OpenMetricsExporter : ExporterBase
 
     public static readonly IExporter Default = new OpenMetricsExporter();
 
-    public override void ExportToLog(Summary summary, ILogger logger)
+    protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
     {
         var metricsSet = new HashSet<OpenMetric>();
 
@@ -42,7 +44,7 @@ public class OpenMetricsExporter : ExporterBase
             AddAdditionalMetrics(metricsSet, metrics, descriptor, parameters);
         }
 
-        WriteMetricsToLogger(logger, metricsSet);
+        await WriteMetricsAsync(writer, metricsSet, cancellationToken).ConfigureAwait(false);
     }
 
     private static void AddCommonMetrics(HashSet<OpenMetric> metricsSet, Descriptor descriptor, ParameterInstances parameters, Statistics stats, GcStats gcStats)
@@ -164,7 +166,7 @@ public class OpenMetricsExporter : ExporterBase
         }
     }
 
-    private static void WriteMetricsToLogger(ILogger logger, HashSet<OpenMetric> metricsSet)
+    private static async ValueTask WriteMetricsAsync(StreamOrLoggerWriter writer, HashSet<OpenMetric> metricsSet, CancellationToken cancellationToken)
     {
         var emittedHelpType = new HashSet<string>();
 
@@ -172,19 +174,19 @@ public class OpenMetricsExporter : ExporterBase
         {
             if (!emittedHelpType.Contains(metric.Name))
             {
-                logger.WriteLine($"# HELP {metric.Name} {metric.Help}");
-                logger.WriteLine($"# TYPE {metric.Name} {metric.Type}");
+                await writer.WriteLineAsync($"# HELP {metric.Name} {metric.Help}", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync($"# TYPE {metric.Name} {metric.Type}", cancellationToken).ConfigureAwait(false);
                 if (metric.Unit.IsNotBlank())
                 {
-                    logger.WriteLine($"# UNIT {metric.Name} {metric.Unit}");
+                    await writer.WriteLineAsync($"# UNIT {metric.Name} {metric.Unit}", cancellationToken).ConfigureAwait(false);
                 }
                 emittedHelpType.Add(metric.Name);
             }
 
-            logger.WriteLine(metric.ToString());
+            await writer.WriteLineAsync(metric.ToString(), cancellationToken).ConfigureAwait(false);
         }
 
-        logger.WriteLine("# EOF");
+        await writer.WriteLineAsync("# EOF", cancellationToken).ConfigureAwait(false);
     }
 
     private static string SanitizeMetricName(string name)

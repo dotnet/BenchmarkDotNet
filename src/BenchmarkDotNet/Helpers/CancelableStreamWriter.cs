@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Loggers;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -7,8 +8,16 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers;
 
-internal sealed class CancelableStreamWriter : IDisposable
+public sealed class CancelableStreamWriter : StreamOrLoggerWriter, IDisposable
 {
+    public CancelableStreamWriter(Stream stream) : this(stream, Encoding.UTF8, 1024) { }
+
+    public override ValueTask WriteLineAsync(string line, LogKind logKind, CancellationToken cancellationToken)
+        => new(WriteLineAsync(line.AsMemory(), cancellationToken));
+
+    public override ValueTask WriteAsync(string line, LogKind logKind, CancellationToken cancellationToken)
+        => new(WriteAsync(line.AsMemory(), cancellationToken));
+
 #if !NETSTANDARD2_0
     private readonly StreamWriter _writer;
 
@@ -23,6 +32,9 @@ internal sealed class CancelableStreamWriter : IDisposable
 
     public Task WriteLineAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken)
         => _writer.WriteLineAsync(buffer, cancellationToken);
+
+    public Task WriteAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken)
+        => _writer.WriteAsync(buffer, cancellationToken);
 
     public void Dispose()
         => _writer.Dispose();

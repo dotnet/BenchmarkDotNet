@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
@@ -36,11 +38,11 @@ namespace BenchmarkDotNet.Exporters.Csv
 
         [PublicAPI] public static Job[] GetJobs(Summary summary) => summary.BenchmarksCases.Select(b => b.Job).ToArray();
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             string realSeparator = Separator;
             var columns = GetColumns(summary);
-            logger.WriteLine(string.Join(realSeparator, columns.Select(c => CsvHelper.Escape(c.Title, realSeparator))));
+            await writer.WriteLineAsync(string.Join(realSeparator, columns.Select(c => CsvHelper.Escape(c.Title, realSeparator))), cancellationToken).ConfigureAwait(false);
 
             foreach (var report in summary.Reports)
             {
@@ -48,14 +50,14 @@ namespace BenchmarkDotNet.Exporters.Csv
                 {
                     for (int i = 0; i < columns.Length; )
                     {
-                        logger.Write(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement), realSeparator));
+                        await writer.WriteAsync(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement), realSeparator), cancellationToken).ConfigureAwait(false);
 
                         if (++i < columns.Length)
                         {
-                            logger.Write(realSeparator);
+                            await writer.WriteAsync(realSeparator, cancellationToken).ConfigureAwait(false);
                         }
                     }
-                    logger.WriteLine();
+                    await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
         }

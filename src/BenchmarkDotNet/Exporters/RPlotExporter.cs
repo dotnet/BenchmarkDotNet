@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains.Parameters;
 
 namespace BenchmarkDotNet.Exporters
 {
@@ -18,7 +21,7 @@ namespace BenchmarkDotNet.Exporters
         public string Name => nameof(RPlotExporter);
 
         private const string ImageExtension = ".png";
-        private static readonly object BuildScriptLock = new object();
+        private static readonly SemaphoreSlim BuildScriptLock = new(1, 1);
 
         public IEnumerable<IExporter> Dependencies
         {
@@ -26,26 +29,29 @@ namespace BenchmarkDotNet.Exporters
             get { yield return CsvMeasurementsExporter.Default; }
         }
 
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
+        public async ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
         {
             const string scriptFileName = "BuildPlots.R";
             const string logFileName = "BuildPlots.log";
-            yield return Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
 
             string csvFullPath = Path.GetFullPath(CsvMeasurementsExporter.Default.GetArtifactFullName(summary));
             string scriptFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, scriptFileName));
             string logFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, logFileName));
-            
+
+            logger.WriteLineInfo($"  {scriptFullPath.GetBaseName(Directory.GetCurrentDirectory())}");
+
             string script = ResourceHelper.
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
-            lock (BuildScriptLock)
-                File.WriteAllText(scriptFullPath, script);
-
-            if (!TryFindRScript(consoleLogger, out var rscriptPath))
+            using (await BuildScriptLock.EnterScopeAsync(cancellationToken))
             {
-                yield break;
+                await File.WriteAllTextAsync(scriptFullPath, script, cancellationToken).ConfigureAwait(false);
+            }
+
+            if (!TryFindRScript(logger, out var rscriptPath))
+            {
+                return;
             }
 
             var start = new ProcessStartInfo
@@ -57,33 +63,51 @@ namespace BenchmarkDotNet.Exporters
                 FileName = rscriptPath,
                 Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
-            using (var process = new Process {StartInfo = start})
-            using (AsyncProcessOutputReader reader = new AsyncProcessOutputReader(process))
+            using (var process = new Process { StartInfo = start })
+            using (AsyncProcessOutputReader reader = new(process, cacheStandardOutput: false, channelStandardOutput: true))
+            using (ProcessCleanupHelper processCleanupHelper = new(process, logger))
             {
                 // When large R scripts are generated then ran, ReadToEnd()
                 // causes the stdout and stderr buffers to become full,
                 // which causes R to hang. To avoid this, use
-                // AsyncProcessOutputReader to cache the log contents
-                // then write to disk rather than Process.Standard*.ReadToEnd().
+                // AsyncProcessOutputReader to stream the log contents
+                // to disk rather than Process.Standard*.ReadToEnd().
                 process.Start();
-                reader.BeginRead();
-                process.WaitForExit();
+                using var fileStream = File.Create(logFullPath);
+                using var streamWriter = new CancelableStreamWriter(fileStream);
+                try
+                {
+                    reader.BeginRead();
+
+                    await foreach (var line in reader.OutputChannel!.Reader.ReadAllAsync(cancellationToken))
+                    {
+                        await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                    {
+                        reader.CancelRead();
+                        processCleanupHelper.KillProcessTree();
+                    }
+                    else
+                    {
+                        await reader.StopReadAsync().ConfigureAwait(false);
+                    }
+                }
+
+                foreach (var line in reader.GetErrorLines())
+                {
+                    await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
+                }
+
                 Debug.Assert(process.HasExited);
                 if (process.ExitCode != 0)
                     throw new ApplicationException($"Process {rscriptPath} has exited with code {process.ExitCode}");
-
-                // TODO: refactor IExporter to support async
-                reader.StopReadAsync().AsTask().GetAwaiter().GetResult();
-                File.WriteAllLines(logFullPath, reader.GetOutputLines());
-                File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }
 
-            yield return Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}");
-        }
-
-        public void ExportToLog(Summary summary, ILogger logger)
-        {
-            throw new NotSupportedException();
+            logger.WriteLineInfo($"  {Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}").GetBaseName(Directory.GetCurrentDirectory())}");
         }
 
         private static bool TryFindRScript(ILogger consoleLogger, out string? rscriptPath)

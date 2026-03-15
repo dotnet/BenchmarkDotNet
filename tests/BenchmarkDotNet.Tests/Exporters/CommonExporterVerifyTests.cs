@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         [TheoryEnvSpecific(".NET SDK is skipped in Framework, so the exported result does not match the verified file.", EnvRequirement.DotNetCoreOnly)]
         [MemberData(nameof(CultureInfoNames))]
-        public Task Exporters(string cultureInfoName)
+        public async Task Exporters(string cultureInfoName)
         {
             var cultureInfo = CultureInfos[cultureInfoName];
             Thread.CurrentThread.CurrentCulture = cultureInfo;
@@ -55,17 +55,17 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(
+                await ((ExporterBase)exporter).ExportToLogAsync(
                     MockFactory.CreateSummary(
                         config.WithCultureInfo(cultureInfo),
                         hugeSd: false,
                         [new Metric(new FakeMetricDescriptor("CacheMisses", "Hardware counter 'CacheMisses' per single operation", "N0"), 7)]),
-                    logger);
+                    logger, CancellationToken.None);
             }
 
             var settings = VerifyHelper.Create();
             settings.UseTextForParameters(GetName(cultureInfo));
-            return Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(logger.GetLog(), settings);
         }
 
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)

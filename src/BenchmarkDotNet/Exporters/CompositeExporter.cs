@@ -1,52 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Exporters;
+
+public sealed class CompositeExporter(ImmutableArray<IExporter> exporters) : IExporter
 {
-    public class CompositeExporter : IExporter
+    public string Name => nameof(CompositeExporter);
+
+    public async ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
     {
-        private readonly ImmutableArray<IExporter> exporters;
+        if (summary.GetColumns().IsNullOrEmpty())
+            logger.WriteLineHint("You haven't configured any columns, your results will be empty");
 
-        public CompositeExporter(ImmutableArray<IExporter> exporters) => this.exporters = exporters;
-
-        public string Name => nameof(CompositeExporter);
-
-        public void ExportToLog(Summary summary, ILogger logger)
+        foreach (var exporter in exporters)
         {
-            if (summary.GetColumns().IsNullOrEmpty())
-                logger.WriteLineHint("You haven't configured any columns, your results will be empty");
-
-            foreach (var exporter in exporters)
+            try
             {
-                try
-                {
-                    exporter.ExportToLog(summary, logger);
-                }
-                catch (Exception e)
-                {
-                    logger.WriteLineError(e.ToString());
-                }
+                await exporter.ExportAsync(summary, logger, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                logger.WriteLineError(e.ToString());
             }
         }
-
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
-            => exporters.SelectMany(exporter =>
-            {
-                var files = new List<string>();
-                try
-                {
-                    files.AddRange(exporter.ExportToFiles(summary, consoleLogger));
-                }
-                catch (Exception e)
-                {
-                    consoleLogger.WriteLineError(e.ToString());
-                }
-                return files;
-            });
     }
 }

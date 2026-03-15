@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers;
 
-internal sealed class CancelableStreamReader : IDisposable
+public sealed class CancelableStreamReader : IDisposable
 {
 #if NET7_0_OR_GREATER
     private readonly StreamReader _defaultReader;

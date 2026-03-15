@@ -1,6 +1,9 @@
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Disassemblers.Exporters;
@@ -18,7 +21,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
         /// Tests that GithubMarkdownDisassemblyExporter includes Job info in headers.
         /// </summary>
         [Fact]
-        public void ExportToLog_IncludesJobInfoInHeader()
+        public async Task ExportToLog_IncludesJobInfoInHeader()
         {
             // Arrange
             var logger = new AccumulationLogger();
@@ -30,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
             var exporter = new GithubMarkdownDisassemblyExporter(results, config);
 
             // Act
-            exporter.ExportToLog(summary, logger);
+            await ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             // Assert
             var output = logger.GetLog();
@@ -38,7 +41,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
         }
 
         [Fact]
-        public void ExportToLog_FormatsHeaderWithJobDisplayInfo()
+        public async Task ExportToLog_FormatsHeaderWithJobDisplayInfo()
         {
             // Arrange
             var logger = new AccumulationLogger();
@@ -50,7 +53,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
             var exporter = new GithubMarkdownDisassemblyExporter(results, config);
 
             // Act
-            exporter.ExportToLog(summary, logger);
+            await ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             // Assert
             var output = logger.GetLog();
