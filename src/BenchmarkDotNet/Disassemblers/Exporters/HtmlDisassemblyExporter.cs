@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "html";
         protected override string FileCaption => "asm";
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             await writer.WriteLineAsync("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' /><head>", cancellationToken).ConfigureAwait(false);
             await writer.WriteLineAsync($"<title>Pretty Output of DisassemblyDiagnoser for {summary.Title}</title>", cancellationToken).ConfigureAwait(false);
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             await writer.WriteLineAsync("</body></html>", cancellationToken).ConfigureAwait(false);
         }
 
-        private async ValueTask<int> Export(StreamOrLoggerWriter writer, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, int referenceIndex, CancellationToken cancellationToken)
+        private async ValueTask<int> Export(CancelableStreamWriter writer, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, int referenceIndex, CancellationToken cancellationToken)
         {
             await writer.WriteLineAsync($"<h2>{summary[benchmarkCase]!.GetRuntimeInfo()}</h2>", cancellationToken).ConfigureAwait(false);
             await writer.WriteLineAsync($"<h3>Job: {benchmarkCase.Job.DisplayInfo}</h3>", cancellationToken).ConfigureAwait(false);

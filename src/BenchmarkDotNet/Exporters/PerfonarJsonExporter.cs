@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Json;
@@ -13,7 +14,7 @@ internal class PerfonarJsonExporter(LightJsonSettings? jsonSettings = null) : Ex
 {
     protected override string FileExtension => "perfonar.json";
 
-    protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+    public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
     {
         await writer.WriteLineAsync(LightJsonSerializer.Serialize(summary.ToPerfonar(), jsonSettings), cancellationToken).ConfigureAwait(false);
     }

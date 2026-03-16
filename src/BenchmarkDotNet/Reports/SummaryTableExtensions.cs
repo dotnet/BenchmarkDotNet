@@ -10,7 +10,7 @@ using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Reports
 {
-    public static class SummaryTableExtensions
+    internal static class SummaryTableExtensions
     {
         [ThreadStatic]
         private static StringBuilder? sharedBuffer;

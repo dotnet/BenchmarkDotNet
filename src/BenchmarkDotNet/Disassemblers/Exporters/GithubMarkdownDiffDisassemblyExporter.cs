@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             this.config = config;
         }
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var benchmarksCases = summary.BenchmarksCases.Where(results.ContainsKey).ToArray();
 
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
         }
 
-        private async ValueTask ExportDiff(Summary summary, StreamOrLoggerWriter writer, BenchmarkCase firstBenchmarkCase, BenchmarkCase secondBenchmarkCase, CancellationToken cancellationToken)
+        private async ValueTask ExportDiff(Summary summary, CancelableStreamWriter writer, BenchmarkCase firstBenchmarkCase, BenchmarkCase secondBenchmarkCase, CancellationToken cancellationToken)
         {
             // We want to get diff for the same method and different JITs
             if (firstBenchmarkCase.Descriptor.WorkloadMethod == secondBenchmarkCase.Descriptor.WorkloadMethod)

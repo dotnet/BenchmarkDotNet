@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "md";
         protected override string FileCaption => "asm";
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
         }
 
-        internal static async ValueTask ExportAsync(StreamOrLoggerWriter writer, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, bool quotingCode = true, CancellationToken cancellationToken = default)
+        internal static async ValueTask ExportAsync(CancelableStreamWriter writer, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, bool quotingCode = true, CancellationToken cancellationToken = default)
         {
             int methodIndex = 0;
             foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))

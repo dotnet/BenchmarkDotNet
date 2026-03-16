@@ -326,10 +326,10 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Detailed results *");
 
-            await ((ExporterBase) BenchmarkReportExporter.Default).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
+            await BenchmarkReportExporter.ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             logger.WriteLineHeader("// * Summary *");
-            await ((ExporterBase) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
+            await ((MarkdownExporter) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());

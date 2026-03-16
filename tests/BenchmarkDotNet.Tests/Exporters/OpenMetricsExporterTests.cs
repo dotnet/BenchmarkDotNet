@@ -15,6 +15,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;

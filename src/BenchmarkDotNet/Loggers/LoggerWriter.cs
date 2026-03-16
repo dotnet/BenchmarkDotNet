@@ -5,6 +5,13 @@ namespace BenchmarkDotNet.Loggers;
 
 internal sealed class LoggerWriter(ILogger logger) : StreamOrLoggerWriter
 {
+    public override ValueTask WriteLineAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        logger.WriteLine();
+        return new();
+    }
+
     public override ValueTask WriteLineAsync(string line, LogKind logKind, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

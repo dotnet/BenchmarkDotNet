@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -90,7 +91,13 @@ namespace BenchmarkDotNet.Exporters
 
         protected MarkdownExporter() { }
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
+            => ExportCore(summary, new StreamWriterWrapper(writer), cancellationToken);
+
+        internal ValueTask ExportToLogAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
+            => ExportCore(summary, new LoggerWriter(logger), cancellationToken);
+
+        private async ValueTask ExportCore(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             if (UseCodeBlocks)
             {

@@ -8,6 +8,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Disassemblers.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 

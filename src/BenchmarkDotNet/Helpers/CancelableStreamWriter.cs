@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Loggers;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -8,15 +7,13 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers;
 
-public sealed class CancelableStreamWriter : StreamOrLoggerWriter, IDisposable
+public sealed class CancelableStreamWriter : IDisposable
 {
     public CancelableStreamWriter(Stream stream) : this(stream, Encoding.UTF8, 1024) { }
 
-    public override ValueTask WriteLineAsync(string line, LogKind logKind, CancellationToken cancellationToken)
-        => new(WriteLineAsync(line.AsMemory(), cancellationToken));
-
-    public override ValueTask WriteAsync(string line, LogKind logKind, CancellationToken cancellationToken)
-        => new(WriteAsync(line.AsMemory(), cancellationToken));
+    public Task WriteLineAsync(CancellationToken cancellationToken) => WriteLineAsync(string.Empty, cancellationToken);
+    public Task WriteLineAsync(string line, CancellationToken cancellationToken) => WriteLineAsync(line.AsMemory(), cancellationToken);
+    public Task WriteAsync(string line, CancellationToken cancellationToken) => WriteAsync(line.AsMemory(), cancellationToken);
 
 #if !NETSTANDARD2_0
     private readonly StreamWriter _writer;

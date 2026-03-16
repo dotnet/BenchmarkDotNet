@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "html";
         protected override string FileCaption => "disassembly-report";
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
@@ -78,7 +79,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             await writer.WriteLineAsync("</html>", cancellationToken).ConfigureAwait(false);
         }
 
-        private async ValueTask PrintTableAsync(BenchmarkCase[] benchmarksCase, StreamOrLoggerWriter writer, string title, Func<BenchmarkCase, string> headerTitleProvider, CancellationToken cancellationToken)
+        private async ValueTask PrintTableAsync(BenchmarkCase[] benchmarksCase, CancelableStreamWriter writer, string title, Func<BenchmarkCase, string> headerTitleProvider, CancellationToken cancellationToken)
         {
             await writer.WriteLineAsync("<table>", cancellationToken).ConfigureAwait(false);
             await writer.WriteLineAsync("<thead>", cancellationToken).ConfigureAwait(false);

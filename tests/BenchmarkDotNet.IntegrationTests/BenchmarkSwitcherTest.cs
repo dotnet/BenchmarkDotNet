@@ -5,6 +5,7 @@ using BenchmarkDotNet.Running;
 using System.Linq;
 using Xunit;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Configs;
@@ -426,7 +427,7 @@ namespace BenchmarkDotNet.IntegrationTests
     public class MockExporter : ExporterBase
     {
         public bool exported = false;
-        protected override ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             exported = true;
             return new();

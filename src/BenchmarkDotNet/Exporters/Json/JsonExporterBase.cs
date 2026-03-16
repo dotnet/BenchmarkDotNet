@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Serialization;
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Exporters.Json
             ExcludeMeasurements = excludeMeasurements;
         }
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var dataToSerialize = GetDataToSerialize(summary);
             var json = BdnSimpleJsonSerializer.Serialize(dataToSerialize, IndentJson);

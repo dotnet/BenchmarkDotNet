@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
@@ -24,7 +25,7 @@ public class OpenMetricsExporter : ExporterBase
 
     public static readonly IExporter Default = new OpenMetricsExporter();
 
-    protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+    public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
     {
         var metricsSet = new HashSet<OpenMetric>();
 
@@ -166,7 +167,7 @@ public class OpenMetricsExporter : ExporterBase
         }
     }
 
-    private static async ValueTask WriteMetricsAsync(StreamOrLoggerWriter writer, HashSet<OpenMetric> metricsSet, CancellationToken cancellationToken)
+    private static async ValueTask WriteMetricsAsync(CancelableStreamWriter writer, HashSet<OpenMetric> metricsSet, CancellationToken cancellationToken)
     {
         var emittedHelpType = new HashSet<string>();
 

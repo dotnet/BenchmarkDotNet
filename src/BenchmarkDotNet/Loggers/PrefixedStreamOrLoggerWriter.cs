@@ -7,6 +7,12 @@ internal sealed class PrefixedStreamOrLoggerWriter(StreamOrLoggerWriter inner, s
 {
     private bool isNewLine = true;
 
+    public override ValueTask WriteLineAsync(CancellationToken cancellationToken)
+    {
+        isNewLine = true;
+        return inner.WriteLineAsync(cancellationToken);
+    }
+
     public override async ValueTask WriteLineAsync(string line, LogKind logKind, CancellationToken cancellationToken)
     {
         if (isNewLine && line.Length > 0)

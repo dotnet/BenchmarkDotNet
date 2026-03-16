@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             this.style = style;
         }
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             string realSeparator = separator.ToRealSeparator();
             var exportStyle = (style ?? summary.Style).WithZeroMetricValuesInContent();

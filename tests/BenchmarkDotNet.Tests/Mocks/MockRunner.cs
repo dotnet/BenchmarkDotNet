@@ -5,6 +5,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks.Toolchain;
 using System;
 using System.Collections.Generic;

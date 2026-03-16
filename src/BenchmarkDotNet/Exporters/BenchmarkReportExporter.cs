@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -14,7 +15,13 @@ namespace BenchmarkDotNet.Exporters
         {
         }
 
-        protected override async ValueTask ExportAsync(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
+        public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
+            => ExportCore(summary, new StreamWriterWrapper(writer), cancellationToken);
+
+        internal static ValueTask ExportToLogAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
+            => ExportCore(summary, new LoggerWriter(logger), cancellationToken);
+
+        private static async ValueTask ExportCore(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             foreach (var report in summary.Reports)
             {
