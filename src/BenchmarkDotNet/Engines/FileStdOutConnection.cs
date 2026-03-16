@@ -21,7 +21,7 @@ internal sealed class FileStdOutConnection(AsyncProcessOutputReader processOutpu
         return await processOutputReader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    internal override void WriteLine(string line)
+    internal override async ValueTask WriteLineAsync(string line)
     {
         if (line == "CANCEL")
         {
@@ -35,7 +35,7 @@ internal sealed class FileStdOutConnection(AsyncProcessOutputReader processOutpu
 
         // Write to temp file first, then move (atomic operation)
         var tempFile = ackFile + ".tmp";
-        File.WriteAllText(tempFile, line, Encoding.UTF8);
+        await File.WriteAllTextAsync(tempFile, line, Encoding.UTF8).ConfigureAwait(false);
         File.Move(tempFile, ackFile);
     }
 }

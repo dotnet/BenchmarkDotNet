@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -84,17 +85,19 @@ namespace BenchmarkDotNet.Loggers
                 }
 
                 using var ic = ipcConnection;
+                using var writeSemaphore = new SemaphoreSlim(1, 1);
+
 #if NETCOREAPP3_0_OR_GREATER
                 using var registration = cancellationToken.UnsafeRegister(_ => Cancel(), null);
 #else
                 using var registration = cancellationToken.Register(Cancel, false);
 #endif
 
-                void Cancel()
+                async void Cancel()
                 {
-                    lock (ipcConnection)
+                    using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait(false))
                     {
-                        ipcConnection.WriteLine("CANCEL");
+                        await ipcConnection.WriteLineAsync("CANCEL").ConfigureAwait(false);
                     }
                 }
 
@@ -159,9 +162,9 @@ namespace BenchmarkDotNet.Loggers
                         // so we send the acknowledgement always.
                         finally
                         {
-                            lock (ipcConnection)
+                            using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait(false))
                             {
-                                ipcConnection.WriteLine(Engine.Signals.Acknowledgment);
+                                await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment).ConfigureAwait(false);
                             }
                         }
 

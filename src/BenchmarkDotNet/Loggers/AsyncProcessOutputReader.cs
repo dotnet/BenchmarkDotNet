@@ -34,12 +34,14 @@ namespace BenchmarkDotNet.Loggers
                 throw new NotSupportedException("set RedirectStandardError to true first");
             if (logOutput && logger == null)
                 throw new ArgumentException($"{nameof(logger)} cannot be null when {nameof(logOutput)} is true");
+            if (!cacheStandardOutput && !channelStandardOutput)
+                throw new ArgumentException($"At least one of {nameof(cacheStandardOutput)} or {nameof(channelStandardOutput)} must be true");
 
             this.process = process;
             output = cacheStandardOutput ? new ConcurrentQueue<string>() : null;
             error = new ConcurrentQueue<string>();
-            stdOutFinishTcs = new();
-            errorFinishTcs = new();
+            stdOutFinishTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+            errorFinishTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
             outputChannel = channelStandardOutput ? Channel.CreateUnbounded<string>() : null;
             status = (long)Status.Created;
             this.logOutput = logOutput;

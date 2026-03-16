@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 {
                     var builder = new StringBuilder();
 
-                    RunGitDiff(firstFileName, secondFileName, builder);
+                    await RunGitDiff(firstFileName, secondFileName, builder, cancellationToken).ConfigureAwait(false);
 
                     await writer.WriteLineAsync($"**Diff for {firstBenchmarkCase.Descriptor.WorkloadMethod.Name} method between:**", cancellationToken).ConfigureAwait(false);
                     await writer.WriteLineAsync($"{GetImportantInfo(summary[firstBenchmarkCase]!)}", cancellationToken).ConfigureAwait(false);
@@ -89,13 +89,13 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         private static string GetImportantInfo(BenchmarkReport benchmarkReport) =>
             $"{benchmarkReport.GetRuntimeInfo()} (Job: {benchmarkReport.BenchmarkCase.Job.DisplayInfo})";
 
-        private static void RunGitDiff(string firstFile, string secondFile, StringBuilder result)
+        private static async ValueTask RunGitDiff(string firstFile, string secondFile, StringBuilder result, CancellationToken cancellationToken)
         {
             try
             {
-                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLineAsync("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}")
-                    // TODO: refactor IExporter to support async and remove this blocking call
-                    .AsTask().GetAwaiter().GetResult();
+                (int exitCode, IReadOnlyList<string> output) = await ProcessHelper
+                    .RunAndReadOutputLineByLineAsync("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}", cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
 
                 bool canRead = false;
 

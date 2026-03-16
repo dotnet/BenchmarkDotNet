@@ -86,7 +86,7 @@ internal sealed class TcpHost : IHost
             Thread.Sleep(1);
         }
 
-        var source = new TaskCompletionSource<string?>();
+        var source = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         acknowledgmentSource = source;
 
         outWriter.WriteLine(Engine.Signals.ToMessage(hostSignal));

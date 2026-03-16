@@ -30,6 +30,6 @@ internal sealed class TcpConnection : IpcConnection
     internal override ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
         => reader.ReadLineAsync(cancellationToken);
 
-    internal override void WriteLine(string line)
-        => writer.WriteLine(line);
+    internal override ValueTask WriteLineAsync(string line)
+        => new(writer.WriteLineAsync(line));
 }
