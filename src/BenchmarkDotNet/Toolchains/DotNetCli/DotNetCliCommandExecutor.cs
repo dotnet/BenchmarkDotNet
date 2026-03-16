@@ -27,8 +27,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public static async Task<DotNetCliCommandResult> ExecuteAsync(DotNetCliCommand parameters, CancellationToken cancellationToken)
         {
-            var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
-            var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger);
+            using var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
+            using var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger);
             using var _ = new ProcessCleanupHelper(process, parameters.Logger);
 
             parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
@@ -73,26 +73,25 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string GetDotNetSdkVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) })
-            using (new ProcessCleanupHelper(process, NullLogger.Instance))
+            using var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) };
+            using var _ = new ProcessCleanupHelper(process, NullLogger.Instance);
+
+            try
             {
-                try
-                {
-                    process.Start();
-                }
-                catch (Win32Exception) // dotnet cli is not installed
-                {
-                    return "";
-                }
-
-                string output = process.StandardOutput.ReadToEnd();
-
-                process.WaitForExit();
-
-                // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
-                return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
-                    .FirstOrDefault(line => line.IsNotBlank()) ?? "";
+                process.Start();
             }
+            catch (Win32Exception) // dotnet cli is not installed
+            {
+                return "";
+            }
+
+            string output = process.StandardOutput.ReadToEnd();
+
+            process.WaitForExit();
+
+            // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
+            return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
+                .FirstOrDefault(line => line.IsNotBlank()) ?? "";
         }
 
         internal static void LogEnvVars(DotNetCliCommand command)
@@ -157,18 +156,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!OsDetector.IsLinux())
                 return "dotnet";
 
-            using (var parentProcess = Process.GetProcessById(libc.getppid()))
-            {
-                string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
-                // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
-                if (parentPath.StartsWith("/snap/", StringComparison.Ordinal) &&
-                    parentPath.EndsWith("/dotnet", StringComparison.Ordinal))
-                {
-                    return parentPath;
-                }
+            using var parentProcess = Process.GetProcessById(libc.getppid());
 
-                return "dotnet";
+            string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
+            // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
+            if (parentPath.StartsWith("/snap/", StringComparison.Ordinal) &&
+                parentPath.EndsWith("/dotnet", StringComparison.Ordinal))
+            {
+                return parentPath;
             }
+
+            return "dotnet";
         }
 
         internal static async Task<string> GetSdkPathAsync(string cliPath, CancellationToken cancellationToken)
