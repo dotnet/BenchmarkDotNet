@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Configs
         {
         }
 
-        public static void SetDefault(IConfig? config)
+        public static void SetCustomConfig(ImmutableConfig? config)
         {
             customDefaultConfig = config;
         }
