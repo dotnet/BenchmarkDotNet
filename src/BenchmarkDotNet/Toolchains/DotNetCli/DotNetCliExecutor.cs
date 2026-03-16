@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             using Process process = new() { StartInfo = startInfo };
             using ProcessCleanupHelper processCleanupHelper = new(process, logger);
-            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: true);
+            using AsyncProcessOutputReader processOutputReader = new(process, stdOutLogger: logger, stdErrLogger: logger, cacheStandardError: false);
 
             bool processOutputStarted = false;
             List<string> results;
@@ -132,15 +132,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     {
                         await processOutputReader.StopReadAsync().ConfigureAwait(false);
                     }
-                }
-            }
-
-            if (process.HasExited && process.ExitCode != 0)
-            {
-                string stderr = processOutputReader.GetErrorText();
-                if (!string.IsNullOrEmpty(stderr))
-                {
-                    logger.WriteLineError($"// Benchmark process stderr: {stderr}");
                 }
             }
 

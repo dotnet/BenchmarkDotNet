@@ -60,7 +60,6 @@ class FileStdOutTransport {
 
         // Wait for acknowledgment file in background
         const ackFile = `${this.ipcDirectory}/ack-${this.ackCounter++}.txt`;
-        const maxAttempts = 6000; // Poll for up to 60 seconds
         const sleepMs = 10;
 
         // Busy wait for v8/d8 (no setTimeout support)
@@ -74,7 +73,7 @@ class FileStdOutTransport {
 
         // Poll for acknowledgment asynchronously and forward through onmessage
         (async () => {
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            while (true) {
                 // Check for cancellation while waiting
                 if (this.checkCancellation()) {
                     return; // Exit early if cancelled
@@ -94,8 +93,6 @@ class FileStdOutTransport {
 
                 await sleep(sleepMs);
             }
-
-            console.error(`Timeout waiting for acknowledgment file: ${ackFile}`);
         })();
     }
 

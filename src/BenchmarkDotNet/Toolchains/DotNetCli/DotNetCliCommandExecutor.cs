@@ -28,7 +28,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public static async Task<DotNetCliCommandResult> ExecuteAsync(DotNetCliCommand parameters, CancellationToken cancellationToken)
         {
             using var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
-            using var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger);
+            using var outputReader = new AsyncProcessOutputReader(process,
+                stdOutLogger: parameters.LogOutput ? parameters.Logger : NullLogger.Instance,
+                stdErrLogger: parameters.Logger,
+                cacheStandardError: false);
             using var _ = new ProcessCleanupHelper(process, parameters.Logger);
 
             parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
