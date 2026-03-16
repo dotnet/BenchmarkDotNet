@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 yield return error;
             }
 
-            if (benchmarkCase.Descriptor.WorkloadMethod.ReturnType.HasAttribute<AsyncCallerTypeAttribute>() == true)
+            if (benchmarkCase.Descriptor.WorkloadMethod.HasAttribute<AsyncCallerTypeAttribute>() == true)
             {
                 yield return new ValidationError(false,
                     $"{nameof(InProcessNoEmitToolchain)} does not support overriding the async caller type via [AsyncCallerType]. It will be ignored.",
