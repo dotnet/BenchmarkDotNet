@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Results;
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
                 return GenerateResult.Success(artifactsPaths, []);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 logger.WriteLineError($"Failed to generate partition: {ex}");
                 return GenerateResult.Failure(artifactsPaths, []);

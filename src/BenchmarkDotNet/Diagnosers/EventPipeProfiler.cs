@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Diagnosers
                     await fs.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
             }

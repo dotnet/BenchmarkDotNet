@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Validators
 
             foreach (var typeGroup in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
             {
-                if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, errors, out var benchmarkTypeInstance))
+                if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, errors, cancellationToken, out var benchmarkTypeInstance))
                 {
                     continue;
                 }
@@ -51,14 +51,14 @@ namespace BenchmarkDotNet.Validators
                     continue;
                 }
 
-                if (!await TryToCallGlobalSetup(benchmarkTypeInstance, errors))
+                if (!await TryToCallGlobalSetup(benchmarkTypeInstance, errors, cancellationToken))
                 {
                     continue;
                 }
 
                 await ExecuteBenchmarksAsync(benchmarkTypeInstance, typeGroup, errors, cancellationToken);
 
-                await TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
+                await TryToCallGlobalCleanup(benchmarkTypeInstance, errors, cancellationToken);
             }
 
             foreach (var error in errors)
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, [NotNullWhen(true)] out object? instance)
+        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, CancellationToken cancellationToken, [NotNullWhen(true)] out object? instance)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Validators
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,
@@ -86,17 +86,17 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        private async ValueTask<bool> TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors)
+        private async ValueTask<bool> TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors, CancellationToken cancellationToken)
         {
-            return await TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors);
+            return await TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors, cancellationToken);
         }
 
-        private async ValueTask TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors)
+        private async ValueTask TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors, CancellationToken cancellationToken)
         {
-            await TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors);
+            await TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors, cancellationToken);
         }
 
-        private async ValueTask<bool> TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors)
+        private async ValueTask<bool> TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors, CancellationToken cancellationToken)
         {
             var methods = benchmarkTypeInstance
                 .GetType()
@@ -124,7 +124,7 @@ namespace BenchmarkDotNet.Validators
 
                 await DynamicAwaitHelper.GetOrAwaitResult(result);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,

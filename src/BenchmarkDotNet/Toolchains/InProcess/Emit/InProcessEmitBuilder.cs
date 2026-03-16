@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             {
                 assembly = RunnableEmitter.EmitPartitionAssembly(generateResult, buildPartition, logger);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 buildError = ex;
             }

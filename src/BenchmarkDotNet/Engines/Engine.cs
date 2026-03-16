@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -74,7 +75,7 @@ namespace BenchmarkDotNet.Engines
             }
             catch (Exception e)
             {
-                didThrowNonCancelation = e is not OperationCanceledException;
+                didThrowNonCancelation = !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken);
                 throw;
             }
             finally
@@ -84,7 +85,7 @@ namespace BenchmarkDotNet.Engines
                     await Parameters.GlobalCleanupAction.Invoke();
                 }
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
-                catch (Exception e) when (didThrowNonCancelation && e is not OperationCanceledException)
+                catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
                 {
                     Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                 }
@@ -144,7 +145,7 @@ namespace BenchmarkDotNet.Engines
                     }
                     catch (Exception e)
                     {
-                        didThrowNonCancelation = e is not OperationCanceledException;
+                        didThrowNonCancelation = !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken);
                         throw;
                     }
                     finally
@@ -154,7 +155,7 @@ namespace BenchmarkDotNet.Engines
                             await iterationData.cleanupAction();
                         }
                         // We only catch if the benchmark threw to not overwrite the exception. #1045
-                        catch (Exception e) when (didThrowNonCancelation && e is not OperationCanceledException)
+                        catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
                         {
                             Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                         }

@@ -482,7 +482,7 @@ namespace BenchmarkDotNet.Running
 
                 return await toolchain.Builder.BuildAsync(generateResult, buildPartition, buildLogger, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch (Exception e) when (!ExceptionHelper.IsProperCancelation(e, cancellationToken))
             {
                 return BuildResult.Failure(generateResult, e);
             }

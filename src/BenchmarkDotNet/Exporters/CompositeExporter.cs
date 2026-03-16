@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -23,7 +24,7 @@ public sealed class CompositeExporter(ImmutableArray<IExporter> exporters) : IEx
             {
                 await exporter.ExportAsync(summary, logger, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch (Exception e) when (!ExceptionHelper.IsProperCancelation(e, cancellationToken))
             {
                 logger.WriteLineError(e.ToString());
             }

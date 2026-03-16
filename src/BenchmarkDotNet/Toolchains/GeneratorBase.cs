@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -41,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains
 
                 return GenerateResult.Success(artifactsPaths, GetArtifactsToCleanup(artifactsPaths));
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 return GenerateResult.Failure(artifactsPaths, GetArtifactsToCleanup(artifactsPaths), ex);
             }

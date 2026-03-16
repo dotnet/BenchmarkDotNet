@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -83,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
                 exitCode = await InProcessEmitRunner.Run(host, parameters);
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, host.CancellationToken))
             {
                 parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
             }

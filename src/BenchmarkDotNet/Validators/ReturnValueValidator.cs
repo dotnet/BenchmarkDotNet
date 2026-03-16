@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Validators
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
                     {
                         hasErrorsInGroup = true;
 
