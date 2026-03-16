@@ -319,6 +319,7 @@ namespace BenchmarkDotNet.Engines
         public static class Signals
         {
             public const string Acknowledgment = "Acknowledgment";
+            public const string Cancel = "CANCEL";
 
             private static readonly Dictionary<HostSignal, string> SignalsToMessages = new()
             {

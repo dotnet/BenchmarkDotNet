@@ -43,7 +43,7 @@ internal sealed class TcpHost : IHost
                 break;
             }
 
-            if (message == "CANCEL")
+            if (message == Engine.Signals.Cancel)
             {
                 cancellationTokenSource.Cancel();
                 // When the benchmark process is canceled, it still sends the final AfterAll signal back to the host in a finally block,

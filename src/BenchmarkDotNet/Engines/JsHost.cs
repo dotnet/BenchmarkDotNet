@@ -28,7 +28,7 @@ public sealed partial class JsHost : IHost
     [JSExport]
     public static void ReceiveMessage(string message)
     {
-        if (message == "CANCEL")
+        if (message == Engine.Signals.Cancel)
         {
             s_cancellationTokenSource.Cancel();
             return;

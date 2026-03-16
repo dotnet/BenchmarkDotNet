@@ -23,7 +23,7 @@ internal sealed class FileStdOutConnection(AsyncProcessOutputReader processOutpu
 
     internal override async ValueTask WriteLineAsync(string line)
     {
-        if (line == "CANCEL")
+        if (line == Engine.Signals.Cancel)
         {
             // mjs checks for file existence, so we just write an empty file.
             File.WriteAllBytes(Path.Combine(ipcDirectory, "cancel.txt"), []);

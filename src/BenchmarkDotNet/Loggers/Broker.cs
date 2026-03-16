@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Loggers
                 {
                     using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait(false))
                     {
-                        await ipcConnection.WriteLineAsync("CANCEL").ConfigureAwait(false);
+                        await ipcConnection.WriteLineAsync(Engine.Signals.Cancel).ConfigureAwait(false);
                     }
                 }
 
