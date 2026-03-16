@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Diagnosers
                 yield break;
             }
 
-            if (validationParameters.Benchmarks.Any() && !await TryInstallPerfCollect(validationParameters, cancellationToken))
+            if (validationParameters.Benchmarks.Any() && !await TryInstallPerfCollect(validationParameters, cancellationToken).ConfigureAwait(false))
             {
                 yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/runtime/blob/main/docs/project/linux-performance-tracing.md");
             }
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             var logger = validationParameters.Config.GetCompositeLogger();
 
-            string script = await ResourceHelper.LoadTemplateAsync(perfCollectFile.Name, cancellationToken);
+            string script = await ResourceHelper.LoadTemplateAsync(perfCollectFile.Name, cancellationToken).ConfigureAwait(false);
             File.WriteAllText(perfCollectFile.FullName, script);
 
             if (libc.chmod(perfCollectFile.FullName, libc.FilePermissions.S_IXUSR) != 0)

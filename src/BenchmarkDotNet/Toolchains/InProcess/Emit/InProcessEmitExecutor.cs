@@ -24,16 +24,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             int exitCode = -1;
             if (executeOnSeparateThread)
             {
-                var taskCompletionSource = new TaskCompletionSource<int>();
+                var taskCompletionSource = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
                 var runThread = new Thread(async () =>
                 {
                     try
                     {
-                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters));
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        taskCompletionSource.SetCanceled();
+                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters).ConfigureAwait(false));
                     }
                     catch (Exception ex)
                     {
@@ -51,11 +47,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
                 runThread.Start();
 
-                exitCode = await taskCompletionSource.Task;
+                exitCode = await taskCompletionSource.Task.ConfigureAwait(true);
+                runThread.Join();
             }
             else
             {
-                exitCode = await ExecuteCore(host, executeParameters);
+                exitCode = await ExecuteCore(host, executeParameters).ConfigureAwait(true);
             }
             host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
 
@@ -82,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = await InProcessEmitRunner.Run(host, parameters);
+                exitCode = await InProcessEmitRunner.Run(host, parameters).ConfigureAwait(false);
             }
             catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, host.CancellationToken))
             {

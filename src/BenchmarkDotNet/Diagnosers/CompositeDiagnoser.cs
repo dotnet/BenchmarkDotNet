@@ -41,8 +41,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var diagnoser in diagnosers)
             {
-                // Do not use ConfigureAwait(false) here so that all diagnosers will be handled on the original context.
-                await diagnoser.HandleAsync(signal, parameters, cancellationToken);
+                await diagnoser.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait(true);
             }
         }
 
@@ -90,8 +89,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 if (router.ShouldHandle(runMode))
                 {
-                    // Do not use ConfigureAwait(false) here so that all handlers will be handled on the original context.
-                    await router.handler.HandleAsync(signal, parameters, cancellationToken);
+                    await router.handler.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait(true);
                 }
             }
 

@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 }
             }
 
-            await writer.WriteLineAsync(cancellationToken);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

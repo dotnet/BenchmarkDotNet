@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Running
             if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => (options.Join, options.Filters) = (true, ["*"])))
                 args = updatedArgs;
 
-            var results = await RunAsync(args, config, cancellationToken);
+            var results = await RunAsync(args, config, cancellationToken).ConfigureAwait(false);
             return results.Single();
         }
 
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Running
             // so it can ignore the version mismatch ;)
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithDirtyAssemblyResolveHelper(args, config, true, cancellationToken);
+                return await RunWithDirtyAssemblyResolveHelper(args, config, true, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -161,7 +161,7 @@ namespace BenchmarkDotNet.Running
 
             if (effectiveConfig.Options.HasFlag(ConfigOptions.ApplesToApples))
             {
-                return await ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options, cancellationToken);
+                return await ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options, cancellationToken).ConfigureAwait(false);
             }
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.Running
                 return [];
             }
 
-            return await BenchmarkRunnerClean.Run(filteredBenchmarks, cancellationToken);
+            return await BenchmarkRunnerClean.Run(filteredBenchmarks, cancellationToken).ConfigureAwait(false);
         }
 
         private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
@@ -227,7 +227,7 @@ namespace BenchmarkDotNet.Running
             }
 
             logger.WriteLineHeader("Each benchmark is going to be executed just once to get invocation counts.");
-            Summary[] invocationCountSummaries = await BenchmarkRunnerClean.Run(invocationCountBenchmarks, cancellationToken);
+            Summary[] invocationCountSummaries = await BenchmarkRunnerClean.Run(invocationCountBenchmarks, cancellationToken).ConfigureAwait(false);
 
             Dictionary<(Descriptor Descriptor, ParameterInstances Parameters), Measurement> dictionary = invocationCountSummaries
                 .SelectMany(summary => summary.Reports)
@@ -257,7 +257,7 @@ namespace BenchmarkDotNet.Running
 #pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
 
             logger.WriteLineHeader("Actual benchmarking is going to happen now!");
-            return await BenchmarkRunnerClean.Run(benchmarksWithInvocationCount, cancellationToken);
+            return await BenchmarkRunnerClean.Run(benchmarksWithInvocationCount, cancellationToken).ConfigureAwait(false);
         }
     }
 }

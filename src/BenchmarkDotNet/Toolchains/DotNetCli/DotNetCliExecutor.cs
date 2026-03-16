@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.LaunchIndex,
                     executeParameters.DiagnoserRunMode,
                     cancellationToken
-                );
+                ).ConfigureAwait(true);
             }
             finally
             {
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     HostSignal.AfterProcessExit,
                     new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId),
                     cancellationToken
-                );
+                ).ConfigureAwait(false);
             }
         }
 
@@ -97,11 +97,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(false);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 process.Start();
 
-                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(false);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 processOutputReader.BeginRead();
                 processOutputStarted = true;
@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                await broker.ProcessData(cancellationToken);
+                await broker.ProcessData(cancellationToken).ConfigureAwait(false);
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;

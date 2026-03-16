@@ -27,8 +27,8 @@ internal sealed class TcpConnection : IpcConnection
         stream.Dispose();
     }
 
-    internal override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
-        => await reader.ReadLineAsync(cancellationToken);
+    internal override ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
+        => reader.ReadLineAsync(cancellationToken);
 
     internal override void WriteLine(string line)
         => writer.WriteLine(line);

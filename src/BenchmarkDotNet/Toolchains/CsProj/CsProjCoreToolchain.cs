@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
             {
                 yield return validationError;
             }

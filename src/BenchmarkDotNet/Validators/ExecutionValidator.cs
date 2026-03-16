@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Validators
                 try
                 {
                     var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
-                    await DynamicAwaitHelper.GetOrAwaitResult(result);
+                    await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
                 }
                 catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
                 {

@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Validators
 
                         if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
                         {
-                            (var hasResult, result) = await DynamicAwaitHelper.GetOrAwaitResult(result);
+                            (var hasResult, result) = await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
                             if (hasResult)
                             {
                                 results.Add((benchmark, result!));

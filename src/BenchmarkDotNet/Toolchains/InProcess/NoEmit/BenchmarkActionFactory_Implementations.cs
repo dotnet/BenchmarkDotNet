@@ -5,6 +5,8 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
+#pragma warning disable CA2007 // We await the returned tasks directly the same as the generated code, we don't use ConfigureAwait on purpose.
+
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /*

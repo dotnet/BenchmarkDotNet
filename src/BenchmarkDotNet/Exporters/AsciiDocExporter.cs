@@ -31,13 +31,13 @@ namespace BenchmarkDotNet.Exporters
             {
                 await writer.WriteLineAsync("[WARNING]", cancellationToken).ConfigureAwait(false);
                 await writer.WriteLineAsync("====", cancellationToken).ConfigureAwait(false);
-                await writer.WriteLineAsync("There are no benchmarks found ", LogKind.Error, cancellationToken);
+                await writer.WriteLineAsync("There are no benchmarks found ", LogKind.Error, cancellationToken).ConfigureAwait(false);
                 await writer.WriteLineAsync("====", cancellationToken).ConfigureAwait(false);
                 await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
                 return;
             }
 
-            await table.PrintCommonColumnsAsync(writer, cancellationToken);
+            await table.PrintCommonColumnsAsync(writer, cancellationToken).ConfigureAwait(false);
             await writer.WriteLineAsync("....", cancellationToken).ConfigureAwait(false);
 
             await writer.WriteLineAsync("[options=\"header\"]", cancellationToken).ConfigureAwait(false);

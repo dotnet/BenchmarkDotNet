@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -82,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            await foreach (var error in base.ValidateAsync(benchmarkCase, resolver))
+            await foreach (var error in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
             {
                 yield return error;
             }

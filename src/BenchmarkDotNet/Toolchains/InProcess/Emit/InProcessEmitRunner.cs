@@ -20,7 +20,7 @@ internal static class InProcessEmitRunner
     {
         // the first thing to do is to let diagnosers hook in before anything happens
         // so all jit-related diagnosers can catch first jit compilation!
-        await host.BeforeAnythingElseAsync();
+        await host.BeforeAnythingElseAsync().ConfigureAwait(true);
 
         try
         {
@@ -28,7 +28,7 @@ internal static class InProcessEmitRunner
                 .GeneratedAssembly
                 .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
 
-            await RunCore(runnableType, host, parameters);
+            await RunCore(runnableType, host, parameters).ConfigureAwait(true);
 
             return 0;
         }
@@ -52,7 +52,7 @@ internal static class InProcessEmitRunner
         }
         finally
         {
-            await host.AfterAllAsync();
+            await host.AfterAllAsync().ConfigureAwait(false);
         }
     }
 
@@ -87,10 +87,10 @@ internal static class InProcessEmitRunner
         );
         if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
         {
-            await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken);
+            await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken).ConfigureAwait(false);
             return;
         }
-        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait(true);
 
         var engineParameters = new EngineParameters()
         {
@@ -113,12 +113,13 @@ internal static class InProcessEmitRunner
         var results = await job
             .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
             .Create(engineParameters)
-            .RunAsync();
+            .RunAsync()
+            .ConfigureAwait(true);
         host.ReportResults(results);
 
         runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
 
-        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken).ConfigureAwait(false);
     }
 
     private static void FillMembers(object instance, BenchmarkCase benchmarkCase, System.Threading.CancellationToken cancellationToken)

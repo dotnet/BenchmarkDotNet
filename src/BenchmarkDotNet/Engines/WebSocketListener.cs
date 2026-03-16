@@ -25,7 +25,7 @@ internal sealed class WebSocketListener : IpcListener
 
     internal async ValueTask<int> StartAndGetPortAsync()
     {
-        await listener.StartAsync();
+        await listener.StartAsync().ConfigureAwait(false);
         return ((IPEndPoint)listener.LocalEndpoints.First()).Port;
     }
 
@@ -35,7 +35,7 @@ internal sealed class WebSocketListener : IpcListener
         timeoutCts.CancelAfter(IpcHelper.ConnectionTimeout);
         try
         {
-            var webSocket = await listener.AcceptWebSocketAsync(cancellationToken);
+            var webSocket = await listener.AcceptWebSocketAsync(cancellationToken).ConfigureAwait(false);
             return new WebSocketConnection(webSocket);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

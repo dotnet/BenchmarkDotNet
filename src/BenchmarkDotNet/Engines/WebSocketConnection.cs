@@ -9,8 +9,8 @@ internal sealed class WebSocketConnection(WebSocket socket) : IpcConnection
     public override void Dispose()
         => socket.Dispose();
 
-    internal override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
-        => await socket.ReadStringAsync(cancellationToken);
+    internal override ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
+        => new(socket.ReadStringAsync(cancellationToken));
 
     internal override void WriteLine(string line)
         // vtortola WebSocket does not support sync writes, we have to do sync-over-async.

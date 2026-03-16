@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args, cancellationToken));
+                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args, cancellationToken)).ConfigureAwait(false);
             }
         }
 
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(types, config, args, cancellationToken));
+                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(types, config, args, cancellationToken)).ConfigureAwait(false);
             }
         }
 
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, methods, config, cancellationToken));
+                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, methods, config, cancellationToken)).ConfigureAwait(false);
             }
         }
 
@@ -103,20 +103,20 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args, cancellationToken));
+                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args, cancellationToken)).ConfigureAwait(false);
             }
         }
 
         [PublicAPI]
         public static async ValueTask<Summary> RunAsync(BenchmarkRunInfo benchmarkRunInfo)
-            => (await RunAsync([benchmarkRunInfo])).Single();
+            => (await RunAsync([benchmarkRunInfo]).ConfigureAwait(false)).Single();
 
         [PublicAPI]
         public static async ValueTask<Summary[]> RunAsync(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken = default)
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos, cancellationToken));
+                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos, cancellationToken)).ConfigureAwait(false);
             }
         }
 
@@ -124,8 +124,8 @@ namespace BenchmarkDotNet.Running
         private static async ValueTask<Summary> RunWithDirtyAssemblyResolveHelper(Type type, IConfig? config, string[]? args, CancellationToken cancellationToken)
         {
             var summaries = args == null
-                ? await BenchmarkRunnerClean.Run([BenchmarkConverter.TypeToBenchmarks(type, config)], cancellationToken)
-                : await new BenchmarkSwitcher([type]).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken);
+                ? await BenchmarkRunnerClean.Run([BenchmarkConverter.TypeToBenchmarks(type, config)], cancellationToken).ConfigureAwait(false)
+                : await new BenchmarkSwitcher([type]).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken).ConfigureAwait(false);
 
             return summaries.SingleOrDefault()
                 ?? Summary.ValidationFailed($"No benchmarks found in type '{type.Name}'", string.Empty, string.Empty);
@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static async ValueTask<Summary> RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig? config, CancellationToken cancellationToken)
         {
-            var summaries = await BenchmarkRunnerClean.Run([BenchmarkConverter.MethodsToBenchmarks(type, methods, config)], cancellationToken);
+            var summaries = await BenchmarkRunnerClean.Run([BenchmarkConverter.MethodsToBenchmarks(type, methods, config)], cancellationToken).ConfigureAwait(false);
 
             return summaries.SingleOrDefault()
                 ?? Summary.ValidationFailed($"No benchmarks found in type '{type.Name}'", string.Empty, string.Empty);
@@ -143,14 +143,14 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static async ValueTask<Summary[]> RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig? config, string[]? args, CancellationToken cancellationToken)
             => args == null
-                ? await BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), cancellationToken)
-                : (await new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken)).ToArray();
+                ? await BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), cancellationToken).ConfigureAwait(false)
+                : (await new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken).ConfigureAwait(false)).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static async ValueTask<Summary[]> RunWithDirtyAssemblyResolveHelper(Type[] types, IConfig? config, string[]? args, CancellationToken cancellationToken)
             => args == null
-                ? await BenchmarkRunnerClean.Run(types.Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), cancellationToken)
-                : (await new BenchmarkSwitcher(types).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken)).ToArray();
+                ? await BenchmarkRunnerClean.Run(types.Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray(), cancellationToken).ConfigureAwait(false)
+                : (await new BenchmarkSwitcher(types).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken).ConfigureAwait(false)).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static ValueTask<Summary[]> RunWithDirtyAssemblyResolveHelper(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken)
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Running
         {
             try
             {
-                return await run();
+                return await run().ConfigureAwait(false);
             }
             catch (InvalidBenchmarkDeclarationException e)
             {
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Running
         {
             try
             {
-                return await run();
+                return await run().ConfigureAwait(false);
             }
             catch (InvalidBenchmarkDeclarationException e)
             {

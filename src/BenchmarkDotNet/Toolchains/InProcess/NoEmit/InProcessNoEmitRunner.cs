@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
-            await host.BeforeAnythingElseAsync();
+            await host.BeforeAnythingElseAsync().ConfigureAwait(true);
 
             try
             {
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                await (ValueTask) methodInfo.Invoke(null, [host, parameters])!;
+                await ((ValueTask) methodInfo.Invoke(null, [host, parameters])!).ConfigureAwait(false);
 
                 return 0;
             }
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
             finally
             {
-                await host.AfterAllAsync();
+                await host.AfterAllAsync().ConfigureAwait(false);
             }
         }
 
@@ -174,10 +174,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 );
                 if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
                 {
-                    await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken);
+                    await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken).ConfigureAwait(false);
                     return;
                 }
-                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait(true);
 
                 var engineParameters = new EngineParameters
                 {
@@ -205,10 +205,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var results = await job
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
                     .Create(engineParameters)
-                    .RunAsync();
+                    .RunAsync()
+                    .ConfigureAwait(true);
                 host.ReportResults(results); // printing costs memory, do this after runs
 
-                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken).ConfigureAwait(false);
             }
         }
     }

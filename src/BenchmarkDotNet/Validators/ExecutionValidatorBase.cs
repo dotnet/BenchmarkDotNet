@@ -51,14 +51,14 @@ namespace BenchmarkDotNet.Validators
                     continue;
                 }
 
-                if (!await TryToCallGlobalSetup(benchmarkTypeInstance, errors, cancellationToken))
+                if (!await TryToCallGlobalSetup(benchmarkTypeInstance, errors, cancellationToken).ConfigureAwait(true))
                 {
                     continue;
                 }
 
-                await ExecuteBenchmarksAsync(benchmarkTypeInstance, typeGroup, errors, cancellationToken);
+                await ExecuteBenchmarksAsync(benchmarkTypeInstance, typeGroup, errors, cancellationToken).ConfigureAwait(true);
 
-                await TryToCallGlobalCleanup(benchmarkTypeInstance, errors, cancellationToken);
+                await TryToCallGlobalCleanup(benchmarkTypeInstance, errors, cancellationToken).ConfigureAwait(true);
             }
 
             foreach (var error in errors)
@@ -88,12 +88,12 @@ namespace BenchmarkDotNet.Validators
 
         private async ValueTask<bool> TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors, CancellationToken cancellationToken)
         {
-            return await TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors, cancellationToken);
+            return await TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors, cancellationToken).ConfigureAwait(false);
         }
 
         private async ValueTask TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors, CancellationToken cancellationToken)
         {
-            await TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors, cancellationToken);
+            await TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors, cancellationToken).ConfigureAwait(false);
         }
 
         private async ValueTask<bool> TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors, CancellationToken cancellationToken)
@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Validators
             {
                 var result = methods[0].Invoke(benchmarkTypeInstance, null);
 
-                await DynamicAwaitHelper.GetOrAwaitResult(result);
+                await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
             }
             catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {

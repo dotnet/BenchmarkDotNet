@@ -67,11 +67,11 @@ namespace BenchmarkDotNet.Engines
         {
             Host.CancellationToken.ThrowIfCancellationRequested();
 
-            await Parameters.GlobalSetupAction.Invoke();
+            await Parameters.GlobalSetupAction.Invoke().ConfigureAwait(true);
             bool didThrowNonCancelation = false;
             try
             {
-                return await RunCore();
+                return await RunCore().ConfigureAwait(true);
             }
             catch (Exception e)
             {
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Engines
             {
                 try
                 {
-                    await Parameters.GlobalCleanupAction.Invoke();
+                    await Parameters.GlobalCleanupAction.Invoke().ConfigureAwait(true);
                 }
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
                 catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
@@ -107,8 +107,8 @@ namespace BenchmarkDotNet.Engines
             {
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    await Host.BeforeMainRunAsync();
-                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun, Host.CancellationToken);
+                    await Host.BeforeMainRunAsync().ConfigureAwait(true);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun, Host.CancellationToken).ConfigureAwait(true);
                 }
 
                 var stageMeasurements = stage.GetMeasurementList();
@@ -123,12 +123,12 @@ namespace BenchmarkDotNet.Engines
                     long totalOperations = invokeCount * Parameters.OperationsPerInvoke;
                     bool randomizeMemory = iterationData.mode == IterationMode.Workload && MemoryRandomization;
 
-                    await iterationData.setupAction();
+                    await iterationData.setupAction().ConfigureAwait(true);
                     bool didThrowNonCancelation = false;
                     ClockSpan clockSpan;
                     try
                     {
-                        await YieldAndThrowIfCancellationRequested();
+                        await YieldAndThrowIfCancellationRequested().ConfigureAwait(true);
 
                         GcCollect();
 
@@ -136,9 +136,10 @@ namespace BenchmarkDotNet.Engines
                             EngineEventSource.Log.IterationStart(iterationData.mode, iterationData.stage, totalOperations);
 
                         clockSpan = randomizeMemory
-                            ? await MeasureWithRandomStack(iterationData.workloadAction, invokeCount / unrollFactor)
-                            : await iterationData.workloadAction(invokeCount / unrollFactor, Clock);
-                        await Host.Yield();
+                            ? await MeasureWithRandomStack(iterationData.workloadAction, invokeCount / unrollFactor).ConfigureAwait(true)
+                            : await iterationData.workloadAction(invokeCount / unrollFactor, Clock).ConfigureAwait(true);
+
+                        await YieldAndThrowIfCancellationRequested().ConfigureAwait(true);
 
                         if (EngineEventSource.Log.IsEnabled())
                             EngineEventSource.Log.IterationStop(iterationData.mode, iterationData.stage, totalOperations);
@@ -152,7 +153,7 @@ namespace BenchmarkDotNet.Engines
                     {
                         try
                         {
-                            await iterationData.cleanupAction();
+                            await iterationData.cleanupAction().ConfigureAwait(true);
                         }
                         // We only catch if the benchmark threw to not overwrite the exception. #1045
                         catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
@@ -160,12 +161,13 @@ namespace BenchmarkDotNet.Engines
                             Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                         }
                     }
-                    await YieldAndThrowIfCancellationRequested();
+                    // The host only yields in wasm, we don't want to force an async yield in other runtimes, so we use ConfigureAwait(false).
+                    await YieldAndThrowIfCancellationRequested().ConfigureAwait(true);
 
                     if (randomizeMemory)
                     {
-                        await RandomizeManagedHeapMemory();
-                        await YieldAndThrowIfCancellationRequested();
+                        await RandomizeManagedHeapMemory().ConfigureAwait(true);
+                        await YieldAndThrowIfCancellationRequested().ConfigureAwait(true);
                     }
 
                     GcCollect();
@@ -183,8 +185,8 @@ namespace BenchmarkDotNet.Engines
 
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
-                    await Host.AfterMainRunAsync();
-                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun, Host.CancellationToken);
+                    await Host.AfterMainRunAsync().ConfigureAwait(true);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterActualRun, Host.CancellationToken).ConfigureAwait(true);
                 }
             }
 
@@ -195,10 +197,10 @@ namespace BenchmarkDotNet.Engines
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadInitial());
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxing(GcStats.ReadFinal());
 
-                await extraIterationData.setupAction!(); // we run iteration setup first, so even if it allocates, it is not included in the results
+                await extraIterationData.setupAction!().ConfigureAwait(true); // we run iteration setup first, so even if it allocates, it is not included in the results
 
-                await Host.SendSignalAsync(HostSignal.BeforeExtraIteration);
-                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration, Host.CancellationToken);
+                await Host.SendSignalAsync(HostSignal.BeforeExtraIteration).ConfigureAwait(true);
+                await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration, Host.CancellationToken).ConfigureAwait(true);
 
                 // GC collect before measuring allocations.
                 ForceGcCollect();
@@ -214,15 +216,15 @@ namespace BenchmarkDotNet.Engines
                 {
                     using (FinalizerBlocker.MaybeStart())
                     {
-                        (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor);
+                        (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor).ConfigureAwait(true);
                     }
 
-                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration, Host.CancellationToken);
-                    await Host.SendSignalAsync(HostSignal.AfterExtraIteration);
+                    await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration, Host.CancellationToken).ConfigureAwait(true);
+                    await Host.SendSignalAsync(HostSignal.AfterExtraIteration).ConfigureAwait(true);
                 }
                 finally
                 {
-                    await extraIterationData.cleanupAction!(); // we run iteration cleanup after diagnosers are complete.
+                    await extraIterationData.cleanupAction!().ConfigureAwait(true); // we run iteration cleanup after diagnosers are complete.
                 }
 
                 var totalOperations = extraIterationData.invokeCount * Parameters.OperationsPerInvoke;
@@ -243,7 +245,7 @@ namespace BenchmarkDotNet.Engines
         private async ValueTask YieldAndThrowIfCancellationRequested()
         {
             // If this is running in wasm, yield back to JS so that it can detect cancellation.
-            await Host.Yield();
+            await Host.Yield().ConfigureAwait(false);
             Host.CancellationToken.ThrowIfCancellationRequested();
         }
 
@@ -275,7 +277,7 @@ namespace BenchmarkDotNet.Engines
         private async ValueTask<(GcStats, ClockSpan)> MeasureWithGc(Func<long, IClock, ValueTask<ClockSpan>> action, long invokeCount)
         {
             var initialGcStats = GcStats.ReadInitial();
-            var clockSpan = await action(invokeCount, Clock);
+            var clockSpan = await action(invokeCount, Clock).ConfigureAwait(false);
             var finalGcStats = GcStats.ReadFinal();
             return (finalGcStats - initialGcStats, clockSpan);
         }
@@ -283,14 +285,14 @@ namespace BenchmarkDotNet.Engines
         private async ValueTask RandomizeManagedHeapMemory()
         {
             // invoke global cleanup before global setup
-            await Parameters.GlobalCleanupAction.Invoke();
+            await Parameters.GlobalCleanupAction.Invoke().ConfigureAwait(true);
 
             var gen0object = new byte[random.Next(32)];
             var lohObject = new byte[85 * 1024 + random.Next(32)];
 
             // we expect the key allocations to happen in global setup (not ctor)
             // so we call it while keeping the random-size objects alive
-            await Parameters.GlobalSetupAction.Invoke();
+            await Parameters.GlobalSetupAction.Invoke().ConfigureAwait(false);
 
             GC.KeepAlive(gen0object);
             GC.KeepAlive(lohObject);

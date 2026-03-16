@@ -69,12 +69,12 @@ public sealed partial class JsHost : IHost
         {
             // Before the last signal is reported and the benchmark process exits,
             // add an artificial sleep to increase the chance of host process reading all std output.
-            await Task.Delay(10);
+            await Task.Delay(10).ConfigureAwait(false);
         }
 
         SendSignal(Engine.Signals.ToMessage(hostSignal));
 
-        string? acknowledgment = await source.Task;
+        string? acknowledgment = await source.Task.ConfigureAwait(false);
         if (acknowledgment != Engine.Signals.Acknowledgment
             && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
         {

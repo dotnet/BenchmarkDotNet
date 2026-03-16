@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Exporters
                 LoadTemplate(scriptFileName).
                 Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
-            using (await BuildScriptLock.EnterScopeAsync(cancellationToken))
+            using (await BuildScriptLock.EnterScopeAsync(cancellationToken).ConfigureAwait(false))
             {
                 await File.WriteAllTextAsync(scriptFullPath, script, cancellationToken).ConfigureAwait(false);
             }
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Exporters
                 {
                     reader.BeginRead();
 
-                    await foreach (var line in reader.OutputChannel!.Reader.ReadAllAsync(cancellationToken))
+                    await foreach (var line in reader.OutputChannel!.Reader.ReadAllAsync().WithCancellation(cancellationToken).ConfigureAwait(false))
                     {
                         await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
                     }

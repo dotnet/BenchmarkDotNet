@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             return await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                 executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
-                executeParameters.DiagnoserRunMode, cancellationToken);
+                executeParameters.DiagnoserRunMode, cancellationToken).ConfigureAwait(false);
         }
 
         private static async ValueTask<bool> ProbeWebSocketSupportAsync(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, IResolver resolver, CancellationToken cancellationToken)
@@ -56,9 +56,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             try
             {
 #if NET7_0_OR_GREATER
-                output = await probeProcess.StandardOutput.ReadToEndAsync(cancellationToken);
+                output = await probeProcess.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
 #else
-                output = await probeProcess.StandardOutput.ReadToEndAsync().WaitAsync(cancellationToken);
+                output = await probeProcess.StandardOutput.ReadToEndAsync().WaitAsync(cancellationToken).ConfigureAwait(false);
 #endif
             }
             finally
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             bool useWebSocket = runtime.IpcType == WasmIpcType.Auto
                 // Probe the JavaScript runtime to check if it supports WebSocket
-                ? await ProbeWebSocketSupportAsync(benchmarkCase, artifactsPaths, resolver, cancellationToken)
+                ? await ProbeWebSocketSupportAsync(benchmarkCase, artifactsPaths, resolver, cancellationToken).ConfigureAwait(false)
                 : runtime.IpcType == WasmIpcType.WebSocket;
 
             IpcListener listener;
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 var webSocketListener = new WebSocketListener();
                 try
                 {
-                    var port = await webSocketListener.StartAndGetPortAsync();
+                    var port = await webSocketListener.StartAndGetPortAsync().ConfigureAwait(false);
                     listener = webSocketListener;
                     args = benchmarkId.ToArguments(port, diagnoserRunMode);
                 }
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
-            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken);
+            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken).ConfigureAwait(true);
             try
             {
                 using ProcessCleanupHelper processCleanupHelper = new(processListener.Process, logger);
@@ -152,14 +152,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     ((FileStdOutListener) processListener.Listener).AttachProcessOutputReader(processOutputReader);
                 }
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait(true);
                 return await Execute(processListener.Process, benchmarkCase, processOutputReader,
                     benchmarkId, logger, processCleanupHelper, launchIndex, diagnoser,
-                    compositeInProcessDiagnoser, processListener.Listener, cancellationToken);
+                    compositeInProcessDiagnoser, processListener.Listener, cancellationToken).ConfigureAwait(true);
             }
             finally
             {
-                await diagnoser.HandleAsync(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -197,11 +197,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 process.Start();
 
-                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 processOutputReader.BeginRead();
 
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 #pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods
                 await broker.ProcessData(cancellationToken)
                     .AsTask()
-                    .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes));
+                    .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes)).ConfigureAwait(false);
 #pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods
 
                 results = broker.Results;
@@ -231,7 +231,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 }
                 else
                 {
-                    await processOutputReader.StopReadAsync();
+                    await processOutputReader.StopReadAsync().ConfigureAwait(false);
                 }
             }
 

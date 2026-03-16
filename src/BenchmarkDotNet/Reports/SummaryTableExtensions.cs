@@ -23,16 +23,16 @@ namespace BenchmarkDotNet.Reports
                 int paramsOnLine = 0;
                 foreach (var column in commonColumns)
                 {
-                    await writer.WriteAsync($"{column.Header}={column.Content[0]}  ", LogKind.Info, cancellationToken);
+                    await writer.WriteAsync($"{column.Header}={column.Content[0]}  ", LogKind.Info, cancellationToken).ConfigureAwait(false);
                     paramsOnLine++;
                     if (paramsOnLine == 3)
                     {
-                        await writer.WriteLineAsync(cancellationToken);
+                        await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
                         paramsOnLine = 0;
                     }
                 }
                 if (paramsOnLine != 0)
-                    await writer.WriteLineAsync(cancellationToken);
+                    await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -42,11 +42,11 @@ namespace BenchmarkDotNet.Reports
             {
                 if (table.Columns[columnIndex].NeedToShow)
                 {
-                    await writer.WriteAsync(BuildStandardText(table, line, leftDel, rightDel, columnIndex), LogKind.Statistic, cancellationToken);
+                    await writer.WriteAsync(BuildStandardText(table, line, leftDel, rightDel, columnIndex), LogKind.Statistic, cancellationToken).ConfigureAwait(false);
                 }
             }
 
-            await writer.WriteLineAsync(cancellationToken);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public static async ValueTask PrintLineAsync(this SummaryTable table, string[] line, StreamOrLoggerWriter writer, string leftDel, string rightDel,
@@ -67,13 +67,13 @@ namespace BenchmarkDotNet.Reports
                     text = text.HtmlEncode();
 
                 // write the row in an alternative color
-                await writer.WriteAsync(text, highlightRow ? LogKind.Header : LogKind.Statistic, cancellationToken);
+                await writer.WriteAsync(text, highlightRow ? LogKind.Header : LogKind.Statistic, cancellationToken).ConfigureAwait(false);
             }
 
             if (startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Marker)
-                await writer.WriteAsync(" ^", highlightRow ? LogKind.Header : LogKind.Statistic, cancellationToken);
+                await writer.WriteAsync(" ^", highlightRow ? LogKind.Header : LogKind.Statistic, cancellationToken).ConfigureAwait(false);
 
-            await writer.WriteLineAsync(cancellationToken);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
         }
 
         private static string BuildStandardText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)

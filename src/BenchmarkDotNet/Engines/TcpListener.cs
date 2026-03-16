@@ -29,14 +29,14 @@ internal sealed class TcpListener : IpcListener
         timeoutCts.CancelAfter(IpcHelper.ConnectionTimeout);
         try
         {
-            client = await listener.AcceptTcpClientAsync(timeoutCts.Token);
+            client = await listener.AcceptTcpClientAsync(timeoutCts.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             throw new TimeoutException($"The connection to the benchmark process timed out after {IpcHelper.ConnectionTimeout}.");
         }
 #else
-        client = await listener.AcceptTcpClientAsync().WaitAsync(IpcHelper.ConnectionTimeout, cancellationToken);
+        client = await listener.AcceptTcpClientAsync().WaitAsync(IpcHelper.ConnectionTimeout, cancellationToken).ConfigureAwait(false);
 #endif
         return new TcpConnection(client);
     }

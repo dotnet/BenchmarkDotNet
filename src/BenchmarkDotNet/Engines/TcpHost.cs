@@ -91,7 +91,7 @@ internal sealed class TcpHost : IHost
 
         outWriter.WriteLine(Engine.Signals.ToMessage(hostSignal));
 
-        string? acknowledgment = await source.Task;
+        string? acknowledgment = await source.Task.ConfigureAwait(false);
         if (acknowledgment != Engine.Signals.Acknowledgment
             && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
         {

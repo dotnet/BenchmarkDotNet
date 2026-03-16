@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -24,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         [PublicAPI]
         public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
             {
                 yield return validationError;
             }

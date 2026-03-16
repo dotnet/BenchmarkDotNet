@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains
                 ? ExecuteResult.CreateFailed()
                 : await Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser, executeParameters.CompositeInProcessDiagnoser, executeParameters.Resolver, executeParameters.LaunchIndex,
-                    executeParameters.DiagnoserRunMode, cancellationToken);
+                    executeParameters.DiagnoserRunMode, cancellationToken).ConfigureAwait(false);
         }
 
         private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
@@ -42,11 +42,13 @@ namespace BenchmarkDotNet.Toolchains
         {
             try
             {
-                return await ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode, cancellationToken);
+                return await ExecuteCore(benchmarkCase, benchmarkId, logger, artifactsPaths, diagnoser, compositeInProcessDiagnoser, resolver, launchIndex, diagnoserRunMode, cancellationToken)
+                    .ConfigureAwait(true);
             }
             finally
             {
-                await diagnoser.HandleAsync(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -70,7 +72,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener);
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId), cancellationToken);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait(true);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -85,7 +87,7 @@ namespace BenchmarkDotNet.Toolchains
                     return new ExecuteResult(true, null, null, [], [], [], launchIndex);
                 }
 
-                await broker.Diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken);
+                await broker.Diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 processOutputReader.BeginRead();
                 processOutputStarted = true;
@@ -96,7 +98,7 @@ namespace BenchmarkDotNet.Toolchains
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                await broker.ProcessData(cancellationToken);
+                await broker.ProcessData(cancellationToken).ConfigureAwait(false);
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
@@ -114,7 +116,7 @@ namespace BenchmarkDotNet.Toolchains
                     }
                     else
                     {
-                        await processOutputReader.StopReadAsync();
+                        await processOutputReader.StopReadAsync().ConfigureAwait(false);
                     }
                 }
             }

@@ -66,9 +66,9 @@ namespace BenchmarkDotNet.Running
 
             compositeLogger.WriteLineInfo("// Validating benchmarks:");
 
-            var (supportedBenchmarks, validationErrors) = await GetSupportedBenchmarks(benchmarkRunInfos, resolver);
+            var (supportedBenchmarks, validationErrors) = await GetSupportedBenchmarks(benchmarkRunInfos, resolver).ConfigureAwait(true);
 
-            validationErrors.AddRange(await Validate(supportedBenchmarks));
+            validationErrors.AddRange(await Validate(supportedBenchmarks).ConfigureAwait(true));
 
             foreach (var validationError in validationErrors)
                 eventProcessor.OnValidationError(validationError);
@@ -100,13 +100,13 @@ namespace BenchmarkDotNet.Running
             var parallelBuildPartitions = buildPartitions.Except(sequentialBuildPartitions).ToArray();
 
             Dictionary<BuildPartition, BuildResult> buildResults = parallelBuildPartitions.Length > 0
-                ? await BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, globalChronometer, eventProcessor, cancellationToken)
+                ? await BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, globalChronometer, eventProcessor, cancellationToken).ConfigureAwait(true)
                 : [];
 
             if (sequentialBuildPartitions.Length > 0)
             {
                 await foreach (var (buildPartition, buildResult) in
-                    BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, globalChronometer, eventProcessor, cancellationToken))
+                    BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, globalChronometer, eventProcessor, cancellationToken).ConfigureAwait(true))
                 {
                     buildResults.Add(buildPartition, buildResult);
                 }
@@ -143,11 +143,11 @@ namespace BenchmarkDotNet.Running
                     eventProcessor.OnStartRunBenchmarksInType(benchmarkRunInfo.Type, benchmarkRunInfo.BenchmarksCases);
                     (var summary, benchmarksToRunCount) = await Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, eventProcessor, artifactsToCleanup,
                         resultsFolderPath, logFilePath, totalBenchmarkCount, runsChronometer, benchmarksToRunCount,
-                        taskbarProgress, cancellationToken);
+                        taskbarProgress, cancellationToken).ConfigureAwait(true);
                     eventProcessor.OnEndRunBenchmarksInType(benchmarkRunInfo.Type, summary);
 
                     if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
-                        await PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary, cancellationToken).ConfigureAwait(false);
+                        await PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary, cancellationToken).ConfigureAwait(true);
 
                     LogTotalTime(compositeLogger, summary.TotalTime, summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
                     compositeLogger.WriteLine();
@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Running
                 {
                     var joinedSummary = Summary.Join(results, runsChronometer.GetElapsed());
 
-                    await PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary, cancellationToken).ConfigureAwait(false);
+                    await PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary, cancellationToken).ConfigureAwait(true);
 
                     results.Clear();
                     results.Add(joinedSummary);
@@ -242,7 +242,7 @@ namespace BenchmarkDotNet.Running
                             artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
                         eventProcessor.OnStartRunBenchmark(benchmark);
-                        var report = await RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult, benchmarkRunInfo.CompositeInProcessDiagnoser, cancellationToken);
+                        var report = await RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult, benchmarkRunInfo.CompositeInProcessDiagnoser, cancellationToken).ConfigureAwait(true);
                         eventProcessor.OnEndRunBenchmark(benchmark, report);
 
                         if (report.AllMeasurements.Any(m => m.Operations == 0))
@@ -304,7 +304,7 @@ namespace BenchmarkDotNet.Running
                     logFilePath,
                     runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                     cultureInfo,
-                    [.. await Validate(benchmarkRunInfo)], // validate them once again, but don't print the output
+                    [.. await Validate(benchmarkRunInfo).ConfigureAwait(false)], // validate them once again, but don't print the output
                     [.. config.GetColumnHidingRules()]
                 ),
                 benchmarksToRunCount
@@ -320,16 +320,16 @@ namespace BenchmarkDotNet.Running
 
             logger.WriteLineHeader("// * Export *");
             string currentDirectory = Directory.GetCurrentDirectory();
-            await config.GetCompositeExporter().ExportAsync(summary, logger, cancellationToken).ConfigureAwait(false);
+            await config.GetCompositeExporter().ExportAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             logger.WriteLine();
 
             logger.WriteLineHeader("// * Detailed results *");
 
-            await ((ExporterBase) BenchmarkReportExporter.Default).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(false);
+            await ((ExporterBase) BenchmarkReportExporter.Default).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             logger.WriteLineHeader("// * Summary *");
-            await ((ExporterBase) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(false);
+            await ((ExporterBase) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
@@ -378,7 +378,7 @@ namespace BenchmarkDotNet.Running
             => await benchmarks
                 .ToAsyncEnumerable()
                 .SelectMany(benchmark => benchmark.Config.GetCompositeValidator().ValidateAsync(new ValidationParameters(benchmark.BenchmarksCases, benchmark.Config)))
-                .ToArrayAsync();
+                .ToArrayAsync().ConfigureAwait(false);
 
         private static async ValueTask<Dictionary<BuildPartition, BuildResult>> BuildInParallel(
             ILogger logger,
@@ -396,8 +396,10 @@ namespace BenchmarkDotNet.Running
 
             async Task<(BuildPartition Partition, BuildResult Result)> BuildAsync(BuildPartition buildPartition)
             {
-                // Do not use ConfigureAwait(false) so that the eventProcessor event will be raised on the original context.
-                var result = await Task.Run(async () => await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken), cancellationToken);
+                var result = await Task.Run(
+                    async () => await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait(false),
+                    cancellationToken
+                ).ConfigureAwait(true);
 
                 // If the generation was successful, but the build was not, we will try building sequentially
                 // so don't send the OnBuildComplete event yet.
@@ -407,7 +409,7 @@ namespace BenchmarkDotNet.Running
                 return (buildPartition, result);
             }
 
-            var buildResults = (await Task.WhenAll(buildPartitions.Select(BuildAsync)))
+            var buildResults = (await Task.WhenAll(buildPartitions.Select(BuildAsync)).ConfigureAwait(true))
                 .ToDictionary(build => build.Partition, build => build.Result);
 
             var afterParallelBuild = globalChronometer.GetElapsed();
@@ -424,7 +426,7 @@ namespace BenchmarkDotNet.Running
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
                 {
                     if (!buildResults[buildPartition].TryToExplainFailureReason(out _))
-                        buildResults[buildPartition] = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken);
+                        buildResults[buildPartition] = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait(true);
 
                     eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
                 }
@@ -451,8 +453,7 @@ namespace BenchmarkDotNet.Running
 
             foreach (var buildPartition in buildPartitions)
             {
-                // Do not use ConfigureAwait(false) so that the eventProcessor event will be raised on the original context.
-                var result = await Build(buildPartition, rootArtifactsFolderPath, logger, cancellationToken);
+                var result = await Build(buildPartition, rootArtifactsFolderPath, logger, cancellationToken).ConfigureAwait(true);
                 eventProcessor.OnBuildComplete(buildPartition, result);
                 yield return (buildPartition, result);
             }
@@ -469,7 +470,7 @@ namespace BenchmarkDotNet.Running
         {
             var toolchain = buildPartition.RepresentativeBenchmarkCase.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
 
-            var generateResult = await toolchain.Generator.GenerateProjectAsync(buildPartition, buildLogger, rootArtifactsFolderPath, cancellationToken).ConfigureAwait(false);
+            var generateResult = await toolchain.Generator.GenerateProjectAsync(buildPartition, buildLogger, rootArtifactsFolderPath, cancellationToken).ConfigureAwait(true);
 
             try
             {
@@ -496,7 +497,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
 
-            var (success, executeResults, metrics) = await Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver, compositeInProcessDiagnoser, cancellationToken);
+            var (success, executeResults, metrics) = await Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver, compositeInProcessDiagnoser, cancellationToken).ConfigureAwait(false);
 
             return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, metrics);
         }
@@ -540,7 +541,7 @@ namespace BenchmarkDotNet.Running
                     launchIndex,
                     useDiagnoser ? Diagnosers.RunMode.NoOverhead : Diagnosers.RunMode.None,
                     cancellationToken
-                );
+                ).ConfigureAwait(true);
 
                 executeResults.Add(executeResult);
 
@@ -585,7 +586,7 @@ namespace BenchmarkDotNet.Running
                     ++launchCount,
                     Diagnosers.RunMode.ExtraRun,
                     cancellationToken
-                );
+                ).ConfigureAwait(true);
 
                 if (executeResult.IsSuccess)
                 {
@@ -600,7 +601,8 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
-                await separateLogicCompositeDiagnoser.HandleAsync(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken);
+                await separateLogicCompositeDiagnoser.HandleAsync(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId), cancellationToken)
+                    .ConfigureAwait(true);
 
                 if (compositeInProcessDiagnoser.InProcessDiagnosers.Any(d => d.GetRunMode(benchmarkCase) == Diagnosers.RunMode.SeparateLogic))
                 {
@@ -616,7 +618,7 @@ namespace BenchmarkDotNet.Running
                         ++launchCount,
                         Diagnosers.RunMode.SeparateLogic,
                         cancellationToken
-                    );
+                    ).ConfigureAwait(true);
 
                     if (executeResult.IsSuccess)
                     {
@@ -646,7 +648,7 @@ namespace BenchmarkDotNet.Running
                     diagnoser,
                     diagnoserRunMode),
                 cancellationToken
-            );
+            ).ConfigureAwait(true);
 
             if (!executeResult.IsSuccess)
             {
@@ -697,13 +699,15 @@ namespace BenchmarkDotNet.Running
 
                         var errors = await benchmark.GetToolchain()
                             .ValidateAsync(benchmark, resolver)
-                            .ToArrayAsync();
+                            .ToArrayAsync()
+                            .ConfigureAwait(true);
 
                         validationErrors.AddRange(errors);
 
                         return !errors.Any(error => error.IsCritical);
                     })
-                    .ToArrayAsync();
+                    .ToArrayAsync()
+                    .ConfigureAwait(true);
 
                 runInfos.Add(
                     new BenchmarkRunInfo(

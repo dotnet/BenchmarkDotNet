@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
@@ -28,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         public async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            await foreach (var error in InProcessValidator.ValidateAsync(benchmarkCase))
+            await foreach (var error in InProcessValidator.ValidateAsync(benchmarkCase).ConfigureAwait(false))
             {
                 yield return error;
             }

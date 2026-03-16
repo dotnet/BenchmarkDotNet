@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Toolchains
 #if NETSTANDARD2_0
             doc.Save(destination, SaveOptions.DisableFormatting);
 #else
-            await doc.SaveAsync(destination, SaveOptions.DisableFormatting, cancellationToken);
+            await doc.SaveAsync(destination, SaveOptions.DisableFormatting, cancellationToken).ConfigureAwait(false);
 #endif
         }
 
