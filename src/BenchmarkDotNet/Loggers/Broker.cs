@@ -162,9 +162,9 @@ namespace BenchmarkDotNet.Loggers
                         // so we send the acknowledgement always.
                         finally
                         {
-                            using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait(false))
+                            using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait(true))
                             {
-                                await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment).ConfigureAwait(false);
+                                await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment).ConfigureAwait(true);
                             }
                         }
 
