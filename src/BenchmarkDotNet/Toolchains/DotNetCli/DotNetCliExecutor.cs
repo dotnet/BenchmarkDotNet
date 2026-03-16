@@ -80,13 +80,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(port, diagnoserRunMode)}",
                 redirectStandardOutput: true,
                 redirectStandardInput: false,
-                redirectStandardError: false); // #1629
+                redirectStandardError: true);
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
             using Process process = new() { StartInfo = startInfo };
             using ProcessCleanupHelper processCleanupHelper = new(process, logger);
-            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: true);
 
             bool processOutputStarted = false;
             List<string> results;
@@ -132,6 +132,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     {
                         await processOutputReader.StopReadAsync().ConfigureAwait(false);
                     }
+                }
+            }
+
+            if (process.HasExited && process.ExitCode != 0)
+            {
+                string stderr = processOutputReader.GetErrorText();
+                if (!string.IsNullOrEmpty(stderr))
+                {
+                    logger.WriteLineError($"// Benchmark process stderr: {stderr}");
                 }
             }
 

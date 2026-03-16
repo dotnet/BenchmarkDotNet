@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 using ProcessCleanupHelper processCleanupHelper = new(processListener.Process, logger);
                 bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
-                using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: false, channelStandardOutput: isFileBasedIpc);
+                using AsyncProcessOutputReader processOutputReader = new(processListener.Process, logOutput: !isFileBasedIpc, logger, readStandardError: true, channelStandardOutput: isFileBasedIpc);
 
                 if (isFileBasedIpc)
                 {
@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = false, // not supported by WASM!
-                RedirectStandardError = false, // #1629
+                RedirectStandardError = true,
                 CreateNoWindow = true
             };
 
@@ -232,6 +232,15 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 else
                 {
                     await processOutputReader.StopReadAsync().ConfigureAwait(false);
+                }
+            }
+
+            if (process.HasExited && process.ExitCode != 0)
+            {
+                string stderr = processOutputReader.GetErrorText();
+                if (!string.IsNullOrEmpty(stderr))
+                {
+                    logger.WriteLineError($"// Benchmark process stderr: {stderr}");
                 }
             }
 

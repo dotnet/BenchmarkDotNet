@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Helpers
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardError = includeErrors
             };
 
             foreach (var environmentVariable in environmentVariables ?? [])
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Helpers
             }
 
             using var process = new Process { StartInfo = processStartInfo };
-            using var outputReader = new AsyncProcessOutputReader(process);
+            using var outputReader = new AsyncProcessOutputReader(process, readStandardError: includeErrors);
             using var _ = new ProcessCleanupHelper(process, logger ?? NullLogger.Instance);
 
             process.Start();

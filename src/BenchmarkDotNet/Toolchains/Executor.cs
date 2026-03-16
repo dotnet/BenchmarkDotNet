@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains
 
             using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
             using ProcessCleanupHelper processCleanupHelper = new(process, logger);
-            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: true);
 
             List<string> results;
             List<string> prefixedOutput;
@@ -121,6 +121,15 @@ namespace BenchmarkDotNet.Toolchains
                 }
             }
 
+            if (process.HasExited && process.ExitCode != 0)
+            {
+                string stderr = processOutputReader.GetErrorText();
+                if (!string.IsNullOrEmpty(stderr))
+                {
+                    logger.WriteLineError($"// Benchmark process stderr: {stderr}");
+                }
+            }
+
             if (results.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
@@ -140,7 +149,7 @@ namespace BenchmarkDotNet.Toolchains
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = false,
-                RedirectStandardError = false, // #1629
+                RedirectStandardError = true,
                 CreateNoWindow = true,
                 WorkingDirectory = null // by default it's null
             };
