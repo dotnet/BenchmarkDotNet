@@ -7,6 +7,7 @@
     <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
     <!-- needed for docfx xref resolver -->
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
@@ -16,6 +17,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BenchmarkDotNet.targets" Pack="true" PackagePath="buildTransitive" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
