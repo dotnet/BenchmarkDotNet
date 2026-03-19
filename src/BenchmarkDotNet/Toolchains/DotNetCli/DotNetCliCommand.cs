@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!buildPartition.GenerateMSBuildBinLog || suffix.IsBlank())
                 return string.Empty;
 
-            return $"-bl:{buildPartition.ProgramName}-{suffix}.binlog";
+            return $"\"-bl:{buildPartition.ProgramName}-{suffix}.binlog\"";
         }
 
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)
