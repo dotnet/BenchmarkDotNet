@@ -1,8 +1,10 @@
-using System;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
+using System;
 
 namespace BenchmarkDotNet.Attributes;
 
@@ -31,8 +33,17 @@ public class InProcessAttribute(
                 : InProcessToolchainType.Emit;
         }
 
-        return toolchainType == InProcessToolchainType.Emit
-            ? baseJob.WithToolchain(new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }))
-            : baseJob.WithToolchain(new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }));
+        IToolchain toolchain = toolchainType switch
+        {
+            InProcessToolchainType.Emit => new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }),
+            InProcessToolchainType.NoEmit => new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }),
+            _ => throw new ArgumentOutOfRangeException(nameof(toolchainType))
+        };
+
+        var job = baseJob.WithToolchain(toolchain);
+        if (!job.HasValue(CharacteristicObject.IdCharacteristic))
+            job = job.WithId("InProcess");
+
+        return job.Freeze();
     }
 }
