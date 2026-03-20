@@ -23,11 +23,21 @@ namespace BenchmarkDotNet.Configs
 {
     public class DefaultConfig : IConfig
     {
-        public static readonly IConfig Instance = new DefaultConfig();
+        public static IConfig Instance => customDefaultConfig ?? Default;
+
+        public static readonly IConfig Default = new DefaultConfig();
+
         private readonly static Conclusion[] emptyConclusion = [];
+
+        private static IConfig? customDefaultConfig = null;
 
         private DefaultConfig()
         {
+        }
+
+        public static void SetCustomConfig(ImmutableConfig? config)
+        {
+            customDefaultConfig = config;
         }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
