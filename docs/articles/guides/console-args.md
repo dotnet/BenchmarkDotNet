@@ -321,7 +321,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--wasmDataDir`             Wasm data directory
 * `--wasmCoreCLR`             (Default: false) Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.
 * `--noForcedGCs`             Specifying would not forcefully induce any GCs.
-* `--noOverheadEvaluation`    Specifying would not run the evaluation overhead iterations.
+* `--evaluateOverhead`        Specifies whether to run and evaluate overhead iterations.
 * `--resume`                  (Default: false) Continue the execution if the last run was stopped.
 * `--help`                    Display this help screen.
 * `--version`                 Display version information.
