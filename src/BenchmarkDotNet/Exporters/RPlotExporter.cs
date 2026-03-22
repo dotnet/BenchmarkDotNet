@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Exporters
                 // AsyncProcessOutputReader to stream the log contents
                 // to disk rather than Process.Standard*.ReadToEnd().
                 process.Start();
-                using var fileStream = File.Create(logFullPath);
+                using var fileStream = new FileStream(logFullPath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
                 using var streamWriter = new CancelableStreamWriter(fileStream);
                 try
                 {

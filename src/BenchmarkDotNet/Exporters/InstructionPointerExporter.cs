@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Exporters
             var totals = SumHardwareCountersStatsOfBenchmarkedCode(disassemblyResult, pmcStats);
             var perMethod = SumHardwareCountersPerMethod(disassemblyResult, pmcStats);
 
-            using var fileStream = File.Create(filePath);
+            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
             using var writer = new CancelableStreamWriter(fileStream);
             await ExportAsync(writer, benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray(), cancellationToken).ConfigureAwait(false);
 

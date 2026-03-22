@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Exporters
                 }
             }
 
-            using var fileStream = File.Create(filePath);
+            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
             using var writer = new CancelableStreamWriter(fileStream);
             await ExportAsync(summary, writer, cancellationToken).ConfigureAwait(false);
 

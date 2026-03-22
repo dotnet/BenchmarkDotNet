@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         {
             string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, Guid.NewGuid().ToString())}-diff.temp";
 
-            using var fileStream = File.Create(filePath);
+            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
             using var writer = new CancelableStreamWriter(fileStream);
 
             await GithubMarkdownDisassemblyExporter.ExportAsync(writer, disassemblyResult, config, quotingCode: false, cancellationToken).ConfigureAwait(false);
