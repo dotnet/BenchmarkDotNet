@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Helpers
                 // we don't care about exceptions here, we just try to cleanup whatever we can
             }
 
-            Dispose();
+            base.Dispose(false);
         }
 
         private void KillProcessTree()
