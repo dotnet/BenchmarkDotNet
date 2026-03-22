@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Loggers
 
         public Channel<string>? OutputChannel => outputChannel;
 
+        internal bool IsStarted => Interlocked.Read(ref status) == (long) Status.Started;
+
         internal AsyncProcessOutputReader(
             Process process,
             ILogger? stdOutLogger = null, ILogger? stdErrLogger = null,

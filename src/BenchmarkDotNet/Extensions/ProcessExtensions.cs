@@ -219,21 +219,13 @@ namespace BenchmarkDotNet.Extensions
                 EnableRaisingEvents = true
             };
             using var processOutputReader = new AsyncProcessOutputReader(process, readStandardError: false);
-            using var processCleanupHelper = new ProcessCleanupHelper(process, NullLogger.Instance);
-
-            process.Start();
-            processOutputReader.BeginRead();
-
-            if (!process.WaitForExit((int) timeout.TotalMilliseconds))
+            using (new ProcessCleanupHelper(process, processOutputReader, NullLogger.Instance))
             {
-                processOutputReader.CancelRead();
-                processCleanupHelper.KillProcessTree();
-
-                return (process.HasExited ? process.ExitCode : -1, "");
+                process.Start();
+                processOutputReader.BeginRead();
+                process.WaitForExit((int) timeout.TotalMilliseconds);
             }
-
-            processOutputReader.StopReadAsync().AsTask().GetAwaiter().GetResult();
-            return (process.ExitCode, processOutputReader.GetOutputText());
+            return (process.HasExited ? process.ExitCode : -1, processOutputReader.GetOutputText());
         }
 
         private static int RunProcessAndIgnoreOutput(string fileName, string arguments, TimeSpan timeout)

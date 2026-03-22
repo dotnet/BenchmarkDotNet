@@ -62,49 +62,41 @@ namespace BenchmarkDotNet.Exporters
                 FileName = rscriptPath,
                 Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
-            using (var process = new Process { StartInfo = start })
-            using (AsyncProcessOutputReader reader = new(process, cacheStandardOutput: false, channelStandardOutput: true))
-            using (ProcessCleanupHelper processCleanupHelper = new(process, logger))
+            using var process = new Process { StartInfo = start };
+            // When large R scripts are generated then ran, ReadToEnd()
+            // causes the stdout and stderr buffers to become full,
+            // which causes R to hang. To avoid this, use
+            // AsyncProcessOutputReader to stream the log contents
+            // to disk rather than Process.Standard*.ReadToEnd().
+            using AsyncProcessOutputReader reader = new(process, cacheStandardOutput: false, channelStandardOutput: true);
+            using var fileStream = new FileStream(logFullPath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
+            using var streamWriter = new CancelableStreamWriter(fileStream);
+
+            await using (new ProcessCleanupHelper(process, reader, logger).ConfigureAwait(false))
             {
-                // When large R scripts are generated then ran, ReadToEnd()
-                // causes the stdout and stderr buffers to become full,
-                // which causes R to hang. To avoid this, use
-                // AsyncProcessOutputReader to stream the log contents
-                // to disk rather than Process.Standard*.ReadToEnd().
                 process.Start();
-                using var fileStream = new FileStream(logFullPath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
-                using var streamWriter = new CancelableStreamWriter(fileStream);
-                try
-                {
-                    reader.BeginRead();
 
-                    await foreach (var line in reader.OutputChannel!.Reader.ReadAllAsync().WithCancellation(cancellationToken).ConfigureAwait(false))
-                    {
-                        await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
-                    {
-                        reader.CancelRead();
-                        processCleanupHelper.KillProcessTree();
-                    }
-                    else
-                    {
-                        await reader.StopReadAsync().ConfigureAwait(false);
-                    }
-                }
+                reader.BeginRead();
 
-                foreach (var line in reader.GetErrorLines())
+                await foreach (var line in reader.OutputChannel!.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
                 {
                     await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
                 }
 
-                Debug.Assert(process.HasExited);
-                if (process.ExitCode != 0)
-                    throw new ApplicationException($"Process {rscriptPath} has exited with code {process.ExitCode}");
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    logger.WriteLineInfo("// The R script process did not quit on time, it's going to get force killed now.");
+                }
             }
+
+            foreach (var line in reader.GetErrorLines())
+            {
+                await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
+            }
+
+            Debug.Assert(process.HasExited);
+            if (process.ExitCode != 0)
+                throw new ApplicationException($"Process {rscriptPath} has exited with code {process.ExitCode}");
 
             logger.WriteLineInfo($"  {Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}").GetBaseName(Directory.GetCurrentDirectory())}");
         }

@@ -31,40 +31,33 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using var outputReader = new AsyncProcessOutputReader(process,
                 stdOutLogger: parameters.LogOutput ? parameters.Logger : NullLogger.Instance,
                 stdErrLogger: parameters.Logger);
-            using var _ = new ProcessCleanupHelper(process, parameters.Logger);
 
             parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
             var stopwatch = Stopwatch.StartNew();
-
-            process.Start();
-            outputReader.BeginRead();
-
-            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            timeoutCts.CancelAfter(parameters.Timeout);
-            try
+            bool timedOut = false;
+            await using (new ProcessCleanupHelper(process, outputReader, parameters.Logger).ConfigureAwait(false))
             {
-                await process.WaitForExitAsync(timeoutCts.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                if (cancellationToken.IsCancellationRequested)
+                process.Start();
+                outputReader.BeginRead();
+
+                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                timeoutCts.CancelAfter(parameters.Timeout);
+                try
                 {
-                    outputReader.CancelRead();
-                    process.KillTree();
-                    throw;
+                    await process.WaitForExitAsync(timeoutCts.Token).ConfigureAwait(false);
                 }
-
-                parameters.Logger.WriteLineError($"// command took longer than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
-
-                outputReader.CancelRead();
-                process.KillTree();
-
-                return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    parameters.Logger.WriteLineError($"// command took longer than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
+                    timedOut = true;
+                }
             }
 
             stopwatch.Stop();
-            await outputReader.StopReadAsync().ConfigureAwait(false);
+
+            if (timedOut)
+                return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
 
             parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
 

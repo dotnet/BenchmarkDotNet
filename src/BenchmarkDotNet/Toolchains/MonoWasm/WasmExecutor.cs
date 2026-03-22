@@ -143,7 +143,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken).ConfigureAwait(true);
             try
             {
-                using ProcessCleanupHelper processCleanupHelper = new(processListener.Process, logger);
                 bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
                 using AsyncProcessOutputReader processOutputReader = new(processListener.Process,
                     stdOutLogger: isFileBasedIpc ? NullLogger.Instance : logger,
@@ -158,7 +157,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait(true);
                 return await Execute(processListener.Process, benchmarkCase, processOutputReader,
-                    benchmarkId, logger, processCleanupHelper, launchIndex, diagnoser,
+                    benchmarkId, logger, launchIndex, diagnoser,
                     compositeInProcessDiagnoser, processListener.Listener, cancellationToken).ConfigureAwait(true);
             }
             finally
@@ -189,13 +188,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         }
 
         private static async ValueTask<ExecuteResult> Execute(Process process, BenchmarkCase benchmarkCase, AsyncProcessOutputReader processOutputReader,
-            BenchmarkId benchmarkId, Loggers.ILogger logger, ProcessCleanupHelper processCleanupHelper, int launchIndex, IDiagnoser diagnoser,
+            BenchmarkId benchmarkId, Loggers.ILogger logger, int launchIndex, IDiagnoser diagnoser,
             CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener, CancellationToken cancellationToken)
         {
             WasmRuntime wasmRuntime = (WasmRuntime) benchmarkCase.GetRuntime();
             List<string> results;
             List<string> prefixedOutput;
-            try
+            await using (new ProcessCleanupHelper(process, processOutputReader, logger).ConfigureAwait(false))
             {
                 using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, ipcListener);
 
@@ -223,19 +222,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
-            }
-            finally
-            {
+
                 if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
-
-                    processOutputReader.CancelRead();
-                    processCleanupHelper.KillProcessTree();
-                }
-                else
-                {
-                    await processOutputReader.StopReadAsync().ConfigureAwait(false);
                 }
             }
 

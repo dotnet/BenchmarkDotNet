@@ -73,15 +73,15 @@ namespace BenchmarkDotNet.Helpers
 
             using var process = new Process { StartInfo = processStartInfo };
             using var outputReader = new AsyncProcessOutputReader(process, readStandardError: includeErrors);
-            using var _ = new ProcessCleanupHelper(process, logger ?? NullLogger.Instance);
 
-            process.Start();
+            await using (new ProcessCleanupHelper(process, outputReader, logger ?? NullLogger.Instance).ConfigureAwait(false))
+            {
+                process.Start();
 
-            outputReader.BeginRead();
+                outputReader.BeginRead();
 
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
-
-            await outputReader.StopReadAsync().ConfigureAwait(false);
+                await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            }
 
             var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
 

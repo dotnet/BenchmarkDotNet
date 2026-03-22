@@ -62,13 +62,11 @@ namespace BenchmarkDotNet.Toolchains
             string args = benchmarkId.ToArguments(port, diagnoserRunMode);
 
             using Process process = new() { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) };
-            using ProcessCleanupHelper processCleanupHelper = new(process, logger);
             using AsyncProcessOutputReader processOutputReader = new(process, stdOutLogger: logger, stdErrLogger: logger, cacheStandardError: false);
 
             List<string> results;
             List<string> prefixedOutput;
-            bool processOutputStarted = false;
-            try
+            await using (new ProcessCleanupHelper(process, processOutputReader, logger).ConfigureAwait(false))
             {
                 using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener);
 
@@ -90,7 +88,6 @@ namespace BenchmarkDotNet.Toolchains
                 await broker.Diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 processOutputReader.BeginRead();
-                processOutputStarted = true;
 
                 process.EnsureHighPriority(logger);
                 if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
@@ -102,22 +99,10 @@ namespace BenchmarkDotNet.Toolchains
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
-            }
-            finally
-            {
-                if (processOutputStarted)
-                {
-                    if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
-                    {
-                        logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 
-                        processOutputReader.CancelRead();
-                        processCleanupHelper.KillProcessTree();
-                    }
-                    else
-                    {
-                        await processOutputReader.StopReadAsync().ConfigureAwait(false);
-                    }
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
                 }
             }
 
