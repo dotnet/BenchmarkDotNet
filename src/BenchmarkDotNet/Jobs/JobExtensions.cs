@@ -300,9 +300,7 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// Specifies if the overhead should be evaluated (Idle runs) and it's average value subtracted from every result.
         /// False by default.
-        /// <remarks>WithEvaluateOverhead is deprecated.</remarks>
         /// </summary>
-        [Obsolete("Overhead evaluation affects the accuracy of benchmark results. This will be removed soon.")]
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
 
         /// <summary>
