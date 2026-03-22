@@ -400,7 +400,6 @@ namespace BenchmarkDotNet.IntegrationTests
             // Don't run warmup by default to save some time for our CI runs
             int warmupCount = 0)
         {
-#pragma warning disable CS0618 // WithEvaluateOverhead is obsolete
             var job = Job.ShortRun
                 .WithEvaluateOverhead(false) // no need to run idle for this test
                 .WithWarmupCount(warmupCount)
@@ -412,7 +411,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
                 .WithEnvironmentVariable(Engines.Engine.UnitTestBlockFinalizerEnvKey, Engines.Engine.UnitTestBlockFinalizerEnvValue)
                 .WithToolchain(toolchain);
-#pragma warning restore CS0618 // WithEvaluateOverhead is obsolete
 
             if (runtime is not null)
             {
