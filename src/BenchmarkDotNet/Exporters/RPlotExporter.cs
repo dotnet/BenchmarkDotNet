@@ -40,10 +40,9 @@ namespace BenchmarkDotNet.Exporters
 
             logger.WriteLineInfo($"  {scriptFullPath.GetBaseName(Directory.GetCurrentDirectory())}");
 
-            string script = ResourceHelper.
-                LoadTemplate(scriptFileName).
-                Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle).
-                Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
+            string script = (await ResourceHelper.LoadTemplateAsync(scriptFileName, cancellationToken).ConfigureAwait(false))
+                .Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle)
+                .Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
             using (await BuildScriptLock.EnterScopeAsync(cancellationToken).ConfigureAwait(false))
             {
                 await File.WriteAllTextAsync(scriptFullPath, script, cancellationToken).ConfigureAwait(false);
