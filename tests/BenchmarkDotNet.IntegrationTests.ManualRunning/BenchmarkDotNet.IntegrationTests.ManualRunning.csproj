@@ -15,6 +15,10 @@
   <PropertyGroup Condition="'$(CustomProp)'=='true'">
     <DefineConstants>$(DefineConstants);CUSTOM_PROP</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ExtraDefineConstants)'!=''">
+    <DefineConstants>$(DefineConstants);$(ExtraDefineConstants)</DefineConstants>
+  </PropertyGroup>
   
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />

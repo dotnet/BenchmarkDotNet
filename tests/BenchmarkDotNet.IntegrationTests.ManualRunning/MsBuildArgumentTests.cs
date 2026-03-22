@@ -48,6 +48,17 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             CanExecute<PropertyDefine>(config);
         }
 
+        [Fact]
+        public void ProcessIsBuiltWithSemicolonSeparatedPropertyValues()
+        {
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry
+                    .WithArguments([new MsBuildProperty("ExtraDefineConstants", "TEST1", "TEST2")])
+                );
+
+            CanExecute<ExtraDefineConstants>(config);
+        }
+
         public class PropertyDefine
         {
             private const bool customPropWasSet =
@@ -64,6 +75,19 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 {
                     throw new InvalidOperationException($"Custom property was not set properly, the expected value was {Environment.GetEnvironmentVariable(CustomPropEnvVarName)}");
                 }
+            }
+        }
+
+        public class ExtraDefineConstants
+        {
+            [Benchmark]
+            public void ThrowWhenWrong()
+            {
+#if TEST1 && TEST2
+                return;
+#else
+                throw new InvalidOperationException("ExtraDefineConstants was not applied to the benchmark build.");
+#endif
             }
         }
     }

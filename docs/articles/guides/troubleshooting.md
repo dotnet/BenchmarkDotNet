@@ -45,7 +45,7 @@ How to troubleshoot the build process:
 The recommended order of solving build issues:
 
 1. Change the right settings in your project file which defines benchmarks to get it working.
-2. Customize the `Job` settings using available options like `job.WithCustomBuildConfiguration($name)`or `job.With(new Argument[] { new MsBuildArgument("/p:SomeProperty=Value")})`.
+2. Customize the `Job` settings using available options like `job.WithCustomBuildConfiguration($name)` or `job.WithArguments(new Argument[] { new MsBuildArgument("/p:SomeProperty=Value") })`. For list-like MSBuild properties that contain special characters (for example, `DefineConstants=TEST1;TEST2`), use `MsBuildProperty` (it escapes the value for you): `job.WithArguments(new Argument[] { new MsBuildProperty("DefineConstants", "TEST1", "TEST2") })`.
 3. Implement your own `IToolchain` and generate and build all the right things in your way (you can use existing Builders and Generators and just override some methods to change specific behaviour).
 4. Report a bug in BenchmarkDotNet repository.
 
@@ -94,4 +94,3 @@ public void Setup()
 ### One of the above, but with a Debug build
 
 By default, BDN builds everything in Release. But debugging Release builds even with full symbols might be non-trivial. To enforce BDN to build the benchmark in Debug please use `DebugBuildConfig` and then attach the debugger.
-
