@@ -37,8 +37,7 @@ namespace BenchmarkDotNet.Environments
         public int ProcessTimeoutMinutes { get; }
 
         /// <summary>
-        /// Specifies the IPC mechanism to use. Default is <see cref="WasmIpcType.Auto"/> which automatically detects
-        /// based on the JavaScript engine name.
+        /// Specifies the IPC mechanism to use. Default is <see cref="WasmIpcType.Auto"/> which automatically detects the JavaScript engine capabilities.
         /// </summary>
         public WasmIpcType IpcType { get; }
 
