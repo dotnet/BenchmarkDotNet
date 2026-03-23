@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,11 @@ namespace BenchmarkDotNet.ConsoleArguments
     {
         private const int MinimumDisplayWidth = 80;
         private const char EnvVarKeyValueSeparator = ':';
+
+        private static bool IsUnitlessNumber(string value)
+            => double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
+               && !double.IsNaN(parsed)
+               && !double.IsInfinity(parsed);
 
         private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -313,10 +319,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
-            if (options.StatisticalTestThreshold.IsNotBlank() && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
+            if (options.StatisticalTestThreshold.IsNotBlank())
             {
-                logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
-                return false;
+                options.StatisticalTestThreshold = options.StatisticalTestThreshold.Trim();
+                if (IsUnitlessNumber(options.StatisticalTestThreshold))
+                {
+                    string original = options.StatisticalTestThreshold;
+                    options.StatisticalTestThreshold = original + "ns";
+                    logger.WriteLineWarning($"No unit suffix supplied for --statisticalTest '{original}'. Interpreting as '{options.StatisticalTestThreshold}' (nanoseconds). If you meant percent, use e.g. '2%'.");
+                }
+
+                if (!Threshold.TryParse(options.StatisticalTestThreshold, out _))
+                {
+                    logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
+                    return false;
+                }
             }
 
             if (options.EnvironmentVariables.Any(envVar => envVar.IndexOf(EnvVarKeyValueSeparator) <= 0))
