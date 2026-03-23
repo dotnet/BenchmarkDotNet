@@ -21,7 +21,6 @@ internal static class TaskExtensions
 
         async Task Core()
         {
-
             var timeoutTaskSource = new TaskCompletionSource<object>();
             using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
             await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
