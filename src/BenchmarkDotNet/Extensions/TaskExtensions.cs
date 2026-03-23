@@ -17,10 +17,15 @@ internal static class TaskExtensions
         {
             return task;
         }
+        return Core();
 
-        var timeoutTaskSource = new TaskCompletionSource<object>();
-        using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
-        return Task.WhenAny(task, timeoutTaskSource.Task).Unwrap();
+        async Task Core()
+        {
+
+            var timeoutTaskSource = new TaskCompletionSource<object>();
+            using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
+            await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
+        }
     }
 
     public static Task WaitAsync(this Task task, TimeSpan timeout)
@@ -29,11 +34,15 @@ internal static class TaskExtensions
         {
             return task;
         }
+        return Core();
 
-        var timeoutTaskSource = new TaskCompletionSource<object>();
-        using var cts = new CancellationTokenSource(timeout);
-        using var _ = cts.Token.Register(() => timeoutTaskSource.SetException(new TimeoutException()), false);
-        return Task.WhenAny(task, timeoutTaskSource.Task).Unwrap();
+        async Task Core()
+        {
+            var timeoutTaskSource = new TaskCompletionSource<object>();
+            using var cts = new CancellationTokenSource(timeout);
+            using var _ = cts.Token.Register(() => timeoutTaskSource.SetException(new TimeoutException()), false);
+            await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
+        }
     }
 
     public static Task WaitAsync(this Task task, TimeSpan timeout, CancellationToken cancellationToken)
@@ -46,12 +55,16 @@ internal static class TaskExtensions
         {
             return task;
         }
+        return Core();
 
-        var timeoutTaskSource = new TaskCompletionSource<object>();
-        using var timeoutCts = new CancellationTokenSource(timeout);
-        using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
-        using var __ = timeoutCts.Token.Register(() => timeoutTaskSource.TrySetException(new TimeoutException()), false);
-        return Task.WhenAny(task, timeoutTaskSource.Task).Unwrap();
+        async Task Core()
+        {
+            var timeoutTaskSource = new TaskCompletionSource<object>();
+            using var timeoutCts = new CancellationTokenSource(timeout);
+            using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
+            using var __ = timeoutCts.Token.Register(() => timeoutTaskSource.TrySetException(new TimeoutException()), false);
+            await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
+        }
     }
 
     public static Task<T> WaitAsync<T>(this Task<T> task, CancellationToken cancellationToken)
@@ -64,10 +77,14 @@ internal static class TaskExtensions
         {
             return task;
         }
+        return Core();
 
-        var timeoutTaskSource = new TaskCompletionSource<T>();
-        using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
-        return Task.WhenAny(task, timeoutTaskSource.Task).Unwrap();
+        async Task<T> Core()
+        {
+            var timeoutTaskSource = new TaskCompletionSource<T>();
+            using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
+            return await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
+        }
     }
 
     public static Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout)
@@ -76,11 +93,15 @@ internal static class TaskExtensions
         {
             return task;
         }
+        return Core();
 
-        var timeoutTaskSource = new TaskCompletionSource<T>();
-        using var cts = new CancellationTokenSource(timeout);
-        using var _ = cts.Token.Register(() => timeoutTaskSource.SetException(new TimeoutException()), false);
-        return Task.WhenAny(task, timeoutTaskSource.Task).Unwrap();
+        async Task<T> Core()
+        {
+            var timeoutTaskSource = new TaskCompletionSource<T>();
+            using var cts = new CancellationTokenSource(timeout);
+            using var _ = cts.Token.Register(() => timeoutTaskSource.SetException(new TimeoutException()), false);
+            return await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
+        }
     }
 
     public static Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken cancellationToken)
@@ -93,12 +114,16 @@ internal static class TaskExtensions
         {
             return task;
         }
+        return Core();
 
-        var timeoutTaskSource = new TaskCompletionSource<T>();
-        using var timeoutCts = new CancellationTokenSource(timeout);
-        using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
-        using var __ = timeoutCts.Token.Register(() => timeoutTaskSource.TrySetException(new TimeoutException()), false);
-        return Task.WhenAny(task, timeoutTaskSource.Task).Unwrap();
+        async Task<T> Core()
+        {
+            var timeoutTaskSource = new TaskCompletionSource<T>();
+            using var timeoutCts = new CancellationTokenSource(timeout);
+            using var _ = cancellationToken.Register(() => timeoutTaskSource.TrySetCanceled(cancellationToken), false);
+            using var __ = timeoutCts.Token.Register(() => timeoutTaskSource.TrySetException(new TimeoutException()), false);
+            return await Task.WhenAny(task, timeoutTaskSource.Task).Unwrap().ConfigureAwait(false);
+        }
     }
 }
 #endif

@@ -160,15 +160,31 @@ public class AsyncBenchmarkCodeFixProvider : CodeFixProvider
                         SyntaxFactory.IdentifierName("Attributes"))));
             }
 
-            if (usingsToAdd.Count > 0)
+            foreach (var usingToAdd in usingsToAdd)
             {
-                newCompilationUnit = compilationUnit.AddUsings(usingsToAdd.ToArray());
+                var usingName = usingToAdd.Name?.ToString() ?? "";
+                var existingUsings = (newCompilationUnit ?? compilationUnit).Usings;
+                var insertIndex = existingUsings.Count;
+                for (int i = 0; i < existingUsings.Count; i++)
+                {
+                    if (string.Compare(existingUsings[i].Name?.ToString(), usingName, System.StringComparison.Ordinal) > 0)
+                    {
+                        insertIndex = i;
+                        break;
+                    }
+                }
+                newCompilationUnit = (newCompilationUnit ?? compilationUnit).WithUsings(existingUsings.Insert(insertIndex, usingToAdd));
             }
         }
 
-        var newRoot = newCompilationUnit != null
-            ? newCompilationUnit.ReplaceNode(newCompilationUnit.DescendantNodes().OfType<ClassDeclarationSyntax>().First(c => c.Identifier.ValueText == classDeclaration.Identifier.ValueText), newClassDeclaration)
-            : root.ReplaceNode(classDeclaration, newClassDeclaration);
+        // Replace the class node first, then add usings if needed.
+        // This avoids a fragile name-based lookup after adding usings changes the tree.
+        var newRoot = root.ReplaceNode(classDeclaration, newClassDeclaration);
+
+        if (newCompilationUnit != null && newRoot is CompilationUnitSyntax updatedCompilationUnit)
+        {
+            newRoot = updatedCompilationUnit.WithUsings(newCompilationUnit.Usings);
+        }
 
         return document.WithSyntaxRoot(newRoot);
     }

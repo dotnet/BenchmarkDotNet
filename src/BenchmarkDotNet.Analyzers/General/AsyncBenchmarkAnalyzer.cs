@@ -101,34 +101,28 @@ public class AsyncBenchmarkAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        // Check if class has a [BenchmarkCancellation] member
+        // Check if class or any base class has a [BenchmarkCancellation] member
         var hasCancellationTokenMember = false;
 
-        foreach (var memberDeclarationSyntax in classDeclarationSyntax.Members)
+        var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+        for (var type = classSymbol; type != null; type = type.BaseType)
         {
-            AttributeListSyntax? attributeList = null;
-
-            if (memberDeclarationSyntax is FieldDeclarationSyntax fieldDeclarationSyntax)
+            foreach (var member in type.GetMembers())
             {
-                attributeList = fieldDeclarationSyntax.AttributeLists.FirstOrDefault();
-            }
-            else if (memberDeclarationSyntax is PropertyDeclarationSyntax propertyDeclarationSyntax)
-            {
-                attributeList = propertyDeclarationSyntax.AttributeLists.FirstOrDefault();
-            }
-
-            if (attributeList != null)
-            {
-                foreach (var attributeSyntax in attributeList.Attributes)
+                if (member is IFieldSymbol or IPropertySymbol)
                 {
-                    var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-                    if (attributeSyntaxTypeSymbol != null &&
-                        SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkCancellationAttributeTypeSymbol))
+                    foreach (var attribute in member.GetAttributes())
                     {
-                        hasCancellationTokenMember = true;
-                        break;
+                        if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkCancellationAttributeTypeSymbol))
+                        {
+                            hasCancellationTokenMember = true;
+                            break;
+                        }
                     }
                 }
+
+                if (hasCancellationTokenMember)
+                    break;
             }
 
             if (hasCancellationTokenMember)

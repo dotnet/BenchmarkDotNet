@@ -184,5 +184,34 @@ public class AsyncBenchmarkAnalyzerTests
 
             await RunAsync();
         }
+
+        [Fact]
+        public async Task Async_benchmark_with_inherited_cancellation_token_should_not_trigger_diagnostic()
+        {
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+                using System.Threading;
+                using System.Threading.Tasks;
+
+                public class BaseClass
+                {
+                    [BenchmarkCancellation]
+                    public CancellationToken CancellationToken { get; set; }
+                }
+
+                public class BenchmarkClass : BaseClass
+                {
+                    [Benchmark]
+                    public async Task AsyncBenchmark()
+                    {
+                        await Task.Delay(100, CancellationToken);
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+
+            await RunAsync();
+        }
     }
 }

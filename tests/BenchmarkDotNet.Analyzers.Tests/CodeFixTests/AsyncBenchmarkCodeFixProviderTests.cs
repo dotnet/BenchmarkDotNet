@@ -30,8 +30,8 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
 
         var fixedCode = /* lang=c#-test */ """
             using BenchmarkDotNet.Attributes;
-            using System.Threading.Tasks;
             using System.Threading;
+            using System.Threading.Tasks;
 
             public class BenchmarkClass
             {

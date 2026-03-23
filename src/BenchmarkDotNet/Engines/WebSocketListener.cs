@@ -35,7 +35,7 @@ internal sealed class WebSocketListener : IpcListener
         timeoutCts.CancelAfter(IpcHelper.ConnectionTimeout);
         try
         {
-            var webSocket = await listener.AcceptWebSocketAsync(cancellationToken).ConfigureAwait(false);
+            var webSocket = await listener.AcceptWebSocketAsync(timeoutCts.Token).ConfigureAwait(false);
             return new WebSocketConnection(webSocket);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

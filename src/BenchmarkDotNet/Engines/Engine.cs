@@ -161,7 +161,6 @@ namespace BenchmarkDotNet.Engines
                             Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                         }
                     }
-                    // The host only yields in wasm, we don't want to force an async yield in other runtimes, so we use ConfigureAwait(false).
                     await YieldAndThrowIfCancellationRequested().ConfigureAwait(true);
 
                     if (randomizeMemory)
