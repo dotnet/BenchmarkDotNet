@@ -206,7 +206,7 @@ dotnet run -c Release -- --warmupCount 1 --minIterationCount 9 --maxIterationCou
 
 To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:
 
-* `--statisticalTest`- Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s
+* `--statisticalTest`- Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns).
 
 Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET 6.0 will be baseline because it was first.
 
@@ -308,7 +308,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--buildTimeout`            Build timeout in seconds.
 * `--wakeLock`                Prevents the system from entering sleep or turning off the display. None/System/Display.
 * `--stopOnFirstError`        (Default: false) Stop on first error.
-* `--statisticalTest`         Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s
+* `--statisticalTest`         Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns).
 * `--disableLogFile`          Disables the `logfile`.
 * `--maxWidth`                Max parameter column width, the default is 20.
 * `--envVars`                 Colon separated environment variables (key:value)

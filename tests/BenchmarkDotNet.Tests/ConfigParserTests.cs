@@ -11,6 +11,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
@@ -525,6 +526,28 @@ namespace BenchmarkDotNet.Tests
                 .OfType<StatisticalTestColumn>().Single();
 
             Assert.Equal(threshold, statisticalTestColumn.Threshold.ToString());
+        }
+
+        [Fact]
+        public void BareStatisticalTestThresholdIsInterpretedAsNanosecondsAndWarns()
+        {
+            var logger = new AccumulationLogger();
+            string[] arguments = ["--runtimes", "net6.0", "net8.0", "--statisticalTest", "0.02"];
+            var (isSuccess, config, options) = ConfigParser.Parse(arguments, logger);
+
+            Assert.True(isSuccess);
+            Assert.NotNull(config);
+            Assert.NotNull(options);
+
+            options.StatisticalTestThreshold.Should().EndWith("ns");
+
+            var mockSummary = MockFactory.CreateSummary(config);
+            var statisticalTestColumn = config.GetColumnProviders()
+                .SelectMany(columnProvider => columnProvider.GetColumns(mockSummary))
+                .OfType<StatisticalTestColumn>().Single();
+
+            statisticalTestColumn.Threshold.ToString().Should().EndWith("ns");
+            logger.GetLog().Should().Contain("--statisticalTest").And.Contain("nanoseconds");
         }
 
         [Fact]

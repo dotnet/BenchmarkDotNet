@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]
         public bool StopOnFirstError { get; set; }
 
-        [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
+        [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns).")]
         public string? StatisticalTestThreshold { get; set; }
 
         [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
