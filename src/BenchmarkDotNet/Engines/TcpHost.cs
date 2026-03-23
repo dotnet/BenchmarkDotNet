@@ -62,7 +62,8 @@ internal sealed class TcpHost : IHost
         outWriter.Dispose();
         inReader.Dispose();
         cancellationTokenSource.Dispose();
-        readTask.GetAwaiter().GetResult();
+        try { readTask.GetAwaiter().GetResult(); }
+        catch { /* Stream may have been closed during dispose. */ }
     }
 
     public void WriteLine()

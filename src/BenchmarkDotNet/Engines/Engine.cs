@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.Engines
             random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
+        // ConfigureAwait(true) ensures that user code is executed on the original context.
         public async ValueTask<RunResults> RunAsync()
         {
             Host.CancellationToken.ThrowIfCancellationRequested();
@@ -158,7 +159,7 @@ namespace BenchmarkDotNet.Engines
                         // We only catch if the benchmark threw to not overwrite the exception. #1045
                         catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
                         {
-                            Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
+                            Host.SendError($"Exception during IterationCleanup!{Environment.NewLine}{e}");
                         }
                     }
                     await YieldAndThrowIfCancellationRequested().ConfigureAwait(true);

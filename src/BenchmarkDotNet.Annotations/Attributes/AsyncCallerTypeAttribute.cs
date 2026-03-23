@@ -11,5 +11,5 @@ public sealed class AsyncCallerTypeAttribute(Type asyncCallerType) : Attribute
     /// <summary>
     /// The return type of the async method that calls the benchmark method.
     /// </summary>
-    public Type AsyncCallerType { get; private set; } = asyncCallerType;
+    public Type AsyncCallerType { get; } = asyncCallerType;
 }

@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Engines;
 
 // This class is used when somebody manually launches benchmarking .exe without providing ipc connection.
 [AggressivelyOptimizeMethods]
-internal sealed class NoAcknowledgementConsoleHost : IHost
+public sealed class NoAcknowledgementConsoleHost : IHost
 {
     private readonly TextWriter outWriter;
 

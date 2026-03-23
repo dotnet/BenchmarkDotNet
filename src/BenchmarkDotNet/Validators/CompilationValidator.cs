@@ -24,10 +24,10 @@ namespace BenchmarkDotNet.Validators
 
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => ValidateCSharpNaming(validationParameters.Benchmarks)
-                .Union(ValidateClassModifiers(validationParameters.Benchmarks))
-                .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
-                .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
-                .Union(ValidateMethodImpl(validationParameters.Benchmarks))
+                .Concat(ValidateClassModifiers(validationParameters.Benchmarks))
+                .Concat(ValidateAccessModifiers(validationParameters.Benchmarks))
+                .Concat(ValidateBindingModifiers(validationParameters.Benchmarks))
+                .Concat(ValidateMethodImpl(validationParameters.Benchmarks))
                 .ToAsyncEnumerable();
 
         private static IEnumerable<ValidationError> ValidateClassModifiers(IEnumerable<BenchmarkCase> benchmarks)
