@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -444,20 +446,16 @@ namespace BenchmarkDotNet.Tests.Configs
                 get { yield return TestExporterDependency.Default; }
             }
 
-            public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => [];
-
             public string Name => nameof(TestExporter);
-            public void ExportToLog(Summary summary, ILogger logger) { }
+            public ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken) => new();
         }
 
         public class TestExporterDependency : IExporter
         {
             public static readonly TestExporterDependency Default = new TestExporterDependency();
 
-            public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => [];
-
             public string Name => nameof(TestExporterDependency);
-            public void ExportToLog(Summary summary, ILogger logger) { }
+            public ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken) => new();
         }
 
         [Fact]

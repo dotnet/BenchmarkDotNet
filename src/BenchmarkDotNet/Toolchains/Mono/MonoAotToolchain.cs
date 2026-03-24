@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -20,9 +21,9 @@ namespace BenchmarkDotNet.Toolchains.Mono
         {
         }
 
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
             {
                 yield return validationError;
             }

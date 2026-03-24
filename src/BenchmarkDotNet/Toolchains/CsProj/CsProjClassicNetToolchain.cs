@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
@@ -47,9 +48,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 packagesPath.EnsureNotNull(),
                 customDotNetCliPath.EnsureNotNull());
 
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
             {
                 yield return validationError;
             }

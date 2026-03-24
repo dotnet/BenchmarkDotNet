@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -23,28 +26,28 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "md";
         protected override string FileCaption => "asm";
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
-                logger.WriteLine($"## {summary[benchmarkCase]!.GetRuntimeInfo()} (Job: {benchmarkCase.Job.DisplayInfo})");
-                logger.WriteLine();
+                await writer.WriteLineAsync($"## {summary[benchmarkCase]!.GetRuntimeInfo()} (Job: {benchmarkCase.Job.DisplayInfo})", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
 
-                Export(logger, results[benchmarkCase], config);
+                await ExportAsync(writer, results[benchmarkCase], config, cancellationToken: cancellationToken).ConfigureAwait(false);
             }
         }
 
-        internal static void Export(ILogger logger, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, bool quotingCode = true)
+        internal static async ValueTask ExportAsync(CancelableStreamWriter writer, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, bool quotingCode = true, CancellationToken cancellationToken = default)
         {
             int methodIndex = 0;
             foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
             {
                 if (quotingCode)
                 {
-                    logger.WriteLine("```assembly");
+                    await writer.WriteLineAsync("```assembly", cancellationToken).ConfigureAwait(false);
                 }
 
-                logger.WriteLine($"; {method.Name}");
+                await writer.WriteLineAsync($"; {method.Name}", cancellationToken).ConfigureAwait(false);
 
                 var pretty = DisassemblyPrettifier.Prettify(method, disassemblyResult, config, $"M{methodIndex++:00}");
 
@@ -53,11 +56,11 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 {
                     if (element is DisassemblyPrettifier.Label label)
                     {
-                        logger.WriteLine($"{label.TextRepresentation}:");
+                        await writer.WriteLineAsync($"{label.TextRepresentation}:", cancellationToken).ConfigureAwait(false);
                     }
                     else if (element.Source is Sharp sharp)
                     {
-                        logger.WriteLine($"; {sharp.Text.Replace("\n", "\n; ")}"); // they are multiline and we need to add ; for each line
+                        await writer.WriteLineAsync($"; {sharp.Text.Replace("\n", "\n; ")}", cancellationToken).ConfigureAwait(false); // they are multiline and we need to add ; for each line
                     }
                     else if (element.Source is Asm asm)
                     {
@@ -66,18 +69,18 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             totalSizeInBytes += (uint)asm.InstructionLength;
                         }
 
-                        logger.WriteLine($"       {element.TextRepresentation}");
+                        await writer.WriteLineAsync($"       {element.TextRepresentation}", cancellationToken).ConfigureAwait(false);
                     }
                     else if (element.Source is MonoCode mono)
                     {
-                        logger.WriteLine(mono.Text);
+                        await writer.WriteLineAsync(mono.Text, cancellationToken).ConfigureAwait(false);
                     }
                 }
 
-                logger.WriteLine($"; Total bytes of code {totalSizeInBytes}");
+                await writer.WriteLineAsync($"; Total bytes of code {totalSizeInBytes}", cancellationToken).ConfigureAwait(false);
                 if (quotingCode)
                 {
-                    logger.WriteLine("```");
+                    await writer.WriteLineAsync("```", cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -85,14 +88,14 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 .Where(method => method.Problem.IsNotBlank())
                 .GroupBy(method => method.Problem))
             {
-                logger.WriteLine($"**{withProblems.Key}**");
+                await writer.WriteLineAsync($"**{withProblems.Key}**", cancellationToken).ConfigureAwait(false);
                 foreach (var withProblem in withProblems)
                 {
-                    logger.WriteLine(withProblem.Name);
+                    await writer.WriteLineAsync(withProblem.Name, cancellationToken).ConfigureAwait(false);
                 }
             }
 
-            logger.WriteLine();
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

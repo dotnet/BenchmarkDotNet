@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Detectors;
@@ -75,7 +77,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, runtimeIdentifier, "publish");
 
-        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        protected override ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             string projectFilePath = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, NullLogger.Instance).FullName;
             string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
@@ -87,7 +89,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 .AppendLine($"call {CliPath} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker, extraArguments)}")
                 .ToString();
 
-            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
+            return new(File.WriteAllTextAsync(artifactsPaths.BuildScriptFilePath, content, cancellationToken));
         }
 
         // we always want to have a new directory for NuGet packages restore
@@ -104,76 +106,78 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 ? base.GetArtifactsToCleanup(artifactsPaths).Concat([artifactsPaths.PackagesDirectoryName]).ToArray()
                 : base.GetArtifactsToCleanup(artifactsPaths);
 
-        protected override void GenerateNuGetConfig(ArtifactsPaths artifactsPaths)
+        protected override async ValueTask GenerateNuGetConfigAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             if (!Feeds.Any())
                 return;
 
-            string content =
-$@"<?xml version=""1.0"" encoding=""utf-8""?>
-<configuration>
-  <packageSources>
-    {(useNuGetClearTag ? "<clear/>" : string.Empty)}
-    {string.Join(Environment.NewLine + "    ", Feeds.Select(feed => $"<add key=\"{feed.Key}\" value=\"{feed.Value}\" />"))}
-  </packageSources>
-</configuration>";
+            string content = $"""
+                <?xml version="1.0" encoding="utf-8"?>
+                <configuration>
+                  <packageSources>
+                    {(useNuGetClearTag ? "<clear/>" : string.Empty)}
+                    {string.Join(Environment.NewLine + "    ", Feeds.Select(feed => $"<add key=\"{feed.Key}\" value=\"{feed.Value}\" />"))}
+                  </packageSources>
+                </configuration>
+                """;
 
-            File.WriteAllText(artifactsPaths.NuGetConfigPath, content);
+            await File.WriteAllTextAsync(artifactsPaths.NuGetConfigPath, content, cancellationToken).ConfigureAwait(false);
         }
 
-        protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
             var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName;
 
-            File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger));
+            await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger), cancellationToken).ConfigureAwait(false);
 
-            GatherReferences(buildPartition, artifactsPaths, logger);
-            GenerateReflectionFile(artifactsPaths);
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+            await GenerateReflectionFileAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
         }
 
-        private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
-    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
-    <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
-    <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
-    <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
-    <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugSymbols>false</DebugSymbols>
-    <UseSharedCompilation>false</UseSharedCompilation>
-    <Deterministic>true</Deterministic>
-    <RunAnalyzers>false</RunAnalyzers>
-    <PublishAot Condition=""$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))"">true</PublishAot>
-    <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
-    <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
-    {GetTrimmingSettings()}
-    <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
-    <StackTraceSupport>{ilcGenerateStackTraceData}</StackTraceSupport>
-    <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
-    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
-    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
-    {GetInstructionSetSettings(buildPartition)}
-  </PropertyGroup>
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
-  <ItemGroup>
-    <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
-  </ItemGroup>
-  <ItemGroup>
-    {GetILCompilerPackageReference()}
-    <ProjectReference Include=""{projectFilePath}"" />
-  </ItemGroup>
-  <ItemGroup>
-    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
-  </ItemGroup>
-{GetCustomProperties(buildPartition, logger)}
-</Project>";
+        private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $"""
+            <Project Sdk="Microsoft.NET.Sdk">
+              <PropertyGroup>
+                <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+                <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+                <OutputType>Exe</OutputType>
+                <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
+                <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
+                <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
+                <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
+                <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
+                <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+                <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
+                <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+                <DebugSymbols>false</DebugSymbols>
+                <UseSharedCompilation>false</UseSharedCompilation>
+                <Deterministic>true</Deterministic>
+                <RunAnalyzers>false</RunAnalyzers>
+                <PublishAot Condition="$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))">true</PublishAot>
+                <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
+                <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
+                {GetTrimmingSettings()}
+                <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+                <StackTraceSupport>{ilcGenerateStackTraceData}</StackTraceSupport>
+                <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
+                <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
+                <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+                <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
+                {GetInstructionSetSettings(buildPartition)}
+              </PropertyGroup>
+              {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
+              <ItemGroup>
+                <Compile Include="{Path.GetFileName(artifactsPaths.ProgramCodePath)}" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+              </ItemGroup>
+              <ItemGroup>
+                {GetILCompilerPackageReference()}
+                <ProjectReference Include="{projectFilePath}" />
+              </ItemGroup>
+              <ItemGroup>
+                {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
+              </ItemGroup>
+              {GetCustomProperties(buildPartition, logger)}
+            </Project>
+            """;
 
         private string GetCustomProperties(BuildPartition buildPartition, ILogger logger)
         {
@@ -228,29 +232,30 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
         /// </summary>
-        private void GenerateReflectionFile(ArtifactsPaths artifactsPaths)
+        private ValueTask GenerateReflectionFileAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
-            const string content = @"
-<Directives>
-    <Application>
-        <Assembly Name=""System.Runtime"">
-            <Type Name=""System.GC"" Dynamic=""Required All"" />
-        </Assembly>
-        <Assembly Name=""System.Threading.ThreadPool"">
-            <Type Name=""System.Threading.ThreadPool"" Dynamic=""Required All"" />
-        </Assembly>
-        <Assembly Name=""System.Threading"">
-            <Type Name=""System.Threading.Monitor"" Dynamic=""Required All"" />
-        </Assembly>
-    </Application>
-</Directives>
-";
+            const string content = """
+                <Directives>
+                    <Application>
+                        <Assembly Name="System.Runtime">
+                            <Type Name="System.GC" Dynamic="Required All" />
+                        </Assembly>
+                        <Assembly Name="System.Threading.ThreadPool">
+                            <Type Name="System.Threading.ThreadPool" Dynamic="Required All" />
+                        </Assembly>
+                        <Assembly Name="System.Threading">
+                            <Type Name="System.Threading.Monitor" Dynamic="Required All" />
+                        </Assembly>
+                    </Application>
+                </Directives>
+
+                """;
 
             string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!;
-            if (directoryName != null)
-                File.WriteAllText(Path.Combine(directoryName, GeneratedRdXmlFileName), content);
-            else
+            if (directoryName == null)
                 throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
+
+            return new(File.WriteAllTextAsync(Path.Combine(directoryName, GeneratedRdXmlFileName), content, cancellationToken));
         }
 
         private string GetCurrentInstructionSet(Platform platform)

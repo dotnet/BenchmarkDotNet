@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -12,13 +15,14 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 {
     internal class CombinedDisassemblyExporter : ExporterBase
     {
-        internal const string CssDefinition = @"
-<style type=""text/css"">
-    table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
-    td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
-    tr { background-color: #fff; border-top: 1px solid #ccc; }
-    tr:nth-child(even) { background: #f8f8f8; }
-</style>";
+        internal const string CssDefinition = """
+            <style type="text/css">
+                table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+                td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
+                tr { background-color: #fff; border-top: 1px solid #ccc; }
+                tr:nth-child(even) { background: #f8f8f8; }
+            </style>
+            """;
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
         private readonly DisassemblyDiagnoserConfig config;
@@ -32,95 +36,97 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "html";
         protected override string FileCaption => "disassembly-report";
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
                 .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod)
                 .ToArray();
 
-            logger.WriteLine("<!DOCTYPE html>");
-            logger.WriteLine("<html lang='en'>");
-            logger.WriteLine("<head>");
-            logger.WriteLine("<meta charset='utf-8' />");
-            logger.WriteLine($"<title>DisassemblyDiagnoser Output {summary.Title}</title>");
-            logger.WriteLine(CssDefinition);
-            logger.WriteLine("</head>");
+            await writer.WriteLineAsync("<!DOCTYPE html>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<html lang='en'>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<head>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<meta charset='utf-8' />", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync($"<title>DisassemblyDiagnoser Output {summary.Title}</title>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(CssDefinition, cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</head>", cancellationToken).ConfigureAwait(false);
 
-            logger.WriteLine("<body>");
+            await writer.WriteLineAsync("<body>", cancellationToken).ConfigureAwait(false);
 
             if (benchmarksByTarget.Any(group => group.Count() > 1)) // the user is comparing same method for different JITs
             {
                 foreach (var targetingSameMethod in benchmarksByTarget)
                 {
-                    PrintTable(
+                    await PrintTableAsync(
                         targetingSameMethod.ToArray(),
-                        logger,
+                        writer,
                         targetingSameMethod.First().Descriptor.DisplayInfo,
-                        benchmark => summary[benchmark]?.GetRuntimeInfo() ?? "");
+                        benchmark => summary[benchmark]?.GetRuntimeInfo() ?? "",
+                        cancellationToken).ConfigureAwait(false);
                 }
             }
             else // different methods, same JIT
             {
-                PrintTable(
+                await PrintTableAsync(
                     summary.BenchmarksCases.Where(results.ContainsKey).ToArray(),
-                    logger,
+                    writer,
                     summary.Title,
-                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {summary[benchmark]?.GetRuntimeInfo()}".TrimEnd());
+                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {summary[benchmark]?.GetRuntimeInfo()}".TrimEnd(),
+                    cancellationToken).ConfigureAwait(false);
             }
 
-            logger.WriteLine("</body>");
-            logger.WriteLine("</html>");
+            await writer.WriteLineAsync("</body>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</html>", cancellationToken).ConfigureAwait(false);
         }
 
-        private void PrintTable(BenchmarkCase[] benchmarksCase, ILogger logger, string title, Func<BenchmarkCase, string> headerTitleProvider)
+        private async ValueTask PrintTableAsync(BenchmarkCase[] benchmarksCase, CancelableStreamWriter writer, string title, Func<BenchmarkCase, string> headerTitleProvider, CancellationToken cancellationToken)
         {
-            logger.WriteLine("<table>");
-            logger.WriteLine("<thead>");
-            logger.WriteLine($"<tr><th colspan=\"{benchmarksCase.Length}\">{title}</th></tr>");
-            logger.WriteLine("<tr>");
+            await writer.WriteLineAsync("<table>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<thead>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync($"<tr><th colspan=\"{benchmarksCase.Length}\">{title}</th></tr>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<tr>", cancellationToken).ConfigureAwait(false);
             foreach (var benchmark in benchmarksCase)
             {
-                logger.WriteLine($"<th>{headerTitleProvider(benchmark)}</th>");
+                await writer.WriteLineAsync($"<th>{headerTitleProvider(benchmark)}</th>", cancellationToken).ConfigureAwait(false);
             }
-            logger.WriteLine("</tr>");
-            logger.WriteLine("</thead>");
+            await writer.WriteLineAsync("</tr>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</thead>", cancellationToken).ConfigureAwait(false);
 
-            logger.WriteLine("<tbody>");
-            logger.WriteLine("<tr>");
+            await writer.WriteLineAsync("<tbody>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<tr>", cancellationToken).ConfigureAwait(false);
             foreach (var benchmark in benchmarksCase)
             {
                 var disassemblyResult = results[benchmark];
-                logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
+                await writer.WriteLineAsync("<td style=\"vertical-align:top;\"><pre><code>", cancellationToken).ConfigureAwait(false);
                 foreach (var method in disassemblyResult.Methods.Where(method => method.Problem.IsBlank()))
                 {
-                    logger.WriteLine(method.Name);
+                    await writer.WriteLineAsync(method.Name, cancellationToken).ConfigureAwait(false);
 
                     var formatter = config.GetFormatterWithSymbolSolver(disassemblyResult.AddressToNameMapping);
 
                     foreach (var map in method.Maps)
                         foreach (var sourceCode in map.SourceCodes)
-                            logger.WriteLine(CodeFormatter.Format(sourceCode, formatter, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping));
+                            await writer.WriteLineAsync(CodeFormatter.Format(sourceCode, formatter, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), cancellationToken).ConfigureAwait(false);
 
-                    logger.WriteLine();
+                    await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
                 }
 
                 foreach (var withProblems in results[benchmark].Methods
                     .Where(method => method.Problem.IsNotBlank())
                     .GroupBy(method => method.Problem))
                 {
-                    logger.WriteLine(withProblems.Key);
+                    await writer.WriteLineAsync(withProblems.Key, cancellationToken).ConfigureAwait(false);
                     foreach (var withProblem in withProblems)
                     {
-                        logger.WriteLine(withProblem.Name);
+                        await writer.WriteLineAsync(withProblem.Name, cancellationToken).ConfigureAwait(false);
                     }
-                    logger.WriteLine();
+                    await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
                 }
-                logger.WriteLine("</code></pre></td>");
+                await writer.WriteLineAsync("</code></pre></td>", cancellationToken).ConfigureAwait(false);
             }
-            logger.WriteLine("</tr>");
-            logger.WriteLine("</tbody>");
-            logger.WriteLine("</table>");
+            await writer.WriteLineAsync("</tr>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</tbody>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</table>", cancellationToken).ConfigureAwait(false);
         }
     }
 }

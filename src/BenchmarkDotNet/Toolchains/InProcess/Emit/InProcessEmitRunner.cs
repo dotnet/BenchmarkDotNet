@@ -1,0 +1,169 @@
+﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Parameters;
+using BenchmarkDotNet.Validators;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
+
+namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
+
+internal static class InProcessEmitRunner
+{
+    public static async ValueTask<int> Run(IHost host, ExecuteParameters parameters)
+    {
+        // the first thing to do is to let diagnosers hook in before anything happens
+        // so all jit-related diagnosers can catch first jit compilation!
+        await host.BeforeAnythingElseAsync().ConfigureAwait(true);
+
+        try
+        {
+            var runnableType = ((InProcessEmitArtifactsPath) parameters.BuildResult.ArtifactsPaths)
+                .GeneratedAssembly
+                .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
+
+            await RunCore(runnableType, host, parameters).ConfigureAwait(true);
+
+            return 0;
+        }
+        catch (Exception oom) when (ExceptionHelper.IsOom(oom))
+        {
+            host.WriteLine();
+            host.WriteLine("OutOfMemoryException!");
+            host.WriteLine("BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.");
+            host.WriteLine("If your benchmark allocates memory and keeps it alive, you are creating a memory leak.");
+            host.WriteLine("You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.");
+            host.WriteLine();
+            host.WriteLine(oom.ToString());
+
+            return -1;
+        }
+        catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, host.CancellationToken))
+        {
+            host.WriteLine();
+            host.WriteLine(ex.ToString());
+            return -1;
+        }
+        finally
+        {
+            await host.AfterAllAsync().ConfigureAwait(false);
+        }
+    }
+
+    private static async ValueTask RunCore(Type runnableType, IHost host, ExecuteParameters parameters)
+    {
+        var benchmarkCase = parameters.BenchmarkCase;
+
+        var instance = Activator.CreateInstance(runnableType)!;
+        FillMembers(instance, benchmarkCase, host.CancellationToken);
+
+        host.WriteLine();
+        foreach (string infoLine in BenchmarkEnvironmentInfo.GetCurrent().ToFormattedString())
+        {
+            host.WriteLine($"// {infoLine}");
+        }
+        var job = new Job().Apply(benchmarkCase.Job).Freeze();
+        host.WriteLine($"// Job: {job.DisplayInfo}");
+        host.WriteLine();
+
+        var errors = BenchmarkProcessValidator.Validate(job, instance);
+        if (ValidationErrorReporter.ReportIfAny(errors, host))
+            return;
+
+        var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
+            parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
+                .Select((d, i) => Diagnosers.InProcessDiagnoserRouter.Create(d, benchmarkCase, i))
+                .Where(r => r.handler != null)
+                .ToArray(),
+            host,
+            parameters.DiagnoserRunMode,
+            new Diagnosers.InProcessDiagnoserActionArgs(instance)
+        );
+        if (parameters.DiagnoserRunMode == Diagnosers.RunMode.SeparateLogic)
+        {
+            await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken).ConfigureAwait(false);
+            return;
+        }
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait(true);
+
+        var engineParameters = new EngineParameters()
+        {
+            Host = host,
+            WorkloadActionUnroll = LoopCallbackFromMethod(instance, WorkloadActionUnrollMethodName),
+            WorkloadActionNoUnroll = LoopCallbackFromMethod(instance, WorkloadActionNoUnrollMethodName),
+            OverheadActionNoUnroll = LoopCallbackFromMethod(instance, OverheadActionNoUnrollMethodName),
+            OverheadActionUnroll = LoopCallbackFromMethod(instance, OverheadActionUnrollMethodName),
+            GlobalSetupAction = SetupOrCleanupCallbackFromMethod(instance, GlobalSetupMethodName),
+            GlobalCleanupAction = SetupOrCleanupCallbackFromMethod(instance, GlobalCleanupMethodName),
+            IterationSetupAction = SetupOrCleanupCallbackFromMethod(instance, IterationSetupMethodName),
+            IterationCleanupAction = SetupOrCleanupCallbackFromMethod(instance, IterationCleanupMethodName),
+            TargetJob = benchmarkCase.Job,
+            OperationsPerInvoke = benchmarkCase.Descriptor.OperationsPerInvoke,
+            RunExtraIteration = benchmarkCase.Config.HasExtraIterationDiagnoser(benchmarkCase),
+            BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase),
+            InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
+        };
+
+        var results = await job
+            .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
+            .Create(engineParameters)
+            .RunAsync()
+            .ConfigureAwait(true);
+        host.ReportResults(results);
+
+        runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
+
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken).ConfigureAwait(false);
+    }
+
+    private static void FillMembers(object instance, BenchmarkCase benchmarkCase, System.Threading.CancellationToken cancellationToken)
+    {
+        var argIndex = 0;
+        foreach (var argInfo in benchmarkCase.Descriptor.WorkloadMethod.GetParameters())
+        {
+            SetArgumentField(instance, benchmarkCase, argInfo, argIndex);
+            argIndex++;
+        }
+
+        foreach (var paramInfo in benchmarkCase.Parameters.Items)
+        {
+            if (!paramInfo.IsArgument)
+            {
+                SetParameter(instance, paramInfo);
+            }
+        }
+
+        // Inject CancellationToken into properties/fields marked with [BenchmarkCancellation]
+        var targetType = benchmarkCase.Descriptor.Type;
+
+        foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        {
+            if (property.PropertyType == typeof(System.Threading.CancellationToken) &&
+                property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+            {
+                var setter = property.GetSetMethod();
+                if (setter != null)
+                {
+                    var callInstance = setter.IsStatic ? null : instance;
+                    setter.Invoke(callInstance, [cancellationToken]);
+                }
+            }
+        }
+
+        foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        {
+            if (field.FieldType == typeof(System.Threading.CancellationToken) &&
+                field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+            {
+                var callInstance = field.IsStatic ? null : instance;
+                field.SetValue(callInstance, cancellationToken);
+            }
+        }
+    }
+}

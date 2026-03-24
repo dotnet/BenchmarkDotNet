@@ -5,10 +5,12 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks.Toolchain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mocks
@@ -39,7 +41,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             var summary = BenchmarkRunner.Run<T>(config);
 
             var exporter = MarkdownExporter.Mock;
-            exporter.ExportToLog(summary, logger);
+            ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
 
             return summary;

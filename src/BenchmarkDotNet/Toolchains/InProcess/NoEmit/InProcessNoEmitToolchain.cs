@@ -1,6 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -25,8 +27,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             Executor = new InProcessNoEmitExecutor(settings.ExecuteOnSeparateThread);
         }
 
-        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) =>
-            InProcessValidator.Validate(benchmarkCase);
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
+        {
+            await foreach (var error in InProcessValidator.ValidateAsync(benchmarkCase).ConfigureAwait(false))
+            {
+                yield return error;
+            }
+
+            if (benchmarkCase.Descriptor.WorkloadMethod.HasAttribute<AsyncCallerTypeAttribute>() == true)
+            {
+                yield return new ValidationError(false,
+                    $"{nameof(InProcessNoEmitToolchain)} does not support overriding the async caller type via [AsyncCallerType]. It will be ignored.",
+                    benchmarkCase);
+            }
+
+        }
 
         /// <summary>Name of the toolchain.</summary>
         /// <value>The name of the toolchain.</value>

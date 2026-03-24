@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
@@ -26,13 +27,16 @@ namespace BenchmarkDotNet.Tests.Mocks
     public static class MockFactory
     {
         public static Summary CreateSummary(Type benchmarkType, params IColumnHidingRule[] columHidingRules)
+            => CreateSummary(benchmarkType, Directory.GetCurrentDirectory(), columHidingRules);
+
+        public static Summary CreateSummary(Type benchmarkType, string resultsDirectoryPath, params IColumnHidingRule[] columHidingRules)
         {
             var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
             return new Summary(
                 "MockSummary",
                 runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 30, (index + 1) * 100)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                string.Empty,
+                resultsDirectoryPath,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
@@ -41,6 +45,9 @@ namespace BenchmarkDotNet.Tests.Mocks
         }
 
         public static Summary CreateSummaryWithBiasedDistribution(Type benchmarkType, int min, int median, int max, int n)
+            => CreateSummaryWithBiasedDistribution(benchmarkType, min, median, max, n, Directory.GetCurrentDirectory());
+
+        public static Summary CreateSummaryWithBiasedDistribution(Type benchmarkType, int min, int median, int max, int n, string resultsDirectoryPath)
         {
             var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
             return new Summary(
@@ -53,7 +60,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                     n,
                     [])).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                string.Empty,
+                resultsDirectoryPath,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,

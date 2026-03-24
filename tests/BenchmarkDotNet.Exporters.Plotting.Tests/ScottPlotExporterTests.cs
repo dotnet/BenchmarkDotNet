@@ -1,14 +1,13 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,7 +25,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
 
         [Theory]
         [MemberData(nameof(GetGroupBenchmarkTypes))]
-        public void BarPlots(Type benchmarkType)
+        public async Task BarPlots(Type benchmarkType)
         {
             var logger = new AccumulationLogger();
             logger.WriteLine("=== " + benchmarkType.Name + " ===");
@@ -37,9 +36,10 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
                 IncludeBoxPlot = false,
             };
             var summary = MockFactory.CreateSummary(benchmarkType);
-            var filePaths = exporter.ExportToFiles(summary, logger).ToList();
+            await exporter.ExportAsync(summary, logger, CancellationToken.None);
+            var filePaths = Directory.GetFiles(summary.ResultsDirectoryPath, "*.png").ToList();
             Assert.NotEmpty(filePaths);
-            Assert.All(filePaths, f => File.Exists(f));
+            Assert.All(filePaths, f => Assert.True(File.Exists(f)));
 
             foreach (string filePath in filePaths)
                 logger.WriteLine($"* {filePath}");
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
 
         [Theory]
         [MemberData(nameof(GetGroupBenchmarkTypes))]
-        public void BoxPlots(Type benchmarkType)
+        public async Task BoxPlots(Type benchmarkType)
         {
             var logger = new AccumulationLogger();
             logger.WriteLine("=== " + benchmarkType.Name + " ===");
@@ -59,9 +59,10 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
                 IncludeBoxPlot = true,
             };
             var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 9);
-            var filePaths = exporter.ExportToFiles(summary, logger).ToList();
+            await exporter.ExportAsync(summary, logger, CancellationToken.None);
+            var filePaths = Directory.GetFiles(summary.ResultsDirectoryPath, "*.png").ToList();
             Assert.NotEmpty(filePaths);
-            Assert.All(filePaths, f => File.Exists(f));
+            Assert.All(filePaths, f => Assert.True(File.Exists(f)));
 
             foreach (string filePath in filePaths)
                 logger.WriteLine($"* {filePath}");
@@ -70,7 +71,7 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
 
         [Theory]
         [MemberData(nameof(GetGroupBenchmarkTypes))]
-        public void BoxPlotsWithOneMeasurement(Type benchmarkType)
+        public async Task BoxPlotsWithOneMeasurement(Type benchmarkType)
         {
             var logger = new AccumulationLogger();
             logger.WriteLine("=== " + benchmarkType.Name + " ===");
@@ -81,9 +82,10 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
                 IncludeBoxPlot = true,
             };
             var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 1);
-            var filePaths = exporter.ExportToFiles(summary, logger).ToList();
+            await exporter.ExportAsync(summary, logger, CancellationToken.None);
+            var filePaths = Directory.GetFiles(summary.ResultsDirectoryPath, "*.png").ToList();
             Assert.NotEmpty(filePaths);
-            Assert.All(filePaths, f => File.Exists(f));
+            Assert.All(filePaths, f => Assert.True(File.Exists(f)));
 
             foreach (string filePath in filePaths)
                 logger.WriteLine($"* {filePath}");

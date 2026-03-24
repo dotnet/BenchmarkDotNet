@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -8,12 +9,12 @@ namespace BenchmarkDotNet.Engines
         public static void WriteLine(this IHost host, string messageFormat, params object[] args)
             => host.WriteLine(string.Format(messageFormat, args));
 
-        public static void BeforeAnythingElse(this IHost host) => host.SendSignal(HostSignal.BeforeAnythingElse);
+        public static ValueTask BeforeAnythingElseAsync(this IHost host) => host.SendSignalAsync(HostSignal.BeforeAnythingElse);
 
-        public static void BeforeMainRun(this IHost host) => host.SendSignal(HostSignal.BeforeActualRun);
+        public static ValueTask BeforeMainRunAsync(this IHost host) => host.SendSignalAsync(HostSignal.BeforeActualRun);
 
-        public static void AfterMainRun(this IHost host) => host.SendSignal(HostSignal.AfterActualRun);
+        public static ValueTask AfterMainRunAsync(this IHost host) => host.SendSignalAsync(HostSignal.AfterActualRun);
 
-        public static void AfterAll(this IHost host) => host.SendSignal(HostSignal.AfterAll);
+        public static ValueTask AfterAllAsync(this IHost host) => host.SendSignalAsync(HostSignal.AfterAll);
     }
 }

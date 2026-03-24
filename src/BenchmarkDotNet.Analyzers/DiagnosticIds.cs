@@ -34,4 +34,10 @@ public static class DiagnosticIds
     public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueCount = "BDN1501";
     public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1502";
     public const string Attributes_ArgumentsAttribute_RequiresParameters = "BDN1503";
+    public const string Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType = "BDN1600";
+    public const string Attributes_BenchmarkCancellationAttribute_FieldMustBePublic = "BDN1601";
+    public const string Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic = "BDN1602";
+    public const string Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField = "BDN1603";
+    public const string Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter = "BDN1604";
+    public const string General_AsyncBenchmark_ShouldHaveCancellationToken = "BDN1605";
 }

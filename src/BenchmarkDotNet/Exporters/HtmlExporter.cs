@@ -1,4 +1,7 @@
-﻿using BenchmarkDotNet.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -18,102 +21,83 @@ namespace BenchmarkDotNet.Exporters
 
         public static readonly IExporter Default = new HtmlExporter();
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
-            PrintAll(summary, new HtmlLoggerWrapper(logger));
-        }
+            await writer.WriteLineAsync("<!DOCTYPE html>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<html lang='en'>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<head>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<meta charset='utf-8' />", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("<title>" + summary.Title + "</title>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(CssDefinition, cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</head>", cancellationToken).ConfigureAwait(false);
 
-        private static void PrintAll(Summary summary, ILogger logger)
-        {
-            logger.WriteLine("<!DOCTYPE html>");
-            logger.WriteLine("<html lang='en'>");
-            logger.WriteLine("<head>");
-            logger.WriteLine("<meta charset='utf-8' />");
-            logger.WriteLine("<title>" + summary.Title + "</title>");
-            logger.WriteLine(CssDefinition);
-            logger.WriteLine("</head>");
-
-            logger.WriteLine("<body>");
-            logger.Write("<pre><code>");
-            logger.WriteLine();
+            await writer.WriteLineAsync("<body>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteAsync("<pre><code>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
             foreach (string infoLine in summary.HostEnvironmentInfo.ToFormattedString())
             {
-                logger.WriteLine(infoLine);
+                await writer.WriteLineAsync(Escape(infoLine), cancellationToken).ConfigureAwait(false);
             }
-            logger.WriteLine(summary.AllRuntimes);
-            logger.Write("</code></pre>");
-            logger.WriteLine();
+            await writer.WriteLineAsync(Escape(summary.AllRuntimes), cancellationToken).ConfigureAwait(false);
+            await writer.WriteAsync("</code></pre>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
 
-            PrintTable(summary.Table, logger);
+            await PrintTableAsync(summary.Table, writer, cancellationToken).ConfigureAwait(false);
 
-            logger.WriteLine("</body>");
-            logger.WriteLine("</html>");
+            await writer.WriteLineAsync("</body>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</html>", cancellationToken).ConfigureAwait(false);
         }
 
-        private static void PrintTable(SummaryTable table, ILogger logger)
+        private static async ValueTask PrintTableAsync(SummaryTable table, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             if (table.FullContent.Length == 0)
             {
-                logger.WriteLineError("<pre>There are no benchmarks found</pre>");
+                await writer.WriteLineAsync("<pre>There are no benchmarks found</pre>", cancellationToken).ConfigureAwait(false);
                 return;
             }
 
-            logger.Write("<pre><code>");
-            table.PrintCommonColumns(logger);
-            logger.WriteLine("</code></pre>");
-            logger.WriteLine();
+            var wrappedWriter = new StreamWriterWrapper(writer);
+            await writer.WriteAsync("<pre><code>", cancellationToken).ConfigureAwait(false);
+            await table.PrintCommonColumnsAsync(wrappedWriter, cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</code></pre>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
 
-            logger.WriteLine("<table>");
+            await writer.WriteLineAsync("<table>", cancellationToken).ConfigureAwait(false);
 
-            logger.Write("<thead>");
-            logger.Write("<tr>");
-            table.PrintLine(table.FullHeader, logger, "<th>", "</th>");
-            logger.WriteLine("</tr>");
-            logger.Write("</thead>");
+            await writer.WriteAsync("<thead>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteAsync("<tr>", cancellationToken).ConfigureAwait(false);
+            await table.PrintLineAsync(table.FullHeader, wrappedWriter, "<th>", "</th>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteLineAsync("</tr>", cancellationToken).ConfigureAwait(false);
+            await writer.WriteAsync("</thead>", cancellationToken).ConfigureAwait(false);
 
-            logger.Write("<tbody>");
+            await writer.WriteAsync("<tbody>", cancellationToken).ConfigureAwait(false);
             foreach (var line in table.FullContent)
             {
-                logger.Write("<tr>");
-                PrintLine(table, line, logger, "<td>", "</td>");
-                logger.Write("</tr>");
+                await writer.WriteAsync("<tr>", cancellationToken).ConfigureAwait(false);
+                await PrintLineAsync(table, line, writer, "<td>", "</td>", cancellationToken).ConfigureAwait(false);
+                await writer.WriteAsync("</tr>", cancellationToken).ConfigureAwait(false);
             }
-            logger.Write("</tbody>");
+            await writer.WriteAsync("</tbody>", cancellationToken).ConfigureAwait(false);
 
-            logger.WriteLine("</table>");
+            await writer.WriteLineAsync("</table>", cancellationToken).ConfigureAwait(false);
         }
 
-        private static void PrintLine(SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel)
+        private static async ValueTask PrintLineAsync(SummaryTable table, string[] line, CancelableStreamWriter writer, string leftDel, string rightDel, CancellationToken cancellationToken)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
                 if (table.Columns[columnIndex].NeedToShow)
                 {
-                    logger.WriteStatistic(leftDel + line[columnIndex].HtmlEncode() + rightDel);
+                    await writer.WriteAsync(leftDel + line[columnIndex].HtmlEncode() + rightDel, cancellationToken).ConfigureAwait(false);
                 }
             }
 
-            logger.WriteLine();
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        private class HtmlLoggerWrapper : ILogger
+        private static string Escape(string text)
         {
-            private readonly ILogger internalLogger;
-
-            public HtmlLoggerWrapper(ILogger logger) => internalLogger = logger;
-
-            public string Id => nameof(HtmlLoggerWrapper);
-            public int Priority => 0;
-
-            public void Write(LogKind logKind, string text) => internalLogger.Write(logKind, Escape(text));
-            public void WriteLine() => internalLogger.WriteLine();
-            public void WriteLine(LogKind logKind, string text) => internalLogger.WriteLine(logKind, Escape(text));
-            public void Flush() => internalLogger.Flush();
-
-            private static string Escape(string text)
-            {
-                return text.Replace("\u03BC", "&mu;");
-            }
+            return text.Replace("\u03BC", "&mu;");
         }
     }
 }

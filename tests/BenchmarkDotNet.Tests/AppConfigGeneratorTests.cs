@@ -1,8 +1,10 @@
-﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -18,42 +20,38 @@ namespace BenchmarkDotNet.Tests
         private static readonly IResolver Resolver = BenchmarkRunnerClean.DefaultResolver;
 
         [Fact]
-        public void GeneratesMinimalRequiredAppConfigForEmptySource()
+        public async Task GeneratesMinimalRequiredAppConfigForEmptySource()
         {
-            using (var destination = new Utf8StringWriter())
-            {
-                string expectedMinimal =
-                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                    "<configuration>" +
-                    $"<runtime>{GcSettings}</runtime>" +
-                    "</configuration>";
+            using var destination = new Utf8StringWriter();
+            string expectedMinimal =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<configuration>" +
+                $"<runtime>{GcSettings}</runtime>" +
+                "</configuration>";
 
-                AppConfigGenerator.Generate(Job.Default, TextReader.Null, destination, Resolver);
+            await AppConfigGenerator.GenerateAsync(Job.Default, TextReader.Null, destination, Resolver, CancellationToken.None);
 
-                AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
-            }
+            AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
         }
 
         [Fact]
-        public void GeneratesMinimalRequiredAppConfigForAlmostEmptySource()
+        public async Task GeneratesMinimalRequiredAppConfigForAlmostEmptySource()
         {
-            using (var source = new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
-            using (var destination = new Utf8StringWriter())
-            {
-                string expectedMinimal =
-                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                    "<configuration>" +
-                    $"<runtime>{GcSettings}</runtime>" +
-                    "</configuration>";
+            using var source = new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            using var destination = new Utf8StringWriter();
+            string expectedMinimal =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<configuration>" +
+                $"<runtime>{GcSettings}</runtime>" +
+                "</configuration>";
 
-                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+            await AppConfigGenerator.GenerateAsync(Job.Default, source, destination, Resolver, CancellationToken.None);
 
-                AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
-            }
+            AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
         }
 
         [Fact]
-        public void RewritesCustomSettings()
+        public async Task RewritesCustomSettings()
         {
             string customSettingsWithoutRuntimeNode =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -74,17 +72,16 @@ namespace BenchmarkDotNet.Tests
                 $"<runtime>{GcSettings}</runtime>" +
                 "</configuration>";
 
-            using (var source = new StringReader(customSettingsWithoutRuntimeNode))
-            using (var destination = new Utf8StringWriter())
-            {
-                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+            using var source = new StringReader(customSettingsWithoutRuntimeNode);
+            using var destination = new Utf8StringWriter();
 
-                AssertAreEqualIgnoringWhitespacesAndCase(customSettingsWithRuntimeNode, destination.ToString());
-            }
+            await AppConfigGenerator.GenerateAsync(Job.Default, source, destination, Resolver, CancellationToken.None);
+
+            AssertAreEqualIgnoringWhitespacesAndCase(customSettingsWithRuntimeNode, destination.ToString());
         }
 
         [Fact]
-        public void RewritesCustomRuntimeSettings()
+        public async Task RewritesCustomRuntimeSettings()
         {
             string customSettingsBefore =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -106,19 +103,18 @@ namespace BenchmarkDotNet.Tests
                 $"<runtime><AppContextSwitchOverrides value=\"Switch.System.IO.UseLegacyPathHandling=false\"/>{GcSettings}</runtime>" +
                 "</configuration>";
 
-            using (var source = new StringReader(customSettingsBefore))
-            using (var destination = new Utf8StringWriter())
-            {
-                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+            using var source = new StringReader(customSettingsBefore);
+            using var destination = new Utf8StringWriter();
 
-                AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAfter, destination.ToString());
-            }
+            await AppConfigGenerator.GenerateAsync(Job.Default, source, destination, Resolver, CancellationToken.None);
+
+            AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAfter, destination.ToString());
         }
 
         [Theory]
         [InlineData(Jit.LegacyJit, "<useLegacyJit enabled=\"1\" />")]
         [InlineData(Jit.RyuJit, "<useLegacyJit enabled=\"0\" />")]
-        public void GeneratesRightJitSettings(Jit jit, string expectedRuntimeNode)
+        public async Task GeneratesRightJitSettings(Jit jit, string expectedRuntimeNode)
         {
             const string customSettings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -133,17 +129,16 @@ namespace BenchmarkDotNet.Tests
                 $"<runtime>{expectedRuntimeNode}{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
-            using (var source = new StringReader(customSettings))
-            using (var destination = new Utf8StringWriter())
-            {
-                AppConfigGenerator.Generate(new Job { Environment = { Jit = jit } }.Freeze(), source, destination, Resolver);
+            using var source = new StringReader(customSettings);
+            using var destination = new Utf8StringWriter();
 
-                AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
-            }
+            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Jit = jit } }.Freeze(), source, destination, Resolver, CancellationToken.None);
+
+            AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
         }
 
         [FactEnvSpecific("Full Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
-        public void RemovesStartupSettingsForPrivateBuildsOfClr()
+        public async Task RemovesStartupSettingsForPrivateBuildsOfClr()
         {
             const string input =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -157,17 +152,16 @@ namespace BenchmarkDotNet.Tests
                 $"<runtime>{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
-            using (var source = new StringReader(input))
-            using (var destination = new Utf8StringWriter())
-            {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0")} }.Freeze(), source, destination, Resolver);
+            using var source = new StringReader(input);
+            using var destination = new Utf8StringWriter();
 
-                AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
-            }
+            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0") } }.Freeze(), source, destination, Resolver, CancellationToken.None);
+
+            AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
         }
 
         [Fact]
-        public void LeavsStartupSettingsIntactForNonPrivateBuildsOfClr()
+        public async Task LeavsStartupSettingsIntactForNonPrivateBuildsOfClr()
         {
             const string input =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -182,17 +176,16 @@ namespace BenchmarkDotNet.Tests
                 $"<runtime>{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
-            using (var source = new StringReader(input))
-            using (var destination = new Utf8StringWriter())
-            {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination, Resolver);
+            using var source = new StringReader(input);
+            using var destination = new Utf8StringWriter();
 
-                AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
-            }
+            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination, Resolver, CancellationToken.None);
+
+            AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
         }
 
         [Fact]
-        public void RewritesCustomAssemblyBindingRedirects()
+        public async Task RewritesCustomAssemblyBindingRedirects()
         {
             const string settingsWithBindings =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -222,13 +215,12 @@ namespace BenchmarkDotNet.Tests
                 "</runtime>" +
                 "</configuration>";
 
-            using (var source = new StringReader(settingsWithBindings))
-            using (var destination = new Utf8StringWriter())
-            {
-                AppConfigGenerator.Generate(Job.RyuJitX64, source, destination, Resolver);
+            using var source = new StringReader(settingsWithBindings);
+            using var destination = new Utf8StringWriter();
 
-                AssertAreEqualIgnoringWhitespacesAndCase(settingsWithBindingsAndJit, destination.ToString());
-            }
+            await AppConfigGenerator.GenerateAsync(Job.RyuJitX64, source, destination, Resolver, CancellationToken.None);
+
+            AssertAreEqualIgnoringWhitespacesAndCase(settingsWithBindingsAndJit, destination.ToString());
         }
 
         private static void AssertAreEqualIgnoringWhitespacesAndCase(string expectedXml, string actualXml)
@@ -257,7 +249,7 @@ namespace BenchmarkDotNet.Tests
             return buffer.ToString();
         }
 
-        private static readonly string GcSettings = $"<gcConcurrentenabled=\"{(GCSettings.LatencyMode != GCLatencyMode.Batch).ToLowerCase()}\"/><gcServerenabled=\"{GCSettings.IsServerGC.ToLowerCase()}\"/>";
+        private static readonly string GcSettings = $"<gcConcurrentenabled=\"{(System.Runtime.GCSettings.LatencyMode != GCLatencyMode.Batch).ToLowerCase()}\"/><gcServerenabled=\"{System.Runtime.GCSettings.IsServerGC.ToLowerCase()}\"/>";
     }
 
     internal class Utf8StringWriter : StringWriter

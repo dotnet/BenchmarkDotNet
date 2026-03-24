@@ -17,7 +17,7 @@ public class RuntimeValidator : IValidator
 
     public bool TreatsWarningsAsErrors => false;
 
-    public IEnumerable<ValidationError> Validate(ValidationParameters input)
+    public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input)
     {
         var allBenchmarks = input.Benchmarks.ToArray();
         var nullRuntimeBenchmarks = allBenchmarks.Where(x => x.Job.Environment.Runtime == null).ToArray();
@@ -25,10 +25,9 @@ public class RuntimeValidator : IValidator
         // There is no validation error if all the runtimes are set or if all the runtimes are null.
         if (allBenchmarks.Length == nullRuntimeBenchmarks.Length)
         {
-            return [];
+            yield break;
         }
 
-        var errors = new List<ValidationError>();
         foreach (var benchmark in nullRuntimeBenchmarks.Where(x=> !x.GetToolchain().IsInProcess))
         {
             var job = benchmark.Job;
@@ -37,8 +36,7 @@ public class RuntimeValidator : IValidator
                 : CharacteristicSetPresenter.Display.ToPresentation(job); // Use job text representation instead for auto generated JobId.
 
             var message = $"Job({jobText}) doesn't have a Runtime characteristic. It's recommended to specify runtime by using WithRuntime explicitly.";
-            errors.Add(new ValidationError(false, message));
+            yield return new ValidationError(false, message);
         }
-        return errors;
     }
 }

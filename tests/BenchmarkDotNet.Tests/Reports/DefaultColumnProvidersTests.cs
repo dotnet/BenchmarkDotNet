@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 using Xunit.Abstractions;
@@ -51,7 +53,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var logger = new AccumulationLogger();
             var summary = MockFactory.CreateSummary<MockBenchmarkClass>(DefaultConfig.Instance, hugeSd, metrics);
-            MarkdownExporter.Default.ExportToLog(summary, logger);
+            ((ExporterBase)MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
             return summary;
         }

@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Serialization;
@@ -6,6 +7,8 @@ using Perfolizer.Helpers;
 using Perfolizer.Horology;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Exporters.Json
 {
@@ -22,11 +25,11 @@ namespace BenchmarkDotNet.Exporters.Json
             ExcludeMeasurements = excludeMeasurements;
         }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var dataToSerialize = GetDataToSerialize(summary);
             var json = BdnSimpleJsonSerializer.Serialize(dataToSerialize, IndentJson);
-            logger.WriteLine(json);
+            await writer.WriteLineAsync(json, cancellationToken).ConfigureAwait(false);
         }
 
         protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(Summary summary)

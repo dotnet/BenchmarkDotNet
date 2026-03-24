@@ -1,9 +1,11 @@
+using System.Threading;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -13,6 +15,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;
@@ -27,7 +30,7 @@ namespace BenchmarkDotNet.Tests.Exporters
     public class OpenMetricsExporterTests
     {
         [Fact]
-        public Task SingleBenchmark_ProducesHelpAndTypeOnce()
+        public async Task SingleBenchmark_ProducesHelpAndTypeOnce()
         {
             var summary = new Summary(
                 "SingleBenchmarkSummary",
@@ -100,14 +103,14 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
 
-            OpenMetricsExporter.Default.ExportToLog(summary, logger);
+            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
-            return Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(logger.GetLog(), settings);
         }
 
         [Fact]
-        public Task ParametrizedBenchmarks_LabelExpansion()
+        public async Task ParametrizedBenchmarks_LabelExpansion()
         {
 var summary = new Summary(
                 "SingleBenchmarkSummary",
@@ -183,14 +186,14 @@ var summary = new Summary(
                 []);
             var logger = new AccumulationLogger();
 
-            OpenMetricsExporter.Default.ExportToLog(summary, logger);
+            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
-            return Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(logger.GetLog(), settings);
         }
 
         [Fact]
-        public Task LabelsAreEscapedCorrectly()
+        public async Task LabelsAreEscapedCorrectly()
         {
             var summary = new Summary(
                 "",
@@ -228,14 +231,14 @@ var summary = new Summary(
                 []);
             var logger = new AccumulationLogger();
 
-            OpenMetricsExporter.Default.ExportToLog(summary, logger);
+            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
-            return Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(logger.GetLog(), settings);
         }
 
         [Fact]
-        public Task DecimalSeparator_UsesInvariantCulture()
+        public async Task DecimalSeparator_UsesInvariantCulture()
         {
             var originalCulture = CultureInfo.CurrentCulture;
             try
@@ -271,7 +274,7 @@ var summary = new Summary(
 
                 var logger = new AccumulationLogger();
 
-                OpenMetricsExporter.Default.ExportToLog(summary, logger);
+                await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
                 var log = logger.GetLog();
                 // Verify that the value uses a period, not a comma
@@ -283,7 +286,7 @@ var summary = new Summary(
                 CultureInfo.CurrentCulture = originalCulture;
             }
 
-            return Task.CompletedTask;
+            return;
         }
     }
 }

@@ -28,7 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\BenchmarkDotNet.Analyzers\bin\$(Configuration)\**\*.dll" Pack="true" PackagePath="analyzers/dotnet/" Visible="false" />
+    <Content Include="..\BenchmarkDotNet.Analyzers\bin\$(Configuration)\**\BenchmarkDotNet.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/" Visible="false" />
+    <Content Include="..\BenchmarkDotNet.CodeFixers\bin\$(Configuration)\**\BenchmarkDotNet.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/" Visible="false" />
   </ItemGroup>
   
   <Choose>

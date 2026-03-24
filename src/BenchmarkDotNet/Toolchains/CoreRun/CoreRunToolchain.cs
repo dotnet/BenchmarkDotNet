@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         public override string ToString() => Name;
 
-        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmark, IResolver resolver)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmark, IResolver resolver)
         {
             if (!SourceCoreRun.Exists)
             {

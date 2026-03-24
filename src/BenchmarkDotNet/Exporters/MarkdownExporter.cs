@@ -1,4 +1,7 @@
-﻿using System.Linq;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -88,85 +91,89 @@ namespace BenchmarkDotNet.Exporters
 
         protected MarkdownExporter() { }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
+            => ExportCore(summary, new StreamWriterWrapper(writer), cancellationToken);
+
+        internal ValueTask ExportToLogAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
+            => ExportCore(summary, new LoggerWriter(logger), cancellationToken);
+
+        private async ValueTask ExportCore(Summary summary, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             if (UseCodeBlocks)
             {
-                logger.WriteLine(CodeBlockStart);
+                await writer.WriteLineAsync(CodeBlockStart, cancellationToken).ConfigureAwait(false);
             }
 
-            logger = GetRightLogger(logger);
-            logger.WriteLine();
+            var prefixedWriter = GetPrefixedWriter(writer);
+
+            await prefixedWriter.WriteLineAsync(cancellationToken).ConfigureAwait(false);
             foreach (string infoLine in summary.HostEnvironmentInfo.ToFormattedString())
             {
-                logger.WriteLineInfo(infoLine);
+                await prefixedWriter.WriteLineAsync(infoLine, LogKind.Info, cancellationToken).ConfigureAwait(false);
             }
 
-            logger.WriteLineInfo(summary.AllRuntimes);
-            logger.WriteLine();
+            await prefixedWriter.WriteLineAsync(summary.AllRuntimes, LogKind.Info, cancellationToken).ConfigureAwait(false);
+            await prefixedWriter.WriteLineAsync(cancellationToken).ConfigureAwait(false);
 
-            PrintTable(summary.Table, logger);
+            await PrintTableAsync(summary.Table, prefixedWriter, cancellationToken).ConfigureAwait(false);
 
             // TODO: move this logic to an analyzer
             var benchmarksWithTroubles = summary.Reports.Where(r => !r.GetResultRuns().Any()).Select(r => r.BenchmarkCase).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
-                logger.WriteLine();
-                logger.WriteLineError("Benchmarks with issues:");
+                await prefixedWriter.WriteLineAsync(cancellationToken).ConfigureAwait(false);
+                await prefixedWriter.WriteLineAsync("Benchmarks with issues:", LogKind.Error, cancellationToken).ConfigureAwait(false);
                 foreach (var benchmarkWithTroubles in benchmarksWithTroubles)
                 {
-                    logger.WriteLineError("  " + benchmarkWithTroubles.DisplayInfo);
+                    await prefixedWriter.WriteLineAsync("  " + benchmarkWithTroubles.DisplayInfo, LogKind.Error, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
 
-        private ILogger GetRightLogger(ILogger logger)
+        private StreamOrLoggerWriter GetPrefixedWriter(StreamOrLoggerWriter writer)
         {
-            if (string.IsNullOrEmpty(Prefix)) // most common scenario!! we don't need expensive LoggerWithPrefix
-            {
-                return logger;
-            }
-
-            return new LoggerWithPrefix(logger, Prefix);
+            if (string.IsNullOrEmpty(Prefix))
+                return writer;
+            return new PrefixedStreamOrLoggerWriter(writer, Prefix);
         }
 
-        private void PrintTable(SummaryTable table, ILogger logger)
+        private async ValueTask PrintTableAsync(SummaryTable table, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             if (table.FullContent.Length == 0)
             {
-                logger.WriteLineError("There are no benchmarks found ");
-                logger.WriteLine();
+                await writer.WriteLineAsync("There are no benchmarks found ", LogKind.Error, cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
                 return;
             }
 
-            table.PrintCommonColumns(logger);
+            await table.PrintCommonColumnsAsync(writer, cancellationToken).ConfigureAwait(false);
 
             if (table.Columns.All(c => !c.NeedToShow))
             {
-                logger.WriteLine();
-                logger.WriteLine("There are no columns to show ");
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("There are no columns to show ", cancellationToken).ConfigureAwait(false);
                 return;
             }
 
-            logger.WriteLine();
+            await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
 
             if (UseCodeBlocks)
             {
-                logger.Write(CodeBlockEnd);
-                logger.WriteLine();
+                await writer.WriteAsync(CodeBlockEnd, cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart() : " ");
+            await writer.WriteAsync(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart() : " ", LogKind.Statistic, cancellationToken).ConfigureAwait(false);
 
-            table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
+            await table.PrintLineAsync(table.FullHeader, writer, string.Empty, TableHeaderSeparator, cancellationToken).ConfigureAwait(false);
             if (UseHeaderSeparatingRow)
             {
-                logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart().TrimEnd() + "-" : "-");
+                await writer.WriteAsync(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart().TrimEnd() + "-" : "-", LogKind.Statistic, cancellationToken).ConfigureAwait(false);
 
-                logger.WriteLineStatistic(string.Join("",
+                await writer.WriteLineAsync(string.Join("",
                     table.Columns.Where(c => c.NeedToShow).Select((column, index) =>
                         new string('-', column.Width - 1) + GetHeaderSeparatorIndicator(column.OriginalColumn.IsNumeric) +
-                        GetHeaderSeparatorColumnDivider(index, table.Columns.Where(c => c.NeedToShow).Count()))));
+                        GetHeaderSeparatorColumnDivider(index, table.Columns.Where(c => c.NeedToShow).Count()))), LogKind.Statistic, cancellationToken).ConfigureAwait(false);
             }
 
             int rowCounter = 0;
@@ -177,10 +184,10 @@ namespace BenchmarkDotNet.Exporters
                 if (rowCounter > 0 && table.FullContentStartOfLogicalGroup[rowCounter] && table.SeparateLogicalGroups)
                 {
                     // Print logical separator
-                    logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
+                    await writer.WriteAsync(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ", LogKind.Statistic, cancellationToken).ConfigureAwait(false);
 
-                    table.PrintLine(separatorLine, logger, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
-                        BoldMarkupFormat, false);
+                    await table.PrintLineAsync(separatorLine, writer, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
+                        BoldMarkupFormat, false, cancellationToken).ConfigureAwait(false);
                 }
 
                 // Each time we hit the start of a new group, alternative the color (in the console) or display bold in Markdown
@@ -189,11 +196,10 @@ namespace BenchmarkDotNet.Exporters
                     highlightRow = !highlightRow;
                 }
 
+                await writer.WriteAsync(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ", LogKind.Statistic, cancellationToken).ConfigureAwait(false);
 
-                logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
-
-                table.PrintLine(line, logger, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
-                    StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml);
+                await table.PrintLineAsync(line, writer, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
+                    StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml, cancellationToken).ConfigureAwait(false);
                 rowCounter++;
             }
         }

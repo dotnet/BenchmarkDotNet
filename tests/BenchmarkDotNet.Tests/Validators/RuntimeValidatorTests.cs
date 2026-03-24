@@ -6,6 +6,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Validators;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Validators;
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.Tests.Validators;
 public class RuntimeValidatorTests
 {
     [Fact]
-    public void SameRuntime_Should_Success()
+    public async Task SameRuntime_Should_Success()
     {
         // Arrange
         var config = new TestConfig1().CreateImmutableConfig();
@@ -21,14 +22,14 @@ public class RuntimeValidatorTests
         var parameters = new ValidationParameters(runInfo.BenchmarksCases, config);
 
         // Act
-        var errors = RuntimeValidator.DontFailOnError.Validate(parameters).Select(e => e.Message).ToArray();
+        var errors = await RuntimeValidator.DontFailOnError.ValidateAsync(parameters).Select(e => e.Message).ToArrayAsync();
 
         // Assert
         Assert.Empty(errors);
     }
 
     [Fact]
-    public void NullRuntimeMixed_Should_Failed()
+    public async Task NullRuntimeMixed_Should_Failed()
     {
         // Arrange
         var config = new TestConfig2().CreateImmutableConfig();
@@ -36,7 +37,7 @@ public class RuntimeValidatorTests
         var parameters = new ValidationParameters(runInfo.BenchmarksCases, config);
 
         // Act
-        var errors = RuntimeValidator.DontFailOnError.Validate(parameters).Select(e => e.Message).ToArray();
+        var errors = await RuntimeValidator.DontFailOnError.ValidateAsync(parameters).Select(e => e.Message).ToArrayAsync();
 
         // Assert
         {
@@ -50,7 +51,7 @@ public class RuntimeValidatorTests
     }
 
     [Fact]
-    public void NotNullRuntimeOnly_Should_Success()
+    public async Task NotNullRuntimeOnly_Should_Success()
     {
         // Arrange
         var config = new TestConfig3().CreateImmutableConfig();
@@ -58,7 +59,7 @@ public class RuntimeValidatorTests
         var parameters = new ValidationParameters(runInfo.BenchmarksCases, config);
 
         // Act
-        var errors = RuntimeValidator.DontFailOnError.Validate(parameters).Select(e => e.Message).ToArray();
+        var errors = await RuntimeValidator.DontFailOnError.ValidateAsync(parameters).Select(e => e.Message).ToArrayAsync();
 
         // Assert
         Assert.Empty(errors);

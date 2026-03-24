@@ -1,5 +1,8 @@
-﻿using System.Linq;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
@@ -13,24 +16,24 @@ namespace BenchmarkDotNet.Exporters
         {
         }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var cultureInfo = summary.GetCultureInfo();
             foreach (var report in summary.Reports)
             {
                 var measurements = report.AllMeasurements;
                 var modeStages = measurements.Select(it => (it.IterationMode, it.IterationStage)).Distinct();
-                logger.WriteLineHeader($"*** {report.BenchmarkCase.DisplayInfo} ***");
-                logger.WriteLineHeader("* Raw *");
+                await writer.WriteLineAsync($"*** {report.BenchmarkCase.DisplayInfo} ***", cancellationToken).ConfigureAwait(false);
+                await writer.WriteLineAsync("* Raw *", cancellationToken).ConfigureAwait(false);
                 foreach (var measurement in measurements)
-                    logger.WriteLineResult(measurement.ToString());
+                    await writer.WriteLineAsync(measurement.ToString(), cancellationToken).ConfigureAwait(false);
                 foreach (var (mode, stage) in modeStages)
                 {
-                    logger.WriteLine();
-                    logger.WriteLineHeader($"* Statistics for {mode}{stage}");
+                    await writer.WriteLineAsync(cancellationToken).ConfigureAwait(false);
+                    await writer.WriteLineAsync($"* Statistics for {mode}{stage}", cancellationToken).ConfigureAwait(false);
                     var statistics = measurements.Where(it => it.Is(mode, stage)).GetStatistics();
                     var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
-                    logger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter, calcHistogram: true));
+                    await writer.WriteLineAsync(statistics.ToString(cultureInfo, formatter, calcHistogram: true), cancellationToken).ConfigureAwait(false);
                 }
             }
         }

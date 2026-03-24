@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => false;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
             => validationParameters
                 .Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type.Assembly)
@@ -19,6 +19,7 @@ namespace BenchmarkDotNet.Validators
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)
                 .Where(result => !result.isSuccess)
-                .Select(result => new ValidationError(false, $"Generic type {result.result.Name} failed to build due to wrong type argument or arguments count, ignoring."));
+                .Select(result => new ValidationError(false, $"Generic type {result.result.Name} failed to build due to wrong type argument or arguments count, ignoring."))
+                .ToAsyncEnumerable();
     }
 }

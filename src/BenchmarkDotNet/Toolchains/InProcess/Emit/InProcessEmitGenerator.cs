@@ -1,19 +1,18 @@
-﻿using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitGenerator : IGenerator
     {
-        public GenerateResult GenerateProject(
-            BuildPartition buildPartition,
-            ILogger logger,
-            string rootArtifactsFolderPath)
+        public async ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
         {
             var artifactsPaths = ArtifactsPaths.Empty;
             try
@@ -22,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
                 return GenerateResult.Success(artifactsPaths, []);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 logger.WriteLineError($"Failed to generate partition: {ex}");
                 return GenerateResult.Failure(artifactsPaths, []);

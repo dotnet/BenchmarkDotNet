@@ -1,18 +1,13 @@
-﻿using System;
-
+﻿using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 
-namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
+
+internal class InProcessNoEmitGenerator : IGenerator
 {
-    /// <summary>
-    /// Implementation of <see cref="IGenerator"/> for in-process (no emit) toolchain.
-    /// </summary>
-    public class InProcessNoEmitGenerator : IGenerator
-    {
-        /// <summary>returns a success</summary>
-        public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-            => GenerateResult.Success(ArtifactsPaths.Empty, artifactsToCleanup: []);
-    }
+    public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+        => new(GenerateResult.Success(ArtifactsPaths.Empty, artifactsToCleanup: []));
 }

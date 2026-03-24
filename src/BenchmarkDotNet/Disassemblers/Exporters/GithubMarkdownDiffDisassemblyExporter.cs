@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
@@ -26,11 +28,11 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             this.config = config;
         }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var benchmarksCases = summary.BenchmarksCases.Where(results.ContainsKey).ToArray();
 
-            logger.WriteLine($"## {summary.Title}");
+            await writer.WriteLineAsync($"## {summary.Title}", cancellationToken).ConfigureAwait(false);
             for (int i = 0; i < benchmarksCases.Length; i++)
             {
                 var firstBenchmarkCase = benchmarksCases[i];
@@ -38,31 +40,31 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 {
                     var secondBenchmarkCase = benchmarksCases[j];
 
-                    ExportDiff(summary, logger, firstBenchmarkCase, secondBenchmarkCase);
+                    await ExportDiff(summary, writer, firstBenchmarkCase, secondBenchmarkCase, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
 
-        private void ExportDiff(Summary summary, ILogger logger, BenchmarkCase firstBenchmarkCase, BenchmarkCase secondBenchmarkCase)
+        private async ValueTask ExportDiff(Summary summary, CancelableStreamWriter writer, BenchmarkCase firstBenchmarkCase, BenchmarkCase secondBenchmarkCase, CancellationToken cancellationToken)
         {
             // We want to get diff for the same method and different JITs
             if (firstBenchmarkCase.Descriptor.WorkloadMethod == secondBenchmarkCase.Descriptor.WorkloadMethod)
             {
-                var firstFileName = SaveDisassemblyResult(summary, results[firstBenchmarkCase]);
-                var secondFileName = SaveDisassemblyResult(summary, results[secondBenchmarkCase]);
+                var firstFileName = await SaveDisassemblyResult(summary, results[firstBenchmarkCase], cancellationToken).ConfigureAwait(false);
+                var secondFileName = await SaveDisassemblyResult(summary, results[secondBenchmarkCase], cancellationToken).ConfigureAwait(false);
                 try
                 {
                     var builder = new StringBuilder();
 
-                    RunGitDiff(firstFileName, secondFileName, builder);
+                    await RunGitDiff(firstFileName, secondFileName, builder, cancellationToken).ConfigureAwait(false);
 
-                    logger.WriteLine($"**Diff for {firstBenchmarkCase.Descriptor.WorkloadMethod.Name} method between:**");
-                    logger.WriteLine($"{GetImportantInfo(summary[firstBenchmarkCase]!)}");
-                    logger.WriteLine($"{GetImportantInfo(summary[secondBenchmarkCase]!)}");
+                    await writer.WriteLineAsync($"**Diff for {firstBenchmarkCase.Descriptor.WorkloadMethod.Name} method between:**", cancellationToken).ConfigureAwait(false);
+                    await writer.WriteLineAsync($"{GetImportantInfo(summary[firstBenchmarkCase]!)}", cancellationToken).ConfigureAwait(false);
+                    await writer.WriteLineAsync($"{GetImportantInfo(summary[secondBenchmarkCase]!)}", cancellationToken).ConfigureAwait(false);
 
-                    logger.WriteLine("```diff");
-                    logger.WriteLine(builder.ToString().Trim());
-                    logger.WriteLine("```");
+                    await writer.WriteLineAsync("```diff", cancellationToken).ConfigureAwait(false);
+                    await writer.WriteLineAsync(builder.ToString().Trim(), cancellationToken).ConfigureAwait(false);
+                    await writer.WriteLineAsync("```", cancellationToken).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -72,20 +74,14 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
         }
 
-        private string SaveDisassemblyResult(Summary summary, DisassemblyResult disassemblyResult)
+        private async ValueTask<string> SaveDisassemblyResult(Summary summary, DisassemblyResult disassemblyResult, CancellationToken cancellationToken)
         {
             string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, Guid.NewGuid().ToString())}-diff.temp";
 
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, useAsync: true);
+            using var writer = new CancelableStreamWriter(fileStream);
 
-            using (var stream = new StreamWriter(filePath, append: false))
-            {
-                using (var streamLogger = new StreamLogger(stream))
-                {
-                    GithubMarkdownDisassemblyExporter.Export(streamLogger, disassemblyResult, config, quotingCode: false);
-                }
-            }
+            await GithubMarkdownDisassemblyExporter.ExportAsync(writer, disassemblyResult, config, quotingCode: false, cancellationToken).ConfigureAwait(false);
 
             return filePath;
         }
@@ -93,11 +89,13 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         private static string GetImportantInfo(BenchmarkReport benchmarkReport) =>
             $"{benchmarkReport.GetRuntimeInfo()} (Job: {benchmarkReport.BenchmarkCase.Job.DisplayInfo})";
 
-        private static void RunGitDiff(string firstFile, string secondFile, StringBuilder result)
+        private static async ValueTask RunGitDiff(string firstFile, string secondFile, StringBuilder result, CancellationToken cancellationToken)
         {
             try
             {
-                (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}");
+                (int exitCode, IReadOnlyList<string> output) = await ProcessHelper
+                    .RunAndReadOutputLineByLineAsync("git", $"diff --no-index --no-color --text --function-context {firstFile} {secondFile}", cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
 
                 bool canRead = false;
 

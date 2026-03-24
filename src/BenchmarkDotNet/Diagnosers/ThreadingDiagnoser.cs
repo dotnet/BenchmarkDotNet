@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
@@ -38,7 +39,7 @@ namespace BenchmarkDotNet.Diagnosers
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraIteration;
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
+        public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
@@ -50,7 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {
@@ -116,7 +117,7 @@ namespace BenchmarkDotNet.Diagnosers
         public long LockContentionCount { get; set; }
 
         [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
-        void IInProcessDiagnoserHandler.Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
+        ValueTask IInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken)
         {
             switch (signal)
             {
@@ -127,6 +128,7 @@ namespace BenchmarkDotNet.Diagnosers
                     ReadFinal();
                     break;
             }
+            return new();
         }
 
         void IInProcessDiagnoserHandler.Initialize(string? serializedConfig) { }

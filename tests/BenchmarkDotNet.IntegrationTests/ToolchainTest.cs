@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -13,19 +14,17 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class ToolchainTest : BenchmarkTestExecutor
+    public class ToolchainTest(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        public ToolchainTest(ITestOutputHelper output) : base(output) { }
-
         private class MyGenerator : IGenerator
         {
             public bool Done { get; private set; }
 
-            public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
+            public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
             {
                 logger.WriteLine("Generating");
                 Done = true;
-                return new GenerateResult(ArtifactsPaths.Empty, true, null, []);
+                return new(new GenerateResult(ArtifactsPaths.Empty, true, null, []));
             }
         }
 
@@ -33,11 +32,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+            public ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
             {
                 logger.WriteLine("Building");
                 Done = true;
-                return BuildResult.Success(generateResult);
+                return new(BuildResult.Success(generateResult));
             }
         }
 
@@ -45,11 +44,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool Done { get; private set; }
 
-            public ExecuteResult Execute(ExecuteParameters executeParameters)
+            public ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
             {
                 executeParameters.Logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, 0, default, [], [], [], executeParameters.LaunchIndex);
+                return new(new ExecuteResult(true, 0, default, [], [], [], executeParameters.LaunchIndex));
             }
         }
 

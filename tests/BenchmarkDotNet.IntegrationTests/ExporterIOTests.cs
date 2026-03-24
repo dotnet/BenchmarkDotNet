@@ -2,10 +2,13 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -21,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public ExporterIOTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void ExporterWritesToFile()
+        public async Task ExporterWritesToFile()
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
@@ -30,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             try
             {
-                exporter.ExportToFiles(mockSummary, NullLogger.Instance);
+                await exporter.ExportAsync(mockSummary, NullLogger.Instance, CancellationToken.None);
 
                 Assert.Equal(1, exporter.ExportCount);
                 Assert.True(File.Exists(filePath));
@@ -43,7 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [FactEnvSpecific("On Unix, it's possible to write to an opened file", EnvRequirement.WindowsOnly)]
-        public void ExporterWorksWhenFileIsLocked()
+        public async Task ExporterWorksWhenFileIsLocked()
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
@@ -52,13 +55,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
             try
             {
-                exporter.ExportToFiles(mockSummary, NullLogger.Instance);
+                await exporter.ExportAsync(mockSummary, NullLogger.Instance, CancellationToken.None);
 
                 Assert.Equal(1, exporter.ExportCount);
                 Assert.True(File.Exists(filePath));
                 using (var handle = File.OpenRead(filePath)) // Gets a lock on the target file
                 {
-                    exporter.ExportToFiles(mockSummary, NullLogger.Instance);
+                    await exporter.ExportAsync(mockSummary, NullLogger.Instance, CancellationToken.None);
                     Assert.Equal(2, exporter.ExportCount);
                 }
                 var savedFiles = Directory.EnumerateFiles(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath) + "*");
@@ -75,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ExporterUsesFullyQualifiedTypeNameAsFileName()
+        public async Task ExporterUsesFullyQualifiedTypeNameAsFileName()
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
@@ -85,7 +88,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
             try
             {
-                actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
+                await exporter.ExportAsync(mockSummary, NullLogger.Instance, CancellationToken.None);
+                actualFilePath = exporter.GetArtifactFullName(mockSummary);
 
                 Assert.Equal(expectedFilePath, actualFilePath);
             }
@@ -97,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ExporterUsesSummaryTitleAsFileNameWhenBenchmarksJoinedToSingleSummary()
+        public async Task ExporterUsesSummaryTitleAsFileNameWhenBenchmarksJoinedToSingleSummary()
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
@@ -108,7 +112,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
             try
             {
-                actualFilePath = exporter.ExportToFiles(mockSummary, NullLogger.Instance).First();
+                await exporter.ExportAsync(mockSummary, NullLogger.Instance, CancellationToken.None);
+                actualFilePath = exporter.GetArtifactFullName(mockSummary);
 
                 Assert.Equal(expectedFilePath, actualFilePath);
             }
@@ -138,9 +143,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public int ExportCount;
 
-            public override void ExportToLog(Summary summary, ILogger logger)
+            public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
             {
                 ExportCount++;
+                return new();
             }
         }
 

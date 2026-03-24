@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -44,13 +46,13 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void LoggersShouldNotFailOnCriticalValidationErrors()
+        public async Task LoggersShouldNotFailOnCriticalValidationErrors()
         {
             var summary = CanExecute<Nothing>(CreateSimpleConfig().AddValidator(new FailingValidator()), fullValidation: false);
 
             foreach (var exporter in AllKnownExportersThatSupportExportToLog)
             {
-                exporter.ExportToLog(summary, new AccumulationLogger());
+                await exporter.ExportAsync(summary, new AccumulationLogger(), CancellationToken.None);
             }
         }
 
@@ -58,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool TreatsWarningsAsErrors => true;
 
-            public IEnumerable<ValidationError> Validate(ValidationParameters input)
+            public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input)
             {
                 yield return new ValidationError(true, "It just fails");
             }

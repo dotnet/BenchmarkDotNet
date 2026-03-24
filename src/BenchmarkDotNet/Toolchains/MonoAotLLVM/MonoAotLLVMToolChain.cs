@@ -3,6 +3,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 {
@@ -29,9 +30,9 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 new Executor(),
                 netCoreAppSettings.CustomDotNetCliPath);
 
-        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
+        public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
             {
                 yield return validationError;
             }

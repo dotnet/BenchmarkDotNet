@@ -19,35 +19,38 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     /// <summary>
     /// In order to run WasmTests locally, the following prerequisites are required:
-    /// * Install wasm-tools workload: `BenchmarkDotNet/build.cmd install-wasm-tools`
-    /// * Install npm
+    /// * Install wasm-tools workload: `dotnet install-wasm-tools-net8`
+    /// * Install Node.js and add it to PATH
     /// * Install v8: `npm install jsvu -g && jsvu --os=default --engines=v8`
     /// * Add `$HOME/.jsvu/bin` to PATH
-    /// * Run tests using .NET SDK from `BenchmarkDotNet/.dotnet/`
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        private const string JsvuSkipReason = "JSVU does not support ARM on Windows or Linux";
+        private const string V8SkipReason = "JSVU does not support ARM on Windows or Linux";
 
-        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        [InlineData(MonoAotCompilerMode.mini)]
+        [Theory]
+        [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineData(MonoAotCompilerMode.mini, "node")]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
-        [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
-        public void WasmIsSupported(MonoAotCompilerMode aotCompilerMode)
+        [InlineData(MonoAotCompilerMode.wasm, "v8", Skip = "AOT is broken")]
+        [InlineData(MonoAotCompilerMode.wasm, "node", Skip = "AOT is broken")]
+        public void WasmIsSupported(MonoAotCompilerMode aotCompilerMode, string javaScriptEngine)
         {
-            CanExecute<WasmBenchmark>(GetConfig(aotCompilerMode));
+            CanExecute<WasmBenchmark>(GetConfig(aotCompilerMode, javaScriptEngine));
         }
 
-        [TheoryEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        [InlineData(MonoAotCompilerMode.mini)]
+        [Theory]
+        [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineData(MonoAotCompilerMode.mini, "node")]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
-        [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
-        public void WasmSupportsInProcessDiagnosers(MonoAotCompilerMode aotCompilerMode)
+        [InlineData(MonoAotCompilerMode.wasm, "v8", Skip = "AOT is broken")]
+        [InlineData(MonoAotCompilerMode.wasm, "node", Skip = "AOT is broken")]
+        public void WasmSupportsInProcessDiagnosers(MonoAotCompilerMode aotCompilerMode, string javaScriptEngine)
         {
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
-                var config = GetConfig(aotCompilerMode).AddDiagnoser(diagnoser);
+                var config = GetConfig(aotCompilerMode, javaScriptEngine).AddDiagnoser(diagnoser);
 
                 CanExecute<WasmBenchmark>(config);
 
@@ -60,38 +63,30 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        public void WasmSupportsCustomMainJs()
+        [Theory]
+        [InlineDataEnvSpecific(["v8", "custom-main-v8.mjs", WasmIpcType.FileStdOut], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineData("node", "custom-main-node.mjs", WasmIpcType.WebSocket)]
+        public void WasmSupportsCustomMainJs(string javaScriptEngine, string customMainJs, WasmIpcType ipcType)
         {
-            var summary = CanExecute<WasmBenchmark>(GetConfig(MonoAotCompilerMode.mini, true, true));
+            var mainJsTemplate = new FileInfo(Path.Combine("wwwroot", customMainJs));
+            var summary = CanExecute<WasmBenchmark>(GetConfig(MonoAotCompilerMode.mini, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType));
 
-            var artefactsPaths = summary.Reports.Single().GenerateResult.ArtifactsPaths;
-            Assert.Contains("custom-template-identifier", File.ReadAllText(artefactsPaths.ExecutablePath));
-
-            Directory.Delete(Path.GetDirectoryName(artefactsPaths.ProjectFilePath)!, true);
+            var standardOutput = summary.Reports.Single().ExecuteResults.Single().StandardOutput;
+            Assert.Contains($"hello from {customMainJs}", standardOutput);
         }
 
-        [FactEnvSpecific(JsvuSkipReason, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
-        public void WasmSupportsNode()
-        {
-            CanExecute<WasmBenchmark>(GetConfig(MonoAotCompilerMode.mini, javaScriptEngine: "node"));
-        }
-
-        private ManualConfig GetConfig(MonoAotCompilerMode aotCompilerMode, bool useMainJsTemplate = false, bool keepBenchmarkFiles = false, string javaScriptEngine = "v8")
+        private ManualConfig GetConfig(MonoAotCompilerMode aotCompilerMode, string javaScriptEngine, FileInfo? mainJsTemplate = null, WasmIpcType ipcType = WasmIpcType.Auto)
         {
             var dotnetVersion = "net8.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
 
-            var mainJsTemplate = useMainJsTemplate ? new FileInfo(Path.Combine("wwwroot", "custom-main.mjs")) : null;
-
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine, mainJsTemplate: mainJsTemplate))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240))
-                .WithOption(ConfigOptions.KeepBenchmarkFiles, keepBenchmarkFiles)
                 .WithOption(ConfigOptions.LogBuildOutput, true)
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
         }

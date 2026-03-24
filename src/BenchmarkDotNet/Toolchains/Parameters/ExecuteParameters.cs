@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Toolchains.Parameters
 
         public CompositeInProcessDiagnoser CompositeInProcessDiagnoser { get; } = compositeInProcessDiagnoser;
 
-        public IDiagnoser? Diagnoser { get; } = diagnoser;
+        public IDiagnoser Diagnoser { get; } = diagnoser ?? NullDiagnoser.Instance;
 
         public int LaunchIndex { get; } = launchIndex;
 

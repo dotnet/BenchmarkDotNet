@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
@@ -20,7 +22,7 @@ namespace BenchmarkDotNet.Validators
         private ReturnValueValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
+        protected override async ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors, CancellationToken cancellationToken)
         {
             foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
             {
@@ -31,13 +33,19 @@ namespace BenchmarkDotNet.Validators
                 {
                     try
                     {
-                        InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark);
-                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null)!;
+                        InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark, cancellationToken);
+                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
 
                         if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
-                            results.Add((benchmark, result));
+                        {
+                            (var hasResult, result) = await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
+                            if (hasResult)
+                            {
+                                results.Add((benchmark, result!));
+                            }
+                        }
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
                     {
                         hasErrorsInGroup = true;
 

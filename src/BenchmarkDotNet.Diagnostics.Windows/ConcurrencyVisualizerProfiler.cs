@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -60,9 +62,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLineInfo("DO remember that this Diagnoser just tries to mimic the CVCollectionCmd.exe and you need to have Visual Studio with Concurrency Visualizer plugin installed to visualize the data.");
         }
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public async ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
-            etwProfiler.Handle(signal, parameters);
+            await etwProfiler.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait(false);
 
             // we need to remember process Id because we loose it when the process exits
             if (signal == HostSignal.AfterAll)
@@ -75,7 +77,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => etwProfiler.ProcessResults(results);
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => etwProfiler.ValidateAsync(validationParameters);
 
         private static EtwProfilerConfig CreateDefaultConfig()
         {

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
@@ -12,15 +15,16 @@ namespace BenchmarkDotNet.Validators
         private ExecutionValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
+        protected override async ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors, CancellationToken cancellationToken)
         {
             foreach (var benchmark in benchmarks)
             {
                 try
                 {
-                    benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
+                    var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
+                    await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,

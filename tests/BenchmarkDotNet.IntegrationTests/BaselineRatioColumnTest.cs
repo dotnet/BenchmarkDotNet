@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using BenchmarkDotNet.Reports;
-using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Loggers;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ColumnsWithBaselineGetsRatio()
         {
-            // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
+            // This is the common way to run benchmarks,
             // BenchmarkTestExecutor.CanExecute(..) calls BenchmarkRunner.Run(..) under the hood
             var summary = CanExecute<BaselineRatioColumnBenchmarks>();
 
@@ -68,9 +69,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             CanExecute<BaselineRatioResultExtenderNoBaseline>(config);
 
-            // Ensure that when the TestBenchmarkExporter() was run, it wasn't passed an instance of "BenchmarkBaselineDeltaResultExtender"
-            Assert.False(testExporter.ExportCalled);
-            Assert.True(testExporter.ExportToFileCalled);
+            Assert.True(testExporter.ExportCalled);
         }
 
         public class BaselineRatioResultExtenderNoBaseline
@@ -86,18 +85,13 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public bool ExportCalled { get; private set; }
 
-            public bool ExportToFileCalled { get; private set; }
-
-            public string Description => "For Testing Only!";
 
             public string Name => "TestBenchmarkExporter";
 
-            public void ExportToLog(Summary summary, BenchmarkDotNet.Loggers.ILogger logger) => ExportCalled = true;
-
-            public IEnumerable<string> ExportToFiles(Summary summary, BenchmarkDotNet.Loggers.ILogger consoleLogger)
+            public ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
             {
-                ExportToFileCalled = true;
-                return [];
+                ExportCalled = true;
+                return new();
             }
         }
     }

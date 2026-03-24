@@ -1,6 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -20,7 +23,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             this.excludeMeasurements = excludeMeasurements;
         }
 
-        public override void ExportToLog(Summary summary, ILogger logger)
+        public override async ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
         {
             var serializer = BuildSerializer(summary);
 
@@ -28,13 +31,13 @@ namespace BenchmarkDotNet.Exporters.Xml
             var stringBuilder = new StringBuilder();
             using (var textWriter = new Utf8StringWriter(stringBuilder))
             {
-                using (var writer = new SimpleXmlWriter(textWriter, indentXml))
+                using (var xmlWriter = new SimpleXmlWriter(textWriter, indentXml))
                 {
-                    serializer.Serialize(writer, new SummaryDto(summary));
+                    serializer.Serialize(xmlWriter, new SummaryDto(summary));
                 }
             }
 
-            logger.WriteLine(stringBuilder.ToString());
+            await writer.WriteLineAsync(stringBuilder.ToString(), cancellationToken).ConfigureAwait(false);
         }
 
         private IXmlSerializer BuildSerializer(Summary summary)

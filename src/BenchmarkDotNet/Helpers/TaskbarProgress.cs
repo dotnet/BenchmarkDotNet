@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Helpers
             terminal?.SetValue(value);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool exiting)
         {
             if (IsEnabled)
             {
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Helpers
                 com = null;
                 terminal = null;
             }
-            base.Dispose();
+            base.Dispose(exiting);
         }
 
         private sealed class Com

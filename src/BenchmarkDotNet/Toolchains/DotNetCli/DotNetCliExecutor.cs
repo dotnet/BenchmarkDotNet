@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -17,26 +18,24 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]
-    public class DotNetCliExecutor : IExecutor
+    public class DotNetCliExecutor(string customDotNetCliPath) : IExecutor
     {
-        public DotNetCliExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
-
-        private string CustomDotNetCliPath { get; }
-
-        public ExecuteResult Execute(ExecuteParameters executeParameters)
+        public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
             if (!File.Exists(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath))
             {
                 executeParameters.Logger.WriteLineError($"Did not find {executeParameters.BuildResult.ArtifactsPaths.ExecutablePath}, but the folder contained:");
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
+                {
                     executeParameters.Logger.WriteLineError(file.Name);
+                }
 
                 return ExecuteResult.CreateFailed();
             }
 
             try
             {
-                return Execute(
+                return await Execute(
                     executeParameters.BenchmarkCase,
                     executeParameters.BenchmarkId,
                     executeParameters.Logger,
@@ -46,55 +45,61 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver,
                     executeParameters.LaunchIndex,
-                    executeParameters.DiagnoserRunMode);
+                    executeParameters.DiagnoserRunMode,
+                    cancellationToken
+                ).ConfigureAwait(true);
             }
             finally
             {
-                executeParameters.Diagnoser?.Handle(
+                await executeParameters.Diagnoser.HandleAsync(
                     HostSignal.AfterProcessExit,
-                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
+                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId),
+                    cancellationToken
+                ).ConfigureAwait(false);
             }
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase,
-                                      BenchmarkId benchmarkId,
-                                      ILogger logger,
-                                      ArtifactsPaths artifactsPaths,
-                                      IDiagnoser? diagnoser,
-                                      CompositeInProcessDiagnoser compositeInProcessDiagnoser,
-                                      string executableName,
-                                      IResolver resolver,
-                                      int launchIndex,
-                                      Diagnosers.RunMode diagnoserRunMode)
+        private async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase,
+            BenchmarkId benchmarkId,
+            ILogger logger,
+            ArtifactsPaths artifactsPaths,
+            IDiagnoser diagnoser,
+            CompositeInProcessDiagnoser compositeInProcessDiagnoser,
+            string executableName,
+            IResolver resolver,
+            int launchIndex,
+            Diagnosers.RunMode diagnoserRunMode,
+            CancellationToken cancellationToken)
         {
-            using AnonymousPipeServerStream inputFromBenchmark = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
-            using AnonymousPipeServerStream acknowledgments = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+            using var tcplistener = new TcpListener();
+            var port = tcplistener.StartAndGetPort();
 
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
-                CustomDotNetCliPath,
+                customDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString(), diagnoserRunMode)}",
+                $"{executableName.EscapeCommandLine()} {benchmarkId.ToArguments(port, diagnoserRunMode)}",
                 redirectStandardOutput: true,
                 redirectStandardInput: false,
-                redirectStandardError: false); // #1629
+                redirectStandardError: true);
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
             using Process process = new() { StartInfo = startInfo };
-            using ConsoleExitHandler consoleExitHandler = new(process, logger);
-            using AsyncProcessOutputReader processOutputReader = new(process, logOutput: true, logger, readStandardError: false);
+            using AsyncProcessOutputReader processOutputReader = new(process, stdOutLogger: logger, stdErrLogger: logger, cacheStandardError: false);
 
             List<string> results;
             List<string> prefixedOutput;
-            using (Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments))
+            await using (new ProcessCleanupHelper(process, processOutputReader, logger).ConfigureAwait(false))
             {
+                using Broker broker = new(logger, process, diagnoser, compositeInProcessDiagnoser, benchmarkCase, benchmarkId, tcplistener);
+
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 process.Start();
 
-                diagnoser?.Handle(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
 
                 processOutputReader.BeginRead();
 
@@ -104,22 +109,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                broker.ProcessData();
+                await broker.ProcessData(cancellationToken).ConfigureAwait(false);
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
-            }
 
-            if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
-            {
-                logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
-
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
-            }
-            else
-            {
-                processOutputReader.StopRead();
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                {
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+                }
             }
 
             return new ExecuteResult(true,

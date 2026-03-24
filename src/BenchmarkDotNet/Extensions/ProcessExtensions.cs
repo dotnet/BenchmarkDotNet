@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -217,22 +219,13 @@ namespace BenchmarkDotNet.Extensions
                 EnableRaisingEvents = true
             };
             using var processOutputReader = new AsyncProcessOutputReader(process, readStandardError: false);
-            using var consoleExitHandler = new ConsoleExitHandler(process, NullLogger.Instance);
-
-            process.Start();
-            processOutputReader.BeginRead();
-
-            bool isSuccess = process.WaitForExit((int)timeout.TotalMilliseconds);
-            if (!isSuccess)
+            using (new ProcessCleanupHelper(process, processOutputReader, NullLogger.Instance))
             {
-                processOutputReader.CancelRead();
-                consoleExitHandler.KillProcessTree();
-
-                return (process.HasExited ? process.ExitCode : -1, "");
+                process.Start();
+                processOutputReader.BeginRead();
+                process.WaitForExit((int) timeout.TotalMilliseconds);
             }
-
-            processOutputReader.StopRead();
-            return (process.ExitCode, processOutputReader.GetOutputText());
+            return (process.HasExited ? process.ExitCode : -1, processOutputReader.GetOutputText());
         }
 
         private static int RunProcessAndIgnoreOutput(string fileName, string arguments, TimeSpan timeout)
@@ -282,5 +275,53 @@ namespace BenchmarkDotNet.Extensions
             start.EnvironmentVariables[$"DOTNET_{suffix}"] = value;
             start.EnvironmentVariables[$"COMPlus_{suffix}"] = value;
         }
+
+#if !NET5_0_OR_GREATER
+        public static async Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)
+        {
+            if (!process.HasExited)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            try
+            {
+                process.EnableRaisingEvents = true;
+            }
+            catch (InvalidOperationException)
+            {
+                if (process.HasExited)
+                {
+                    // BCL waits for output streams to be drained here, but we don't have access to the internal EOF streams.
+                    // Callers use AsyncProcessOutputReader, so it's not really necessary anyway.
+                    return;
+                }
+                throw;
+            }
+
+            var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            EventHandler handler = (_, _) => tcs.TrySetResult(null);
+            process.Exited += handler;
+
+            try
+            {
+                if (!process.HasExited)
+                {
+                    using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken), false))
+                    {
+                        await tcs.Task.ConfigureAwait(false);
+                    }
+                }
+
+                // BCL waits for output streams to be drained here, but we don't have access to the internal EOF streams.
+                // Callers use AsyncProcessOutputReader, so it's not really necessary anyway.
+            }
+            finally
+            {
+                process.Exited -= handler;
+            }
+        }
+#endif
     }
 }

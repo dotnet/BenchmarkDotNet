@@ -13,12 +13,13 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input) => input.Benchmarks
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input) => input.Benchmarks
             .Select(benchmark => benchmark.Descriptor.Type)
             .Distinct()
-            .SelectMany(Validate);
+            .ToAsyncEnumerable()
+            .SelectMany(ValidateAsync);
 
-        private IEnumerable<ValidationError> Validate(Type type)
+        private async IAsyncEnumerable<ValidationError> ValidateAsync(Type type)
         {
             const BindingFlags reflectionFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance |
                                                  BindingFlags.FlattenHierarchy;

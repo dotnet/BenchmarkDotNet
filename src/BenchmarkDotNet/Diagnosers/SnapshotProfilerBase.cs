@@ -8,11 +8,11 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Diagnosers;
 
@@ -39,7 +39,8 @@ public abstract class SnapshotProfilerBase : IProfiler
     public RunMode GetRunMode(BenchmarkCase benchmarkCase) =>
         IsSupported(benchmarkCase.Job.Environment.GetRuntime().RuntimeMoniker) ? RunMode.ExtraRun : RunMode.None;
 
-    public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+
+    public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
     {
         var logger = parameters.Config.GetCompositeLogger();
         var job = parameters.BenchmarkCase.Job;
@@ -48,7 +49,7 @@ public abstract class SnapshotProfilerBase : IProfiler
         if (!IsSupported(runtimeMoniker))
         {
             logger.WriteLineError($"Runtime '{runtimeMoniker}' is not supported by dotMemory");
-            return;
+            return new();
         }
 
         switch (signal)
@@ -64,9 +65,10 @@ public abstract class SnapshotProfilerBase : IProfiler
                 Stop(logger);
                 break;
         }
+        return new();
     }
 
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+    public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
     {
         var runtimeMonikers = validationParameters.Benchmarks.Select(b => b.Job.Environment.GetRuntime().RuntimeMoniker).Distinct();
         foreach (var runtimeMoniker in runtimeMonikers)

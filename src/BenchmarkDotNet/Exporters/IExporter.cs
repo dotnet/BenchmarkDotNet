@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Exporters
-{
-    public interface IExporter
-    {
-        string Name { get; }
+namespace BenchmarkDotNet.Exporters;
 
-        void ExportToLog(Summary summary, ILogger logger);
-        IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger);
-    }
+public interface IExporter
+{
+    string Name { get; }
+
+    ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken);
 }

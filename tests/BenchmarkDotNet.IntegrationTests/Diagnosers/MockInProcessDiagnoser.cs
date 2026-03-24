@@ -8,7 +8,9 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests.Diagnosers;
 
@@ -31,11 +33,11 @@ public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDi
 
     public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode;
 
-    public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
+    public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
 
     public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
-    public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => [];
+    public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
 
     InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         => RunMode == RunMode.None
@@ -74,12 +76,13 @@ public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
         _result = split[1];
     }
 
-    public void Handle(BenchmarkSignal signal, InProcessDiagnoserActionArgs args)
+    public ValueTask HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken)
     {
         if (signal == _signal)
         {
             _result = $"{Interlocked.Increment(ref s_order)} {_result}";
         }
+        return new();
     }
 
     public string SerializeResults() => _result;

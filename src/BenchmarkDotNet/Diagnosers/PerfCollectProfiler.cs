@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
@@ -51,7 +54,10 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => config.RunMode;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+            => ValidateAsyncCore(validationParameters);
+
+        private async IAsyncEnumerable<ValidationError> ValidateAsyncCore(ValidationParameters validationParameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             if (!OsDetector.IsLinux())
             {
@@ -65,7 +71,7 @@ namespace BenchmarkDotNet.Diagnosers
                 yield break;
             }
 
-            if (validationParameters.Benchmarks.Any() && !TryInstallPerfCollect(validationParameters))
+            if (validationParameters.Benchmarks.Any() && !await TryInstallPerfCollect(validationParameters, cancellationToken).ConfigureAwait(false))
             {
                 yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/runtime/blob/main/docs/project/linux-performance-tracing.md");
             }
@@ -80,15 +86,15 @@ namespace BenchmarkDotNet.Diagnosers
             logger.WriteLineInfo(benchmarkToTraceFile.Values.First().FullName);
         }
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
+        public async ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             if (signal == HostSignal.BeforeProcessStart)
-                perfCollectProcess = StartCollection(parameters);
+                await StartCollection(parameters, cancellationToken).ConfigureAwait(false);
             else if (signal == HostSignal.AfterProcessExit)
                 StopCollection(parameters);
         }
 
-        private bool TryInstallPerfCollect(ValidationParameters validationParameters)
+        private async ValueTask<bool> TryInstallPerfCollect(ValidationParameters validationParameters, CancellationToken cancellationToken)
         {
             var scriptInstallationDirectory = new DirectoryInfo(validationParameters.Config.ArtifactsPath).CreateIfNotExists();
 
@@ -100,7 +106,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             var logger = validationParameters.Config.GetCompositeLogger();
 
-            string script = ResourceHelper.LoadTemplate(perfCollectFile.Name);
+            string script = await ResourceHelper.LoadTemplateAsync(perfCollectFile.Name, cancellationToken).ConfigureAwait(false);
             File.WriteAllText(perfCollectFile.FullName, script);
 
             if (libc.chmod(perfCollectFile.FullName, libc.FilePermissions.S_IXUSR) != 0)
@@ -110,7 +116,15 @@ namespace BenchmarkDotNet.Diagnosers
             }
             else
             {
-                (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install -force", perfCollectFile.Directory!.FullName, null, includeErrors: true, logger);
+                (int exitCode, var output) = await ProcessHelper.RunAndReadOutputLineByLineAsync(
+                    perfCollectFile.FullName,
+                    "install -force",
+                    perfCollectFile.Directory!.FullName,
+                    null,
+                    includeErrors: true,
+                    logger,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
                 if (exitCode == 0)
                 {
@@ -133,9 +147,9 @@ namespace BenchmarkDotNet.Diagnosers
             return false;
         }
 
-        private Process StartCollection(DiagnoserActionParameters parameters)
+        private async ValueTask StartCollection(DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
-            EnsureSymbolsForNativeRuntime(parameters);
+            await EnsureSymbolsForNativeRuntime(parameters, cancellationToken).ConfigureAwait(false);
 
             var traceName = GetTraceFile(parameters, extension: "").Name;
 
@@ -149,7 +163,7 @@ namespace BenchmarkDotNet.Diagnosers
                 WorkingDirectory = perfCollectFile.Directory!.FullName
             };
 
-            return Process.Start(start)!;
+            perfCollectProcess = Process.Start(start)!;
         }
 
         private void StopCollection(DiagnoserActionParameters parameters)
@@ -192,7 +206,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private void EnsureSymbolsForNativeRuntime(DiagnoserActionParameters parameters)
+        private async ValueTask EnsureSymbolsForNativeRuntime(DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
             if (parameters.BenchmarkCase.GetToolchain() is CoreRunToolchain)
             {
@@ -211,7 +225,7 @@ namespace BenchmarkDotNet.Diagnosers
                 return;
             }
 
-            string sdkPath = DotNetCliCommandExecutor.GetSdkPath(cliPath); // /usr/share/dotnet/sdk/
+            string sdkPath = await DotNetCliCommandExecutor.GetSdkPathAsync(cliPath, cancellationToken).ConfigureAwait(false); // /usr/share/dotnet/sdk/
             string dotnetPath = Path.GetDirectoryName(sdkPath)!; // /usr/share/dotnet/
             string[] missingSymbols = Directory.GetFiles(dotnetPath, "lib*.so", SearchOption.AllDirectories)
                 .Where(nativeLibPath => !nativeLibPath.Contains("FallbackFolder") && !File.Exists(Path.ChangeExtension(nativeLibPath, "so.dbg")))
@@ -239,18 +253,23 @@ namespace BenchmarkDotNet.Diagnosers
                 timeout: TimeSpan.FromMinutes(3),
                 logOutput: true); // the following commands might take a while and fail, let's log them
 
-            var installResult = DotNetCliCommandExecutor.Execute(cliCommand);
+            var installResult = await DotNetCliCommandExecutor.ExecuteAsync(cliCommand, cancellationToken).ConfigureAwait(false);
             if (!installResult.IsSuccess)
             {
                 logger.WriteError("Unable to install dotnet symbol.");
                 return;
             }
 
-            DotNetCliCommandExecutor.Execute(cliCommand
+            await DotNetCliCommandExecutor.ExecuteAsync(cliCommand
                 .WithCliPath(Path.Combine(toolPath, "dotnet-symbol"))
-                .WithArguments($"--recurse-subdirectories --symbols \"{dotnetPath}/dotnet\" \"{dotnetPath}/lib*.so\""));
+                .WithArguments($"--recurse-subdirectories --symbols \"{dotnetPath}/dotnet\" \"{dotnetPath}/lib*.so\""),
+                cancellationToken)
+                .ConfigureAwait(false);
 
-            DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool uninstall dotnet-symbol --tool-path \"{toolPath}\""));
+            await DotNetCliCommandExecutor.ExecuteAsync(cliCommand
+                .WithArguments($"tool uninstall dotnet-symbol --tool-path \"{toolPath}\""),
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private FileInfo GetTraceFile(DiagnoserActionParameters parameters, string extension)

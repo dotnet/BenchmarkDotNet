@@ -2,6 +2,7 @@
   <PropertyGroup>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -9,8 +10,9 @@
     <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))</SolutionDir>
   </PropertyGroup>
 
-  <!-- ProjectReferences are not transitive, so we need to directly include the analyzers for all test projects. -->
+  <!-- ProjectReferences are not transitive, so we need to directly include the analyzers and code fixers for all test projects. -->
   <ItemGroup Condition="'$(AssemblyName)' != 'BenchmarkDotNet.Analyzers.Tests'">
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.CodeFixers\BenchmarkDotNet.CodeFixers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 </Project>

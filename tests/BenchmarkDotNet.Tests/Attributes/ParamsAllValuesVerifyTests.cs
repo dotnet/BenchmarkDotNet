@@ -9,6 +9,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.Builders;
+using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Attributes
 
         [Theory]
         [MemberData(nameof(GetBenchmarkTypes))]
-        public Task BenchmarkShouldProduceSummary(Type benchmarkType)
+        public async Task BenchmarkShouldProduceSummary(Type benchmarkType)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -44,18 +45,18 @@ namespace BenchmarkDotNet.Tests.Attributes
 
             var exporter = MarkdownExporter.Mock;
             var summary = MockFactory.CreateSummary(benchmarkType);
-            exporter.ExportToLog(summary, logger);
+            await ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var validator = ParamsAllValuesValidator.FailOnError;
-            var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToList();
+            var errors = await validator.ValidateAsync(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToArrayAsync();
             logger.WriteLine();
-            logger.WriteLine("Errors: " + errors.Count);
+            logger.WriteLine("Errors: " + errors.Length);
             foreach (var error in errors)
                 logger.WriteLineError("* " + error.Message);
 
             var settings = VerifyHelper.Create();
             settings.UseTextForParameters(benchmarkType.Name);
-            return Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(logger.GetLog(), settings);
         }
 
         public void Dispose() => Thread.CurrentThread.CurrentCulture = initCulture;

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
@@ -9,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {
     public class InProcessEmitBuilder : IBuilder
     {
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {
             Assembly? assembly = null;
             Exception? buildError = null;
@@ -17,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             {
                 assembly = RunnableEmitter.EmitPartitionAssembly(generateResult, buildPartition, logger);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
             {
                 buildError = ex;
             }

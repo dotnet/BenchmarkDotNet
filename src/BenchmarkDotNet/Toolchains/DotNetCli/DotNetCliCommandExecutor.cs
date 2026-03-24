@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -20,65 +22,71 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public static class DotNetCliCommandExecutor
     {
-        internal static readonly Lazy<string> DefaultDotNetCliPath = new Lazy<string>(GetDefaultDotNetCliPath);
+        internal static readonly Lazy<string> DefaultDotNetCliPath = new(GetDefaultDotNetCliPath);
 
         [PublicAPI]
-        public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
+        public static async Task<DotNetCliCommandResult> ExecuteAsync(DotNetCliCommand parameters, CancellationToken cancellationToken)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
-            using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
-            using (new ConsoleExitHandler(process, parameters.Logger))
+            using var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
+            using var outputReader = new AsyncProcessOutputReader(process,
+                stdOutLogger: parameters.LogOutput ? parameters.Logger : NullLogger.Instance,
+                stdErrLogger: parameters.Logger);
+
+            parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+
+            var stopwatch = Stopwatch.StartNew();
+            bool timedOut = false;
+            await using (new ProcessCleanupHelper(process, outputReader, parameters.Logger).ConfigureAwait(false))
             {
-                parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-                var stopwatch = Stopwatch.StartNew();
-
                 process.Start();
                 outputReader.BeginRead();
 
-                if (!process.WaitForExit((int)parameters.Timeout.TotalMilliseconds))
+                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                timeoutCts.CancelAfter(parameters.Timeout);
+                try
+                {
+                    await process.WaitForExitAsync(timeoutCts.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
                     parameters.Logger.WriteLineError($"// command took longer than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
-
-                    outputReader.CancelRead();
-                    process.KillTree();
-
-                    return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
+                    timedOut = true;
                 }
-
-                stopwatch.Stop();
-                outputReader.StopRead();
-
-                parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
-
-                return process.ExitCode <= 0
-                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())
-                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
             }
+
+            stopwatch.Stop();
+
+            if (timedOut)
+                return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
+
+            parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
+
+            return process.ExitCode <= 0
+                ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())
+                : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
         }
 
         internal static string GetDotNetSdkVersion()
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) })
-            using (new ConsoleExitHandler(process, NullLogger.Instance))
+            using var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version", redirectStandardError: false) };
+            using var _ = new ProcessCleanupHelper(process, NullLogger.Instance);
+
+            try
             {
-                try
-                {
-                    process.Start();
-                }
-                catch (Win32Exception) // dotnet cli is not installed
-                {
-                    return "";
-                }
-
-                string output = process.StandardOutput.ReadToEnd();
-
-                process.WaitForExit();
-
-                // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
-                return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
-                    .FirstOrDefault(line => line.IsNotBlank()) ?? "";
+                process.Start();
             }
+            catch (Win32Exception) // dotnet cli is not installed
+            {
+                return "";
+            }
+
+            string output = process.StandardOutput.ReadToEnd();
+
+            process.WaitForExit();
+
+            // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
+            return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
+                .FirstOrDefault(line => line.IsNotBlank()) ?? "";
         }
 
         internal static void LogEnvVars(DotNetCliCommand command)
@@ -143,21 +151,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!OsDetector.IsLinux())
                 return "dotnet";
 
-            using (var parentProcess = Process.GetProcessById(libc.getppid()))
-            {
-                string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
-                // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
-                if (parentPath.StartsWith("/snap/", StringComparison.Ordinal) &&
-                    parentPath.EndsWith("/dotnet", StringComparison.Ordinal))
-                {
-                    return parentPath;
-                }
+            using var parentProcess = Process.GetProcessById(libc.getppid());
 
-                return "dotnet";
+            string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
+            // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
+            if (parentPath.StartsWith("/snap/", StringComparison.Ordinal) &&
+                parentPath.EndsWith("/dotnet", StringComparison.Ordinal))
+            {
+                return parentPath;
             }
+
+            return "dotnet";
         }
 
-        internal static string GetSdkPath(string cliPath)
+        internal static async Task<string> GetSdkPathAsync(string cliPath, CancellationToken cancellationToken)
         {
             DotNetCliCommand cliCommand = new(
                 cliPath: cliPath,
@@ -171,14 +178,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 timeout: TimeSpan.FromMinutes(1),
                 logOutput: false);
 
-            string sdkPath = Execute(cliCommand)
+            string sdkPath = (await ExecuteAsync(cliCommand, cancellationToken).ConfigureAwait(false))
                 .StandardOutput.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => line.EndsWith("/sdk]")) // sth like "  3.1.423 [/usr/share/dotnet/sdk]
                 .Select(line => line.Split('[')[1])
                 .Distinct()
                 .Single(); // I assume there will be only one such folder
 
-            return sdkPath.Substring(0, sdkPath.Length - 1); // remove trailing `]`
+            return sdkPath[..^1]; // remove trailing `]`
         }
     }
 }

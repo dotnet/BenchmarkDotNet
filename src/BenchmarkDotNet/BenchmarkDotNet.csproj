@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
+  
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1510;NU1702;CS3001;CS3003</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -23,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="deniszykov.WebSocketListener" Version="4.2.19" />
     <PackageReference Include="Gee.External.Capstone" Version="2.3.0" />
     <PackageReference Include="Iced" Version="1.21.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="3.1.525101" />
@@ -30,8 +32,9 @@
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.30" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-    <PackageReference Include="System.Management" Version="10.0.3" />
-    <PackageReference Include="System.Text.Json" Version="10.0.3" />
+    <PackageReference Include="System.Management" Version="10.0.5" />
+    <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.5" />
+    <PackageReference Include="System.Text.Json" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
@@ -40,6 +43,7 @@
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageReference Include="System.Threading.Channels" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
@@ -54,5 +58,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <!-- The transitive weaver reference is stripped during full pack, so we need to reference it directly. -->
+  <ItemGroup Condition="'$(IsFullPack)' == 'true'">
+    <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" PrivateAssets="all" />
+  </ItemGroup>
+  
   <Import Project="..\..\build\common.targets" />
 </Project>

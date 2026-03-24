@@ -4,16 +4,15 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains
-{
-    public interface IToolchain
-    {
-        [PublicAPI] string Name { get; }
-        IGenerator Generator { get; }
-        IBuilder Builder { get; }
-        IExecutor Executor { get; }
-        bool IsInProcess { get; }
+namespace BenchmarkDotNet.Toolchains;
 
-        IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver);
-    }
+public interface IToolchain
+{
+    [PublicAPI] string Name { get; }
+    IGenerator Generator { get; }
+    IBuilder Builder { get; }
+    IExecutor Executor { get; }
+    bool IsInProcess { get; }
+
+    IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver);
 }

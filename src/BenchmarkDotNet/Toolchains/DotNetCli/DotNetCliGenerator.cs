@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -102,14 +104,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
 
-        protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
+        protected override ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
                 .AppendLine($"call {CliPath} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
                 .ToString();
 
-            File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
+            return new(File.WriteAllTextAsync(artifactsPaths.BuildScriptFilePath, content, cancellationToken));
         }
 
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)

@@ -1,5 +1,5 @@
-using System;
-using BenchmarkDotNet.Jobs;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
@@ -23,9 +23,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             LogOutput = logOutput;
         }
 
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {
-            var buildResult = new DotNetCliCommand(
+            var buildResult = await new DotNetCliCommand(
                 CustomDotNetCliPath,
                 generateResult.ArtifactsPaths.ProjectFilePath,
                 TargetFrameworkMoniker,
@@ -36,7 +36,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 [],
                 buildPartition.Timeout,
                 logOutput: LogOutput
-            ).RestoreThenBuild();
+            )
+                .RestoreThenBuildAsync(cancellationToken)
+                .ConfigureAwait(false);
             if (buildResult.IsBuildSuccess &&
                 buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
             {
