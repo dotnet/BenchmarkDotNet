@@ -43,10 +43,10 @@ jobs:
       run: git tag v${{ steps.version.outputs.VERSION }}
 
     - name: Build
-      run: ./build.cmd build --stable /p:WeaverVersionSuffix=
+      run: ./build.cmd build --stable /p:WeaverVersionSuffix=\"\"
 
     - name: Pack
-      run: ./build.cmd pack --stable /p:WeaverVersionSuffix=
+      run: ./build.cmd pack --stable /p:WeaverVersionSuffix=\"\"
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4

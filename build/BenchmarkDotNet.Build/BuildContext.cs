@@ -102,20 +102,9 @@ public class BuildContext : FrostingContext
                     var name = split[0];
                     var value = split[1];
 
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        // WithProperty rejects empty values, so pass it as a raw argument.
-                        var arg = $"/p:{name}=";
-                        MsBuildSettingsRestore.ArgumentCustomization = args => args.Append(arg);
-                        MsBuildSettingsBuild.ArgumentCustomization = args => args.Append(arg);
-                        MsBuildSettingsPack.ArgumentCustomization = args => args.Append(arg);
-                    }
-                    else
-                    {
-                        MsBuildSettingsRestore.WithProperty(name, value);
-                        MsBuildSettingsBuild.WithProperty(name, value);
-                        MsBuildSettingsPack.WithProperty(name, value);
-                    }
+                    MsBuildSettingsRestore.WithProperty(name, value);
+                    MsBuildSettingsBuild.WithProperty(name, value);
+                    MsBuildSettingsPack.WithProperty(name, value);
 
                     if (name.Equals("configuration", StringComparison.OrdinalIgnoreCase)) BuildConfiguration = value;
 
