@@ -20,9 +20,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.5" />
     <PackageReference Update="FSharp.Core" Version="10.0.103" />
     <PackageReference Update="System.ValueTuple" Version="4.6.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
   </ItemGroup>
 
   <Import Project="..\..\build\common.targets" />
