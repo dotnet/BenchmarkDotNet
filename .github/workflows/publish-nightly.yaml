@@ -16,7 +16,7 @@ jobs:
       - name: Set date
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: Pack
-        run: ./build.cmd pack /p:VersionSuffix=nightly.$DATE.$GITHUB_RUN_NUMBER
+        run: ./build.cmd pack /p:VersionSuffix=nightly.$DATE.$GITHUB_RUN_NUMBER /p:WeaverVersionSuffix=
       - name: Upload nupkg to artifacts
         uses: actions/upload-artifact@v6
         with:

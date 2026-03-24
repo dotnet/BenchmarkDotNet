@@ -7,7 +7,7 @@ then run `build.cmd pack-weaver`.
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <VersionSuffix Condition="'$(IsFullPack)' != 'true'">$(VersionSuffix)$(WeaverVersionSuffix)</VersionSuffix>
+    <VersionSuffix>$(VersionSuffix)$(WeaverVersionSuffix)</VersionSuffix>
     <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IncludeBuildOutput>false</IncludeBuildOutput>

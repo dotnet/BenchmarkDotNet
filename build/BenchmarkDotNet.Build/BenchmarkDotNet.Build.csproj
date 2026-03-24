@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Cake.Frosting" Version="6.0.0" />
