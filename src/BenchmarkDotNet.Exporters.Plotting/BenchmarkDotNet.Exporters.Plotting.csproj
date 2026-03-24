@@ -5,10 +5,14 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Exporters.Plotting</AssemblyName>
     <PackageId>BenchmarkDotNet.Exporters.Plotting</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RootNamespace>BenchmarkDotNet.Exporters.Plotting</RootNamespace>
     <!-- needed for docfx xref resolver -->
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
