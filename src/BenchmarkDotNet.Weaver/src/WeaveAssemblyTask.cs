@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Weaver;
 /// <summary>
 /// The Task used by MSBuild to weave the assembly.
 /// </summary>
-public sealed class WeaveAssemblyTask : Task
+public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
 {
     /// <summary>
     /// The path of the target assembly.
