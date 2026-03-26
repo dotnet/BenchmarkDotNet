@@ -99,9 +99,9 @@ namespace BenchmarkDotNet.Running
             var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>().ToArray();
             if (typeAttributes.Any(x => x is UseLocalJobOnlyAttribute))
             {
-                // UseLocalJobOnlyAttribute.can't be combined with other benchmark attribute that set non-default UnionRule.
+                // UseLocalJobOnlyAttribute can't be combined with other benchmark attribute that setting non-default UnionRule.
                 if (typeAttributes.Any(x => x.Config.UnionRule != ConfigUnionRule.Union))
-                    throw new InvalidBenchmarkDeclarationException($"{type.Name} using UseLocalJobOnlyAttribute, but other benchmarks attribute set another UnionRule.");
+                    throw new InvalidBenchmarkDeclarationException($"{type.Name} using UseLocalJobOnlyAttribute, but other benchmar attributes setting another UnionRule.");
 
                 // Aggregate attribute-based configs.
                 var typeConfig = ManualConfig.CreateEmpty();
