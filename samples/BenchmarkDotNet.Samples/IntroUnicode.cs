@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Samples
 {

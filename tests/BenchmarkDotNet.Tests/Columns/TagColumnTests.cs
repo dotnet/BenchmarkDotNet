@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Columns;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Columns
 {

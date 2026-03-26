@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
@@ -14,6 +10,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Running
 {

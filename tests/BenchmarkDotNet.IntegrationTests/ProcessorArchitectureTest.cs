@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests

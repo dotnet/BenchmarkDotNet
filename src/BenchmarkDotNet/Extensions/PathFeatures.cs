@@ -4,7 +4,6 @@
 
 // file copied from https://github.com/dotnet/runtime/blob/bf2e135c12cbd34aeba2fa4a31d0e84184041a17/src/libraries/Common/tests/System/IO/PathFeatures.cs
 
-using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 

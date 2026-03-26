@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Diagnosers
 {

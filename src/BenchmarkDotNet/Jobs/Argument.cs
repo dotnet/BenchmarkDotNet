@@ -1,6 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
 using System.Text;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
 {

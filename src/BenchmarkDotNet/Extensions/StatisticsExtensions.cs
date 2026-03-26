@@ -1,14 +1,12 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.Histograms;
 using Perfolizer.Mathematics.Multimodality;
 using Perfolizer.Metrology;
+using System.Globalization;
+using System.Text;
 
 namespace BenchmarkDotNet.Extensions
 {

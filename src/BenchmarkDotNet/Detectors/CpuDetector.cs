@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Detectors.Cpu.Linux;
 using BenchmarkDotNet.Detectors.Cpu.macOS;

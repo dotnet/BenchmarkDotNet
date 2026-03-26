@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;

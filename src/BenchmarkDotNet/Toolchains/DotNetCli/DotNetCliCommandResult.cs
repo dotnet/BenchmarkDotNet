@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 

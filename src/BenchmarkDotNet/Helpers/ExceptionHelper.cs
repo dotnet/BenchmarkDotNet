@@ -1,7 +1,5 @@
 ﻿using JetBrains.Annotations;
-using System;
 using System.Reflection;
-using System.Threading;
 
 namespace BenchmarkDotNet.Helpers
 {

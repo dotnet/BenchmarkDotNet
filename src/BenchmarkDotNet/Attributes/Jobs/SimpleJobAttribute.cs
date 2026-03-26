@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;

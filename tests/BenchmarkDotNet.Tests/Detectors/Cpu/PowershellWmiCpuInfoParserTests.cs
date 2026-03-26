@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Detectors.Cpu.Windows;
 using Perfolizer.Models;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;

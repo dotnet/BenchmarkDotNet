@@ -1,11 +1,9 @@
-using System;
 using AnotherNamespace;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Tests;
 using NamespaceB;
 using NamespaceB.NamespaceC;
-using Xunit;
 using MyClassA = NamespaceB.MyClassA;
 
 namespace BenchmarkDotNet.Tests

@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Mathematics;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Mathematics
 {

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace BenchmarkDotNet.Validators
+﻿namespace BenchmarkDotNet.Validators
 {
     public class DiagnosersValidator : IValidator
     {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using AsmResolver.DotNet;
+﻿using AsmResolver.DotNet;
 
 namespace BenchmarkDotNet.Weaver;
 

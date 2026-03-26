@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management;
-using System.Runtime.Versioning;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
+using System.Management;
+using System.Runtime.Versioning;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 

@@ -6,10 +6,6 @@
 using AsmResolver.DotNet;
 using AsmResolver.PE.DotNet.Metadata.Tables;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace BenchmarkDotNet.Weaver;
 

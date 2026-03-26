@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 
 // THIS TYPE MUST NOT HAVE ANY DEPENDENCIES TO BENCHMARKDOTNET, VALUE TUPLE, IMMUTABLE TYPES OR ANYTHING COMPLEX!!
 

@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Extensions;
-using System;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit

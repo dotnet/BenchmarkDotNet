@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Analysers

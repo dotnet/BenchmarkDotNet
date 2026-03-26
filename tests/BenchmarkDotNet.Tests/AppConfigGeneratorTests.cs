@@ -1,17 +1,12 @@
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains;
-using System;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using Xunit;
 using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Toolchains;
 using System.Runtime;
+using System.Text;
 
 namespace BenchmarkDotNet.Tests
 {

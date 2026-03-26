@@ -1,11 +1,10 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
 {

@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Validators;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
-using BenchmarkDotNet.Loggers;
-using Xunit;
-using Xunit.Abstractions;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.OpenMetrics;
 using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Validators;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

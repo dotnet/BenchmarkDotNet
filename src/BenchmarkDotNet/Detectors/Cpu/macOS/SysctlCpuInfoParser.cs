@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Detectors.Cpu.macOS;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace BenchmarkDotNet.Engines;
+﻿namespace BenchmarkDotNet.Engines;
 
 internal abstract class IpcConnection : IDisposable
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;

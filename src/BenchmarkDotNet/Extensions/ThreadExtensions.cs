@@ -1,8 +1,6 @@
-﻿using System;
+﻿using BenchmarkDotNet.Loggers;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Extensions
 {

@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BenchmarkDotNet.Toolchains.Results
 {

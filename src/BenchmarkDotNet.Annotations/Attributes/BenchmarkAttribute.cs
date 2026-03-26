@@ -1,6 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {

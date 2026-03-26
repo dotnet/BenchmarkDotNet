@@ -8,8 +8,6 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System.Linq;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Configs;
 

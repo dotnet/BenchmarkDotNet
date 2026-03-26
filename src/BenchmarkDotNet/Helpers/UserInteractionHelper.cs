@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Helpers
 {

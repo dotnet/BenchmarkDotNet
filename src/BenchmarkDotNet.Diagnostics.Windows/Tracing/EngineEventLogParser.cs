@@ -1,8 +1,7 @@
-﻿using System;
-using System.Diagnostics.Tracing;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.Diagnostics.Tracing;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {

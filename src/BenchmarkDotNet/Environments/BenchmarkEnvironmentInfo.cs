@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime;
 using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -9,6 +5,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using System.Diagnostics;
+using System.Runtime;
 
 namespace BenchmarkDotNet.Environments
 {

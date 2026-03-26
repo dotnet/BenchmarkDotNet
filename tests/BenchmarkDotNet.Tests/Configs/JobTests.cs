@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
-using Xunit;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Tests.Configs
 {

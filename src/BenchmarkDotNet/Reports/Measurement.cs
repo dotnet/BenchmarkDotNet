@@ -1,9 +1,7 @@
-﻿using System;
-#if DEBUG
+﻿#if DEBUG
 using System.Diagnostics;
 #endif
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;

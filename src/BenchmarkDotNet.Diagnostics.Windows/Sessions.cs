@@ -1,7 +1,3 @@
-using System;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -12,6 +8,7 @@ using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.ComponentModel;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {

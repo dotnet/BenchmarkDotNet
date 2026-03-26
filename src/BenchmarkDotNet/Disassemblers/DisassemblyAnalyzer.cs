@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 

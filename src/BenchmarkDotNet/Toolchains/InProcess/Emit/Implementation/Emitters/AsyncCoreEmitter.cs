@@ -4,11 +4,9 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
-using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;

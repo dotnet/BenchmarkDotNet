@@ -1,9 +1,3 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -13,6 +7,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {

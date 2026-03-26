@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

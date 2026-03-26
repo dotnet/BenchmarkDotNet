@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using BenchmarkDotNet.Extensions;
 using System.Text;
-using BenchmarkDotNet.Extensions;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

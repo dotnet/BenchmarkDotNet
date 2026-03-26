@@ -1,8 +1,6 @@
 using BenchmarkDotNet.Analyzers.General;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
 using BenchmarkDotNet.CodeFixers;
-using Microsoft.CodeAnalysis.Testing;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.CodeFixTests;

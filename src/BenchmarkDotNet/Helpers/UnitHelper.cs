@@ -1,5 +1,4 @@
 using Perfolizer.Horology;
-using Perfolizer.Metrology;
 using Pragmastat.Metrology;
 
 namespace BenchmarkDotNet.Helpers;

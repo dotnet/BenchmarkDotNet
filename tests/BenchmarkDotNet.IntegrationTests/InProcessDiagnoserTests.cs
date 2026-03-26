@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -10,7 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using Xunit;
 using Xunit.Abstractions;
 using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
 

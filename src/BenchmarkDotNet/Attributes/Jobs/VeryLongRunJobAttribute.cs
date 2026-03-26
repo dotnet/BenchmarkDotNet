@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 

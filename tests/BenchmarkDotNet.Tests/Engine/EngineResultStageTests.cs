@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
 {

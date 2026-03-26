@@ -1,5 +1,5 @@
-using System.Globalization;
 using BenchmarkDotNet.Helpers;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Tests
 {

@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnostics.dotMemory;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Samples
 {

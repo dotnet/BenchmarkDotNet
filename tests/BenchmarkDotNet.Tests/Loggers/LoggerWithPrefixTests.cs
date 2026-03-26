@@ -1,6 +1,4 @@
-using System;
 using BenchmarkDotNet.Loggers;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Loggers
 {

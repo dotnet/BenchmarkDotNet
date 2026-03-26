@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using Perfolizer.Horology;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Analysers

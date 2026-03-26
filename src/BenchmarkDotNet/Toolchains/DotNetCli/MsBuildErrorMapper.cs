@@ -1,8 +1,6 @@
 ﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.Results;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli

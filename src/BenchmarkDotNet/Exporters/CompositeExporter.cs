@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using System.Collections.Immutable;
 
 namespace BenchmarkDotNet.Exporters;
 

@@ -1,7 +1,5 @@
-using System;
 using BenchmarkDotNet.Diagnostics.dotTrace;
 using BenchmarkDotNet.Jobs;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.dotTrace;
 

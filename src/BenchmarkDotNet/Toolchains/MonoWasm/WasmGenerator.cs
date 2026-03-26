@@ -1,14 +1,11 @@
-﻿using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
+using System.Text;
+using System.Xml;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {

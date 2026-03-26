@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -14,6 +7,8 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using System.Collections.Immutable;
+using System.ComponentModel;
 
 namespace BenchmarkDotNet.Diagnosers
 {

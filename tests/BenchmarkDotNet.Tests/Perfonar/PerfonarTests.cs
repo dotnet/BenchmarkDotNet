@@ -1,19 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Models;
 using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Perfonar.Infra;
 using JetBrains.Annotations;
-using Perfolizer.Models;
 using Perfolizer.Json;
+using Perfolizer.Models;
 using Perfolizer.Perfonar.Base;
 using Perfolizer.Perfonar.Tables;
-using VerifyXunit;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Perfonar;

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Session;

@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 using static FSharpBenchmarks;
 
 namespace BenchmarkDotNet.IntegrationTests

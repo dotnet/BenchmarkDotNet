@@ -1,6 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
 using System.Diagnostics.Tracing;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {

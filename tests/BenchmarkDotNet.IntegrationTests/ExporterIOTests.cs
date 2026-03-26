@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
@@ -13,8 +6,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Validators;
-using Xunit;
+using System.Collections.Immutable;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests

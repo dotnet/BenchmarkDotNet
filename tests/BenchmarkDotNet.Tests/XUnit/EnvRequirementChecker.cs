@@ -1,6 +1,4 @@
 using BenchmarkDotNet.Environments;
-using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using BdnRuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;

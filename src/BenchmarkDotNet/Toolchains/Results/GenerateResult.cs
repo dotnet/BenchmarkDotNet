@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BenchmarkDotNet.Toolchains.Results
+﻿namespace BenchmarkDotNet.Toolchains.Results
 {
     public class GenerateResult
     {

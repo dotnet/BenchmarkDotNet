@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
 {

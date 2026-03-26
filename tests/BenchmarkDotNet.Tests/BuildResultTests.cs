@@ -1,8 +1,6 @@
 ﻿using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
-using System;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

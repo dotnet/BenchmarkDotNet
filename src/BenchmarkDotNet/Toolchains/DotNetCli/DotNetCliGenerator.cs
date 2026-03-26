@@ -1,13 +1,8 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {

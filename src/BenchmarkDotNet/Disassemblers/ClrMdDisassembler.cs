@@ -1,15 +1,11 @@
-﻿using BenchmarkDotNet.Diagnosers;
+﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
-using Microsoft.Diagnostics.Runtime;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Portability;
 using Microsoft.Diagnostics.NETCore.Client;
-using BenchmarkDotNet.Extensions;
+using Microsoft.Diagnostics.Runtime;
+using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Disassemblers
 {

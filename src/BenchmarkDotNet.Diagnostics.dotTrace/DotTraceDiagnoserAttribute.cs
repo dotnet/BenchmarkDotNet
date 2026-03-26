@@ -1,4 +1,3 @@
-using System;
 using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Diagnostics.dotTrace;

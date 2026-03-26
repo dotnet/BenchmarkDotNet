@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Reports
 {

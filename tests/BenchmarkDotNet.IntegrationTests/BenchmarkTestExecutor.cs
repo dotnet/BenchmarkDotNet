@@ -1,17 +1,13 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
-using System.Collections.Generic;
-using BenchmarkDotNet.IntegrationTests.Xunit;
-using BenchmarkDotNet.Reports;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

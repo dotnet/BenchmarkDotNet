@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;

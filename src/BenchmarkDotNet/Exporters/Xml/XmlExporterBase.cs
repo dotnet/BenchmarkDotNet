@@ -1,12 +1,7 @@
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
+using System.Text;
 
 namespace BenchmarkDotNet.Exporters.Xml
 {

@@ -1,8 +1,8 @@
 #if NETSTANDARD2_0
+using BenchmarkDotNet.Helpers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Helpers;
 
 namespace System.IO;
 

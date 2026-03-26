@@ -3,7 +3,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Tests.Builders

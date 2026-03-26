@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Mathematics.Distributions.ContinuousDistributions;
 using Perfolizer.Metrology;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Columns
 {

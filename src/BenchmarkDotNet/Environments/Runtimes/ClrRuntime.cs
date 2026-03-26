@@ -1,8 +1,7 @@
-﻿using System;
-using System.Reflection;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Environments
 {

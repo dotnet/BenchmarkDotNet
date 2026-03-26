@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Security;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
@@ -16,6 +7,11 @@ using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using Perfolizer.Horology;
+using System.Diagnostics;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using System.Security;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 

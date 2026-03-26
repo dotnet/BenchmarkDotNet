@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using BenchmarkDotNet.ConsoleArguments;
+﻿using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Running
 {

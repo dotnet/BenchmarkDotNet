@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Reports;
+﻿using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.IntegrationTests.Xunit
 {

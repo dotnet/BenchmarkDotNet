@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -12,6 +6,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.Parameters;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Exporters
 {

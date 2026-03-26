@@ -1,6 +1,5 @@
-using System.Collections.Immutable;
-using System.Linq;
 using BenchmarkDotNet.Running;
+using System.Collections.Immutable;
 
 namespace BenchmarkDotNet.Reports
 {

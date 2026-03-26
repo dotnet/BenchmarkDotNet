@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
@@ -15,6 +9,8 @@ using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Models;
 using Perfolizer.Perfonar.Tables;
+using System.Collections.Immutable;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Reports
 {

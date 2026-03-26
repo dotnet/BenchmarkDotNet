@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Running

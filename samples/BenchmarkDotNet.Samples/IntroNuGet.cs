@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO.Hashing;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using System.IO.Hashing;
 
 namespace BenchmarkDotNet.Samples
 {

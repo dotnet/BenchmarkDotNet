@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
 {

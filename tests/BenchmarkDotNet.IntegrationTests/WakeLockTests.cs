@@ -4,14 +4,8 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.Versioning;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;

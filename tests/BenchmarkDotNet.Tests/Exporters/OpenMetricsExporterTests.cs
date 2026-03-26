@@ -1,14 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Globalization;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.OpenMetrics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -20,9 +13,7 @@ using BenchmarkDotNet.Tests.Infra;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;
 using BenchmarkDotNet.Toolchains.Results;
-using BenchmarkDotNet.Validators;
-using VerifyXunit;
-using Xunit;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {

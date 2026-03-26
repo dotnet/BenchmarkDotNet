@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using Microsoft.Win32;
 using System.Reflection;
 using System.Runtime.Versioning;
-using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
 {

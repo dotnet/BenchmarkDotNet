@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Detectors.Cpu;
@@ -17,6 +9,8 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using System.Text;
+using System.Xml;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {

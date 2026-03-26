@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -15,8 +10,7 @@ using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
-using BenchmarkDotNet.Validators;
-using Xunit;
+using System.Collections.Immutable;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Reports

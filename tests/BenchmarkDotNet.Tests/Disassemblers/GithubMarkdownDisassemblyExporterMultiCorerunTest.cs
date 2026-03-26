@@ -1,16 +1,11 @@
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Disassemblers.Exporters;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks;
-using Xunit;
+using System.Collections.Immutable;
 
 namespace BenchmarkDotNet.Tests.Disassemblers
 {

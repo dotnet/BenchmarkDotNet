@@ -1,4 +1,3 @@
-using System;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using JetBrains.Annotations;

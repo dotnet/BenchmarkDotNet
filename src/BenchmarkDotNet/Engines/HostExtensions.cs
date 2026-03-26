@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines
 {

@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Diagnosers
 {

@@ -1,10 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Models;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs
 {

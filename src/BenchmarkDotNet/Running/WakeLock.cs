@@ -2,9 +2,7 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using System;
 using System.ComponentModel;
-using System.Linq;
 
 namespace BenchmarkDotNet.Running;
 

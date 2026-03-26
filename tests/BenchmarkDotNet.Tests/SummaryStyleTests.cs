@@ -1,10 +1,8 @@
-﻿using System.Globalization;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
-using Xunit;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Tests
 {

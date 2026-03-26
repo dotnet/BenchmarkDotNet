@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Sources;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using Xunit;
+using System.Threading.Tasks.Sources;
 
 namespace BenchmarkDotNet.Tests.Validators
 {

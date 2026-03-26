@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using System;
 
 namespace BenchmarkDotNet.Extensions
 {

@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Analysers
 {

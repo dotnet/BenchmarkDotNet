@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Perfolizer.Mathematics.Common;
+﻿using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
 

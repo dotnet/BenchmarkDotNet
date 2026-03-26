@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Columns;
 using JetBrains.Annotations;
-using System;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Reports
 {

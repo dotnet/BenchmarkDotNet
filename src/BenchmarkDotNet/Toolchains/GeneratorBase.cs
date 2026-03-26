@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Code;
+﻿using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -11,6 +6,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
+using System.Text;
 using StreamWriter = System.IO.StreamWriter;
 
 namespace BenchmarkDotNet.Toolchains

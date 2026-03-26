@@ -1,10 +1,9 @@
-using System;
-using System.Reflection;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Profiler.SelfApi;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Diagnostics.dotTrace;
 

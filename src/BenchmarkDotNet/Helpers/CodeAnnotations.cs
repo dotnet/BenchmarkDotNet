@@ -22,7 +22,6 @@ SOFTWARE. */
 
 #nullable disable
 
-using System;
 // ReSharper disable UnusedType.Global
 
 #pragma warning disable 1591

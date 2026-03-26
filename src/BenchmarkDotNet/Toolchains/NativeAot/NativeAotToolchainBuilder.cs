@@ -1,9 +1,7 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot
 {

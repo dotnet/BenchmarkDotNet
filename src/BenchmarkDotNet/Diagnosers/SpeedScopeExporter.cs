@@ -4,8 +4,6 @@ using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Stacks;
 using Microsoft.Diagnostics.Tracing.Stacks.Formats;
-using System;
-using System.IO;
 
 namespace BenchmarkDotNet.Diagnosers
 {

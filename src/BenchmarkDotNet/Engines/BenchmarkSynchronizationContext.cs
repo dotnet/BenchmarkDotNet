@@ -1,8 +1,5 @@
 ﻿using JetBrains.Annotations;
-using System;
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines;
 

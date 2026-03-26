@@ -7,13 +7,9 @@ using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Perfolizer.Mathematics.Histograms;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading;
 
 namespace BenchmarkDotNet.TestAdapter
 {

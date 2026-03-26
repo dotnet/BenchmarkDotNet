@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
-using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {

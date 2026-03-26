@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 

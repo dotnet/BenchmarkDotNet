@@ -5,8 +5,6 @@ using BenchmarkDotNet.Tests.XUnit;
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
-using System.Linq;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests;
 

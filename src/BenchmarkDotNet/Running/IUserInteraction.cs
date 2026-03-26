@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Running
 {

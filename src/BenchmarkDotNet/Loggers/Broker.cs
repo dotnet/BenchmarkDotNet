@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
+using System.Diagnostics;
+using System.Net.Sockets;
+using System.Text;
 
 namespace BenchmarkDotNet.Loggers
 {

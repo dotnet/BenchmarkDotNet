@@ -1,13 +1,9 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains
 {

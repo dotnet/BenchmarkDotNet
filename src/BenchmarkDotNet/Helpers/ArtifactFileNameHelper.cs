@@ -4,9 +4,6 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace BenchmarkDotNet.Helpers
 {

@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
-using System;
 
 namespace BenchmarkDotNet.Toolchains.Mono
 {

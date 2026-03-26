@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
+﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
 {

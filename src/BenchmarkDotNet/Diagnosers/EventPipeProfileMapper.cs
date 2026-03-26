@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using Microsoft.Diagnostics.NETCore.Client;
+﻿using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Diagnostics.Tracing.Parsers;
+using System.Diagnostics.Tracing;
 
 namespace BenchmarkDotNet.Diagnosers
 {

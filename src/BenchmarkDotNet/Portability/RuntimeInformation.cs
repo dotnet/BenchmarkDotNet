@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Text.RegularExpressions;
-using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using static System.Runtime.InteropServices.RuntimeInformation;
 
 namespace BenchmarkDotNet.Portability

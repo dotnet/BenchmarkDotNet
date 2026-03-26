@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace BenchmarkDotNet.Order
 {
     internal class CategoryComparer : IComparer<string[]>

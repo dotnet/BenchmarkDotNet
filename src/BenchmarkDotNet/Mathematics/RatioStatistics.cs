@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BenchmarkDotNet.Mathematics
+﻿namespace BenchmarkDotNet.Mathematics
 {
     /// <summary>
     /// Statistics for *relation* of two data sets

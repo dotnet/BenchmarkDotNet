@@ -1,16 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Parameters;
-using System.IO;
-using System.Threading.Tasks;
-using System.Threading;
+using BenchmarkDotNet.Running;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Tests
 {

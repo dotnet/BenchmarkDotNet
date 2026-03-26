@@ -1,12 +1,10 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.CsProj;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
 {

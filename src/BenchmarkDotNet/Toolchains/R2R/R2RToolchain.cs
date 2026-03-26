@@ -4,8 +4,6 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using System;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Toolchains.R2R
 {

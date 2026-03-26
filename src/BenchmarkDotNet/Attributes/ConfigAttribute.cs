@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Attributes
 {

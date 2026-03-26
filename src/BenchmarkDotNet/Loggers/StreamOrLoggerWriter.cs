@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace BenchmarkDotNet.Loggers;
 
 internal abstract class StreamOrLoggerWriter

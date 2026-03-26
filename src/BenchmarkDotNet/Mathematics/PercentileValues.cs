@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
-using Perfolizer;
 using Perfolizer.Mathematics.QuantileEstimators;
 using Pragmastat;
+using System.Globalization;
+using System.Text;
 
 namespace BenchmarkDotNet.Mathematics
 {

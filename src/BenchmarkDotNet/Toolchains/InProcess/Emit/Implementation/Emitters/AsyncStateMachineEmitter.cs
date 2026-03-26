@@ -1,12 +1,8 @@
 ﻿using BenchmarkDotNet.Helpers.Reflection.Emit;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;

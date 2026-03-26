@@ -1,7 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Parameters;
-using System.Linq;
-using Xunit;
+﻿using BenchmarkDotNet.Parameters;
 
 namespace BenchmarkDotNet.Tests
 {

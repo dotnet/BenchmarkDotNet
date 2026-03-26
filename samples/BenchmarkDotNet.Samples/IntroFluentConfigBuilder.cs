@@ -1,11 +1,10 @@
-﻿using System;
-using System.Security.Cryptography;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using System.Security.Cryptography;
 
 namespace BenchmarkDotNet.Samples
 {

@@ -1,9 +1,7 @@
-﻿using System.IO;
-using System.Reflection;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Perfolizer.Helpers;
 using Perfolizer.Models;
-using Xunit;
+using System.Reflection;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;

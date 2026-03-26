@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BenchmarkDotNet.Exporters.Xml;
+using JetBrains.Annotations;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Exporters.Xml;
-using JetBrains.Annotations;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {

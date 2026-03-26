@@ -1,14 +1,11 @@
-using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Toolchains.R2R;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using Xunit;
+using BenchmarkDotNet.Toolchains.R2R;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests

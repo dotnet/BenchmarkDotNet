@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace BenchmarkDotNet.Engines;
+﻿namespace BenchmarkDotNet.Engines;
 
 public interface IEngine
 {

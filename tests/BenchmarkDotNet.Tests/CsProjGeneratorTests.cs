@@ -7,12 +7,8 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Xml;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

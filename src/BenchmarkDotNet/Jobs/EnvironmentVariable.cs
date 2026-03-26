@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Jobs
+﻿namespace BenchmarkDotNet.Jobs
 {
     public class EnvironmentVariable : IEquatable<EnvironmentVariable>
     {
