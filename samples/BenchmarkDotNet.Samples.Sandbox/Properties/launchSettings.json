@@ -1,0 +1,37 @@
+{
+  "profiles": {
+    "Default": {
+        "commandName": "Project",
+        "commandLineArgs": "--filter *DefaultBenchmarks*",
+        "environmentVariables": {
+        }
+    },
+    "Debug": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *DefaultBenchmarks*",
+      "environmentVariables": {
+          "BENCHMARKDOTNET_CONFIG": "Debug"
+      }
+    },
+    "DebugInProcess": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *DefaultBenchmarks*",
+      "environmentVariables": {
+          "BENCHMARKDOTNET_CONFIG": "DebugInProcess"
+      }
+    },
+    "TargetFrameworks": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *DefaultBenchmarks*",
+      "environmentVariables": {
+          "BENCHMARKDOTNET_CONFIG": "TargetFrameworks"
+      }
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help",
+      "environmentVariables": {
+      }
+    }
+  }
+}

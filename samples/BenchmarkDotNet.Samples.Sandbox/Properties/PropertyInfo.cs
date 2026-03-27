@@ -1,0 +1,3 @@
+﻿using BenchmarkDotNet;
+
+[assembly: AssemblyConfigProvider]

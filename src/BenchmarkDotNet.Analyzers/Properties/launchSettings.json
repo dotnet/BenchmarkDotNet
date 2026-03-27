@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\..\\samples\\BenchmarkDotNet.Samples.Sandbox\\BenchmarkDotNet.Samples.Sandbox.csproj"
+    }
+  }
+}
