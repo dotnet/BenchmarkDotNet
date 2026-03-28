@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (platform == Platform.X64)
             {
                 ++jobCount;
-                config.AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithPlatform(Platform.X86).WithGcServer(false).WithLargeAddressAware().WithId("X86"));
+                config.AddJob(Job.Dry.WithRuntime(ClrRuntime.Net472).WithPlatform(Platform.X86).WithGcServer(false).WithLargeAddressAware().WithId("X86"));
             }
             config.AddColumnProvider(DefaultColumnProviders.Instance)
                   .AddLogger(new OutputLogger(output));

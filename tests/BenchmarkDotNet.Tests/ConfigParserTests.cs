@@ -308,6 +308,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net8.0", true)]
         [InlineData("net9.0", true)]
         [InlineData("net462", false)]
+        [InlineData("net472", false)]
         [InlineData("net48", false)]
         public void DotNetCliParsedCorrectly(string tfm, bool isCore)
         {

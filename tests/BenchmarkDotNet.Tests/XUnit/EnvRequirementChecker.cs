@@ -25,7 +25,7 @@ public static class EnvRequirementChecker
 
     private static bool IsPrivilegedProcess()
     {
-#if NET462
+#if NETFRAMEWORK
         using WindowsIdentity currentUser = WindowsIdentity.GetCurrent();
         return new WindowsPrincipal(currentUser).IsInRole(WindowsBuiltInRole.Administrator);
 #else

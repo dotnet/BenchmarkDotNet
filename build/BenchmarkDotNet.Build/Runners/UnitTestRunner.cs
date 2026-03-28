@@ -70,14 +70,14 @@ public class UnitTestRunner(BuildContext context)
 
     public void RunUnitTests()
     {
-        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net462", "net8.0"] : ["net8.0"];
+        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net472", "net8.0"] : ["net8.0"];
         foreach (var targetFramework in targetFrameworks)
             RunUnitTests(targetFramework);
     }
 
     public void RunAnalyzerTests()
     {
-        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net462", "net8.0"] : ["net8.0"];
+        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net472", "net8.0"] : ["net8.0"];
         foreach (var targetFramework in targetFrameworks)
             RunTests(AnalyzerTestsProjectFile, "analyzer", targetFramework);
     }

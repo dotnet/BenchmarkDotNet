@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetJits()
             =>
             [
-                [Jit.LegacyJit, Platform.X64, ClrRuntime.Net462], // 64bit LegacyJit for desktop .NET
-                [Jit.RyuJit, Platform.X64, ClrRuntime.Net462], // RyuJit for desktop .NET
+                [Jit.LegacyJit, Platform.X64, ClrRuntime.Net472], // 64bit LegacyJit for desktop .NET
+                [Jit.RyuJit, Platform.X64, ClrRuntime.Net472], // RyuJit for desktop .NET
             ];
 
         public class TailCallBenchmarks

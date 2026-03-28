@@ -28,9 +28,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (RuntimeInformation.IsFullFramework)
             {
-                yield return [Jit.LegacyJit, Platform.X86, CsProjClassicNetToolchain.Net462]; // 32bit LegacyJit for desktop .NET
-                yield return [Jit.LegacyJit, Platform.X64, CsProjClassicNetToolchain.Net462]; // 64bit LegacyJit for desktop .NET
-                yield return [Jit.RyuJit, Platform.X64, CsProjClassicNetToolchain.Net462]; // RyuJit for desktop .NET
+                yield return [Jit.LegacyJit, Platform.X86, CsProjClassicNetToolchain.Net472]; // 32bit LegacyJit for desktop .NET
+                yield return [Jit.LegacyJit, Platform.X64, CsProjClassicNetToolchain.Net472]; // 64bit LegacyJit for desktop .NET
+                yield return [Jit.RyuJit, Platform.X64, CsProjClassicNetToolchain.Net472]; // RyuJit for desktop .NET
             }
             else if (RuntimeInformation.IsNetCore)
             {

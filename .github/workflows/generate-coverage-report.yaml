@@ -80,13 +80,13 @@ jobs:
 
       - name: Collect Code Coverage
         run: |
-          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Tests -c Release --no-build --framework net462"
-          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Analyzers.Tests  -c Release --no-build --framework net462"
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Tests -c Release --no-build --framework net472"
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Analyzers.Tests  -c Release --no-build --framework net472"
 
       - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
         run: |
-          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net462 --filter "(FullyQualifiedName!~DotMemoryTests) & (FullyQualifiedName!~DotTraceTests) & (FullyQualifiedName!~WasmIsSupported) & (FullyQualifiedName!~WasmSupportsInProcessDiagnosers)"'
+          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net472 --filter "(FullyQualifiedName!~DotMemoryTests) & (FullyQualifiedName!~DotTraceTests) & (FullyQualifiedName!~WasmIsSupported) & (FullyQualifiedName!~WasmSupportsInProcessDiagnosers)"'
 
       - name: Shutdown dotnet-coverage server.
         run: dotnet coverage shutdown bdn_coverage --timeout 60000

@@ -31,7 +31,7 @@ on:
         required: true
         options:
           - net8.0
-          - net462
+          - net472
       filter:
         type: string
         description: Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests

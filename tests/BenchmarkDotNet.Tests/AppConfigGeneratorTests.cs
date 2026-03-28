@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.Tests
             using var source = new StringReader(input);
             using var destination = new Utf8StringWriter();
 
-            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination, Resolver, CancellationToken.None);
+            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Runtime = ClrRuntime.Net472 } }.Freeze(), source, destination, Resolver, CancellationToken.None);
 
             AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
         }

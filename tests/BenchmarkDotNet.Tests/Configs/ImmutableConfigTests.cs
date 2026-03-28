@@ -264,7 +264,7 @@ namespace BenchmarkDotNet.Tests.Configs
             const int warmupCount = 2;
             var configWithMutatorJob = CreateConfigFromJobs(Job.Default.WithWarmupCount(warmupCount).AsMutator());
             var configWithTwoStandardJobs = CreateConfigFromJobs(
-                Job.Default.WithRuntime(ClrRuntime.Net462),
+                Job.Default.WithRuntime(ClrRuntime.Net472),
                 Job.Default.WithRuntime(CoreRuntime.Core80));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithTwoStandardJobs, configWithMutatorJob))
