@@ -6,8 +6,12 @@
         <AssemblyTitle>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyTitle>
         <AssemblyName>BenchmarkDotNet.Diagnostics.dotMemory</AssemblyName>
         <PackageId>BenchmarkDotNet.Diagnostics.dotMemory</PackageId>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     </ItemGroup>

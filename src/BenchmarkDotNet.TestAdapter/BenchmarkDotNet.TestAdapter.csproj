@@ -5,8 +5,12 @@
     <AssemblyTitle>BenchmarkDotNet.TestAdapter</AssemblyTitle>
     <AssemblyName>BenchmarkDotNet.TestAdapter</AssemblyName>
     <PackageId>BenchmarkDotNet.TestAdapter</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <!-- Use minimum supported LTSC version of Visual Studio 2022 -->
   <!-- https://learn.microsoft.com/en-us/lifecycle/products/visual-studio-2022 -->

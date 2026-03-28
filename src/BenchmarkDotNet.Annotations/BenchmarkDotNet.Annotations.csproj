@@ -6,10 +6,14 @@
     <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;NU5100;CA1825</NoWarn>
     <AssemblyName>BenchmarkDotNet.Annotations</AssemblyName>
     <PackageId>BenchmarkDotNet.Annotations</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
     <!-- needed for docfx xref resolver -->
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>
     <PolySharpIncludeGeneratedTypes>

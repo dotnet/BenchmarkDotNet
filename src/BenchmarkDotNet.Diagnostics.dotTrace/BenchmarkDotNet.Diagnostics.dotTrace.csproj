@@ -6,8 +6,12 @@
         <AssemblyTitle>BenchmarkDotNet.Diagnostics.dotTrace</AssemblyTitle>
         <AssemblyName>BenchmarkDotNet.Diagnostics.dotTrace</AssemblyName>
         <PackageId>BenchmarkDotNet.Diagnostics.dotTrace</PackageId>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     </ItemGroup>
