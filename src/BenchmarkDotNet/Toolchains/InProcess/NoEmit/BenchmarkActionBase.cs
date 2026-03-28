@@ -1,0 +1,67 @@
+using BenchmarkDotNet.Extensions;
+using Perfolizer.Horology;
+using System.Reflection;
+
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
+
+/*
+    Design goals of the whole stuff:
+    0. Reusable API to call Setup/Clean/Overhead/Workload actions with arbitrary return value and store the result.
+        Supported ones are: void, T, Task, Task<T>, ValueTask<T>. No input args.
+    1. Overhead signature should match to the benchmark method signature (including static/instance modifier).
+    2. Should work under .Net native. Uses Delegate.Combine instead of emitting the code.
+    3. High data locality and no additional allocations / JIT where possible.
+        This means NO closures allowed, no allocations but in .ctor,
+        all state should be stored explicitly as BenchmarkFunc's fields.
+    4. There can be multiple benchmark actions per single target instance (workload, globalSetup, globalCleanup methods),
+        so target instantiation is not a responsibility of the benchmark action.
+    5. Implementation should match to the code in BenchmarkProgram.txt.
+ */
+
+// DONTTOUCH: Be VERY CAREFUL when changing the code.
+// Please, ensure that the implementation is in sync with content of BenchmarkType.txt
+/// <summary>Base class that provides reusable API for final implementations.</summary>
+public abstract class BenchmarkActionBase : IBenchmarkAction
+{
+    public required Func<ValueTask> InvokeSingle { get; init; }
+    public required Func<long, IClock, ValueTask<ClockSpan>> InvokeUnroll { get; init; }
+    public required Func<long, IClock, ValueTask<ClockSpan>> InvokeNoUnroll { get; init; }
+    public abstract void Complete();
+
+    protected static TDelegate CreateWorkload<TDelegate>(object? targetInstance, MethodInfo workloadMethod) where TDelegate : Delegate
+        => workloadMethod.IsStatic
+            ? workloadMethod.CreateDelegate<TDelegate>()
+            : workloadMethod.CreateDelegate<TDelegate>(targetInstance);
+
+    private protected Action CreateWorkloadOrOverhead(object? instance, MethodInfo? method)
+    {
+        if (method == null)
+        {
+            return instance == null ? OverheadStatic : OverheadInstance;
+        }
+        return method.IsStatic
+            ? method.CreateDelegate<Action>()
+            : method.CreateDelegate<Action>(instance);
+    }
+
+    protected static TDelegate Unroll<TDelegate>(TDelegate callback, int unrollFactor)
+         where TDelegate : notnull, Delegate
+    {
+        if (unrollFactor <= 1)
+        {
+            return callback;
+        }
+
+        var delegates = new Delegate[unrollFactor];
+        for (int i = 0; i < unrollFactor; i++)
+        {
+            delegates[i] = callback;
+        }
+
+        return (TDelegate) Delegate.Combine(delegates)!;
+    }
+
+    // must be kept in sync with Runnable_X.__Overhead
+    internal static void OverheadStatic() { }
+    private void OverheadInstance() { }
+}

@@ -1,8 +1,9 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -11,8 +12,10 @@ using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Xunit.Abstractions;
 
 
@@ -93,24 +96,24 @@ namespace BenchmarkDotNet.IntegrationTests
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(null, descriptor, new BenchmarkAllCases(), unrollFactor);
             await TestInvoke(action, unrollFactor, false);
 
             // Idle mode
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(null, descriptor, new BenchmarkAllCases(), unrollFactor);
             await TestInvoke(action, unrollFactor, true);
 
             // GlobalSetup/GlobalCleanup
-            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalSetup(null, descriptor, new BenchmarkAllCases());
             await TestInvoke(action, 1, false);
-            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(null, descriptor, new BenchmarkAllCases());
             await TestInvoke(action, 1, false);
 
             // GlobalSetup/GlobalCleanup (empty)
             descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
-            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalSetup(null, descriptor, new BenchmarkAllCases());
             await TestInvoke(action, unrollFactor, true);
-            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
+            action = BenchmarkActionFactory.CreateGlobalCleanup(null, descriptor, new BenchmarkAllCases());
             await TestInvoke(action, unrollFactor, true);
         }
 
@@ -127,16 +130,16 @@ namespace BenchmarkDotNet.IntegrationTests
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(null, descriptor, new BenchmarkAllCases(), unrollFactor);
             await TestInvoke(action, unrollFactor, false);
 
             // Idle mode
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(null, descriptor, new BenchmarkAllCases(), unrollFactor);
             await TestInvoke(action, unrollFactor, true);
         }
 
         [AssertionMethod]
-        private async Task TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle)
+        private async Task TestInvoke(IBenchmarkAction benchmarkAction, int unrollFactor, bool isIdle)
         {
             try
             {
@@ -206,7 +209,6 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class BenchmarkAllCases
         {
             public static int Counter;
@@ -336,7 +338,6 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(callerThreadId, SameThreadBenchmarkNoEmit.BenchmarkThreadId);
         }
 
-        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
         public class SameThreadBenchmarkNoEmit
         {
             public static int CallerThreadId;
@@ -347,6 +348,84 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 BenchmarkThreadId = Thread.CurrentThread.ManagedThreadId;
             }
+        }
+
+        [Fact]
+        public void BenchmarkActionFactoryTaskYieldSupported()
+        {
+            var factory = new YieldAwaitableBenchmarkActionFactory();
+            var config = new ManualConfig()
+                .AddJob(Job.Dry
+                    .WithToolchain(new InProcessNoEmitToolchain(new InProcessNoEmitSettings { BenchmarkActionFactory = factory }))
+                    .WithInvocationCount(UnrollFactor)
+                    .WithUnrollFactor(UnrollFactor))
+                .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
+                .AddColumnProvider(DefaultColumnProviders.Instance);
+
+            var summary = CanExecute<TaskYieldBenchmark>(config);
+
+            Assert.True(factory.WasCalled, "Custom IBenchmarkActionFactory.TryCreate should have been called");
+            Assert.DoesNotContain("No benchmarks found", summary.AllRuntimes);
+        }
+
+        public class TaskYieldBenchmark
+        {
+            [Benchmark]
+            public YieldAwaitable ReturnsYieldAwaitable() => Task.Yield();
+        }
+
+        private class YieldAwaitableBenchmarkActionFactory : IBenchmarkActionFactory
+        {
+            public bool WasCalled { get; private set; }
+
+            public bool TryCreate(object instance, MethodInfo targetMethod, int unrollFactor, [NotNullWhen(true)] out IBenchmarkAction? benchmarkAction)
+            {
+                WasCalled = true;
+
+                if (targetMethod.ReturnType == typeof(YieldAwaitable))
+                {
+                    benchmarkAction = new YieldAwaitableBenchmarkAction(instance, targetMethod);
+                    return true;
+                }
+
+                benchmarkAction = default;
+                return false;
+            }
+        }
+
+        private class YieldAwaitableBenchmarkAction : IBenchmarkAction
+        {
+            private readonly Func<YieldAwaitable> callback;
+
+            public YieldAwaitableBenchmarkAction(object instance, MethodInfo method)
+            {
+                callback = method.CreateDelegate<Func<YieldAwaitable>>(instance);
+                InvokeSingle = InvokeOnce;
+                InvokeUnroll = WorkloadActionUnroll;
+                InvokeNoUnroll = WorkloadActionNoUnroll;
+            }
+
+            public Func<ValueTask> InvokeSingle { get; }
+            public Func<long, IClock, ValueTask<ClockSpan>> InvokeUnroll { get; }
+            public Func<long, IClock, ValueTask<ClockSpan>> InvokeNoUnroll { get; }
+
+            private async ValueTask InvokeOnce()
+                => await callback();
+
+            private async ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+            {
+                var startedClock = clock.Start();
+                while (--invokeCount >= 0)
+                {
+                    await callback();
+                }
+                return startedClock.GetElapsed();
+            }
+
+            private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
+                => WorkloadActionUnroll(invokeCount, clock);
+
+            public void Complete() { }
         }
 
 #if NET8_0_OR_GREATER
