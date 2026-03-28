@@ -107,7 +107,7 @@ internal unsafe class BenchmarkActionVoidPointer : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal unsafe class BenchmarkActionByRef<T> : BenchmarkActionBase
+internal class BenchmarkActionByRef<T> : BenchmarkActionBase
 #if NET9_0_OR_GREATER
         where T : allows ref struct
 #endif
@@ -157,7 +157,7 @@ internal unsafe class BenchmarkActionByRef<T> : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal unsafe class BenchmarkActionByRefReadonly<T> : BenchmarkActionBase
+internal class BenchmarkActionByRefReadonly<T> : BenchmarkActionBase
 #if NET9_0_OR_GREATER
         where T : allows ref struct
 #endif

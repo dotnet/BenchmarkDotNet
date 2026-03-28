@@ -384,7 +384,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 if (targetMethod.ReturnType == typeof(YieldAwaitable))
                 {
-                    benchmarkAction = new YieldAwaitableBenchmarkAction(instance, targetMethod);
+                    benchmarkAction = new YieldAwaitableBenchmarkAction(instance, targetMethod, unrollFactor);
                     return true;
                 }
 
@@ -396,10 +396,12 @@ namespace BenchmarkDotNet.IntegrationTests
         private class YieldAwaitableBenchmarkAction : IBenchmarkAction
         {
             private readonly Func<YieldAwaitable> callback;
+            private readonly int unrollFactor;
 
-            public YieldAwaitableBenchmarkAction(object instance, MethodInfo method)
+            public YieldAwaitableBenchmarkAction(object instance, MethodInfo method, int unrollFactor)
             {
                 callback = method.CreateDelegate<Func<YieldAwaitable>>(instance);
+                this.unrollFactor = unrollFactor;
                 InvokeSingle = InvokeOnce;
                 InvokeUnroll = WorkloadActionUnroll;
                 InvokeNoUnroll = WorkloadActionNoUnroll;
@@ -412,7 +414,10 @@ namespace BenchmarkDotNet.IntegrationTests
             private async ValueTask InvokeOnce()
                 => await callback();
 
-            private async ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+            private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+                => WorkloadActionNoUnroll(invokeCount * unrollFactor, clock);
+
+            private async ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
             {
                 var startedClock = clock.Start();
                 while (--invokeCount >= 0)
@@ -421,9 +426,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
                 return startedClock.GetElapsed();
             }
-
-            private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
-                => WorkloadActionUnroll(invokeCount, clock);
 
             public void Complete() { }
         }
