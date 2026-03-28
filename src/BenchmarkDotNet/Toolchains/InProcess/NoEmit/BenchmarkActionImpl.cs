@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 // DONTTOUCH: Be VERY CAREFUL when changing the code.
 // Please, ensure that the implementation is in sync with content of BenchmarkType.txt
 [AggressivelyOptimizeMethods]
-internal sealed class BenchmarkActionVoid : BenchmarkActionBase
+public sealed class BenchmarkActionVoid : BenchmarkActionBase
 {
     private readonly Action callback;
     private readonly Action unrolledCallback;
@@ -60,7 +60,7 @@ internal sealed class BenchmarkActionVoid : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal unsafe class BenchmarkActionVoidPointer : BenchmarkActionBase
+public unsafe class BenchmarkActionVoidPointer : BenchmarkActionBase
 {
     private delegate void* PointerFunc();
 
@@ -107,9 +107,9 @@ internal unsafe class BenchmarkActionVoidPointer : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkActionByRef<T> : BenchmarkActionBase
+public class BenchmarkActionByRef<T> : BenchmarkActionBase
 #if NET9_0_OR_GREATER
-        where T : allows ref struct
+    where T : allows ref struct
 #endif
 {
     private delegate ref T ByRefFunc();
@@ -157,9 +157,9 @@ internal class BenchmarkActionByRef<T> : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkActionByRefReadonly<T> : BenchmarkActionBase
+public class BenchmarkActionByRefReadonly<T> : BenchmarkActionBase
 #if NET9_0_OR_GREATER
-        where T : allows ref struct
+    where T : allows ref struct
 #endif
 {
     private delegate ref readonly T ByRefReadonlyFunc();
@@ -207,9 +207,9 @@ internal class BenchmarkActionByRefReadonly<T> : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkAction<T> : BenchmarkActionBase
+public class BenchmarkAction<T> : BenchmarkActionBase
 #if NET9_0_OR_GREATER
-        where T : allows ref struct
+    where T : allows ref struct
 #endif
 {
     private readonly Func<T> callback;
@@ -255,7 +255,7 @@ internal class BenchmarkAction<T> : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkActionTask : BenchmarkActionBase
+public class BenchmarkActionTask : BenchmarkActionBase
 {
     private readonly Func<Task> callback;
     private readonly int unrollFactor;
@@ -327,7 +327,7 @@ internal class BenchmarkActionTask : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkActionTask<T> : BenchmarkActionBase
+public class BenchmarkActionTask<T> : BenchmarkActionBase
 {
     private readonly Func<Task<T>> callback;
     private readonly int unrollFactor;
@@ -400,7 +400,7 @@ internal class BenchmarkActionTask<T> : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkActionValueTask : BenchmarkActionBase
+public class BenchmarkActionValueTask : BenchmarkActionBase
 {
     private readonly Func<ValueTask> callback;
     private readonly int unrollFactor;
@@ -472,7 +472,7 @@ internal class BenchmarkActionValueTask : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
+public class BenchmarkActionValueTask<T> : BenchmarkActionBase
 {
     private readonly Func<ValueTask<T>> callback;
     private readonly int unrollFactor;
