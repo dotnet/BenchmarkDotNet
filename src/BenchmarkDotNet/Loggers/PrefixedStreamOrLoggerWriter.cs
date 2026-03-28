@@ -1,6 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace BenchmarkDotNet.Loggers;
 
 internal sealed class PrefixedStreamOrLoggerWriter(StreamOrLoggerWriter inner, string prefix) : StreamOrLoggerWriter

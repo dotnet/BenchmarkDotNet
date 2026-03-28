@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Toolchains.DotNetCli;
+﻿using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Toolchains.Results
 {

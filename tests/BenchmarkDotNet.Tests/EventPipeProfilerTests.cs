@@ -3,8 +3,6 @@ using BenchmarkDotNet.Engines;
 using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using System.Diagnostics.Tracing;
-using System.Linq;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

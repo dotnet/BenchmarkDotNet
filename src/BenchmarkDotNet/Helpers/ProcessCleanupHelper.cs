@@ -1,8 +1,6 @@
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Helpers
 {

@@ -1,9 +1,6 @@
-using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Mocks;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Columns

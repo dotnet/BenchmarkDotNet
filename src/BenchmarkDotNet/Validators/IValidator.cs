@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BenchmarkDotNet.Validators
+﻿namespace BenchmarkDotNet.Validators
 {
     public interface IValidator
     {

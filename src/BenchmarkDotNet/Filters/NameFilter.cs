@@ -1,5 +1,3 @@
-using System;
-
 namespace BenchmarkDotNet.Filters
 {
     public class NameFilter : SimpleFilter

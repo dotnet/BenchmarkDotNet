@@ -1,6 +1,5 @@
 ﻿using Gee.External.Capstone.Arm64;
 using Iced.Intel;
-using System.Collections.Generic;
 using System.Text;
 
 namespace BenchmarkDotNet.Disassemblers

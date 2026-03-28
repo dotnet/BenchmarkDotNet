@@ -1,4 +1,3 @@
-using System.Threading;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples

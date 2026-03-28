@@ -1,7 +1,5 @@
-﻿using System;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Helpers;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

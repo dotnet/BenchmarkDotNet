@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace BenchmarkDotNet.Tests.Common;
 
 public class AbsoluteEqualityComparer(double eps) : IEqualityComparer<double>

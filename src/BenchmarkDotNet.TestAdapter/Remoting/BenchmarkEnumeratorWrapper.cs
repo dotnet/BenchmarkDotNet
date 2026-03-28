@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace BenchmarkDotNet.TestAdapter.Remoting
+﻿namespace BenchmarkDotNet.TestAdapter.Remoting
 {
     /// <summary>
     /// A wrapper around the BenchmarkEnumerator for passing data across AppDomain boundaries.

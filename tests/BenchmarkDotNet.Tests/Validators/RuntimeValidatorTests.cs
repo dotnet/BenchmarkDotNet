@@ -5,9 +5,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Validators;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Validators;
 

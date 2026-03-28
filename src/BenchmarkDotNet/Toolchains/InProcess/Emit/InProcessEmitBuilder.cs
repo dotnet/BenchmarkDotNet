@@ -1,12 +1,9 @@
-﻿using System;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using BenchmarkDotNet.Toolchains.Results;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 {

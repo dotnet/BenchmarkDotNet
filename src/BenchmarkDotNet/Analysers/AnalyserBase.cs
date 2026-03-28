@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Reports;
+﻿using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Analysers

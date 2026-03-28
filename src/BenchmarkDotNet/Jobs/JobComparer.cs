@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Order;
-using System;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Jobs
 {

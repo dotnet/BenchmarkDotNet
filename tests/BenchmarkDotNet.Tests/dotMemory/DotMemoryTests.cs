@@ -1,7 +1,5 @@
-using System;
 using BenchmarkDotNet.Diagnostics.dotMemory;
 using BenchmarkDotNet.Jobs;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.dotMemory;
 

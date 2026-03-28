@@ -1,9 +1,8 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
+using Perfolizer.Horology;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
-using BenchmarkDotNet.Extensions;
-using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Helpers
 {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using BenchmarkDotNet.Detectors;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
-using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.Helpers;
 

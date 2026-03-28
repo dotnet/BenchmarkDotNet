@@ -1,20 +1,13 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Tests.Mocks;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Infra;
+using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using VerifyXunit;
-using Xunit;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Tests.Attributes
 {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes.CompilerServices;
+﻿using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -12,6 +6,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
 {

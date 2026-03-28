@@ -1,16 +1,13 @@
-using System;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using Xunit;
 using System.Reflection;
 using System.Reflection.Emit;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Filters;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

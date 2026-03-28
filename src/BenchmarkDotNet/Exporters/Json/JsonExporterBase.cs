@@ -1,14 +1,9 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Serialization;
 using Perfolizer.Helpers;
 using Perfolizer.Horology;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Exporters.Json
 {

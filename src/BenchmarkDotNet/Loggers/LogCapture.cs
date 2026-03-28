@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BenchmarkDotNet.Loggers
+﻿namespace BenchmarkDotNet.Loggers
 {
     public class LogCapture : ILogger
     {

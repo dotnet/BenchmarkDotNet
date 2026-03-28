@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Configs
+﻿namespace BenchmarkDotNet.Configs
 {
     [Flags]
     public enum ConfigOptions

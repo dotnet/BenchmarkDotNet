@@ -1,5 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Characteristics
 {

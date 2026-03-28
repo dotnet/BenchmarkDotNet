@@ -1,5 +1,4 @@
-﻿using System;
-namespace BenchmarkDotNet.Attributes
+﻿namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ParamsAllValuesAttribute : PriorityAttribute

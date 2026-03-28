@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using System;
 
 namespace BenchmarkDotNet.Environments
 {

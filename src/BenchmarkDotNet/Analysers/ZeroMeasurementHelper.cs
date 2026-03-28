@@ -1,8 +1,6 @@
 using BenchmarkDotNet.Mathematics;
-using Perfolizer;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
-using Perfolizer.Mathematics.GenericEstimators;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
 using Perfolizer.Metrology;

@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Microsoft.Win32;
-using System.Runtime.InteropServices;
-using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
-using System.Runtime.Versioning;
 
 namespace BenchmarkDotNet.Detectors;
 

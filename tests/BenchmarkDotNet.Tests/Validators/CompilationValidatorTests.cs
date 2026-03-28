@@ -4,12 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using System.Reflection.Emit;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Validators
 {

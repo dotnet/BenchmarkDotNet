@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
-using Xunit;
-using Xunit.Abstractions;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Jobs;
 using Perfolizer.Mathematics.OutlierDetection;
-using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

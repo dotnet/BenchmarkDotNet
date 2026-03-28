@@ -1,6 +1,5 @@
-﻿using System.IO;
+﻿using BenchmarkDotNet.Loggers;
 using System.Text;
-using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {

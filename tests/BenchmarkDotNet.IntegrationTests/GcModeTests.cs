@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime;
-using Xunit;
+﻿using System.Runtime;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;

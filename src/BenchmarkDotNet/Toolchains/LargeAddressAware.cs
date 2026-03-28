@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace BenchmarkDotNet.Toolchains
+﻿namespace BenchmarkDotNet.Toolchains
 {
     // From https://github.com/KirillOsenkov/LargeAddressAware/blob/95e5fc6024438f94325df4bac6ef73c77bf90e71/SetLargeAddressAware/LargeAddressAware.cs
     internal class LargeAddressAware

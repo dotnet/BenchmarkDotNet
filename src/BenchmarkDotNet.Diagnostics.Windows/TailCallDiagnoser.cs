@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {

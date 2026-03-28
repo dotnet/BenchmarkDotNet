@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Portability;
+﻿using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.Helpers
 {

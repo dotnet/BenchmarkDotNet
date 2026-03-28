@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Portability
+﻿namespace BenchmarkDotNet.Portability
 {
     internal static class StringExtensions
     {

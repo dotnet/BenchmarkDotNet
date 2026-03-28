@@ -1,10 +1,9 @@
-﻿using System;
-using System.Globalization;
-using BenchmarkDotNet.Code;
+﻿using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Parameters
 {

@@ -7,9 +7,7 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace BenchmarkDotNet.Configs
 {

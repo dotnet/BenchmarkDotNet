@@ -2,13 +2,9 @@
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.ComponentModel;
 
 
 #if NET6_0_OR_GREATER

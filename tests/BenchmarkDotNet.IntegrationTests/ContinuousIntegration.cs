@@ -1,6 +1,4 @@
-﻿using BenchmarkDotNet.Portability;
-using System;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

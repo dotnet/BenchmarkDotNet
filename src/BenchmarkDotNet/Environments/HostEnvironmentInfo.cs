@@ -12,9 +12,6 @@ using Perfolizer.Helpers;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;
 using Perfolizer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace BenchmarkDotNet.Environments

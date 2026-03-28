@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
+using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;
 

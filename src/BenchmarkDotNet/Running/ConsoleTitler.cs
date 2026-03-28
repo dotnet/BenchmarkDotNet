@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Versioning;
-using BenchmarkDotNet.Detectors;
+﻿using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
+using System.Runtime.Versioning;
 
 namespace BenchmarkDotNet.Running
 {

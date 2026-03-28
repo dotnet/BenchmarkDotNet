@@ -1,10 +1,7 @@
 ﻿using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Symbols;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 
 namespace BenchmarkDotNet.Disassemblers
 {

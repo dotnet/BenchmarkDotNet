@@ -1,5 +1,4 @@
 ﻿using Iced.Intel;
-using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {

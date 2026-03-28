@@ -1,9 +1,8 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Samples
 {

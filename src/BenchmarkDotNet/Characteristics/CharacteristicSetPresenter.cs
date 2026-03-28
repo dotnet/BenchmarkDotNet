@@ -3,9 +3,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BenchmarkDotNet.Characteristics
 {

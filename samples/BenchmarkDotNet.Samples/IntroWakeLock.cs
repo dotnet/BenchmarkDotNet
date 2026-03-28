@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using System;
-using System.Threading;
 
 // *** Attribute Style applied to Assembly ***
 [assembly: WakeLock(WakeLockType.System)]

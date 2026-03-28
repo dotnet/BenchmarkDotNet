@@ -1,6 +1,4 @@
-﻿using VerifyTests;
-
-namespace BenchmarkDotNet.Tests.Infra;
+﻿namespace BenchmarkDotNet.Tests.Infra;
 
 public static class VerifyHelper
 {

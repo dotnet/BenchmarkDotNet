@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs
 {

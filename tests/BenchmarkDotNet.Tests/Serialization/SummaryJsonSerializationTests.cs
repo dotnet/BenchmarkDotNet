@@ -1,8 +1,4 @@
-﻿using AwesomeAssertions;
-using BenchmarkDotNet.Serialization;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+﻿using BenchmarkDotNet.Serialization;
 
 namespace BenchmarkDotNet.Tests;
 

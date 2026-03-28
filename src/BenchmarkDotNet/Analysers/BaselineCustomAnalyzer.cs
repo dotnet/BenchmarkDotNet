@@ -1,8 +1,6 @@
 ﻿using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Reports;
-using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Analysers
 {

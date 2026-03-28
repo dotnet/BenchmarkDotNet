@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Parameters
 {

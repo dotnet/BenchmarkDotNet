@@ -1,7 +1,5 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Jobs;
-using Xunit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Tests.Configs
 {

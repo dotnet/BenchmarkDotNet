@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using System;
 
 namespace BenchmarkDotNet.TestAdapter.Remoting
 {

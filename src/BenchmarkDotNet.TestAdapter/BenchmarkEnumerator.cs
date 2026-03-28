@@ -2,9 +2,6 @@
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace BenchmarkDotNet.TestAdapter

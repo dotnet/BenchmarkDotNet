@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using System.Linq;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Jobs;
 

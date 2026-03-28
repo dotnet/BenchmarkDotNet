@@ -1,10 +1,7 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
-using Xunit;
+using System.Reflection;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Configs

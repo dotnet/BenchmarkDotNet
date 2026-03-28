@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Microsoft.Diagnostics.Tracing;
 using System.Text;
-using Microsoft.Diagnostics.Tracing;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {

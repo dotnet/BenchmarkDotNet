@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Loggers;

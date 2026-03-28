@@ -1,11 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -18,7 +11,8 @@ using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
-using Xunit;
+using System.Linq.Expressions;
+using System.Reflection;
 using Xunit.Abstractions;
 
 

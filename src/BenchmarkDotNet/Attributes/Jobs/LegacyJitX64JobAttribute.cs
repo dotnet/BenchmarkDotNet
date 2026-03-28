@@ -1,4 +1,3 @@
-using System;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Attributes

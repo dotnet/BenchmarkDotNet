@@ -1,8 +1,5 @@
 ﻿using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
-using System;
-using System.Collections.Generic;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

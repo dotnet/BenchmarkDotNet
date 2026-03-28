@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Validators;

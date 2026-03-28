@@ -1,6 +1,4 @@
-using System;
 using BenchmarkDotNet.Helpers;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Helpers
 {

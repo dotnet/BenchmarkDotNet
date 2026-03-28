@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Samples

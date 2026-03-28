@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
-using BenchmarkDotNet.Parameters;
-using BenchmarkDotNet.Running;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.Collections.Concurrent;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {

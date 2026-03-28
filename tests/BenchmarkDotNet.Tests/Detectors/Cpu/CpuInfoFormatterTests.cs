@@ -1,10 +1,7 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Tests.Infra;
+﻿using BenchmarkDotNet.Tests.Infra;
 using Perfolizer.Helpers;
 using Perfolizer.Models;
-using VerifyXunit;
-using Xunit;
+using System.Text;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 

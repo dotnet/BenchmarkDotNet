@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Perfolizer.Mathematics.OutlierDetection;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
 {

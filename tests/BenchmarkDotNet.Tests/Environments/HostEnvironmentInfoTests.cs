@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Builders;
 using JetBrains.Annotations;
 using Perfolizer.Helpers;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Environments
 {

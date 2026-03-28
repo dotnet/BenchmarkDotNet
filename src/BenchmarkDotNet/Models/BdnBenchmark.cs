@@ -1,6 +1,6 @@
-using System.Text;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;
+using System.Text;
 
 namespace BenchmarkDotNet.Models;
 

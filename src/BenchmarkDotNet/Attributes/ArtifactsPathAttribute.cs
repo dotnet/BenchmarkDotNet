@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes

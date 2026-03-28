@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Attributes.CompilerServices;
+﻿using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Loggers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {

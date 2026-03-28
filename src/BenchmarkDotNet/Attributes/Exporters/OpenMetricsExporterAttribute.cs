@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.OpenMetrics;
+﻿using BenchmarkDotNet.Exporters.OpenMetrics;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes

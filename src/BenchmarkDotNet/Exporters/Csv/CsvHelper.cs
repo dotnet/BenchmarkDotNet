@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace BenchmarkDotNet.Exporters.Csv
+﻿namespace BenchmarkDotNet.Exporters.Csv
 {
     // TODO: Introduce a CsvWriter class (based on ILogger and CsvSeparator)
     public static class CsvHelper

@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 namespace BenchmarkDotNet.Helpers;
 
 internal static class XUnitHelper

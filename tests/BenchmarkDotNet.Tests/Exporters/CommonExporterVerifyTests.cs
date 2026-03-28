@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
@@ -18,8 +13,7 @@ using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
-using VerifyXunit;
-using Xunit;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using BenchmarkDotNet.Filters;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Samples
 {

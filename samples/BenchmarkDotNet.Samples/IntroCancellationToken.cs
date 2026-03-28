@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples;

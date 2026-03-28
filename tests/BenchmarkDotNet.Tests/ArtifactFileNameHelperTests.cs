@@ -5,9 +5,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Buffers.Tests;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

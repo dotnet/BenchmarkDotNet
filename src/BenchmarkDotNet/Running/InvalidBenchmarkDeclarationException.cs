@@ -1,5 +1,3 @@
-using System;
-
 namespace BenchmarkDotNet.Running
 {
     public class InvalidBenchmarkDeclarationException : Exception

@@ -1,6 +1,4 @@
 ﻿using BenchmarkDotNet.Disassemblers;
-using System;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

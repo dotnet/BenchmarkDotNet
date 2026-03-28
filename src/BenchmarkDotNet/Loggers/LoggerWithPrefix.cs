@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BenchmarkDotNet.Loggers
+﻿namespace BenchmarkDotNet.Loggers
 {
     /// <summary>
     /// Adds prefix for each line

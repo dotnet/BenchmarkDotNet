@@ -1,9 +1,6 @@
 ﻿using BenchmarkDotNet.Diagnosers;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BenchmarkDotNet.Disassemblers
 {

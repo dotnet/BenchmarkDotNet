@@ -4,8 +4,6 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using System;
-using System.Linq;
 
 namespace BenchmarkDotNet.Samples;
 

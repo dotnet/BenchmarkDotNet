@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BenchmarkDotNet.Reports;
 using System.Collections.Immutable;
-using System.Linq;
-using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Analysers
 {

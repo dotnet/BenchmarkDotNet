@@ -4,7 +4,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using System;
 
 namespace BenchmarkDotNet.Attributes;
 

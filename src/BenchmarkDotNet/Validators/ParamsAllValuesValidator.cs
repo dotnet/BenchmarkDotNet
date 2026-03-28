@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Validators
 {

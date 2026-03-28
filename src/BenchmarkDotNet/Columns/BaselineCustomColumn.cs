@@ -1,9 +1,8 @@
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Columns
 {

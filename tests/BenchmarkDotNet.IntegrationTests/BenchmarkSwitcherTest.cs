@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
-using System.Linq;
-using Xunit;
-using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit.Abstractions;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

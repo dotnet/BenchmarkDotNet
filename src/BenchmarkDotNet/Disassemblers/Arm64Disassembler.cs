@@ -2,9 +2,6 @@
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BenchmarkDotNet.Disassemblers
 {

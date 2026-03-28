@@ -1,9 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Perfolizer.Horology;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Sources;
 
 namespace BenchmarkDotNet.Engines;

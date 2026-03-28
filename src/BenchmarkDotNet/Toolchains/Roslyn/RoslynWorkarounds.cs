@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {

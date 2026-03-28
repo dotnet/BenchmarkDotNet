@@ -1,7 +1,6 @@
-﻿using System;
-using System.Reflection;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Properties
 {

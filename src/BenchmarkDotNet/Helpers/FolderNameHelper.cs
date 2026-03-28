@@ -1,9 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
+using System.Globalization;
+using System.Text;
 
 namespace BenchmarkDotNet.Helpers
 {

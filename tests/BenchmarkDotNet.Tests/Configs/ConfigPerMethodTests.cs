@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using System.Runtime.InteropServices;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Running;
-using Xunit;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Tests.Configs
 {

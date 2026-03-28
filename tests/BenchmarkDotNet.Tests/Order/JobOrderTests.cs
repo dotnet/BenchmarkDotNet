@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
-using System.Linq;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Order;
 

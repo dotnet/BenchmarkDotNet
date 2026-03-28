@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Exporters;
+﻿using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace BenchmarkDotNet.Reports
 {

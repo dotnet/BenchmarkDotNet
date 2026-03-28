@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using BenchmarkDotNet.Attributes;
-using Xunit;
+﻿using BenchmarkDotNet.Attributes;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests

@@ -1,7 +1,5 @@
-﻿using System.IO;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Portability;
 using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;

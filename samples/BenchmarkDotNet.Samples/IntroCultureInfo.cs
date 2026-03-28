@@ -1,7 +1,6 @@
-using System.Globalization;
-using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Samples
 {

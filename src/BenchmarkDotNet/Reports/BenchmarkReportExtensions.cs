@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Reports
 {

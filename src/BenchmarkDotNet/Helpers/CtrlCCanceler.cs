@@ -1,6 +1,4 @@
 ﻿using BenchmarkDotNet.Loggers;
-using System;
-using System.Threading;
 
 namespace BenchmarkDotNet.Helpers
 {

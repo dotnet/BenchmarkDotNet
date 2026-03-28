@@ -1,4 +1,3 @@
-using System;
 using BenchmarkDotNet.Exporters;
 
 namespace BenchmarkDotNet.Attributes;

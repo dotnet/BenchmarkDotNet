@@ -1,9 +1,5 @@
 ﻿using BenchmarkDotNet.Helpers;
-using System;
-using System.Linq;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using vtortola.WebSockets;
 using vtortola.WebSockets.Rfc6455;
 

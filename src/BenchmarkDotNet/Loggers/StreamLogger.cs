@@ -1,5 +1,4 @@
-﻿using System.IO;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
 {

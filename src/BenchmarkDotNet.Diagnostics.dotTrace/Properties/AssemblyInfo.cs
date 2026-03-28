@@ -1,6 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Properties;
 using System.Runtime.CompilerServices;
-using BenchmarkDotNet.Properties;
 
 [assembly: CLSCompliant(true)]
 

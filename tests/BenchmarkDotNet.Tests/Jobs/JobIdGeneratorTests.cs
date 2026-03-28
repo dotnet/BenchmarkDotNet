@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Jobs;
 

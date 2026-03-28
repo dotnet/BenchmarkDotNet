@@ -1,5 +1,3 @@
-using System;
-
 namespace BenchmarkDotNet.Extensions;
 
 internal static class MathExtensions

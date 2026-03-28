@@ -1,11 +1,7 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using BenchmarkDotNet.Detectors;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

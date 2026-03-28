@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Xunit;
-
 namespace BenchmarkDotNet.Tests
 {
     public static class TheoryDataHelper

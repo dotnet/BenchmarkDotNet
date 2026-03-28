@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Text;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using System.Collections;
+using System.Text;
 
 namespace BenchmarkDotNet.Characteristics
 {

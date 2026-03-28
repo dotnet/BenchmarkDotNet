@@ -1,6 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Extensions;
 using System.Globalization;
-using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Exporters.Csv
 {

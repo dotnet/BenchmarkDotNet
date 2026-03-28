@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using BenchmarkDotNet.Code;
+﻿using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using System.Collections;
+using System.Reflection;
+using System.Text;
 
 namespace BenchmarkDotNet.Exporters
 {

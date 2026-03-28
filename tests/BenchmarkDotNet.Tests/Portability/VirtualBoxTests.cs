@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Portability;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability
 {

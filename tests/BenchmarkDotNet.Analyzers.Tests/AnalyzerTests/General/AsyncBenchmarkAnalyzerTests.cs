@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Analyzers.General;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.AnalyzerTests.General;

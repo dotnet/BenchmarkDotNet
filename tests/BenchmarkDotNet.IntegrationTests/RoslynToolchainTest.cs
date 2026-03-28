@@ -1,10 +1,8 @@
-﻿using System.Globalization;
-using System.Threading;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.Roslyn;
-using Xunit;
+using System.Globalization;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests

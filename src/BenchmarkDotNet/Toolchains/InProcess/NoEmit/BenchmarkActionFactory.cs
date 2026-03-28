@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Running;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 

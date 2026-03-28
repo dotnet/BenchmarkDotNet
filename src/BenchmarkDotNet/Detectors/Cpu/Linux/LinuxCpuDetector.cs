@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;

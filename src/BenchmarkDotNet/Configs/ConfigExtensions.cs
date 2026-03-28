@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.EventProcessors;
@@ -16,6 +10,8 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using System.Collections.Immutable;
+using System.Globalization;
 
 namespace BenchmarkDotNet.Configs
 {

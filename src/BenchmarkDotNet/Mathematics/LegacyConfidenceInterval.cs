@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.Common;
+using System.Globalization;
+using System.Text;
 
 namespace BenchmarkDotNet.Mathematics;
 

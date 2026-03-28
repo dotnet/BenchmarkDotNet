@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Columns;
+﻿using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Metrology;
 

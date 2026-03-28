@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using BenchmarkDotNet.Toolchains.CsProj;
+﻿using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {

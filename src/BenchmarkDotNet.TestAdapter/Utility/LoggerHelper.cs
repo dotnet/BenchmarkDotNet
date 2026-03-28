@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System.Diagnostics;
-using System.IO;
 
 namespace BenchmarkDotNet.TestAdapter;
 

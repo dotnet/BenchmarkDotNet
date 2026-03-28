@@ -5,7 +5,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using Microsoft.TestPlatform.AdapterUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System;
 
 namespace BenchmarkDotNet.TestAdapter
 {

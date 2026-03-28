@@ -1,11 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using BenchmarkDotNet.Helpers;
+﻿using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.MonoWasm;
+using System.ComponentModel;
 
 namespace BenchmarkDotNet.Environments
 {

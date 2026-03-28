@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
@@ -13,6 +9,7 @@ using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {

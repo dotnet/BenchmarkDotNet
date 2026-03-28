@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Disassemblers;
-using Xunit;
+﻿using BenchmarkDotNet.Disassemblers;
 
 namespace BenchmarkDotNet.Tests
 {

@@ -1,4 +1,3 @@
-using System.IO;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples

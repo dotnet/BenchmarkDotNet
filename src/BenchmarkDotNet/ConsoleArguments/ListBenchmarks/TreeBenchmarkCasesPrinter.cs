@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BenchmarkDotNet.Loggers;
+﻿using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {

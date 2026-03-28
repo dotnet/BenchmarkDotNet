@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Helpers
 {

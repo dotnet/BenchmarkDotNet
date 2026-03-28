@@ -1,8 +1,6 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Running;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {

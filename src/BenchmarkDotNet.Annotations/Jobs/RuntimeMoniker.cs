@@ -1,5 +1,3 @@
-using System;
-
 namespace BenchmarkDotNet.Jobs
 {
     public enum RuntimeMoniker

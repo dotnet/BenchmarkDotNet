@@ -1,9 +1,6 @@
 ﻿using BenchmarkDotNet.Analyzers.General;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.AnalyzerTests.General;

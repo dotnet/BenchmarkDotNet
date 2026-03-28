@@ -6,17 +6,13 @@
 using AsmResolver.DotNet;
 using AsmResolver.PE.DotNet.Metadata.Tables;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace BenchmarkDotNet.Weaver;
 
 /// <summary>
 /// The Task used by MSBuild to weave the assembly.
 /// </summary>
-public sealed class WeaveAssemblyTask : Task
+public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
 {
     /// <summary>
     /// The path of the target assembly.

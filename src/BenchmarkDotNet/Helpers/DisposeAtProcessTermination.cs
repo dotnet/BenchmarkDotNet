@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Detectors;
-using System;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Helpers

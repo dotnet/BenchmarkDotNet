@@ -7,10 +7,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks.Toolchain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mocks

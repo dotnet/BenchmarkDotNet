@@ -1,6 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Characteristics;
 using System.Diagnostics.CodeAnalysis;
-using BenchmarkDotNet.Characteristics;
 
 namespace BenchmarkDotNet.Jobs
 {
