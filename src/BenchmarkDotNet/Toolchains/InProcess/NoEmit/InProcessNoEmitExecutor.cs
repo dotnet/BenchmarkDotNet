@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
-    internal class InProcessNoEmitExecutor(bool executeOnSeparateThread) : IExecutor
+    internal class InProcessNoEmitExecutor(bool executeOnSeparateThread, IBenchmarkActionFactory? benchmarkActionFactory) : IExecutor
     {
         public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 {
                     try
                     {
-                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters).ConfigureAwait(false));
+                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters, benchmarkActionFactory).ConfigureAwait(false));
                     }
                     catch (Exception ex)
                     {
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
             else
             {
-                exitCode = await ExecuteCore(host, executeParameters).ConfigureAwait(true);
+                exitCode = await ExecuteCore(host, executeParameters, benchmarkActionFactory).ConfigureAwait(true);
             }
 
             host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             return ExecuteResult.FromRunResults(host.RunResults, exitCode);
         }
 
-        private async ValueTask<int> ExecuteCore(IHost host, ExecuteParameters parameters)
+        private async ValueTask<int> ExecuteCore(IHost host, ExecuteParameters parameters, IBenchmarkActionFactory? benchmarkActionFactory)
         {
             int exitCode = -1;
             var process = Process.GetCurrentProcess();
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = await InProcessNoEmitRunner.Run(host, parameters).ConfigureAwait(false);
+                exitCode = await InProcessNoEmitRunner.Run(host, parameters, benchmarkActionFactory).ConfigureAwait(false);
             }
             catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, host.CancellationToken))
             {

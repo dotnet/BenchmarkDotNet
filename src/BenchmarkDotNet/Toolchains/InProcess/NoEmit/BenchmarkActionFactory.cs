@@ -1,27 +1,23 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
-internal static partial class BenchmarkActionFactory
+internal static class BenchmarkActionFactory
 {
-    /// <summary>
-    /// Dispatch method that creates <see cref="BenchmarkAction"/> using
-    /// <paramref name="targetMethod"/> or <paramref name="fallbackIdleSignature"/> to find correct implementation.
-    /// Either <paramref name="targetMethod"/> or <paramref name="fallbackIdleSignature"/> should be not <c>null</c>.
-    /// </summary>
-    private static BenchmarkAction CreateCore(object instance, MethodInfo? targetMethod, MethodInfo? fallbackIdleSignature, int unrollFactor)
+    private static IBenchmarkAction CreateCore(IBenchmarkActionFactory? factory, object instance, MethodInfo targetMethod, int unrollFactor)
     {
-        PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out var resultInstance, out var resultType);
+        if (factory?.TryCreate(instance, targetMethod, unrollFactor, out var benchmarkAction) == true)
+        {
+            return benchmarkAction;
+        }
+
+        PrepareInstanceAndResultType(instance, targetMethod, out var resultInstance, out var resultType);
 
         if (resultType == typeof(void))
             return new BenchmarkActionVoid(resultInstance, targetMethod, unrollFactor);
-
-        // targetMethod must not be null here. Because it's checked by PrepareInstanceAndResultType.
-        // Following null check is added to suppress nullable annotation errors.
-        ArgumentNullException.ThrowIfNull(targetMethod);
 
         if (resultType == typeof(void*))
             return new BenchmarkActionVoidPointer(resultInstance, targetMethod, unrollFactor);
@@ -71,7 +67,7 @@ internal static partial class BenchmarkActionFactory
 
         if (resultType.IsAwaitable())
         {
-            throw new NotSupportedException($"{nameof(InProcessNoEmitToolchain)} does not support returning awaitable types except (Value)Task(<T>).");
+            throw new NotSupportedException($"Default {nameof(BenchmarkActionFactory)} does not support returning awaitable types except (Value)Task(<T>).");
         }
 
         return Create(
@@ -81,21 +77,10 @@ internal static partial class BenchmarkActionFactory
             unrollFactor);
     }
 
-    private static void PrepareInstanceAndResultType(object instance, MethodInfo? targetMethod, MethodInfo? fallbackIdleSignature, out object? resultInstance, out Type resultType)
+    private static void PrepareInstanceAndResultType(object instance, MethodInfo targetMethod, out object? resultInstance, out Type resultType)
     {
-        var signature = targetMethod ?? fallbackIdleSignature;
-        if (signature == null)
-            throw new ArgumentNullException(
-                nameof(fallbackIdleSignature),
-                $"Either {nameof(targetMethod)} or  {nameof(fallbackIdleSignature)} should be not null.");
-
-        if (!signature.IsStatic && instance == null)
-            throw new ArgumentNullException(
-                nameof(instance),
-                $"The {nameof(instance)} parameter should be not null as invocation method is instance method.");
-
-        resultInstance = signature.IsStatic ? null : instance;
-        resultType = signature.ReturnType;
+        resultInstance = targetMethod.IsStatic ? null : instance;
+        resultType = targetMethod.ReturnType;
 
         if (resultType == typeof(void))
         {
@@ -107,7 +92,7 @@ internal static partial class BenchmarkActionFactory
         }
         else if (resultType.IsPointer && resultType != typeof(void*))
         {
-            throw new NotSupportedException("InProcessNoEmitToolchain only supports void* return, not T*");
+            throw new NotSupportedException($"Default {nameof(BenchmarkActionFactory)} only supports void* return, not T*");
         }
     }
 
@@ -115,24 +100,23 @@ internal static partial class BenchmarkActionFactory
     private static BenchmarkActionBase Create(Type actionType, object? instance, MethodInfo method, int unrollFactor) =>
         (BenchmarkActionBase)Activator.CreateInstance(actionType, instance, method, unrollFactor)!;
 
-    private static void FallbackMethod() { }
-    private static readonly MethodInfo FallbackSignature = new Action(FallbackMethod).GetMethodInfo();
+    private static readonly MethodInfo FallbackSignature = new Action(BenchmarkActionBase.OverheadStatic).GetMethodInfo();
 
-    public static BenchmarkAction CreateWorkload(Descriptor descriptor, object instance, int unrollFactor) =>
-        CreateCore(instance, descriptor.WorkloadMethod, null, unrollFactor);
+    public static IBenchmarkAction CreateWorkload(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance, int unrollFactor) =>
+        CreateCore(factory, instance, descriptor.WorkloadMethod, unrollFactor);
 
-    public static BenchmarkAction CreateOverhead(Descriptor descriptor, object instance, int unrollFactor) =>
-        CreateCore(instance, null, FallbackSignature, unrollFactor);
+    public static IBenchmarkAction CreateOverhead(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance, int unrollFactor) =>
+        CreateCore(factory, instance, FallbackSignature, unrollFactor);
 
-    public static BenchmarkAction CreateGlobalSetup(Descriptor descriptor, object instance) =>
-        CreateCore(instance, descriptor.GlobalSetupMethod, FallbackSignature, 1);
+    public static IBenchmarkAction CreateGlobalSetup(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance) =>
+        CreateCore(factory, instance, descriptor.GlobalSetupMethod ?? FallbackSignature, 1);
 
-    public static BenchmarkAction CreateGlobalCleanup(Descriptor descriptor, object instance) =>
-        CreateCore(instance, descriptor.GlobalCleanupMethod, FallbackSignature, 1);
+    public static IBenchmarkAction CreateGlobalCleanup(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance) =>
+        CreateCore(factory, instance, descriptor.GlobalCleanupMethod ?? FallbackSignature, 1);
 
-    public static BenchmarkAction CreateIterationSetup(Descriptor descriptor, object instance) =>
-        CreateCore(instance, descriptor.IterationSetupMethod, FallbackSignature, 1);
+    public static IBenchmarkAction CreateIterationSetup(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance) =>
+        CreateCore(factory, instance, descriptor.IterationSetupMethod ?? FallbackSignature, 1);
 
-    public static BenchmarkAction CreateIterationCleanup(Descriptor descriptor, object instance) =>
-        CreateCore(instance, descriptor.IterationCleanupMethod, FallbackSignature, 1);
+    public static IBenchmarkAction CreateIterationCleanup(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance) =>
+        CreateCore(factory, instance, descriptor.IterationCleanupMethod ?? FallbackSignature, 1);
 }

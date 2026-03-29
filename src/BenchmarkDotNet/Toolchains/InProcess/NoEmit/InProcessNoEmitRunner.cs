@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     internal class InProcessNoEmitRunner
     {
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Runnable))]
-        public static async ValueTask<int> Run(IHost host, ExecuteParameters parameters)
+        public static async ValueTask<int> Run(IHost host, ExecuteParameters parameters, IBenchmarkActionFactory? benchmarkActionFactory)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                await ((ValueTask) methodInfo.Invoke(null, [host, parameters])!).ConfigureAwait(false);
+                await ((ValueTask) methodInfo.Invoke(null, [host, parameters, benchmarkActionFactory])!).ConfigureAwait(false);
 
                 return 0;
             }
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         [UsedImplicitly]
         private static class Runnable
         {
-            public static async ValueTask RunCore(IHost host, ExecuteParameters parameters)
+            public static async ValueTask RunCore(IHost host, ExecuteParameters parameters, IBenchmarkActionFactory? benchmarkActionFactory)
             {
                 var benchmarkCase = parameters.BenchmarkCase;
                 var target = benchmarkCase.Descriptor;
@@ -140,12 +140,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type)!;
-                var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, unrollFactor);
-                var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, unrollFactor);
-                var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
-                var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
-                var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
-                var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance);
+                var workloadAction = BenchmarkActionFactory.CreateWorkload(benchmarkActionFactory, target, instance, unrollFactor);
+                var overheadAction = BenchmarkActionFactory.CreateOverhead(benchmarkActionFactory, target, instance, unrollFactor);
+                var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(benchmarkActionFactory, target, instance);
+                var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(benchmarkActionFactory, target, instance);
+                var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(benchmarkActionFactory, target, instance);
+                var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(benchmarkActionFactory, target, instance);
 
                 FillMembers(instance, benchmarkCase, host.CancellationToken);
 
