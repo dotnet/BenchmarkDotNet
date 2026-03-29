@@ -28,6 +28,7 @@
     <Project Path="templates/BenchmarkDotNet.Templates.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <File Path="tests/.editorconfig" />
     <File Path="tests/Directory.Build.props" />
     <Project Path="tests/BenchmarkDotNet.Analyzers.Tests/BenchmarkDotNet.Analyzers.Tests.csproj" />
     <Project Path="tests/BenchmarkDotNet.Exporters.Plotting.Tests/BenchmarkDotNet.Exporters.Plotting.Tests.csproj" />
