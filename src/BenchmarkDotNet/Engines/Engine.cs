@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes.CompilerServices;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -89,16 +89,18 @@ namespace BenchmarkDotNet.Engines
         }
 
         // This method is extra long because the helper methods were inlined in order to prevent extra async allocations on each iteration.
-        private async ValueTask<RunResults> RunCore()
+        private async Task<RunResults> RunCore()
         {
+            // We need to force an async yield here to ensure each benchmark invocation is called with a constant stack size. #1120
+            await Task.Yield();
+
             var measurements = new List<Measurement>();
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(Parameters.BenchmarkName);
 
             IterationData extraIterationData = default;
-            // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size.
-            // #1120
+            // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size. #1120
             foreach (var stage in EngineStage.EnumerateStages(Parameters))
             {
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
