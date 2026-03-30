@@ -153,6 +153,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <UseSharedCompilation>false</UseSharedCompilation>
                 <Deterministic>true</Deterministic>
                 <RunAnalyzers>false</RunAnalyzers>
+                <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
                 <PublishAot Condition="$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))">true</PublishAot>
                 <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
                 <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
