@@ -28,9 +28,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\Loggers\OutputLogger.cs" Link="Shared\Loggers\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\XUnit\**\*.cs" Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)"/>
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\BenchmarkTestExecutor.cs" Link="Shared\BenchmarkTestExecutor.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\MisconfiguredEnvironmentException.cs" Link="Shared\MisconfiguredEnvironmentException.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\Extensions.cs" Link="Shared\Extensions.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\TestConfigs.cs" Link="Shared\TestConfigs.cs" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Shared\Loggers\OutputLogger.cs" Link="Shared\Loggers\OutputLogger.cs" />
   </ItemGroup>
 
   <ItemGroup>
