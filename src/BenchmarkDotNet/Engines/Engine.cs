@@ -93,6 +93,7 @@ namespace BenchmarkDotNet.Engines
         {
             // We need to force an async yield here to ensure each benchmark invocation is called with a constant stack size. #1120
             await Task.Yield();
+            Host.CancellationToken.ThrowIfCancellationRequested();
 
             var measurements = new List<Measurement>();
 
