@@ -3,7 +3,9 @@ using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Test;
+using Cake.Core;
 using Cake.Core.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Build.Runners;
@@ -41,11 +43,16 @@ public class UnitTestRunner(BuildContext context)
             Framework = tfm,
             NoBuild = true,
             NoRestore = true,
-            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}", "console;verbosity=detailed" },
             EnvironmentVariables =
             {
                 ["Platform"] = "" // force the tool to not look for the .dll in platform-specific directory
-            }
+            },
+            PathType = DotNetTestPathType.Auto,
+            ArgumentCustomization = args
+                => args.Append("--report-trx")
+                    .AppendSwitchQuoted("--report-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
+                    .AppendSwitch("--output", "Detailed")
+                    .Append("--no-progress"),
         };
         return settings;
     }
