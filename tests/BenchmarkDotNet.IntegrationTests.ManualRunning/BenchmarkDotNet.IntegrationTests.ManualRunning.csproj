@@ -3,6 +3,8 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyTitle>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyName>
