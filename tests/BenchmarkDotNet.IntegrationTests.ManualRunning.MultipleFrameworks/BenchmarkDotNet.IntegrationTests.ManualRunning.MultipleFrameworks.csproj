@@ -17,12 +17,10 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\Loggers\OutputLogger.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\XUnit\SmartAssert.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Shared\SmartAssert.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\TestConfigs.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\Extensions.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\MisconfiguredEnvironmentException.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
