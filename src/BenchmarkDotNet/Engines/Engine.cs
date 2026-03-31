@@ -91,10 +91,6 @@ namespace BenchmarkDotNet.Engines
         // This method is extra long because the helper methods were inlined in order to prevent extra async allocations on each iteration.
         private async Task<RunResults> RunCore()
         {
-            // We need to force an async yield here to ensure each benchmark invocation is called with a constant stack size. #1120
-            await Task.Yield();
-            Host.CancellationToken.ThrowIfCancellationRequested();
-
             var measurements = new List<Measurement>();
 
             if (EngineEventSource.Log.IsEnabled())
@@ -109,6 +105,10 @@ namespace BenchmarkDotNet.Engines
                     await Host.BeforeMainRunAsync().ConfigureAwait(true);
                     await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeActualRun, Host.CancellationToken).ConfigureAwait(true);
                 }
+
+                // We need to force an async yield before each stage to ensure each benchmark invocation is called with a constant stack size. #1120
+                await Task.Yield();
+                Host.CancellationToken.ThrowIfCancellationRequested();
 
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))

@@ -3,6 +3,10 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
+using System.Diagnostics;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -67,6 +71,39 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             [Benchmark]
             public void Foo() => Thread.Sleep(10);
+        }
+
+        public static TheoryData<IToolchain> GetToolchains() =>
+        [
+            InProcessEmitToolchain.Default,
+            InProcessNoEmitToolchain.Default,
+            Job.Default.GetToolchain()
+        ];
+
+        // #1120
+        [Theory]
+        [MemberData(nameof(GetToolchains))]
+        public void BenchmarkIsInvokedWithSameStack(IToolchain toolchain)
+        {
+            CanExecute<StackBench>(DefaultConfig.Instance
+                .WithOptions(ConfigOptions.DisableOptimizationsValidator)
+                .AddJob(Job.Default.WithToolchain(toolchain).WithUnrollFactor(1)));
+        }
+
+        public class StackBench
+        {
+            private string? _stacktrace;
+
+            [Benchmark]
+            public void CheckStack()
+            {
+                var stacktrace = new StackTrace(true).ToString();
+                if (_stacktrace != null && _stacktrace != stacktrace)
+                {
+                    throw new Exception($"Stack trace is different between benchmark invocations!\n\n{_stacktrace}\n\n{stacktrace}");
+                }
+                _stacktrace = stacktrace;
+            }
         }
     }
 }
