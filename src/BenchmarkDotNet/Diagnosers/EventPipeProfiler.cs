@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly bool performExtraBenchmarksRun;
 
         private Task collectingTask = default!;
+        private EventPipeSession? session;
 
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
         // we use performExtraBenchmarksRun = false for better first user experience
@@ -70,7 +71,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 var diagnosticsClient = new DiagnosticsClient(parameters.ProcessId);
 
-                EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
+                session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
 
                 var fileName = ArtifactFileNameHelper.GetTraceFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
                 benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
@@ -79,6 +80,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
             else if (signal == HostSignal.AfterAll)
             {
+                await session!.StopAsync(cancellationToken).ConfigureAwait(false);
                 await collectingTask.ConfigureAwait(false);
             }
         }
