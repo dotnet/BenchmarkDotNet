@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly ImmutableHashSet<EventPipeProvider> eventPipeProviders;
         private readonly bool performExtraBenchmarksRun;
 
-        private Task collectingTask = default!;
+        private Task? collectingTask;
         private EventPipeSession? session;
 
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Diagnosers
             else if (signal == HostSignal.AfterAll)
             {
                 await session!.StopAsync(cancellationToken).ConfigureAwait(false);
-                await collectingTask.ConfigureAwait(false);
+                await collectingTask!.ConfigureAwait(false);
             }
         }
 
