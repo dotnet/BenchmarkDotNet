@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Helpers;
 
 public sealed class CancelableStreamWriter : IDisposable
 {
-    private static readonly Encoding UTF8NoBOM = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+    private static readonly Encoding UTF8NoBOM = IpcHelper.UTF8NoBOM;
 
     public CancelableStreamWriter(Stream stream) : this(stream, UTF8NoBOM, 1024) { }
 
