@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Helpers;
 
 public sealed class CancelableStreamWriter : IDisposable
 {
-    public CancelableStreamWriter(Stream stream) : this(stream, Encoding.UTF8, 1024) { }
+    public CancelableStreamWriter(Stream stream) : this(stream, IpcHelper.UTF8NoBOM, 1024) { }
 
     public Task WriteLineAsync(CancellationToken cancellationToken) => WriteLineAsync(string.Empty, cancellationToken);
     public Task WriteLineAsync(string line, CancellationToken cancellationToken) => WriteLineAsync(line.AsMemory(), cancellationToken);
