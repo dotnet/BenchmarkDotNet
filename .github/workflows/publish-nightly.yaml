@@ -18,7 +18,7 @@ jobs:
       - name: Pack
         run: ./build.cmd pack /p:VersionSuffix=nightly.$DATE.$GITHUB_RUN_NUMBER /p:WeaverVersionSuffix=\"\"
       - name: Upload nupkg to artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: nupkgs
           path: "**/*.*nupkg"
