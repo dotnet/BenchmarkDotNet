@@ -7,7 +7,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Tests.Mocks.Toolchain;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mocks
 {

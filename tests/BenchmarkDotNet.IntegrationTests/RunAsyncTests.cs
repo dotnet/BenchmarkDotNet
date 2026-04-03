@@ -1,23 +1,22 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;
 
 public class RunAsyncTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public static TheoryData<IToolchain> GetToolchains() => 
+    public static TheoryData<IToolchain> GetToolchains() => new(
     [
         new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
         new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
         new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
         new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
-    ];
+    ]);
 
     [Theory]
     [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]

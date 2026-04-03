@@ -2,7 +2,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using System.Reflection;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Configs
 {

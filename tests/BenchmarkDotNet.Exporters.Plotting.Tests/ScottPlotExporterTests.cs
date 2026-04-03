@@ -3,7 +3,9 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using System.Diagnostics.CodeAnalysis;
-using Xunit.Abstractions;
+using System.IO;
+using System.Linq;
+using Xunit;
 
 namespace BenchmarkDotNet.Exporters.Plotting.Tests
 {

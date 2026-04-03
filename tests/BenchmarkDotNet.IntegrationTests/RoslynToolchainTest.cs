@@ -3,7 +3,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using System.Globalization;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

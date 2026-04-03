@@ -1,5 +1,3 @@
-﻿using Xunit.Abstractions;
-
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class ReferencesTests : BenchmarkTestExecutor

@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Detectors.Cpu.Windows;
 using Perfolizer.Models;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
@@ -36,13 +35,13 @@ public class PowershellWmiCpuInfoParserTests(ITestOutputHelper output)
             Name:Intel(R) Xeon(R) CPU E5-2630 v3
             NumberOfCores:8
             NumberOfLogicalProcessors:16
-                            
-                          
+
+
             MaxClockSpeed:2400
             Name:Intel(R) Xeon(R) CPU E5-2630 v3
             NumberOfCores:8
             NumberOfLogicalProcessors:16
-            
+
             """;
         CpuInfo? actual = PowershellWmiCpuInfoParser.Parse(cpuInfo);
 

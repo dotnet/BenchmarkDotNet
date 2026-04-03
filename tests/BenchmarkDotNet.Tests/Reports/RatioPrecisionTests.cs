@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -11,7 +11,6 @@ using BenchmarkDotNet.Tests.Helpers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using System.Collections.Immutable;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Reports
 {
