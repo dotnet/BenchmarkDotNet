@@ -1,4 +1,9 @@
 <Project>
+  <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+    <!-- Settings to run .NET Framework tests without x64 emulation when using `dotnet test` command -->
+    <PreferNativeArm64>true</PreferNativeArm64>
+  </PropertyGroup>
+  
   <!-- Settings to suppress UseAppHost error on Wasm tests -->
   <Target Name="_XunitValidateBuild" BeforeTargets="BeforeBuild" Condition=" '$(TargetFramework)' != '' ">
     <Error Text="xUnit.net v3 test projects must be executable (set project property '&lt;OutputType&gt;Exe&lt;/OutputType&gt;'). If this is not a test project, reference xunit.v3.extensibility.core instead."
