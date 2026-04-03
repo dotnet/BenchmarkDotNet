@@ -10,6 +10,11 @@
     <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))</SolutionDir>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+    <!-- Settings to run .NET Framework tests without x64 emulation when using `dotnet test` command -->
+    <PreferNativeArm64>true</PreferNativeArm64>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="2.1.0" />
   </ItemGroup>
