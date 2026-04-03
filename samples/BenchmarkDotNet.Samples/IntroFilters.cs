@@ -5,6 +5,7 @@ using BenchmarkDotNet.Filters;
 namespace BenchmarkDotNet.Samples
 {
     [DryJob]
+    [UseLocalJobOnly]
     [Config(typeof(Config))]
     public class IntroFilters
     {

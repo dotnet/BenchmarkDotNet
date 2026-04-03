@@ -3,6 +3,7 @@
 namespace BenchmarkDotNet.Samples
 {
     [DryJob]
+    [UseLocalJobOnly]
     [XmlExporterAttribute.Brief]
     [XmlExporterAttribute.Full]
     [XmlExporterAttribute.BriefCompressed]
