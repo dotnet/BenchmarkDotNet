@@ -14,6 +14,11 @@
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+    <!-- Settings to run .NET Framework tests without x64 emulation when using `dotnet test` command -->
+    <PreferNativeArm64>true</PreferNativeArm64>
+  </PropertyGroup>
+
   <!-- ProjectReferences are not transitive, so we need to directly include the analyzers and code fixers for all test projects. -->
   <ItemGroup Condition="'$(AssemblyName)' != 'BenchmarkDotNet.Analyzers.Tests'">
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
