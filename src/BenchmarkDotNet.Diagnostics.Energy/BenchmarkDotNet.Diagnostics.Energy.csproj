@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <Import Project="..\..\build\common.targets" />
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net462</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+	<AssemblyName>BenchmarkDotNet.Diagnostics.Energy</AssemblyName>
+	<PackageId>BenchmarkDotNet.Diagnostics.Energy</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+
+</Project>
