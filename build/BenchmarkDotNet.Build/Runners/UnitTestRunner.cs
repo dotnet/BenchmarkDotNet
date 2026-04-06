@@ -51,7 +51,10 @@ public class UnitTestRunner(BuildContext context)
             ArgumentCustomization = args
                 => args.Append("--report-trx")
                     .AppendSwitchQuoted("--report-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
-                    .Append("--no-progress"),
+                    .Append("--no-ansi")
+                    .AppendSwitch("--output", "Detailed")
+                    .Append("--diagnostic")
+                    .AppendSwitch("--diagnostic-verbosity", "Trace")
         };
         return settings;
     }
