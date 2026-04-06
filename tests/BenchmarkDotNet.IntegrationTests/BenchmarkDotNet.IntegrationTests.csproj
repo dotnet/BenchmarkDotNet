@@ -38,14 +38,15 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\**\*.cs"
-             Exclude="*Tests.cs"
-             Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\*.cs"
+             Exclude="..\BenchmarkDotNet.Tests\XUnit\*Tests.cs"
+             Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)"/>
 
     <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="Shared\Loggers\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\BenchmarkDotNet.Tests\Mocks\**\*.cs" Link="Shared\Mocks\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\BenchmarkDotNet.Tests\Builders\**\*.cs" Link="Shared\Builders\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Helpers\**\*.cs" Link="Shared\Helpers\%(RecursiveDir)%(Filename)%(Extension)" />
+
+    <Compile Include="..\BenchmarkDotNet.Tests\Helpers\ExporterTestHelper.cs" Link="Shared\Helpers\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\BenchmarkDotNet.Tests\TestCultureInfo.cs" />
   </ItemGroup>
   <ItemGroup>

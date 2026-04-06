@@ -29,7 +29,9 @@
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\Xunit\Extensions.cs" Link="Shared\Xunit\Extensions.cs" />
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\TestConfigs.cs" Link="Shared\TestConfigs.cs" />
     <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="Shared\Loggers\OutputLogger.cs" />
-    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\*.cs" Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)"/>
+    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\*.cs"
+             Exclude="..\BenchmarkDotNet.Tests\XUnit\*Tests.cs"
+             Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)"/>
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
