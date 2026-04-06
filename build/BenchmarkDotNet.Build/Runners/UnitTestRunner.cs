@@ -50,12 +50,12 @@ public class UnitTestRunner(BuildContext context)
             PathType = DotNetTestPathType.Auto,
             ArgumentCustomization = args
                 => args.Append("--report-xunit-trx")
-                    .AppendSwitchQuoted("--report-xunit-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
-                    .Append("--no-ansi")
-                    .AppendSwitch("--output", "Detailed")
-                    .AppendSwitch("--show-stdout", "Failed")
-                    .Append("--diagnostic")
-                    .AppendSwitch("--diagnostic-verbosity", "Trace")
+                       .AppendSwitchQuoted("--report-xunit-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
+                       .Append("--no-ansi")
+                       .AppendSwitch("--output", "Detailed")
+                       .AppendSwitch("--show-stdout", "Failed")
+                       .Append("--diagnostic")
+                       .AppendSwitch("--diagnostic-verbosity", "Trace")
         };
         return settings;
     }
