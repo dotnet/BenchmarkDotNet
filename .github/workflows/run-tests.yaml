@@ -57,7 +57,9 @@ jobs:
         if: always()
         with:
           name: test-windows-core-trx-${{ github.run_id }}-${{ matrix.os }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-windows-full:
     strategy:
@@ -100,7 +102,9 @@ jobs:
         if: always()
         with:
           name: test-windows-full-trx-${{ github.run_id }}-${{ matrix.os }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-linux:
     strategy:
@@ -136,7 +140,9 @@ jobs:
         if: always()
         with:
           name: test-linux-trx-${{ github.run_id }}-${{ matrix.os }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-macos:
     name: test-macos (${{ matrix.os.arch }})
@@ -177,7 +183,9 @@ jobs:
         if: always()
         with:
           name: test-macos(${{ matrix.os.arch }})-trx-${{ github.run_id }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-pack:
     runs-on: ubuntu-latest
