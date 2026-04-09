@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS())
+            if (OsDetector.IsMacOS() && toolchain.IsInProcess)
                 Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3076");
 
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
