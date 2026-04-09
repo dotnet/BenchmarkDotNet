@@ -50,7 +50,7 @@ jobs:
       - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
         run: |
-          dotnet coverage connect bdn_coverage 'dotnet test --project tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net8.0 --filter-query "/*/*/(!*DotMemoryTests)&(!*DotTraceTests)/(!*WasmIsSupported)&(!*WasmSupportsInProcessDiagnosers)"'
+          dotnet coverage connect bdn_coverage 'dotnet test --project tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net8.0 --filter-query "/*/*/(!*DotMemoryTests)&(!*DotTraceTests)&(!*WasmTests)"' --no-ansi --output Detailed
 
       - name: Shutdown dotnet-coverage server.
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
@@ -86,7 +86,7 @@ jobs:
       - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
         run: |
-          dotnet coverage connect bdn_coverage 'dotnet test --project tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net472 --filter-query "/*/*/(!*DotMemoryTests)&(!*DotTraceTests)/(!*WasmIsSupported)&(!*WasmSupportsInProcessDiagnosers)"'
+          dotnet coverage connect bdn_coverage 'dotnet test --project tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net472 --filter-query "/*/*/(!*DotMemoryTests)&(!*DotTraceTests)&(!*WasmTests)"' --no-ansi --output Detailed
 
       - name: Shutdown dotnet-coverage server.
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
