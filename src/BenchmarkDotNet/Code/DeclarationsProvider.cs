@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Code
     {
         public override string[] GetExtraFields() =>
         [
-            $"public {typeof(WorkloadContinuerAndValueTaskSource).GetCorrectCSharpTypeName()} workloadContinuerAndValueTaskSource;",
+            $"public {typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()} workloadContinuerAndValueTaskSource;",
             $"public {typeof(IClock).GetCorrectCSharpTypeName()} clock;",
             "public long invokeCount;"
         ];
@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Code
                         this.__fieldsContainer.clock = clock;
                         if (this.__fieldsContainer.workloadContinuerAndValueTaskSource == null)
                         {
-                            this.__fieldsContainer.workloadContinuerAndValueTaskSource = new {{typeof(WorkloadContinuerAndValueTaskSource).GetCorrectCSharpTypeName()}}();
+                            this.__fieldsContainer.workloadContinuerAndValueTaskSource = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
                             this.__StartWorkload();
                         }
                         return this.__fieldsContainer.workloadContinuerAndValueTaskSource.Continue();
@@ -240,14 +240,12 @@ namespace BenchmarkDotNet.Code
                     {
                         try
                         {
+                            if (await this.__fieldsContainer.workloadContinuerAndValueTaskSource.GetIsComplete())
+                            {
+                                {{finalReturn}}
+                            }
                             while (true)
                             {
-                                await this.__fieldsContainer.workloadContinuerAndValueTaskSource;
-                                if (this.__fieldsContainer.workloadContinuerAndValueTaskSource.IsCompleted)
-                                {
-                                    {{finalReturn}}
-                                }
-
                                 {{typeof(StartedClock).GetCorrectCSharpTypeName()}} startedClock = {{typeof(ClockExtensions).GetCorrectCSharpTypeName()}}.Start(this.__fieldsContainer.clock);
                                 while (--this.__fieldsContainer.invokeCount >= 0)
                                 {
@@ -256,7 +254,10 @@ namespace BenchmarkDotNet.Code
                                     unsafe { awaitable = {{workloadMethodCall}} }
                                     await awaitable;
                                 }
-                                this.__fieldsContainer.workloadContinuerAndValueTaskSource.SetResult(startedClock.GetElapsed());
+                                if (await this.__fieldsContainer.workloadContinuerAndValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                                {
+                                    {{finalReturn}}
+                                }
                             }
                         }
                         catch (global::System.Exception e)

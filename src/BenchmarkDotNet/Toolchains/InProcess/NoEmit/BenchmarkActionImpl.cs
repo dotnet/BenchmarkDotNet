@@ -259,7 +259,7 @@ public class BenchmarkActionTask : BenchmarkActionBase
 {
     private readonly Func<Task> callback;
     private readonly int unrollFactor;
-    private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
+    private WorkloadValueTaskSource? workloadValueTaskSource;
     private IClock? clock;
     private long invokeCount;
 
@@ -283,12 +283,12 @@ public class BenchmarkActionTask : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadContinuerAndValueTaskSource == null)
+        if (workloadValueTaskSource == null)
         {
-            workloadContinuerAndValueTaskSource = new();
+            workloadValueTaskSource = new();
             StartWorkload();
         }
-        return workloadContinuerAndValueTaskSource.Continue();
+        return workloadValueTaskSource.Continue();
     }
 
     private async void StartWorkload()
@@ -300,30 +300,31 @@ public class BenchmarkActionTask : BenchmarkActionBase
     {
         try
         {
+            if (await workloadValueTaskSource!.GetIsComplete())
+            {
+                return;
+            }
             while (true)
             {
-                await workloadContinuerAndValueTaskSource!;
-                if (workloadContinuerAndValueTaskSource.IsCompleted)
-                {
-                    return;
-                }
-
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
                     await callback();
                 }
-                workloadContinuerAndValueTaskSource.SetResult(startedClock.GetElapsed());
+                if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                {
+                    return;
+                }
             }
         }
         catch (Exception e)
         {
-            workloadContinuerAndValueTaskSource!.SetException(e);
+            workloadValueTaskSource!.SetException(e);
         }
     }
 
     public override void Complete()
-        => workloadContinuerAndValueTaskSource?.Complete();
+        => workloadValueTaskSource?.Complete();
 }
 
 [AggressivelyOptimizeMethods]
@@ -331,7 +332,7 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
 {
     private readonly Func<Task<T>> callback;
     private readonly int unrollFactor;
-    private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
+    private WorkloadValueTaskSource? workloadValueTaskSource;
     private IClock? clock;
     private long invokeCount;
 
@@ -355,12 +356,12 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadContinuerAndValueTaskSource == null)
+        if (workloadValueTaskSource == null)
         {
-            workloadContinuerAndValueTaskSource = new();
+            workloadValueTaskSource = new();
             StartWorkload();
         }
-        return workloadContinuerAndValueTaskSource.Continue();
+        return workloadValueTaskSource.Continue();
     }
 
     private async void StartWorkload()
@@ -372,31 +373,32 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
     {
         try
         {
+            if (await workloadValueTaskSource!.GetIsComplete())
+            {
+                return default!;
+            }
             while (true)
             {
-                await workloadContinuerAndValueTaskSource!;
-                if (workloadContinuerAndValueTaskSource.IsCompleted)
-                {
-                    return default!;
-                }
-
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
                     await callback();
                 }
-                workloadContinuerAndValueTaskSource.SetResult(startedClock.GetElapsed());
+                if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                {
+                    return default!;
+                }
             }
         }
         catch (Exception e)
         {
-            workloadContinuerAndValueTaskSource!.SetException(e);
+            workloadValueTaskSource!.SetException(e);
             return default!;
         }
     }
 
     public override void Complete()
-        => workloadContinuerAndValueTaskSource?.Complete();
+        => workloadValueTaskSource?.Complete();
 }
 
 [AggressivelyOptimizeMethods]
@@ -404,7 +406,7 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
 {
     private readonly Func<ValueTask> callback;
     private readonly int unrollFactor;
-    private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
+    private WorkloadValueTaskSource? workloadValueTaskSource;
     private IClock? clock;
     private long invokeCount;
 
@@ -428,12 +430,12 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadContinuerAndValueTaskSource == null)
+        if (workloadValueTaskSource == null)
         {
-            workloadContinuerAndValueTaskSource = new();
+            workloadValueTaskSource = new();
             StartWorkload();
         }
-        return workloadContinuerAndValueTaskSource.Continue();
+        return workloadValueTaskSource.Continue();
     }
 
     private async void StartWorkload()
@@ -445,30 +447,31 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
     {
         try
         {
+            if (await workloadValueTaskSource!.GetIsComplete())
+            {
+                return;
+            }
             while (true)
             {
-                await workloadContinuerAndValueTaskSource!;
-                if (workloadContinuerAndValueTaskSource.IsCompleted)
-                {
-                    return;
-                }
-
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
                     await callback();
                 }
-                workloadContinuerAndValueTaskSource.SetResult(startedClock.GetElapsed());
+                if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                {
+                    return;
+                }
             }
         }
         catch (Exception e)
         {
-            workloadContinuerAndValueTaskSource!.SetException(e);
+            workloadValueTaskSource!.SetException(e);
         }
     }
 
     public override void Complete()
-        => workloadContinuerAndValueTaskSource?.Complete();
+        => workloadValueTaskSource?.Complete();
 }
 
 [AggressivelyOptimizeMethods]
@@ -476,7 +479,7 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
 {
     private readonly Func<ValueTask<T>> callback;
     private readonly int unrollFactor;
-    private WorkloadContinuerAndValueTaskSource? workloadContinuerAndValueTaskSource;
+    private WorkloadValueTaskSource? workloadValueTaskSource;
     private IClock? clock;
     private long invokeCount;
 
@@ -500,12 +503,12 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadContinuerAndValueTaskSource == null)
+        if (workloadValueTaskSource == null)
         {
-            workloadContinuerAndValueTaskSource = new();
+            workloadValueTaskSource = new();
             StartWorkload();
         }
-        return workloadContinuerAndValueTaskSource.Continue();
+        return workloadValueTaskSource.Continue();
     }
 
     private async void StartWorkload()
@@ -517,29 +520,30 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
     {
         try
         {
+            if (await workloadValueTaskSource!.GetIsComplete())
+            {
+                return default!;
+            }
             while (true)
             {
-                await workloadContinuerAndValueTaskSource!;
-                if (workloadContinuerAndValueTaskSource.IsCompleted)
-                {
-                    return default!;
-                }
-
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
                     await callback();
                 }
-                workloadContinuerAndValueTaskSource.SetResult(startedClock.GetElapsed());
+                if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                {
+                    return default!;
+                }
             }
         }
         catch (Exception e)
         {
-            workloadContinuerAndValueTaskSource!.SetException(e);
+            workloadValueTaskSource!.SetException(e);
             return default!;
         }
     }
 
     public override void Complete()
-        => workloadContinuerAndValueTaskSource?.Complete();
+        => workloadValueTaskSource?.Complete();
 }
