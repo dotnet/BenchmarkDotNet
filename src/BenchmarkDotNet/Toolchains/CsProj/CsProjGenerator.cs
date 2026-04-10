@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             "EnablePreviewFeatures",
             "RuntimeHostConfigurationOption",
             "WarningsAsErrors",
+            "Features",
         }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
