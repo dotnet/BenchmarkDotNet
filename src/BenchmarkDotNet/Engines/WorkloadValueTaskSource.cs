@@ -40,7 +40,8 @@ public sealed class WorkloadValueTaskSource : IValueTaskSource<ClockSpan>, IValu
         => continuerSource.GetStatus(token);
 
     void IValueTaskSource<bool>.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags)
-        => continuerSource.OnCompleted(continuation, state, token, flags);
+        // Strip UseSchedulingContext to ensure Continue() and Complete() synchronously continue __WorkloadCore.
+        => continuerSource.OnCompleted(continuation, state, token, flags & ~ValueTaskSourceOnCompletedFlags.UseSchedulingContext);
 
     bool IValueTaskSource<bool>.GetResult(short token)
         => continuerSource.GetResult(token);
