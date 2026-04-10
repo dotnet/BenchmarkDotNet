@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
@@ -21,15 +21,15 @@ namespace BenchmarkDotNet.Loggers
             return !(OsDetector.IsAndroid() || OsDetector.IsIOS() || RuntimeInformation.IsWasm || OsDetector.IsTvOS());
         });
 
-        private static readonly Lazy<bool> ConsoleSupports256Colors = new (() =>
+        private static readonly Lazy<bool> ConsoleSupports256Colors = new(() =>
         {
-            
+
             var colorTerm = Environment.GetEnvironmentVariable("COLORTERM");
-            if ( colorTerm == "truecolor" || colorTerm=="24bit")
+            if (colorTerm == "truecolor" || colorTerm == "24bit")
                 return true;
 
             var term = Environment.GetEnvironmentVariable("TERM");
-            return term!=null && term.Contains("256color");
+            return term != null && term.Contains("256color");
         });
 
         private readonly bool unicodeSupport;
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Loggers
 
             if (ConsoleSupports256Colors.Value)
             {
-                var colorIndex=Get256Color(logKind);
+                var colorIndex = Get256Color(logKind);
                 Console.Write($"\x1b[38;5;{colorIndex}m");
                 write(text);
                 Console.Write("\x1b[0m");
@@ -91,40 +91,41 @@ namespace BenchmarkDotNet.Loggers
         }
 
         private ConsoleColor GetColor(LogKind logKind) =>
-            colorScheme.ContainsKey(logKind) ? colorScheme[logKind] : DefaultColor;
+            colorScheme.TryGetValue(logKind, out ConsoleColor value) ? value : DefaultColor;
 
         private static int Get256Color(LogKind logKind)
         {
             var scheme = Create256ColorScheme();
-            return scheme.ContainsKey(logKind) ? scheme[logKind] :252;
+            return scheme.TryGetValue(logKind, out int value) ? value : 252;
         }
-        private static Dictionary<LogKind, ConsoleColor> CreateColorfulScheme() =>
-    new Dictionary<LogKind, ConsoleColor>
-    {
-        { LogKind.Default, ConsoleColor.Gray },
-        { LogKind.Help, ConsoleColor.Cyan },
-        { LogKind.Header, ConsoleColor.Magenta },
-        { LogKind.Result, ConsoleColor.Blue },
-        { LogKind.Statistic, ConsoleColor.DarkCyan },
-        { LogKind.Info, ConsoleColor.DarkGray },
-        { LogKind.Error, ConsoleColor.Red },
-        { LogKind.Warning, ConsoleColor.DarkYellow },
-        { LogKind.Hint, ConsoleColor.DarkMagenta }
-    };
 
-private static Dictionary<LogKind, int> Create256ColorScheme() =>
-    new Dictionary<LogKind, int>
-    {
-        { LogKind.Default,   244 },  // mid gray - readable on both
-        { LogKind.Help,      36  },  // teal-green
-        { LogKind.Header,    127 },  // mid magenta
-        { LogKind.Result,    33  },  // mid blue
-        { LogKind.Statistic, 30  },  // darker teal - distinct from Result and Help
-        { LogKind.Info,      130 },  // dark orange/brown - distinct from Warning
-        { LogKind.Error,     160 },  // darker red - visible on white without blinding
-        { LogKind.Warning,   166 },  // orange - distinct from Info
-        { LogKind.Hint,      98  }   // muted purple - distinct from Header
-    };
+        private static Dictionary<LogKind, ConsoleColor> CreateColorfulScheme() =>
+            new()
+            {
+                { LogKind.Default, ConsoleColor.Gray },
+                { LogKind.Help, ConsoleColor.Cyan },
+                { LogKind.Header, ConsoleColor.Magenta },
+                { LogKind.Result, ConsoleColor.Blue },
+                { LogKind.Statistic, ConsoleColor.DarkCyan },
+                { LogKind.Info, ConsoleColor.DarkGray },
+                { LogKind.Error, ConsoleColor.Red },
+                { LogKind.Warning, ConsoleColor.DarkYellow },
+                { LogKind.Hint, ConsoleColor.DarkMagenta }
+            };
+
+        private static Dictionary<LogKind, int> Create256ColorScheme() =>
+            new()
+            {
+                { LogKind.Default,   244 },  // mid gray - readable on both
+                { LogKind.Help,      36  },  // teal-green
+                { LogKind.Header,    127 },  // mid magenta
+                { LogKind.Result,    33  },  // mid blue
+                { LogKind.Statistic, 30  },  // darker teal - distinct from Result and Help
+                { LogKind.Info,      130 },  // dark orange/brown - distinct from Warning
+                { LogKind.Error,     160 },  // darker red - visible on white without blinding
+                { LogKind.Warning,   166 },  // orange - distinct from Info
+                { LogKind.Hint,      98  }   // muted purple - distinct from Header
+            };
 
         [PublicAPI]
         public static Dictionary<LogKind, ConsoleColor> CreateGrayScheme()
