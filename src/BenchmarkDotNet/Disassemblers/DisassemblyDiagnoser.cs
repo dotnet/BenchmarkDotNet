@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Disassemblers;
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Diagnosers
                     );
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
-                    var result = await monoDisassembler.Disassemble(benchmark, (MonoRuntime) benchmark.Job.Environment.Runtime!, cancellationToken).ConfigureAwait(false);
+                    var result = await monoDisassembler.Disassemble(benchmark, (MonoRuntime)benchmark.Job.Environment.Runtime!, cancellationToken).ConfigureAwait(false);
                     results.Add(benchmark, result);
                     break;
             }
@@ -173,6 +173,16 @@ namespace BenchmarkDotNet.Diagnosers
                 else if (!ShouldUseMonoDisassembler(benchmark))
                 {
                     yield return new ValidationError(true, $"Only Windows and Linux are supported in DisassemblyDiagnoser without Mono. Current OS is {System.Runtime.InteropServices.RuntimeInformation.OSDescription}");
+                }
+
+                var isInProcess = benchmark.Job.Infrastructure.TryGetToolchain(out toolchain) && toolchain.IsInProcess;
+                if (isInProcess && OsDetector.IsMacOS() && AppHostDetector.HasAppHost())
+                {
+                    // On macos environment, WriteDump API is used and it cause freeze when using AppHost with InProcessToolchain.
+                    // https://github.com/dotnet/BenchmarkDotNet/issues/3076
+                    var errorMessage = "DisassemblyDiagnoser is not supported on macos environment that using AppHost and InProcessToolchain. "
+                                     + "Disable AppHost with '<UseAppHost>false</UseAppHost>' or use another toolchain";
+                    yield return new ValidationError(true, errorMessage);
                 }
             }
         }
