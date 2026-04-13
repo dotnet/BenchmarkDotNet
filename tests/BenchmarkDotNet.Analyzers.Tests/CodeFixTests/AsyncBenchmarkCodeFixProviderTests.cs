@@ -24,7 +24,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(100);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         var fixedCode = /* lang=c#-test */ """
             using BenchmarkDotNet.Attributes;
@@ -42,7 +42,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(100);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         TestCode = testCode;
         FixedCode = fixedCode;
@@ -67,7 +67,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(100);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         var fixedCode = /* lang=c#-test */ """
             using BenchmarkDotNet.Attributes;
@@ -85,7 +85,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(100);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         TestCode = testCode;
         FixedCode = fixedCode;
@@ -113,7 +113,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(Size);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         var fixedCode = /* lang=c#-test */ """
             using BenchmarkDotNet.Attributes;
@@ -134,7 +134,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(Size);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         TestCode = testCode;
         FixedCode = fixedCode;
@@ -165,7 +165,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(200);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         var fixedCode = /* lang=c#-test */ """
             using BenchmarkDotNet.Attributes;
@@ -189,7 +189,7 @@ public class AsyncBenchmarkCodeFixProviderTests : CodeFixTestFixture<AsyncBenchm
                     await Task.Delay(200);
                 }
             }
-            """;
+            """.ReplaceLineEndings();
 
         TestCode = testCode;
         FixedCode = fixedCode;
