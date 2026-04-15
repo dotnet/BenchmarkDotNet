@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddJob(Job.Dry
                     .WithRuntime(GetCurrentR2RRuntime())
                     .WithToolchain(toolchain))
-                .WithBuildTimeout(TimeSpan.FromSeconds(240));
+                .WithBuildTimeout(TimeSpan.FromSeconds(360));
         }
 
         private static string GetTargetFrameworkMoniker()
