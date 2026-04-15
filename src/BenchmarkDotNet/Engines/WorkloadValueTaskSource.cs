@@ -40,8 +40,9 @@ public sealed class WorkloadValueTaskSource : IValueTaskSource<ClockSpan>, IValu
         => continuerSource.GetStatus(token);
 
     void IValueTaskSource<bool>.OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags)
-        // Strip UseSchedulingContext to ensure Continue() and Complete() synchronously continue __WorkloadCore.
-        => continuerSource.OnCompleted(continuation, state, token, flags & ~ValueTaskSourceOnCompletedFlags.UseSchedulingContext);
+        // This is where the async workload loop yields for the next iteration.
+        // Ignore flags to always continue synchronously without capturing synchronization or execution context.
+        => continuerSource.OnCompleted(continuation, state, token, ValueTaskSourceOnCompletedFlags.None);
 
     bool IValueTaskSource<bool>.GetResult(short token)
         => continuerSource.GetResult(token);
