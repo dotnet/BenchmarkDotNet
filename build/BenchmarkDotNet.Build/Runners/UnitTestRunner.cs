@@ -49,8 +49,8 @@ public class UnitTestRunner(BuildContext context)
             },
             PathType = DotNetTestPathType.Auto,
             ArgumentCustomization = args
-                => args.Append("--report-trx")
-                    .AppendSwitchQuoted("--report-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
+                => args.Append("--report-xunit-trx")
+                    .AppendSwitchQuoted("--report-xunit-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
                     .Append("--no-ansi")
                     .AppendSwitch("--output", "Detailed")
                     .Append("--diagnostic")
