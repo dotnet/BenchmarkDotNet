@@ -1,9 +1,9 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Xunit.Sdk;
 
 namespace BenchmarkDotNet.Tests.XUnit;
 
-[DataDiscoverer("BenchmarkDotNet.Tests.XUnit.InlineDataEnvSpecificDiscoverer", "BenchmarkDotNet.Tests")]
+[DataDiscoverer("BenchmarkDotNet.Tests.XUnit.InlineDataEnvSpecificDiscoverer", "BenchmarkDotNet.IntegrationTests")]
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class InlineDataEnvSpecific : DataAttribute
 {
