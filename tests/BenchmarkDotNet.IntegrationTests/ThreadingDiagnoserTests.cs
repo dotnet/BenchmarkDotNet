@@ -9,14 +9,10 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.NativeAot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.IntegrationTests.Xunit;
-using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -30,6 +26,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
+            yield return new object[] { InProcessEmitToolchain.Default };
+
             yield return new object[] { Job.Default.GetToolchain() };
 
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
@@ -37,8 +35,6 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 yield return new object[] { NativeAotToolchain.Net80 };
             }
-            // TODO: Support InProcessEmitToolchain.Instance
-            // yield return new object[] { InProcessEmitToolchain.Instance };
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
