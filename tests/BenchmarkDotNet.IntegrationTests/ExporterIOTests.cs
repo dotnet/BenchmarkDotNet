@@ -5,6 +5,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Collections.Immutable;
 
