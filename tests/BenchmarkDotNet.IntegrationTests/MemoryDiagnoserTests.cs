@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
@@ -21,7 +21,6 @@ using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

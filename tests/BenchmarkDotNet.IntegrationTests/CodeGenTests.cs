@@ -1,11 +1,10 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System.Diagnostics;
 using System.Reflection;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;
 

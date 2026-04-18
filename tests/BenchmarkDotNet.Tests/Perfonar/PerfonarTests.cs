@@ -9,7 +9,6 @@ using Perfolizer.Json;
 using Perfolizer.Models;
 using Perfolizer.Perfonar.Base;
 using Perfolizer.Perfonar.Tables;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Perfonar;
 

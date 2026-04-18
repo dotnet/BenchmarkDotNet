@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
@@ -9,7 +9,6 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

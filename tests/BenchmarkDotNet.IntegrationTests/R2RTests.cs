@@ -6,7 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.R2R;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

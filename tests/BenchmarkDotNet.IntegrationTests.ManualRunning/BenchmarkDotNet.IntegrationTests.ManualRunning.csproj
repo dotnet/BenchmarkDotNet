@@ -12,6 +12,11 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Xunit.Abstractions" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(CustomProp)'=='true'">
     <DefineConstants>$(DefineConstants);CUSTOM_PROP</DefineConstants>
   </PropertyGroup>

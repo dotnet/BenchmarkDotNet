@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Reports
 {

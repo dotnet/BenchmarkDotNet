@@ -1,6 +1,5 @@
-﻿using BenchmarkDotNet.Detectors.Cpu.Linux;
+using BenchmarkDotNet.Detectors.Cpu.Linux;
 using Perfolizer.Models;
-using Xunit.Abstractions;
 using static Perfolizer.Horology.Frequency;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
