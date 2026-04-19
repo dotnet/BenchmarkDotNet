@@ -75,7 +75,7 @@ for (file in files) {
   }
 
   resultStats <- result %>%
-    group_by_(.dots = c("Target_Method", "Job_Id")) %>%
+    group_by(Target_Method, Job_Id) %>%
     summarise(se = std.error(Measurement_Value), Value = mean(Measurement_Value))
 
   benchmarkBoxplot <- ggplot(result, aes(x=Target_Method, y=Measurement_Value, fill=Job_Id)) +
