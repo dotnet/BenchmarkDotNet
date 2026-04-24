@@ -21,59 +21,48 @@ For some unit tests (e.g. for exporter tests) BenchmarkDotNet uses [Verify](http
 * The expected value for each test is stored in a `*.verified.txt` file located near the test source file in the repository. Verify generates verified file's names automatically according test name and its parameters. This files must be added under the source control.
 * It also creates a `*.received` file for each failed test. You can use diff tools for convenient file comparison. By default you can find test run results on the test runner console as usual. You can comment out the line ```result.DisableDiff()``` in ```VerifySettingsFactory.Create``` method and then Verify will open KDiff for each failed test. This way you can easily understand what's the difference between verified and received values and choose the correct one.
 
-## Running tests on GitHub Actions
+## Running tests on GitHub Actions with GitHub CLI
 
-This section describes how to run specific tests on GitHub Actions.
+This section describes how to run tests on GitHub Actions by using CLI.
 
 ### Prerequisites
 
-The following tools are required to run tests on CI.
+The following tools are required to run tests on CI with `gh workflow run` command.
 
-* [Git](https://git-scm.com)
 * [GitHub CLI](https://cli.github.com)
-* [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell)
+
+Run `gh auth login` command to authenticate with your GitHub account after installation.
+
+### Common parameters of `gh workflow run` command
+
+Following parameters need to specified to invoke workflow with `gh workflow run` command.
+
+| name              | description
+|-------------------|----------------------
+| `<workflow-name>` | Specify workflow name (e.g. `run-tests-selected.yaml`)
+| `--repo`          | Specify target repository name with `{owner}/{repo}` format (e.g. `dotnet/BenchmarkDotNet`)
+| `--ref`           | Specify target branch name
 
 > [!NOTE]
 > `gh run workflow` command requires `Write` permission on target repository.
-> Contributors who don't have write permission need to run workflow on a **forked** repository.
+> Contributors who don't have write permission to `dotnet/BenchmarkDotNet` need to run workflow on a **forked** repository.
 
-This section's scripts are expected to be executed with PowerShell 7(`pwsh`)
+### Parameters of `run-tests-selected.yaml` workflow
 
-### How to run specific tests with `gh workflow run` command
+`run-tests-selected.yaml` accept following input parameters. (Passed with `-f` or --field)
 
-**1.Get target repository information**
-Run the following script to gets variables that are used by command.
+| name              | default                                  | description
+|-------------------|------------------------------------------|---------------------
+| `runs_on`         | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `macos-latest` `macos-15-intel`)
+| `project`         | `tests/BenchmarkDotNet.IntegrationTests` | Specify path of project directory
+| `framework`       | `net8.0`                                 | Target Framework (e.g. `net8.0`, `net472`)
+| `filter`          | `BenchmarkDotNet`                        | Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests
+| `iteration_count` | `1`                                      | Count of test loop (It's expected to be used for flaky tests)
 
-```pwsh
-$ErrorActionPreference = 'Stop'
-$PSNativeCommandUseErrorActionPreference = $true
-Set-StrictMode -Version
+### Command examples
 
-# Gets target repository with `owner/repo` format.
-$originUrl = git config --get remote.origin.url
-$repo = if ($originUrl -match 'github\.com[:/](.+?)/(.+?)(?:\.git)?$') {"$($Matches[1])/$($Matches[2])"} else { throw 'Failed to get repository "owner/repo" from $originUrl' }
-
-# Gets current branch name.
-$branchName = git branch --show-current
-```
-
-**2. Set target tests information**
-Modify following scripts and execute script to set target tests information.
+#### Run `CompletedWorkItemCountIsAccurate` test
 
 ```pwsh
-$arguments = @(
-  '--repo', $repo
-  '--ref', $branchName
-  '-f', 'runs_on=windows-latest'                         # `windows-latest`, `windows-11-arm`, `ubuntu-latest`, `ubuntu-24.04-arm`, `macos-latest`, `macos-15-intel`
-  '-f', 'project=tests/BenchmarkDotNet.IntegrationTests' # Target test project path.
-  '-f', 'framework=net8.0'                               # `net8.0` or `net472`
-  '-f', 'filter=*.WasmTests.*'                           # Specify filter with GlobFilter syntax(https://benchmarkdotnet.org/articles/configs/filters.html)
-)
-```
-
-**3. Start tests on CI**
-Run following command to start tests on CI.
-
-```pwsh
-gh workflow run run-tests-selected.yaml @arguments
+gh workflow run run-tests-selected.yaml --repo dotnet/BenchmarkDotNet --ref master -f runs_on=windows-latest -f filter=CompletedWorkItemCountIsAccurate
 ```
