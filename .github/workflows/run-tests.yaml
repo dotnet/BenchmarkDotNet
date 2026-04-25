@@ -126,13 +126,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       # Set up the environment
-      - name: Set up Clang
-        uses: egor-tensin/setup-clang@471a6f8ef1d449dba8e1a51780e7f943572a3f99 # v2.1
-        with:
-          version: latest
-          platform: x64
-      - name: Set up zlib-static
-        run: sudo apt-get install -y libkrb5-dev
       - name: Set up node
         uses: actions/setup-node@v6
         with:
@@ -215,13 +208,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Clang
-        uses: egor-tensin/setup-clang@471a6f8ef1d449dba8e1a51780e7f943572a3f99 # v2.1
-        with:
-          version: latest
-          platform: x64
-      - name: Set up zlib-static
-        run: sudo apt-get install -y libkrb5-dev
       - name: Run task 'pack'
         run: ./build.cmd pack
 
