@@ -32,7 +32,7 @@ jobs:
       - name: Set up v8
         run: |
           npm install jsvu -g
-          jsvu --os=win64 --engines=v8
+          jsvu --os=default --engines=v8
           Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
@@ -85,7 +85,7 @@ jobs:
       - name: Set up v8
         run: |
           npm install jsvu -g
-          jsvu --os=win64 --engines=v8
+          jsvu --os=default --engines=v8
           Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
@@ -138,7 +138,7 @@ jobs:
         with:
           node-version: "24"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=linux64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+        run: npm install jsvu -g && jsvu --os=default --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
       # Build and Test
@@ -173,10 +173,8 @@ jobs:
       matrix:
         os:
           - runs-on: 'macos-latest'
-            jsvu-os: 'mac64arm'
             arch: 'arm64'
           - runs-on: 'macos-15-intel'
-            jsvu-os: 'mac64'
             arch: 'x64'
     steps:
       - uses: actions/checkout@v6
@@ -185,7 +183,7 @@ jobs:
         with:
           node-version: "24"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=${{ matrix.os.jsvu-os }} --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+        run: npm install jsvu -g && jsvu --os=default --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
       # Build and Test
