@@ -108,9 +108,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             // Skip creating NuGet.config file if clear tag is not specified, and feeds only contain a default nuget.org feed.
             if (!useNuGetClearTag && Feeds.Count == 1)
             {
-                var feed = Feeds.First();
-                if (feed.Key == NativeAotNuGetFeed
-                 && feed.Value == "https://api.nuget.org/v3/index.json")
+                if (Feeds.TryGetValue(NativeAotNuGetFeed, out var value) && value == "https://api.nuget.org/v3/index.json")
                     return;
             }
 
