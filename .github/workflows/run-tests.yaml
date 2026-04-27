@@ -32,7 +32,7 @@ jobs:
       - name: Set up v8
         run: |
           npm install jsvu -g
-          jsvu --os=win64 --engines=v8
+          jsvu --os=default --engines=v8
           Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
@@ -85,7 +85,7 @@ jobs:
       - name: Set up v8
         run: |
           npm install jsvu -g
-          jsvu --os=win64 --engines=v8
+          jsvu --os=default --engines=v8
           Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
@@ -126,19 +126,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       # Set up the environment
-      - name: Set up Clang
-        uses: egor-tensin/setup-clang@471a6f8ef1d449dba8e1a51780e7f943572a3f99 # v2.1
-        with:
-          version: latest
-          platform: x64
-      - name: Set up zlib-static
-        run: sudo apt-get install -y libkrb5-dev
       - name: Set up node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=linux64 --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+        run: npm install jsvu -g && jsvu --os=default --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
       # Build and Test
@@ -173,10 +166,8 @@ jobs:
       matrix:
         os:
           - runs-on: 'macos-latest'
-            jsvu-os: 'mac64arm'
             arch: 'arm64'
           - runs-on: 'macos-15-intel'
-            jsvu-os: 'mac64'
             arch: 'x64'
     steps:
       - uses: actions/checkout@v6
@@ -185,7 +176,7 @@ jobs:
         with:
           node-version: "24"
       - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=${{ matrix.os.jsvu-os }} --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
+        run: npm install jsvu -g && jsvu --os=default --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
       - name: Install wasm-tools workload
         run: ./build.cmd install-wasm-tools
       # Build and Test
@@ -217,13 +208,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Clang
-        uses: egor-tensin/setup-clang@471a6f8ef1d449dba8e1a51780e7f943572a3f99 # v2.1
-        with:
-          version: latest
-          platform: x64
-      - name: Set up zlib-static
-        run: sudo apt-get install -y libkrb5-dev
       - name: Run task 'pack'
         run: ./build.cmd pack
 
