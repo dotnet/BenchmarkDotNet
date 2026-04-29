@@ -34,7 +34,7 @@ on:
           - net472
       filter:
         type: string
-        description: Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests
+        description: Test filter text (It's used for `dotnet test --filter-method`) Use default value when running all tests
         required: true
         default: "BenchmarkDotNet"
       iteration_count:
@@ -91,12 +91,13 @@ jobs:
         run: |
           $PSNativeCommandUseErrorActionPreference = $true
           $iterationCount = ${{ inputs.iteration_count }}
+          
+          Write-Host ("OSArchitecture" + [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)
 
           foreach($i in 1..$iterationCount) {
             Write-Output ('##[group]Executing Iteration: {0}/${{ inputs.iteration_count }}' -f $i)
 
-            dotnet test -c Release --framework ${{ inputs.framework }} --filter ${{ inputs.filter }} -tl:off --no-build --logger "console;verbosity=normal"
-
+            dotnet test -c Release --framework ${{ inputs.framework }} --no-build --filter-method "${{ inputs.filter }}" --no-ansi
             Write-Output '##[endgroup]'
           }
 

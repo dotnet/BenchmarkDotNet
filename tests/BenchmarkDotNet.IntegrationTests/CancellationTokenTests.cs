@@ -17,7 +17,6 @@ using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Validators;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;
 

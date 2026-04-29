@@ -4,6 +4,7 @@
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests</AssemblyTitle>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net472;net8.0</TargetFrameworks>
     <TargetFramework Condition="'$(OS)' != 'Windows_NT'">net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests</PackageId>
@@ -14,6 +15,9 @@
     <NoWarn>$(NoWarn);CA2007;CA1825</NoWarn>
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -29,18 +33,24 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj" />
-    <ProjectReference Include="..\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\*.cs"
+             Exclude="..\BenchmarkDotNet.Tests\XUnit\*Tests.cs"
+             Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)"/>
+
+    <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="Shared\Loggers\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Mocks\**\*.cs" Link="Shared\Mocks\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Builders\**\*.cs" Link="Shared\Builders\%(RecursiveDir)%(Filename)%(Extension)" />
+
+    <Compile Include="..\BenchmarkDotNet.Tests\Helpers\ExporterTestHelper.cs" Link="Shared\Helpers\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.Tests\TestCultureInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">

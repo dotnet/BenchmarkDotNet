@@ -7,7 +7,7 @@
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Frosting" Version="6.0.0" />
+    <PackageReference Include="Cake.Frosting" Version="6.1.0" />
     <PackageReference Include="Cake.FileHelpers" Version="7.0.0" />
     <PackageReference Include="Cake.Git" Version="5.0.1" />
     <PackageReference Include="Docfx.App" Version="2.78.5" />

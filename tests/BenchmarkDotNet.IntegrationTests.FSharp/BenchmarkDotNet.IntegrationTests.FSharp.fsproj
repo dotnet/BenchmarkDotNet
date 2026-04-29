@@ -2,6 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <PublicSign>false</PublicSign>
   </PropertyGroup>
   <ItemGroup>
@@ -9,6 +10,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="10.0.103" />

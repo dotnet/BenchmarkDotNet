@@ -14,18 +14,17 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests;
 
 public class CallerThreadTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public static TheoryData<IToolchain> GetToolchains() =>
+    public static TheoryData<IToolchain> GetToolchains() => new(
     [
         new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
         new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
         Job.Default.GetToolchain()
-    ];
+    ]);
 
     [Theory]
     [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]

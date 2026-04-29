@@ -7,7 +7,6 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using System.Diagnostics;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -73,12 +72,12 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Foo() => Thread.Sleep(10);
         }
 
-        public static TheoryData<IToolchain> GetToolchains() =>
+        public static TheoryData<IToolchain> GetToolchains() => new(
         [
             InProcessEmitToolchain.Default,
             InProcessNoEmitToolchain.Default,
             Job.Default.GetToolchain()
-        ];
+        ]);
 
         // #1120
         [Theory]

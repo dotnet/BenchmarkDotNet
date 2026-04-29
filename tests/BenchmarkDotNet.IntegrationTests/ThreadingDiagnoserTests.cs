@@ -14,7 +14,6 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

@@ -4,7 +4,6 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using System.Threading.Tasks.Sources;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -62,14 +61,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void TaskReturningMethodsAreAwaited_AlreadyComplete() => CanExecute<TaskImmediateMethods>();
 
-        public static TheoryData<IToolchain> GetToolchains() =>
+        public static TheoryData<IToolchain> GetToolchains() => new(
         [
             new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
             new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
             new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
             new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true }),
             Job.Default.GetToolchain()
-        ];
+        ]);
 
         [Theory]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]

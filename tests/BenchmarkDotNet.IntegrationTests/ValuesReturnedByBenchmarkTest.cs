@@ -1,11 +1,10 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System.Collections.Immutable;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
