@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 throw;
             }
 
-            AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
+            AssertStats(summary, toolchain, new Dictionary<string, (string metricName, double expectedValue)>
             {
                 { nameof(CompletedWorkItemCount.DoNothing), ("CompletedWorkItemCount", 0.0) },
                 { nameof(CompletedWorkItemCount.CompleteOneWorkItem), ("CompletedWorkItemCount", 1.0) }
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 throw;
             }
 
-            AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
+            AssertStats(summary, toolchain, new Dictionary<string, (string metricName, double expectedValue)>
             {
                 { nameof(LockContentionCount.DoNothing), ("LockContentionCount", 0.0) },
                 { nameof(LockContentionCount.RunIntoLockContention), ("LockContentionCount", 1.0) }
@@ -167,7 +167,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     ? ConsoleLogger.Default
                     : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
-        private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
+        private void AssertStats(Summary summary, IToolchain toolchain, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {
             foreach (var assertion in assertions)
             {
@@ -175,9 +175,17 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 var metric = selectedReport.Metrics.Single(m => m.Key == assertion.Value.metricName);
 
-                // precision is set to 2 because CoreCLR might schedule some work item on it's own and hence affect the results..
-                // precision = 3 is not enough (e.g., sometimes the actual value may be equal 1.0009765625 while the expected value is 1.0)
-                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision: 2);
+                int precision = 0;
+                if (toolchain.IsInProcess)
+                {
+                    // precision is set to 2 because CoreCLR might schedule some work item on it's own and hence affect the results..
+                    // precision = 3 is not enough (e.g., sometimes the actual value may be equal 1.0009765625 while the expected value is 1.0)
+                    precision = !OsDetector.IsMacOS()
+                        ? 2
+                        : 1; // On macos, there are some additional background operations (https://github.com/dotnet/BenchmarkDotNet/issues/3098)
+                }
+
+                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision);
             }
         }
     }
