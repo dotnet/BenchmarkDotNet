@@ -175,15 +175,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 var metric = selectedReport.Metrics.Single(m => m.Key == assertion.Value.metricName);
 
-                int precision = 0;
-                if (toolchain.IsInProcess)
-                {
-                    // precision is set to 2 because CoreCLR might schedule some work item on it's own and hence affect the results..
-                    // precision = 3 is not enough (e.g., sometimes the actual value may be equal 1.0009765625 while the expected value is 1.0)
-                    precision = !OsDetector.IsMacOS()
-                        ? 2
-                        : 1; // On macos, there are some additional background operations (https://github.com/dotnet/BenchmarkDotNet/issues/3098)
-                }
+                // precision is set to 2 because CoreCLR might schedule some work item on it's own and hence affect the results..
+                // precision = 3 is not enough (e.g., sometimes the actual value may be equal 1.0009765625 while the expected value is 1.0)
+                int precision = 2;
+
+                // On macos, there are some additional background operations (https://github.com/dotnet/BenchmarkDotNet/issues/3098)
+                if (OsDetector.IsMacOS())
+                    precision = 1;
 
                 Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision);
             }
