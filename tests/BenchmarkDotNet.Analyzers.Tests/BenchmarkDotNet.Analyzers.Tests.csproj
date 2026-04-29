@@ -10,6 +10,10 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Xunit.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="BenchmarkDotNet.Analyzers.Tests.csproj.DotSettings" />
   </ItemGroup>
   <ItemGroup>

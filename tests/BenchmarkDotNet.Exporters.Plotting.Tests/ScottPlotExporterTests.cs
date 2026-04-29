@@ -3,7 +3,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using System.Diagnostics.CodeAnalysis;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Exporters.Plotting.Tests
 {

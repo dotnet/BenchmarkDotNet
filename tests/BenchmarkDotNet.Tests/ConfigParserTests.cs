@@ -1,4 +1,4 @@
-﻿using AwesomeAssertions;
+using AwesomeAssertions;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
@@ -21,7 +21,6 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using Perfolizer.Horology;
 using System.Reflection;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests
 {

@@ -1,7 +1,6 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

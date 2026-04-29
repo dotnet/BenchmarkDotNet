@@ -1,10 +1,9 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Globalization;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

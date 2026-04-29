@@ -1,7 +1,5 @@
 #if NETFRAMEWORK
 using BenchmarkDotNet.IntegrationTests.CustomPaths;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

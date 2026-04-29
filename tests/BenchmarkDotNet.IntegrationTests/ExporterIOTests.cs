@@ -1,13 +1,13 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Collections.Immutable;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

@@ -1,8 +1,7 @@
-﻿using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Tests.Common;
 using JetBrains.Annotations;
 using Pragmastat.Exceptions;
-using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mathematics;
 
