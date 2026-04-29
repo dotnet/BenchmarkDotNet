@@ -1,9 +1,8 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Portability;
-using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Diagnostics.Runtime;
 using System.Text.RegularExpressions;
 
@@ -58,24 +57,9 @@ namespace BenchmarkDotNet.Disassemblers
             }
             if (OsDetector.IsMacOS())
             {
-                // ClrMD does not support CreateSnapshotAndAttach on MacOS, and AttachToProcess is unreliable, so we have to create a dump file and load it.
-                string dumpPath = Path.GetTempFileName();
-                try
-                {
-                    try
-                    {
-                        new DiagnosticsClient(processId).WriteDump(DumpType.Full, dumpPath, logDumpGeneration: false);
-                    }
-                    catch (ServerErrorException sxe)
-                    {
-                        throw new ArgumentException($"Unable to create a snapshot of process {processId:x}.", sxe);
-                    }
-                    return DataTarget.LoadDump(dumpPath);
-                }
-                finally
-                {
-                    File.Delete(dumpPath);
-                }
+                // On macOS it need to use CreateSnapshotAndAttach API instead of AttachToProcess.
+                // https://github.com/microsoft/clrmd/issues/1034
+                return DataTarget.CreateSnapshotAndAttach(processId);
             }
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
@@ -85,8 +69,6 @@ namespace BenchmarkDotNet.Disassemblers
             using var dataTarget = Attach(args.ProcessId);
 
             var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
-
-            ConfigureSymbols(dataTarget);
 
             var state = new State(runtime, args.TargetFrameworkMoniker);
 
@@ -118,12 +100,6 @@ namespace BenchmarkDotNet.Disassemblers
                 AddressToNameMapping = state.AddressToNameMapping,
                 PointerSize = (uint)IntPtr.Size
             };
-        }
-
-        private static void ConfigureSymbols(DataTarget dataTarget)
-        {
-            // code copied from https://github.com/Microsoft/clrmd/issues/34#issuecomment-161926535
-            dataTarget.SetSymbolPath("http://msdl.microsoft.com/download/symbols");
         }
 
         private static void FilterAndEnqueue(State state, ClrMdArgs args)
