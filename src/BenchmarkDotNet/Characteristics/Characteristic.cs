@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
 namespace BenchmarkDotNet.Characteristics

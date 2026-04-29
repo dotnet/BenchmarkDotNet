@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using System.Diagnostics.CodeAnalysis;
 

@@ -732,7 +732,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanSpecifyWasmArgsUsingEquals()
         {
-            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module" , GetDummyWasmEngine()], new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(["--runtimes", "wasmnet80", "--wasmArgs=--expose_wasm --module", GetDummyWasmEngine()], new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
             Assert.NotNull(parsedConfiguration.config);
             var jobs = parsedConfiguration.config.GetJobs();

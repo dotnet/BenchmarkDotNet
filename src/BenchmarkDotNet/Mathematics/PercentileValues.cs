@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.QuantileEstimators;
 using Pragmastat;

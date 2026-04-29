@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
 using Perfolizer.Metrology;

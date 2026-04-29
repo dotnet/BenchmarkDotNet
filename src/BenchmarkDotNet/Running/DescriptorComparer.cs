@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Order;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running

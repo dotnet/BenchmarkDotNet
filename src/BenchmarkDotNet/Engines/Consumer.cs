@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System.Runtime.CompilerServices;
 
 // ReSharper disable NotAccessedField.Local
@@ -101,13 +101,13 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
-             => Consume((object) objectValue);
+             => Consume((object)objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void Consume<T>(T* ptrValue) where T : unmanaged => ptrHolder = (IntPtr) ptrValue;
+        public unsafe void Consume<T>(T* ptrValue) where T : unmanaged => ptrHolder = (IntPtr)ptrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void Consume(void* ptrValue) => ptrHolder = (IntPtr) ptrValue;
+        public unsafe void Consume(void* ptrValue) => ptrHolder = (IntPtr)ptrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)

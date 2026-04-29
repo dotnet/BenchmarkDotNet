@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;

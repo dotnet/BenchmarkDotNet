@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes.CompilerServices;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;

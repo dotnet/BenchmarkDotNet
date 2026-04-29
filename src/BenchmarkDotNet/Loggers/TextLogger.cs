@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Loggers
+namespace BenchmarkDotNet.Loggers
 {
     public class TextLogger : ILogger, IDisposable
     {

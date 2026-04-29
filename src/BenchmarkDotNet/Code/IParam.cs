@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Code
+namespace BenchmarkDotNet.Code
 {
     public interface IParam
     {

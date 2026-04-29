@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using System.Diagnostics;
 using System.Xml;
 using System.Xml.Serialization;

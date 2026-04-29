@@ -54,54 +54,54 @@ namespace BenchmarkDotNet.Columns
             switch (Metric)
             {
                 case RatioMetric.Mean:
-                {
-                    bool advancedPrecision = IsNonBaselinesPrecise(summary, baseline, benchmarkCase);
-                    switch (ratioStyle)
                     {
-                        case RatioStyle.Value:
-                            return ratio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo);
-                        case RatioStyle.Percentage:
-                            return isBaseline
-                                ? "baseline"
-                                : ratio.Mean >= 1.0
-                                    ? "+" + ((ratio.Mean - 1.0) * 100).ToString(advancedPrecision ? "N1" : "N0", cultureInfo) + "%"
-                                    : "-" + ((1.0 - ratio.Mean) * 100).ToString(advancedPrecision ? "N1" : "N0", cultureInfo) + "%";
-                        case RatioStyle.Trend:
-                            return isBaseline
-                                ? "baseline"
-                                : ratio.Mean >= 1.0
-                                    ? ratio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo) + "x slower"
-                                    : invertedRatio == null
-                                        ? "NA"
-                                        : invertedRatio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo) + "x faster";
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
+                        bool advancedPrecision = IsNonBaselinesPrecise(summary, baseline, benchmarkCase);
+                        switch (ratioStyle)
+                        {
+                            case RatioStyle.Value:
+                                return ratio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo);
+                            case RatioStyle.Percentage:
+                                return isBaseline
+                                    ? "baseline"
+                                    : ratio.Mean >= 1.0
+                                        ? "+" + ((ratio.Mean - 1.0) * 100).ToString(advancedPrecision ? "N1" : "N0", cultureInfo) + "%"
+                                        : "-" + ((1.0 - ratio.Mean) * 100).ToString(advancedPrecision ? "N1" : "N0", cultureInfo) + "%";
+                            case RatioStyle.Trend:
+                                return isBaseline
+                                    ? "baseline"
+                                    : ratio.Mean >= 1.0
+                                        ? ratio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo) + "x slower"
+                                        : invertedRatio == null
+                                            ? "NA"
+                                            : invertedRatio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo) + "x faster";
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
+                        }
                     }
-                }
                 case RatioMetric.StdDev:
-                {
-                    switch (ratioStyle)
                     {
-                        case RatioStyle.Value:
-                            return ratio.StandardDeviation.ToString("N2", cultureInfo);
-                        case RatioStyle.Percentage:
-                            return isBaseline
-                                ? ""
-                                : Math.Abs(ratio.Mean) < 1e-9
-                                    ? "NA"
-                                    : (100 * ratio.StandardDeviation / ratio.Mean).ToString("N1", cultureInfo) + "%";
-                        case RatioStyle.Trend:
-                            return isBaseline
-                                ? ""
-                                : ratio.Mean >= 1.0
-                                    ? ratio.StandardDeviation.ToString("N2", cultureInfo) + "x"
-                                    : invertedRatio == null
+                        switch (ratioStyle)
+                        {
+                            case RatioStyle.Value:
+                                return ratio.StandardDeviation.ToString("N2", cultureInfo);
+                            case RatioStyle.Percentage:
+                                return isBaseline
+                                    ? ""
+                                    : Math.Abs(ratio.Mean) < 1e-9
                                         ? "NA"
-                                        : invertedRatio.StandardDeviation.ToString("N2", cultureInfo) + "x";
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
+                                        : (100 * ratio.StandardDeviation / ratio.Mean).ToString("N1", cultureInfo) + "%";
+                            case RatioStyle.Trend:
+                                return isBaseline
+                                    ? ""
+                                    : ratio.Mean >= 1.0
+                                        ? ratio.StandardDeviation.ToString("N2", cultureInfo) + "x"
+                                        : invertedRatio == null
+                                            ? "NA"
+                                            : invertedRatio.StandardDeviation.ToString("N2", cultureInfo) + "x";
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
+                        }
                     }
-                }
                 default:
                     throw new NotSupportedException();
             }
@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public override int PriorityInCategory => (int) Metric;
+        public override int PriorityInCategory => (int)Metric;
         public override bool IsNumeric => true;
         public override UnitType UnitType => UnitType.Dimensionless;
 

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators

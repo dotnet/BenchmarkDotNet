@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Reports
                 return MinPrecision;
             if (minValue < 1 - 1e-9)
                 return MaxPrecision;
-            return MathHelper.Clamp((int) Math.Truncate(-Math.Log10(minValue)) + 3, MinPrecision, MaxPrecision);
+            return MathHelper.Clamp((int)Math.Truncate(-Math.Log10(minValue)) + 3, MinPrecision, MaxPrecision);
         }
 
         internal static int CalcPrecision(IList<double> values, int parentPrecision)

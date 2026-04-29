@@ -1,9 +1,9 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System.Text;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public abstract class Argument: IEquatable<Argument>
+    public abstract class Argument : IEquatable<Argument>
     {
         [PublicAPI] public string TextRepresentation { get; }
 

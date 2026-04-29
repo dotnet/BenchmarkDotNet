@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
 
-                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
                 }

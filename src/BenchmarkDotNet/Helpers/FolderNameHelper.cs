@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
 using System.Globalization;
 using System.Text;
@@ -9,7 +9,8 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string ToFolderName(object? value)
         {
-            switch (value) {
+            switch (value)
+            {
                 case null:
                     return "null";
                 case bool b:

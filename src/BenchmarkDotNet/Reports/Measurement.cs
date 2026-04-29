@@ -1,4 +1,4 @@
-﻿#if DEBUG
+#if DEBUG
 using System.Diagnostics;
 #endif
 using System.Globalization;

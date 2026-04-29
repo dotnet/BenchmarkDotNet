@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Toolchains.InProcess;
+namespace BenchmarkDotNet.Toolchains.InProcess;
 
 public abstract class InProcessSettings
 {

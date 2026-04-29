@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;

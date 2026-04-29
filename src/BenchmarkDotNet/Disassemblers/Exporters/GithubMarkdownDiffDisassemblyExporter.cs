@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;

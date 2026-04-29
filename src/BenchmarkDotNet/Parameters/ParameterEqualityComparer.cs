@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using BenchmarkDotNet.Portability;
 
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (x is IEnumerable xEnumerable) // General collection equality support
             {
-                return EnumerablesEqual(xEnumerable, (IEnumerable) y);
+                return EnumerablesEqual(xEnumerable, (IEnumerable)y);
             }
 
             return FallbackSimpleEquals(x, y);
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Parameters
             // Check for multi-dimensional array and ITuple and re-try for each element recursively.
             if (x is Array xArr)
             {
-                Array yArr = (Array) y;
+                Array yArr = (Array)y;
                 if (xArr.Rank != yArr.Rank)
                 {
                     equals = false;
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Parameters
                     string methodName = xArr.Rank == 2
                         ? nameof(TwoDArraysEqual)
                         : nameof(ThreeDArraysEqual);
-                    equals = (bool) typeof(ParameterEqualityComparer)
+                    equals = (bool)typeof(ParameterEqualityComparer)
                         .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)!
                         .MakeGenericMethod(xArr.GetType().GetElementType()!, yArr.GetType().GetElementType()!)
                         .Invoke(null, [xArr, yArr])!;
@@ -163,7 +163,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (x is IEnumerable xEnumerable) // General collection equality support
             {
-                equals = EnumerablesEqual(xEnumerable, (IEnumerable) y);
+                equals = EnumerablesEqual(xEnumerable, (IEnumerable)y);
                 return true;
             }
 
@@ -229,7 +229,7 @@ namespace BenchmarkDotNet.Parameters
             {
                 for (int j = 0; j < arrOne.GetLength(1); j++)
                 {
-                    for (int k = 0; k <arrOne.GetLength(2); k++)
+                    for (int k = 0; k < arrOne.GetLength(2); k++)
                     {
                         if (!ValuesEqual(arrOne[i, j, k], arrTwo[i, j, k]))
                         {

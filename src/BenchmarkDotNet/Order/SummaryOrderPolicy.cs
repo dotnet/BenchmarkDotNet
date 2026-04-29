@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Order
+namespace BenchmarkDotNet.Order
 {
     public enum SummaryOrderPolicy
     {

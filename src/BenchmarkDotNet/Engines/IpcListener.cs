@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Engines;
+namespace BenchmarkDotNet.Engines;
 
 internal abstract class IpcListener : IDisposable
 {

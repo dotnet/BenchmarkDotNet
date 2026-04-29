@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Attributes

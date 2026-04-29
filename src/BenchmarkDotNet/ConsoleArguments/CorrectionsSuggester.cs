@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;

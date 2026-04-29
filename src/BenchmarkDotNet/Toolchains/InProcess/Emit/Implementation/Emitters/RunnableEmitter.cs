@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
@@ -469,7 +469,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
              */
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, notElevenField);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte) 11);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)11);
             ilBuilder.Emit(OpCodes.Bne_Un, notElevenLabel);
             {
                 /*
@@ -512,7 +512,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Replace arg names
             var parameters = Descriptor.WorkloadMethod.GetParameters()
                 .Select(p =>
-                    (ParameterInfo) new EmitParameterInfo(
+                    (ParameterInfo)new EmitParameterInfo(
                         p.Position,
                         ArgParamPrefix + p.Position,
                         p.ParameterType,

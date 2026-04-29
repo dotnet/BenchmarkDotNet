@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Xml;
 
 namespace BenchmarkDotNet.Attributes

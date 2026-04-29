@@ -1,4 +1,4 @@
-﻿using Gee.External.Capstone.Arm64;
+using Gee.External.Capstone.Arm64;
 using Iced.Intel;
 using System.Text;
 

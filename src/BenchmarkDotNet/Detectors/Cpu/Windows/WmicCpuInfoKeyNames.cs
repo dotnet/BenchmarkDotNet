@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Detectors.Cpu.Windows;
+namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 internal static class WmicCpuInfoKeyNames
 {

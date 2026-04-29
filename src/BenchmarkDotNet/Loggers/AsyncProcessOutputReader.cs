@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Loggers
 
         public Channel<string>? OutputChannel => outputChannel;
 
-        internal bool IsStarted => Interlocked.Read(ref status) == (long) Status.Started;
+        internal bool IsStarted => Interlocked.Read(ref status) == (long)Status.Started;
 
         internal AsyncProcessOutputReader(
             Process process,
@@ -47,19 +47,19 @@ namespace BenchmarkDotNet.Loggers
             this.readStandardError = readStandardError;
             this.stdOutLogger = stdOutLogger ?? NullLogger.Instance;
             this.stdErrLogger = stdErrLogger ?? NullLogger.Instance;
-            status = (long) Status.Created;
+            status = (long)Status.Created;
         }
 
         public void Dispose()
         {
-            Interlocked.Exchange(ref status, (long) Status.Disposed);
+            Interlocked.Exchange(ref status, (long)Status.Disposed);
 
             Detach();
         }
 
         internal void BeginRead()
         {
-            if (Interlocked.CompareExchange(ref status, (long) Status.Started, (long) Status.Created) != (long) Status.Created)
+            if (Interlocked.CompareExchange(ref status, (long)Status.Started, (long)Status.Created) != (long)Status.Created)
                 throw new InvalidOperationException("Reader can be started only once");
 
             Attach();
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Loggers
 
         internal void CancelRead()
         {
-            if (Interlocked.CompareExchange(ref status, (long) Status.Stopped, (long) Status.Started) != (long) Status.Started)
+            if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
 
             process.CancelOutputRead();
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Loggers
 
         internal async ValueTask StopReadAsync()
         {
-            if (Interlocked.CompareExchange(ref status, (long) Status.Stopped, (long) Status.Started) != (long) Status.Started)
+            if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
 
             await stdOutFinishTcs.Task.WaitAsync(FinishEventTimeout).ConfigureAwait(false);

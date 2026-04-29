@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Exporters.Xml
+namespace BenchmarkDotNet.Exporters.Xml
 {
     internal interface IXmlSerializer
     {

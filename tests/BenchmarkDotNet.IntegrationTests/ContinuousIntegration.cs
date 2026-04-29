@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

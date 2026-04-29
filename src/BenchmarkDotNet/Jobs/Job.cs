@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using JetBrains.Annotations;
 using System.Diagnostics.CodeAnalysis;
 

@@ -1,8 +1,9 @@
-﻿using BenchmarkDotNet.Analyzers.Attributes;
+using BenchmarkDotNet.Analyzers.Attributes;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.AnalyzerTests.Attributes;
+
 public class GeneralArgumentAttributesAnalyzerTests
 {
     public class MethodWithoutAttributeMustHaveNoParameters : AnalyzerTestFixture<GeneralArgumentAttributesAnalyzer>

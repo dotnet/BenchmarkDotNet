@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var builder = new MyBuilder();
             var executor = new MyExecutor();
             var myToolchain = new Toolchain("My", generator, builder, executor);
-            var job = new Job(Job.Dry) { Infrastructure = { Toolchain = myToolchain} };
+            var job = new Job(Job.Dry) { Infrastructure = { Toolchain = myToolchain } };
             var config = CreateSimpleConfig(logger).AddJob(job);
 
             CanExecute<ToolchainBenchmark>(config, fullValidation: false);

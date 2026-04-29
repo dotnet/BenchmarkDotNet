@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Exporters.Csv
             {
                 foreach (var measurement in report.AllMeasurements)
                 {
-                    for (int i = 0; i < columns.Length; )
+                    for (int i = 0; i < columns.Length;)
                     {
                         await writer.WriteAsync(CsvHelper.Escape(columns[i].GetValue(summary, report, measurement), realSeparator), cancellationToken).ConfigureAwait(false);
 

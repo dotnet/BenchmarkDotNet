@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Engines;
@@ -51,7 +51,8 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
+        [PublicAPI]
+        public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(RunAllAsync(config, args));
@@ -60,7 +61,8 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        [PublicAPI] public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
+        [PublicAPI]
+        public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(RunAllJoinedAsync(config, args));

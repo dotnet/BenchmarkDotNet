@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using System.Collections.Immutable;

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         public IEnumerable<Conclusion> Analyse(Summary summary)
             => from pair in results
-                from error in pair.Value.Errors
-                select Conclusion.CreateWarning(Id, error, summary[pair.Key]);
+               from error in pair.Value.Errors
+               select Conclusion.CreateWarning(Id, error, summary[pair.Key]);
     }
 }

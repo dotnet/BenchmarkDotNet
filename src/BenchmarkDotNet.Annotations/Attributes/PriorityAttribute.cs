@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Attributes
+namespace BenchmarkDotNet.Attributes
 {
     public abstract class PriorityAttribute : Attribute
     {

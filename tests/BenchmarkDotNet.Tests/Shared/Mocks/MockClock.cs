@@ -1,4 +1,4 @@
-﻿using Perfolizer.Horology;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Tests.Mocks
 {

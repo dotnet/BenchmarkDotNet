@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -161,7 +161,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             // we create delegate to avoid boxing, IMPORTANT!
             return property != null
-                ? (Func<long>) property.GetGetMethod()!.CreateDelegate(typeof(Func<long>))
+                ? (Func<long>)property.GetGetMethod()!.CreateDelegate(typeof(Func<long>))
                 : () => 0;
         }
 #endif

@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Diagnosers;
+namespace BenchmarkDotNet.Diagnosers;
 
 public class InProcessDiagnoserActionArgs(object benchmarkInstance)
 {

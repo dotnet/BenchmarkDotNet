@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Running;
 
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("*stillWRONG*", false)]
         public void TheFilterIsCaseInsensitive(string pattern, bool expected)
         {
-            var benchmarkCase  = BenchmarkConverter.TypeToBenchmarks(typeof(TypeWithBenchmarks)).BenchmarksCases.Single();
+            var benchmarkCase = BenchmarkConverter.TypeToBenchmarks(typeof(TypeWithBenchmarks)).BenchmarksCases.Single();
 
             var filter = new GlobFilter([pattern]);
 

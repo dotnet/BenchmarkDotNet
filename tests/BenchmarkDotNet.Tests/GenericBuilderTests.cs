@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Tests
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(types, typeof(ThreeArgGenericBenchmark<char, string, byte>));
         }
 
-        [GenericTypeArguments(typeof(int), typeof(char),  typeof(string))]
+        [GenericTypeArguments(typeof(int), typeof(char), typeof(string))]
         [GenericTypeArguments(typeof(char), typeof(string), typeof(byte))]
         public class ThreeArgGenericBenchmark<T1, T2, T3>
         {

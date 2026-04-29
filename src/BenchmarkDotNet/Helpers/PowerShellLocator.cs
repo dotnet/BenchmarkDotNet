@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
@@ -13,7 +13,7 @@ internal class PowerShellLocator
         $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}" +
         $"v1.0{Path.DirectorySeparatorChar}powershell.exe";
 
-        [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("windows")]
     internal static string? LocateOnWindows()
     {
         if (OsDetector.IsWindows() == false)

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime;
@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         public long Value { get { return _value; } }
 
-        public Arm64RegisterId RegisterId {  get {  return _registerId; } }
+        public Arm64RegisterId RegisterId { get { return _registerId; } }
     }
 
     internal class Arm64Disassembler : ClrMdDisassembler

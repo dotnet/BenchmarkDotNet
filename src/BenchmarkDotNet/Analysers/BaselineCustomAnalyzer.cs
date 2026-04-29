@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 

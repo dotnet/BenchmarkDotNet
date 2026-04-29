@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.IntegrationTests;
+namespace BenchmarkDotNet.IntegrationTests;
 
 internal class PowerRequest(string requestType, string requesterType, string requesterName, string? reason)
 {

@@ -1,7 +1,7 @@
-﻿namespace BenchmarkDotNet.Configs
+namespace BenchmarkDotNet.Configs
 {
     public interface IConfigSource
     {
-         IConfig Config { get; }
+        IConfig Config { get; }
     }
 }

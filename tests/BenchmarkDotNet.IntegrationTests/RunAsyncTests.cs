@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.IntegrationTests;
 
 public class RunAsyncTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public static TheoryData<IToolchain> GetToolchains() => 
+    public static TheoryData<IToolchain> GetToolchains() =>
     [
         new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
         new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),

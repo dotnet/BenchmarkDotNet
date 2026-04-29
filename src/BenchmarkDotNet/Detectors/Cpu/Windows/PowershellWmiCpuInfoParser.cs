@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
 using Perfolizer.Models;
@@ -40,8 +40,8 @@ internal static class PowershellWmiCpuInfoParser
                 && double.TryParse(frequencyValue, out double frequency)
                 && frequency > 0)
             {
-               nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
-               maxFrequency = Math.Max(maxFrequency, frequency);
+                nominalFrequency = nominalFrequency == 0 ? frequency : Math.Min(nominalFrequency, frequency);
+                maxFrequency = Math.Max(maxFrequency, frequency);
             }
         }
 

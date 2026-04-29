@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability;
 using System.Reflection;
 using System.Reflection.Emit;
 

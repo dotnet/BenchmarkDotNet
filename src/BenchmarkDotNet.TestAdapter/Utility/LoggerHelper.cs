@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System.Diagnostics;
 
 namespace BenchmarkDotNet.TestAdapter;

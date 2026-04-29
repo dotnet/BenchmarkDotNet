@@ -11,14 +11,14 @@ public static class Repo
     public const string Name = "BenchmarkDotNet";
     private const string HttpsUrlBase = $"https://github.com/{Owner}/{Name}";
     public const string SshGitUrl = $"git@github.com:{Owner}/{Name}.git";
-    
+
     public const string ChangelogBranch = "docs-changelog";
     public const string DocsStableBranch = "docs-stable";
     public const string MasterBranch = "master";
 
     public const string MaintainerAuthorName = "GitHub Actions";
     public const string MaintainerAuthorEmail = "actions@github.com";
-    
+
     public static async Task<int> GetDependentProjectsNumber()
     {
         using var httpClient = new HttpClient();

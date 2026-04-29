@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes.CompilerServices;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Engines;

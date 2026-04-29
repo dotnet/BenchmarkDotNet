@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using System.Runtime.CompilerServices;
 

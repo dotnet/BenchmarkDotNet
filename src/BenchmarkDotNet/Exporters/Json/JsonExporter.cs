@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Exporters.Json
+namespace BenchmarkDotNet.Exporters.Json
 {
     public class JsonExporter : JsonExporterBase
     {

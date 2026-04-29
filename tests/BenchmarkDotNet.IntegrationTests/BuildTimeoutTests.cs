@@ -8,7 +8,7 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class BuildTimeoutTests: BenchmarkTestExecutor
+    public class BuildTimeoutTests : BenchmarkTestExecutor
     {
         public BuildTimeoutTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 

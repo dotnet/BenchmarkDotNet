@@ -103,10 +103,10 @@ namespace BenchmarkDotNet.Tests.Exporters
         [Fact]
         public async Task ParametrizedBenchmarks_LabelExpansion()
         {
-var summary = new Summary(
-                "SingleBenchmarkSummary",
-                [
-                    new BenchmarkReport(
+            var summary = new Summary(
+                            "SingleBenchmarkSummary",
+                            [
+                                new BenchmarkReport(
                         success: true,
                         benchmarkCase: new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
@@ -167,14 +167,14 @@ var summary = new Summary(
                         [
                             new(new FakeMetricDescriptor("label", "label"), 42.0)
                         ])
-                ],
-                HostEnvironmentInfo.GetCurrent(),
-                "",
-                "",
-                TimeSpan.Zero,
-                CultureInfo.InvariantCulture,
-                [],
-                []);
+                            ],
+                            HostEnvironmentInfo.GetCurrent(),
+                            "",
+                            "",
+                            TimeSpan.Zero,
+                            CultureInfo.InvariantCulture,
+                            [],
+                            []);
             var logger = new AccumulationLogger();
 
             await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);

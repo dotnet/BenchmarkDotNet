@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                CultureInfo = (CultureInfo) CultureInfo.InvariantCulture.Clone();
+                CultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
                 CultureInfo.NumberFormat.NumberDecimalSeparator = "@";
             }
         }

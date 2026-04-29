@@ -96,7 +96,8 @@ public static class ConfidenceLevelExtensions
         return s + "%";
     }
 
-    [PublicAPI] public static double ToPercent(this LegacyConfidenceLevel level)
+    [PublicAPI]
+    public static double ToPercent(this LegacyConfidenceLevel level)
     {
         (int value, int digits) = ConfidenceLevelDetails[level];
 

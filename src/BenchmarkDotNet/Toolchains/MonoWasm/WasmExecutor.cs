@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             }
             finally
             {
-                if (!probeProcess.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (!probeProcess.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     probeProcess.KillTree();
                 }
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 if (isFileBasedIpc)
                 {
-                    ((FileStdOutListener) processListener.Listener).AttachProcessOutputReader(processOutputReader);
+                    ((FileStdOutListener)processListener.Listener).AttachProcessOutputReader(processOutputReader);
                 }
 
                 await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait(true);
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             BenchmarkId benchmarkId, Loggers.ILogger logger, int launchIndex, IDiagnoser diagnoser,
             CompositeInProcessDiagnoser compositeInProcessDiagnoser, IpcListener ipcListener, CancellationToken cancellationToken)
         {
-            WasmRuntime wasmRuntime = (WasmRuntime) benchmarkCase.GetRuntime();
+            WasmRuntime wasmRuntime = (WasmRuntime)benchmarkCase.GetRuntime();
             List<string> results;
             List<string> prefixedOutput;
             await using (new ProcessCleanupHelper(process, processOutputReader, logger).ConfigureAwait(false))
@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
 
-                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
                 }

@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Analysers
+namespace BenchmarkDotNet.Analysers
 {
     public enum ConclusionKind
     {

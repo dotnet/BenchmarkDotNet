@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Configs
+namespace BenchmarkDotNet.Configs
 {
     public enum BenchmarkLogicalGroupRule
     {

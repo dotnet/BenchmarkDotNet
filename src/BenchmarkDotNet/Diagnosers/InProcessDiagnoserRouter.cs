@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 using System.ComponentModel;
@@ -29,7 +29,7 @@ public struct InProcessDiagnoserRouter
         }
         return new()
         {
-            handler = Init((IInProcessDiagnoserHandler) Activator.CreateInstance(data.HandlerType)!, data.SerializedConfig!),
+            handler = Init((IInProcessDiagnoserHandler)Activator.CreateInstance(data.HandlerType)!, data.SerializedConfig!),
             index = index,
             runMode = diagnoser.GetRunMode(benchmarkCase)
         };

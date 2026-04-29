@@ -5,7 +5,7 @@ using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class BenchmarkReportExporter: ExporterBase
+    public class BenchmarkReportExporter : ExporterBase
     {
         public static readonly IExporter Default = new BenchmarkReportExporter();
 

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -10,7 +10,8 @@ namespace BenchmarkDotNet.Helpers
     {
         public static string ToSourceCode(object? value)
         {
-            switch (value) {
+            switch (value)
+            {
                 case null:
                     return "null";
                 case bool b:
@@ -33,14 +34,14 @@ namespace BenchmarkDotNet.Helpers
                     return $"System.Guid.Parse(\"{guid.ToString()}\")";
                 // Multi-dimensional arrays are more complex, we only need single-dimension support for now.
                 case Array { Rank: 1 } array:
-                {
-                    var elementsSourceCode = new string[array.Length];
-                    for (int i = 0; i < array.Length; ++i)
                     {
-                        elementsSourceCode[i] = ToSourceCode(array.GetValue(i));
+                        var elementsSourceCode = new string[array.Length];
+                        for (int i = 0; i < array.Length; ++i)
+                        {
+                            elementsSourceCode[i] = ToSourceCode(array.GetValue(i));
+                        }
+                        return $"new {array.GetType().GetElementType()!.GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", elementsSourceCode)} }}";
                     }
-                    return $"new {array.GetType().GetElementType()!.GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", elementsSourceCode)} }}";
-                }
             }
 
             var valueType = value.GetType();
@@ -51,7 +52,8 @@ namespace BenchmarkDotNet.Helpers
             if (!valueType.IsValueType)
                 return "System.Activator.CreateInstance<" + valueType.GetCorrectCSharpTypeName() + ">()";
 
-            switch (value) {
+            switch (value)
+            {
                 case TimeInterval interval:
                     return "new Perfolizer.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
                 case IntPtr ptr:

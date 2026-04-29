@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Disassemblers;
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Diagnosers
                     );
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
-                    var result = await monoDisassembler.Disassemble(benchmark, (MonoRuntime) benchmark.Job.Environment.Runtime!, cancellationToken).ConfigureAwait(false);
+                    var result = await monoDisassembler.Disassemble(benchmark, (MonoRuntime)benchmark.Job.Environment.Runtime!, cancellationToken).ConfigureAwait(false);
                     results.Add(benchmark, result);
                     break;
             }

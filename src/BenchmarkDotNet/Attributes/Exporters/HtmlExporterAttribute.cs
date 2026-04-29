@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters;
 
 namespace BenchmarkDotNet.Attributes
 {

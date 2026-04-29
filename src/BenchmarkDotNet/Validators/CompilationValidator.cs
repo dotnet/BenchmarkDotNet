@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using Microsoft.CodeAnalysis.CSharp;
@@ -106,9 +106,9 @@ namespace BenchmarkDotNet.Validators
             var memberInfos = typeof(SyntaxKind).GetMembers(BindingFlags.Public | BindingFlags.Static);
 
             return from memberInfo in memberInfos
-                           where memberInfo.Name.EndsWith("Keyword")
-                           orderby memberInfo.Name
-                           select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
+                   where memberInfo.Name.EndsWith("Keyword")
+                   orderby memberInfo.Name
+                   select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
         }
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;

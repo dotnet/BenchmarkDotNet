@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Disassemblers.Exporters;
+using BenchmarkDotNet.Disassemblers.Exporters;
 using Iced.Intel;
 using JetBrains.Annotations;
 

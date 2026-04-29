@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {

@@ -1,4 +1,4 @@
-﻿using AsmResolver.DotNet;
+using AsmResolver.DotNet;
 
 namespace BenchmarkDotNet.Weaver;
 

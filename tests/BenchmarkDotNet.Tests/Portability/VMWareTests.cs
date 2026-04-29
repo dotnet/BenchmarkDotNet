@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Tests.Portability
 {

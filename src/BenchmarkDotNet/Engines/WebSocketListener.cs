@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers;
 using System.Net;
 using vtortola.WebSockets;
 using vtortola.WebSockets.Rfc6455;

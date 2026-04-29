@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests
 
         static TestCultureInfo()
         {
-            Instance = (CultureInfo) DefaultCultureInfo.Instance.Clone();
+            Instance = (CultureInfo)DefaultCultureInfo.Instance.Clone();
         }
     }
 }

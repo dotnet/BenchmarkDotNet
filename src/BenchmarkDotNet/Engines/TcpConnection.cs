@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers;
 using System.Net.Sockets;
 
 namespace BenchmarkDotNet.Engines;

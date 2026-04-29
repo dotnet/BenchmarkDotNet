@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Mathematics
+namespace BenchmarkDotNet.Mathematics
 {
     /// <summary>
     /// Statistics for *relation* of two data sets

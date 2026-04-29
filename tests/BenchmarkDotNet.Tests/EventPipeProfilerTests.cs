@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Diagnostics.Tracing.Parsers;
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests
             var userSettings = new EventPipeProvider(
                 DotNetRuntime,
                 EventLevel.Verbose,
-                (long) (ClrTraceEventParser.Keywords.Default | ClrTraceEventParser.Keywords.JitTracing));
+                (long)(ClrTraceEventParser.Keywords.Default | ClrTraceEventParser.Keywords.JitTracing));
 
             var result = EventPipeProfiler.MapToProviders(EventPipeProfile.CpuSampling, [userSettings]);
 

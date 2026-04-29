@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using System.Diagnostics.CodeAnalysis;

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -67,7 +67,7 @@ public sealed class MockInProcessDiagnoserHandler : IInProcessDiagnoserHandler
     public void Initialize(string? serializedConfig)
     {
         var split = serializedConfig!.Split(' ');
-        _signal = (BenchmarkSignal) Enum.Parse(typeof(BenchmarkSignal), split[0]);
+        _signal = (BenchmarkSignal)Enum.Parse(typeof(BenchmarkSignal), split[0]);
         _result = split[1];
     }
 

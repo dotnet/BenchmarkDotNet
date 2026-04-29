@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using JetBrains.Annotations;
 using Perfolizer.Horology;

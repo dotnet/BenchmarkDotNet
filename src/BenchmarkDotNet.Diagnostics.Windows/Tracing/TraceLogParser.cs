@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
@@ -190,8 +190,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     if (overheadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
                         goto next;
 
-                next:
-                    continue;
+            next:
+                continue;
             }
         }
 

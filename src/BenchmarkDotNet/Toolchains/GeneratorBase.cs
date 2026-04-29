@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -52,7 +52,8 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns a path where executable should be found after the build (usually \bin)
         /// </summary>
-        [PublicAPI] protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+        [PublicAPI]
+        protected virtual string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => buildArtifactsDirectoryPath;
 
         /// <summary>
@@ -65,13 +66,15 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns OS-specific executable extension
         /// </summary>
-        [PublicAPI] protected virtual string GetExecutableExtension()
+        [PublicAPI]
+        protected virtual string GetExecutableExtension()
             => OsDetector.ExecutableExtension;
 
         /// <summary>
         /// returns a path to the auto-generated .csproj file
         /// </summary>
-        [PublicAPI] protected virtual string GetProjectFilePath(string buildArtifactsDirectoryPath)
+        [PublicAPI]
+        protected virtual string GetProjectFilePath(string buildArtifactsDirectoryPath)
             => string.Empty;
 
         /// <summary>
@@ -107,7 +110,8 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// generates an app.config file next to the executable with benchmarks
         /// </summary>
-        [PublicAPI] protected virtual async ValueTask GenerateAppConfigAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
+        [PublicAPI]
+        protected virtual async ValueTask GenerateAppConfigAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             string sourcePath = $"{buildPartition.AssemblyLocation}.config";
             artifactsPaths.AppConfigPath.EnsureFolderExists();

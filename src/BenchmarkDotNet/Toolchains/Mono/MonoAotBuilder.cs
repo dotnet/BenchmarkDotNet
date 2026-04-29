@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;

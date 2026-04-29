@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public JitRuntimeValidationTest(ITestOutputHelper output) : base(output) { }
 
-//      private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
+        //      private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
         private const string RyuJitNotAvailable = "// ERROR:  RyuJIT is requested but it is not available in current environment";
         private const string ToolchainSupportsOnlyRyuJit = "Currently dotnet cli toolchain supports only RyuJit";
 
@@ -27,15 +27,15 @@ namespace BenchmarkDotNet.IntegrationTests
             Verify(ClrRuntime.Net472, jit, platform, errorMessage);
         }
 
-//      [TheoryWindowsOnly("CLR is a valid job only on Windows")]
-//      [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
-//      [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]
-//      [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
-//      [InlineData(Jit.RyuJit, Platform.X64, RyuJitNotAvailable)]
-//      public void CheckMono(Jit jit, Platform platform, string errorMessage)
-//      {
-//          Verify(Runtime.Mono, jit, platform, errorMessage);
-//      }
+        //      [TheoryWindowsOnly("CLR is a valid job only on Windows")]
+        //      [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
+        //      [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]
+        //      [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
+        //      [InlineData(Jit.RyuJit, Platform.X64, RyuJitNotAvailable)]
+        //      public void CheckMono(Jit jit, Platform platform, string errorMessage)
+        //      {
+        //          Verify(Runtime.Mono, jit, platform, errorMessage);
+        //      }
 
         public static IEnumerable<object[]> CheckCore_Arguments()
         {

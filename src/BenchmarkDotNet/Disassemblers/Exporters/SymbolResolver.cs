@@ -1,4 +1,4 @@
-﻿using Iced.Intel;
+using Iced.Intel;
 
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {

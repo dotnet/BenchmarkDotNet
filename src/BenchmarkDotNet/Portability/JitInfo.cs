@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using System.Diagnostics;
 using static BenchmarkDotNet.Portability.RuntimeInformation;
 

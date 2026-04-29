@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Loggers;
 using Microsoft.Diagnostics.Symbols;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Etlx;

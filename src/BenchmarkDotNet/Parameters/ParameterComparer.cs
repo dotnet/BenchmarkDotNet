@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using BenchmarkDotNet.Portability;
 
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (x is IEnumerable xEnumerable) // General collection comparison support
             {
-                return CompareEnumerables(xEnumerable, (IEnumerable) y);
+                return CompareEnumerables(xEnumerable, (IEnumerable)y);
             }
 
             // Anything else to differentiate between objects.
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Parameters
             // Check for multi-dimensional array and ITuple and re-try for each element recursively.
             if (x is Array xArr)
             {
-                Array yArr = (Array) y;
+                Array yArr = (Array)y;
                 if (xArr.Rank != yArr.Rank)
                 {
                     comparison = xArr.Rank.CompareTo(yArr.Rank);
@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Parameters
                     string methodName = xArr.Rank == 2
                         ? nameof(CompareTwoDArray)
                         : nameof(CompareThreeDArray);
-                    comparison = (int) typeof(ParameterComparer)
+                    comparison = (int)typeof(ParameterComparer)
                         .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)!
                         .MakeGenericMethod(xArr.GetType().GetElementType()!, yArr.GetType().GetElementType()!)
                         .Invoke(null, [xArr, yArr])!;
@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Parameters
 
             if (x is IEnumerable xEnumerable) // General collection equality support
             {
-                comparison = CompareEnumerables(xEnumerable, (IEnumerable) y);
+                comparison = CompareEnumerables(xEnumerable, (IEnumerable)y);
                 return true;
             }
 
@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Parameters
             {
                 for (int j = 0; j < arrOne.GetLength(1); j++)
                 {
-                    for (int k = 0; k <arrOne.GetLength(2); k++)
+                    for (int k = 0; k < arrOne.GetLength(2); k++)
                     {
                         var comparison = CompareValues(arrOne[i, j, k], arrTwo[i, j, k]);
                         if (comparison != 0)

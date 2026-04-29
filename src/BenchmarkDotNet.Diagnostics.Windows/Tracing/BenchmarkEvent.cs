@@ -1,4 +1,4 @@
-﻿using Microsoft.Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing;
 using System.Text;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing

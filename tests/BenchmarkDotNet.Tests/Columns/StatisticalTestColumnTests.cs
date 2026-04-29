@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Mathematics.Distributions.ContinuousDistributions;

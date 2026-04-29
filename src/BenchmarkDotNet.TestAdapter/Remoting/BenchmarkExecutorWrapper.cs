@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.TestAdapter.Remoting
+namespace BenchmarkDotNet.TestAdapter.Remoting
 {
     /// <summary>
     /// A wrapper around the BenchmarkExecutor that works across AppDomain boundaries.

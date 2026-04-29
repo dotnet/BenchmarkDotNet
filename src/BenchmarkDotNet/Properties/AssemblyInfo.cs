@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Properties;
+using BenchmarkDotNet.Properties;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

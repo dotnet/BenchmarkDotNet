@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {

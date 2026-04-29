@@ -24,7 +24,7 @@ public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null)
     protected override void AttachToProcessByPid(int pid, string snapshotFile)
     {
         var config = new DotMemory.Config()
-            .UseCustomResponseTimeout(milliseconds:60 * 1000)
+            .UseCustomResponseTimeout(milliseconds: 60 * 1000)
             .ProfileExternalProcess(pid)
             .SaveToFile(snapshotFile);
         DotMemory.Attach(config);

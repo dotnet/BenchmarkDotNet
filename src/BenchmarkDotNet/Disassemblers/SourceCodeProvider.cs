@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Symbols;
 using System.Diagnostics;

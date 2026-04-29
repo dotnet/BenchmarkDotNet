@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;

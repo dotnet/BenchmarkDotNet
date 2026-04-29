@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private bool ShouldPrintEventInfo(string inlinerNamespace, string inlineeNamespace)
             => !filterByNamespace ||
-                (allowedNamespaces?.Any(x=> inlineeNamespace.StartsWith(x) || inlinerNamespace.StartsWith(x))
+                (allowedNamespaces?.Any(x => inlineeNamespace.StartsWith(x) || inlinerNamespace.StartsWith(x))
                     ?? (inlinerNamespace.StartsWith(defaultNamespace)) || inlineeNamespace.StartsWith(defaultNamespace));
     }
 }

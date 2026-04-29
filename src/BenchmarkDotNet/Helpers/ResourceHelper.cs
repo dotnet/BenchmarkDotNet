@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 
 namespace BenchmarkDotNet.Helpers;
@@ -11,7 +11,7 @@ internal static class ResourceHelper
     private static async ValueTask<string> LoadResourceAsync(string resourceName, CancellationToken cancellationToken)
     {
         using var stream = GetResourceStream(resourceName);
-        
+
         if (stream == null)
             throw new Exception($"Resource {resourceName} not found");
 

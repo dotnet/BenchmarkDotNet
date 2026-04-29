@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Results;
@@ -24,11 +24,11 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         private void UpdateDuplicatedDependencies(ArtifactsPaths artifactsPaths, ILogger logger)
         {
             var publishedDirectory = new DirectoryInfo(artifactsPaths.BinariesDirectoryPath);
-            var coreRunDirectory =  coreRun.Directory!;
+            var coreRunDirectory = coreRun.Directory!;
 
             foreach (var publishedDependency in publishedDirectory
                 .EnumerateFileSystemInfos()
-                .Where(file => file.Extension == ".dll" || file.Extension == ".exe" ))
+                .Where(file => file.Extension == ".dll" || file.Extension == ".exe"))
             {
                 var coreRunDependency = new FileInfo(Path.Combine(coreRunDirectory.FullName, publishedDependency.Name));
 

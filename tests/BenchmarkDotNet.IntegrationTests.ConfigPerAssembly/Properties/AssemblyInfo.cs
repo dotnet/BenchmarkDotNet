@@ -1,3 +1,3 @@
-﻿using BenchmarkDotNet.IntegrationTests.ConfigPerAssembly;
+using BenchmarkDotNet.IntegrationTests.ConfigPerAssembly;
 
 [assembly: AssemblyConfig]

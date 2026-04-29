@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Validators;
@@ -26,7 +26,7 @@ public class RuntimeValidator : IValidator
             yield break;
         }
 
-        foreach (var benchmark in nullRuntimeBenchmarks.Where(x=> !x.GetToolchain().IsInProcess))
+        foreach (var benchmark in nullRuntimeBenchmarks.Where(x => !x.GetToolchain().IsInProcess))
         {
             var job = benchmark.Job;
             var jobText = job.HasValue(CharacteristicObject.IdCharacteristic)

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Exporters
                     await streamWriter.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
                 }
 
-                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     logger.WriteLineInfo("// The R script process did not quit on time, it's going to get force killed now.");
                 }

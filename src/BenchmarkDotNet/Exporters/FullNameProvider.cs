@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
@@ -130,7 +130,8 @@ namespace BenchmarkDotNet.Exporters
 
         private static string GetArgument(object? argumentValue, Type? argumentType)
         {
-            switch (argumentValue) {
+            switch (argumentValue)
+            {
                 case null:
                     return "null";
                 case IParam iparam:

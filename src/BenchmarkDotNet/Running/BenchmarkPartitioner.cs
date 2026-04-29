@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 
@@ -19,10 +19,10 @@ namespace BenchmarkDotNet.Running
 
             public bool Equals(BenchmarkCase? x, BenchmarkCase? y)
             {
-                if (ReferenceEquals(x, y)) 
+                if (ReferenceEquals(x, y))
                     return true;
 
-                if (x is null || y is null) 
+                if (x is null || y is null)
                     return false;
 
                 var jobX = x.Job;
@@ -78,10 +78,10 @@ namespace BenchmarkDotNet.Running
 
             private static bool AreDifferent(IReadOnlyList<Argument>? x, IReadOnlyList<Argument>? y)
             {
-                if (ReferenceEquals(x, y)) 
+                if (ReferenceEquals(x, y))
                     return false;
 
-                if (x is null || y is null) 
+                if (x is null || y is null)
                     return true;
 
                 return !x.SequenceEqual(y);

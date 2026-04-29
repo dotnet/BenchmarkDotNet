@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Tests

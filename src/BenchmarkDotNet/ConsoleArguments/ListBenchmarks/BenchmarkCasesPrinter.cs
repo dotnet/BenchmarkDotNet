@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
         public BenchmarkCasesPrinter(ListBenchmarkCaseMode listBenchmarkCaseMode)
         {
             printer = listBenchmarkCaseMode == ListBenchmarkCaseMode.Tree
-                ? (IBenchmarkCasesPrinter) new TreeBenchmarkCasesPrinter()
+                ? (IBenchmarkCasesPrinter)new TreeBenchmarkCasesPrinter()
                 : new FlatBenchmarkCasesPrinter();
         }
 

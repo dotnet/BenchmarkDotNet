@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Exporters.Xml;
 using JetBrains.Annotations;
 using System.Globalization;
 using System.Text;

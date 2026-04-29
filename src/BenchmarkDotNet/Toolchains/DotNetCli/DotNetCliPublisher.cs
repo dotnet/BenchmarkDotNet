@@ -12,7 +12,7 @@ public class DotNetCliPublisher : IBuilder
     public string CustomDotNetCliPath { get; }
     public string ExtraArguments { get; }
     public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
-    public bool LogOutput{ get; }
+    public bool LogOutput { get; }
 
     public DotNetCliPublisher(
         string tfm,

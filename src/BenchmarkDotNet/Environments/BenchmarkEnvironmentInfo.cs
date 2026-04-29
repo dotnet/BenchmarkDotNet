@@ -55,7 +55,8 @@ namespace BenchmarkDotNet.Environments
             yield return $"{HardwareIntrinsicsPrefix}{HardwareIntrinsics.GetFullInfo(RuntimeInformation.GetCurrentPlatform())} {HardwareIntrinsics.GetVectorSize()}";
         }
 
-        [PublicAPI] protected string GetConfigurationFlag() => Configuration == RuntimeInformation.Unknown || Configuration == RuntimeInformation.ReleaseConfigurationName
+        [PublicAPI]
+        protected string GetConfigurationFlag() => Configuration == RuntimeInformation.Unknown || Configuration == RuntimeInformation.ReleaseConfigurationName
             ? ""
             : Configuration;
 

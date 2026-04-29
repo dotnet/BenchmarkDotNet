@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 using System.Runtime.Versioning;

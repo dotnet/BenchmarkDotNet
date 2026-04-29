@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;

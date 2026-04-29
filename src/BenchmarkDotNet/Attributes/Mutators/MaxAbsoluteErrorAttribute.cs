@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 

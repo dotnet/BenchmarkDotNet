@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Configs

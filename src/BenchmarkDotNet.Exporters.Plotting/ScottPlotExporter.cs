@@ -311,16 +311,16 @@ namespace BenchmarkDotNet.Exporters.Plotting
             foreach (var (targetGroup, targetGroupIndex) in data.GroupBy(s => s.Target).Select((targetGroup, index) => (targetGroup, index)))
             {
                 var boxes = targetGroup.Select(job => (job.JobId, Stats: job.CalculateBoxPlotStatistics())).Select((j, jobIndex) => new Box()
-                    {
-                        Position = ticks[globalIndex++].Position,
-                        FillStyle = new FillStyle() { Color = legendPalette[j.JobId] },
-                        LineStyle = new LineStyle() { Color = Colors.Black },
-                        BoxMin = j.Stats.Q1,
-                        BoxMax = j.Stats.Q3,
-                        WhiskerMin = j.Stats.Min,
-                        WhiskerMax = j.Stats.Max,
-                        BoxMiddle = j.Stats.Median
-                    })
+                {
+                    Position = ticks[globalIndex++].Position,
+                    FillStyle = new FillStyle() { Color = legendPalette[j.JobId] },
+                    LineStyle = new LineStyle() { Color = Colors.Black },
+                    BoxMin = j.Stats.Q1,
+                    BoxMax = j.Stats.Q3,
+                    WhiskerMin = j.Stats.Min,
+                    WhiskerMax = j.Stats.Max,
+                    BoxMiddle = j.Stats.Median
+                })
                     .ToList();
                 plt.Add.Boxes(boxes);
             }

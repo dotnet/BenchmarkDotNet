@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Engines
             => new(Mode, Stage, ++iterationIndex, invokeCount, unrollFactor, parameters.IterationSetupAction, parameters.IterationCleanupAction,
                 Mode == IterationMode.Workload
                 ? unrollFactor == 1 ? parameters.WorkloadActionNoUnroll : parameters.WorkloadActionUnroll
-                : unrollFactor == 1 ? parameters.OverheadActionNoUnroll: parameters.OverheadActionUnroll);
+                : unrollFactor == 1 ? parameters.OverheadActionNoUnroll : parameters.OverheadActionUnroll);
     }
 
     internal sealed class EngineWarmupStageAuto(IterationMode iterationMode, int minIterationCount, int maxIterationCount, long invokeCount, int unrollFactor, EngineParameters parameters)

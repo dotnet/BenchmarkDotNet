@@ -1,4 +1,4 @@
-﻿using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.Common;
 using Perfolizer.Metrology;
 using static System.Math;
 

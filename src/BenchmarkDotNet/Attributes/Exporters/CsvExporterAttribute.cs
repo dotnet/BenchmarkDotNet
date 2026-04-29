@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Exporters.Csv;
 
 namespace BenchmarkDotNet.Attributes
 {
