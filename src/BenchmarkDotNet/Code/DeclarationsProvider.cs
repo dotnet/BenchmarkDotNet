@@ -25,17 +25,19 @@ namespace BenchmarkDotNet.Code
 
         public SmartStringBuilder ReplaceTemplate(SmartStringBuilder smartStringBuilder)
         {
-            Replace(smartStringBuilder, Descriptor.GlobalSetupMethod, "$GlobalSetupModifiers$", "$GlobalSetupImpl$", false);
-            Replace(smartStringBuilder, Descriptor.GlobalCleanupMethod, "$GlobalCleanupModifiers$", "$GlobalCleanupImpl$", true);
-            Replace(smartStringBuilder, Descriptor.IterationSetupMethod, "$IterationSetupModifiers$", "$IterationSetupImpl$", false);
-            Replace(smartStringBuilder, Descriptor.IterationCleanupMethod, "$IterationCleanupModifiers$", "$IterationCleanupImpl$", false);
+            Replace(smartStringBuilder, Descriptor.GlobalSetupMethod, "$GlobalSetupModifiers$", "$GlobalSetupImpl$", PrependKind.GlobalSetup);
+            Replace(smartStringBuilder, Descriptor.GlobalCleanupMethod, "$GlobalCleanupModifiers$", "$GlobalCleanupImpl$", PrependKind.GlobalCleanup);
+            Replace(smartStringBuilder, Descriptor.IterationSetupMethod, "$IterationSetupModifiers$", "$IterationSetupImpl$", PrependKind.None);
+            Replace(smartStringBuilder, Descriptor.IterationCleanupMethod, "$IterationCleanupModifiers$", "$IterationCleanupImpl$", PrependKind.None);
             return ReplaceCore(smartStringBuilder)
                 .Replace("$DisassemblerEntryMethodImpl$", GetWorkloadMethodCall(GetPassArgumentsDirect()))
                 .Replace("$OperationsPerInvoke$", Descriptor.OperationsPerInvoke.ToString())
                 .Replace("$WorkloadTypeName$", Descriptor.Type.GetCorrectCSharpTypeName());
         }
 
-        private void Replace(SmartStringBuilder smartStringBuilder, MethodInfo? method, string replaceModifiers, string replaceImpl, bool isGlobalCleanup)
+        protected enum PrependKind { None, GlobalSetup, GlobalCleanup }
+
+        private void Replace(SmartStringBuilder smartStringBuilder, MethodInfo? method, string replaceModifiers, string replaceImpl, PrependKind prependKind)
         {
             string modifier;
             string impl;
@@ -43,10 +45,7 @@ namespace BenchmarkDotNet.Code
             {
                 modifier = string.Empty;
                 impl = ReturnCompletedValueTask;
-                if (isGlobalCleanup)
-                {
-                    impl = PrependExtraGlobalCleanupImpl(impl);
-                }
+                impl = ApplyPrepend(impl, prependKind);
                 smartStringBuilder
                     .Replace(replaceModifiers, modifier)
                     .Replace(replaceImpl, impl);
@@ -66,15 +65,20 @@ namespace BenchmarkDotNet.Code
                             {ReturnCompletedValueTask}
                 """;
             }
-            if (isGlobalCleanup)
-            {
-                impl = PrependExtraGlobalCleanupImpl(impl);
-            }
+            impl = ApplyPrepend(impl, prependKind);
             smartStringBuilder
                 .Replace(replaceModifiers, modifier)
                 .Replace(replaceImpl, impl);
         }
 
+        private string ApplyPrepend(string impl, PrependKind prependKind) => prependKind switch
+        {
+            PrependKind.GlobalSetup => PrependExtraGlobalSetupImpl(impl),
+            PrependKind.GlobalCleanup => PrependExtraGlobalCleanupImpl(impl),
+            _ => impl,
+        };
+
+        protected virtual string PrependExtraGlobalSetupImpl(string impl) => impl;
         protected abstract string PrependExtraGlobalCleanupImpl(string impl);
 
         protected abstract SmartStringBuilder ReplaceCore(SmartStringBuilder smartStringBuilder);
@@ -182,10 +186,35 @@ namespace BenchmarkDotNet.Code
             "public long invokeCount;"
         ];
 
+        protected override string PrependExtraGlobalSetupImpl(string impl)
+            => $$"""
+            // Pre-allocate the workload source and start the async workload loop so it parks at
+            // its first await before the engine begins iterating. Doing this here (in
+            // __GlobalSetup, which is also re-invoked between iterations when MemoryRandomization
+            // is enabled) keeps the per-iteration WorkloadActionNoUnroll path branchless and
+            // allocation-free, so MemoryDiagnoser doesn't see engine bookkeeping bytes.
+            this.__fieldsContainer.workloadContinuerAndValueTaskSource = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
+                        this.__StartWorkload();
+                        {{impl}}
+            """;
+
         protected override string PrependExtraGlobalCleanupImpl(string impl)
-            => $"""
-            this.__fieldsContainer.workloadContinuerAndValueTaskSource?.Complete();
-                        {impl}
+            => $$"""
+            if (this.__fieldsContainer.workloadContinuerAndValueTaskSource != null
+                            && this.__fieldsContainer.workloadContinuerAndValueTaskSource.IsContinuerPending)
+                        {
+                            // Tell the async workload loop to exit. Skip when not pending
+                            // (e.g. the workload threw and the loop has already exited via
+                            // SetException) to avoid masking the original exception with a
+                            // double-signal InvalidOperationException from SignalCompletion.
+                            this.__fieldsContainer.workloadContinuerAndValueTaskSource.Complete();
+                        }
+                        // Drop the reference so a stale source can never be Continue()'d after
+                        // GlobalCleanup. The next __GlobalSetup (only happens when
+                        // MemoryRandomization=true forces a between-iteration restart) will
+                        // re-allocate.
+                        this.__fieldsContainer.workloadContinuerAndValueTaskSource = null;
+                        {{impl}}
             """;
 
         protected override SmartStringBuilder ReplaceCore(SmartStringBuilder smartStringBuilder)
@@ -222,11 +251,8 @@ namespace BenchmarkDotNet.Code
                     {
                         this.__fieldsContainer.invokeCount = invokeCount;
                         this.__fieldsContainer.clock = clock;
-                        if (this.__fieldsContainer.workloadContinuerAndValueTaskSource == null)
-                        {
-                            this.__fieldsContainer.workloadContinuerAndValueTaskSource = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
-                            this.__StartWorkload();
-                        }
+                        // The source is allocated and the workload loop started in __GlobalSetup,
+                        // so this hot path is branchless and allocation-free.
                         return this.__fieldsContainer.workloadContinuerAndValueTaskSource.Continue();
                     }
 
