@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes

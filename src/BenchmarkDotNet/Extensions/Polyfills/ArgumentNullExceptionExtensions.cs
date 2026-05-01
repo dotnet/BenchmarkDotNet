@@ -1,4 +1,4 @@
-﻿#if NET6_0 || NETSTANDARD2_0
+#if NET6_0 || NETSTANDARD2_0
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 

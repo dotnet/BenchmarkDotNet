@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 

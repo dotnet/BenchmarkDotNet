@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Helpers
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Helpers
 
             private Com(IntPtr handle)
             {
-                taskbarInstance = (ITaskbarList3) new TaskbarInstance();
+                taskbarInstance = (ITaskbarList3)new TaskbarInstance();
                 consoleWindowHandle = handle;
             }
 

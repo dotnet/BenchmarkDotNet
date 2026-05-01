@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Analysers

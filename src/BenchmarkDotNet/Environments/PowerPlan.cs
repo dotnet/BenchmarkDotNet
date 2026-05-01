@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Environments
+namespace BenchmarkDotNet.Environments
 {
     public enum PowerPlan
     {

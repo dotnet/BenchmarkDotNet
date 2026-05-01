@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.EventProcessors;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;

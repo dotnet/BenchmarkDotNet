@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analyzers.BenchmarkRunner;
+using BenchmarkDotNet.Analyzers.BenchmarkRunner;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
 using System.Collections.ObjectModel;
 using Xunit;

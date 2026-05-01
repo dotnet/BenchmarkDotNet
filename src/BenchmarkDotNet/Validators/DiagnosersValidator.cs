@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Validators
+namespace BenchmarkDotNet.Validators
 {
     public class DiagnosersValidator : IValidator
     {

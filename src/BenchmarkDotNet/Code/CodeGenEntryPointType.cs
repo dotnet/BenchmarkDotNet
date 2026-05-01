@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Code;
+namespace BenchmarkDotNet.Code;
 
 /// <summary>
 /// Specifies how to generate the entry-point for the benchmark process.

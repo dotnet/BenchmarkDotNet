@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
@@ -134,16 +134,16 @@ namespace BenchmarkDotNet.Tests.Validators
             protected internal class ProtectedInternalNestedClass { }
         }
 
-        private class MyPrivateClass{ [Benchmark] public void PublicMethod(){} }
+        private class MyPrivateClass { [Benchmark] public void PublicMethod() { } }
 
-        protected class MyPublicProtectedClass{ [Benchmark] public void PublicMethod(){} }
+        protected class MyPublicProtectedClass { [Benchmark] public void PublicMethod() { } }
 
-        private protected class MyPrivateProtectedClass{ [Benchmark] public void PublicMethod(){} }
+        private protected class MyPrivateProtectedClass { [Benchmark] public void PublicMethod() { } }
 
-        internal class MyInternalClass{ [Benchmark] public void PublicMethod(){} }
+        internal class MyInternalClass { [Benchmark] public void PublicMethod() { } }
 
-        protected internal class MyProtectedInternalClass{ [Benchmark] public void PublicMethod() { } }
-        }
+        protected internal class MyProtectedInternalClass { [Benchmark] public void PublicMethod() { } }
+    }
 
     public class BenchmarkClassWithStaticMethod
     {
@@ -176,7 +176,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
     internal class OuterClass
     {
-        [Benchmark] public void PublicMethod(){}
+        [Benchmark] public void PublicMethod() { }
 
         internal class InternalNestedClass { [Benchmark] public void PublicMethod() { } }
 
@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
     public class BenchMarkPublicClass
     {
-        [Benchmark] public void PublicMethod(){}
+        [Benchmark] public void PublicMethod() { }
 
         public class PublicNestedClass { [Benchmark] public void PublicMethod() { } }
 

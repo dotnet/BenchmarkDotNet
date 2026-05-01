@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
 

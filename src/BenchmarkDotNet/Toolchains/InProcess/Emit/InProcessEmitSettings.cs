@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
+namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 public class InProcessEmitSettings : InProcessSettings
 {

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string FolderInfo => string.Join("_", Items.Select(p => $"{p.Name}-{p.ToDisplayText()}")).AsValidFileName();
 
-        public string DisplayInfo =>  Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.ToDisplayText()}")) + "]" : "";
+        public string DisplayInfo => Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.ToDisplayText()}")) + "]" : "";
 
         public string ValueInfo => Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation}")) + "]" : "";
 
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Parameters
             return true;
         }
 
-        public override bool Equals(object? obj) 
+        public override bool Equals(object? obj)
             => obj is ParameterInstances other && Equals(other);
 
         public override int GetHashCode() => FolderInfo.GetHashCode();

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Running;
 using System.ComponentModel;
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Tests
 
         [Fact]
         public void UnicodeIsSupported()
-            => AssertBenchmarkName<WithCrazyUnicodeCharacters>("BenchmarkDotNet.Tests.WithCrazyUnicodeCharacters.Method(arg1: \"" + "FOO" + "\", arg2: \""+ "\u03C3" + "\", arg3: \"" + "x\u0305" + "\")");
+            => AssertBenchmarkName<WithCrazyUnicodeCharacters>("BenchmarkDotNet.Tests.WithCrazyUnicodeCharacters.Method(arg1: \"" + "FOO" + "\", arg2: \"" + "\u03C3" + "\", arg3: \"" + "x\u0305" + "\")");
 
         [Fact]
         public void TabsAndEnters()

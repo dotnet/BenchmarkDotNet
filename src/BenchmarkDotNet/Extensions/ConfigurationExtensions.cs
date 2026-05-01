@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;
@@ -97,7 +97,7 @@ internal sealed class EngineJitStage : EngineStage
                 // If we can run one batch of calls within the time limit (based on the last measurement), do that instead of multiple single-invocation iterations.
                 var remainingTimeLimit = MaxTieringTime.ToNanoseconds() - startedClock.GetElapsed().GetNanoseconds();
                 var lastMeasurementSingleInvocationTime = lastMeasurement.Nanoseconds / lastInvokeCount;
-                int allowedCallsWithinTimeLimit = (int) Math.Floor(remainingTimeLimit / lastMeasurementSingleInvocationTime);
+                int allowedCallsWithinTimeLimit = (int)Math.Floor(remainingTimeLimit / lastMeasurementSingleInvocationTime);
                 int invokeCount = allowedCallsWithinTimeLimit > 0
                     ? Math.Min(remainingCalls, allowedCallsWithinTimeLimit)
                     : 1;

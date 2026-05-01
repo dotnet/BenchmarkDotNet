@@ -1,4 +1,4 @@
-﻿using AwesomeAssertions;
+using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Serialization;
 using BenchmarkDotNet.Tests.XUnit;

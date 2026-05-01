@@ -1,11 +1,11 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
 {
     [PublicAPI]
     [AttributeUsage(AttributeTargets.Class)]
-    public class GroupBenchmarksByAttribute: Attribute, IConfigSource
+    public class GroupBenchmarksByAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }
 

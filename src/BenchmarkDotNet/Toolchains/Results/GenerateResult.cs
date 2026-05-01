@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Toolchains.Results
+namespace BenchmarkDotNet.Toolchains.Results
 {
     public class GenerateResult
     {

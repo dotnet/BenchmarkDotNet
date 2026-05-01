@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
+namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
 
 using Xunit;
 

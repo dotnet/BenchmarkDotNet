@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.Results;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
@@ -40,15 +40,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             foreach (var errorLine in buildResult.ErrorMessage.Split('\r', '\n').Where(line => line.IsNotBlank()))
-            foreach (var rule in Rules)
-            {
-                var match = rule.regex.Match(errorLine);
-                if (match.Success)
+                foreach (var rule in Rules)
                 {
-                    reason = rule.translation(match);
-                    return true;
+                    var match = rule.regex.Match(errorLine);
+                    if (match.Success)
+                    {
+                        reason = rule.translation(match);
+                        return true;
+                    }
                 }
-            }
 
             return false;
         }

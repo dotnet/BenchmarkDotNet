@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 #if NET6_0_OR_GREATER
@@ -54,40 +54,40 @@ namespace BenchmarkDotNet.Detectors.Cpu
                 {
                     case Platform.X86:
                     case Platform.X64:
-                    {
-                        if (IsX86Avx10v2Supported) yield return "AVX10v2";
-                        if (IsX86Avx10v1Supported)
                         {
-                            yield return "AVX10v1";
-                            yield return "AVX512 BF16+FP16";
+                            if (IsX86Avx10v2Supported) yield return "AVX10v2";
+                            if (IsX86Avx10v1Supported)
+                            {
+                                yield return "AVX10v1";
+                                yield return "AVX512 BF16+FP16";
+                            }
+                            if (IsX86Avx512v3Supported) yield return "AVX512 BITALG+VBMI2+VNNI+VPOPCNTDQ";
+                            if (IsX86Avx512v2Supported) yield return "AVX512 IFMA+VBMI";
+                            if (IsX86Avx512Supported) yield return "AVX512 F+BW+CD+DQ+VL";
+                            if (IsX86Avx2Supported) yield return "AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE";
+                            if (IsX86AvxSupported) yield return "AVX";
+                            if (IsX86Sse42Supported) yield return "SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT";
+                            if (IsX86BaseSupported) yield return "X86Base+SSE+SSE2";
+                            if (IsX86AesSupported) yield return "AES+PCLMUL";
+                            if (IsX86AvxVnniSupported) yield return "AvxVnni";
+                            if (IsX86SerializeSupported) yield return "SERIALIZE";
+                            break;
                         }
-                        if (IsX86Avx512v3Supported) yield return "AVX512 BITALG+VBMI2+VNNI+VPOPCNTDQ";
-                        if (IsX86Avx512v2Supported) yield return "AVX512 IFMA+VBMI";
-                        if (IsX86Avx512Supported) yield return "AVX512 F+BW+CD+DQ+VL";
-                        if (IsX86Avx2Supported) yield return "AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE";
-                        if (IsX86AvxSupported) yield return "AVX";
-                        if (IsX86Sse42Supported) yield return "SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT";
-                        if (IsX86BaseSupported) yield return "X86Base+SSE+SSE2";
-                        if (IsX86AesSupported) yield return "AES+PCLMUL";
-                        if (IsX86AvxVnniSupported) yield return "AvxVnni";
-                        if (IsX86SerializeSupported) yield return "SERIALIZE";
-                        break;
-                    }
                     case Platform.Arm64:
-                    {
-                        if (IsArmBaseSupported)
                         {
-                            yield return "ArmBase+AdvSimd";
-                        }
+                            if (IsArmBaseSupported)
+                            {
+                                yield return "ArmBase+AdvSimd";
+                            }
 
-                        if (IsArmAesSupported) yield return "AES";
-                        if (IsArmCrc32Supported) yield return "CRC32";
-                        if (IsArmDpSupported) yield return "DP";
-                        if (IsArmRdmSupported) yield return "RDM";
-                        if (IsArmSha1Supported) yield return "SHA1";
-                        if (IsArmSha256Supported) yield return "SHA256";
-                        break;
-                    }
+                            if (IsArmAesSupported) yield return "AES";
+                            if (IsArmCrc32Supported) yield return "CRC32";
+                            if (IsArmDpSupported) yield return "DP";
+                            if (IsArmRdmSupported) yield return "RDM";
+                            if (IsArmSha1Supported) yield return "SHA1";
+                            if (IsArmSha256Supported) yield return "SHA256";
+                            break;
+                        }
 
                     default:
                         yield break;

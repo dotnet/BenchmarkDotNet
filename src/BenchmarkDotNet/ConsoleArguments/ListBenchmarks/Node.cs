@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
+namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
     internal class Node
     {

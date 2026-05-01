@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.Common;
 using Perfolizer.Mathematics.OutlierDetection;

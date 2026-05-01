@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -49,9 +49,9 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public void AddMono (string name, string mono_top_dir)
+            public void AddMono(string name, string mono_top_dir)
             {
-                var aot_compile_args  = "--aot=llvm";
+                var aot_compile_args = "--aot=llvm";
                 var mono_bcl = $@"{mono_top_dir}\lib\mono\4.5";
                 var mono_bin = $@"{mono_top_dir}\bin\mono.exe";
                 AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(

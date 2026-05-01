@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Disassemblers;
+using BenchmarkDotNet.Disassemblers;
 using System.Text.Json.Serialization;
 
 namespace BenchmarkDotNet.Serialization;

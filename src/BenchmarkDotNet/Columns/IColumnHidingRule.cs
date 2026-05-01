@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Columns
+namespace BenchmarkDotNet.Columns
 {
     public interface IColumnHidingRule
     {

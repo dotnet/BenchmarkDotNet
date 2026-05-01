@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Exporters
 {
     /// <summary>
     /// This is an internal interface, it allows Exporters to specify that

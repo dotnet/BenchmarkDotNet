@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace BenchmarkDotNet.Helpers.Reflection.Emit
@@ -117,16 +117,16 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
         public static void EmitStarg(this ILGenerator ilBuilder, ParameterInfo argument)
         {
             var position = argument.Position;
-            if (!((MethodBase) argument.Member).IsStatic)
+            if (!((MethodBase)argument.Member).IsStatic)
                 position++;
 
             if (position < 255)
             {
-                ilBuilder.Emit(OpCodes.Starg_S, (byte) position);
+                ilBuilder.Emit(OpCodes.Starg_S, (byte)position);
             }
             else
             {
-                ilBuilder.Emit(OpCodes.Starg, checked((short) position));
+                ilBuilder.Emit(OpCodes.Starg, checked((short)position));
             }
         }
 
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldc_I4_8);
                     break;
                 case var i when sbyte.MinValue <= i && i <= sbyte.MaxValue:
-                    ilBuilder.Emit(OpCodes.Ldc_I4_S, (sbyte) value);
+                    ilBuilder.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
                     break;
                 default:
                     ilBuilder.Emit(OpCodes.Ldc_I4, value);

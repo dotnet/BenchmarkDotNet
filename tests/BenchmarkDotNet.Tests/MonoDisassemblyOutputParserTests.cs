@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Disassemblers;
+using BenchmarkDotNet.Disassemblers;
 
 namespace BenchmarkDotNet.Tests
 {

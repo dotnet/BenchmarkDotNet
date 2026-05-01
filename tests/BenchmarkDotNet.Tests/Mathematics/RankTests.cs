@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.Tests.Mathematics
 {

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.TestAdapter
         internal static TestCase ToVsTestCase(this BenchmarkCase benchmarkCase, string assemblyPath, bool includeJobInName = false)
         {
             var benchmarkMethod = benchmarkCase.Descriptor.WorkloadMethod;
-            var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName(prefixWithGlobal:false);
+            var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
             var parametrizedMethodName = FullNameProvider.GetMethodName(benchmarkCase);
 
             var displayJobInfo = benchmarkCase.GetUnrandomizedJobDisplayInfo();

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Helpers
@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Helpers
             if (typeArguments.Any())
                 return BuildGenericTypes(type, typeArguments);
 
-            return [(true,  type)];
+            return [(true, type)];
         }
 
         private static IEnumerable<(bool isSuccess, Type result)> BuildGenericTypes(Type type, IEnumerable<Type[]> typeArguments)

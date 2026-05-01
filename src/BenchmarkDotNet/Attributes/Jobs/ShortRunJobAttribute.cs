@@ -1,10 +1,10 @@
-﻿using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
-    public class ShortRunJobAttribute: JobConfigBaseAttribute
+    public class ShortRunJobAttribute : JobConfigBaseAttribute
     {
         public ShortRunJobAttribute() : base(Job.ShortRun)
         {

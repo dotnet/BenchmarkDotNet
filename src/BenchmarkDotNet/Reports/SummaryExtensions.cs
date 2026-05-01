@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;

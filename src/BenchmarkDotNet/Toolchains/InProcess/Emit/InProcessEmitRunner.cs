@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
@@ -21,7 +21,7 @@ internal static class InProcessEmitRunner
 
         try
         {
-            var runnableType = ((InProcessEmitArtifactsPath) parameters.BuildResult.ArtifactsPaths)
+            var runnableType = ((InProcessEmitArtifactsPath)parameters.BuildResult.ArtifactsPaths)
                 .GeneratedAssembly
                 .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
 

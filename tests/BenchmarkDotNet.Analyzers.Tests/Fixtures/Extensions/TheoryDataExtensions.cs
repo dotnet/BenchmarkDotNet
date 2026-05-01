@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;

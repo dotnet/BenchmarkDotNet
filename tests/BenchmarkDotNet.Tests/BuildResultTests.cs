@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 

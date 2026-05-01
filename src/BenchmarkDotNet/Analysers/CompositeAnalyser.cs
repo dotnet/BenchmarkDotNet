@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Reports;
 using System.Collections.Immutable;
 
 namespace BenchmarkDotNet.Analysers

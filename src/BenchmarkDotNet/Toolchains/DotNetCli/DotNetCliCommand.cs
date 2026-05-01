@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                         GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)
                     ),
                     cancellationToken).ConfigureAwait(false);
-                    
+
                 return result.ToBuildResult(GenerateResult);
             }
             else

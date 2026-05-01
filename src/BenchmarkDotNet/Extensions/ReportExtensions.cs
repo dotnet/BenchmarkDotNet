@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using System.Linq.Expressions;
 

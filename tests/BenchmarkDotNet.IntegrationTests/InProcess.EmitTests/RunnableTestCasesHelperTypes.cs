@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 // ReSharper disable UnusedMember.Global
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests

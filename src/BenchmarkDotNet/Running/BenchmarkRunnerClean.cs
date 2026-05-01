@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -333,7 +333,7 @@ namespace BenchmarkDotNet.Running
             await BenchmarkReportExporter.ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             logger.WriteLineHeader("// * Summary *");
-            await ((MarkdownExporter) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
+            await ((MarkdownExporter)MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait(true);
 
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());

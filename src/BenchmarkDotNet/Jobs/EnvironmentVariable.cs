@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Jobs
+namespace BenchmarkDotNet.Jobs
 {
     public class EnvironmentVariable : IEquatable<EnvironmentVariable>
     {
@@ -28,7 +28,7 @@
                 return true;
             if (obj.GetType() != GetType())
                 return false;
-            return Equals((EnvironmentVariable) obj);
+            return Equals((EnvironmentVariable)obj);
         }
 
         public override int GetHashCode() => HashCode.Combine(Key, Value);

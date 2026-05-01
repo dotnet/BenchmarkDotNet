@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Parameters
+namespace BenchmarkDotNet.Parameters
 {
     public class ParameterDefinition
     {

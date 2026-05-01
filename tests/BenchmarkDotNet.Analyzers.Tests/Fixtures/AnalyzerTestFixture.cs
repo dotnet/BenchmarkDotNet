@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -253,7 +253,7 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
 
         if (interceptorsNamespaces)
         {
-            parseOptions = parseOptions.WithFeatures([ new KeyValuePair<string, string>(AnalyzerHelper.InterceptorsNamespaces, "") ]);
+            parseOptions = parseOptions.WithFeatures([new KeyValuePair<string, string>(AnalyzerHelper.InterceptorsNamespaces, "")]);
         }
 
         _analyzerTest.SolutionTransforms.Add((solution, projectId) => solution.WithProjectParseOptions(projectId, parseOptions));

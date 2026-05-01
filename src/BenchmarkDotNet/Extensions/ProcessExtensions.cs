@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Extensions
             {
                 process.Start();
                 processOutputReader.BeginRead();
-                process.WaitForExit((int) timeout.TotalMilliseconds);
+                process.WaitForExit((int)timeout.TotalMilliseconds);
             }
             return (process.HasExited ? process.ExitCode : -1, processOutputReader.GetOutputText());
         }

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers.Reflection.Emit;
+using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Reflection;

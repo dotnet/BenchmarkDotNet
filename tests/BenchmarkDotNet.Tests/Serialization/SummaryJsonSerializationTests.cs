@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Serialization;
+using BenchmarkDotNet.Serialization;
 
 namespace BenchmarkDotNet.Tests;
 

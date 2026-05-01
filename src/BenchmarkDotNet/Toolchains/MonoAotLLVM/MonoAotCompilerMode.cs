@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
+namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 {
     public enum MonoAotCompilerMode
     {

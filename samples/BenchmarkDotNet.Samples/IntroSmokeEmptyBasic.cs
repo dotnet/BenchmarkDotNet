@@ -1,14 +1,14 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples;
 
 [DisassemblyDiagnoser]
 public class IntroSmokeEmptyBasic
 {
-    [Benchmark] public void Void1() {}
-    [Benchmark] public void Void2() {}
-    [Benchmark] public void Void3() {}
-    [Benchmark] public void Void4() {}
+    [Benchmark] public void Void1() { }
+    [Benchmark] public void Void2() { }
+    [Benchmark] public void Void3() { }
+    [Benchmark] public void Void4() { }
 
     [Benchmark] public byte Byte1() => 0;
     [Benchmark] public byte Byte2() => 0;

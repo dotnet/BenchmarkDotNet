@@ -1,4 +1,4 @@
-﻿using Gee.External.Capstone;
+using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;

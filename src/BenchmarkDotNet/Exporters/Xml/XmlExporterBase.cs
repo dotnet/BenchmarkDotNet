@@ -64,6 +64,6 @@ namespace BenchmarkDotNet.Exporters.Xml
     {
         public override Encoding Encoding => Encoding.UTF8;
 
-        public Utf8StringWriter(StringBuilder builder) :base(builder) { }
+        public Utf8StringWriter(StringBuilder builder) : base(builder) { }
     }
 }

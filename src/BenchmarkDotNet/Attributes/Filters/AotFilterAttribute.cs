@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Filters;
+using BenchmarkDotNet.Filters;
 
 namespace BenchmarkDotNet.Attributes.Filters
 {

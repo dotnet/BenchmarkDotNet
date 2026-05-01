@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System.Reflection;
 using System.Runtime.Versioning;
 

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Columns

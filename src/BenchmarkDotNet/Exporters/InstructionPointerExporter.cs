@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Exporters
                             ulong forRange = instruction.SumPerCounter[hardwareCounter];
 
                             await writer.WriteAsync(forRange != 0
-                                ? $"<td title=\"{forRange} of {totalWithoutNoise}\">{(double) forRange / totalWithoutNoise:P}</td>"
+                                ? $"<td title=\"{forRange} of {totalWithoutNoise}\">{(double)forRange / totalWithoutNoise:P}</td>"
                                 : "<td>-</td>", cancellationToken).ConfigureAwait(false);
                         }
 
@@ -237,7 +237,7 @@ namespace BenchmarkDotNet.Exporters
                     ulong forMethod = method.SumPerCounter[hardwareCounter];
 
                     await writer.WriteAsync(forMethod != 0
-                        ? $"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double) forMethod / totalWithoutNoise:P}</td>"
+                        ? $"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double)forMethod / totalWithoutNoise:P}</td>"
                         : "<td  class=\"perMethod\">-</td>", cancellationToken).ConfigureAwait(false);
                 }
                 await writer.WriteLineAsync("<td></td></tr>", cancellationToken).ConfigureAwait(false);

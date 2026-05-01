@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.Common;
@@ -38,10 +38,12 @@ namespace BenchmarkDotNet.Mathematics
         private readonly TukeyOutlierDetector outlierDetector;
 
         public Statistics(params double[] values) :
-            this(values.ToList()) { }
+            this(values.ToList())
+        { }
 
         public Statistics(IEnumerable<int> values) :
-            this(values.Select(value => (double)value)) { }
+            this(values.Select(value => (double)value))
+        { }
 
         public Statistics(IEnumerable<double> values) : this(new Sample(values.ToArray(), TimeUnit.Nanosecond)) { }
 

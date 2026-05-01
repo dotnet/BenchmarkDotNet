@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -44,8 +44,8 @@ namespace BenchmarkDotNet.Engines
             long? allocatedBytes = GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects);
             return allocatedBytes == null ? null
                 : allocatedBytes == 0 ? 0
-                : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                    (double) allocatedBytes.Value / TotalOperations,
+                : (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                    (double)allocatedBytes.Value / TotalOperations,
                     MidpointRounding.ToEven);
         }
 
@@ -79,7 +79,8 @@ namespace BenchmarkDotNet.Engines
 
         public int GetCollectionsCount(int generation)
         {
-            switch (generation) {
+            switch (generation)
+            {
                 case 0:
                     return Gen0Collections;
                 case 1:

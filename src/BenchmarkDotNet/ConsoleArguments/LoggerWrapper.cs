@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Loggers;
 using System.Text;
 
 namespace BenchmarkDotNet.ConsoleArguments

@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Engines
         public required Func<ValueTask> IterationSetupAction { get; set; }
         public required Func<ValueTask> IterationCleanupAction { get; set; }
         public bool RunExtraIteration { get; set; }
-        public required string BenchmarkName { get;  set; }
+        public required string BenchmarkName { get; set; }
         public required Diagnosers.CompositeInProcessDiagnoserHandler InProcessDiagnoserHandler { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Perfolizer.Horology;

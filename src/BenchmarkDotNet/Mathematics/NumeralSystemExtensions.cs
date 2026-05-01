@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Mathematics
+namespace BenchmarkDotNet.Mathematics
 {
     public static class NumeralSystemExtensions
     {

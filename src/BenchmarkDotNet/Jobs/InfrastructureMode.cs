@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Jobs
             set => ArgumentsCharacteristic[this] = value;
         }
 
-        public bool TryGetToolchain([NotNullWhen(true)]out IToolchain? toolchain)
+        public bool TryGetToolchain([NotNullWhen(true)] out IToolchain? toolchain)
         {
             toolchain = HasValue(ToolchainCharacteristic) ? Toolchain : default;
             return toolchain != default;

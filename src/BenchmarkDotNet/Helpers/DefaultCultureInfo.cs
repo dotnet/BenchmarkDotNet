@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Helpers
 
         static DefaultCultureInfo()
         {
-            Instance = (CultureInfo) CultureInfo.InvariantCulture.Clone();
+            Instance = (CultureInfo)CultureInfo.InvariantCulture.Clone();
             Instance.NumberFormat.NumberDecimalSeparator = ".";
         }
     }

@@ -77,7 +77,7 @@ public class ChangelogBuilder
                 history.CurrentVersion,
                 history.StableVersions.Last(),
                 "HEAD");
-        
+
         context.GitRunner.AddAll(SrcDirectory);
         context.GitRunner.Commit("Update changelog", SrcDirectory);
     }

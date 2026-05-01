@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using Perfolizer.Mathematics.Multimodality;
 using System.Globalization;

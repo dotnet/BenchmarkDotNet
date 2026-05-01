@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
+namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal class RunnableConstants
     {

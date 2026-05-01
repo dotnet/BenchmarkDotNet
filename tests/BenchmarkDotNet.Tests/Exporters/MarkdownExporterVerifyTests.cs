@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
@@ -213,8 +213,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
             public class MethodJobBaseline_MethodsJobs
             {
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark] public void Bar() {}
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
@@ -223,8 +223,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark] public void Bar() {}
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
 
             /* Invalid */
@@ -233,8 +233,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             public class Invalid_TwoMethodBaselines
             {
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark(Baseline = true)] public void Bar() {}
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark(Baseline = true)] public void Bar() { }
             }
 #pragma warning restore BDN1107
 
@@ -242,8 +242,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2", baseline: true)]
             public class Invalid_TwoJobBaselines
             {
-                [Benchmark] public void Foo() {}
-                [Benchmark] public void Bar() {}
+                [Benchmark] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
 
             /* Escape Params */
@@ -252,9 +252,10 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Params("\t", "\n"), UsedImplicitly] public required string StringParam;
 
-                [Arguments('\t')] [Arguments('\n')]
-                [Benchmark] public void Foo(char charArg) {}
-                [Benchmark] public void Bar() {}
+                [Arguments('\t')]
+                [Arguments('\n')]
+                [Benchmark] public void Foo(char charArg) { }
+                [Benchmark] public void Bar() { }
             }
         }
     }

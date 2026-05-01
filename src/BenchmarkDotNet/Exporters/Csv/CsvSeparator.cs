@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Exporters.Csv
+namespace BenchmarkDotNet.Exporters.Csv
 {
     public enum CsvSeparator
     {

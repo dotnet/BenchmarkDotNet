@@ -1,4 +1,4 @@
-﻿Imports BenchmarkDotNet.Attributes
+Imports BenchmarkDotNet.Attributes
 
 Public Class Sample
     <Params(1, 2)>
@@ -8,6 +8,6 @@ Public Class Sample
 
     <Benchmark>
     Public Function Benchmark() As Integer
-            return A + B
+        return A + B
     End Function
 End Class

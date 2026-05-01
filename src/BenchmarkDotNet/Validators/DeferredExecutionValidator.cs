@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using System.Collections;
 
 namespace BenchmarkDotNet.Validators

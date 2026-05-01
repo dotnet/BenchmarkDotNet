@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Attributes;
+namespace BenchmarkDotNet.Attributes;
 
 /// <summary>
 /// When applied to an async benchmark method, overrides the return type of the async method that calls the benchmark method.

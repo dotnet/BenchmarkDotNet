@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Loggers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using System.Text;
 

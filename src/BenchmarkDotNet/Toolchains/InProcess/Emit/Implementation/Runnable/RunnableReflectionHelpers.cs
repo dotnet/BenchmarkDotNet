@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Reflection;

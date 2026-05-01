@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                await ((ValueTask) methodInfo.Invoke(null, [host, parameters, benchmarkActionFactory])!).ConfigureAwait(true);
+                await ((ValueTask)methodInfo.Invoke(null, [host, parameters, benchmarkActionFactory])!).ConfigureAwait(true);
 
                 return 0;
             }

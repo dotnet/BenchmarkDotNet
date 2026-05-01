@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.IntegrationTests;
+namespace BenchmarkDotNet.IntegrationTests;
 
 /// <summary>
 /// Parses the output of 'powercfg /requests' command into a list of <see cref="PowerRequest"/>s.

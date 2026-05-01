@@ -9,7 +9,7 @@ public class VersionHistory
     public string FirstCommit { get; }
     public string[] StableVersions { get; }
     public string CurrentVersion { get; }
-    
+
     public VersionHistory(BuildContext context, FilePath versionFilePath)
     {
         var lines = context.FileReadLines(versionFilePath).Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
