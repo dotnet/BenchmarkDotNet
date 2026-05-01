@@ -1,0 +1,27 @@
+name: Setup Additional Tools
+description: |
+  Setup additional tools that required for Wasm/NativeAOT tests
+  - Node.js
+  - V8 with jsvu
+  - .NET wasm-tools workload
+
+runs:
+  using: composite
+  steps:
+    - name: Set up node
+      uses: actions/setup-node@v6
+      with:
+        node-version: "24"
+
+    - name: Set up v8
+      shell: pwsh
+      run: |
+        npm install jsvu -g
+        jsvu --os=default --engines=v8
+        
+        $jsvuDir = Join-Path $HOME '.jsvu/bin'
+        Add-Content -Path $env:GITHUB_PATH -Value $jsvuDir
+
+    - name: Install wasm-tools workload
+      shell: bash
+      run: ./build.cmd install-wasm-tools
