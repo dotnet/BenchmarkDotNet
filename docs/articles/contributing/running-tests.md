@@ -51,13 +51,14 @@ Following parameters need to specified to invoke workflow with `gh workflow run`
 
 `run-tests-selected.yaml` accept following input parameters. (Passed with `-f` or --field)
 
-| name              | default                                  | description
-|-------------------|------------------------------------------|---------------------
-| `runs_on`         | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `macos-latest` `macos-15-intel`)
-| `project`         | `tests/BenchmarkDotNet.IntegrationTests` | Specify path of project directory
-| `framework`       | `net8.0`                                 | Target Framework (e.g. `net8.0`, `net472`)
-| `filter`          | `BenchmarkDotNet`                        | Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests
-| `iteration_count` | `1`                                      | Count of test loop (It's expected to be used for flaky tests)
+| name                          | default                                  | description
+|-------------------------------|------------------------------------------|---------------------
+| `runs_on`                     | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `macos-latest` `macos-15-intel`)
+| `project`                     | `tests/BenchmarkDotNet.IntegrationTests` | Specify path of project directory
+| `framework`                   | `net8.0`                                 | Target Framework (e.g. `net8.0`, `net472`)
+| `filter`                      | `BenchmarkDotNet`                        | Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests
+| `iteration_count`             | `1`                                      | Count of test loop (It's expected to be used for flaky tests)
+| `skip_setup_additional_tools` | `false`                                  | Skip setup additional tools for Wasm/NativeAOT tests  
 
 ### Command examples
 

@@ -42,52 +42,44 @@ on:
         description: Count of test loop (It's expected to be used for flaky tests)
         required: true
         default: 1
-
+      skip_setup_additional_tools:
+        type: boolean
+        description: Skip setup additional tools for Wasm/NativeAot related tests
+        required: true
+        default: false      
 jobs:
   test:
     name: test (${{ inputs.runs_on }} --framework ${{ inputs.framework}} --filter ${{ inputs.filter }})
     runs-on: ${{ inputs.runs_on }}
     timeout-minutes: 60 # Explicitly set timeout. When wrong input parameter is passed. It may continue to run until it times out (Default:360 minutes))
     steps:
+      # Checkout
       - uses: actions/checkout@v4
+      
+      # Add Windows Defender Exclusions
+      - uses: ./.github/actions/add-windowsdefender-exclusions
+        if: runner.os == 'Windows'
 
       # Setup
-      - name: Setup
+      - name: Create `artifacts` directory
         run: |
           mkdir artifacts
 
-      - name: Install workloads
-        run: |
-          dotnet workload install wasm-tools
-          dotnet workload install wasm-tools-net8
-
-      - name: Set up node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-      - name: Set up v8
-        shell: pwsh
-        run: |
-          npm install jsvu -g
-          jsvu --os=default --engines=v8
-
-          $homeDir = $env:HOME
-          if (-not $homeDir) {
-              $homeDir = $env:USERPROFILE
-          }
-
-          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $homeDir ".jsvu/bin")
+      # Setup additional tools
+      - name: Setup additional tools for Wasm/NativeAot tests
+        uses: ./.github/actions/setup-additional-tools
+        if: ${{ !inputs.skip_setup_additional_tools }}
 
       # Build
       - name: Run build
-        working-directory: ${{ github.event.inputs.project }}
+        working-directory: ${{ inputs.project }}
         run: |
           dotnet build -c Release --framework ${{ inputs.framework }} -tl:off
 
       # Test
       - name: Run tests
         shell: pwsh
-        working-directory: ${{ github.event.inputs.project }}
+        working-directory: ${{ inputs.project }}
         run: |
           $PSNativeCommandUseErrorActionPreference = $true
           $iterationCount = ${{ inputs.iteration_count }}

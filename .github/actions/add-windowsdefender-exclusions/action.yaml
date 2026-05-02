@@ -1,0 +1,29 @@
+name: Add Windows Defender Exclusions
+description: |
+  Add Windows Defender exclusions for the following directories.
+  - $env:GITHUB_WORKSPACE
+  - $env:TEMP
+runs:
+  using: "composite"
+  steps:
+    - name: Add Windows Defender Exclusions
+      shell: pwsh
+      run: |
+        $maxRetries = 5
+
+        for ($i = 1; $i -le $maxRetries; $i++) {
+          try {
+            Add-MpPreference -ExclusionPath  $env:GITHUB_WORKSPACE
+            Add-MpPreference -ExclusionPath  $env:TEMP
+            break
+          }
+          catch {
+            if ($i -ge $maxRetries) {
+              throw
+            }
+            
+            # Write warning by using Workflow command syntax
+            Write-Host "::warning::Failed to configure Windows Defender exclusions (attempt $i/$maxRetries). Retrying..."
+            Start-Sleep -Seconds 1
+          }
+        }

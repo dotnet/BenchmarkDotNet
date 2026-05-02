@@ -18,24 +18,13 @@ jobs:
         os: [windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Add Windows Defender Exclusions
-        shell: powershell
-        run: |
-          Add-MpPreference -ExclusionPath $env:GITHUB_WORKSPACE
-          Add-MpPreference -ExclusionPath $env:TEMP
+      # Checkout
       - uses: actions/checkout@v6
-      # Setup wasm
-      - name: Set up node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-      - name: Set up v8
-        run: |
-          npm install jsvu -g
-          jsvu --os=default --engines=v8
-          Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
-      - name: Install wasm-tools workload
-        run: ./build.cmd install-wasm-tools
+      # Add Windows Defender Exclusions
+      - uses: ./.github/actions/add-windowsdefender-exclusions
+      # Setup additional tools
+      - name: Setup additional tools for Wasm/NativeAot tests
+        uses: ./.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -71,24 +60,13 @@ jobs:
         os: [windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Add Windows Defender Exclusions
-        shell: powershell
-        run: |
-          Add-MpPreference -ExclusionPath $env:GITHUB_WORKSPACE
-          Add-MpPreference -ExclusionPath $env:TEMP
+      # Checkout
       - uses: actions/checkout@v6
-      # Setup wasm
-      - name: Set up node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-      - name: Set up v8
-        run: |
-          npm install jsvu -g
-          jsvu --os=default --engines=v8
-          Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.jsvu\bin"
-      - name: Install wasm-tools workload
-        run: ./build.cmd install-wasm-tools
+      # Add Windows Defender Exclusions
+      - uses: ./.github/actions/add-windowsdefender-exclusions
+      # Setup additional tools
+      - name: Setup additional tools for Wasm/NativeAot tests
+        uses: ./.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -125,15 +103,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
-      # Set up the environment
-      - name: Set up node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-      - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=default --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
-      - name: Install wasm-tools workload
-        run: ./build.cmd install-wasm-tools
+      # Setup additional tools
+      - name: Setup additional tools for Wasm/NativeAot tests
+        uses: ./.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
@@ -171,14 +143,9 @@ jobs:
             arch: 'x64'
     steps:
       - uses: actions/checkout@v6
-      - name: Set up node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-      - name: Set up v8
-        run: npm install jsvu -g && jsvu --os=default --engines=v8 && echo "$HOME/.jsvu/bin" >> $GITHUB_PATH
-      - name: Install wasm-tools workload
-        run: ./build.cmd install-wasm-tools
+      # Setup additional tools
+      - name: Setup additional tools for Wasm/NativeAot tests
+        uses: ./.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
