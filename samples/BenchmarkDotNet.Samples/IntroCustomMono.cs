@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Samples
 
     [MonoJob("Mono x64", @"C:\Program Files\Mono\bin\mono.exe")]
     [MonoJob("Mono x86", @"C:\Program Files (x86)\Mono\bin\mono.exe")]
+    [UseLocalJobOnly]
     public class IntroCustomMono
     {
         [Benchmark]
@@ -22,6 +23,7 @@ namespace BenchmarkDotNet.Samples
     // *** Object Style ***
 
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroCustomMonoObjectStyle
     {
         private class Config : ManualConfig
@@ -45,6 +47,7 @@ namespace BenchmarkDotNet.Samples
     // ** Object Style, Using AOT **
 
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroCustomMonoObjectStyleAot
     {
         private class Config : ManualConfig
