@@ -65,12 +65,17 @@ internal sealed class EngineJitStage : EngineStage
 
     private IEnumerator<IterationData> EnumerateIterations()
     {
+        // If the user pinned InvocationCount (e.g. via [IterationSetup]/[IterationCleanup] which implies RunOncePerIteration),
+        // honor it so IterationSetup/Cleanup runs around each invocation. #3102
+        bool hasUserInvocationCount = parameters.TargetJob.HasValue(RunMode.InvocationCountCharacteristic);
+        long userInvokeCount = parameters.TargetJob.ResolveValue(RunMode.InvocationCountCharacteristic, parameters.Resolver, 1);
+
         ++iterationIndex;
         if (evaluateOverhead)
         {
             yield return GetOverheadIterationData(1);
         }
-        yield return GetWorkloadIterationData(1);
+        yield return GetWorkloadIterationData(userInvokeCount);
 
         // If the jit is not tiered, we're done.
         if (!JitInfo.IsTiered)
@@ -87,20 +92,29 @@ internal sealed class EngineJitStage : EngineStage
         StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver)!.Start();
 
         int remainingTiers = JitInfo.MaxTierPromotions;
-        int lastInvokeCount = 1;
+        long lastInvokeCount = userInvokeCount;
         while (remainingTiers > 0)
         {
             --remainingTiers;
-            int remainingCalls = JitInfo.TieredCallCountThreshold;
+            long remainingCalls = JitInfo.TieredCallCountThreshold;
             while (remainingCalls > 0)
             {
-                // If we can run one batch of calls within the time limit (based on the last measurement), do that instead of multiple single-invocation iterations.
-                var remainingTimeLimit = MaxTieringTime.ToNanoseconds() - startedClock.GetElapsed().GetNanoseconds();
-                var lastMeasurementSingleInvocationTime = lastMeasurement.Nanoseconds / lastInvokeCount;
-                int allowedCallsWithinTimeLimit = (int)Math.Floor(remainingTimeLimit / lastMeasurementSingleInvocationTime);
-                int invokeCount = allowedCallsWithinTimeLimit > 0
-                    ? Math.Min(remainingCalls, allowedCallsWithinTimeLimit)
-                    : 1;
+                long invokeCount;
+                if (hasUserInvocationCount)
+                {
+                    invokeCount = userInvokeCount;
+                }
+                else
+                {
+                    // If we can run a batch of calls within the time limit (based on the last measurement), do that instead of multiple single-invocation iterations.
+                    // For long-running benchmarks where even a small batch wouldn't fit, fall back to one invocation per iteration.
+                    var remainingTimeLimit = MaxTieringTime.ToNanoseconds() - startedClock.GetElapsed().GetNanoseconds();
+                    var lastMeasurementSingleInvocationTime = lastMeasurement.Nanoseconds / lastInvokeCount;
+                    long allowedCallsWithinTimeLimit = (long)Math.Floor(remainingTimeLimit / lastMeasurementSingleInvocationTime);
+                    invokeCount = allowedCallsWithinTimeLimit > 0
+                        ? Math.Min(remainingCalls, allowedCallsWithinTimeLimit)
+                        : 1;
+                }
                 lastInvokeCount = invokeCount;
 
                 remainingCalls -= invokeCount;
@@ -108,7 +122,7 @@ internal sealed class EngineJitStage : EngineStage
                 // The generated __Overhead method is aggressively optimized, so we don't need to run it again.
                 yield return GetWorkloadIterationData(invokeCount);
 
-                if ((remainingTiers + remainingCalls) > 0
+                if ((remainingTiers > 0 || remainingCalls > 0)
                     && startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
                 {
                     didStopEarly = true;
@@ -122,7 +136,7 @@ internal sealed class EngineJitStage : EngineStage
         // Empirical evidence shows that the first call after the method is tiered up may take longer,
         // so we run an extra iteration to ensure the next stage gets a stable measurement.
         ++iterationIndex;
-        yield return GetWorkloadIterationData(1);
+        yield return GetWorkloadIterationData(userInvokeCount);
     }
 
     private IterationData GetOverheadIterationData(long invokeCount)

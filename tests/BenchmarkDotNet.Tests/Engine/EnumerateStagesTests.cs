@@ -131,6 +131,38 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.True(didRunUnroll);
         }
 
+        [Theory]
+        [InlineData(1)]  // #3102: RunOncePerIteration auto-applied for [IterationSetup]/[IterationCleanup]
+        [InlineData(2)]  // small explicit count, JIT stage repeats it to cover TieredCallCountThreshold
+        [InlineData(5)]
+        [InlineData(30)] // matches the default TieredCallCountThreshold — one yield per tier
+        [InlineData(50)] // exceeds the default TieredCallCountThreshold — one yield per tier
+        public void JobWithExplicitInvocationCount(long invocationCount)
+        {
+            // When the user pins InvocationCount (e.g. via [IterationSetup]/[IterationCleanup] which
+            // implies RunOncePerIteration), every stage — including the JIT stage — must honor it so
+            // the user's IterationSetup/IterationCleanup runs around the requested number of calls.
+            var job = Job.Default.WithInvocationCount(invocationCount).WithUnrollFactor(1);
+            var engineParameters = CreateEngineParameters(job);
+
+            // A short measurement encourages the JIT stage to batch many invocations into a single iteration,
+            // which is the regression introduced by #2806.
+            var fastMeasurement = TimeInterval.FromMicroseconds(1);
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    if (iterationData.mode == IterationMode.Workload)
+                    {
+                        Assert.Equal(invocationCount, iterationData.invokeCount);
+                    }
+                    var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, iterationData.invokeCount, fastMeasurement.Nanoseconds);
+                    stageMeasurements.Add(measurement);
+                }
+            }
+        }
+
         [Fact]
         public void MediumTimeConsumingBenchmarksStartPilotFrom2AndIncrementItWithEveryStep()
         {
