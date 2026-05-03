@@ -46,6 +46,7 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [GlobalSetup]
         public CustomAwaitable GlobalSetup()
         {
+            // GlobalSetup runs before the engine starts the workload loop.
             Assert.Equal(0, AsyncCustomTaskMethodBuilder.InUseCounter);
             return new();
         }
@@ -53,6 +54,7 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [GlobalCleanup]
         public CustomAwaitable GlobalCleanup()
         {
+            // GlobalCleanup runs after the engine has stopped the workload loop.
             Assert.Equal(0, AsyncCustomTaskMethodBuilder.InUseCounter);
             return new();
         }
@@ -60,7 +62,8 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [IterationSetup]
         public CustomAwaitable IterationSetup()
         {
-            Assert.Equal(0, AsyncCustomTaskMethodBuilder.InUseCounter);
+            // The workload loop state machine is alive between iterations.
+            Assert.Equal(1, AsyncCustomTaskMethodBuilder.InUseCounter);
             return new();
         }
 
@@ -93,6 +96,7 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [GlobalSetup]
         public CustomTask GlobalSetup()
         {
+            // GlobalSetup runs before the engine starts the workload loop.
             Assert.Equal(0, AsyncCustomTaskMethodBuilder.InUseCounter);
             return new();
         }
@@ -100,6 +104,7 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [GlobalCleanup]
         public CustomTask GlobalCleanup()
         {
+            // GlobalCleanup runs after the engine has stopped the workload loop.
             Assert.Equal(0, AsyncCustomTaskMethodBuilder.InUseCounter);
             return new();
         }
@@ -107,7 +112,8 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [IterationSetup]
         public CustomTask IterationSetup()
         {
-            Assert.Equal(0, AsyncCustomTaskMethodBuilder.InUseCounter);
+            // The workload loop state machine is alive between iterations.
+            Assert.Equal(1, AsyncCustomTaskMethodBuilder.InUseCounter);
             return new();
         }
 
@@ -189,19 +195,22 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         [GlobalSetup]
         public void GlobalSetup()
         {
+            // GlobalSetup runs before the engine starts the workload loop.
             Assert.Equal(0, AsyncWrapperTaskMethodBuilder.InUseCounter);
         }
 
         [GlobalCleanup]
         public void GlobalCleanup()
         {
+            // GlobalCleanup runs after the engine has stopped the workload loop.
             Assert.Equal(0, AsyncWrapperTaskMethodBuilder.InUseCounter);
         }
 
         [IterationSetup]
         public void IterationSetup()
         {
-            Assert.Equal(0, AsyncWrapperTaskMethodBuilder.InUseCounter);
+            // The workload loop state machine is alive between iterations.
+            Assert.Equal(1, AsyncWrapperTaskMethodBuilder.InUseCounter);
         }
 
         [IterationCleanup]
