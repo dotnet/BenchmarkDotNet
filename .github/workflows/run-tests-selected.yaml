@@ -15,7 +15,7 @@ on:
           - macos-latest
           - windows-11-arm
           - ubuntu-24.04-arm
-          - macos-15-intel
+          - macos-26-intel
       project:
         type: string
         description: Specify test project path

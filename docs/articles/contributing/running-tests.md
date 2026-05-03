@@ -53,7 +53,7 @@ Following parameters need to specified to invoke workflow with `gh workflow run`
 
 | name                          | default                                  | description
 |-------------------------------|------------------------------------------|---------------------
-| `runs_on`                     | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `macos-latest` `macos-15-intel`)
+| `runs_on`                     | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `macos-latest` `macos-26-intel`)
 | `project`                     | `tests/BenchmarkDotNet.IntegrationTests` | Specify path of project directory
 | `framework`                   | `net8.0`                                 | Target Framework (e.g. `net8.0`, `net472`)
 | `filter`                      | `BenchmarkDotNet`                        | Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests

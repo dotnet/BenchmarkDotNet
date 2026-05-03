@@ -139,7 +139,7 @@ jobs:
         os:
           - runs-on: 'macos-latest'
             arch: 'arm64'
-          - runs-on: 'macos-15-intel'
+          - runs-on: 'macos-26-intel'
             arch: 'x64'
     steps:
       - uses: actions/checkout@v6

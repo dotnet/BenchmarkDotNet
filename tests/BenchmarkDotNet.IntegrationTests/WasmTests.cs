@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddJob(Job.Dry
                     .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
-                .WithBuildTimeout(TimeSpan.FromSeconds(240))
+                .WithBuildTimeout(TimeSpan.FromSeconds(480)) // Increase timeout for `WasmSupportsInProcessDiagnosers` test on macos(x64)
                 .WithOption(ConfigOptions.LogBuildOutput, true)
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
         }
