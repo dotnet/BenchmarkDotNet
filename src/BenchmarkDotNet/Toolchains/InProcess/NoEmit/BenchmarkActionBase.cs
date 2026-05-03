@@ -26,7 +26,8 @@ public abstract class BenchmarkActionBase : IBenchmarkAction
     public required Func<ValueTask> InvokeSingle { get; init; }
     public required Func<long, IClock, ValueTask<ClockSpan>> InvokeUnroll { get; init; }
     public required Func<long, IClock, ValueTask<ClockSpan>> InvokeNoUnroll { get; init; }
-    public abstract void Complete();
+    public virtual void Setup() { }
+    public virtual void Cleanup() { }
 
     protected static TDelegate CreateWorkload<TDelegate>(object? targetInstance, MethodInfo workloadMethod) where TDelegate : Delegate
         => workloadMethod.IsStatic

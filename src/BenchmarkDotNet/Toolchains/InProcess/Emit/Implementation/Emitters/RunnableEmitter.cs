@@ -235,10 +235,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             EmitFields();
             EmitCtor();
-            EmitSetupCleanupMethods();
             EmitTrickTheJit();
             overheadImplementationMethod = EmitOverheadImplementation(OverheadImplementationMethodName);
+            // EmitCoreImpl runs before EmitSetupCleanupMethods so AsyncCoreEmitter can capture
+            // the __StartWorkload method handle before __GlobalSetup needs to call it.
             EmitCoreImpl();
+            EmitSetupCleanupMethods();
 
             foreach (var nestedTypeBuilder in nestedTypeBuilders)
             {
@@ -387,10 +389,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private void EmitSetupCleanupMethods()
         {
-            EmitSetupCleanup(GlobalSetupMethodName, Descriptor.GlobalSetupMethod, false);
-            EmitSetupCleanup(GlobalCleanupMethodName, Descriptor.GlobalCleanupMethod, true);
-            EmitSetupCleanup(IterationSetupMethodName, Descriptor.IterationSetupMethod, false);
-            EmitSetupCleanup(IterationCleanupMethodName, Descriptor.IterationCleanupMethod, false);
+            EmitSetupCleanup(GlobalSetupMethodName, Descriptor.GlobalSetupMethod, SetupCleanupKind.GlobalSetup);
+            EmitSetupCleanup(GlobalCleanupMethodName, Descriptor.GlobalCleanupMethod, SetupCleanupKind.GlobalCleanup);
+            EmitSetupCleanup(IterationSetupMethodName, Descriptor.IterationSetupMethod, SetupCleanupKind.Other);
+            EmitSetupCleanup(IterationCleanupMethodName, Descriptor.IterationCleanupMethod, SetupCleanupKind.Other);
         }
 
         private void EmitTrickTheJit()

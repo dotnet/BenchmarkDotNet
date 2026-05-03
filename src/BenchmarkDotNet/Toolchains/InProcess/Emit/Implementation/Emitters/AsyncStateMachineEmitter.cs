@@ -366,10 +366,10 @@ partial class RunnableEmitter
             await base.GlobalSetup();
         }
      */
-    private MethodInfo EmitAsyncSingleCall(string methodName, Type asyncMethodBuilderType, MethodInfo methodToCall, bool isGlobalCleanup)
+    private MethodInfo EmitAsyncSingleCall(string methodName, Type asyncMethodBuilderType, MethodInfo methodToCall, SetupCleanupKind kind)
     {
         bool needsThisLocal = !methodToCall.IsStatic
-            || (isGlobalCleanup && this is AsyncCoreEmitter);
+            || (kind != SetupCleanupKind.Other && this is AsyncCoreEmitter);
         var builderInfo = BeginAsyncStateMachineTypeBuilder(methodName, asyncMethodBuilderType, needsThisLocal ? runnableBuilder : null);
         var (asyncStateMachineTypeBuilder, publicFields, (ilBuilder, _, returnLabel, stateLocal, thisLocal, _)) = builderInfo;
         var (stateField, builderField, _) = publicFields;
@@ -405,7 +405,7 @@ partial class RunnableEmitter
             ilBuilder.EmitLdloc(stateLocal);
             ilBuilder.Emit(OpCodes.Brfalse_S, state0Label);
 
-            if (isGlobalCleanup)
+            if (kind == SetupCleanupKind.GlobalCleanup)
             {
                 EmitExtraGlobalCleanup(ilBuilder, thisLocal);
             }
@@ -549,6 +549,11 @@ partial class RunnableEmitter
             if (getResultMethod.ReturnType != typeof(void))
             {
                 ilBuilder.Emit(OpCodes.Pop);
+            }
+
+            if (kind == SetupCleanupKind.GlobalSetup)
+            {
+                EmitExtraGlobalSetup(ilBuilder, thisLocal);
             }
         }
     }

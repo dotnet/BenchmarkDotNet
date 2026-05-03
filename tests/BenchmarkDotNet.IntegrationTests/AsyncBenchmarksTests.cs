@@ -76,6 +76,29 @@ namespace BenchmarkDotNet.IntegrationTests
         public void TaskYieldWithNullSyncContext(IToolchain toolchain)
             => CanExecute<NullSyncContextBenchmarks>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
 
+        // #3103
+        [Theory]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AsyncWorkloadRestartsAfterMemoryRandomization(IToolchain toolchain)
+            => CanExecute<RandomMemoryAsyncBenchmarks>(CreateSimpleConfig(
+                job: Job.Dry.WithToolchain(toolchain).WithIterationCount(3).WithMemoryRandomization(true)));
+
+        public class RandomMemoryAsyncBenchmarks
+        {
+            [GlobalSetup(Targets = new[] { nameof(ReturningTask), nameof(ReturningGenericTask), nameof(AwaitingValueTask) })]
+            public void GlobalSetup() { }
+
+            [GlobalCleanup(Targets = new[] { nameof(ReturningGenericTask), nameof(AwaitingTask) })]
+            public void GlobalCleanup() { }
+
+            [Benchmark] public Task ReturningTask() => Task.CompletedTask;
+            [Benchmark] public ValueTask ReturningValueTask() => default;
+            [Benchmark] public Task<int> ReturningGenericTask() => Task.FromResult(0);
+            [Benchmark] public ValueTask<int> ReturningGenericValueTask() => new(0);
+            [Benchmark] public async Task AwaitingTask() => await Task.Yield();
+            [Benchmark] public async ValueTask AwaitingValueTask() => await Task.Yield();
+        }
+
         public class TaskDelayMethods
         {
             private readonly ValueTaskSource<int> valueTaskSource = new();

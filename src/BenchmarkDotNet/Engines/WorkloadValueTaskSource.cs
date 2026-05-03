@@ -26,12 +26,6 @@ public sealed class WorkloadValueTaskSource : IValueTaskSource<ClockSpan>, IValu
     public void Complete()
         => continuerSource.SetResult(true);
 
-    // Used by __GlobalCleanup to safely call Complete only when the async workload loop
-    // is awaiting the next iteration. When the workload threw or the loop has already exited,
-    // calling SetResult(true) again on an already-signaled source would throw.
-    public bool IsContinuerPending
-        => continuerSource.GetStatus(continuerSource.Version) == ValueTaskSourceStatus.Pending;
-
     public ValueTask<bool> SetResultAndGetIsComplete(ClockSpan result)
     {
         continuerSource.Reset();
@@ -40,7 +34,13 @@ public sealed class WorkloadValueTaskSource : IValueTaskSource<ClockSpan>, IValu
     }
 
     public void SetException(Exception exception)
-        => clockSpanSource.SetException(exception);
+    {
+        clockSpanSource.SetException(exception);
+        // Reset so __GlobalCleanup's unconditional Complete() can safely SetResult(true)
+        // even after the workload threw and left continuerSource signaled with the
+        // last Continue() result.
+        continuerSource.Reset();
+    }
 
     ValueTaskSourceStatus IValueTaskSource<bool>.GetStatus(short token)
         => continuerSource.GetStatus(token);

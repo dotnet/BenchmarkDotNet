@@ -147,6 +147,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 IClock clock = new MockClock(Frequency.MHz);
 
+                // Async benchmark actions allocate their workload source in Setup(); the engine
+                // calls this before any iteration, so do the same here for direct invocation.
+                benchmarkAction.Setup();
+
                 if (isIdle)
                 {
                     await benchmarkAction.InvokeSingle();
@@ -168,6 +172,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
             finally
             {
+                benchmarkAction.Cleanup();
                 BenchmarkAllCases.Counter = 0;
             }
         }
@@ -427,7 +432,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 return startedClock.GetElapsed();
             }
 
-            public void Complete() { }
+            public void Setup() { }
+
+            public void Cleanup() { }
         }
 
 #if NET8_0_OR_GREATER

@@ -182,11 +182,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     WorkloadActionUnroll = workloadAction.InvokeUnroll,
                     OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,
                     OverheadActionUnroll = overheadAction.InvokeUnroll,
-                    GlobalSetupAction = globalSetupAction.InvokeSingle,
+                    GlobalSetupAction = async () =>
+                    {
+                        await globalSetupAction.InvokeSingle().ConfigureAwait(true);
+                        workloadAction.Setup();
+                        overheadAction.Setup();
+                    },
                     GlobalCleanupAction = () =>
                     {
-                        workloadAction.Complete();
-                        overheadAction.Complete();
+                        workloadAction.Cleanup();
+                        overheadAction.Cleanup();
                         return globalCleanupAction.InvokeSingle();
                     },
                     IterationSetupAction = iterationSetupAction.InvokeSingle,

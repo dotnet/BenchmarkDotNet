@@ -8,22 +8,24 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
 partial class RunnableEmitter
 {
-    private void EmitSetupCleanup(string methodName, MethodInfo? methodToCall, bool isGlobalCleanup)
+    private enum SetupCleanupKind { Other, GlobalSetup, GlobalCleanup }
+
+    private void EmitSetupCleanup(string methodName, MethodInfo? methodToCall, SetupCleanupKind kind)
     {
         if (methodToCall?.ReturnType.IsAwaitable() == true)
         {
-            EmitAsyncSetupCleanup(methodName, methodToCall, isGlobalCleanup);
+            EmitAsyncSetupCleanup(methodName, methodToCall, kind);
         }
         else
         {
-            EmitSyncSetupCleanup(methodName, methodToCall, isGlobalCleanup);
+            EmitSyncSetupCleanup(methodName, methodToCall, kind);
         }
     }
 
-    private void EmitSyncSetupCleanup(string methodName, MethodInfo? methodToCall, bool isGlobalCleanup)
+    private void EmitSyncSetupCleanup(string methodName, MethodInfo? methodToCall, SetupCleanupKind kind)
     {
         /*
-            .method private hidebysig 
+            .method private hidebysig
                instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask __GlobalSetup () cil managed flags(0200)
         */
         var methodBuilder = runnableBuilder
@@ -40,13 +42,17 @@ partial class RunnableEmitter
 	        )
          */
         var valueTaskLocal = ilBuilder.DeclareLocal(typeof(ValueTask));
-        if (isGlobalCleanup)
+        if (kind == SetupCleanupKind.GlobalCleanup)
         {
             EmitExtraGlobalCleanup(ilBuilder, null);
         }
         if (methodToCall != null)
         {
             EmitNoArgsMethodCallPopReturn(methodBuilder, methodToCall, ilBuilder);
+        }
+        if (kind == SetupCleanupKind.GlobalSetup)
+        {
+            EmitExtraGlobalSetup(ilBuilder, null);
         }
         /*
             // return new ValueTask();
@@ -62,9 +68,12 @@ partial class RunnableEmitter
     }
 
 
-    private void EmitAsyncSetupCleanup(string methodName, MethodInfo methodToCall, bool isGlobalCleanup)
-        => EmitAsyncSingleCall(methodName, typeof(AsyncValueTaskMethodBuilder), methodToCall, isGlobalCleanup);
+    private void EmitAsyncSetupCleanup(string methodName, MethodInfo methodToCall, SetupCleanupKind kind)
+        => EmitAsyncSingleCall(methodName, typeof(AsyncValueTaskMethodBuilder), methodToCall, kind);
 
-    // this.__fieldsContainer.workloadContinuerAndValueTaskSource?.Complete();
-    protected abstract void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal);
+    // Cleanup: this.__fieldsContainer.workloadContinuerAndValueTaskSource.Complete();
+    protected virtual void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
+
+    // Setup (after user code): this.__fieldsContainer.workloadContinuerAndValueTaskSource = new(); this.__StartWorkload();
+    protected virtual void EmitExtraGlobalSetup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
 }

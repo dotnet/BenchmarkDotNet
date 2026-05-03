@@ -55,8 +55,6 @@ public sealed class BenchmarkActionVoid : BenchmarkActionBase
         }
         return new ValueTask<ClockSpan>(startedClock.GetElapsed());
     }
-
-    public override void Complete() { }
 }
 
 [AggressivelyOptimizeMethods]
@@ -102,8 +100,6 @@ public unsafe class BenchmarkActionVoidPointer : BenchmarkActionBase
         }
         return new ValueTask<ClockSpan>(startedClock.GetElapsed());
     }
-
-    public override void Complete() { }
 }
 
 [AggressivelyOptimizeMethods]
@@ -152,8 +148,6 @@ public class BenchmarkActionByRef<T> : BenchmarkActionBase
         }
         return new ValueTask<ClockSpan>(startedClock.GetElapsed());
     }
-
-    public override void Complete() { }
 }
 
 [AggressivelyOptimizeMethods]
@@ -202,8 +196,6 @@ public class BenchmarkActionByRefReadonly<T> : BenchmarkActionBase
         }
         return new ValueTask<ClockSpan>(startedClock.GetElapsed());
     }
-
-    public override void Complete() { }
 }
 
 [AggressivelyOptimizeMethods]
@@ -250,8 +242,6 @@ public class BenchmarkAction<T> : BenchmarkActionBase
         }
         return new ValueTask<ClockSpan>(startedClock.GetElapsed());
     }
-
-    public override void Complete() { }
 }
 
 [AggressivelyOptimizeMethods]
@@ -259,7 +249,7 @@ public class BenchmarkActionTask : BenchmarkActionBase
 {
     private readonly Func<Task> callback;
     private readonly int unrollFactor;
-    private WorkloadValueTaskSource? workloadValueTaskSource;
+    private WorkloadValueTaskSource workloadValueTaskSource = null!;
     private IClock? clock;
     private long invokeCount;
 
@@ -283,12 +273,13 @@ public class BenchmarkActionTask : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadValueTaskSource == null)
-        {
-            workloadValueTaskSource = new();
-            StartWorkload();
-        }
         return workloadValueTaskSource.Continue();
+    }
+
+    public override void Setup()
+    {
+        workloadValueTaskSource = new();
+        StartWorkload();
     }
 
     private async void StartWorkload()
@@ -300,7 +291,7 @@ public class BenchmarkActionTask : BenchmarkActionBase
     {
         try
         {
-            if (await workloadValueTaskSource!.GetIsComplete())
+            if (await workloadValueTaskSource.GetIsComplete())
             {
                 return;
             }
@@ -319,12 +310,12 @@ public class BenchmarkActionTask : BenchmarkActionBase
         }
         catch (Exception e)
         {
-            workloadValueTaskSource!.SetException(e);
+            workloadValueTaskSource.SetException(e);
         }
     }
 
-    public override void Complete()
-        => workloadValueTaskSource?.Complete();
+    public override void Cleanup()
+        => workloadValueTaskSource.Complete();
 }
 
 [AggressivelyOptimizeMethods]
@@ -332,7 +323,7 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
 {
     private readonly Func<Task<T>> callback;
     private readonly int unrollFactor;
-    private WorkloadValueTaskSource? workloadValueTaskSource;
+    private WorkloadValueTaskSource workloadValueTaskSource = null!;
     private IClock? clock;
     private long invokeCount;
 
@@ -356,12 +347,13 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadValueTaskSource == null)
-        {
-            workloadValueTaskSource = new();
-            StartWorkload();
-        }
         return workloadValueTaskSource.Continue();
+    }
+
+    public override void Setup()
+    {
+        workloadValueTaskSource = new();
+        StartWorkload();
     }
 
     private async void StartWorkload()
@@ -373,7 +365,7 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
     {
         try
         {
-            if (await workloadValueTaskSource!.GetIsComplete())
+            if (await workloadValueTaskSource.GetIsComplete())
             {
                 return default!;
             }
@@ -392,13 +384,13 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
         }
         catch (Exception e)
         {
-            workloadValueTaskSource!.SetException(e);
+            workloadValueTaskSource.SetException(e);
             return default!;
         }
     }
 
-    public override void Complete()
-        => workloadValueTaskSource?.Complete();
+    public override void Cleanup()
+        => workloadValueTaskSource.Complete();
 }
 
 [AggressivelyOptimizeMethods]
@@ -406,7 +398,7 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
 {
     private readonly Func<ValueTask> callback;
     private readonly int unrollFactor;
-    private WorkloadValueTaskSource? workloadValueTaskSource;
+    private WorkloadValueTaskSource workloadValueTaskSource = null!;
     private IClock? clock;
     private long invokeCount;
 
@@ -430,12 +422,13 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadValueTaskSource == null)
-        {
-            workloadValueTaskSource = new();
-            StartWorkload();
-        }
         return workloadValueTaskSource.Continue();
+    }
+
+    public override void Setup()
+    {
+        workloadValueTaskSource = new();
+        StartWorkload();
     }
 
     private async void StartWorkload()
@@ -447,7 +440,7 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
     {
         try
         {
-            if (await workloadValueTaskSource!.GetIsComplete())
+            if (await workloadValueTaskSource.GetIsComplete())
             {
                 return;
             }
@@ -466,12 +459,12 @@ public class BenchmarkActionValueTask : BenchmarkActionBase
         }
         catch (Exception e)
         {
-            workloadValueTaskSource!.SetException(e);
+            workloadValueTaskSource.SetException(e);
         }
     }
 
-    public override void Complete()
-        => workloadValueTaskSource?.Complete();
+    public override void Cleanup()
+        => workloadValueTaskSource.Complete();
 }
 
 [AggressivelyOptimizeMethods]
@@ -479,7 +472,7 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
 {
     private readonly Func<ValueTask<T>> callback;
     private readonly int unrollFactor;
-    private WorkloadValueTaskSource? workloadValueTaskSource;
+    private WorkloadValueTaskSource workloadValueTaskSource = null!;
     private IClock? clock;
     private long invokeCount;
 
@@ -503,12 +496,13 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
     {
         this.invokeCount = invokeCount;
         this.clock = clock;
-        if (workloadValueTaskSource == null)
-        {
-            workloadValueTaskSource = new();
-            StartWorkload();
-        }
         return workloadValueTaskSource.Continue();
+    }
+
+    public override void Setup()
+    {
+        workloadValueTaskSource = new();
+        StartWorkload();
     }
 
     private async void StartWorkload()
@@ -520,7 +514,7 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
     {
         try
         {
-            if (await workloadValueTaskSource!.GetIsComplete())
+            if (await workloadValueTaskSource.GetIsComplete())
             {
                 return default!;
             }
@@ -539,11 +533,11 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
         }
         catch (Exception e)
         {
-            workloadValueTaskSource!.SetException(e);
+            workloadValueTaskSource.SetException(e);
             return default!;
         }
     }
 
-    public override void Complete()
-        => workloadValueTaskSource?.Complete();
+    public override void Cleanup()
+        => workloadValueTaskSource.Complete();
 }
