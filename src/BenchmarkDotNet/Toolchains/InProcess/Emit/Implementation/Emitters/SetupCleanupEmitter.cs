@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -71,9 +71,6 @@ partial class RunnableEmitter
     private void EmitAsyncSetupCleanup(string methodName, MethodInfo methodToCall, SetupCleanupKind kind)
         => EmitAsyncSingleCall(methodName, typeof(AsyncValueTaskMethodBuilder), methodToCall, kind);
 
-    // Cleanup: this.__fieldsContainer.workloadContinuerAndValueTaskSource.Complete();
     protected virtual void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
-
-    // Setup (after user code): this.__fieldsContainer.workloadContinuerAndValueTaskSource = new(); this.__StartWorkload();
     protected virtual void EmitExtraGlobalSetup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
 }
