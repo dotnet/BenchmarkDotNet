@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <GenerateProgramFile>false</GenerateProgramFile>
     <!-- Disable parallel tests between TargetFrameworks -->
     <TestTfmsInParallel>false</TestTfmsInParallel>

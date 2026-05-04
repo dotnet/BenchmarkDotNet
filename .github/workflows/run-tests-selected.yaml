@@ -17,7 +17,7 @@ on:
           - ubuntu-24.04-arm
           - macos-15-intel
       project:
-        type: string
+        type: choice
         description: Specify test project path
         required: true
         default: tests/BenchmarkDotNet.IntegrationTests
@@ -25,6 +25,8 @@ on:
           - tests/BenchmarkDotNet.Tests
           - tests/BenchmarkDotNet.IntegrationTests
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning
+          - tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks
+          - samples/BenchmarkDotNet.Samples
       framework:
         type: choice
         description: Specify target framework
@@ -32,6 +34,10 @@ on:
         options:
           - net8.0
           - net472
+          # Following target framework is used for `MultipleFrameworks` tests
+          - net10.0
+          - net462
+          - net48
       filter:
         type: string
         description: Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests
@@ -101,3 +107,4 @@ jobs:
           if-no-files-found: ignore
           path: |
             artifacts/**/*
+            **/BenchmarkDotNet.Artifacts/**
