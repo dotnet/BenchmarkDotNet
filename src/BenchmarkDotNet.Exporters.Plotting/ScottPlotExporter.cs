@@ -221,9 +221,10 @@ namespace BenchmarkDotNet.Exporters.Plotting
 
                 // determine the width of the largest tick label
                 float largestLabelWidth = 0;
+                using Paint paint = Paint.NewDisposablePaint();
                 foreach (Tick tick in ticks)
                 {
-                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label).Size;
+                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label, paint).Size;
                     largestLabelWidth = Math.Max(largestLabelWidth, size.Width);
                 }
 
@@ -296,9 +297,10 @@ namespace BenchmarkDotNet.Exporters.Plotting
 
                 // determine the width of the largest tick label
                 float largestLabelWidth = 0;
+                using Paint paint = Paint.NewDisposablePaint();
                 foreach (Tick tick in ticks)
                 {
-                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label).Size;
+                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label, paint).Size;
                     largestLabelWidth = Math.Max(largestLabelWidth, size.Width);
                 }
 

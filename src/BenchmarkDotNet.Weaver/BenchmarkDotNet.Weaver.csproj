@@ -21,8 +21,8 @@ then run `build.cmd pack-weaver`.
 
   <ItemGroup>
     <PackageReference Include="AsmResolver.DotNet" Version="6.0.0-rc.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="18.0.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="18.4.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.4.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
