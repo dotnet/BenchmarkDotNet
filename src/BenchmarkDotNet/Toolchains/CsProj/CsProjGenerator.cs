@@ -395,6 +395,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             ".git",
             ".vs",
+            ".vscode",
+            ".claude",
+            ".github",
+            ".gitlab",
             "bin",
             "obj",
         };
