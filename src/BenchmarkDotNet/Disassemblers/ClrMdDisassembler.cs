@@ -41,20 +41,15 @@ namespace BenchmarkDotNet.Disassemblers
         private DataTarget Attach(int processId)
         {
             bool isSelf = processId == System.Diagnostics.Process.GetCurrentProcess().Id;
-            if (OsDetector.IsWindows())
+            if (OsDetector.IsWindows() || OsDetector.IsLinux())
             {
-                // Windows CoreCLR fails to disassemble generic types when using CreateSnapshotAndAttach, and succeeds with AttachToProcess. https://github.com/microsoft/clrmd/issues/1334
-                return isSelf && !RuntimeInformation.IsNetCore
-                    ? DataTarget.CreateSnapshotAndAttach(processId)
-                    : DataTarget.AttachToProcess(processId, suspend: false);
-            }
-            if (OsDetector.IsLinux())
-            {
-                // Linux crashes when using AttachToProcess in the same process.
+                // AttachToProcess API does not support attaching to the own process.
+                // https://github.com/microsoft/clrmd/blob/main/doc/FAQ.md#can-i-use-this-api-to-inspect-my-own-process
                 return isSelf
                     ? DataTarget.CreateSnapshotAndAttach(processId)
                     : DataTarget.AttachToProcess(processId, suspend: false);
             }
+
             if (OsDetector.IsMacOS())
             {
                 // On macOS it need to use CreateSnapshotAndAttach API instead of AttachToProcess.
