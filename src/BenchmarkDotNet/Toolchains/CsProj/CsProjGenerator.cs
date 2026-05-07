@@ -457,11 +457,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 {
                     if (ShouldIgnoreDirectory(dir))
                         continue;
-#if NETSTANDARD2_0
-                    // Ignore reparse point / symlink to avoid infinite loops
-                    if (dir.Attributes.HasFlag(FileAttributes.ReparsePoint))
-                        continue;
-#endif
                     stack.Push(dir);
                 }
             }
@@ -488,11 +483,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             try
             {
-#if NETSTANDARD2_0
                 return currentDir.EnumerateDirectories();
-#else
-                return currentDir.EnumerateDirectories("*", DirectoryEnumerationOptions);
-#endif
             }
             catch
             {
