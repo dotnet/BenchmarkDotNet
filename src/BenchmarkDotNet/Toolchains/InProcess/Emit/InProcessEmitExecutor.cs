@@ -21,27 +21,32 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             if (executeOnSeparateThread)
             {
                 var taskCompletionSource = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-                var runThread = new Thread(async () =>
+                Thread runThread;
+                // Ensure the new thread is started with a fresh execution context.
+                using (ExecutionContextHelper.SuppressFlow())
                 {
-                    try
+                    runThread = new Thread(() =>
                     {
-                        taskCompletionSource.SetResult(await ExecuteCore(host, executeParameters).ConfigureAwait(false));
-                    }
-                    catch (Exception ex)
+                        // The engine yields immediately, so we need to set the synchronization context to ensure the benchmarks are executed on this dedicated thread, and not on a ThreadPool thread.
+                        using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+                        try
+                        {
+                            var executeTask = ExecuteCore(host, executeParameters);
+                            taskCompletionSource.SetResult(context.ExecuteUntilComplete(executeTask));
+                        }
+                        catch (Exception ex)
+                        {
+                            taskCompletionSource.SetException(ex);
+                        }
+                    });
+                    if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any()
+                        && OsDetector.IsWindows())
                     {
-                        taskCompletionSource.SetException(ex);
+                        runThread.SetApartmentState(ApartmentState.STA);
                     }
-                });
-
-                if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any()
-                    && OsDetector.IsWindows())
-                {
-                    runThread.SetApartmentState(ApartmentState.STA);
+                    runThread.IsBackground = true;
+                    runThread.Start();
                 }
-
-                runThread.IsBackground = true;
-
-                runThread.Start();
 
                 exitCode = await taskCompletionSource.Task.ConfigureAwait(true);
                 runThread.Join();
