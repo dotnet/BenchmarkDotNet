@@ -53,26 +53,32 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI]
         public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAllAsync(config, args));
-        }
+            => ExecuteSynchronously(RunAllAsync(config, args));
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
         [PublicAPI]
         public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAllJoinedAsync(config, args));
-        }
+            => ExecuteSynchronously(RunAllJoinedAsync(config, args));
 
         [PublicAPI]
         public IEnumerable<Summary> Run(string[]? args = null, IConfig? config = null)
+            => ExecuteSynchronously(RunAsync(args, config));
+
+        // Bridges sync entrypoints to the async pipeline. The BenchmarkSynchronizationContext is installed
+        // ONLY when the returned task is not already completed (i.e., we have actual benchmark execution to pump).
+        // Discovery, --list, --info, --help, no-benchmarks, and other early-exit paths complete synchronously
+        // inside the async pipeline and bypass the context entirely. This avoids deadlocks when a user
+        // [ParamsSource]/[ArgumentsSource] evaluator does sync-over-async during discovery, since the BDN
+        // SynchronizationContext is single-threaded and discovery would otherwise block waiting for a
+        // continuation that can never run.
+        private static T ExecuteSynchronously<T>(ValueTask<T> task)
         {
+            if (task.IsCompleted)
+                return task.GetAwaiter().GetResult();
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(args, config));
+            return context.ExecuteUntilComplete(task);
         }
 
         /// <summary>

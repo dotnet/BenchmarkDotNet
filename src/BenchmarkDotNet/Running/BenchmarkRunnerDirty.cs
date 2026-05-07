@@ -16,51 +16,42 @@ namespace BenchmarkDotNet.Running
     {
         [PublicAPI]
         public static Summary Run<T>(IConfig? config = null, string[]? args = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync<T>(config, args));
-        }
+            => ExecuteSynchronously(RunAsync<T>(config, args));
 
         [PublicAPI]
         public static Summary Run(Type type, IConfig? config = null, string[]? args = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(type, config, args));
-        }
+            => ExecuteSynchronously(RunAsync(type, config, args));
 
         [PublicAPI]
         public static Summary[] Run(Type[] types, IConfig? config = null, string[]? args = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(types, config, args));
-        }
+            => ExecuteSynchronously(RunAsync(types, config, args));
 
         [PublicAPI]
         public static Summary Run(Type type, MethodInfo[] methods, IConfig? config = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(type, methods, config));
-        }
+            => ExecuteSynchronously(RunAsync(type, methods, config));
 
         [PublicAPI]
         public static Summary[] Run(Assembly assembly, IConfig? config = null, string[]? args = null)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(assembly, config, args));
-        }
+            => ExecuteSynchronously(RunAsync(assembly, config, args));
 
         [PublicAPI]
         public static Summary Run(BenchmarkRunInfo benchmarkRunInfo)
-        {
-            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(benchmarkRunInfo));
-        }
+            => ExecuteSynchronously(RunAsync(benchmarkRunInfo));
 
         [PublicAPI]
         public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
+            => ExecuteSynchronously(RunAsync(benchmarkRunInfos));
+
+        // See BenchmarkSwitcher.ExecuteSynchronously: defer installing BenchmarkSynchronizationContext
+        // until after the async pipeline has started, so synchronous discovery / early-exit paths
+        // are not pumped under the single-threaded BDN context (avoids deadlocks when a user
+        // [ParamsSource]/[ArgumentsSource] evaluator does sync-over-async).
+        private static T ExecuteSynchronously<T>(ValueTask<T> task)
         {
+            if (task.IsCompleted)
+                return task.GetAwaiter().GetResult();
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(benchmarkRunInfos));
+            return context.ExecuteUntilComplete(task);
         }
 
         [PublicAPI]
