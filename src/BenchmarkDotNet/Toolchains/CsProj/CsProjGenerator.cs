@@ -406,8 +406,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         private static bool ShouldIgnoreDirectory(DirectoryInfo directory)
             => IgnoredDirectoryNames.Contains(directory.Name)
-               || directory.Name.StartsWith(".", StringComparison.Ordinal)
-               || directory.Attributes.HasFlag(FileAttributes.Hidden);
+            || directory.Name.StartsWith(".", StringComparison.Ordinal)
+#if NETSTANDARD2_0
+            || directory.Attributes.HasFlag(FileAttributes.Hidden)
+            || directory.Attributes.HasFlag(FileAttributes.ReparsePoint)
+#endif
+            ;
 
         public static FileInfo FindProjectFile(DirectoryInfo rootDirectory, string projectName)
         {
@@ -484,7 +488,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             try
             {
+#if NETSTANDARD2_0
                 return currentDir.EnumerateDirectories();
+#else
+                return currentDir.EnumerateDirectories("*", DirectoryEnumerationOptions);
+#endif
             }
             catch
             {
@@ -496,7 +504,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             RecurseSubdirectories = false,
             IgnoreInaccessible = true,
-            AttributesToSkip = FileAttributes.ReparsePoint
+            AttributesToSkip = FileAttributes.ReparsePoint | FileAttributes.Hidden
         };
 
         private static IEnumerable<FileInfo> EnumerateProjectFiles(DirectoryInfo directory)
