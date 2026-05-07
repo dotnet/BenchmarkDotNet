@@ -237,6 +237,34 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(expectedPath, binariesPath);
         }
 
+        [Fact]
+        public void FindProjectFileIgnoresDotAndHiddenDirectories()
+        {
+            var temporaryDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(temporaryDirectory);
+
+            try
+            {
+                var rootProjectDir = Path.Combine(temporaryDirectory, "XXX.Benchmark");
+                Directory.CreateDirectory(rootProjectDir);
+                var rootProjectFile = Path.Combine(rootProjectDir, "XXX.Benchmark.csproj");
+                File.WriteAllText(rootProjectFile, "<Project />");
+
+                var hiddenProjectDir = Path.Combine(temporaryDirectory, ".claude", "worktrees", "XXX.Benchmark");
+                Directory.CreateDirectory(hiddenProjectDir);
+                var hiddenProjectFile = Path.Combine(hiddenProjectDir, "XXX.Benchmark.csproj");
+                File.WriteAllText(hiddenProjectFile, "<Project />");
+
+                var foundProject = BenchmarkDotNet.Toolchains.CsProj.Helpers.FindProjectFile(new DirectoryInfo(temporaryDirectory), "XXX.Benchmark");
+
+                Assert.Equal(Path.GetFullPath(rootProjectFile), Path.GetFullPath(foundProject.FullName));
+            }
+            finally
+            {
+                Directory.Delete(temporaryDirectory, recursive: true);
+            }
+        }
+
         private class SteamLoadedBuildPartition : CsProjGenerator
         {
             internal string ResolvePathForBinaries(BuildPartition buildPartition, string programName)

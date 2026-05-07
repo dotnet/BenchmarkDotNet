@@ -389,22 +389,25 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             => HashCode.Combine(TargetFrameworkMoniker, RuntimeFrameworkVersion, CliPath, PackagesPath);
     }
 
-    file static class Helpers
+    internal static class Helpers
     {
-        private static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.Ordinal)
+        private static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.OrdinalIgnoreCase)
         {
-            ".git",
-            ".vs",
             "bin",
             "obj",
         };
 
-        private static readonly HashSet<string> ProjectExtensions = new(StringComparer.Ordinal)
+        private static readonly HashSet<string> ProjectExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
             ".csproj",
             ".fsproj",
             ".vbproj"
         };
+
+        private static bool ShouldIgnoreDirectory(DirectoryInfo directory)
+            => IgnoredDirectoryNames.Contains(directory.Name)
+               || directory.Name.StartsWith(".", StringComparison.Ordinal)
+               || directory.Attributes.HasFlag(FileAttributes.Hidden);
 
         public static FileInfo FindProjectFile(DirectoryInfo rootDirectory, string projectName)
         {
@@ -448,7 +451,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // 2. Handle sub directories.
                 foreach (var dir in subDirectories)
                 {
-                    if (IgnoredDirectoryNames.Contains(dir.Name))
+                    if (ShouldIgnoreDirectory(dir))
                         continue;
 #if NETSTANDARD2_0
                     // Ignore reparse point / symlink to avoid infinite loops
