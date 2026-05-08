@@ -1,4 +1,6 @@
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -10,5 +12,8 @@ namespace BenchmarkDotNet.IntegrationTests
             => OsDetector.IsWindows() && IsGitHubActions();
 
         internal static bool IsLocalRun() => !IsGitHubActions();
+
+        internal static bool IsGitHubDraftPR()
+           => EnvRequirementChecker.GetSkip(EnvRequirement.NonGitHubDraftPR).IsNotBlank();
     }
 }
