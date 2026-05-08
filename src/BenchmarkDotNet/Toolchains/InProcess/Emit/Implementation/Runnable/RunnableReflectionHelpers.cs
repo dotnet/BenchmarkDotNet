@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public const BindingFlags BindingFlagsNonPublicInstance = BindingFlags.NonPublic | BindingFlags.Instance;
         public const BindingFlags BindingFlagsPublicInstance = BindingFlags.Public | BindingFlags.Instance;
         public const BindingFlags BindingFlagsPublicStatic = BindingFlags.Public | BindingFlags.Static;
-        public const BindingFlags BindingFlagsAllStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+        public const BindingFlags BindingFlagsAllStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy;
         public const BindingFlags BindingFlagsAllInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
         private static object? TryChangeType(object? value, Type targetType)
