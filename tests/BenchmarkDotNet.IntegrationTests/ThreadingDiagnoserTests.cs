@@ -13,6 +13,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.IntegrationTests.Xunit;
+using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -26,6 +27,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { InProcessEmitToolchain.Default };
 
+            if (ContinuousIntegration.IsGitHubDraftPR())
+                yield break;
+
             yield return new object[] { Job.Default.GetToolchain() };
 
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
@@ -35,7 +39,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void CompletedWorkItemCountIsAccurate(IToolchain toolchain)
         {
             var config = CreateConfig(toolchain);
@@ -76,7 +81,8 @@ namespace BenchmarkDotNet.IntegrationTests
             public void DoNothing() { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void LockContentionCountIsAccurate(IToolchain toolchain)
         {
             var config = CreateConfig(toolchain);

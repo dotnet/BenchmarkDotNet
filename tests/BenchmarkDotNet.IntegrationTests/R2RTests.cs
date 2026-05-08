@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests
 #endif
         }
 
-        [FactEnvSpecific("R2R requires .NET Core runtime", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("R2R requires .NET Core runtime", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void R2RToolchainCanExecuteBenchmarks()
         {
             try

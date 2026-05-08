@@ -32,12 +32,14 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            yield return new object[] { Job.Default.GetToolchain() };
             // InProcessEmit reports flaky allocations in current .Net 8.
             if (!RuntimeInformation.IsNetCore)
-            {
                 yield return new object[] { InProcessEmitToolchain.Default };
-            }
+
+            if (ContinuousIntegration.IsGitHubDraftPR())
+                yield break;
+
+            yield return new object[] { Job.Default.GetToolchain() };
         }
 
         public class AccurateAllocations
@@ -68,7 +70,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 8.0)", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 8.0)", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
             if (OsDetector.IsMacOS())
@@ -77,13 +79,13 @@ namespace BenchmarkDotNet.IntegrationTests
             MemoryDiagnoserIsAccurate(NativeAotToolchain.Net80);
         }
 
-        [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 8.0), and it's not supported on Windows+Arm", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm])]
+        [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 8.0), and it's not supported on Windows+Arm", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsModernMono()
         {
             MemoryDiagnoserIsAccurate(MonoToolchain.Mono80);
         }
 
-        [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
+        [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
         [InlineData(MonoAotCompilerMode.mini)]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]

@@ -14,11 +14,14 @@ namespace BenchmarkDotNet.IntegrationTests
         public ParamSourceTests(ITestOutputHelper output) : base(output) { }
 
         public static IEnumerable<object[]> GetToolchains()
-            =>
-                [
-                    [Job.Default.GetToolchain()],
-                    [InProcessEmitToolchain.Default],
-                ];
+        {
+            yield return [InProcessEmitToolchain.Default];
+
+            if (ContinuousIntegration.IsGitHubDraftPR())
+                yield break;
+
+            yield return [Job.Default.GetToolchain()];
+        }
 
         [Fact]
         public void ParamSourceCanHandleStringWithSurrogates()

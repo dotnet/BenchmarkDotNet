@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private const string V8SkipReason = "JSVU does not support ARM on Windows or Linux";
 
-        [Theory]
+        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
         [InlineData(MonoAotCompilerMode.mini, "node")]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WasmBenchmark>(GetConfig(aotCompilerMode, javaScriptEngine));
         }
 
-        [Theory]
+        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         [InlineDataEnvSpecific([MonoAotCompilerMode.mini, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
         [InlineData(MonoAotCompilerMode.mini, "node")]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory]
+        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         [InlineDataEnvSpecific(["v8", "custom-main-v8.mjs", WasmIpcType.FileStdOut], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
         [InlineData("node", "custom-main-node.mjs", WasmIpcType.WebSocket)]
         public void WasmSupportsCustomMainJs(string javaScriptEngine, string customMainJs, WasmIpcType ipcType)

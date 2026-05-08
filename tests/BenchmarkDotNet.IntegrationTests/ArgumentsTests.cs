@@ -11,11 +11,14 @@ namespace BenchmarkDotNet.IntegrationTests
     public class ArgumentsTests : BenchmarkTestExecutor
     {
         public static IEnumerable<object[]> GetToolchains()
-            =>
-                [
-                    [Job.Default.GetToolchain()],
-                    [InProcessEmitToolchain.Default],
-                ];
+        {
+            yield return [InProcessEmitToolchain.Default];
+
+            if (ContinuousIntegration.IsGitHubDraftPR())
+                yield break;
+
+            yield return [Job.Default.GetToolchain()];
+        }
 
         public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 

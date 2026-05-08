@@ -52,7 +52,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         CanExecute<BenchmarkWithCancellationToken>(config);
     }
 
-    [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm)]
+    [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR)]
     [InlineData("v8")]
     [InlineData("node")]
     public void BenchmarkWithCancellationTokenProperty_ReceivesToken_Wasm(string javaScriptEngine)
@@ -116,7 +116,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
     }
 
     [Theory]
-    [InlineDataEnvSpecific("v8", "JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+    [InlineDataEnvSpecific("v8", "JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
     [InlineData("node")]
     public async Task RunWithCancellationTokenIsCancelled_Wasm(string javaScriptEngine)
     {

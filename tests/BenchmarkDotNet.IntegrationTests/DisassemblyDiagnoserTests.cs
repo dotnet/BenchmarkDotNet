@@ -25,6 +25,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default]; // InProcess
 
+            if (ContinuousIntegration.IsGitHubDraftPR())
+                yield break;
+
             if (RuntimeInformation.IsFullFramework)
             {
                 yield return [Jit.LegacyJit, Platform.X86, CsProjClassicNetToolchain.Net472]; // 32bit LegacyJit for desktop .NET

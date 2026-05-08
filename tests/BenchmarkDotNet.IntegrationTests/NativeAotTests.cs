@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithEnvironmentVariable(NativeAotBenchmark.EnvVarKey, IsAvx2Supported().ToString().ToLower()));
         }
 
-        [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void LatestNativeAotVersionIsSupported()
         {
             if (!GetShouldRunTest())
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void NativeAotSupportsInProcessDiagnosers()
         {
             if (!GetShouldRunTest())
