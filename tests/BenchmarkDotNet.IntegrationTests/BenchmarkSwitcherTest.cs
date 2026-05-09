@@ -20,13 +20,19 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
 
+        private IConfig GetRunInProcessConfig()
+            => new SingleRunInProcessConfig(Output);
+
+        private IConfig GetRunOutOfProcessConfig()
+           => new SingleRunOutOfProcessConfig(Output);
+
         [FactEnvSpecific(
             "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
             EnvRequirement.DotNetCoreOnly)]
         public void WhenInvalidCommandLineArgumentIsPassedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([])
@@ -39,8 +45,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUserAsksForInfoAnInfoIsDisplayedAndNoBenchmarksAreExecuted()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([])
@@ -53,8 +59,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenInvalidTypeIsProvidedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([typeof(ClassC)])
@@ -67,8 +73,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenNoTypesAreProvidedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([])
@@ -81,8 +87,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenFilterReturnsNothingAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             const string filter = "WRONG";
             var summaries = BenchmarkSwitcher
@@ -96,8 +102,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUserAsksToPrintAListWePrintIt()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([typeof(ClassA)])
@@ -111,8 +117,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUserAsksToPrintAListAndProvidesAFilterWePrintFilteredList()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([typeof(ClassA)])
@@ -127,8 +133,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenDisableLogFileWeDontWriteToFile()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger).WithOptions(ConfigOptions.DisableLogFile).AddJob(Job.Dry);
+            var config = GetRunInProcessConfig().WithOptions(ConfigOptions.DisableLogFile);
 
             string? logFilePath = null;
             try
@@ -153,8 +158,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void EnsureLogFileIsWritten()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger).AddJob(Job.Dry);
+            var config = GetRunInProcessConfig();
 
             string? logFilePath = null;
             try
@@ -179,12 +183,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUserDoesNotProvideFilterOrCategoriesViaCommandLineWeAskToChooseBenchmark()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
             var userInteractionMock = new UserInteractionMock(returnValue: []);
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
-                .With([typeof(WithDryAttributeAndCategory)])
+                .With([typeof(WithCategory)])
                 .Run([], config);
 
             Assert.Empty(summaries); // summaries is empty because the returnValue configured for mock returns 0 types
@@ -196,9 +199,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData("--anyCategories")]
         public void WhenUserProvidesCategoriesWithoutFiltersWeDontAskToChooseBenchmarkJustRunGivenCategories(string categoriesConsoleLineArgument)
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
-            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var config = GetRunInProcessConfig();
+            var types = new[] { typeof(WithCategory) };
             var userInteractionMock = new UserInteractionMock(returnValue: types);
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
@@ -214,9 +216,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData("--anyCategories")]
         public void WhenUserProvidesCategoriesWithFiltersWeDontAskToChooseBenchmarkJustUseCombinedFilterAndRunTheBenchmarks(string categoriesConsoleLineArgument)
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
-            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var config = GetRunInProcessConfig();
+            var types = new[] { typeof(WithCategory) };
             var userInteractionMock = new UserInteractionMock(returnValue: types);
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
@@ -230,8 +231,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ValidCommandLineArgumentsAreProperlyHandled()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunOutOfProcessConfig();
 
             // Don't cover every combination, just pick a complex scenario and check
             // it works end-to-end, i.e. "method=Method1" and "class=ClassB"
@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var types = new[] { typeof(ClassB) };
             var switcher = new BenchmarkSwitcher(types);
             MockExporter mockExporter = new MockExporter();
-            var configWithJobDefined = ManualConfig.CreateEmpty().AddExporter(mockExporter).AddJob(Job.Dry);
+            var configWithJobDefined = GetRunInProcessConfig().AddExporter(mockExporter);
 
             var results = switcher.Run(["--filter", "*Method3"], configWithJobDefined);
 
@@ -262,7 +262,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
-            Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Dry)));
+            Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job.Id == "Dry")));
         }
 
         [Fact]
@@ -271,7 +271,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var types = new[] { typeof(WithDryAttributeAndCategory) };
             var switcher = new BenchmarkSwitcher(types);
             MockExporter mockExporter = new MockExporter();
-            var configWithoutJobDefined = ManualConfig.CreateEmpty().AddExporter(mockExporter);
+            var configWithoutJobDefined = GetRunOutOfProcessConfig().AddExporter(mockExporter);
 
             var results = switcher.Run(["--filter", "*WithDryAttribute*"], configWithoutJobDefined);
 
@@ -289,7 +289,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var types = new[] { typeof(JustBenchmark) };
             var switcher = new BenchmarkSwitcher(types);
             MockExporter mockExporter = new MockExporter();
-            var configWithoutJobDefined = ManualConfig.CreateEmpty().AddExporter(mockExporter);
+            var configWithoutJobDefined = GetRunOutOfProcessConfig().AddExporter(mockExporter);
 
             var results = switcher.Run(["--filter", "*"], configWithoutJobDefined);
 
@@ -304,8 +304,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromTypes()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summariesForType = BenchmarkSwitcher
                 .FromTypes([typeof(Static.BenchmarkClassWithStaticMethodsOnly)])
@@ -318,8 +318,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromAssembly()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunInProcessConfig();
+            var logger = config.GetOutputLogger();
 
             var summariesForAssembly = BenchmarkSwitcher
                 .FromAssembly(typeof(Static.BenchmarkClassWithStaticMethodsOnly).Assembly)
@@ -332,16 +332,15 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("For some reason this test is flaky on Full Framework", EnvRequirement.DotNetCoreOnly)]
         public void WhenUserAddTheResumeAttributeAndRunTheBenchmarks()
         {
-            var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+            var config = GetRunOutOfProcessConfig().AddJob(Job.Dry);
 
-            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var types = new[] { typeof(WithCategory) };
             var switcher = new BenchmarkSwitcher(types);
 
             // the first run should execute all benchmarks
-            Assert.Single(switcher.Run(["--filter", "*WithDryAttributeAndCategory*"], config));
+            Assert.Single(switcher.Run(["--filter", "*WithCategory*"], config));
             // resuming after succesfull run should run nothing
-            Assert.Empty(switcher.Run(["--resume", "--filter", "*WithDryAttributeAndCategory*"], config));
+            Assert.Empty(switcher.Run(["--resume", "--filter", "*WithCategory*"], config));
         }
 
         private class UserInteractionMock : IUserInteraction
@@ -369,6 +368,12 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             return $"No [Benchmark] attribute found on '{type.Name}' benchmark case.";
         }
+    }
+
+    file static class ExtensionMethods
+    {
+        public static OutputLogger GetOutputLogger(this IConfig config)
+            => (OutputLogger)config.GetLoggers().Single();
     }
 }
 
@@ -400,6 +405,13 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Method1() { }
         public void Method2() { }
         public void Method3() { }
+    }
+
+    [BenchmarkCategory(BenchmarkSwitcherTest.TestCategory)]
+    public class WithCategory
+    {
+        [Benchmark]
+        public void Method() { }
     }
 
     [DryJob]

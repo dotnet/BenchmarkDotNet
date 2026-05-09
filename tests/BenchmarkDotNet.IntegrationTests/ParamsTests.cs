@@ -1,4 +1,6 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -6,11 +8,36 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ParamsTests(ITestOutputHelper output) : base(output) { }
 
+        private IConfig? GetConfig()
+            => new SingleRunInProcessConfig(Output); // Use `null` when running test with out-of-process toolchain.
+
+        private IReadOnlyList<string> Execute<T>()
+        {
+            var config = GetConfig();
+
+            bool isInProcess = config == null
+                ? false
+                : config.GetJobs().Single().GetToolchain().IsInProcess;
+
+            if (isInProcess)
+            {
+                // When using inprocess toolchain, Report don't contains StandardOutput.
+                using var captureConsoleHelper = new CaptureConsoleHelper();
+                CanExecute<T>(config);
+                return captureConsoleHelper.CapturedLines; // CapturedLines contains benchmark execution logs also.
+            }
+            else
+            {
+                // Use following code when running test with out-of-process.
+                var summary = CanExecute<T>();
+                return GetCombinedStandardOutput(summary);
+            }
+        }
+
         [Fact]
         public void ParamsSupportPropertyWithPublicSetter()
         {
-            var summary = CanExecute<ParamsTestProperty>();
-            var standardOutput = GetCombinedStandardOutput(summary);
+            var standardOutput = Execute<ParamsTestProperty>();
 
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###", standardOutput);
@@ -30,8 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ParamsSupportPublicFields()
         {
-            var summary = CanExecute<ParamsTestField>();
-            var standardOutput = GetCombinedStandardOutput(summary);
+            var standardOutput = Execute<ParamsTestField>();
 
             foreach (var param in new[] { 1, 2 })
                 Assert.Contains($"// ### New Parameter {param} ###", standardOutput);
@@ -54,7 +80,10 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void NestedEnumsAsParamsAreSupported() => CanExecute<NestedEnumsAsParams>();
+        public void NestedEnumsAsParamsAreSupported()
+        {
+            Execute<NestedEnumsAsParams>();
+        }
 
         public class NestedEnumsAsParams
         {
@@ -66,7 +95,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void CharactersAsParamsAreSupported() => CanExecute<CharactersAsParams>();
+        public void CharactersAsParamsAreSupported()
+            => Execute<CharactersAsParams>();
 
         public class CharactersAsParams
         {
@@ -78,7 +108,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void NullableTypesAsParamsAreSupported() => CanExecute<NullableTypesAsParams>();
+        public void NullableTypesAsParamsAreSupported()
+            => Execute<NullableTypesAsParams>();
 
         public class NullableTypesAsParams
         {
@@ -93,7 +124,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void InvalidFileNamesInParamsAreSupported() => CanExecute<InvalidFileNamesInParams>();
+        public void InvalidFileNamesInParamsAreSupported()
+            => Execute<InvalidFileNamesInParams>();
 
         public class InvalidFileNamesInParams
         {
@@ -105,7 +137,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void SpecialCharactersInStringAreSupported() => CanExecute<CompileSpecialCharactersInString>();
+        public void SpecialCharactersInStringAreSupported()
+            => Execute<CompileSpecialCharactersInString>();
 
         public class CompileSpecialCharactersInString
         {
@@ -140,7 +173,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void SpecialCharactersInCharAreSupported() => CanExecute<CompileSpecialCharactersInChar>();
+        public void SpecialCharactersInCharAreSupported()
+            => Execute<CompileSpecialCharactersInChar>();
 
         public class CompileSpecialCharactersInChar
         {
@@ -156,7 +190,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ParamsMustBeEscapedProperly() => CanExecute<NeedEscaping>();
+        public void ParamsMustBeEscapedProperly()
+            => Execute<NeedEscaping>();
 
         public class NeedEscaping
         {
@@ -175,7 +210,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ArrayCanBeUsedAsParameter() => CanExecute<WithArray>();
+        public void ArrayCanBeUsedAsParameter()
+            => Execute<WithArray>();
 
         public class WithArray
         {
@@ -195,7 +231,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void StaticFieldsAndPropertiesCanBeParams() => CanExecute<WithStaticParams>();
+        public void StaticFieldsAndPropertiesCanBeParams()
+            => Execute<WithStaticParams>();
 
         public class WithStaticParams
         {
@@ -219,8 +256,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ParamsSupportRequiredProperty()
         {
-            var summary = CanExecute<ParamsTestRequiredProperty>();
-            var standardOutput = GetCombinedStandardOutput(summary);
+            var standardOutput = Execute<ParamsTestRequiredProperty>();
 
             foreach (var param in new[] { "a", "b" })
             {

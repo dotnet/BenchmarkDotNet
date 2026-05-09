@@ -14,9 +14,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ColumnsWithBaselineGetsRatio()
         {
+            var config = new SingleRunInProcessConfig(Output);
+
             // This is the common way to run benchmarks,
             // BenchmarkTestExecutor.CanExecute(..) calls BenchmarkRunner.Run(..) under the hood
-            var summary = CanExecute<BaselineRatioColumnBenchmarks>();
+            var summary = CanExecute<BaselineRatioColumnBenchmarks>(config);
 
             var table = summary.Table;
             var headerRow = table.FullHeader;
@@ -59,7 +61,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var testExporter = new TestExporter();
-            var config = CreateSimpleConfig().AddExporter(testExporter);
+            var config = new SingleRunInProcessConfig(Output).AddExporter(testExporter);
 
             CanExecute<BaselineRatioResultExtenderNoBaseline>(config);
 
@@ -97,7 +99,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void OnlyOneMethodCanBeBaseline()
         {
-            var summary = CanExecute<BaselineRatioResultExtenderError>(fullValidation: false);
+            var config = new SingleRunInProcessConfig(Output);
+
+            var summary = CanExecute<BaselineRatioResultExtenderError>(config, fullValidation: false);
 
             // You can't have more than 1 method in a class with [Benchmark(Baseline = true)]
             Assert.True(summary.HasCriticalValidationErrors);
@@ -122,7 +126,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ColumnsWithBaselineGetsRatio()
         {
-            var summary = CanExecute<BaselineRatioColumnWithLongParams>(fullValidation: false);
+            var config = new SingleRunInProcessConfig(Output);
+
+            var summary = CanExecute<BaselineRatioColumnWithLongParams>(config, fullValidation: false);
 
             // Ensure that Params attribute values will not affect Baseline property
             Assert.False(summary.HasCriticalValidationErrors);

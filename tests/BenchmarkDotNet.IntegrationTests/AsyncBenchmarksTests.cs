@@ -46,7 +46,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void TaskReturningMethodsAreAwaited()
         {
-            var summary = CanExecute<TaskDelayMethods>();
+            var config = new SingleRunInProcessConfig(Output);
+            var summary = CanExecute<TaskDelayMethods>(config);
 
             foreach (var report in summary.Reports)
                 foreach (var measurement in report.AllMeasurements)

@@ -9,7 +9,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AttributesAreNotSealed()
         {
-            CanExecute<ConsumingCustomAttributes>();
+            var config = new SingleRunInProcessConfig(Output);
+
+            CanExecute<ConsumingCustomAttributes>(config);
         }
 
         public class ConsumingCustomAttributes
