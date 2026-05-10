@@ -6,15 +6,11 @@ using System.Runtime.Versioning;
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 /// <summary>
-/// CPU information from output of the `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List` command.
+/// CPU information from output of the `Get-CimInstance Win32_Processor -Property Name, NumberOfCores, NumberOfLogicalProcessors` command.
 /// Windows only.
 /// </summary>
 internal class PowershellWmiCpuDetector : ICpuDetector
 {
-    private readonly string windowsPowershellPath =
-        $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}" +
-        $"v1.0{Path.DirectorySeparatorChar}powershell.exe";
-
     public bool IsApplicable() => OsDetector.IsWindows();
 
     [SupportedOSPlatform("windows")]
@@ -22,10 +18,10 @@ internal class PowershellWmiCpuDetector : ICpuDetector
     {
         if (!IsApplicable()) return null;
 
-        const string argList = $"{WmicCpuInfoKeyNames.Name}, " +
-                               $"{WmicCpuInfoKeyNames.NumberOfCores}, " +
-                               $"{WmicCpuInfoKeyNames.NumberOfLogicalProcessors}, " +
-                               $"{WmicCpuInfoKeyNames.MaxClockSpeed}";
+        const string argList = $"{WmiCpuInfoKeyNames.Name}, " +
+                               $"{WmiCpuInfoKeyNames.NumberOfCores}, " +
+                               $"{WmiCpuInfoKeyNames.NumberOfLogicalProcessors}, " +
+                               $"{WmiCpuInfoKeyNames.MaxClockSpeed}";
 
         string? output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
             "Get-CimInstance Win32_Processor -Property " + argList);
@@ -33,6 +29,6 @@ internal class PowershellWmiCpuDetector : ICpuDetector
         if (output.IsBlank())
             return null;
 
-        return PowershellWmiCpuInfoParser.Parse(output);
+        return WmiCpuInfoParser.Parse(output);
     }
 }

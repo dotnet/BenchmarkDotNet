@@ -5,13 +5,17 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
-internal static class WmicCpuInfoParser
+internal static class WmiCpuInfoParser
 {
     /// <summary>
     /// Parses wmic output and returns <see cref="CpuInfo"/>
     /// </summary>
-    /// <param name="wmicOutput">Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`</param>
-    internal static CpuInfo Parse(string wmicOutput)
+    /// <param name="wmiOutput">
+    /// Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`
+    /// or
+    /// Output of `Get-CimInstance Win32_Processor -Property Name, NumberOfCores, NumberOfLogicalProcessors`
+    /// </param>
+    internal static CpuInfo Parse(string wmiOutput)
     {
         HashSet<string> processorModelNames = [];
         int physicalCoreCount = 0;
@@ -20,26 +24,26 @@ internal static class WmicCpuInfoParser
         double maxFrequency = 0.0;
         double nominalFrequency = 0.0;
 
-        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(wmicOutput, '=');
+        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(wmiOutput, '=');
         foreach (var processor in processors)
         {
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfCores, out var numberOfCoresValue) &&
+            if (processor.TryGetValue(WmiCpuInfoKeyNames.NumberOfCores, out var numberOfCoresValue) &&
                 int.TryParse(numberOfCoresValue, out int numberOfCores) &&
                 numberOfCores > 0)
                 physicalCoreCount += numberOfCores;
 
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.NumberOfLogicalProcessors, out var numberOfLogicalValue) &&
+            if (processor.TryGetValue(WmiCpuInfoKeyNames.NumberOfLogicalProcessors, out var numberOfLogicalValue) &&
                 int.TryParse(numberOfLogicalValue, out int numberOfLogical) &&
                 numberOfLogical > 0)
                 logicalCoreCount += numberOfLogical;
 
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.Name, out var name))
+            if (processor.TryGetValue(WmiCpuInfoKeyNames.Name, out var name))
             {
                 processorModelNames.Add(name);
                 processorsCount++;
             }
 
-            if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out var frequencyValue)
+            if (processor.TryGetValue(WmiCpuInfoKeyNames.MaxClockSpeed, out var frequencyValue)
                 && double.TryParse(frequencyValue, out double frequency)
                 && frequency > 0)
             {
@@ -53,7 +57,9 @@ internal static class WmicCpuInfoParser
             ? Frequency.FromMHz(maxFrequency)
             : null;
 
-        Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorsCount > 0 ? Frequency.FromMHz(nominalFrequency) : null;
+        Frequency? nominalFrequencyActual = nominalFrequency > 0 && processorsCount > 0
+            ? Frequency.FromMHz(nominalFrequency)
+            : null;
 
         return new CpuInfo
         {

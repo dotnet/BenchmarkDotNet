@@ -1,6 +1,6 @@
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
-internal static class WmicCpuInfoKeyNames
+internal static class WmiCpuInfoKeyNames
 {
     internal const string NumberOfLogicalProcessors = "NumberOfLogicalProcessors";
     internal const string NumberOfCores = "NumberOfCores";

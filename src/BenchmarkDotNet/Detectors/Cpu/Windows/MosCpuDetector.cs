@@ -30,14 +30,14 @@ internal class MosCpuDetector : ICpuDetector
         {
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
             {
-                string? name = moProcessor[WmicCpuInfoKeyNames.Name]?.ToString();
+                string? name = moProcessor[WmiCpuInfoKeyNames.Name]?.ToString();
                 if (name.IsNotBlank())
                 {
                     processorModelNames.Add(name);
                     processorsCount++;
-                    physicalCoreCount += (int)(uint)moProcessor[WmicCpuInfoKeyNames.NumberOfCores];
-                    logicalCoreCount += (int)(uint)moProcessor[WmicCpuInfoKeyNames.NumberOfLogicalProcessors];
-                    double tempMaxFrequency = (uint)moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed];
+                    physicalCoreCount += (int)(uint)moProcessor[WmiCpuInfoKeyNames.NumberOfCores];
+                    logicalCoreCount += (int)(uint)moProcessor[WmiCpuInfoKeyNames.NumberOfLogicalProcessors];
+                    double tempMaxFrequency = (uint)moProcessor[WmiCpuInfoKeyNames.MaxClockSpeed];
 
                     if (tempMaxFrequency > 0)
                     {

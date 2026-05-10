@@ -4,14 +4,14 @@ using Perfolizer.Models;
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
 // ReSharper disable StringLiteralTypo
-public class WmicCpuInfoParserTests(ITestOutputHelper output)
+public class WmiCpuInfoParserTests(ITestOutputHelper output)
 {
     private ITestOutputHelper Output { get; } = output;
 
     [Fact]
     public void EmptyTest()
     {
-        var actual = WmicCpuInfoParser.Parse(string.Empty);
+        var actual = WmiCpuInfoParser.Parse(string.Empty);
         var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
@@ -19,7 +19,7 @@ public class WmicCpuInfoParserTests(ITestOutputHelper output)
     [Fact]
     public void MalformedTest()
     {
-        var actual = WmicCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
+        var actual = WmiCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
         var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
@@ -27,21 +27,21 @@ public class WmicCpuInfoParserTests(ITestOutputHelper output)
     [Fact]
     public void RealTwoProcessorEightCoresTest()
     {
-        const string cpuInfo = @"
+        const string cpuInfo = """
 
-MaxClockSpeed=2400
-Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-NumberOfCores=8
-NumberOfLogicalProcessors=16
+            MaxClockSpeed=2400
+            Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+            NumberOfCores=8
+            NumberOfLogicalProcessors=16
 
 
-MaxClockSpeed=2400
-Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-NumberOfCores=8
-NumberOfLogicalProcessors=16
+            MaxClockSpeed=2400
+            Name=Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+            NumberOfCores=8
+            NumberOfLogicalProcessors=16
 
-";
-        var actual = WmicCpuInfoParser.Parse(cpuInfo);
+            """;
+        var actual = WmiCpuInfoParser.Parse(cpuInfo);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
@@ -73,7 +73,7 @@ NumberOfLogicalProcessors=16
             "\r\r\n" +
             "\r\r\n" +
             "\r\r\n";
-        var actual = WmicCpuInfoParser.Parse(cpuInfo);
+        var actual = WmiCpuInfoParser.Parse(cpuInfo);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz",
@@ -89,16 +89,16 @@ NumberOfLogicalProcessors=16
     [Fact]
     public void RealOneProcessorFourCoresTest()
     {
-        const string cpuInfo = @"
+        const string cpuInfo = """
 
-MaxClockSpeed=2500
-Name=Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
-NumberOfCores=4
-NumberOfLogicalProcessors=8
+            MaxClockSpeed=2500
+            Name=Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz
+            NumberOfCores=4
+            NumberOfLogicalProcessors=8
 
-";
+            """;
 
-        var actual = WmicCpuInfoParser.Parse(cpuInfo);
+        var actual = WmiCpuInfoParser.Parse(cpuInfo);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz",
