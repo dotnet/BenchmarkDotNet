@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
             {
-                var results = new List<(BenchmarkCase benchmark, object returnValue)>();
+                List<(BenchmarkCase benchmark, object? returnValue)> results = [];
                 bool hasErrorsInGroup = false;
 
                 foreach (var benchmark in parameterGroup.DistinctBy(i => i.Descriptor.WorkloadMethod))
@@ -29,15 +29,34 @@ namespace BenchmarkDotNet.Validators
                     try
                     {
                         InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark, cancellationToken);
-                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
-
-                        if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
+                        var workloadMethod = benchmark.Descriptor.WorkloadMethod;
+                        var result = workloadMethod.Invoke(benchmarkTypeInstance, null);
+                        if (workloadMethod.ReturnType.IsAwaitable())
                         {
-                            (var hasResult, result) = await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
+                            if (result is null)
+                            {
+                                errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Awaitable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
+                                continue;
+                            }
+                            (var hasResult, result) = await DynamicAwaitHelper.AwaitResult(result, workloadMethod.ReturnType).ConfigureAwait(true);
                             if (hasResult)
                             {
                                 results.Add((benchmark, result!));
                             }
+                        }
+                        else if (workloadMethod.ReturnType.IsAsyncEnumerable(out _, out _, out _))
+                        {
+                            if (result is null)
+                            {
+                                errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Async enumerable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
+                                continue;
+                            }
+                            result = await DynamicAwaitHelper.ToListAsync(result, workloadMethod.ReturnType).ConfigureAwait(true);
+                            results.Add((benchmark, result));
+                        }
+                        else if (workloadMethod.ReturnType != typeof(void))
+                        {
+                            results.Add((benchmark, result!));
                         }
                     }
                     catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))

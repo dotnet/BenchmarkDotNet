@@ -639,5 +639,29 @@ namespace BenchmarkDotNet.Tests.Validators
             [Benchmark]
             public void NonThrowing() { }
         }
+
+        [Fact]
+        public async Task IteratorBodyExceptionsInAsyncEnumerableBenchmarksAreDiscovered()
+        {
+            // Without draining, calling the iterator method just allocates the state machine and the
+            // body never runs — so the throw inside MoveNextAsync would silently pass validation.
+            var validationErrors = await ExecutionValidator.FailOnError
+                .ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(ThrowingAsyncEnumerableBenchmark)))
+                .ToArrayAsync();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.Contains(validationErrors, error => error.Message.Contains("This iterator throws"));
+        }
+
+        public class ThrowingAsyncEnumerableBenchmark
+        {
+            [Benchmark]
+            public async IAsyncEnumerable<int> Throwing()
+            {
+                yield return 1;
+                await Task.Yield();
+                throw new Exception("This iterator throws");
+            }
+        }
     }
 }

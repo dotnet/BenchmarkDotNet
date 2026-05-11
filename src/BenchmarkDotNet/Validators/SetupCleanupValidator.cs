@@ -23,10 +23,30 @@ namespace BenchmarkDotNet.Validators
                 validationErrors.AddRange(ValidateAttributes<GlobalSetupAttribute>(groupByType.Key.Name, allMethods));
                 validationErrors.AddRange(ValidateAttributes<GlobalCleanupAttribute>(groupByType.Key.Name, allMethods));
                 validationErrors.AddRange(ValidateAttributes<IterationSetupAttribute>(groupByType.Key.Name, allMethods));
-                validationErrors.AddRange(ValidateAttributes<IterationSetupAttribute>(groupByType.Key.Name, allMethods));
+                validationErrors.AddRange(ValidateAttributes<IterationCleanupAttribute>(groupByType.Key.Name, allMethods));
+
+                validationErrors.AddRange(ValidateReturnType<GlobalSetupAttribute>(groupByType.Key.Name, allMethods));
+                validationErrors.AddRange(ValidateReturnType<GlobalCleanupAttribute>(groupByType.Key.Name, allMethods));
+                validationErrors.AddRange(ValidateReturnType<IterationSetupAttribute>(groupByType.Key.Name, allMethods));
+                validationErrors.AddRange(ValidateReturnType<IterationCleanupAttribute>(groupByType.Key.Name, allMethods));
             }
 
             return validationErrors.ToAsyncEnumerable();
+        }
+
+        private IEnumerable<ValidationError> ValidateReturnType<T>(string benchmarkClassName, IEnumerable<MethodInfo> allMethods) where T : Attribute
+        {
+            foreach (var method in allMethods)
+            {
+                if (method.GetCustomAttributes(false).OfType<T>().Any()
+                    && method.ReturnType.IsAsyncEnumerable(out _, out _, out _)
+                    && !method.ReturnType.IsAwaitable())
+                {
+                    yield return new ValidationError(
+                        TreatsWarningsAsErrors,
+                        $"[{typeof(T).Name}] method {benchmarkClassName}.{method.Name} returns an async enumerable, which is not supported.");
+                }
+            }
         }
 
         private IEnumerable<ValidationError> ValidateAttributes<T>(string benchmarkClassName, IEnumerable<MethodInfo> allMethods) where T : TargetedAttribute

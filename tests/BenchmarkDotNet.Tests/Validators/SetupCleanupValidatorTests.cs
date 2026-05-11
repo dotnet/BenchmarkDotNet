@@ -43,5 +43,99 @@ namespace BenchmarkDotNet.Tests.Validators
 
             Assert.Equal(1, count);
         }
+
+        public class AsyncEnumerableGlobalSetupClass
+        {
+            [GlobalSetup]
+            public async IAsyncEnumerable<int> Setup()
+            {
+                await Task.Yield();
+                yield return 1;
+            }
+
+            [Benchmark]
+            public void Benchmark() { }
+        }
+
+        [Fact]
+        public async Task AsyncEnumerableGlobalSetupIsRejected()
+        {
+            // Setup/cleanup methods returning IAsyncEnumerable would be silently dropped by the framework
+            // (only awaitables are awaited there). Surface this clearly at validation time.
+            var validationErrors = await SetupCleanupValidator.FailOnError.ValidateAsync(
+                BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerableGlobalSetupClass))).ToArrayAsync();
+
+            Assert.Contains(validationErrors, v =>
+                v.IsCritical && v.Message.Contains("[GlobalSetupAttribute]") && v.Message.Contains("async enumerable"));
+        }
+
+        public class AsyncEnumerableGlobalCleanupClass
+        {
+            [GlobalCleanup]
+            public async IAsyncEnumerable<int> Cleanup()
+            {
+                await Task.Yield();
+                yield return 1;
+            }
+
+            [Benchmark]
+            public void Benchmark() { }
+        }
+
+        [Fact]
+        public async Task AsyncEnumerableGlobalCleanupIsRejected()
+        {
+            var validationErrors = await SetupCleanupValidator.FailOnError.ValidateAsync(
+                BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerableGlobalCleanupClass))).ToArrayAsync();
+
+            Assert.Contains(validationErrors, v =>
+                v.IsCritical && v.Message.Contains("[GlobalCleanupAttribute]") && v.Message.Contains("async enumerable"));
+        }
+
+        public class AsyncEnumerableIterationSetupClass
+        {
+            [IterationSetup]
+            public async IAsyncEnumerable<int> Setup()
+            {
+                await Task.Yield();
+                yield return 1;
+            }
+
+            [Benchmark]
+            public void Benchmark() { }
+        }
+
+        [Fact]
+        public async Task AsyncEnumerableIterationSetupIsRejected()
+        {
+            var validationErrors = await SetupCleanupValidator.FailOnError.ValidateAsync(
+                BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerableIterationSetupClass))).ToArrayAsync();
+
+            Assert.Contains(validationErrors, v =>
+                v.IsCritical && v.Message.Contains("[IterationSetupAttribute]") && v.Message.Contains("async enumerable"));
+        }
+
+        public class AsyncEnumerableIterationCleanupClass
+        {
+            [IterationCleanup]
+            public async IAsyncEnumerable<int> Cleanup()
+            {
+                await Task.Yield();
+                yield return 1;
+            }
+
+            [Benchmark]
+            public void Benchmark() { }
+        }
+
+        [Fact]
+        public async Task AsyncEnumerableIterationCleanupIsRejected()
+        {
+            var validationErrors = await SetupCleanupValidator.FailOnError.ValidateAsync(
+                BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerableIterationCleanupClass))).ToArrayAsync();
+
+            Assert.Contains(validationErrors, v =>
+                v.IsCritical && v.Message.Contains("[IterationCleanupAttribute]") && v.Message.Contains("async enumerable"));
+        }
     }
 }

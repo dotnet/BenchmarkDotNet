@@ -39,6 +39,11 @@
   $COPIEDSETTINGS$
   <!-- End copied settings -->
 
+  <!-- Set LangVersion after copied settings so it overrides any LangVersion copied from the benchmarks project -->
+  <PropertyGroup>
+    <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '8.0')">latest</LangVersion>
+  </PropertyGroup>
+
   <!-- Redirect 'dotnet publish' to in-tree runtime pack -->
   <Target Name="TrickRuntimePackLocation" AfterTargets="ProcessFrameworkReferences">
     <ItemGroup>

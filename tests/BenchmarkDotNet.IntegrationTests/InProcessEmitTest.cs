@@ -110,6 +110,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(RunnableClassCaseBenchmark))]
         [InlineData(typeof(RunnableManyArgsCaseBenchmark))]
         [InlineData(typeof(RunnableTaskCaseBenchmark))]
+        [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableBenchmarks))]
+        [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableCallerOverride))]
+        [InlineData(typeof(AsyncEnumerableBenchmarksTests.CustomAsyncEnumerableBenchmarks))]
         public void InProcessBenchmarkEmitsSameIL(Type benchmarkType)
         {
             var logger = new OutputLogger(Output);

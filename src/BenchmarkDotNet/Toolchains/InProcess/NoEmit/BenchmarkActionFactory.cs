@@ -70,6 +70,29 @@ internal static class BenchmarkActionFactory
             throw new NotSupportedException($"Default {nameof(BenchmarkActionFactory)} does not support returning awaitable types except (Value)Task(<T>).");
         }
 
+        if (resultType.IsAsyncEnumerable(out var asyncEnumerableItemType, out _, out _))
+        {
+            var asyncEnumerableInterface = typeof(IAsyncEnumerable<>).MakeGenericType(asyncEnumerableItemType);
+            if (asyncEnumerableInterface.IsAssignableFrom(resultType))
+            {
+                return Create(
+                    typeof(BenchmarkActionAsyncEnumerable<>).MakeGenericType(asyncEnumerableItemType),
+                    resultInstance,
+                    targetMethod,
+                    unrollFactor);
+            }
+            if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(ConfiguredCancelableAsyncEnumerable<>))
+            {
+                return Create(
+                    typeof(BenchmarkActionConfiguredCancelableAsyncEnumerable<>).MakeGenericType(resultType.GetGenericArguments()[0]),
+                    resultInstance,
+                    targetMethod,
+                    unrollFactor);
+            }
+            throw new NotSupportedException(
+                $"Default {nameof(BenchmarkActionFactory)} does not support custom async enumerables besides IAsyncEnumerable<T> and ConfiguredCancelableAsyncEnumerable<T>");
+        }
+
         return Create(
             typeof(BenchmarkAction<>).MakeGenericType(resultType),
             resultInstance,

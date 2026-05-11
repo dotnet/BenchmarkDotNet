@@ -118,6 +118,11 @@ namespace BenchmarkDotNet.Code
                 return new AsyncDeclarationsProvider(benchmark);
             }
 
+            if (method.ReturnType.IsAsyncEnumerable(out var itemType, out var enumeratorType, out var moveNextAwaitableType))
+            {
+                return new AsyncEnumerableDeclarationsProvider(benchmark, itemType, enumeratorType, moveNextAwaitableType);
+            }
+
             if (method.ReturnType == typeof(void) && method.HasAttribute<AsyncStateMachineAttribute>())
             {
                 throw new NotSupportedException("async void is not supported by design");

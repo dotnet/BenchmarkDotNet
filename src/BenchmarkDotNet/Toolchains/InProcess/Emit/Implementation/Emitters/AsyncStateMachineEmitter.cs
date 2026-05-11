@@ -207,7 +207,7 @@ partial class RunnableEmitter
              */
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, stateField);
-            ilBuilder.Emit(OpCodes.Stloc, stateLocal);
+            ilBuilder.EmitStloc(stateLocal);
             if (thisField is not null)
             {
                 /*
@@ -218,7 +218,7 @@ partial class RunnableEmitter
                  */
                 ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Ldfld, thisField);
-                ilBuilder.Emit(OpCodes.Stloc, thisLocal!);
+                ilBuilder.EmitStloc(thisLocal!);
             }
 
             ilBuilder.BeginExceptionBlock();
@@ -246,6 +246,7 @@ partial class RunnableEmitter
                     [typeof(IAsyncStateMachine)]
                 )
                 .SetAggressiveOptimizationImplementationFlag();
+            methodBuilder.DefineParameter(1, ParameterAttributes.None, "stateMachine");
 
             // [DebuggerHidden]
             var attrCtor = typeof(DebuggerHiddenAttribute).GetConstructor([])
@@ -292,7 +293,7 @@ partial class RunnableEmitter
                 IL_006b: stloc.3
              */
             var exLocal = ilBuilder.DeclareLocal(typeof(Exception));
-            ilBuilder.Emit(OpCodes.Stloc, exLocal);
+            ilBuilder.EmitStloc(exLocal);
             /*
                 // <>1__state = -2;
                 IL_006c: ldarg.0
@@ -313,6 +314,11 @@ partial class RunnableEmitter
             ilBuilder.Emit(OpCodes.Ldflda, builderField);
             ilBuilder.EmitLdloc(exLocal);
             ilBuilder.Emit(OpCodes.Call, asyncMethodBuilderType.GetMethod(nameof(AsyncTaskMethodBuilder.SetException), BindingFlags.Public | BindingFlags.Instance)!);
+            /*
+                // return;
+                IL_0080: leave IL_0095
+             */
+            ilBuilder.Emit(OpCodes.Leave, returnLabel);
 
             ilBuilder.EndExceptionBlock();
         } // end handler
@@ -400,10 +406,10 @@ partial class RunnableEmitter
             /*
                 // if (num != 0)
                 IL_000e: ldloc.0
-                IL_000f: brfalse.s IL_0046
+                IL_000f: brfalse IL_0046
              */
             ilBuilder.EmitLdloc(stateLocal);
-            ilBuilder.Emit(OpCodes.Brfalse_S, state0Label);
+            ilBuilder.Emit(OpCodes.Brfalse, state0Label);
 
             if (kind == SetupCleanupKind.GlobalCleanup)
             {
@@ -432,7 +438,7 @@ partial class RunnableEmitter
                 ilBuilder.EmitLdloca(awaitableLocal);
                 ilBuilder.Emit(OpCodes.Call, getAwaiterMethod);
             }
-            ilBuilder.Emit(OpCodes.Stloc, awaiterLocal);
+            ilBuilder.EmitStloc(awaiterLocal);
             /*
                 // if (!awaiter.IsCompleted)
                 IL_001d: ldloca.s 2
@@ -449,7 +455,7 @@ partial class RunnableEmitter
                 ilBuilder.EmitLdloc(awaiterLocal);
                 ilBuilder.Emit(OpCodes.Callvirt, awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
             }
-            ilBuilder.Emit(OpCodes.Brtrue_S, completedLabel);
+            ilBuilder.Emit(OpCodes.Brtrue, completedLabel);
 
             /*
                 // num = (<>1__state = 0);
@@ -462,7 +468,7 @@ partial class RunnableEmitter
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldc_I4_0);
             ilBuilder.Emit(OpCodes.Dup);
-            ilBuilder.Emit(OpCodes.Stloc, stateLocal);
+            ilBuilder.EmitStloc(stateLocal);
             ilBuilder.Emit(OpCodes.Stfld, stateField);
             /*
                 // <>u__1 = awaiter;
@@ -488,9 +494,9 @@ partial class RunnableEmitter
             ilBuilder.Emit(OpCodes.Call, GetAwaitOnCompletedMethod(asyncMethodBuilderType, awaiterType, asyncStateMachineTypeBuilder));
             /*
                 // return;
-                IL_0044: leave.s IL_0095
+                IL_0044: leave IL_0095
              */
-            ilBuilder.Emit(OpCodes.Leave_S, returnLabel);
+            ilBuilder.Emit(OpCodes.Leave, returnLabel);
 
             /*
                 // awaiter = <>u__1;
@@ -503,7 +509,7 @@ partial class RunnableEmitter
 
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, awaiterField);
-            ilBuilder.Emit(OpCodes.Stloc, awaiterLocal);
+            ilBuilder.EmitStloc(awaiterLocal);
             /*
                 // <>u__1 = default(TaskAwaiter);
                 IL_004d: ldarg.0
@@ -523,7 +529,7 @@ partial class RunnableEmitter
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldc_I4_M1);
             ilBuilder.Emit(OpCodes.Dup);
-            ilBuilder.Emit(OpCodes.Stloc, stateLocal);
+            ilBuilder.EmitStloc(stateLocal);
             ilBuilder.Emit(OpCodes.Stfld, stateField);
 
             /*

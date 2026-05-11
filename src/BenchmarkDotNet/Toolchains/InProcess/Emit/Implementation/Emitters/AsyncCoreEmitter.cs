@@ -1,6 +1,4 @@
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -14,274 +12,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 partial class RunnableEmitter
 {
     // TODO: update this to support runtime-async.
-    private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
+    private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : AsyncCoreEmitterBase(buildPartition, moduleBuilder, benchmark)
     {
-        private FieldInfo workloadContinuerAndValueTaskSourceField = null!;
-        private FieldInfo clockField = null!;
-        private FieldInfo invokeCountField = null!;
-        private MethodInfo startWorkloadMethod = null!;
-
-        protected override int GetExtraFieldsCount() => 3;
-
-        protected override void EmitExtraFields(TypeBuilder fieldsContainerBuilder)
+        protected override void EmitWorkloadCore()
         {
-            base.EmitExtraFields(fieldsContainerBuilder);
-
-            workloadContinuerAndValueTaskSourceField = fieldsContainerBuilder.DefineField(
-                WorkloadContinuerAndValueTaskSourceFieldName,
-                typeof(WorkloadValueTaskSource),
-                FieldAttributes.Public);
-            clockField = fieldsContainerBuilder.DefineField(
-                ClockFieldName,
-                typeof(IClock),
-                FieldAttributes.Public);
-            invokeCountField = fieldsContainerBuilder.DefineField(
-                InvokeCountFieldName,
-                typeof(long),
-                FieldAttributes.Public);
-        }
-
-        protected override void EmitExtraGlobalSetup(ILGenerator ilBuilder, LocalBuilder? thisLocal)
-        {
-            // __fieldsContainer.workloadContinuerAndValueTaskSource = new WorkloadValueTaskSource();
-            if (thisLocal != null)
-            {
-                ilBuilder.EmitLdloc(thisLocal);
-            }
-            else
-            {
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            }
-            ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-            ilBuilder.Emit(OpCodes.Newobj, typeof(WorkloadValueTaskSource).GetConstructor([])!);
-            ilBuilder.Emit(OpCodes.Stfld, workloadContinuerAndValueTaskSourceField);
-
-            // this.__StartWorkload();
-            if (thisLocal != null)
-            {
-                ilBuilder.EmitLdloc(thisLocal);
-            }
-            else
-            {
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            }
-            ilBuilder.Emit(OpCodes.Call, startWorkloadMethod);
-        }
-
-        protected override void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal)
-        {
-            // __fieldsContainer.workloadContinuerAndValueTaskSource.Complete();
-            if (thisLocal != null)
-            {
-                ilBuilder.EmitLdloc(thisLocal);
-            }
-            else
-            {
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            }
-            ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-            ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
-            ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.Complete), BindingFlags.Public | BindingFlags.Instance)!);
-        }
-
-        protected override void EmitCoreImpl()
-        {
-            EmitOverhead();
-            EmitWorkload();
-        }
-
-        private void EmitOverhead()
-        {
-            var noUnrollMethod = EmitNoUnrollMethod();
-            EmitUnrollMethod();
-
-            MethodInfo EmitNoUnrollMethod()
-            {
-                /*
-                    // private ValueTask<ClockSpan> OverheadActionNoUnroll(long invokeCount, IClock clock)
-                    .method private hidebysig 
-	                    instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> OverheadActionNoUnroll (
-		                    int64 invokeCount,
-		                    class [Perfolizer]Perfolizer.Horology.IClock clock
-	                    ) cil managed flags(0200)
-                 */
-                var invokeCountArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
-                var methodBuilder = runnableBuilder
-                    .DefineNonVirtualInstanceMethod(
-                        OverheadActionNoUnrollMethodName,
-                        MethodAttributes.Private,
-                        EmitParameterInfo.CreateReturnParameter(typeof(ValueTask<ClockSpan>)),
-                        [
-                            invokeCountArg,
-                            new EmitParameterInfo(1, ClockParamName, typeof(IClock))
-                        ]
-                    )
-                    .SetAggressiveOptimizationImplementationFlag();
-                invokeCountArg.SetMember(methodBuilder);
-
-                var ilBuilder = methodBuilder.GetILGenerator();
-
-                /*
-                    .locals init (
-		                [0] valuetype [Perfolizer]Perfolizer.Horology.StartedClock startedClock
-	                )
-                 */
-                var startedClockLocal = ilBuilder.DeclareLocal(typeof(StartedClock));
-
-                var startLoopLabel = ilBuilder.DefineLabel(); // IL_000f
-
-                /*
-                    // StartedClock startedClock = ClockExtensions.Start(clock);
-	                IL_0000: ldarg.2
-	                IL_0001: call valuetype [Perfolizer]Perfolizer.Horology.StartedClock [Perfolizer]Perfolizer.Horology.ClockExtensions::Start(class [Perfolizer]Perfolizer.Horology.IClock)
-	                IL_0006: stloc.0
-                 */
-                ilBuilder.Emit(OpCodes.Ldarg_2);
-                ilBuilder.Emit(OpCodes.Call, GetStartClockMethod());
-                ilBuilder.EmitStloc(startedClockLocal);
-
-                // loop
-                ilBuilder.EmitLoopBeginFromArgToZero(out var loopStartLabel, out var loopHeadLabel);
-                {
-                    /*
-	                    // __Overhead();
-		                IL_0009: ldarg.0
-		                IL_000a: call instance void BenchmarkDotNet.Autogenerated.Runnable_1::__Overhead()
-                     */
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    EmitLoadArgFieldsForCall(ilBuilder, null);
-                    ilBuilder.Emit(OpCodes.Call, overheadImplementationMethod);
-                }
-                ilBuilder.EmitLoopEndFromArgToZero(loopStartLabel, loopHeadLabel, invokeCountArg);
-
-                /*
-	                // return new ValueTask<ClockSpan>(startedClock.GetElapsed());
-	                IL_001a: ldloca.s 0
-	                IL_001c: call instance valuetype [Perfolizer]Perfolizer.Horology.ClockSpan [Perfolizer]Perfolizer.Horology.StartedClock::GetElapsed()
-	                IL_0021: newobj instance void valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan>::.ctor(!0)
-	                IL_0026: ret
-                 */
-                ilBuilder.EmitLdloca(startedClockLocal);
-                ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
-                ilBuilder.Emit(OpCodes.Newobj, typeof(ValueTask<ClockSpan>).GetConstructor([typeof(ClockSpan)])!);
-                ilBuilder.Emit(OpCodes.Ret);
-
-                return methodBuilder;
-            }
-
-            void EmitUnrollMethod()
-            {
-                /*
-                    // private ValueTask<ClockSpan> OverheadActionUnroll(long invokeCount, IClock clock)
-                    .method private hidebysig 
-	                    instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> OverheadActionUnroll (
-		                    int64 invokeCount,
-		                    class [Perfolizer]Perfolizer.Horology.IClock clock
-	                    ) cil managed flags(0200)
-                 */
-                var methodBuilder = runnableBuilder
-                    .DefineNonVirtualInstanceMethod(
-                        OverheadActionUnrollMethodName,
-                        MethodAttributes.Private,
-                        EmitParameterInfo.CreateReturnParameter(typeof(ValueTask<ClockSpan>)),
-                        [
-                            new EmitParameterInfo(0, InvokeCountParamName, typeof(long)),
-                            new EmitParameterInfo(1, ClockParamName, typeof(IClock))
-                        ]
-                    )
-                    .SetAggressiveOptimizationImplementationFlag();
-
-                var ilBuilder = methodBuilder.GetILGenerator();
-
-                /*
-                    // return OverheadActionNoUnroll(invokeCount * 16, clock);
-	                IL_0000: ldarg.0
-	                IL_0001: ldarg.1
-	                IL_0002: ldc.i4.s 16
-	                IL_0004: conv.i8
-	                IL_0005: mul
-	                IL_0006: ldarg.2
-	                IL_0007: call instance valuetype [System.Threading.Tasks.Extensions]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> BenchmarkDotNet.Autogenerated.Runnable_0::OverheadActionNoUnroll(int64, class [Perfolizer]Perfolizer.Horology.IClock)
-	                IL_000c: ret
-                 */
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-                ilBuilder.Emit(OpCodes.Ldarg_1);
-                ilBuilder.EmitLdc_I4(jobUnrollFactor);
-                ilBuilder.Emit(OpCodes.Conv_I8);
-                ilBuilder.Emit(OpCodes.Mul);
-                ilBuilder.Emit(OpCodes.Ldarg_2);
-                ilBuilder.Emit(OpCodes.Call, noUnrollMethod);
-                ilBuilder.Emit(OpCodes.Ret);
-            }
-        }
-
-        private Type GetWorkloadCoreAsyncMethodBuilderType()
-        {
-            // If the benchmark method overrode the caller type, use that type to get the builder type.
-            if (Descriptor.WorkloadMethod.ResolveAttribute<AsyncCallerTypeAttribute>() is AsyncCallerTypeAttribute asyncCallerTypeAttribute)
-            {
-                return GetBuilderTypeFromUserSpecifiedAsyncType(asyncCallerTypeAttribute.AsyncCallerType);
-            }
-            // If the benchmark method overrode the builder, use the same builder.
-            if (Descriptor.WorkloadMethod.GetAsyncMethodBuilderAttribute() is { } methodAttr
-                && methodAttr.GetType().GetProperty(nameof(AsyncMethodBuilderAttribute.BuilderType), BindingFlags.Public | BindingFlags.Instance)?.GetValue(methodAttr) is Type methodBuilderType)
-            {
-                return methodBuilderType;
-            }
-            if (Descriptor.WorkloadMethod.ReturnType.GetAsyncMethodBuilderAttribute() is { } typeAttr
-                && typeAttr.GetType().GetProperty(nameof(AsyncMethodBuilderAttribute.BuilderType), BindingFlags.Public | BindingFlags.Instance)?.GetValue(typeAttr) is Type typeBuilderType)
-            {
-                return GetConcreteBuilderType(typeBuilderType);
-            }
-            // Task and Task<T> are not annotated with their builder type, the C# compiler special-cases them.
-            if (Descriptor.WorkloadMethod.ReturnType.IsGenericType && Descriptor.WorkloadMethod.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-            {
-                return GetConcreteBuilderType(typeof(AsyncTaskMethodBuilder<>));
-            }
-            // Fallback to AsyncTaskMethodBuilder if the benchmark return type is Task or any awaitable type that is not a custom task-like type.
-            return typeof(AsyncTaskMethodBuilder);
-
-            Type GetBuilderTypeFromUserSpecifiedAsyncType(Type asyncType)
-            {
-                if (asyncType.GetAsyncMethodBuilderAttribute() is { } typeAttr
-                    && typeAttr.GetType().GetProperty(nameof(AsyncMethodBuilderAttribute.BuilderType), BindingFlags.Public | BindingFlags.Instance)?.GetValue(typeAttr) is Type typeBuilderType)
-                {
-                    return GetConcreteBuilderType(typeBuilderType);
-                }
-                // Task and Task<T> are not annotated with their builder type, the C# compiler special-cases them.
-                if (asyncType == typeof(Task))
-                {
-                    return typeof(AsyncTaskMethodBuilder);
-                }
-                if (asyncType.IsGenericType && asyncType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    return typeof(AsyncTaskMethodBuilder<>).MakeGenericType([asyncType.GetGenericArguments()[0]]);
-                }
-                throw new NotSupportedException($"AsyncMethodBuilderAttribute not found on type {asyncType.GetDisplayName()} from {Descriptor.DisplayInfo}");
-            }
-
-            Type GetConcreteBuilderType(Type builderType)
-            {
-                if (!builderType.IsGenericTypeDefinition)
-                {
-                    return builderType;
-                }
-                if (builderType.GetGenericArguments().Length != 1)
-                {
-                    throw new NotSupportedException($"AsyncMethodBuilder {builderType.GetDisplayName()} has generic arity greater than 1.");
-                }
-                var resultType = Descriptor.WorkloadMethod.ReturnType
-                    .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
-                    .ReturnType
-                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!
-                    .ReturnType;
-                return builderType.MakeGenericType([resultType]);
-            }
-        }
-
-        private void EmitWorkload()
-        {
-            var asyncMethodBuilderType = GetWorkloadCoreAsyncMethodBuilderType();
+            var asyncMethodBuilderType = GetWorkloadCoreAsyncMethodBuilderType(Descriptor.WorkloadMethod.ReturnType);
             var builderInfo = BeginAsyncStateMachineTypeBuilder(WorkloadCoreMethodName, asyncMethodBuilderType, runnableBuilder);
             var (asyncStateMachineTypeBuilder, publicFields, (ilBuilder, endTryLabel, returnLabel, stateLocal, thisLocal, returnDefaultLocal)) = builderInfo;
             var (stateField, builderField, _) = publicFields;
@@ -307,16 +42,12 @@ partial class RunnableEmitter
 
             var workloadCoreMethod = EmitAsyncCallerStub(WorkloadCoreMethodName, asyncStateMachineType, publicFields);
 
-            var startWorkloadMethod = EmitAsyncSingleCall(StartWorkloadMethodName, typeof(AsyncVoidMethodBuilder), workloadCoreMethod, SetupCleanupKind.Other);
-            this.startWorkloadMethod = startWorkloadMethod;
-
-            var noUnrollMethod = EmitNoUnrollMethod();
-            EmitUnrollMethod();
+            startWorkloadMethod = EmitAsyncSingleCall(StartWorkloadMethodName, typeof(AsyncVoidMethodBuilder), workloadCoreMethod, SetupCleanupKind.Other);
 
             void EmitMoveNextImpl()
             {
-                var isCompleteAwaitableLocal = ilBuilder.DeclareLocal(typeof(ValueTask<bool>));
                 var isCompleteAwaiterLocal = ilBuilder.DeclareLocal(typeof(ValueTaskAwaiter<bool>));
+                var isCompleteAwaitableLocal = ilBuilder.DeclareLocal(typeof(ValueTask<bool>));
                 var benchmarkAwaitableLocal = Descriptor.WorkloadMethod.ReturnType.IsValueType
                     ? ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType)
                     : null;
@@ -334,7 +65,8 @@ partial class RunnableEmitter
                 var setResultContinuationLabel = ilBuilder.DefineLabel();
                 var setResultGetResultLabel = ilBuilder.DefineLabel();
 
-                // Roslyn preamble.
+                // Roslyn preamble — the C# compiler emits this dead-code sequence at the start of async
+                // state machine MoveNext methods. Keeping it makes the EmitsSameIL diff line up.
                 ilBuilder.EmitLdloc(stateLocal);
                 ilBuilder.Emit(OpCodes.Ldc_I4_2);
                 ilBuilder.Emit(OpCodes.Pop);
@@ -343,17 +75,9 @@ partial class RunnableEmitter
 
                 ilBuilder.BeginExceptionBlock();
                 {
-                    // State dispatch: 0 → getIsComplete resume, 1 → benchmark resume, 2 → setResult resume
+                    // State dispatch: 0 → getIsComplete resume, 1 → benchmark resume, 2 → setResult resume.
                     ilBuilder.EmitLdloc(stateLocal);
-                    ilBuilder.Emit(OpCodes.Brfalse, getIsCompleteContinuationLabel);
-
-                    ilBuilder.EmitLdloc(stateLocal);
-                    ilBuilder.Emit(OpCodes.Ldc_I4_1);
-                    ilBuilder.Emit(OpCodes.Beq, benchmarkContinuationLabel);
-
-                    ilBuilder.EmitLdloc(stateLocal);
-                    ilBuilder.Emit(OpCodes.Ldc_I4_2);
-                    ilBuilder.Emit(OpCodes.Beq, setResultContinuationLabel);
+                    ilBuilder.Emit(OpCodes.Switch, [getIsCompleteContinuationLabel, benchmarkContinuationLabel, setResultContinuationLabel]);
 
                     // ===== await workloadValueTaskSource.GetIsComplete() =====
                     // var awaitable = workloadValueTaskSource.GetIsComplete();
@@ -523,9 +247,6 @@ partial class RunnableEmitter
                     ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetResultAndGetIsComplete), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.EmitStloc(isCompleteAwaitableLocal);
-                    // startedClock = default;
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.EmitSetFieldToDefault(startedClockField);
                     // var awaiter = awaitable.GetAwaiter();
                     ilBuilder.EmitLdloca(isCompleteAwaitableLocal);
                     ilBuilder.Emit(OpCodes.Call, typeof(ValueTask<bool>).GetMethod(nameof(ValueTask<bool>.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
@@ -573,11 +294,17 @@ partial class RunnableEmitter
                     // bool isComplete = awaiter.GetResult();
                     ilBuilder.EmitLdloca(isCompleteAwaiterLocal);
                     ilBuilder.Emit(OpCodes.Call, typeof(ValueTaskAwaiter<bool>).GetMethod(nameof(ValueTaskAwaiter<bool>.GetResult), BindingFlags.Public | BindingFlags.Instance)!);
-                    // if (!isComplete) goto startClockLabel;
-                    ilBuilder.Emit(OpCodes.Brfalse, startClockLabel);
+                    // if (!isComplete) goto continueLoopLabel;
+                    var continueLoopLabel = ilBuilder.DefineLabel();
+                    ilBuilder.Emit(OpCodes.Brfalse, continueLoopLabel);
                     // return default;
                     ilBuilder.MaybeEmitSetLocalToDefault(returnDefaultLocal);
                     ilBuilder.Emit(OpCodes.Leave, endTryLabel);
+                    // continueLoopLabel: startedClock = default; goto startClockLabel;
+                    ilBuilder.MarkLabel(continueLoopLabel);
+                    ilBuilder.Emit(OpCodes.Ldarg_0);
+                    ilBuilder.EmitSetFieldToDefault(startedClockField);
+                    ilBuilder.Emit(OpCodes.Br, startClockLabel);
                 }
                 // end .try
                 ilBuilder.BeginCatchBlock(typeof(Exception));
@@ -592,118 +319,11 @@ partial class RunnableEmitter
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetException), [typeof(Exception)])!);
                     // result = default;
                     ilBuilder.MaybeEmitSetLocalToDefault(returnDefaultLocal);
+                    // return;
+                    ilBuilder.Emit(OpCodes.Leave, endTryLabel);
 
                     ilBuilder.EndExceptionBlock();
                 } // end handler
-            }
-
-            MethodInfo EmitNoUnrollMethod()
-            {
-                /*
-                    // private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
-                    .method private hidebysig 
-	                    instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> WorkloadActionNoUnroll (
-		                    int64 invokeCount,
-		                    class [Perfolizer]Perfolizer.Horology.IClock clock
-	                    ) cil managed flags(0200)
-                 */
-                var methodBuilder = runnableBuilder
-                    .DefineNonVirtualInstanceMethod(
-                        WorkloadActionNoUnrollMethodName,
-                        MethodAttributes.Private,
-                        EmitParameterInfo.CreateReturnParameter(typeof(ValueTask<ClockSpan>)),
-                        [
-                            new EmitParameterInfo(0, InvokeCountParamName, typeof(long)),
-                            new EmitParameterInfo(1, ClockParamName, typeof(IClock))
-                        ]
-                    )
-                    .SetAggressiveOptimizationImplementationFlag();
-
-                var ilBuilder = methodBuilder.GetILGenerator();
-
-                /*
-                    // __fieldsContainer.invokeCount = invokeCount;
-	                IL_0000: ldarg.0
-	                IL_0001: ldflda valuetype BenchmarkDotNet.Autogenerated.Runnable_1/FieldsContainer BenchmarkDotNet.Autogenerated.Runnable_1::__fieldsContainer
-	                IL_0006: ldarg.1
-	                IL_0007: stfld int64 BenchmarkDotNet.Autogenerated.Runnable_1/FieldsContainer::invokeCount
-                 */
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-                ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                ilBuilder.Emit(OpCodes.Ldarg_1);
-                ilBuilder.Emit(OpCodes.Stfld, invokeCountField);
-                /*
-	                // __fieldsContainer.clock = clock;
-	                IL_000c: ldarg.0
-	                IL_000d: ldflda valuetype BenchmarkDotNet.Autogenerated.Runnable_1/FieldsContainer BenchmarkDotNet.Autogenerated.Runnable_1::__fieldsContainer
-	                IL_0012: ldarg.2
-	                IL_0013: stfld class [Perfolizer]Perfolizer.Horology.IClock BenchmarkDotNet.Autogenerated.Runnable_1/FieldsContainer::clock
-                 */
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-                ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                ilBuilder.Emit(OpCodes.Ldarg_2);
-                ilBuilder.Emit(OpCodes.Stfld, clockField);
-
-                /*
-	                // return __fieldsContainer.workloadContinuerAndValueTaskSource.Continue();
-	                IL_003b: ldarg.0
-	                IL_003c: ldflda valuetype BenchmarkDotNet.Autogenerated.Runnable_1/FieldsContainer BenchmarkDotNet.Autogenerated.Runnable_1::__fieldsContainer
-	                IL_0041: ldfld class [BenchmarkDotNet]BenchmarkDotNet.Engines.WorkloadContinuerAndValueTaskSource BenchmarkDotNet.Autogenerated.Runnable_1/FieldsContainer::workloadContinuerAndValueTaskSource
-	                IL_0046: callvirt instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> [BenchmarkDotNet]BenchmarkDotNet.Engines.WorkloadContinuerAndValueTaskSource::Continue()
-	                IL_004b: ret
-                 */
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-                ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
-                ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.Continue), BindingFlags.Public | BindingFlags.Instance)!);
-                ilBuilder.Emit(OpCodes.Ret);
-
-                return methodBuilder;
-            }
-
-            void EmitUnrollMethod()
-            {
-                /*
-                    // private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
-                    .method private hidebysig 
-	                    instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> WorkloadActionUnroll (
-		                    int64 invokeCount,
-		                    class [Perfolizer]Perfolizer.Horology.IClock clock
-	                    ) cil managed flags(0200)
-                 */
-                var methodBuilder = runnableBuilder
-                    .DefineNonVirtualInstanceMethod(
-                        WorkloadActionUnrollMethodName,
-                        MethodAttributes.Private,
-                        EmitParameterInfo.CreateReturnParameter(typeof(ValueTask<ClockSpan>)),
-                        [
-                            new EmitParameterInfo(0, InvokeCountParamName, typeof(long)),
-                            new EmitParameterInfo(1, ClockParamName, typeof(IClock))
-                        ]
-                    )
-                    .SetAggressiveOptimizationImplementationFlag();
-
-                var ilBuilder = methodBuilder.GetILGenerator();
-
-                /*
-                    // return WorkloadActionNoUnroll(invokeCount * 16, clock);
-	                IL_0000: ldarg.0
-	                IL_0001: ldarg.1
-	                IL_0002: ldc.i4.s 16
-	                IL_0004: conv.i8
-	                IL_0005: mul
-	                IL_0006: ldarg.2
-	                IL_0007: call instance valuetype [System.Threading.Tasks.Extensions]System.Threading.Tasks.ValueTask`1<valuetype [Perfolizer]Perfolizer.Horology.ClockSpan> BenchmarkDotNet.Autogenerated.Runnable_0::WorkloadActionNoUnroll(int64, class [Perfolizer]Perfolizer.Horology.IClock)
-	                IL_000c: ret
-                 */
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-                ilBuilder.Emit(OpCodes.Ldarg_1);
-                ilBuilder.EmitLdc_I4(jobUnrollFactor);
-                ilBuilder.Emit(OpCodes.Conv_I8);
-                ilBuilder.Emit(OpCodes.Mul);
-                ilBuilder.Emit(OpCodes.Ldarg_2);
-                ilBuilder.Emit(OpCodes.Call, noUnrollMethod);
-                ilBuilder.Emit(OpCodes.Ret);
             }
         }
     }

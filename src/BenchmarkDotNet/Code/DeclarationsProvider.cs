@@ -200,7 +200,7 @@ namespace BenchmarkDotNet.Code
             string passArguments = GetPassArgumentsDirect();
             string workloadMethodCall = GetWorkloadMethodCall(passArguments);
             bool hasAsyncMethodBuilderAttribute = TryGetAsyncMethodBuilderAttribute(out var asyncMethodBuilderAttribute);
-            Type workloadCoreReturnType = GetWorkloadCoreReturnType(hasAsyncMethodBuilderAttribute);
+            Type workloadCoreReturnType = GetWorkloadCoreReturnType(hasAsyncMethodBuilderAttribute, Descriptor.WorkloadMethod.ReturnType);
             string finalReturn = GetFinalReturn(workloadCoreReturnType);
             string coreImpl = $$"""
             private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
@@ -274,7 +274,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$CoreImpl$", coreImpl);
         }
 
-        private bool TryGetAsyncMethodBuilderAttribute(out string asyncMethodBuilderAttribute)
+        protected bool TryGetAsyncMethodBuilderAttribute(out string asyncMethodBuilderAttribute)
         {
             asyncMethodBuilderAttribute = string.Empty;
             if (Descriptor.WorkloadMethod.HasAttribute<AsyncCallerTypeAttribute>())
@@ -293,25 +293,25 @@ namespace BenchmarkDotNet.Code
             return true;
         }
 
-        private Type GetWorkloadCoreReturnType(bool hasAsyncMethodBuilderAttribute)
+        protected Type GetWorkloadCoreReturnType(bool hasAsyncMethodBuilderAttribute, Type returnType)
         {
             if (Descriptor.WorkloadMethod.ResolveAttribute<AsyncCallerTypeAttribute>() is { } asyncCallerTypeAttribute)
             {
                 return asyncCallerTypeAttribute.AsyncCallerType;
             }
             if (hasAsyncMethodBuilderAttribute
-                || Descriptor.WorkloadMethod.ReturnType.HasAsyncMethodBuilderAttribute()
+                || returnType.HasAsyncMethodBuilderAttribute()
                 // Task and Task<T> are not annotated with their builder type, the C# compiler special-cases them.
-                || (Descriptor.WorkloadMethod.ReturnType.IsGenericType && Descriptor.WorkloadMethod.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                || (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
             )
             {
-                return Descriptor.WorkloadMethod.ReturnType;
+                return returnType;
             }
-            // Fallback to Task if the benchmark return type is Task or any awaitable type that is not a custom task-like type.
+            // Fallback to Task if the return type is Task or any awaitable type that is not a custom task-like type.
             return typeof(Task);
         }
 
-        private static string GetFinalReturn(Type workloadCoreReturnType)
+        protected static string GetFinalReturn(Type workloadCoreReturnType)
         {
             var finalReturnType = workloadCoreReturnType
                 .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
@@ -321,6 +321,132 @@ namespace BenchmarkDotNet.Code
             return finalReturnType == typeof(void)
                 ? "return;"
                 : $"return default({finalReturnType.GetCorrectCSharpTypeName()});";
+        }
+    }
+
+    internal class AsyncEnumerableDeclarationsProvider(BenchmarkCase benchmark, Type itemType, Type enumeratorType, Type moveNextAwaitableType) : AsyncDeclarationsProvider(benchmark)
+    {
+        protected override SmartStringBuilder ReplaceCore(SmartStringBuilder smartStringBuilder)
+        {
+            int unrollFactor = Benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
+            string passArguments = GetPassArgumentsDirect();
+            string workloadMethodCall = GetWorkloadMethodCall(passArguments);
+            string itemTypeName = itemType.GetCorrectCSharpTypeName();
+            string enumerableTypeName = Descriptor.WorkloadMethod.ReturnType.GetCorrectCSharpTypeName();
+            string enumeratorTypeName = enumeratorType.GetCorrectCSharpTypeName();
+            // We hand-roll the `await foreach` desugaring (explicit GetAsyncEnumerator + while-loop) instead
+            // of using the C# `await foreach` keyword: that keeps the IL byte-for-byte aligned with
+            // AsyncEnumerableCoreEmitter, which doesn't wrap the iteration in the try/catch + wrap field
+            // pattern Roslyn emits for the keyword form.
+            string disposeAsyncCall = ResolveDisposeAsync() is { } disposeAsyncMethod
+                ? $"await enumerator.{disposeAsyncMethod.Name}();"
+                : string.Empty;
+            // IAsyncEnumerable<T> has no GetAwaiter, so its own return type can't drive the WorkloadCore
+            // builder. Use MoveNextAsync's return type as the proxy and feed it through the same resolver
+            // as the awaitable path: any result the awaitable produces (typically `bool`) is discarded by
+            // `__StartWorkload`'s `await`, and `[AsyncCallerType]` / `[AsyncMethodBuilder]` overrides on
+            // the workload method still apply.
+            bool hasAsyncMethodBuilderAttribute = TryGetAsyncMethodBuilderAttribute(out var asyncMethodBuilderAttribute);
+            Type workloadCoreReturnType = GetWorkloadCoreReturnType(hasAsyncMethodBuilderAttribute, moveNextAwaitableType);
+            string finalReturn = GetFinalReturn(workloadCoreReturnType);
+            string coreImpl = $$"""
+            private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
+                    {
+                        return this.OverheadActionNoUnroll(invokeCount * {{unrollFactor}}, clock);
+                    }
+
+                    private {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
+                    {
+                        {{StartClockSyncCode}}
+                        while (--invokeCount >= 0)
+                        {
+                            this.__Overhead({{passArguments}});
+                        }
+                        {{ReturnSyncCode}}
+                    }
+
+                    private {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
+                    {
+                        return this.WorkloadActionNoUnroll(invokeCount * {{unrollFactor}}, clock);
+                    }
+
+                    private {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
+                    {
+                        this.__fieldsContainer.invokeCount = invokeCount;
+                        this.__fieldsContainer.clock = clock;
+                        // The source is allocated and the workload loop started in __GlobalSetup,
+                        // so this hot path is branchless and allocation-free.
+                        return this.__fieldsContainer.workloadContinuerAndValueTaskSource.Continue();
+                    }
+
+                    private async void __StartWorkload()
+                    {
+                        await __WorkloadCore();
+                    }
+
+                    {{asyncMethodBuilderAttribute}}
+                    private async {{workloadCoreReturnType.GetCorrectCSharpTypeName()}} __WorkloadCore()
+                    {
+                        try
+                        {
+                            if (await this.__fieldsContainer.workloadContinuerAndValueTaskSource.GetIsComplete())
+                            {
+                                {{finalReturn}}
+                            }
+                            while (true)
+                            {
+                                {{itemTypeName}} lastItem = default({{itemTypeName}});
+                                {{typeof(StartedClock).GetCorrectCSharpTypeName()}} startedClock = {{typeof(ClockExtensions).GetCorrectCSharpTypeName()}}.Start(this.__fieldsContainer.clock);
+                                while (--this.__fieldsContainer.invokeCount >= 0)
+                                {
+                                    // Necessary because of error CS4004: Cannot await in an unsafe context
+                                    {{enumerableTypeName}} enumerable;
+                                    unsafe { enumerable = {{workloadMethodCall}} }
+                                    {{enumeratorTypeName}} enumerator = enumerable.GetAsyncEnumerator();
+                                    while (await enumerator.MoveNextAsync())
+                                    {
+                                        lastItem = enumerator.Current;
+                                    }
+                                    {{disposeAsyncCall}}
+                                }
+                                {{typeof(ClockSpan).GetCorrectCSharpTypeName()}} elapsed = startedClock.GetElapsed();
+                                {{typeof(DeadCodeEliminationHelper).GetCorrectCSharpTypeName()}}.KeepAliveWithoutBoxing(lastItem);
+                                if (await this.__fieldsContainer.workloadContinuerAndValueTaskSource.SetResultAndGetIsComplete(elapsed))
+                                {
+                                    {{finalReturn}}
+                                }
+                            }
+                        }
+                        catch (global::System.Exception e)
+                        {
+                            __fieldsContainer.workloadContinuerAndValueTaskSource.SetException(e);
+                            {{finalReturn}}
+                        }
+                    }
+            """;
+
+            return smartStringBuilder
+                .Replace("$CoreImpl$", coreImpl);
+        }
+
+        // Roslyn's `await foreach` resolution: prefer a public instance DisposeAsync with all-optional
+        // params whose awaiter's GetResult returns void; otherwise fall back to IAsyncDisposable.
+        // Returns null if neither shape matches, in which case the template skips the dispose call.
+        private MethodInfo? ResolveDisposeAsync()
+        {
+            var disposeAsyncMethod = enumeratorType
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(m => m.Name == nameof(IAsyncDisposable.DisposeAsync)
+                    && m.GetParameters().All(p => p.IsOptional)
+                    && m.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
+                        ?.ReturnType
+                        .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
+                        ?.ReturnType == typeof(void));
+            if (disposeAsyncMethod is not null)
+                return disposeAsyncMethod;
+            if (typeof(IAsyncDisposable).IsAssignableFrom(enumeratorType))
+                return typeof(IAsyncDisposable).GetMethod(nameof(IAsyncDisposable.DisposeAsync));
+            return null;
         }
     }
 }

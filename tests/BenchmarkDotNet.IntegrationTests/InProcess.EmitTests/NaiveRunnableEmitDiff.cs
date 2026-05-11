@@ -33,9 +33,19 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private static readonly IReadOnlyDictionary<OpCode, OpCode> AltOpCodes = new Dictionary<OpCode, OpCode>()
         {
             { OpCodes.Br_S, OpCodes.Br },
+            { OpCodes.Brtrue_S, OpCodes.Brtrue },
+            { OpCodes.Brfalse_S, OpCodes.Brfalse },
             { OpCodes.Blt_S, OpCodes.Blt },
             { OpCodes.Bne_Un_S, OpCodes.Bne_Un },
-            { OpCodes.Bge_S, OpCodes.Bge }
+            { OpCodes.Bge_S, OpCodes.Bge },
+            { OpCodes.Beq_S, OpCodes.Beq },
+            { OpCodes.Bgt_S, OpCodes.Bgt },
+            { OpCodes.Ble_S, OpCodes.Ble },
+            { OpCodes.Bge_Un_S, OpCodes.Bge_Un },
+            { OpCodes.Bgt_Un_S, OpCodes.Bgt_Un },
+            { OpCodes.Ble_Un_S, OpCodes.Ble_Un },
+            { OpCodes.Blt_Un_S, OpCodes.Blt_Un },
+            { OpCodes.Leave_S, OpCodes.Leave },
         };
 
         public static void RunDiff(string roslynAssemblyPath, string emittedAssemblyPath, ILogger logger)
@@ -88,7 +98,79 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
                     result.Add(instruction);
             }
 
+            // Collapse leave-chains. ILGenerator's BeginCatchBlock/EndExceptionBlock unconditionally insert
+            // implicit `Leave` instructions at the end of every try and catch block; when those blocks are
+            // nested, the implicit leaves chain (Leave A → A: Leave B → B: real-target). Roslyn never emits
+            // these — its explicit leaves jump straight to the final target. To compare the two:
+            //   1) A "leave to the next instruction" is an unconditional no-op; drop it. Anything that
+            //      branched to it now flows into whatever the next instruction is (which is exactly what
+            //      the leave would have done anyway).
+            //   2) A leave with no fall-through entry (predecessor is Leave/Br/Throw/Ret/Endfinally/Jmp)
+            //      AND no incoming branch is unreachable; drop it. Removing one can make a previously-
+            //      targeted leave unreachable too, so iterate until stable.
+            //   3) Diff(Instruction) below resolves each leave's operand through the chain, so paired
+            //      leaves on both sides compare against their final destination rather than the next link.
+            bool changed;
+            do
+            {
+                changed = false;
+                // Drop leave-to-next no-ops first; they can shift fall-through status of subsequent leaves.
+                for (int k = result.Count - 2; k >= 0; k--)
+                {
+                    if (IsLeave(result[k]) && result[k].Operand is Instruction t && t == result[k + 1])
+                    {
+                        result.RemoveAt(k);
+                        changed = true;
+                    }
+                }
+                var targets = new HashSet<Instruction>();
+                foreach (var instr in result)
+                {
+                    if (instr.Operand is Instruction t)
+                        targets.Add(t);
+                    else if (instr.Operand is Instruction[] ts)
+                        foreach (var x in ts) targets.Add(x);
+                }
+                for (int k = result.Count - 1; k >= 0; k--)
+                {
+                    if (!IsLeave(result[k]))
+                        continue;
+                    bool fallThroughable = k > 0 && IsFallThroughable(result[k - 1]);
+                    bool branched = targets.Contains(result[k]);
+                    if (!fallThroughable && !branched)
+                    {
+                        result.RemoveAt(k);
+                        changed = true;
+                    }
+                }
+            } while (changed);
+
             return result;
+        }
+
+        private static bool IsLeave(Instruction instruction) =>
+            instruction.OpCode == OpCodes.Leave || instruction.OpCode == OpCodes.Leave_S;
+
+        private static bool IsFallThroughable(Instruction instruction)
+        {
+            var op = instruction.OpCode;
+            return op != OpCodes.Leave && op != OpCodes.Leave_S
+                && op != OpCodes.Br && op != OpCodes.Br_S
+                && op != OpCodes.Throw && op != OpCodes.Rethrow
+                && op != OpCodes.Ret
+                && op != OpCodes.Endfinally
+                && op != OpCodes.Jmp;
+        }
+
+        // Follow a chain of Leave instructions to its final non-Leave target.
+        private static Instruction ResolveLeaveTarget(Instruction target)
+        {
+            var seen = new HashSet<Instruction>();
+            while (IsLeave(target) && seen.Add(target))
+            {
+                target = (Instruction)target.Operand;
+            }
+            return target;
         }
 
         private static void DiffSignature(TypeReference left, TypeReference? right)
@@ -141,30 +223,30 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             if (left.OpCode != right.OpCode)
             {
                 if (!AltOpCodes.TryGetValue(left.OpCode, out var altOpCode1) || altOpCode1 != right.OpCode)
-                    throw new InvalidOperationException($"No matching op for {left} ({method}).");
+                    throw new InvalidOperationException($"No matching op for {left} vs {right} ({method}).");
             }
             else if (left.GetSize() != right.GetSize())
             {
-                throw new InvalidOperationException($"No matching op for {left} ({method}).");
+                throw new InvalidOperationException($"No matching op for {left} vs {right} ({method}).");
             }
 
             if (left.Operand == null && right.Operand != null)
-                throw new InvalidOperationException($"No matching op for {left} ({method}).");
+                throw new InvalidOperationException($"No matching op for {left} vs {right} ({method}).");
 
             if (left.Operand != null && right.Operand == null)
-                throw new InvalidOperationException($"No matching op for {left} ({method}).");
+                throw new InvalidOperationException($"No matching op for {left} vs {right} ({method}).");
         }
 
         private static void DiffSignature(VariableDefinition left, VariableDefinition right, MethodDefinition method)
         {
             if (left.Index != right.Index)
-                throw new InvalidOperationException($"No matching variable for {left} ({method}).");
+                throw new InvalidOperationException($"No matching variable for {left}: index {left.Index} vs {right.Index} ({method}).");
 
             if (left.IsPinned != right.IsPinned)
-                throw new InvalidOperationException($"No matching variable for {left} ({method}).");
+                throw new InvalidOperationException($"No matching variable for {left}: pinned {left.IsPinned} vs {right.IsPinned} ({method}).");
 
             if (!AreSameTypeIgnoreNested(left.VariableType, right.VariableType))
-                throw new InvalidOperationException($"No matching variable for {left} ({method}).");
+                throw new InvalidOperationException($"No matching variable for {left}: type {left.VariableType} vs {right.VariableType} ({method}).");
         }
 
         private static void Diff(
@@ -316,11 +398,54 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
                 else
                     logger.WriteLineInfo(" SKIPPED.");
             }
+
+            // Recurse into nested types so that compiler-generated state machines (e.g. <method>d__N) and
+            // the FieldsContainer struct are diffed too. Without this, helper-based emit and inline-foreach
+            // emit look identical from the outside even though the state machine bodies differ.
+            // Use [AsyncStateMachine(typeof(X))] on ignored methods to authoritatively skip the matching
+            // state machine type — the outer methods (Run, .ctor) are intentionally not emitted, so their
+            // compiler-generated state machines wouldn't exist on the Emit side either.
+            var ignoredStateMachineNames = CollectIgnoredStateMachineNames(type1);
+            var nested2ByName = type2.NestedTypes.ToLookup(t => t.Name);
+            foreach (var nested1 in type1.NestedTypes)
+            {
+                if (ignoredStateMachineNames.Contains(nested1.FullName))
+                    continue;
+                var nested2 = nested2ByName[nested1.Name].SingleOrDefault()
+                    ?? type2.NestedTypes.SingleOrDefault(t => AreSameTypeIgnoreNested(nested1, t));
+                Diff(nested1, nested2, logger);
+            }
+        }
+
+        private static HashSet<string> CollectIgnoredStateMachineNames(TypeDefinition type)
+        {
+            HashSet<string> names = [];
+            if (!IsRunnable(type))
+            {
+                return names;
+            }
+            foreach (var method in type.Methods)
+            {
+                if (!IgnoredRunnableMethodNames.Contains(method.Name))
+                {
+                    continue;
+                }
+                foreach (var attr in method.CustomAttributes)
+                {
+                    if (attr.AttributeType.FullName == typeof(AsyncStateMachineAttribute).FullName
+                        && attr.ConstructorArguments.Count == 1
+                        && attr.ConstructorArguments[0].Value is TypeReference smType)
+                    {
+                        names.Add(smType.FullName);
+                    }
+                }
+            }
+            return names;
         }
 
         private static void Diff(FieldDefinition field1, FieldDefinition? field2)
         {
-            DiffSignature(field1, field1);
+            DiffSignature(field1, field2!);
 
             if (field1.Attributes != field2!.Attributes)
                 throw new InvalidOperationException($"No matching field for {field1.FullName}");
@@ -411,24 +536,46 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             var instructions1 = GetOpInstructions(method1);
             var instructions2 = GetOpInstructions(method2);
-            var diffMax = Math.Min(instructions1.Count, instructions2.Count);
 
-            var op2ToOp1Map = instructions1.Take(diffMax)
-                .Zip(
-                    instructions2.Take(diffMax),
-                    (i1, i2) => (i1, i2))
-                .ToDictionary(x => x.i2, x => x.i1);
-
-            for (var i = 0; i < diffMax; i++)
+            // Two-pointer pairing: System.Reflection.Emit's BeginCatchBlock/EndExceptionBlock unconditionally
+            // emit long-form `Leave` instructions that don't appear in Roslyn's output. Roslyn never emits
+            // extra leaves, so the only artifact we tolerate is an unmatched `Leave` on the Emit side;
+            // user-emitted leaves that pair up on both sides stay in the diff stream like any other op.
+            var paired1 = new List<Instruction>(instructions1.Count);
+            var paired2 = new List<Instruction>(instructions2.Count);
+            int i = 0, j = 0;
+            while (i < instructions1.Count && j < instructions2.Count)
             {
-                Diff(instructions1[i], instructions2[i], method1, op2ToOp1Map);
+                if (!IsLeave(instructions1[i]) && IsLeave(instructions2[j]))
+                {
+                    j++; // unmatched leave on the Emit side (ILGenerator artifact) — skip it
+                }
+                else
+                {
+                    paired1.Add(instructions1[i]);
+                    paired2.Add(instructions2[j]);
+                    i++; j++;
+                }
             }
 
-            if (instructions1.Count > diffMax)
+            // Any trailing instruction on the Roslyn side is a real divergence; trailing Emit leaves are
+            // ILGenerator artifacts and stay tolerated.
+            if (i < instructions1.Count)
                 throw new InvalidOperationException($"There are additional instructions in {method1}.");
+            for (; j < instructions2.Count; j++)
+            {
+                if (!IsLeave(instructions2[j]))
+                    throw new InvalidOperationException($"There are additional instructions in {method2}.");
+            }
 
-            if (instructions2.Count > diffMax)
-                throw new InvalidOperationException($"There are additional instructions in {method2}.");
+            var op2ToOp1Map = paired1
+                .Zip(paired2, (i1, i2) => (i1, i2))
+                .ToDictionary(x => x.i2, x => x.i1);
+
+            for (int k = 0; k < paired1.Count; k++)
+            {
+                Diff(paired1[k], paired2[k], method1, op2ToOp1Map);
+            }
         }
 
         private static void Diff(Instruction op1, Instruction op2, MethodDefinition method1, Dictionary<Instruction, Instruction> op2ToOp1Map)
@@ -461,12 +608,32 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             }
             else if (op1.Operand is Instruction i)
             {
-                op2ToOp1Map.TryGetValue((Instruction)op2.Operand, out var expectedOp1Operand);
-                if (i != expectedOp1Operand)
-                    throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
+                // Follow leave-chains so a paired-up Leave on each side compares against its FINAL
+                // destination — Roslyn jumps directly, ILGenerator chains via implicit hops.
+                var resolved2 = ResolveLeaveTarget((Instruction)op2.Operand);
+                var resolved1 = ResolveLeaveTarget(i);
+                op2ToOp1Map.TryGetValue(resolved2, out var expectedOp1Operand);
+                if (resolved1 != expectedOp1Operand)
+                    throw new InvalidOperationException($"No matching op for {op1} vs {op2} ({method1}).");
+            }
+            else if (op1.Operand is Instruction[] targets1)
+            {
+                // OpCodes.Switch has an Instruction[] operand. Each branch target must map to the
+                // same instruction-index on both sides via op2ToOp1Map, just like the single-target case.
+                var targets2 = (Instruction[])op2.Operand;
+                if (targets1.Length != targets2.Length)
+                    throw new InvalidOperationException($"No matching op for {op1} vs {op2} ({method1}).");
+                for (int t = 0; t < targets1.Length; t++)
+                {
+                    var resolved2 = ResolveLeaveTarget(targets2[t]);
+                    var resolved1 = ResolveLeaveTarget(targets1[t]);
+                    op2ToOp1Map.TryGetValue(resolved2, out var expectedOp1Operand);
+                    if (resolved1 != expectedOp1Operand)
+                        throw new InvalidOperationException($"No matching op for {op1} vs {op2} ({method1}).");
+                }
             }
             else if (!Equals(op1.Operand, op2.Operand))
-                throw new InvalidOperationException($"No matching op for {op1} ({method1}).");
+                throw new InvalidOperationException($"No matching op for {op1} vs {op2} ({method1}).");
         }
     }
 }

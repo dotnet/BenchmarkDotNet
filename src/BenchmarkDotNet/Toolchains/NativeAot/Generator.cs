@@ -177,6 +177,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
               </ItemGroup>
               {GetCustomProperties(buildPartition, logger)}
+              <!-- Set LangVersion after copied settings so it overrides any LangVersion copied from the benchmarks project -->
+              <PropertyGroup>
+                <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '8.0')">latest</LangVersion>
+              </PropertyGroup>
             </Project>
             """;
 

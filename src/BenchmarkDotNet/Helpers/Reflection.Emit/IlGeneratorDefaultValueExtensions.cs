@@ -13,9 +13,17 @@ internal static class IlGeneratorDefaultValueExtensions
             case null:
             case Type t when t == typeof(void):
                 throw new ArgumentException();
-            case Type t when t.IsValueType:
+            case Type t when t.UseInitObjForInitLocal():
+                // Custom struct (or other non-primitive value type) — `Ldflda + Initobj` zero-fills in-place,
+                // matching what the C# compiler emits for `field = default(MyStruct)`.
                 ilBuilder.Emit(OpCodes.Ldflda, fieldInfo);
                 ilBuilder.Emit(OpCodes.Initobj, resultType);
+                break;
+            case Type t when t.IsValueType:
+                // Primitive (or enum / IntPtr / decimal) — load the default value and `Stfld`, matching
+                // what the C# compiler emits for `field = default(int)` / `field = 0`.
+                EmitLoadDefaultPrimitive(ilBuilder, resultType);
+                ilBuilder.Emit(OpCodes.Stfld, fieldInfo);
                 break;
             default:
                 ilBuilder.Emit(OpCodes.Ldnull);

@@ -4,6 +4,8 @@
   href: baselines.md
 - name: Setup And Cleanup
   href: setup-and-cleanup.md
+- name: IAsyncEnumerable Benchmarks
+  href: async-enumerable.md
 - name: Statistics
   href: statistics.md
 - name: Disassembler

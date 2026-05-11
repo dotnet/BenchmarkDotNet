@@ -20,6 +20,23 @@ public readonly struct CustomTaskAwaiter(ValueTaskAwaiter valueTaskAwaiter) : IC
     public void UnsafeOnCompleted(Action continuation) => valueTaskAwaiter.UnsafeOnCompleted(continuation);
 }
 
+[AsyncMethodBuilder(typeof(AsyncCustomTaskMethodBuilder<>))]
+public readonly struct CustomTask<T>(ValueTask<T> valueTask)
+{
+    public CustomTaskAwaiter<T> GetAwaiter() => new(valueTask.GetAwaiter());
+}
+
+public readonly struct CustomTaskAwaiter<T>(ValueTaskAwaiter<T> valueTaskAwaiter) : ICriticalNotifyCompletion
+{
+    public bool IsCompleted => valueTaskAwaiter.IsCompleted;
+
+    public T GetResult() => valueTaskAwaiter.GetResult();
+
+    public void OnCompleted(Action continuation) => valueTaskAwaiter.OnCompleted(continuation);
+
+    public void UnsafeOnCompleted(Action continuation) => valueTaskAwaiter.UnsafeOnCompleted(continuation);
+}
+
 public struct AsyncCustomTaskMethodBuilder
 {
     public static int InUseCounter { get; private set; }
@@ -43,6 +60,49 @@ public struct AsyncCustomTaskMethodBuilder
     {
         --InUseCounter;
         _methodBuilder.SetResult();
+    }
+
+    public void SetException(Exception exception)
+    {
+        --InUseCounter;
+        _methodBuilder.SetException(exception);
+    }
+
+    public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+        where TAwaiter : INotifyCompletion
+        where TStateMachine : IAsyncStateMachine
+        => _methodBuilder.AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+    [SecuritySafeCritical]
+    public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+        where TAwaiter : ICriticalNotifyCompletion
+        where TStateMachine : IAsyncStateMachine
+        => _methodBuilder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+}
+
+public struct AsyncCustomTaskMethodBuilder<T>
+{
+    public static int InUseCounter { get; private set; }
+
+    private AsyncValueTaskMethodBuilder<T> _methodBuilder;
+
+    public static AsyncCustomTaskMethodBuilder<T> Create()
+    {
+        ++InUseCounter;
+        return default;
+    }
+
+    public CustomTask<T> Task => new(_methodBuilder.Task);
+
+    public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+        => _methodBuilder.Start(ref stateMachine);
+
+    public void SetStateMachine(IAsyncStateMachine stateMachine) => _methodBuilder.SetStateMachine(stateMachine);
+
+    public void SetResult(T result)
+    {
+        --InUseCounter;
+        _methodBuilder.SetResult(result);
     }
 
     public void SetException(Exception exception)

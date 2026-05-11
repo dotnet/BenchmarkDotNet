@@ -234,6 +234,56 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
+        public async Task ConsistentAsyncEnumerablesAreOmitted()
+            => await AssertConsistent<ConsistentAsyncEnumerableReturnType>();
+
+        public class ConsistentAsyncEnumerableReturnType
+        {
+            [Benchmark]
+            public async IAsyncEnumerable<int> Foo()
+            {
+                await Task.Yield();
+                yield return 1;
+                yield return 2;
+                yield return 3;
+            }
+
+            [Benchmark]
+            public async IAsyncEnumerable<int> Bar()
+            {
+                yield return 1;
+                yield return 2;
+                await Task.Yield();
+                yield return 3;
+            }
+        }
+
+        [Fact]
+        public async Task InconsistentAsyncEnumerablesAreDetected()
+            => await AssertInconsistent<InconsistentAsyncEnumerableReturnType>();
+
+        public class InconsistentAsyncEnumerableReturnType
+        {
+            [Benchmark]
+            public async IAsyncEnumerable<int> Foo()
+            {
+                await Task.Yield();
+                yield return 1;
+                yield return 2;
+                yield return 3;
+            }
+
+            [Benchmark]
+            public async IAsyncEnumerable<int> Bar()
+            {
+                await Task.Yield();
+                yield return 1;
+                yield return 42;
+                yield return 3;
+            }
+        }
+
+        [Fact]
         public async Task ConsistentBenchmarksAlteringParameterAreOmitted()
             => await AssertConsistent<ConsistentAlterParam>();
 

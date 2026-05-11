@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
@@ -17,8 +18,26 @@ namespace BenchmarkDotNet.Validators
             {
                 try
                 {
-                    var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
-                    await DynamicAwaitHelper.GetOrAwaitResult(result).ConfigureAwait(false);
+                    var workloadMethod = benchmark.Descriptor.WorkloadMethod;
+                    var result = workloadMethod.Invoke(benchmarkTypeInstance, null);
+                    if (workloadMethod.ReturnType.IsAwaitable())
+                    {
+                        if (result is null)
+                        {
+                            errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Awaitable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
+                            continue;
+                        }
+                        await DynamicAwaitHelper.AwaitResult(result, workloadMethod.ReturnType).ConfigureAwait(true);
+                    }
+                    else if (workloadMethod.ReturnType.IsAsyncEnumerable(out _, out _, out _))
+                    {
+                        if (result is null)
+                        {
+                            errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Async enumerable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
+                            continue;
+                        }
+                        await DynamicAwaitHelper.DrainAsyncEnumerableAsync(result, workloadMethod.ReturnType).ConfigureAwait(true);
+                    }
                 }
                 catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
                 {
