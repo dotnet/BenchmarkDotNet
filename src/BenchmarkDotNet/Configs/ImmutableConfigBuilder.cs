@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Configs
         {
             BaselineValidator.FailOnError,
             SetupCleanupValidator.FailOnError,
+            AwaitableAsyncEnumerableAmbiguityValidator.DontFailOnError,
             RunModeValidator.FailOnError,
             DiagnosersValidator.Composite,
             CompilationValidator.FailOnError,

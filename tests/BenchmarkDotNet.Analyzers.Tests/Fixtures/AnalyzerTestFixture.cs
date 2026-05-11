@@ -33,7 +33,10 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
                     "BenchmarkDotNet.dll",
                     "BenchmarkDotNet.Annotations.dll",
 #if !NET6_0_OR_GREATER
-                    "System.Memory.dll"
+                    "System.Memory.dll",
+                    // Polyfills `IAsyncEnumerable<T>` etc. on netstandard2.0 — the analyzer's
+                    // setup/cleanup rule needs the type symbol to resolve on the net472 test path.
+                    "Microsoft.Bcl.AsyncInterfaces.dll"
 #endif
                 }
             }

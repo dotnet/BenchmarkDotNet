@@ -9,6 +9,8 @@ BDN1602  |  Usage   | Error    | Properties annotated with [BenchmarkCancellatio
 BDN1603  |  Usage   | Error    | [BenchmarkCancellation] attribute is not valid on readonly fields
 BDN1604  |  Usage   | Error    | Properties annotated with [BenchmarkCancellation] must have a public setter
 BDN1605  |  Usage   | Info     | Async benchmarks should have a [BenchmarkCancellation] property for cancellation support
+BDN1700  |  Usage   | Error    | [GlobalSetup]/[GlobalCleanup]/[IterationSetup]/[IterationCleanup] method must not return an async enumerable
+BDN1701  |  Usage   | Warning  | Benchmark/setup/cleanup return type is both awaitable and an async enumerable; the iterator is never enumerated
 
 
 ### Removed Rules

@@ -38,6 +38,10 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var method in allMethods)
             {
+                // The dual-shaped (awaitable AND async-enumerable) case is owned by
+                // AwaitableAsyncEnumerableAmbiguityValidator — skip it here so the same method does not
+                // produce two errors at once. The runtime awaits dual-shaped returns instead of rejecting
+                // them, which matches that validator's warning-not-error severity.
                 if (method.GetCustomAttributes(false).OfType<T>().Any()
                     && method.ReturnType.IsAsyncEnumerable(out _, out _, out _)
                     && !method.ReturnType.IsAwaitable())

@@ -433,4 +433,22 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   <data name="General_AsyncBenchmark_ShouldHaveCancellationToken_Description" xml:space="preserve">
     <value>Async benchmark methods should check for cancellation to allow graceful termination. Add a public property 'public CancellationToken CancellationToken { get; set; }' annotated with [BenchmarkCancellation] to enable this functionality.</value>
   </data>
+  <data name="Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_Title" xml:space="preserve">
+    <value>Setup and cleanup methods must not return an async enumerable</value>
+  </data>
+  <data name="Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_MessageFormat" xml:space="preserve">
+    <value>[{0}] method '{1}' returns an async enumerable, which is not supported</value>
+  </data>
+  <data name="Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_Description" xml:space="preserve">
+    <value>BenchmarkDotNet awaits awaitable return values of [GlobalSetup], [GlobalCleanup], [IterationSetup], and [IterationCleanup] methods, but it does not enumerate async enumerables — the iterator body would silently never run. Change the return type to void, Task, ValueTask, or another awaitable.</value>
+  </data>
+  <data name="General_AwaitableAsyncEnumerable_AmbiguousReturnType_Title" xml:space="preserve">
+    <value>Return type is both awaitable and an async enumerable</value>
+  </data>
+  <data name="General_AwaitableAsyncEnumerable_AmbiguousReturnType_MessageFormat" xml:space="preserve">
+    <value>[{0}] method '{1}' returns '{2}', which is both awaitable and an async enumerable; BenchmarkDotNet awaits the value and never enumerates it</value>
+  </data>
+  <data name="General_AwaitableAsyncEnumerable_AmbiguousReturnType_Description" xml:space="preserve">
+    <value>When a benchmark or setup/cleanup return type satisfies both the awaitable pattern (a public GetAwaiter) and the async-enumerable pattern (a public GetAsyncEnumerator), BenchmarkDotNet treats it as awaitable — the iterator's body is never executed. Pick one shape so the intent is unambiguous: drop GetAwaiter if you want it consumed as an async enumerable, or drop GetAsyncEnumerator if you want it awaited.</value>
+  </data>
 </root>

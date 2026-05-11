@@ -40,4 +40,6 @@ public static class DiagnosticIds
     public const string Attributes_BenchmarkCancellationAttribute_NotValidOnReadonlyField = "BDN1603";
     public const string Attributes_BenchmarkCancellationAttribute_PropertyMustHavePublicSetter = "BDN1604";
     public const string General_AsyncBenchmark_ShouldHaveCancellationToken = "BDN1605";
+    public const string Attributes_SetupCleanup_MustNotReturnAsyncEnumerable = "BDN1700";
+    public const string General_AwaitableAsyncEnumerable_AmbiguousReturnType = "BDN1701";
 }

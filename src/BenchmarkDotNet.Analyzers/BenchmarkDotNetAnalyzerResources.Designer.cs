@@ -1026,5 +1026,59 @@ namespace BenchmarkDotNet.Analyzers {
                 return ResourceManager.GetString("General_AsyncBenchmark_ShouldHaveCancellationToken_Description", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Setup and cleanup methods must not return an async enumerable.
+        /// </summary>
+        internal static string Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_Title {
+            get {
+                return ResourceManager.GetString("Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to [{0}] method '{1}' returns an async enumerable, which is not supported.
+        /// </summary>
+        internal static string Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to BenchmarkDotNet awaits awaitable return values of [GlobalSetup], [GlobalCleanup], [IterationSetup], and [IterationCleanup] methods, but it does not enumerate async enumerables — the iterator body would silently never run. Change the return type to void, Task, ValueTask, or another awaitable..
+        /// </summary>
+        internal static string Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_Description {
+            get {
+                return ResourceManager.GetString("Attributes_SetupCleanup_MustNotReturnAsyncEnumerable_Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Return type is both awaitable and an async enumerable.
+        /// </summary>
+        internal static string General_AwaitableAsyncEnumerable_AmbiguousReturnType_Title {
+            get {
+                return ResourceManager.GetString("General_AwaitableAsyncEnumerable_AmbiguousReturnType_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to [{0}] method '{1}' returns '{2}', which is both awaitable and an async enumerable; BenchmarkDotNet awaits the value and never enumerates it.
+        /// </summary>
+        internal static string General_AwaitableAsyncEnumerable_AmbiguousReturnType_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_AwaitableAsyncEnumerable_AmbiguousReturnType_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When a benchmark or setup/cleanup return type satisfies both the awaitable pattern (a public GetAwaiter) and the async-enumerable pattern (a public GetAsyncEnumerator), BenchmarkDotNet treats it as awaitable — the iterator's body is never executed. Pick one shape so the intent is unambiguous: drop GetAwaiter if you want it consumed as an async enumerable, or drop GetAsyncEnumerator if you want it awaited..
+        /// </summary>
+        internal static string General_AwaitableAsyncEnumerable_AmbiguousReturnType_Description {
+            get {
+                return ResourceManager.GetString("General_AwaitableAsyncEnumerable_AmbiguousReturnType_Description", resourceCulture);
+            }
+        }
     }
 }

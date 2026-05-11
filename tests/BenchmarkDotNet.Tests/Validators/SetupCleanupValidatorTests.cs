@@ -2,6 +2,11 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
+// BDN1700 is the analyzer counterpart of the rejection branch in SetupCleanupValidator. The test types
+// below intentionally return async enumerables from setup/cleanup, so suppress the analyzer in this file
+// — we are validating the runtime validator's reject behavior, not the analyzer.
+#pragma warning disable BDN1700
+
 namespace BenchmarkDotNet.Tests.Validators
 {
     public class SetupCleanupValidatorTests

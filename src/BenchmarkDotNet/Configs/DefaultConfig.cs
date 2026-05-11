@@ -70,6 +70,7 @@ namespace BenchmarkDotNet.Configs
         {
             yield return BaselineValidator.FailOnError;
             yield return SetupCleanupValidator.FailOnError;
+            yield return AwaitableAsyncEnumerableAmbiguityValidator.DontFailOnError;
 #if !DEBUG
             yield return JitOptimizationsValidator.FailOnError;
 #endif
