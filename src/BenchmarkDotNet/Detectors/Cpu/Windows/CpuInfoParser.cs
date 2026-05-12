@@ -5,17 +5,27 @@ using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
-internal static class WmiCpuInfoParser
+internal static class CpuInfoParser
 {
+    /// <summary>
+    /// Parses Get-CimInstance output and returns <see cref="CpuInfo"/>
+    /// </summary>
+    internal static CpuInfo ParseCimOutput(string cimOutput)
+    {
+        var processorSections = SectionsHelper.ParseSectionsForPowershellWmi(cimOutput, ':');
+        return ParseCore(processorSections);
+    }
+
     /// <summary>
     /// Parses wmic output and returns <see cref="CpuInfo"/>
     /// </summary>
-    /// <param name="wmiOutput">
-    /// Output of `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List`
-    /// or
-    /// Output of `Get-CimInstance Win32_Processor -Property Name, NumberOfCores, NumberOfLogicalProcessors`
-    /// </param>
-    internal static CpuInfo Parse(string wmiOutput)
+    internal static CpuInfo ParseWmicOutput(string wmicOutput)
+    {
+        var processorSections = SectionsHelper.ParseSections(wmicOutput, '=');
+        return ParseCore(processorSections);
+    }
+
+    private static CpuInfo ParseCore(List<Dictionary<string, string>> processors)
     {
         HashSet<string> processorModelNames = [];
         int physicalCoreCount = 0;
@@ -24,7 +34,6 @@ internal static class WmiCpuInfoParser
         double maxFrequency = 0.0;
         double nominalFrequency = 0.0;
 
-        List<Dictionary<string, string>> processors = SectionsHelper.ParseSections(wmiOutput, '=');
         foreach (var processor in processors)
         {
             if (processor.TryGetValue(WmiCpuInfoKeyNames.NumberOfCores, out var numberOfCoresValue) &&

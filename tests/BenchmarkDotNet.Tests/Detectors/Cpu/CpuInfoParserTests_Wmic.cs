@@ -4,14 +4,14 @@ using Perfolizer.Models;
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
 // ReSharper disable StringLiteralTypo
-public class WmiCpuInfoParserTests(ITestOutputHelper output)
+public class WmiCpuInfoParserTests_Wmic(ITestOutputHelper output)
 {
     private ITestOutputHelper Output { get; } = output;
 
     [Fact]
     public void EmptyTest()
     {
-        var actual = WmiCpuInfoParser.Parse(string.Empty);
+        var actual = CpuInfoParser.ParseWmicOutput(string.Empty);
         var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
@@ -19,7 +19,7 @@ public class WmiCpuInfoParserTests(ITestOutputHelper output)
     [Fact]
     public void MalformedTest()
     {
-        var actual = WmiCpuInfoParser.Parse("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
+        var actual = CpuInfoParser.ParseWmicOutput("malformedkey=malformedvalue\n\nmalformedkey2=malformedvalue2");
         var expected = new CpuInfo();
         Output.AssertEqual(expected, actual);
     }
@@ -41,7 +41,7 @@ public class WmiCpuInfoParserTests(ITestOutputHelper output)
             NumberOfLogicalProcessors=16
 
             """;
-        var actual = WmiCpuInfoParser.Parse(cpuInfo);
+        var actual = CpuInfoParser.ParseWmicOutput(cpuInfo);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
@@ -73,7 +73,7 @@ public class WmiCpuInfoParserTests(ITestOutputHelper output)
             "\r\r\n" +
             "\r\r\n" +
             "\r\r\n";
-        var actual = WmiCpuInfoParser.Parse(cpuInfo);
+        var actual = CpuInfoParser.ParseWmicOutput(cpuInfo);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz",
@@ -98,7 +98,7 @@ public class WmiCpuInfoParserTests(ITestOutputHelper output)
 
             """;
 
-        var actual = WmiCpuInfoParser.Parse(cpuInfo);
+        var actual = CpuInfoParser.ParseWmicOutput(cpuInfo);
         var expected = new CpuInfo
         {
             ProcessorName = "Intel(R) Core(TM) i7-4710MQ CPU @ 2.50GHz",

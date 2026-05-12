@@ -5,7 +5,7 @@ using Perfolizer.Models;
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 /// <summary>
-/// CPU information from output of the `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List` command.
+/// CPU information from output of the `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed /Format:List` command.
 /// Windows only.
 /// </summary>
 /// <remarks>
@@ -34,6 +34,6 @@ internal class WmicCpuDetector : ICpuDetector
         if (wmicOutput.IsBlank())
             return null;
 
-        return WmiCpuInfoParser.Parse(wmicOutput);
+        return CpuInfoParser.ParseWmicOutput(wmicOutput);
     }
 }

@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
 /// <summary>
-/// CPU information from output of the `Get-CimInstance Win32_Processor -Property Name, NumberOfCores, NumberOfLogicalProcessors` command.
+/// CPU information from output of the `Get-CimInstance Win32_Processor -Property Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed` command.
 /// Windows only.
 /// </summary>
 internal class PowershellWmiCpuDetector : ICpuDetector
@@ -24,11 +24,11 @@ internal class PowershellWmiCpuDetector : ICpuDetector
                                $"{WmiCpuInfoKeyNames.MaxClockSpeed}";
 
         string? output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
-            "Get-CimInstance Win32_Processor -Property " + argList);
+            $"Get-CimInstance Win32_Processor -Property {argList} | Format-List {argList}");
 
         if (output.IsBlank())
             return null;
 
-        return WmiCpuInfoParser.Parse(output);
+        return CpuInfoParser.ParseCimOutput(output);
     }
 }
