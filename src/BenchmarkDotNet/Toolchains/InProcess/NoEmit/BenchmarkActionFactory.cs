@@ -65,18 +65,18 @@ internal static class BenchmarkActionFactory
                     unrollFactor);
         }
 
-        if (resultType.IsAwaitable())
+        if (resultType.IsAwaitable(out _))
         {
             throw new NotSupportedException($"Default {nameof(BenchmarkActionFactory)} does not support returning awaitable types except (Value)Task(<T>).");
         }
 
-        if (resultType.IsAsyncEnumerable(out var asyncEnumerableItemType, out _, out _))
+        if (resultType.IsAsyncEnumerable(out var asyncEnumerableInfo))
         {
-            var asyncEnumerableInterface = typeof(IAsyncEnumerable<>).MakeGenericType(asyncEnumerableItemType);
+            var asyncEnumerableInterface = typeof(IAsyncEnumerable<>).MakeGenericType(asyncEnumerableInfo.ItemType);
             if (asyncEnumerableInterface.IsAssignableFrom(resultType))
             {
                 return Create(
-                    typeof(BenchmarkActionAsyncEnumerable<>).MakeGenericType(asyncEnumerableItemType),
+                    typeof(BenchmarkActionAsyncEnumerable<>).MakeGenericType(asyncEnumerableInfo.ItemType),
                     resultInstance,
                     targetMethod,
                     unrollFactor);
@@ -84,7 +84,7 @@ internal static class BenchmarkActionFactory
             if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(ConfiguredCancelableAsyncEnumerable<>))
             {
                 return Create(
-                    typeof(BenchmarkActionConfiguredCancelableAsyncEnumerable<>).MakeGenericType(resultType.GetGenericArguments()[0]),
+                    typeof(BenchmarkActionConfiguredCancelableAsyncEnumerable<>).MakeGenericType(asyncEnumerableInfo.ItemType),
                     resultInstance,
                     targetMethod,
                     unrollFactor);

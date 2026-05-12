@@ -43,8 +43,8 @@ namespace BenchmarkDotNet.Validators
                 // produce two errors at once. The runtime awaits dual-shaped returns instead of rejecting
                 // them, which matches that validator's warning-not-error severity.
                 if (method.GetCustomAttributes(false).OfType<T>().Any()
-                    && method.ReturnType.IsAsyncEnumerable(out _, out _, out _)
-                    && !method.ReturnType.IsAwaitable())
+                    && method.ReturnType.IsAsyncEnumerable(out _)
+                    && !method.ReturnType.IsAwaitable(out _))
                 {
                     yield return new ValidationError(
                         TreatsWarningsAsErrors,

@@ -375,7 +375,8 @@ public class BenchmarkActionTask<T> : BenchmarkActionBase
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
-                    await callback();
+                    var result = await callback();
+                    DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in result);
                 }
                 if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
                 {
@@ -524,7 +525,8 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
-                    await callback();
+                    var result = await callback();
+                    DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in result);
                 }
                 if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
                 {
@@ -544,86 +546,10 @@ public class BenchmarkActionValueTask<T> : BenchmarkActionBase
 }
 
 [AggressivelyOptimizeMethods]
-public class BenchmarkActionConfiguredCancelableAsyncEnumerable<T> : BenchmarkActionBase
-{
-    private readonly Func<ConfiguredCancelableAsyncEnumerable<T>> callback;
-    private readonly int unrollFactor;
-    private WorkloadValueTaskSource workloadValueTaskSource = null!;
-    private IClock? clock;
-    private long invokeCount;
-
-    [SetsRequiredMembers]
-    public BenchmarkActionConfiguredCancelableAsyncEnumerable(object? instance, MethodInfo method, int unrollFactor)
-    {
-        callback = CreateWorkload<Func<ConfiguredCancelableAsyncEnumerable<T>>>(instance, method);
-        this.unrollFactor = unrollFactor;
-        InvokeSingle = InvokeOnce;
-        InvokeUnroll = WorkloadActionUnroll;
-        InvokeNoUnroll = WorkloadActionNoUnroll;
-    }
-
-    private ValueTask InvokeOnce() => throw new NotSupportedException();
-
-    private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
-        => WorkloadActionNoUnroll(invokeCount * unrollFactor, clock);
-
-    private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
-    {
-        this.invokeCount = invokeCount;
-        this.clock = clock;
-        return workloadValueTaskSource.Continue();
-    }
-
-    public override void Setup()
-    {
-        workloadValueTaskSource = new();
-        StartWorkload();
-    }
-
-    private async void StartWorkload()
-    {
-        await WorkloadCore();
-    }
-
-    private async Task WorkloadCore()
-    {
-        try
-        {
-            if (await workloadValueTaskSource.GetIsComplete())
-            {
-                return;
-            }
-            while (true)
-            {
-                T? lastItem = default;
-                var startedClock = clock!.Start();
-                while (--invokeCount >= 0)
-                {
-                    await foreach (var item in callback())
-                    {
-                        lastItem = item;
-                    }
-                }
-                var elapsed = startedClock.GetElapsed();
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(lastItem);
-                if (await workloadValueTaskSource.SetResultAndGetIsComplete(elapsed))
-                {
-                    return;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            workloadValueTaskSource.SetException(e);
-        }
-    }
-
-    public override void Cleanup()
-        => workloadValueTaskSource.Complete();
-}
-
-[AggressivelyOptimizeMethods]
 public class BenchmarkActionAsyncEnumerable<T> : BenchmarkActionBase
+#if NET9_0_OR_GREATER
+    where T : allows ref struct
+#endif
 {
     private readonly Func<IAsyncEnumerable<T>> callback;
     private readonly int unrollFactor;
@@ -674,18 +600,94 @@ public class BenchmarkActionAsyncEnumerable<T> : BenchmarkActionBase
             }
             while (true)
             {
-                T? lastItem = default;
                 var startedClock = clock!.Start();
                 while (--invokeCount >= 0)
                 {
                     await foreach (var item in callback())
                     {
-                        lastItem = item;
+                        DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in item);
                     }
                 }
-                var elapsed = startedClock.GetElapsed();
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(lastItem);
-                if (await workloadValueTaskSource.SetResultAndGetIsComplete(elapsed))
+                if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                {
+                    return;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            workloadValueTaskSource.SetException(e);
+        }
+    }
+
+    public override void Cleanup()
+        => workloadValueTaskSource.Complete();
+}
+
+[AggressivelyOptimizeMethods]
+public class BenchmarkActionConfiguredCancelableAsyncEnumerable<T> : BenchmarkActionBase
+#if NET10_0_OR_GREATER
+    where T : allows ref struct
+#endif
+{
+    private readonly Func<ConfiguredCancelableAsyncEnumerable<T>> callback;
+    private readonly int unrollFactor;
+    private WorkloadValueTaskSource workloadValueTaskSource = null!;
+    private IClock? clock;
+    private long invokeCount;
+
+    [SetsRequiredMembers]
+    public BenchmarkActionConfiguredCancelableAsyncEnumerable(object? instance, MethodInfo method, int unrollFactor)
+    {
+        callback = CreateWorkload<Func<ConfiguredCancelableAsyncEnumerable<T>>>(instance, method);
+        this.unrollFactor = unrollFactor;
+        InvokeSingle = InvokeOnce;
+        InvokeUnroll = WorkloadActionUnroll;
+        InvokeNoUnroll = WorkloadActionNoUnroll;
+    }
+
+    private ValueTask InvokeOnce() => throw new NotSupportedException();
+
+    private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+        => WorkloadActionNoUnroll(invokeCount * unrollFactor, clock);
+
+    private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
+    {
+        this.invokeCount = invokeCount;
+        this.clock = clock;
+        return workloadValueTaskSource.Continue();
+    }
+
+    public override void Setup()
+    {
+        workloadValueTaskSource = new();
+        StartWorkload();
+    }
+
+    private async void StartWorkload()
+    {
+        await WorkloadCore();
+    }
+
+    private async Task WorkloadCore()
+    {
+        try
+        {
+            if (await workloadValueTaskSource.GetIsComplete())
+            {
+                return;
+            }
+            while (true)
+            {
+                var startedClock = clock!.Start();
+                while (--invokeCount >= 0)
+                {
+                    await foreach (var item in callback())
+                    {
+                        DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in item);
+                    }
+                }
+                if (await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
                 {
                     return;
                 }

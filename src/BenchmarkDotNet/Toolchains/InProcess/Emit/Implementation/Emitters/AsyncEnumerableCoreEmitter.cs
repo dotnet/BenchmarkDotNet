@@ -14,15 +14,36 @@ partial class RunnableEmitter
 {
     private sealed class AsyncEnumerableCoreEmitter : AsyncCoreEmitterBase
     {
-        private readonly Type itemType;
-        private readonly EnumerableInfo enumerableInfo;
+        private readonly AsyncEnumerableInfo enumerableInfo;
+        private readonly MethodInfo? disposeAsyncMethod;
+        private readonly AwaitableInfo? disposeAwaitableInfo;
 
-        public AsyncEnumerableCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark)
+        public AsyncEnumerableCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark, AsyncEnumerableInfo enumerableInfo)
             : base(buildPartition, moduleBuilder, benchmark)
         {
-            var workloadReturnType = benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType;
-            enumerableInfo = ResolveEnumerableInfo(workloadReturnType);
-            itemType = enumerableInfo.ItemType;
+            this.enumerableInfo = enumerableInfo;
+
+            // DisposeAsync is optional for the await-foreach pattern. Roslyn matches a public instance
+            // method named DisposeAsync whose parameters are all optional and whose return type satisfies
+            // the awaitable pattern with a void GetResult; otherwise it falls back to the IAsyncDisposable
+            // interface dispatch.
+            foreach (var candidate in enumerableInfo.EnumeratorType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (candidate.Name == nameof(IAsyncDisposable.DisposeAsync)
+                    && candidate.GetParameters().All(p => p.IsOptional)
+                    && candidate.ReturnType.IsAwaitable(out var awaitable)
+                    && awaitable.ResultType == typeof(void))
+                {
+                    disposeAsyncMethod = candidate;
+                    disposeAwaitableInfo = awaitable;
+                    break;
+                }
+            }
+            if (disposeAsyncMethod is null && typeof(IAsyncDisposable).IsAssignableFrom(enumerableInfo.EnumeratorType))
+            {
+                disposeAsyncMethod = typeof(IAsyncDisposable).GetMethod(nameof(IAsyncDisposable.DisposeAsync))!;
+                disposeAsyncMethod.ReturnType.IsAwaitable(out disposeAwaitableInfo);
+            }
         }
 
         protected override void EmitWorkloadCore()
@@ -35,26 +56,33 @@ partial class RunnableEmitter
             // Field declaration order matches Roslyn (and `<>u__N` numbering follows declaration order):
             // 1) <>u__1 — first awaiter type to appear in the IL (always ValueTaskAwaiter<bool> here, used
             //    by GetIsComplete and SetResultAndGetIsComplete);
-            // 2) hoisted user locals in source declaration order (lastItem, startedClock);
-            // 3) the synthetic enumerator local (named in the template so it's <enumerator>5__N, not
-            //    <>7__wrap{N});
-            // 4) <>u__N for any subsequent awaiter type that doesn't already match an existing field —
+            // 2) hoisted user locals in source declaration order (startedClock);
+            // 3) <>7__wrap2 — synthesized hoisted enumerator (Roslyn names it `<>7__wrap2` because the
+            //    `await foreach` lowering captures the GetAsyncEnumerator result as an unnamed wrap);
+            // 4) when DisposeAsync exists, <>7__wrap3 (captured catch object) and <>7__wrap4 (unused state
+            //    discriminator that Roslyn emits as part of its try/finally lowering);
+            // 5) <>u__N for any subsequent awaiter type that doesn't already match an existing field —
             //    Roslyn dedupes by type, so we reuse <>u__1 when MoveNextAsync also returns ValueTaskAwaiter<bool>.
             var workloadContinuerAwaiterField = asyncStateMachineTypeBuilder.DefineField("<>u__1", typeof(ValueTaskAwaiter<bool>), FieldAttributes.Private);
-            var lastItemField = asyncStateMachineTypeBuilder.DefineField("<lastItem>5__2", itemType, FieldAttributes.Private);
-            var startedClockField = asyncStateMachineTypeBuilder.DefineField("<startedClock>5__3", typeof(StartedClock), FieldAttributes.Private);
-            var enumeratorField = asyncStateMachineTypeBuilder.DefineField("<enumerator>5__4", enumerableInfo.EnumeratorType, FieldAttributes.Private);
-            int nextAwaiterOrdinal = 2;
-            var moveNextAwaiterField = enumerableInfo.MoveNextAwaiterType == workloadContinuerAwaiterField.FieldType
-                ? workloadContinuerAwaiterField
-                : asyncStateMachineTypeBuilder.DefineField($"<>u__{nextAwaiterOrdinal++}", enumerableInfo.MoveNextAwaiterType, FieldAttributes.Private);
-            var disposeAwaiterField = enumerableInfo.DisposeAsyncMethod is null
+            var startedClockField = asyncStateMachineTypeBuilder.DefineField("<startedClock>5__2", typeof(StartedClock), FieldAttributes.Private);
+            var enumeratorField = asyncStateMachineTypeBuilder.DefineField("<>7__wrap2", enumerableInfo.EnumeratorType, FieldAttributes.Private);
+            var capturedExceptionField = disposeAsyncMethod is null
                 ? null
-                : enumerableInfo.DisposeAwaiterType == workloadContinuerAwaiterField.FieldType
+                : asyncStateMachineTypeBuilder.DefineField("<>7__wrap3", typeof(object), FieldAttributes.Private);
+            var disposeDiscriminatorField = disposeAsyncMethod is null
+                ? null
+                : asyncStateMachineTypeBuilder.DefineField("<>7__wrap4", typeof(int), FieldAttributes.Private);
+            int nextAwaiterOrdinal = 2;
+            var moveNextAwaiterField = enumerableInfo.MoveNextAwaitable.AwaiterType == workloadContinuerAwaiterField.FieldType
+                ? workloadContinuerAwaiterField
+                : asyncStateMachineTypeBuilder.DefineField($"<>u__{nextAwaiterOrdinal++}", enumerableInfo.MoveNextAwaitable.AwaiterType, FieldAttributes.Private);
+            var disposeAwaiterField = disposeAsyncMethod is null
+                ? null
+                : disposeAwaitableInfo!.AwaiterType == workloadContinuerAwaiterField.FieldType
                     ? workloadContinuerAwaiterField
-                    : enumerableInfo.DisposeAwaiterType == moveNextAwaiterField.FieldType
+                    : disposeAwaitableInfo!.AwaiterType == moveNextAwaiterField.FieldType
                         ? moveNextAwaiterField
-                        : asyncStateMachineTypeBuilder.DefineField($"<>u__{nextAwaiterOrdinal++}", enumerableInfo.DisposeAwaiterType!, FieldAttributes.Private);
+                        : asyncStateMachineTypeBuilder.DefineField($"<>u__{nextAwaiterOrdinal++}", disposeAwaitableInfo!.AwaiterType!, FieldAttributes.Private);
 
             EmitMoveNextImpl();
             var asyncStateMachineType = CompleteAsyncStateMachineType(asyncMethodBuilderType, builderInfo);
@@ -73,31 +101,36 @@ partial class RunnableEmitter
                 const int StateGetIsComplete = 0;
                 const int StateMoveNextAsync = 1;
                 int StateDisposeAsync = 2;
-                int StateSetResult = enumerableInfo.DisposeAsyncMethod is null ? 2 : 3;
+                int StateSetResult = disposeAsyncMethod is null ? 2 : 3;
 
                 // Local declaration order matches Roslyn so the EmitsSameIL var-by-var diff lines up:
                 // 1) awaiter then awaitable temps for the first await (Roslyn declares awaiter before
                 //    awaitable for synthetic `await expr` with no named result);
-                // 2) ClockSpan elapsed temp for the SetResult arg — Roslyn forces a local because the
-                //    template puts a DCE.KeepAliveWithoutBoxing call between the elapsed read and the
-                //    await suspension;
-                // 3) the named source local `enumerable` (always — Roslyn declares one even for reference
+                // 2) the named source local `enumerable` (always — Roslyn declares one even for reference
                 //    types because `unsafe { enumerable = ... }` is a separate assignment statement);
-                // 4) optional default-value materializers for GetAsyncEnumerator's optional params
+                // 3) optional default-value materializers for GetAsyncEnumerator's optional params
                 //    (typically a CancellationToken local pre-declared here so EmitDefaultArgsForOptionalParameters
                 //    can reuse it rather than declaring a new local mid-emit and shifting indexes);
-                // 5) MoveNext awaiter/awaitable temps — REUSED from V_3/V_4 when types match (Roslyn dedupes
+                // 4) the named source local `item` for `var item = enumerator.Current;` — Roslyn declares
+                //    it after `enumerable` (and after defaultArg materializers) but BEFORE the MoveNext
+                //    awaiter/awaitable temps;
+                // 5) caught-exception `object` local — only when DisposeAsync exists (the inner catch(object)
+                //    handler that captures any exception thrown by the iteration uses this slot, and it is
+                //    reused after the dispose await for the rethrow logic that reads <>7__wrap3);
+                // 6) MoveNext awaiter/awaitable temps — REUSED from V_3/V_4 when types match (Roslyn dedupes
                 //    by type), otherwise new locals;
-                // 6) DisposeAsync awaiter/awaitable temps (if applicable);
-                // 7) the loop-decrement long, then the catch-block Exception local.
+                // 7) DisposeAsync awaiter/awaitable temps (if applicable);
+                // 8) the loop-decrement long, then the catch-block Exception local.
+                // The template inlines `startedClock.GetElapsed()` directly into the SetResult call site,
+                // so no ClockSpan local is declared.
                 var isCompleteAwaiterLocal = ilBuilder.DeclareLocal(typeof(ValueTaskAwaiter<bool>));
                 var isCompleteAwaitableLocal = ilBuilder.DeclareLocal(typeof(ValueTask<bool>));
-                var elapsedLocal = ilBuilder.DeclareLocal(typeof(ClockSpan));
-                var enumerableLocal = ilBuilder.DeclareLocal(enumerableInfo.WorkloadReturnType);
+                var enumerableLocal = ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType);
                 var defaultArgLocals = enumerableInfo.GetAsyncEnumeratorMethod
                     .GetParameters()
                     .DistinctBy(p => p.ParameterType)
                     .ToDictionary(p => p.ParameterType, p => ilBuilder.DeclareLocal(p.ParameterType));
+                var itemLocal = ilBuilder.DeclareLocal(enumerableInfo.ItemType);
                 var moveNextAwaiterLocal = moveNextAwaiterField.FieldType == isCompleteAwaiterLocal.LocalType
                     ? isCompleteAwaiterLocal
                     : ilBuilder.DeclareLocal(moveNextAwaiterField.FieldType);
@@ -106,15 +139,18 @@ partial class RunnableEmitter
                         ? isCompleteAwaitableLocal
                         : ilBuilder.DeclareLocal(enumerableInfo.MoveNextAsyncMethod.ReturnType))
                     : null;
+                var caughtObjectLocal = disposeAsyncMethod is null
+                    ? null
+                    : ilBuilder.DeclareLocal(typeof(object));
                 LocalBuilder? disposeAwaiterLocal = null;
                 LocalBuilder? disposeAwaitableLocal = null;
-                if (enumerableInfo.DisposeAsyncMethod is not null)
+                if (disposeAsyncMethod is not null)
                 {
                     // Same awaiter-then-awaitable order as the GetIsComplete pattern (Roslyn always emits
                     // the awaiter local first for synthetic awaits).
                     disposeAwaiterLocal = ilBuilder.DeclareLocal(disposeAwaiterField!.FieldType);
-                    disposeAwaitableLocal = enumerableInfo.DisposeAsyncMethod.ReturnType.IsValueType
-                        ? ilBuilder.DeclareLocal(enumerableInfo.DisposeAsyncMethod.ReturnType)
+                    disposeAwaitableLocal = disposeAsyncMethod.ReturnType.IsValueType
+                        ? ilBuilder.DeclareLocal(disposeAsyncMethod.ReturnType)
                         : null;
                 }
                 var invokeCountLocal = ilBuilder.DeclareLocal(typeof(long));
@@ -125,9 +161,18 @@ partial class RunnableEmitter
                 var startClockLabel = ilBuilder.DefineLabel();
                 var callBenchmarkLabel = ilBuilder.DefineLabel();
                 var callBenchmarkLoopLabel = ilBuilder.DefineLabel();
+                var loopBodyLabel = ilBuilder.DefineLabel();
                 var moveNextLoopLabel = ilBuilder.DefineLabel();
                 var moveNextContinuationLabel = ilBuilder.DefineLabel();
                 var moveNextGetResultLabel = ilBuilder.DefineLabel();
+                // The following labels only matter when DisposeAsync exists — they're the await-foreach
+                // try/finally lowering's skeleton (state-1 lands at `state1TargetLabel` which is the nop
+                // right before the inner try opens; after the inner try-catch, control reaches
+                // `afterInnerTryLabel` and runs the dispose-then-rethrow sequence).
+                var state1TargetLabel = ilBuilder.DefineLabel();
+                var afterInnerTryLabel = ilBuilder.DefineLabel();
+                var skipRethrowLabel = ilBuilder.DefineLabel();
+                var rethrowDispatchLabel = ilBuilder.DefineLabel();
                 var startDisposeLabel = ilBuilder.DefineLabel();
                 var disposeContinuationLabel = ilBuilder.DefineLabel();
                 var disposeGetResultLabel = ilBuilder.DefineLabel();
@@ -138,7 +183,7 @@ partial class RunnableEmitter
                 // largest dispatch state (3 when DisposeAsync exists, 2 otherwise) — Roslyn's switch
                 // emit pre-pushes it as part of bounds-check elimination scaffolding.
                 ilBuilder.EmitLdloc(stateLocal);
-                ilBuilder.EmitLdc_I4(enumerableInfo.DisposeAsyncMethod is null ? 2 : 3);
+                ilBuilder.EmitLdc_I4(disposeAsyncMethod is null ? 2 : 3);
                 ilBuilder.Emit(OpCodes.Pop);
                 ilBuilder.Emit(OpCodes.Pop);
                 ilBuilder.Emit(OpCodes.Nop);
@@ -150,9 +195,15 @@ partial class RunnableEmitter
                     // array is [state-0 → ..., state-1 → ..., state-2 → ..., state-3 → ...]; everything
                     // outside the range falls through to the first-time path.
                     ilBuilder.EmitLdloc(stateLocal);
-                    ilBuilder.Emit(OpCodes.Switch, enumerableInfo.DisposeAsyncMethod is null
+                    // When DisposeAsync exists Roslyn wraps the iteration in a nested try whose body
+                    // contains the MoveNext resume point — but CIL forbids branching into a protected
+                    // region from outside it, so state-1 targets a `nop` just *before* the inner try and
+                    // falls through into it; a redispatch inside the try then jumps to the actual
+                    // moveNextContinuation. Without DisposeAsync there is no nested try and state-1
+                    // targets the moveNext continuation directly.
+                    ilBuilder.Emit(OpCodes.Switch, disposeAsyncMethod is null
                         ? [getIsCompleteContinuationLabel, moveNextContinuationLabel, setResultContinuationLabel]
-                        : [getIsCompleteContinuationLabel, moveNextContinuationLabel, disposeContinuationLabel, setResultContinuationLabel]);
+                        : [getIsCompleteContinuationLabel, state1TargetLabel, disposeContinuationLabel, setResultContinuationLabel]);
 
                     EmitGetIsCompleteAwait(StateGetIsComplete);
 
@@ -166,11 +217,8 @@ partial class RunnableEmitter
                     ilBuilder.MaybeEmitSetLocalToDefault(returnDefaultLocal);
                     ilBuilder.Emit(OpCodes.Leave, endTryLabel);
 
-                    // ===== while(true) { startClock → benchmark loop → DCE → SetResultAndGetIsComplete } =====
+                    // ===== while(true) { startClock → benchmark loop → SetResultAndGetIsComplete } =====
                     ilBuilder.MarkLabel(startClockLabel);
-                    // lastItem = default; — reset accumulator per measurement
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.EmitSetFieldToDefault(lastItemField);
                     // startedClock = ClockExtensions.Start(clock);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.EmitLdloc(thisLocal!);
@@ -180,12 +228,12 @@ partial class RunnableEmitter
                     ilBuilder.Emit(OpCodes.Stfld, startedClockField);
                     ilBuilder.Emit(OpCodes.Br, callBenchmarkLoopLabel);
 
-                    // ===== Benchmark call: get enumerable, get enumerator, foreach loop, dispose =====
-                    // Note: there is intentionally no nested CIL try/catch around the foreach. In CIL you can't
-                    // branch into a protected region from outside, and the state-1 (MoveNextAsync) resume needs
-                    // to land in the foreach loop body which would be inside such a region. If the foreach
-                    // throws, the outer SetException catch surfaces it as a benchmark failure (DisposeAsync
-                    // doesn't run in that case — acceptable trade-off given the benchmark process exits anyway).
+                    // ===== Benchmark call: get enumerable, get enumerator, await foreach, dispose =====
+                    // When DisposeAsync exists Roslyn lowers the `await foreach` into a nested try/catch
+                    // (the catch captures into <>7__wrap3) followed by a dispose-then-rethrow sequence;
+                    // we mirror that exactly so the state-machine layout matches the template's IL.
+                    // Without DisposeAsync there is no nested protected region and the iteration lives
+                    // directly in the outer try.
                     ilBuilder.MarkLabel(callBenchmarkLabel);
 
                     // enumerable = workload(args); enumerator = enumerable.GetAsyncEnumerator(...);
@@ -198,28 +246,62 @@ partial class RunnableEmitter
                     ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
                     ilBuilder.EmitStloc(enumerableLocal);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
-                    if (enumerableInfo.WorkloadReturnType.IsValueType)
+                    if (Descriptor.WorkloadMethod.ReturnType.IsValueType)
                         ilBuilder.EmitLdloca(enumerableLocal);
                     else
                         ilBuilder.EmitLdloc(enumerableLocal);
                     EmitGetAsyncEnumeratorCall();
                     ilBuilder.Emit(OpCodes.Stfld, enumeratorField);
 
-                    // "Goto check first" pattern Roslyn uses for `while (await MoveNextAsync()) { body }`:
-                    // skip the body on first entry, run the MoveNextAsync check, and only enter the body
-                    // when GetResult returns true. Conventional do-while-style structure (check at the
-                    // bottom) would emit a different sequence of instructions and throw off the
-                    // EmitsSameIL diff.
-                    var loopBodyLabel = ilBuilder.DefineLabel();
-                    ilBuilder.Emit(OpCodes.Br, moveNextLoopLabel);
+                    if (disposeAsyncMethod is not null)
+                    {
+                        // <>7__wrap3 = null; <>7__wrap4 = 0; — Roslyn initializes both before opening the
+                        // inner try. <>7__wrap3 holds any exception caught by the try; <>7__wrap4 is the
+                        // try/finally state discriminator that Roslyn emits but never actually reads back
+                        // for this lowering shape (kept for IL-equivalence).
+                        ilBuilder.Emit(OpCodes.Ldarg_0);
+                        ilBuilder.Emit(OpCodes.Ldnull);
+                        ilBuilder.Emit(OpCodes.Stfld, capturedExceptionField!);
+                        ilBuilder.Emit(OpCodes.Ldarg_0);
+                        ilBuilder.Emit(OpCodes.Ldc_I4_0);
+                        ilBuilder.Emit(OpCodes.Stfld, disposeDiscriminatorField!);
 
-                    // --- Loop body: lastItem = enumerator.Current; ---
+                        // state-1 jumps to this label (just before the inner try opens), then control
+                        // falls through into the try at its first instruction.
+                        ilBuilder.MarkLabel(state1TargetLabel);
+                        ilBuilder.Emit(OpCodes.Nop);
+
+                        ilBuilder.BeginExceptionBlock();
+                        // Re-dispatch state-1 inside the inner protected region — CIL forbids branching
+                        // into the try from outside, so the outer switch lands at the nop above and we
+                        // jump to moveNextContinuationLabel here once execution is safely inside the try.
+                        ilBuilder.EmitLdloc(stateLocal);
+                        ilBuilder.EmitLdc_I4(StateMoveNextAsync);
+                        ilBuilder.Emit(OpCodes.Beq_S, moveNextContinuationLabel);
+                        ilBuilder.Emit(OpCodes.Br_S, moveNextLoopLabel);
+                    }
+                    else
+                    {
+                        // "Goto check first" pattern Roslyn uses for `while (await MoveNextAsync()) { body }`:
+                        // skip the body on first entry, run the MoveNextAsync check, and only enter the
+                        // body when GetResult returns true.
+                        ilBuilder.Emit(OpCodes.Br, moveNextLoopLabel);
+                    }
+
+                    // --- Loop body: var item = enumerator.Current; DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in item); ---
                     ilBuilder.MarkLabel(loopBodyLabel);
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     EmitLoadEnumeratorForCall(enumeratorField);
                     EmitInvokeEnumeratorMethod(enumerableInfo.CurrentProperty.GetMethod!);
-                    ilBuilder.Emit(OpCodes.Stfld, lastItemField);
+                    ilBuilder.EmitStloc(itemLocal);
+                    ilBuilder.EmitLdloca(itemLocal);
+                    var keepAliveInMethod = typeof(DeadCodeEliminationHelper)
+                        .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                        .First(m => m.Name == nameof(DeadCodeEliminationHelper.KeepAliveWithoutBoxing)
+                            && m.GetParameters().Length == 1
+                            && m.GetParameters()[0].ParameterType.IsByRef)
+                        .MakeGenericMethod(enumerableInfo.ItemType);
+                    ilBuilder.Emit(OpCodes.Call, keepAliveInMethod);
 
                     ilBuilder.MarkLabel(moveNextLoopLabel);
                     // moveNextAwaitable = enumerator.MoveNextAsync();
@@ -228,17 +310,17 @@ partial class RunnableEmitter
                     EmitInvokeEnumeratorMethod(enumerableInfo.MoveNextAsyncMethod);
                     if (moveNextAwaitableLocal is null)
                     {
-                        ilBuilder.Emit(OpCodes.Callvirt, enumerableInfo.MoveNextAwaitableType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
+                        ilBuilder.Emit(OpCodes.Callvirt, enumerableInfo.MoveNextAwaitable.GetAwaiterMethod);
                     }
                     else
                     {
                         ilBuilder.EmitStloc(moveNextAwaitableLocal);
                         ilBuilder.EmitLdloca(moveNextAwaitableLocal);
-                        ilBuilder.Emit(OpCodes.Call, enumerableInfo.MoveNextAwaitableType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
+                        ilBuilder.Emit(OpCodes.Call, enumerableInfo.MoveNextAwaitable.GetAwaiterMethod);
                     }
                     ilBuilder.EmitStloc(moveNextAwaiterLocal);
                     EmitLoadAwaiterAddressOrValue(moveNextAwaiterLocal);
-                    ilBuilder.Emit(OpCodes.Call, moveNextAwaiterField.FieldType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
+                    ilBuilder.Emit(OpCodes.Call, enumerableInfo.MoveNextAwaitable.IsCompletedProperty.GetMethod!);
                     ilBuilder.Emit(OpCodes.Brtrue, moveNextGetResultLabel);
                     // state = 1; <>u__moveNext = awaiter; AwaitUnsafeOnCompleted(...); leave;
                     ilBuilder.Emit(OpCodes.Ldarg_0);
@@ -269,35 +351,62 @@ partial class RunnableEmitter
                     ilBuilder.EmitStloc(stateLocal);
                     ilBuilder.Emit(OpCodes.Stfld, stateField);
 
-                    // --- GetResult --- if true, loop body again; else fall through to dispose.
+                    // --- GetResult --- if true, loop body again; else fall through.
                     ilBuilder.MarkLabel(moveNextGetResultLabel);
                     EmitLoadAwaiterAddressOrValue(moveNextAwaiterLocal);
-                    ilBuilder.Emit(OpCodes.Call, moveNextAwaiterField.FieldType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null)!);
+                    ilBuilder.Emit(OpCodes.Call, enumerableInfo.MoveNextAwaitable.GetResultMethod);
                     ilBuilder.Emit(OpCodes.Brtrue, loopBodyLabel);
 
-                    // ====== Inline finally: DisposeAsync (if applicable) ======
-                    ilBuilder.MarkLabel(startDisposeLabel);
-                    if (enumerableInfo.DisposeAsyncMethod is not null)
+                    if (disposeAsyncMethod is not null)
                     {
+                        // catch (object) { <>7__wrap3 = caught; } — Roslyn's await-foreach lowering uses
+                        // `catch (object)` (not `catch (Exception)`) so non-Exception throwables are also
+                        // captured and rethrown after dispose. ILGenerator synthesizes `leave` instructions
+                        // at the end of the try body (when transitioning to BeginCatchBlock) and at the end
+                        // of the catch body (when EndExceptionBlock runs); both target the end-of-block
+                        // marker which we re-mark as `afterInnerTryLabel` below.
+                        ilBuilder.BeginCatchBlock(typeof(object));
+                        ilBuilder.EmitStloc(caughtObjectLocal!);
+                        ilBuilder.Emit(OpCodes.Ldarg_0);
+                        ilBuilder.EmitLdloc(caughtObjectLocal!);
+                        ilBuilder.Emit(OpCodes.Stfld, capturedExceptionField!);
+                        ilBuilder.EndExceptionBlock();
+
+                        // ====== After-foreach: optional await DisposeAsync, then rethrow if captured ======
+                        ilBuilder.MarkLabel(afterInnerTryLabel);
+
+                        // For REFERENCE-type enumerators (typically IAsyncEnumerator<T>): if the enumerator
+                        // field is null we skip the dispose await entirely. Roslyn emits this `ldfld;
+                        // brfalse` guard only for reference enumerators — a value-type Enumerator (struct)
+                        // can never be null, and `ldfld; brfalse` on a multi-word struct is meaningless,
+                        // so the value-type path goes straight to DisposeAsync.
+                        ilBuilder.MarkLabel(startDisposeLabel);
+                        if (!enumerableInfo.EnumeratorType.IsValueType)
+                        {
+                            ilBuilder.Emit(OpCodes.Ldarg_0);
+                            ilBuilder.Emit(OpCodes.Ldfld, enumeratorField);
+                            ilBuilder.Emit(OpCodes.Brfalse_S, skipRethrowLabel);
+                        }
+
                         // disposeAwaitable = enumerator.DisposeAsync();
                         ilBuilder.Emit(OpCodes.Ldarg_0);
                         EmitLoadEnumeratorForCall(enumeratorField);
-                        EmitInvokeEnumeratorMethod(enumerableInfo.DisposeAsyncMethod);
+                        EmitInvokeEnumeratorMethod(disposeAsyncMethod);
                         if (disposeAwaitableLocal is null)
                         {
-                            ilBuilder.Emit(OpCodes.Callvirt, enumerableInfo.DisposeAwaitableType!.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
+                            ilBuilder.Emit(OpCodes.Callvirt, disposeAwaitableInfo!.GetAwaiterMethod);
                         }
                         else
                         {
                             ilBuilder.EmitStloc(disposeAwaitableLocal);
                             ilBuilder.EmitLdloca(disposeAwaitableLocal);
-                            ilBuilder.Emit(OpCodes.Call, enumerableInfo.DisposeAwaitableType!.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
+                            ilBuilder.Emit(OpCodes.Call, disposeAwaitableInfo!.GetAwaiterMethod);
                         }
                         ilBuilder.EmitStloc(disposeAwaiterLocal!);
                         EmitLoadAwaiterAddressOrValue(disposeAwaiterLocal!);
-                        ilBuilder.Emit(OpCodes.Call, disposeAwaiterField!.FieldType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
+                        ilBuilder.Emit(OpCodes.Call, disposeAwaitableInfo!.IsCompletedProperty.GetMethod!);
                         ilBuilder.Emit(OpCodes.Brtrue, disposeGetResultLabel);
-                        // state = 3; <>u__dispose = awaiter; AwaitUnsafeOnCompleted; leave
+                        // state = 2; <>u__dispose = awaiter; AwaitUnsafeOnCompleted; leave
                         ilBuilder.Emit(OpCodes.Ldarg_0);
                         ilBuilder.EmitLdc_I4(StateDisposeAsync);
                         ilBuilder.Emit(OpCodes.Dup);
@@ -305,15 +414,15 @@ partial class RunnableEmitter
                         ilBuilder.Emit(OpCodes.Stfld, stateField);
                         ilBuilder.Emit(OpCodes.Ldarg_0);
                         ilBuilder.EmitLdloc(disposeAwaiterLocal!);
-                        ilBuilder.Emit(OpCodes.Stfld, disposeAwaiterField);
+                        ilBuilder.Emit(OpCodes.Stfld, disposeAwaiterField!);
                         ilBuilder.Emit(OpCodes.Ldarg_0);
                         ilBuilder.Emit(OpCodes.Ldflda, builderField);
                         ilBuilder.EmitLdloca(disposeAwaiterLocal!);
                         ilBuilder.Emit(OpCodes.Ldarg_0);
-                        ilBuilder.Emit(OpCodes.Call, GetAwaitOnCompletedMethod(asyncMethodBuilderType, disposeAwaiterField.FieldType, asyncStateMachineTypeBuilder));
+                        ilBuilder.Emit(OpCodes.Call, GetAwaitOnCompletedMethod(asyncMethodBuilderType, disposeAwaiterField!.FieldType, asyncStateMachineTypeBuilder));
                         ilBuilder.Emit(OpCodes.Leave, returnLabel);
 
-                        // --- Resume from state 3 ---
+                        // --- Resume from state 2 ---
                         ilBuilder.MarkLabel(disposeContinuationLabel);
                         ilBuilder.Emit(OpCodes.Ldarg_0);
                         ilBuilder.Emit(OpCodes.Ldfld, disposeAwaiterField);
@@ -328,10 +437,36 @@ partial class RunnableEmitter
 
                         ilBuilder.MarkLabel(disposeGetResultLabel);
                         EmitLoadAwaiterAddressOrValue(disposeAwaiterLocal!);
-                        ilBuilder.Emit(OpCodes.Call, disposeAwaiterField.FieldType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null)!);
+                        ilBuilder.Emit(OpCodes.Call, disposeAwaitableInfo!.GetResultMethod);
+
+                        // Rethrow path: if <>7__wrap3 holds a captured exception, rethrow it (via
+                        // ExceptionDispatchInfo when it's a real Exception, raw `throw` otherwise so
+                        // non-Exception payloads keep their original semantics).
+                        ilBuilder.MarkLabel(skipRethrowLabel);
+                        ilBuilder.Emit(OpCodes.Ldarg_0);
+                        ilBuilder.Emit(OpCodes.Ldfld, capturedExceptionField!);
+                        ilBuilder.EmitStloc(caughtObjectLocal!);
+                        ilBuilder.EmitLdloc(caughtObjectLocal!);
+                        var afterRethrowLabel = ilBuilder.DefineLabel();
+                        ilBuilder.Emit(OpCodes.Brfalse_S, afterRethrowLabel);
+                        ilBuilder.EmitLdloc(caughtObjectLocal!);
+                        ilBuilder.Emit(OpCodes.Isinst, typeof(Exception));
+                        ilBuilder.Emit(OpCodes.Dup);
+                        ilBuilder.Emit(OpCodes.Brtrue_S, rethrowDispatchLabel);
+                        ilBuilder.EmitLdloc(caughtObjectLocal!);
+                        ilBuilder.Emit(OpCodes.Throw);
+                        ilBuilder.MarkLabel(rethrowDispatchLabel);
+                        ilBuilder.Emit(OpCodes.Call, typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod(nameof(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture))!);
+                        ilBuilder.Emit(OpCodes.Callvirt, typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod(nameof(System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw), Type.EmptyTypes)!);
+                        ilBuilder.MarkLabel(afterRethrowLabel);
+
+                        // <>7__wrap3 = null; — clear the captured-exception field for the next iteration.
+                        ilBuilder.Emit(OpCodes.Ldarg_0);
+                        ilBuilder.Emit(OpCodes.Ldnull);
+                        ilBuilder.Emit(OpCodes.Stfld, capturedExceptionField!);
                     }
 
-                    // Reset enumerator field so next iteration starts fresh
+                    // Reset enumerator field so next iteration starts fresh.
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.EmitSetFieldToDefault(enumeratorField);
 
@@ -353,26 +488,9 @@ partial class RunnableEmitter
                     ilBuilder.Emit(OpCodes.Conv_I8);
                     ilBuilder.Emit(OpCodes.Bge, callBenchmarkLabel);
 
-                    // Match the template's source order: compute `elapsed` first, then DCE keep-alive on
-                    // `lastItem`, then await SetResult(elapsed). Forcing `elapsed` through a local is what
-                    // Roslyn does too — the DCE call between the elapsed read and the await prevents the
-                    // C# compiler from keeping the ClockSpan on the stack.
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.Emit(OpCodes.Ldflda, startedClockField);
-                    ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
-                    ilBuilder.EmitStloc(elapsedLocal);
-
-                    // DCE keep-alive on the accumulated lastItem after the inner loop ends.
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.Emit(OpCodes.Ldfld, lastItemField);
-                    var keepAliveMethod = typeof(DeadCodeEliminationHelper)
-                        .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                        .First(m => m.Name == nameof(DeadCodeEliminationHelper.KeepAliveWithoutBoxing)
-                            && m.GetParameters().Length == 1
-                            && !m.GetParameters()[0].ParameterType.IsByRef)
-                        .MakeGenericMethod(itemType);
-                    ilBuilder.Emit(OpCodes.Call, keepAliveMethod);
-
+                    // The template inlines `startedClock.GetElapsed()` directly into SetResult — no
+                    // intermediate ClockSpan local. EmitSetResultAndGetIsCompleteAwait emits the GetElapsed
+                    // call as part of the SetResult argument sequence.
                     EmitSetResultAndGetIsCompleteAwait(StateSetResult);
 
                     ilBuilder.MarkLabel(setResultContinuationLabel);
@@ -440,11 +558,14 @@ partial class RunnableEmitter
 
                 void EmitSetResultAndGetIsCompleteAwait(int state)
                 {
-                    // elapsed is now in the elapsed local (computed before the DCE call).
+                    // Inline `startedClock.GetElapsed()` as the SetResult argument — the template no longer
+                    // declares a ClockSpan elapsed local, so neither do we.
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
                     ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
-                    ilBuilder.EmitLdloc(elapsedLocal);
+                    ilBuilder.Emit(OpCodes.Ldarg_0);
+                    ilBuilder.Emit(OpCodes.Ldflda, startedClockField);
+                    ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetResultAndGetIsComplete), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.EmitStloc(isCompleteAwaitableLocal);
                     ilBuilder.EmitLdloca(isCompleteAwaitableLocal);
@@ -486,7 +607,7 @@ partial class RunnableEmitter
                 void EmitGetAsyncEnumeratorCall()
                 {
                     EmitDefaultArgsForOptionalParameters(enumerableInfo.GetAsyncEnumeratorMethod);
-                    var opCode = enumerableInfo.IsInterfaceDispatch || !enumerableInfo.WorkloadReturnType.IsValueType
+                    var opCode = enumerableInfo.IsInterfaceDispatch || !Descriptor.WorkloadMethod.ReturnType.IsValueType
                         ? OpCodes.Callvirt
                         : OpCodes.Call;
                     ilBuilder.Emit(opCode, enumerableInfo.GetAsyncEnumeratorMethod);
@@ -539,111 +660,6 @@ partial class RunnableEmitter
                         ilBuilder.EmitLdloc(awaiterLocal);
                 }
             }
-        }
-
-        // -----------------------------------------------------------------------------------------
-        // Resolution: figure out which methods/types the await foreach pattern binds to for the
-        // workload's return type. Mirrors the C# compiler's resolution rules — pattern first, then
-        // interface fallback.
-        // -----------------------------------------------------------------------------------------
-
-        private sealed record EnumerableInfo(
-            Type WorkloadReturnType,
-            Type EnumeratorType,
-            Type ItemType,
-            MethodInfo GetAsyncEnumeratorMethod,
-            MethodInfo MoveNextAsyncMethod,
-            Type MoveNextAwaitableType,
-            Type MoveNextAwaiterType,
-            PropertyInfo CurrentProperty,
-            MethodInfo? DisposeAsyncMethod,
-            Type? DisposeAwaitableType,
-            Type? DisposeAwaiterType,
-            bool IsInterfaceDispatch);
-
-        private static EnumerableInfo ResolveEnumerableInfo(Type workloadReturnType)
-        {
-            // Pattern first: a public instance GetAsyncEnumerator with all-optional parameters.
-            var patternGetAsyncEnumerator = workloadReturnType
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerable<>.GetAsyncEnumerator)
-                    && m.GetParameters().All(p => p.IsOptional));
-            MethodInfo getAsyncEnumeratorMethod;
-            bool isInterfaceDispatch;
-            if (patternGetAsyncEnumerator != null)
-            {
-                getAsyncEnumeratorMethod = patternGetAsyncEnumerator;
-                isInterfaceDispatch = false;
-            }
-            else
-            {
-                Type? iface = null;
-                if (workloadReturnType.IsGenericType && workloadReturnType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-                {
-                    iface = workloadReturnType;
-                }
-                else
-                {
-                    foreach (var i in workloadReturnType.GetInterfaces())
-                    {
-                        if (i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-                        {
-                            iface = i;
-                            break;
-                        }
-                    }
-                }
-                if (iface is null)
-                {
-                    throw new NotSupportedException($"Type {workloadReturnType.GetDisplayName()} is not an async enumerable.");
-                }
-                getAsyncEnumeratorMethod = iface.GetMethod(nameof(IAsyncEnumerable<>.GetAsyncEnumerator))!;
-                isInterfaceDispatch = true;
-            }
-
-            var enumeratorType = getAsyncEnumeratorMethod.ReturnType;
-            var moveNextAsyncMethod = enumeratorType
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerator<>.MoveNextAsync) && m.GetParameters().All(p => p.IsOptional))
-                ?? throw new NotSupportedException($"Enumerator type {enumeratorType.GetDisplayName()} does not expose MoveNextAsync.");
-            var moveNextAwaitableType = moveNextAsyncMethod.ReturnType;
-            var moveNextAwaiterType = moveNextAwaitableType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!.ReturnType;
-
-            var currentProperty = enumeratorType.GetProperty(nameof(IAsyncEnumerator<>.Current), BindingFlags.Public | BindingFlags.Instance)
-                ?? throw new NotSupportedException($"Enumerator type {enumeratorType.GetDisplayName()} does not expose Current.");
-            var itemType = currentProperty.PropertyType;
-
-            // DisposeAsync is optional for the await-foreach pattern. Roslyn matches a public instance
-            // method named DisposeAsync whose parameters are all optional and whose awaiter's GetResult
-            // returns void; otherwise it falls back to the IAsyncDisposable interface dispatch.
-            MethodInfo? disposeAsyncMethod = enumeratorType
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == nameof(IAsyncDisposable.DisposeAsync)
-                    && m.GetParameters().All(p => p.IsOptional)
-                    && m.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
-                        ?.ReturnType
-                        .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
-                        ?.ReturnType == typeof(void));
-            if (disposeAsyncMethod is null && typeof(IAsyncDisposable).IsAssignableFrom(enumeratorType))
-            {
-                disposeAsyncMethod = typeof(IAsyncDisposable).GetMethod(nameof(IAsyncDisposable.DisposeAsync));
-            }
-            Type? disposeAwaitableType = disposeAsyncMethod?.ReturnType;
-            Type? disposeAwaiterType = disposeAwaitableType?.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!.ReturnType;
-
-            return new EnumerableInfo(
-                workloadReturnType,
-                enumeratorType,
-                itemType,
-                getAsyncEnumeratorMethod,
-                moveNextAsyncMethod,
-                moveNextAwaitableType,
-                moveNextAwaiterType,
-                currentProperty,
-                disposeAsyncMethod,
-                disposeAwaitableType,
-                disposeAwaiterType,
-                isInterfaceDispatch);
         }
     }
 }

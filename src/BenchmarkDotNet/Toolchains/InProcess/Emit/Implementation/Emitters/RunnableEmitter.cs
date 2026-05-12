@@ -72,10 +72,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             {
                 var returnType = benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType;
                 RunnableEmitter runnableEmitter;
-                if (returnType.IsAwaitable())
-                    runnableEmitter = new AsyncCoreEmitter(buildPartition, moduleBuilder, benchmark);
-                else if (returnType.IsAsyncEnumerable(out _, out _, out _))
-                    runnableEmitter = new AsyncEnumerableCoreEmitter(buildPartition, moduleBuilder, benchmark);
+                if (returnType.IsAwaitable(out var awaitableInfo))
+                    runnableEmitter = new AsyncCoreEmitter(buildPartition, moduleBuilder, benchmark, awaitableInfo);
+                else if (returnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
+                    runnableEmitter = new AsyncEnumerableCoreEmitter(buildPartition, moduleBuilder, benchmark, asyncEnumerableInfo);
                 else
                     runnableEmitter = new SyncCoreEmitter(buildPartition, moduleBuilder, benchmark);
                 runnableEmitter.EmitRunnableCore();

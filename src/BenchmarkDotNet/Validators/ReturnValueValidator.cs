@@ -31,27 +31,27 @@ namespace BenchmarkDotNet.Validators
                         InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark, cancellationToken);
                         var workloadMethod = benchmark.Descriptor.WorkloadMethod;
                         var result = workloadMethod.Invoke(benchmarkTypeInstance, null);
-                        if (workloadMethod.ReturnType.IsAwaitable())
+                        if (workloadMethod.ReturnType.IsAwaitable(out var awaitableInfo))
                         {
                             if (result is null)
                             {
                                 errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Awaitable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
                                 continue;
                             }
-                            (var hasResult, result) = await DynamicAwaitHelper.AwaitResult(result, workloadMethod.ReturnType).ConfigureAwait(true);
+                            (var hasResult, result) = await DynamicAwaitHelper.AwaitResult(result, awaitableInfo).ConfigureAwait(true);
                             if (hasResult)
                             {
                                 results.Add((benchmark, result!));
                             }
                         }
-                        else if (workloadMethod.ReturnType.IsAsyncEnumerable(out _, out _, out _))
+                        else if (workloadMethod.ReturnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
                         {
                             if (result is null)
                             {
                                 errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Async enumerable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
                                 continue;
                             }
-                            result = await DynamicAwaitHelper.ToListAsync(result, workloadMethod.ReturnType).ConfigureAwait(true);
+                            result = await DynamicAwaitHelper.ToListAsync(result, asyncEnumerableInfo).ConfigureAwait(true);
                             results.Add((benchmark, result));
                         }
                         else if (workloadMethod.ReturnType != typeof(void))

@@ -37,10 +37,10 @@ public class AwaitableAsyncEnumerableAmbiguityValidator : IValidator
             if (!method.GetCustomAttributes(false).OfType<T>().Any())
                 continue;
 
-            if (!method.ReturnType.IsAsyncEnumerable(out _, out _, out _))
+            if (!method.ReturnType.IsAsyncEnumerable(out _))
                 continue;
 
-            if (!method.ReturnType.IsAwaitable())
+            if (!method.ReturnType.IsAwaitable(out _))
                 continue;
 
             validationErrors.Add(new ValidationError(

@@ -113,14 +113,14 @@ namespace BenchmarkDotNet.Code
         {
             var method = benchmark.Descriptor.WorkloadMethod;
 
-            if (method.ReturnType.IsAwaitable())
+            if (method.ReturnType.IsAwaitable(out var awaitableInfo))
             {
-                return new AsyncDeclarationsProvider(benchmark);
+                return new AsyncDeclarationsProvider(benchmark, awaitableInfo.ResultType);
             }
 
-            if (method.ReturnType.IsAsyncEnumerable(out var itemType, out var enumeratorType, out var moveNextAwaitableType))
+            if (method.ReturnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
             {
-                return new AsyncEnumerableDeclarationsProvider(benchmark, itemType, enumeratorType, moveNextAwaitableType);
+                return new AsyncEnumerableDeclarationsProvider(benchmark, asyncEnumerableInfo.ItemType, asyncEnumerableInfo.MoveNextAsyncMethod.ReturnType);
             }
 
             if (method.ReturnType == typeof(void) && method.HasAttribute<AsyncStateMachineAttribute>())

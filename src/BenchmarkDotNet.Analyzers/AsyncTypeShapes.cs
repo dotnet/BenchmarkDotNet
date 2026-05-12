@@ -25,11 +25,15 @@ internal static class AsyncTypeShapes
             return true;
         }
 
-        if (TryFindPatternGetAsyncEnumerator(type) is { } enumeratorType
-            && HasPatternMoveNextAsync(enumeratorType)
-            && HasPublicInstanceProperty(enumeratorType, "Current"))
+        if (TryFindPatternGetAsyncEnumerator(type) is { } enumeratorType)
         {
-            return true;
+            // Roslyn commits to a found pattern `GetAsyncEnumerator` — if its return type doesn't
+            // satisfy the await-foreach enumerator shape it reports an error instead of falling back
+            // to `IAsyncEnumerable<T>`, even when the source also implements the interface. We mirror
+            // that here so the analyzer's view of binding matches what `await foreach` would actually
+            // accept.
+            return HasPatternMoveNextAsync(enumeratorType)
+                && HasPublicInstanceProperty(enumeratorType, "Current");
         }
 
         if (asyncEnumerableInterfaceSymbol != null)

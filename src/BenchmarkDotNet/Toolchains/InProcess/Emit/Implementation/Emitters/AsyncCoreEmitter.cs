@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 partial class RunnableEmitter
 {
     // TODO: update this to support runtime-async.
-    private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : AsyncCoreEmitterBase(buildPartition, moduleBuilder, benchmark)
+    private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark, AwaitableInfo awaitableInfo) : AsyncCoreEmitterBase(buildPartition, moduleBuilder, benchmark)
     {
         protected override void EmitWorkloadCore()
         {
@@ -32,9 +33,7 @@ partial class RunnableEmitter
             );
             var benchmarkAwaiterField = asyncStateMachineTypeBuilder.DefineField(
                 "<>u__2",
-                Descriptor.WorkloadMethod.ReturnType
-                    .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!
-                    .ReturnType,
+                awaitableInfo.AwaiterType,
                 FieldAttributes.Private
             );
             EmitMoveNextImpl();
@@ -46,11 +45,21 @@ partial class RunnableEmitter
 
             void EmitMoveNextImpl()
             {
+                var resultType = awaitableInfo.ResultType;
                 var isCompleteAwaiterLocal = ilBuilder.DeclareLocal(typeof(ValueTaskAwaiter<bool>));
                 var isCompleteAwaitableLocal = ilBuilder.DeclareLocal(typeof(ValueTask<bool>));
+                // The value-type awaitable spill local (Roslyn declares one for ValueTask<T> et al. so it
+                // can take its address for GetAwaiter — reference-type awaitables stay on the stack).
                 var benchmarkAwaitableLocal = Descriptor.WorkloadMethod.ReturnType.IsValueType
                     ? ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType)
                     : null;
+                // Source local for `T result = await awaitable;` — declared only when the awaiter's
+                // GetResult returns non-void, in which case the template captures the value and pipes
+                // it through DeadCodeEliminationHelper so the JIT can't elide the producer's work.
+                // Roslyn places this AFTER the (optional) awaitable spill and BEFORE the awaiter temp.
+                var resultLocal = resultType == typeof(void)
+                    ? null
+                    : ilBuilder.DeclareLocal(resultType);
                 var benchmarkAwaiterLocal = ilBuilder.DeclareLocal(benchmarkAwaiterField.FieldType);
                 var invokeCountLocal = ilBuilder.DeclareLocal(typeof(long));
                 var exceptionLocal = ilBuilder.DeclareLocal(typeof(Exception));
@@ -162,18 +171,18 @@ partial class RunnableEmitter
                     ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
                     if (benchmarkAwaitableLocal == null)
                     {
-                        ilBuilder.Emit(OpCodes.Callvirt, Descriptor.WorkloadMethod.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
+                        ilBuilder.Emit(OpCodes.Callvirt, awaitableInfo.GetAwaiterMethod);
                     }
                     else
                     {
                         ilBuilder.EmitStloc(benchmarkAwaitableLocal);
                         ilBuilder.EmitLdloca(benchmarkAwaitableLocal);
-                        ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!);
+                        ilBuilder.Emit(OpCodes.Call, awaitableInfo.GetAwaiterMethod);
                     }
                     // if (awaiter.IsCompleted) goto benchmarkContinuationGetResultLabel;
                     ilBuilder.EmitStloc(benchmarkAwaiterLocal);
                     ilBuilder.EmitLdloca(benchmarkAwaiterLocal);
-                    ilBuilder.Emit(OpCodes.Call, benchmarkAwaiterField.FieldType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!);
+                    ilBuilder.Emit(OpCodes.Call, awaitableInfo.IsCompletedProperty.GetMethod!);
                     ilBuilder.Emit(OpCodes.Brtrue, benchmarkContinuationGetResultLabel);
                     // state = 1; <>u__2 = awaiter;
                     ilBuilder.Emit(OpCodes.Ldarg_0);
@@ -212,11 +221,21 @@ partial class RunnableEmitter
                     // --- Benchmark GetResult ---
                     ilBuilder.MarkLabel(benchmarkContinuationGetResultLabel);
                     ilBuilder.EmitLdloca(benchmarkAwaiterLocal);
-                    var benchmarkAwaiterGetResultMethod = benchmarkAwaiterField.FieldType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!;
-                    ilBuilder.Emit(OpCodes.Call, benchmarkAwaiterGetResultMethod);
-                    if (benchmarkAwaiterGetResultMethod.ReturnType != typeof(void))
+                    ilBuilder.Emit(OpCodes.Call, awaitableInfo.GetResultMethod);
+                    if (resultLocal is not null)
                     {
-                        ilBuilder.Emit(OpCodes.Pop);
+                        // Mirror the template's `T result = await awaitable; KeepAliveWithoutBoxing(in result);`:
+                        // store the GetResult value into a local and pass it to the non-inlined sink so the
+                        // JIT can't elide whatever produced it.
+                        ilBuilder.EmitStloc(resultLocal);
+                        ilBuilder.EmitLdloca(resultLocal);
+                        var keepAliveInMethod = typeof(DeadCodeEliminationHelper)
+                            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                            .First(m => m.Name == nameof(DeadCodeEliminationHelper.KeepAliveWithoutBoxing)
+                                && m.GetParameters().Length == 1
+                                && m.GetParameters()[0].ParameterType.IsByRef)
+                            .MakeGenericMethod(resultType);
+                        ilBuilder.Emit(OpCodes.Call, keepAliveInMethod);
                     }
 
                     // --- Benchmark loop: if (--invokeCount >= 0) goto callBenchmarkLabel ---

@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.Engines
             else if (default(T) == null && !typeof(T).IsValueType)
                 Consume((object?)value);
             else
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive and nullable value types
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in value); // non-primitive and nullable value types
         }
     }
 }

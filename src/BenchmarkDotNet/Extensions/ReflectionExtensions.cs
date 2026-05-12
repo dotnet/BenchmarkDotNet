@@ -252,86 +252,102 @@ namespace BenchmarkDotNet.Extensions
             => type.IsByRefLike;
 #endif
 
-        internal static bool IsAwaitable(this Type type)
+        internal static bool IsAwaitable(this Type type, [NotNullWhen(true)] out AwaitableInfo? info)
         {
             // This does not handle await extension.
-            var awaiterType = type
+            var getAwaiterMethod = type
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == nameof(Task.GetAwaiter) && m.GetParameters().Length == 0)
-                ?.ReturnType;
-            if (awaiterType is null)
+                .FirstOrDefault(m => m.Name == nameof(Task.GetAwaiter) && m.GetParameters().Length == 0);
+            if (getAwaiterMethod is null)
             {
+                info = null;
                 return false;
             }
-            if (!awaiterType
+            var awaiterType = getAwaiterMethod.ReturnType;
+            var getResultMethod = awaiterType
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Any(m => m.Name == nameof(TaskAwaiter.GetResult) && m.GetParameters().Length == 0))
+                .FirstOrDefault(m => m.Name == nameof(TaskAwaiter.GetResult) && m.GetParameters().Length == 0);
+            var isCompletedProperty = awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance);
+            if (getResultMethod is null
+                || isCompletedProperty?.PropertyType != typeof(bool)
+                || !awaiterType.GetInterfaces().Any(t => typeof(INotifyCompletion).IsAssignableFrom(t)))
             {
+                info = null;
                 return false;
             }
-            if (awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)?.PropertyType != typeof(bool))
-            {
-                return false;
-            }
-            return awaiterType.GetInterfaces().Any(type => typeof(INotifyCompletion).IsAssignableFrom(type));
+            info = new AwaitableInfo(awaiterType, getAwaiterMethod, getResultMethod, isCompletedProperty, getResultMethod.ReturnType);
+            return true;
         }
 
-        internal static bool IsAsyncEnumerable(this Type type, [NotNullWhen(true)] out Type? itemType, [NotNullWhen(true)] out Type? enumeratorType, [NotNullWhen(true)] out Type? moveNextAwaitableType)
+        internal static bool IsAsyncEnumerable(this Type type, [NotNullWhen(true)] out AsyncEnumerableInfo? info)
         {
-            // 1. If the type IS exactly IAsyncEnumerable<T>, the interface's T is what `await foreach` will see.
-            //    Also short-circuits the case where there is no public pattern method to find anyway
-            //    (the interface declares it but on the type itself it's only accessible via interface dispatch).
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-            {
-                itemType = type.GetGenericArguments()[0];
-                enumeratorType = typeof(IAsyncEnumerator<>).MakeGenericType(itemType);
-                moveNextAwaitableType = typeof(ValueTask<bool>);
-                return true;
-            }
-            // 2. Otherwise mirror the C# `await foreach` resolution: pattern-based lookup wins over the
-            //    interface, so try a public instance GetAsyncEnumerator (with all parameters optional, e.g.
-            //    `CancellationToken` defaulting to default) whose return type has a public instance
-            //    MoveNextAsync awaitable-to-bool (also accepting all-optional params) and a public instance
-            //    Current property. The element type comes from Current so it tracks what the compiler binds
-            //    to, even if the type also explicitly implements IAsyncEnumerable<U> for a different U.
-            //    This does not handle extension GetAsyncEnumerator.
-            var getAsyncEnumeratorMethod = type
+            // 1. Pattern first: a public instance GetAsyncEnumerator with all-optional parameters whose
+            //    return type has a public instance MoveNextAsync awaitable-to-bool (also accepting
+            //    all-optional params) and a public instance Current property. Roslyn's `await foreach`
+            //    binds to this in preference to the interface, so we mirror that order. The element type
+            //    comes from Current so it tracks what the compiler binds to, even if the type also
+            //    implements IAsyncEnumerable<U> for a different U. (Extension GetAsyncEnumerator is not
+            //    handled.)
+            //
+            //    Note: when the type IS exactly IAsyncEnumerable<T>, `GetMethods(Public|Instance)` returns
+            //    the interface's own GetAsyncEnumerator, so this branch also handles that case naturally —
+            //    we just flag it as interface dispatch via the conditional below.
+            var patternGetAsyncEnumerator = type
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerable<>.GetAsyncEnumerator)
                     && m.GetParameters().All(p => p.IsOptional));
-            if (getAsyncEnumeratorMethod is not null)
+            if (patternGetAsyncEnumerator is not null)
             {
-                var patternEnumeratorType = getAsyncEnumeratorMethod.ReturnType;
+                var patternEnumeratorType = patternGetAsyncEnumerator.ReturnType;
                 var moveNextAsyncMethod = patternEnumeratorType
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerator<>.MoveNextAsync) && m.GetParameters().All(p => p.IsOptional));
-                if (moveNextAsyncMethod?.ReturnType.IsAwaitable() == true
-                    && moveNextAsyncMethod.ReturnType
-                        .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!.ReturnType
-                        .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)?.ReturnType == typeof(bool)
-                    && patternEnumeratorType.GetProperty(nameof(IAsyncEnumerator<>.Current), BindingFlags.Public | BindingFlags.Instance)?.GetMethod is { } currentGetter)
+                if (moveNextAsyncMethod?.ReturnType.IsAwaitable(out var moveNextAwaitable) == true
+                    && moveNextAwaitable.ResultType == typeof(bool)
+                    && patternEnumeratorType.GetProperty(nameof(IAsyncEnumerator<>.Current), BindingFlags.Public | BindingFlags.Instance) is { } currentProperty)
                 {
-                    itemType = currentGetter.ReturnType;
-                    enumeratorType = patternEnumeratorType;
-                    moveNextAwaitableType = moveNextAsyncMethod.ReturnType;
+                    info = new AsyncEnumerableInfo(
+                        currentProperty.PropertyType,
+                        patternEnumeratorType,
+                        patternGetAsyncEnumerator,
+                        moveNextAsyncMethod,
+                        moveNextAwaitable,
+                        currentProperty,
+                        IsInterfaceDispatch: type.IsInterface);
                     return true;
                 }
+                // A public pattern `GetAsyncEnumerator` was found but its return type doesn't satisfy
+                // the await-foreach enumerator pattern. Roslyn commits to the pattern method once it's
+                // found and reports an error rather than silently falling back to `IAsyncEnumerable<T>`,
+                // so we reject here as well — even if the source also implements the interface.
+                info = null;
+                return false;
             }
-            // 3. Last fallback: the type only implements IAsyncEnumerable<T> via the interface (typically
-            //    an explicit interface implementation), with no matching public pattern method.
+            // 2. Fallback: no pattern method on the source — bind via the `IAsyncEnumerable<T>` interface
+            //    if the source implements it (typically an explicit interface implementation).
             foreach (var iface in type.GetInterfaces())
             {
                 if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
-                    itemType = iface.GetGenericArguments()[0];
-                    enumeratorType = typeof(IAsyncEnumerator<>).MakeGenericType(itemType);
-                    moveNextAwaitableType = typeof(ValueTask<bool>);
+                    var ifaceItemType = iface.GetGenericArguments()[0];
+                    var ifaceEnumeratorType = typeof(IAsyncEnumerator<>).MakeGenericType(ifaceItemType);
+                    var ifaceMoveNextAsync = ifaceEnumeratorType.GetMethod(nameof(IAsyncEnumerator<>.MoveNextAsync))!;
+                    // `MoveNextAsync` on `IAsyncEnumerator<T>` returns `ValueTask<bool>` which always
+                    // satisfies the awaitable shape; pull the resolved `AwaitableInfo` from IsAwaitable
+                    // rather than constructing it by hand.
+                    ifaceMoveNextAsync.ReturnType.IsAwaitable(out var ifaceMoveNextAwaitable);
+                    info = new AsyncEnumerableInfo(
+                        ifaceItemType,
+                        ifaceEnumeratorType,
+                        iface.GetMethod(nameof(IAsyncEnumerable<>.GetAsyncEnumerator))!,
+                        ifaceMoveNextAsync,
+                        ifaceMoveNextAwaitable!,
+                        ifaceEnumeratorType.GetProperty(nameof(IAsyncEnumerator<>.Current))!,
+                        IsInterfaceDispatch: true);
                     return true;
                 }
             }
-            itemType = null;
-            enumeratorType = null;
-            moveNextAwaitableType = null;
+            info = null;
             return false;
         }
 
@@ -342,4 +358,32 @@ namespace BenchmarkDotNet.Extensions
         internal static bool HasAsyncMethodBuilderAttribute(this MemberInfo memberInfo)
             => memberInfo.GetAsyncMethodBuilderAttribute() != null;
     }
+
+    /// <summary>
+    /// Everything <see cref="ReflectionExtensions.IsAwaitable"/> resolves while binding the
+    /// awaitable pattern — bundled so callers (emitter, codegen, validators) reuse the same lookups
+    /// instead of repeating the GetAwaiter/GetResult/IsCompleted reflection.
+    /// </summary>
+    internal sealed record AwaitableInfo(
+        Type AwaiterType,
+        MethodInfo GetAwaiterMethod,
+        MethodInfo GetResultMethod,
+        PropertyInfo IsCompletedProperty,
+        Type ResultType);
+
+    /// <summary>
+    /// Everything <see cref="ReflectionExtensions.IsAsyncEnumerable"/> resolves while binding the await-foreach
+    /// pattern — bundled so callers (emitter, codegen, validators) reuse the same lookups instead of
+    /// repeating the pattern-vs-interface discrimination and the Current-property search. DisposeAsync
+    /// is only needed by the emitter, so its resolution lives there to keep validator/codegen paths
+    /// from paying for a lookup they don't use.
+    /// </summary>
+    internal sealed record AsyncEnumerableInfo(
+        Type ItemType,
+        Type EnumeratorType,
+        MethodInfo GetAsyncEnumeratorMethod,
+        MethodInfo MoveNextAsyncMethod,
+        AwaitableInfo MoveNextAwaitable,
+        PropertyInfo CurrentProperty,
+        bool IsInterfaceDispatch);
 }

@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Extensions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -5,66 +6,62 @@ namespace BenchmarkDotNet.Helpers;
 
 internal static class DynamicAwaitHelper
 {
-    internal static async ValueTask<(bool hasResult, object? result)> AwaitResult(object value, Type declaredType)
+    internal static async ValueTask<(bool hasResult, object? result)> AwaitResult(object value, AwaitableInfo awaitableInfo)
     {
-        var getAwaiterMethod = declaredType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!;
-        var awaiterType = getAwaiterMethod.ReturnType;
-        var getResultMethod = awaiterType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!;
-        var result = await new DynamicAwaitable(getAwaiterMethod, awaiterType, getResultMethod, value);
-        return (getResultMethod.ReturnType != typeof(void), result);
+        var result = await new DynamicAwaitable(awaitableInfo, value);
+        return (awaitableInfo.ResultType != typeof(void), result);
     }
 
-    internal static ValueTask DrainAsyncEnumerableAsync(object asyncEnumerable, Type declaredType)
-        => EnumerateCoreAsync(asyncEnumerable, declaredType, items: null);
+    internal static ValueTask DrainAsyncEnumerableAsync(object asyncEnumerable, AsyncEnumerableInfo enumerableInfo)
+        => EnumerateCoreAsync(asyncEnumerable, enumerableInfo, items: null);
 
-    internal static async ValueTask<List<object?>> ToListAsync(object asyncEnumerable, Type declaredType)
+    internal static async ValueTask<List<object?>> ToListAsync(object asyncEnumerable, AsyncEnumerableInfo enumerableInfo)
     {
         List<object?> items = [];
-        await EnumerateCoreAsync(asyncEnumerable, declaredType, items).ConfigureAwait(false);
+        await EnumerateCoreAsync(asyncEnumerable, enumerableInfo, items).ConfigureAwait(false);
         return items;
     }
 
-    private static async ValueTask EnumerateCoreAsync(object asyncEnumerable, Type declaredType, List<object?>? items)
+    private static async ValueTask EnumerateCoreAsync(object asyncEnumerable, AsyncEnumerableInfo enumerableInfo, List<object?>? items)
     {
-        var (getAsyncEnumeratorMethod, getAsyncEnumeratorArgs) = ResolveGetAsyncEnumerator(declaredType);
-        var enumerator = getAsyncEnumeratorMethod.Invoke(asyncEnumerable, getAsyncEnumeratorArgs)!;
+        var getAsyncEnumeratorArgs = GetDefaultArgs(enumerableInfo.GetAsyncEnumeratorMethod);
+        var enumerator = enumerableInfo.GetAsyncEnumeratorMethod.Invoke(asyncEnumerable, getAsyncEnumeratorArgs)!;
 
-        // Look up enumerator members via GetAsyncEnumerator's declared return type rather than the runtime
-        // type. For the interface path that's IAsyncEnumerator<T>, whose interface methods dispatch virtually
-        // — important for compiler-generated async iterator state machines that implement MoveNextAsync /
-        // Current as explicit interface members and so don't surface them as public instance members on the
-        // runtime type. For the pattern path it's the concrete enumerator type with public members.
-        var enumeratorMemberType = getAsyncEnumeratorMethod.ReturnType;
+        var moveNextAsyncArgs = GetDefaultArgs(enumerableInfo.MoveNextAsyncMethod);
+        var currentProperty = enumerableInfo.CurrentProperty;
+        var moveNextAwaitable = enumerableInfo.MoveNextAwaitable;
 
-        var moveNextAsyncMethod = enumeratorMemberType
-            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerator<>.MoveNextAsync) && m.GetParameters().All(p => p.IsOptional))
-            ?? throw new InvalidOperationException($"Type {enumeratorMemberType} does not expose a MoveNextAsync method.");
-        var moveNextAsyncArgs = GetDefaultArgs(moveNextAsyncMethod);
-        var currentProperty = enumeratorMemberType.GetProperty(nameof(IAsyncEnumerator<>.Current), BindingFlags.Public | BindingFlags.Instance)
-            ?? throw new InvalidOperationException($"Type {enumeratorMemberType} does not expose a Current property.");
-        // DisposeAsync is optional for the pattern. Prefer a public instance method on the declared enumerator
-        // type with all-optional parameters whose awaiter's GetResult returns void; otherwise fall back to the
-        // IAsyncDisposable interface implementation.
-        var disposeAsyncMethod = enumeratorMemberType
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == nameof(IAsyncDisposable.DisposeAsync)
-                    && m.GetParameters().All(p => p.IsOptional)
-                    && m.ReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
-                        ?.ReturnType
-                        .GetMethod(nameof(System.Runtime.CompilerServices.TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
-                        ?.ReturnType == typeof(void))
-            ?? (typeof(IAsyncDisposable).IsAssignableFrom(enumeratorMemberType)
-                ? typeof(IAsyncDisposable).GetMethod(nameof(IAsyncDisposable.DisposeAsync))
-                : null);
+        // DisposeAsync is optional for the await-foreach pattern. Roslyn matches a public instance
+        // method named DisposeAsync whose parameters are all optional and whose return type satisfies
+        // the awaitable pattern with a void GetResult; otherwise it falls back to the IAsyncDisposable
+        // interface dispatch.
+        MethodInfo? disposeAsyncMethod = null;
+        AwaitableInfo? disposeAwaitableInfo = null;
+        foreach (var candidate in enumerableInfo.EnumeratorType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (candidate.Name == nameof(IAsyncDisposable.DisposeAsync)
+                && candidate.GetParameters().All(p => p.IsOptional)
+                && candidate.ReturnType.IsAwaitable(out var awaitable)
+                && awaitable.ResultType == typeof(void))
+            {
+                disposeAsyncMethod = candidate;
+                disposeAwaitableInfo = awaitable;
+                break;
+            }
+        }
+        if (disposeAsyncMethod is null && typeof(IAsyncDisposable).IsAssignableFrom(enumerableInfo.EnumeratorType))
+        {
+            disposeAsyncMethod = typeof(IAsyncDisposable).GetMethod(nameof(IAsyncDisposable.DisposeAsync))!;
+            disposeAsyncMethod.ReturnType.IsAwaitable(out disposeAwaitableInfo);
+        }
         var disposeAsyncArgs = disposeAsyncMethod is null ? null : GetDefaultArgs(disposeAsyncMethod);
 
         try
         {
             while (true)
             {
-                var moveNextResult = moveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs);
-                bool hasMore = (bool)(await AwaitDynamicAsync(moveNextAsyncMethod.ReturnType, moveNextResult!).ConfigureAwait(false))!;
+                var moveNextResult = enumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs);
+                bool hasMore = (bool)(await new DynamicAwaitable(moveNextAwaitable, moveNextResult!))!;
                 if (!hasMore)
                 {
                     break;
@@ -79,36 +76,10 @@ internal static class DynamicAwaitHelper
                 var disposeResult = disposeAsyncMethod.Invoke(enumerator, disposeAsyncArgs);
                 if (disposeResult != null)
                 {
-                    await AwaitDynamicAsync(disposeAsyncMethod.ReturnType, disposeResult).ConfigureAwait(false);
+                    await new DynamicAwaitable(disposeAwaitableInfo!, disposeResult);
                 }
             }
         }
-    }
-
-    private static (MethodInfo method, object?[] args) ResolveGetAsyncEnumerator(Type enumerableType)
-    {
-        // Mirror IsAsyncEnumerable's precedence: exact IAsyncEnumerable<T>, then pattern, then interface fallback.
-        if (enumerableType.IsGenericType && enumerableType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-        {
-            var method = enumerableType.GetMethod(nameof(IAsyncEnumerable<>.GetAsyncEnumerator))!;
-            return (method, [CancellationToken.None]);
-        }
-        var pattern = enumerableType
-            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerable<>.GetAsyncEnumerator) && m.GetParameters().All(p => p.IsOptional));
-        if (pattern != null)
-        {
-            return (pattern, GetDefaultArgs(pattern));
-        }
-        foreach (var iface in enumerableType.GetInterfaces())
-        {
-            if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
-            {
-                var method = iface.GetMethod(nameof(IAsyncEnumerable<>.GetAsyncEnumerator))!;
-                return (method, [CancellationToken.None]);
-            }
-        }
-        throw new InvalidOperationException($"Type {enumerableType} is not an async enumerable.");
     }
 
     private static object?[] GetDefaultArgs(MethodInfo method)
@@ -126,27 +97,19 @@ internal static class DynamicAwaitHelper
         return args;
     }
 
-    private static async ValueTask<object?> AwaitDynamicAsync(Type awaitableType, object awaitable)
-    {
-        var getAwaiterMethod = awaitableType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)!;
-        var awaiterType = getAwaiterMethod.ReturnType;
-        var getResultMethod = awaiterType.GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)!;
-        return await new DynamicAwaitable(getAwaiterMethod, awaiterType, getResultMethod, awaitable);
-    }
-
-    private readonly struct DynamicAwaitable(MethodInfo getAwaiterMethod, Type awaiterType, MethodInfo getResultMethod, object awaitable)
+    private readonly struct DynamicAwaitable(AwaitableInfo awaitableInfo, object awaitable)
     {
         public DynamicAwaiter GetAwaiter()
-            => new(awaiterType, getResultMethod, getAwaiterMethod.Invoke(awaitable, null));
+            => new(awaitableInfo, awaitableInfo.GetAwaiterMethod.Invoke(awaitable, null));
     }
 
-    private readonly struct DynamicAwaiter(Type awaiterType, MethodInfo getResultMethod, object? awaiter) : ICriticalNotifyCompletion
+    private readonly struct DynamicAwaiter(AwaitableInfo awaitableInfo, object? awaiter) : ICriticalNotifyCompletion
     {
         public bool IsCompleted
-            => awaiterType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlags.Public | BindingFlags.Instance)!.GetMethod!.Invoke(awaiter, null) is true;
+            => awaitableInfo.IsCompletedProperty.GetMethod!.Invoke(awaiter, null) is true;
 
         public object? GetResult()
-            => getResultMethod.Invoke(awaiter, null);
+            => awaitableInfo.GetResultMethod.Invoke(awaiter, null);
 
         public void OnCompleted(Action continuation)
             => OnCompletedCore(typeof(INotifyCompletion), nameof(INotifyCompletion.OnCompleted), continuation);
@@ -157,7 +120,7 @@ internal static class DynamicAwaitHelper
         private void OnCompletedCore(Type interfaceType, string methodName, Action continuation)
         {
             var onCompletedMethod = interfaceType.GetMethod(methodName);
-            var map = awaiterType.GetInterfaceMap(interfaceType);
+            var map = awaitableInfo.AwaiterType.GetInterfaceMap(interfaceType);
 
             for (int i = 0; i < map.InterfaceMethods.Length; i++)
             {

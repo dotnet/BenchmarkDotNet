@@ -116,14 +116,14 @@ namespace BenchmarkDotNet.Validators
             try
             {
                 var result = methods[0].Invoke(benchmarkTypeInstance, null);
-                if (methods[0].ReturnType.IsAwaitable())
+                if (methods[0].ReturnType.IsAwaitable(out var awaitableInfo))
                 {
                     if (result is null)
                     {
                         errors.Add(new ValidationError(TreatsWarningsAsErrors, $"[{GetAttributeName(typeof(T))}] for {benchmarkTypeInstance.GetType().Name} returned null"));
                         return false;
                     }
-                    await DynamicAwaitHelper.AwaitResult(result, methods[0].ReturnType).ConfigureAwait(false);
+                    await DynamicAwaitHelper.AwaitResult(result, awaitableInfo).ConfigureAwait(false);
                 }
             }
             catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))

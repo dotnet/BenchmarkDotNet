@@ -12,7 +12,7 @@ partial class RunnableEmitter
 
     private void EmitSetupCleanup(string methodName, MethodInfo? methodToCall, SetupCleanupKind kind)
     {
-        if (methodToCall?.ReturnType.IsAwaitable() == true)
+        if (methodToCall?.ReturnType.IsAwaitable(out _) == true)
         {
             EmitAsyncSetupCleanup(methodName, methodToCall, kind);
         }
