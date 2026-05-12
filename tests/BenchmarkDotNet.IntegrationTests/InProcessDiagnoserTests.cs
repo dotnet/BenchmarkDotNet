@@ -65,6 +65,10 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
 
                     bool ShouldSkip()
                     {
+                        // Skip out-of-process when running tests on GitHub Draft PR.
+                        if (ContinuousIntegration.IsGitHubDraftPR() && toolchain == ToolchainType.Default)
+                            return true;
+
                         // Default toolchain is much slower than in-process toolchains, so to prevent CI from taking too much time, we skip combinations with duplicate run modes.
                         if (toolchain != ToolchainType.Default || runModes.Length != 3)
                             return false;
