@@ -209,19 +209,28 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
+try
+                {
 #pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods
-                await broker.ProcessData(cancellationToken)
-                    .AsTask()
-                    .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes)).ConfigureAwait(false);
+                    await broker.ProcessData(cancellationToken)
+                        .AsTask()
+                        .WaitAsync(TimeSpan.FromMinutes(wasmRuntime.ProcessTimeoutMinutes)).ConfigureAwait(false);
 #pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods
+
+                    if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                    {
+                        logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+                    }
+                }
+                catch (TimeoutException)
+                {
+                    // Preserve pre-async-refactor behavior: log a message and let ProcessCleanupHelper
+                    // force-kill the process tree rather than propagating the timeout to the caller.
+                    logger.WriteLineInfo($"// The benchmarking process did not finish within {wasmRuntime.ProcessTimeoutMinutes} minutes, it's going to get force killed now.");
+                }
 
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
-
-                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
-                {
-                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
-                }
             }
 
             return new ExecuteResult(true,
