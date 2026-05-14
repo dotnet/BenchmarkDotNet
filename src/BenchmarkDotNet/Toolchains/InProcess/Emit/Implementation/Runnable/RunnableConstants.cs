@@ -10,8 +10,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public const string ArgParamPrefix = "arg";
         public const string FieldsContainerName = "__fieldsContainer";
 
-        public const string NotElevenFieldName = "NotEleven";
-
         public const string TrickTheJitCoreMethodName = "__TrickTheJIT__";
         public const string OverheadImplementationMethodName = "__Overhead";
         public const string OverheadActionUnrollMethodName = "OverheadActionUnroll";
@@ -27,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public const string IterationSetupMethodName = "__IterationSetup";
         public const string IterationCleanupMethodName = "__IterationCleanup";
 
-        public const string WorkloadContinuerAndValueTaskSourceFieldName = "workloadContinuerAndValueTaskSource";
+        public const string WorkloadValueTaskSourceFieldName = "workloadValueTaskSource";
         public const string ClockFieldName = "clock";
         public const string InvokeCountFieldName = "invokeCount";
         public const string StartWorkloadMethodName = "__StartWorkload";

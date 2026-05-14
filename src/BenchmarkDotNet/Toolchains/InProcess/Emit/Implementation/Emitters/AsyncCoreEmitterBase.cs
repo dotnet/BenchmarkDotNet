@@ -15,7 +15,7 @@ partial class RunnableEmitter
 {
     private abstract class AsyncCoreEmitterBase(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
     {
-        protected FieldInfo workloadContinuerAndValueTaskSourceField = null!;
+        protected FieldInfo workloadValueTaskSourceField = null!;
         protected FieldInfo clockField = null!;
         protected FieldInfo invokeCountField = null!;
         protected MethodInfo startWorkloadMethod = null!;
@@ -26,8 +26,8 @@ partial class RunnableEmitter
         {
             base.EmitExtraFields(fieldsContainerBuilder);
 
-            workloadContinuerAndValueTaskSourceField = fieldsContainerBuilder.DefineField(
-                WorkloadContinuerAndValueTaskSourceFieldName,
+            workloadValueTaskSourceField = fieldsContainerBuilder.DefineField(
+                WorkloadValueTaskSourceFieldName,
                 typeof(WorkloadValueTaskSource),
                 FieldAttributes.Public);
             clockField = fieldsContainerBuilder.DefineField(
@@ -42,11 +42,11 @@ partial class RunnableEmitter
 
         protected override void EmitExtraGlobalSetup(ILGenerator ilBuilder, LocalBuilder? thisLocal)
         {
-            // __fieldsContainer.workloadContinuerAndValueTaskSource = new WorkloadValueTaskSource();
+            // __fieldsContainer.workloadValueTaskSource = new WorkloadValueTaskSource();
             EmitLoadThis(ilBuilder, thisLocal);
             ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
             ilBuilder.Emit(OpCodes.Newobj, typeof(WorkloadValueTaskSource).GetConstructor([])!);
-            ilBuilder.Emit(OpCodes.Stfld, workloadContinuerAndValueTaskSourceField);
+            ilBuilder.Emit(OpCodes.Stfld, workloadValueTaskSourceField);
 
             // this.__StartWorkload();
             EmitLoadThis(ilBuilder, thisLocal);
@@ -55,10 +55,10 @@ partial class RunnableEmitter
 
         protected override void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal)
         {
-            // __fieldsContainer.workloadContinuerAndValueTaskSource.Complete();
+            // __fieldsContainer.workloadValueTaskSource.Complete();
             EmitLoadThis(ilBuilder, thisLocal);
             ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-            ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+            ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
             ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.Complete), BindingFlags.Public | BindingFlags.Instance)!);
         }
 
@@ -309,10 +309,10 @@ partial class RunnableEmitter
             ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
             ilBuilder.Emit(OpCodes.Ldarg_2);
             ilBuilder.Emit(OpCodes.Stfld, clockField);
-            // return __fieldsContainer.workloadContinuerAndValueTaskSource.Continue();
+            // return __fieldsContainer.workloadValueTaskSource.Continue();
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-            ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+            ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
             ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.Continue), BindingFlags.Public | BindingFlags.Instance)!);
             ilBuilder.Emit(OpCodes.Ret);
 

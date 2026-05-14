@@ -107,48 +107,60 @@ namespace BenchmarkDotNet.Code
             string passArguments = GetPassArguments();
             string workloadMethodCall = GetWorkloadMethodCall(passArguments);
             string coreImpl = $$"""
-            private unsafe {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
+            private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
                     {
-                        {{loadArguments}}
-                        {{StartClockSyncCode}}
-                        while (--invokeCount >= 0)
+                        unsafe
                         {
-                            this.__Overhead({{passArguments}});@Unroll@
+                            {{loadArguments}}
+                            {{StartClockSyncCode}}
+                            while (--invokeCount >= 0)
+                            {
+                                this.__Overhead({{passArguments}});@Unroll@
+                            }
+                            {{ReturnSyncCode}}
                         }
-                        {{ReturnSyncCode}}
                     }
 
-                    private unsafe {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
                     {
-                        {{loadArguments}}
-                        {{StartClockSyncCode}}
-                        while (--invokeCount >= 0)
+                        unsafe
                         {
-                            this.__Overhead({{passArguments}});
+                            {{loadArguments}}
+                            {{StartClockSyncCode}}
+                            while (--invokeCount >= 0)
+                            {
+                                this.__Overhead({{passArguments}});
+                            }
+                            {{ReturnSyncCode}}
                         }
-                        {{ReturnSyncCode}}
                     }
 
-                    private unsafe {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
                     {
-                        {{loadArguments}}
-                        {{StartClockSyncCode}}
-                        while (--invokeCount >= 0)
+                        unsafe
                         {
-                            {{workloadMethodCall}}@Unroll@
+                            {{loadArguments}}
+                            {{StartClockSyncCode}}
+                            while (--invokeCount >= 0)
+                            {
+                                {{workloadMethodCall}}@Unroll@
+                            }
+                            {{ReturnSyncCode}}
                         }
-                        {{ReturnSyncCode}}
                     }
 
-                    private unsafe {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
                     {
-                        {{loadArguments}}
-                        {{StartClockSyncCode}}
-                        while (--invokeCount >= 0)
+                        unsafe
                         {
-                            {{workloadMethodCall}}
+                            {{loadArguments}}
+                            {{StartClockSyncCode}}
+                            while (--invokeCount >= 0)
+                            {
+                                {{workloadMethodCall}}
+                            }
+                            {{ReturnSyncCode}}
                         }
-                        {{ReturnSyncCode}}
                     }
             """;
 
@@ -184,19 +196,19 @@ namespace BenchmarkDotNet.Code
 
         public override string[] GetExtraFields() =>
         [
-            $"public {typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()} workloadContinuerAndValueTaskSource;",
+            $"public {typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()} workloadValueTaskSource;",
             $"public {typeof(IClock).GetCorrectCSharpTypeName()} clock;",
             "public long invokeCount;"
         ];
 
         protected override string GetExtraGlobalSetupImpl()
             => $$"""
-            this.__fieldsContainer.workloadContinuerAndValueTaskSource = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
+            this.__fieldsContainer.workloadValueTaskSource = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
                         this.__StartWorkload();
             """;
 
         protected override string GetExtraGlobalCleanupImpl()
-            => "this.__fieldsContainer.workloadContinuerAndValueTaskSource.Complete();";
+            => "this.__fieldsContainer.workloadValueTaskSource.Complete();";
 
         protected bool TryGetAsyncMethodBuilderAttribute(out string asyncMethodBuilderAttribute)
         {
@@ -283,7 +295,7 @@ namespace BenchmarkDotNet.Code
                         this.__fieldsContainer.clock = clock;
                         // The source is allocated and the workload loop started in __GlobalSetup,
                         // so this hot path is branchless and allocation-free.
-                        return this.__fieldsContainer.workloadContinuerAndValueTaskSource.Continue();
+                        return this.__fieldsContainer.workloadValueTaskSource.Continue();
                     }
 
                     private async void __StartWorkload()
@@ -296,7 +308,7 @@ namespace BenchmarkDotNet.Code
                     {
                         try
                         {
-                            if (await this.__fieldsContainer.workloadContinuerAndValueTaskSource.GetIsComplete())
+                            if (await this.__fieldsContainer.workloadValueTaskSource.GetIsComplete())
                             {
                                 {{finalReturn}}
                             }
@@ -307,7 +319,7 @@ namespace BenchmarkDotNet.Code
                                 {
                                     {{GetCallAndConsumeImpl(workloadMethodCall)}}
                                 }
-                                if (await this.__fieldsContainer.workloadContinuerAndValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                                if (await this.__fieldsContainer.workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
                                 {
                                     {{finalReturn}}
                                 }
@@ -315,7 +327,7 @@ namespace BenchmarkDotNet.Code
                         }
                         catch (global::System.Exception e)
                         {
-                            __fieldsContainer.workloadContinuerAndValueTaskSource.SetException(e);
+                            __fieldsContainer.workloadValueTaskSource.SetException(e);
                             {{finalReturn}}
                         }
                     }
@@ -332,24 +344,14 @@ namespace BenchmarkDotNet.Code
     {
         protected override string GetCallAndConsumeImpl(string workloadMethodCall)
         {
-            string awaitStatement;
             if (resultType == typeof(void))
             {
-                awaitStatement = "await awaitable;";
+                return $"await {workloadMethodCall}";
             }
-            else
-            {
-                var resultTypeName = resultType.GetCorrectCSharpTypeName();
-                awaitStatement = $"""
-                {resultTypeName} result = await awaitable;
-                                        {typeof(DeadCodeEliminationHelper).GetCorrectCSharpTypeName()}.KeepAliveWithoutBoxing<{resultTypeName}>(in result);
-                """;
-            }
-            return $$"""
-            // Necessary because of error CS4004: Cannot await in an unsafe context
-                                    {{Descriptor.WorkloadMethod.ReturnType.GetCorrectCSharpTypeName()}} awaitable;
-                                    unsafe { awaitable = {{workloadMethodCall}} }
-                                    {{awaitStatement}}
+            var resultTypeName = resultType.GetCorrectCSharpTypeName();
+            return $"""
+            {resultTypeName} result = await {workloadMethodCall}
+                                    {typeof(DeadCodeEliminationHelper).GetCorrectCSharpTypeName()}.KeepAliveWithoutBoxing<{resultTypeName}>(in result);
             """;
         }
     }
@@ -362,10 +364,7 @@ namespace BenchmarkDotNet.Code
         {
             string itemTypeName = itemType.GetCorrectCSharpTypeName();
             return $$"""
-            // Necessary because of error CS4004: Cannot await in an unsafe context
-                                    {{Descriptor.WorkloadMethod.ReturnType.GetCorrectCSharpTypeName()}} enumerable;
-                                    unsafe { enumerable = {{workloadMethodCall}} }
-                                    await foreach ({{itemTypeName}} item in enumerable)
+            await foreach ({{itemTypeName}} item in {{workloadMethodCall.TrimEnd(';')}})
                                     {
                                         {{typeof(DeadCodeEliminationHelper).GetCorrectCSharpTypeName()}}.KeepAliveWithoutBoxing<{{itemTypeName}}>(in item);
                                     }

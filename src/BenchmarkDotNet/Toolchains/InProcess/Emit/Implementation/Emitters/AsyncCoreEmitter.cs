@@ -31,11 +31,16 @@ partial class RunnableEmitter
                 typeof(ValueTaskAwaiter<bool>),
                 FieldAttributes.Private
             );
-            var benchmarkAwaiterField = asyncStateMachineTypeBuilder.DefineField(
-                "<>u__2",
-                awaitableInfo.AwaiterType,
-                FieldAttributes.Private
-            );
+            // Roslyn dedupes hoisted awaiter fields by type — when the workload's awaiter matches the
+            // workloadValueTaskSource awaiter (e.g., the workload itself returns ValueTask<bool>) only
+            // `<>u__1` is emitted, and both awaits reuse it.
+            var benchmarkAwaiterField = awaitableInfo.AwaiterType == workloadContinuerAwaiterField.FieldType
+                ? workloadContinuerAwaiterField
+                : asyncStateMachineTypeBuilder.DefineField(
+                    "<>u__2",
+                    awaitableInfo.AwaiterType,
+                    FieldAttributes.Private
+                );
             EmitMoveNextImpl();
             var asyncStateMachineType = CompleteAsyncStateMachineType(asyncMethodBuilderType, builderInfo);
 
@@ -48,19 +53,27 @@ partial class RunnableEmitter
                 var resultType = awaitableInfo.ResultType;
                 var isCompleteAwaiterLocal = ilBuilder.DeclareLocal(typeof(ValueTaskAwaiter<bool>));
                 var isCompleteAwaitableLocal = ilBuilder.DeclareLocal(typeof(ValueTask<bool>));
-                // The value-type awaitable spill local (Roslyn declares one for ValueTask<T> et al. so it
-                // can take its address for GetAwaiter — reference-type awaitables stay on the stack).
-                var benchmarkAwaitableLocal = Descriptor.WorkloadMethod.ReturnType.IsValueType
-                    ? ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType)
-                    : null;
-                // Source local for `T result = await awaitable;` — declared only when the awaiter's
+                // Source local for `T result = await workloadCall;` — declared only when the awaiter's
                 // GetResult returns non-void, in which case the template captures the value and pipes
                 // it through DeadCodeEliminationHelper so the JIT can't elide the producer's work.
-                // Roslyn places this AFTER the (optional) awaitable spill and BEFORE the awaiter temp.
+                // Roslyn places this BEFORE the awaiter temp and the (optional) awaitable spill.
                 var resultLocal = resultType == typeof(void)
                     ? null
                     : ilBuilder.DeclareLocal(resultType);
-                var benchmarkAwaiterLocal = ilBuilder.DeclareLocal(benchmarkAwaiterField.FieldType);
+                // Roslyn dedupes locals by type — when the workload awaiter matches the isComplete
+                // awaiter (e.g., the workload itself returns ValueTask<bool>), it reuses the existing
+                // local rather than declaring a new one.
+                var benchmarkAwaiterLocal = benchmarkAwaiterField.FieldType == isCompleteAwaiterLocal.LocalType
+                    ? isCompleteAwaiterLocal
+                    : ilBuilder.DeclareLocal(benchmarkAwaiterField.FieldType);
+                // The value-type awaitable spill local (Roslyn declares one for ValueTask<T> et al. so it
+                // can take its address for GetAwaiter — reference-type awaitables stay on the stack).
+                // Roslyn places this AFTER the awaiter temp, and dedupes by type just like the awaiter.
+                var benchmarkAwaitableLocal = Descriptor.WorkloadMethod.ReturnType.IsValueType
+                    ? (Descriptor.WorkloadMethod.ReturnType == isCompleteAwaitableLocal.LocalType
+                        ? isCompleteAwaitableLocal
+                        : ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType))
+                    : null;
                 var invokeCountLocal = ilBuilder.DeclareLocal(typeof(long));
                 var exceptionLocal = ilBuilder.DeclareLocal(typeof(Exception));
 
@@ -92,7 +105,7 @@ partial class RunnableEmitter
                     // var awaitable = workloadValueTaskSource.GetIsComplete();
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                    ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+                    ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.GetIsComplete), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.EmitStloc(isCompleteAwaitableLocal);
                     // var awaiter = awaitable.GetAwaiter();
@@ -260,7 +273,7 @@ partial class RunnableEmitter
                     // var awaitable = workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed());
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                    ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+                    ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldflda, startedClockField);
                     ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
@@ -333,7 +346,7 @@ partial class RunnableEmitter
                     // workloadValueTaskSource.SetException(exception);
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                    ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+                    ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
                     ilBuilder.EmitLdloc(exceptionLocal);
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetException), [typeof(Exception)])!);
                     // result = default;

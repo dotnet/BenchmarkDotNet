@@ -125,7 +125,12 @@ partial class RunnableEmitter
                 // so no ClockSpan local is declared.
                 var isCompleteAwaiterLocal = ilBuilder.DeclareLocal(typeof(ValueTaskAwaiter<bool>));
                 var isCompleteAwaitableLocal = ilBuilder.DeclareLocal(typeof(ValueTask<bool>));
-                var enumerableLocal = ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType);
+                // Roslyn only spills the workload result to a local when its return type is a value type
+                // (needed to take an address for the instance GetAsyncEnumerator call). Reference-type
+                // results stay on the stack and pass directly to GetAsyncEnumerator.
+                var enumerableLocal = Descriptor.WorkloadMethod.ReturnType.IsValueType
+                    ? ilBuilder.DeclareLocal(Descriptor.WorkloadMethod.ReturnType)
+                    : null;
                 var defaultArgLocals = enumerableInfo.GetAsyncEnumeratorMethod
                     .GetParameters()
                     .DistinctBy(p => p.ParameterType)
@@ -236,20 +241,20 @@ partial class RunnableEmitter
                     // directly in the outer try.
                     ilBuilder.MarkLabel(callBenchmarkLabel);
 
-                    // enumerable = workload(args); enumerator = enumerable.GetAsyncEnumerator(...);
-                    // Roslyn defers loading `this` (for the stfld below) until AFTER the workload call so
-                    // the call site doesn't carry an extra stack slot through it; mirroring that keeps the
-                    // diff aligned.
+                    // this.<>7__wrap2 = workload(args).GetAsyncEnumerator(...);
+                    // Roslyn loads `this` (for the stfld) BEFORE evaluating the right-hand side, matching
+                    // C# evaluation order for `this.field = expr`.
+                    ilBuilder.Emit(OpCodes.Ldarg_0);
                     if (!Descriptor.WorkloadMethod.IsStatic)
                         ilBuilder.EmitLdloc(thisLocal!);
                     EmitLoadArgFieldsForCall(ilBuilder, thisLocal);
                     ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
-                    ilBuilder.EmitStloc(enumerableLocal);
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    if (Descriptor.WorkloadMethod.ReturnType.IsValueType)
+                    if (enumerableLocal is not null)
+                    {
+                        // Value-type result: spill so we can take its address for the instance call.
+                        ilBuilder.EmitStloc(enumerableLocal);
                         ilBuilder.EmitLdloca(enumerableLocal);
-                    else
-                        ilBuilder.EmitLdloc(enumerableLocal);
+                    }
                     EmitGetAsyncEnumeratorCall();
                     ilBuilder.Emit(OpCodes.Stfld, enumeratorField);
 
@@ -517,7 +522,7 @@ partial class RunnableEmitter
                     ilBuilder.EmitStloc(exceptionLocal);
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                    ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+                    ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
                     ilBuilder.EmitLdloc(exceptionLocal);
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetException), [typeof(Exception)])!);
                     ilBuilder.MaybeEmitSetLocalToDefault(returnDefaultLocal);
@@ -531,7 +536,7 @@ partial class RunnableEmitter
                 {
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                    ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+                    ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
                     ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.GetIsComplete), BindingFlags.Public | BindingFlags.Instance)!);
                     ilBuilder.EmitStloc(isCompleteAwaitableLocal);
                     ilBuilder.EmitLdloca(isCompleteAwaitableLocal);
@@ -562,7 +567,7 @@ partial class RunnableEmitter
                     // declares a ClockSpan elapsed local, so neither do we.
                     ilBuilder.EmitLdloc(thisLocal!);
                     ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
-                    ilBuilder.Emit(OpCodes.Ldfld, workloadContinuerAndValueTaskSourceField);
+                    ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldflda, startedClockField);
                     ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);

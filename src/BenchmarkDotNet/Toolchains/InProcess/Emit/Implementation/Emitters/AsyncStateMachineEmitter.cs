@@ -18,12 +18,12 @@ partial class RunnableEmitter
         { GlobalCleanupMethodName, 5 },
         { IterationSetupMethodName, 6 },
         { IterationCleanupMethodName, 7 },
-        { OverheadActionUnrollMethodName, 12 },
-        { OverheadActionNoUnrollMethodName, 13 },
-        { WorkloadActionUnrollMethodName, 14 },
-        { WorkloadActionNoUnrollMethodName, 15 },
-        { StartWorkloadMethodName, 16 },
-        { WorkloadCoreMethodName, 17 },
+        { OverheadActionUnrollMethodName, 11 },
+        { OverheadActionNoUnrollMethodName, 12 },
+        { WorkloadActionUnrollMethodName, 13 },
+        { WorkloadActionNoUnrollMethodName, 14 },
+        { StartWorkloadMethodName, 15 },
+        { WorkloadCoreMethodName, 16 },
     };
 
     private record struct AsyncStateMachineFields(FieldInfo StateField, FieldInfo BuilderField, FieldInfo? ThisField);

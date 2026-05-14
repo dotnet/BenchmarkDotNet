@@ -194,11 +194,10 @@ namespace BenchmarkDotNet.Code
                 return string.Empty;
             }
 
-            // Wrapper struct is necessary because of error CS4004: Cannot await in an unsafe context
             var sb = new StringBuilder();
             sb.AppendLine("""
                     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
-                    private unsafe struct FieldsContainer
+                    private struct FieldsContainer
                     {
             """);
             foreach (var field in fields)

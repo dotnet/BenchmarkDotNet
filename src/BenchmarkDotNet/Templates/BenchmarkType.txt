@@ -1,6 +1,6 @@
     // Type name must be in sync with DisassemblyDiagnoser.BuildClrMdArgs.
     [global::BenchmarkDotNet.Attributes.CompilerServices.AggressivelyOptimizeMethods]
-    public sealed partial class Runnable_$ID$ : $WorkloadTypeName$
+    public sealed class Runnable_$ID$ : $WorkloadTypeName$
     {
         public static async global::System.Threading.Tasks.ValueTask Run(global::BenchmarkDotNet.Engines.IHost host, global::System.String benchmarkName, global::BenchmarkDotNet.Diagnosers.RunMode diagnoserRunMode)
         {
@@ -62,7 +62,7 @@
         }
 
         [global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
-        public unsafe Runnable_$ID$(global::System.Threading.CancellationToken cancellationToken)
+        public Runnable_$ID$(global::System.Threading.CancellationToken cancellationToken)
         {
             $InitializeArgumentFields$
             $ParamsContent$
@@ -93,20 +93,21 @@
 
         // this method is used only for the disassembly diagnoser purposes
         // the goal is to get this and the benchmarked method jitted, but without executing the benchmarked method itself
-        public global::System.Int32 NotEleven;
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public void __TrickTheJIT__()
         {
-            this.NotEleven = new global::System.Random(123).Next(0, 10);
-            $DisassemblerEntryMethodName$();
+            $DisassemblerEntryMethodName$(new global::System.Random(123).Next(0, 10));
         }
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public unsafe void $DisassemblerEntryMethodName$()
+        public void $DisassemblerEntryMethodName$(global::System.Int32 notEleven)
         {
-            if (this.NotEleven == 11)
+            if (notEleven == 11)
             {
-                $DisassemblerEntryMethodImpl$
+                unsafe
+                {
+                    $DisassemblerEntryMethodImpl$
+                }
             }
         }
 

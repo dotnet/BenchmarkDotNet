@@ -1,4 +1,4 @@
-﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ output extension=".cs" #>
 //------------------------------------------------------------------------------
@@ -13,6 +13,7 @@
 using BenchmarkDotNet.Attributes;
 
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {
@@ -24,19 +25,14 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 <#
     int counter = 1;
     EmitTaskCaseBenchmark(ref counter, "Task", "Task.CompletedTask");
-    EmitTaskCaseBenchmark(ref counter, "Task<int>", "Task.FromResult(123)");
+    EmitTaskCaseBenchmark(ref counter, "Task<string>", "Task.FromResult(\"123\")");
     EmitTaskCaseBenchmark(ref counter, "ValueTask", "new ValueTask()");
-    EmitTaskCaseBenchmark(ref counter, "ValueTask<string>", "new ValueTask<string>(\"\")");
+    EmitTaskCaseBenchmark(ref counter, "ValueTask<bool>", "new ValueTask<bool>(true)");
 
-    // BDN do not support custom awaitables
-    //EmitTaskCaseBenchmark(ref counter, "ConfiguredTaskAwaitable", "Task.CompletedTask.ConfigureAwait(false)");
-    //EmitTaskCaseBenchmark(ref counter, "ConfiguredTaskAwaitable<int?>", "Task.FromResult((int?)123).ConfigureAwait(false)");
-    //EmitTaskCaseBenchmark(ref counter, "ConfiguredValueTaskAwaitable<string>", "new ValueTask<string>(\"\").ConfigureAwait(false)");
-
-    //EmitTaskCaseBenchmark(ref counter, "CustomAwatiableStruct", "new CustomAwatiableStruct()");
-    //EmitTaskCaseBenchmark(ref counter, "CustomAwatiableStruct2", "new CustomAwatiableStruct2()");
-    //EmitTaskCaseBenchmark(ref counter, "CustomAwatiableClass", "new CustomAwatiableClass()");
-    //EmitTaskCaseBenchmark(ref counter, "CustomAwatiableClass2", "new CustomAwatiableClass2()");
+    EmitTaskCaseBenchmark(ref counter, "ConfiguredTaskAwaitable", "Task.CompletedTask.ConfigureAwait(false)");
+    EmitTaskCaseBenchmark(ref counter, "ConfiguredTaskAwaitable<string>", "Task.FromResult(\"123\").ConfigureAwait(false)");
+    EmitTaskCaseBenchmark(ref counter, "ConfiguredValueTaskAwaitable", "new ValueTask().ConfigureAwait(false)");
+    EmitTaskCaseBenchmark(ref counter, "ConfiguredValueTaskAwaitable<bool>", "new ValueTask<bool>(true).ConfigureAwait(false)");
 #>
     }
 }<#+
