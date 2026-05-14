@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Extensions
                 SetClrEnvironmentVariables(start, "Version", clrRuntime.Version);
 
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && monoRuntime.MonoBclPath.IsNotBlank())
-                start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
+                start.Environment["MONO_PATH"] = monoRuntime.MonoBclPath;
 
             if (benchmarkCase.Config.HasPerfCollectProfiler())
             {
@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Extensions
                 // enable BDN Event Source (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#filtering)
                 SetClrEnvironmentVariables(start, "EventSourceFilter", EngineEventSource.SourceName);
                 // workaround for https://github.com/dotnet/runtime/issues/71786, will be solved by next perf version
-                start.EnvironmentVariables["DOTNET_EnableWriteXorExecute"] = "0";
+                start.Environment["DOTNET_EnableWriteXorExecute"] = "0";
             }
 
             // corerun does not understand runtimeconfig.json files;
@@ -132,7 +132,7 @@ namespace BenchmarkDotNet.Extensions
                 start.SetCoreRunEnvironmentVariables(benchmarkCase, resolver);
 
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
-            start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
+            start.Environment["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
             if (benchmarkCase.Job.ResolveValueAsNullable(RunMode.RunStrategyCharacteristic) != RunStrategy.ColdStart
                 // CallCountingDelayMs=0 breaks DisassemblyDiagnoser, so we only set it if the job doesn't need disassembly. https://github.com/dotnet/runtime/issues/117339
@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.Extensions
                 return;
 
             foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables ?? [])
-                start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
+                start.Environment[environmentVariable.Key] = environmentVariable.Value;
         }
 
         // the code below was copy-pasted from https://github.com/dotnet/cli/blob/0bc24bff775e22352c2309ef990281280f92dbaa/test/Microsoft.DotNet.Tools.Tests.Utilities/Extensions/ProcessExtensions.cs#L13
@@ -267,8 +267,8 @@ namespace BenchmarkDotNet.Extensions
 
         private static void SetClrEnvironmentVariables(ProcessStartInfo start, string suffix, string value)
         {
-            start.EnvironmentVariables[$"DOTNET_{suffix}"] = value;
-            start.EnvironmentVariables[$"COMPlus_{suffix}"] = value;
+            start.Environment[$"DOTNET_{suffix}"] = value;
+            start.Environment[$"COMPlus_{suffix}"] = value;
         }
 
 #if !NET5_0_OR_GREATER

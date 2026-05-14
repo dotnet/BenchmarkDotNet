@@ -94,12 +94,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             ProcessStartInfo startInfo = BuildStartInfo(
                 command.CliPath, command.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, command.Arguments, command.EnvironmentVariables);
 
-            if (startInfo.EnvironmentVariables.Keys.Count > 0)
+            if (startInfo.Environment.Keys.Count > 0)
             {
                 command.Logger.WriteLineInfo("// Environment Variables:");
-                foreach (string name in startInfo.EnvironmentVariables.Keys)
+                foreach (var entry in startInfo.Environment.OrderBy(x=>x.Key))
                 {
-                    command.Logger.WriteLine($"\t[{name}] = \"{startInfo.EnvironmentVariables[name]}\"");
+                    command.Logger.WriteLine($"\t[{entry.Key}] = \"{entry.Value}\"");
                 }
             }
         }
@@ -133,10 +133,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             if (environmentVariables != null)
                 foreach (var environmentVariable in environmentVariables)
-                    startInfo.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
+                    startInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
 
             if (customDotNetCliPath.IsNotBlank() && (environmentVariables == null || environmentVariables.All(envVar => envVar.Key != dotnetMultiLevelLookupEnvVarName)))
-                startInfo.EnvironmentVariables[dotnetMultiLevelLookupEnvVarName] = "0";
+                startInfo.Environment[dotnetMultiLevelLookupEnvVarName] = "0";
 
             return startInfo;
         }
