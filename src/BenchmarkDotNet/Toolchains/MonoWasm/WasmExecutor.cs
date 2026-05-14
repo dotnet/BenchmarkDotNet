@@ -209,7 +209,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-try
+                try
                 {
 #pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods
                     await broker.ProcessData(cancellationToken)
