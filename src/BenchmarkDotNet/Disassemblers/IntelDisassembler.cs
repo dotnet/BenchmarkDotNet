@@ -152,5 +152,66 @@ namespace BenchmarkDotNet.Disassemblers
             referencedAddress = default;
             return false;
         }
+
+        // Recognise the common x86/x64 JMP trampoline shapes the CLR JIT emits when a call's real
+        // target is out of rel32 range:
+        //   E9 rel32                            — JMP near rel32      (5 bytes)
+        //   EB rel8                             — JMP short           (2 bytes)
+        //   FF 25 disp32                        — JMP qword [rip+d]   (6 bytes, x64 RIP-relative)
+        //   48 B8 imm64 ; FF E0                 — MOV rax,imm64;JMP rax (12 bytes)
+        // Writes the resolved target into `target` and returns true if one matches.
+        protected override bool TryFollowJumpTrampoline(IDataReader dataReader, ulong address, out ulong target)
+        {
+            target = 0;
+            byte[] buffer = new byte[12];
+            int read = dataReader.Read(address, buffer);
+            if (read < 2)
+                return false;
+
+            // E9 rel32 — JMP near rel32 (target = next-instr + sign_extended(rel32))
+            if (read >= 5 && buffer[0] == 0xE9)
+            {
+                int rel = buffer[1] | (buffer[2] << 8) | (buffer[3] << 16) | (buffer[4] << 24);
+                target = unchecked(address + 5 + (ulong)(long)rel);
+                return IsValidAddress(target);
+            }
+
+            // EB rel8 — JMP short (target = next-instr + sign_extended(rel8))
+            if (buffer[0] == 0xEB)
+            {
+                sbyte rel = (sbyte)buffer[1];
+                target = unchecked(address + 2 + (ulong)(long)rel);
+                return IsValidAddress(target);
+            }
+
+            // FF 25 disp32 — JMP qword ptr [rip+disp32]; the slot at rip+disp32 holds the actual target
+            if (read >= 6 && buffer[0] == 0xFF && buffer[1] == 0x25)
+            {
+                int disp = buffer[2] | (buffer[3] << 8) | (buffer[4] << 16) | (buffer[5] << 24);
+                ulong slot = unchecked(address + 6 + (ulong)(long)disp);
+                if (dataReader.ReadPointer(slot, out ulong slotTarget) && IsValidAddress(slotTarget))
+                {
+                    target = slotTarget;
+                    return true;
+                }
+                return false;
+            }
+
+            // 48 B8 imm64 ; FF E0 — MOV rax, imm64; JMP rax
+            if (read >= 12 && buffer[0] == 0x48 && buffer[1] == 0xB8 && buffer[10] == 0xFF && buffer[11] == 0xE0)
+            {
+                target = (ulong)buffer[2]
+                    | ((ulong)buffer[3] << 8)
+                    | ((ulong)buffer[4] << 16)
+                    | ((ulong)buffer[5] << 24)
+                    | ((ulong)buffer[6] << 32)
+                    | ((ulong)buffer[7] << 40)
+                    | ((ulong)buffer[8] << 48)
+                    | ((ulong)buffer[9] << 56);
+                return IsValidAddress(target);
+            }
+
+            return false;
+        }
     }
 }

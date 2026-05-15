@@ -30,13 +30,20 @@ namespace BenchmarkDotNet.Disassemblers
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
 
-        private static bool IsValidAddress(ulong address)
+        protected static bool IsValidAddress(ulong address)
             // -1 (ulong.MaxValue) address is invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
             // 0 is NULL and therefore never valid.
             // Addresses less than the minimum virtual address are also invalid.
             => address != ulong.MaxValue
                 && address != 0
                 && address >= MinValidAddress;
+
+        // When ClrMD's GetMethodByInstructionPointer fails on a call target, the bytes at that
+        // address may be a small JMP/B thunk the JIT inserted because the real callee was too far for
+        // a direct relative branch. Architecture-specific subclasses decode their respective shapes
+        // and return the resolved target so TryTranslateAddressToName can retry the method lookup.
+        // Best-effort: return false for anything we don't recognise (matches prior behaviour).
+        protected abstract bool TryFollowJumpTrampoline(IDataReader dataReader, ulong address, out ulong target);
 
         private DataTarget Attach(int processId)
         {
@@ -264,6 +271,32 @@ namespace BenchmarkDotNet.Disassemblers
                 && runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
             {
                 method = runtime.GetMethodByInstructionPointer(newAddress);
+            }
+
+            if (method is null)
+            {
+                // Chase trampolines iteratively: a near JMP/B thunk's target may itself be a precode/stub
+                // that lands on another near jump (e.g., tier-0 → tier-1 transitions, or PLT-style
+                // indirection through a slot that's been repointed). Bounded by maxHops so a pathological
+                // case (corrupted snapshot, self-pointing thunk) can't loop, and tracks visited addresses
+                // to short-circuit cycles. 8 hops is far more than CoreCLR is known to chain in practice.
+                ulong current = address;
+                HashSet<ulong>? visited = null;
+                const int maxHops = 8;
+                for (int hop = 0; hop < maxHops; hop++)
+                {
+                    if (!TryFollowJumpTrampoline(runtime.DataTarget.DataReader, current, out ulong next))
+                        break;
+                    if (next == current)
+                        break;
+                    visited ??= [];
+                    if (!visited.Add(next))
+                        break;
+                    method = runtime.GetMethodByInstructionPointer(next);
+                    if (method is not null)
+                        break;
+                    current = next;
+                }
             }
 
             if (method is null)

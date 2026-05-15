@@ -296,5 +296,37 @@ namespace BenchmarkDotNet.Disassemblers
                 DisassemblySyntax.Intel => DisassembleSyntax.Intel,
                 _ => DisassembleSyntax.Masm
             };
+
+        // Recognise the common AArch64 jump trampoline shapes the CLR JIT/runtime emits when a call's
+        // real target is out of rel26 range (±128 MB). The PLT-style precode patterns (ADRP+LDR+BR)
+        // are matched by the byte-exact templates in RuntimeSpecificData above; here we just decode
+        // the simple single-instruction "B imm26" thunk that bridges modest cross-region gaps:
+        //   B imm26   (bits[31:26] = 0b000101)   — target = address + sign_extended(imm26) * 4
+        // Writes the resolved target into `target` and returns true if one matches. Wider patterns
+        // (ADRP/ADR + ADD + BR Xn, ADRP + LDR + BR Xn, etc.) intentionally aren't decoded here — they
+        // need register tracking and are already covered by the precode byte-template match path.
+        protected override bool TryFollowJumpTrampoline(IDataReader dataReader, ulong address, out ulong target)
+        {
+            target = 0;
+            byte[] buffer = new byte[4];
+            if (dataReader.Read(address, buffer) != 4)
+                return false;
+
+            uint instr = (uint)buffer[0] | ((uint)buffer[1] << 8) | ((uint)buffer[2] << 16) | ((uint)buffer[3] << 24);
+
+            // B imm26 — bits[31:26] == 0b000101 (0x5)
+            if ((instr >> 26) == 0x5)
+            {
+                uint imm26 = instr & 0x03FFFFFFu;
+                // Sign-extend the 26-bit immediate to 32 bits, then multiply by 4 (instructions are 4-byte aligned).
+                int offset = (int)(imm26 & 0x02000000u) != 0
+                    ? unchecked((int)(imm26 | 0xFC000000u)) << 2
+                    : (int)imm26 << 2;
+                target = unchecked(address + (ulong)(long)offset);
+                return IsValidAddress(target);
+            }
+
+            return false;
+        }
     }
 }
