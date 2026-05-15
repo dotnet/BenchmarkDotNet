@@ -6,52 +6,8 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal class IntelDisassembler : ClrMdDisassembler
     {
-        internal sealed class RuntimeSpecificData
-        {
-            // See dotnet/runtime src/coreclr/vm/amd64/thunktemplates.asm/.S for the stub code
-            // mov    rax,QWORD PTR [rip + DATA_SLOT(CallCountingStub, RemainingCallCountCell)]
-            // dec    WORD PTR [rax]
-            // je     LOCAL_LABEL(CountReachedZero)
-            // jmp    QWORD PTR [rip + DATA_SLOT(CallCountingStub, TargetForMethod)]
-            // LOCAL_LABEL(CountReachedZero):
-            // jmp    QWORD PTR [rip + DATA_SLOT(CallCountingStub, TargetForThresholdReached)]
-            internal readonly byte[] callCountingStubTemplate = [0x48, 0x8b, 0x05, 0xf9, 0x0f, 0x00, 0x00, 0x66, 0xff, 0x08];
-            // mov    r10, [rip + DATA_SLOT(StubPrecode, MethodDesc)]
-            // jmp    [rip + DATA_SLOT(StubPrecode, Target)]
-            internal readonly byte[] stubPrecodeTemplate = [0x4c, 0x8b, 0x15, 0xf9, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfb, 0x0f, 0x00, 0x00];
-            // jmp    [rip + DATA_SLOT(FixupPrecode, Target)]
-            // mov    r10, [rip + DATA_SLOT(FixupPrecode, MethodDesc)]
-            // jmp    [rip + DATA_SLOT(FixupPrecode, PrecodeFixupThunk)]
-            internal readonly byte[] fixupPrecodeTemplate = [0xff, 0x25, 0xfa, 0x0f, 0x00, 0x00, 0x4c, 0x8b, 0x15, 0xfb, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfd, 0x0f, 0x00, 0x00];
-            internal readonly ulong stubPageSize;
-
-            internal RuntimeSpecificData(State state)
-            {
-                stubPageSize = (ulong)Environment.SystemPageSize;
-                if (state.RuntimeVersion.Major >= 8)
-                {
-                    // In .NET 8, the stub page size was changed to 16kB
-                    stubPageSize = 16384;
-                    // Update the templates so that the offsets are correct
-                    callCountingStubTemplate[4] = 0x3f;
-                    stubPrecodeTemplate[4] = 0x3f;
-                    stubPrecodeTemplate[10] = 0x3f;
-                    fixupPrecodeTemplate[3] = 0x3f;
-                    fixupPrecodeTemplate[10] = 0x3f;
-                    fixupPrecodeTemplate[16] = 0x3f;
-                }
-            }
-        }
-
-        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = [];
-
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
-            if (!runtimeSpecificData.TryGetValue(state.RuntimeVersion, out var data))
-            {
-                runtimeSpecificData.Add(state.RuntimeVersion, data = new RuntimeSpecificData(state));
-            }
-
             var reader = new ByteArrayCodeReader(code);
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
             decoder.IP = startAddress;
@@ -98,10 +54,11 @@ namespace BenchmarkDotNet.Disassemblers
         // rewritten to the resolved slot value; `isPrestubMD` is set when the resolved value is a
         // MethodDesc handle (used downstream to dispatch to GetMethodByHandle).
         //
-        // The runtime's data-section layout shifts between patch versions (slot offsets vary), so
-        // we match on the fixed OPCODE bytes only and extract the actual RIP-relative displacements
-        // straight from the encoded instructions — that makes us resilient to data-page layout
-        // changes without hard-coding StubPrecodeData offsets per runtime version.
+        // The data-section layout (slot order within the data page) is stable, but the offset
+        // between the code page and its data section is part of the runtime's allocator policy and
+        // has changed in the past (currently 16 kB on x64). Reading the RIP-relative displacements
+        // out of the encoded instructions themselves avoids any dependency on that code-to-data
+        // gap, so the resolver doesn't need a runtime-version-specific table of stub page sizes.
         private static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
         {
             isPrestubMD = false;
@@ -214,14 +171,16 @@ namespace BenchmarkDotNet.Disassemblers
         //   EB rel8                             — JMP short           (2 bytes)
         //   FF 25 disp32                        — JMP qword [rip+d]   (6 bytes, RIP-relative) — also matches FixupPrecode
         //   48 B8 imm64 ; FF E0                 — MOV rax,imm64;JMP rax (12 bytes)
-        //   CallCountingStub  (template match)  — reads TargetForMethod slot at data offset 8
-        //   StubPrecode       (template match)  — reads Target slot at data offset 8
-        // Writes the resolved target into `target` and returns true if one matches.
+        //   CallCountingStub  (opcode match)    — reads TargetForMethod slot
+        //   StubPrecode       (opcode match)    — reads Target slot
+        // Slot displacements are extracted from the encoded instructions themselves, so the stub
+        // recognition doesn't depend on the runtime's code-to-data offset. Writes the resolved
+        // target into `target` and returns true if one matches.
         protected override bool TryFollowJumpTrampoline(State state, ulong address, out ulong target)
         {
             target = 0;
             IDataReader dataReader = state.Runtime.DataTarget.DataReader;
-            byte[] buffer = new byte[19];
+            byte[] buffer = new byte[13];
             int read = dataReader.Read(address, buffer);
             if (read < 2)
                 return false;
@@ -229,7 +188,7 @@ namespace BenchmarkDotNet.Disassemblers
             // E9 rel32 — JMP near rel32 (target = next-instr + sign_extended(rel32))
             if (read >= 5 && buffer[0] == 0xE9)
             {
-                int rel = buffer[1] | (buffer[2] << 8) | (buffer[3] << 16) | (buffer[4] << 24);
+                int rel = BitConverter.ToInt32(buffer, 1);
                 target = unchecked(address + 5 + (ulong)(long)rel);
                 return IsValidAddress(target);
             }
@@ -246,7 +205,7 @@ namespace BenchmarkDotNet.Disassemblers
             // target. This also matches FixupPrecode (Target slot lives at data offset 0).
             if (read >= 6 && buffer[0] == 0xFF && buffer[1] == 0x25)
             {
-                int disp = buffer[2] | (buffer[3] << 8) | (buffer[4] << 16) | (buffer[5] << 24);
+                int disp = BitConverter.ToInt32(buffer, 2);
                 ulong slot = unchecked(address + 6 + (ulong)(long)disp);
                 if (dataReader.ReadPointer(slot, out ulong slotTarget) && IsValidAddress(slotTarget))
                 {
@@ -259,43 +218,35 @@ namespace BenchmarkDotNet.Disassemblers
             // 48 B8 imm64 ; FF E0 — MOV rax, imm64; JMP rax
             if (read >= 12 && buffer[0] == 0x48 && buffer[1] == 0xB8 && buffer[10] == 0xFF && buffer[11] == 0xE0)
             {
-                target = (ulong)buffer[2]
-                    | ((ulong)buffer[3] << 8)
-                    | ((ulong)buffer[4] << 16)
-                    | ((ulong)buffer[5] << 24)
-                    | ((ulong)buffer[6] << 32)
-                    | ((ulong)buffer[7] << 40)
-                    | ((ulong)buffer[8] << 48)
-                    | ((ulong)buffer[9] << 56);
+                target = BitConverter.ToUInt64(buffer, 2);
                 return IsValidAddress(target);
             }
 
-            // CallCountingStub / StubPrecode — both start with a MOV from a RIP-relative slot, so
-            // they aren't picked up by the JMP patterns above. Match the byte template and read the
-            // Target slot from the data page that sits one stub-page above the code page. Only the
-            // runtime-7+ thunks use this fixed layout; older runtimes never get here.
-            if (state.RuntimeVersion.Major >= 7
-                && runtimeSpecificData.TryGetValue(state.RuntimeVersion, out var data))
+            // CallCountingStub: MOV rax, [rip+disp32] ; DEC word ptr [rax] ; ... (later JMP via
+            // TargetForMethod slot, which lives 8 bytes after RemainingCallCount in the data page).
+            if (read >= 10
+                && buffer[0] == 0x48 && buffer[1] == 0x8B && buffer[2] == 0x05
+                && buffer[7] == 0x66 && buffer[8] == 0xFF && buffer[9] == 0x08)
             {
-                // CallCountingStub: 10-byte template, TargetForMethod at data offset 8
-                if (read >= 10 && new ReadOnlySpan<byte>(buffer, 0, 10).SequenceEqual(data.callCountingStubTemplate))
-                {
-                    const ulong TargetForMethodOffset = 8;
-                    if (dataReader.ReadPointer(address + data.stubPageSize + TargetForMethodOffset, out target) && IsValidAddress(target))
-                        return true;
-                    target = 0;
-                    return false;
-                }
+                int disp = BitConverter.ToInt32(buffer, 3);
+                ulong countSlot = unchecked(address + 7 + (ulong)(long)disp);
+                if (dataReader.ReadPointer(countSlot + 8, out target) && IsValidAddress(target))
+                    return true;
+                target = 0;
+                return false;
+            }
 
-                // StubPrecode: 13-byte template, Target at data offset 8 (MethodDesc at 0)
-                if (read >= 13 && new ReadOnlySpan<byte>(buffer, 0, 13).SequenceEqual(data.stubPrecodeTemplate))
-                {
-                    const ulong TargetOffset = 8;
-                    if (dataReader.ReadPointer(address + data.stubPageSize + TargetOffset, out target) && IsValidAddress(target))
-                        return true;
-                    target = 0;
-                    return false;
-                }
+            // StubPrecode: MOV r10, [rip+disp32] ; JMP [rip+disp32]. Follow the JMP slot.
+            if (read >= 13
+                && buffer[0] == 0x4C && buffer[1] == 0x8B && buffer[2] == 0x15
+                && buffer[7] == 0xFF && buffer[8] == 0x25)
+            {
+                int disp = BitConverter.ToInt32(buffer, 9);
+                ulong slot = unchecked(address + 13 + (ulong)(long)disp);
+                if (dataReader.ReadPointer(slot, out target) && IsValidAddress(target))
+                    return true;
+                target = 0;
+                return false;
             }
 
             return false;
