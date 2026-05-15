@@ -39,11 +39,13 @@ namespace BenchmarkDotNet.Disassemblers
                 && address >= MinValidAddress;
 
         // When ClrMD's GetMethodByInstructionPointer fails on a call target, the bytes at that
-        // address may be a small JMP/B thunk the JIT inserted because the real callee was too far for
-        // a direct relative branch. Architecture-specific subclasses decode their respective shapes
-        // and return the resolved target so TryTranslateAddressToName can retry the method lookup.
+        // address may be (a) a small JMP/B thunk the JIT inserted because the real callee was too
+        // far for a direct relative branch, or (b) a CoreCLR precode/stub (call-counting stub,
+        // stub precode, fixup precode) — the stable entry point for a tiered method. Architecture
+        // -specific subclasses decode their respective shapes and return the resolved target
+        // (the Target slot for precodes) so TryTranslateAddressToName can retry the lookup.
         // Best-effort: return false for anything we don't recognise (matches prior behaviour).
-        protected abstract bool TryFollowJumpTrampoline(IDataReader dataReader, ulong address, out ulong target);
+        protected abstract bool TryFollowJumpTrampoline(State state, ulong address, out ulong target);
 
         private DataTarget Attach(int processId)
         {
@@ -275,17 +277,17 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (method is null)
             {
-                // Chase trampolines iteratively: a near JMP/B thunk's target may itself be a precode/stub
-                // that lands on another near jump (e.g., tier-0 → tier-1 transitions, or PLT-style
-                // indirection through a slot that's been repointed). Bounded by maxHops so a pathological
-                // case (corrupted snapshot, self-pointing thunk) can't loop, and tracks visited addresses
-                // to short-circuit cycles. 8 hops is far more than CoreCLR is known to chain in practice.
+                // Chase trampolines/precodes iteratively: a near JMP/B thunk may target another
+                // near jump, and a stable-entry precode's Target slot may itself currently point at a
+                // tier-0 → tier-1 promotion stub. Bounded by maxHops so a pathological case
+                // (corrupted snapshot, self-pointing thunk) can't loop; visited-set short-circuits
+                // cycles. 8 hops is far more than CoreCLR is known to chain in practice.
                 ulong current = address;
                 HashSet<ulong>? visited = null;
                 const int maxHops = 8;
                 for (int hop = 0; hop < maxHops; hop++)
                 {
-                    if (!TryFollowJumpTrampoline(runtime.DataTarget.DataReader, current, out ulong next))
+                    if (!TryFollowJumpTrampoline(state, current, out ulong next))
                         break;
                     if (next == current)
                         break;
@@ -307,6 +309,11 @@ namespace BenchmarkDotNet.Disassemblers
                     if (isAddressPrecodeMD)
                     {
                         state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
+                        // The precode resolves to a method handle, but if the underlying method has
+                        // already been JITted we still want to disassemble its body — otherwise a
+                        // call routed through a stable-entry precode never enqueues its target.
+                        if (methodDescriptor.NativeCode > 0 && !state.HandledMethods.Contains(methodDescriptor))
+                            state.Todo.Enqueue(new MethodInfo(methodDescriptor, depth + 1));
                     }
                     else
                     {
