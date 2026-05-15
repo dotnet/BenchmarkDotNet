@@ -134,7 +134,9 @@ namespace BenchmarkDotNet.Extensions
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
             start.Environment["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
-            if (benchmarkCase.Job.ResolveValueAsNullable(RunMode.RunStrategyCharacteristic) != RunStrategy.ColdStart)
+            if (benchmarkCase.Job.ResolveValueAsNullable(RunMode.RunStrategyCharacteristic) != RunStrategy.ColdStart
+                // CallCountingDelayMs=0 breaks DisassemblyDiagnoser, so we only set it if the job doesn't need disassembly. https://github.com/dotnet/runtime/issues/117339
+                && !benchmarkCase.Config.HasDisassemblyDiagnoser())
             {
                 SetClrEnvironmentVariables(start, JitInfo.EnvCallCountingDelayMs, "0");
             }
