@@ -188,12 +188,11 @@ namespace BenchmarkDotNet.Disassemblers
         // (so GetMethodByHandle can recover the live ClrMethod even if the call site is still
         // pointing at PreStub), and to the TargetForMethod slot for call-counting stubs.
         //
-        // The data-section layout (slot order within the data page) is stable, but the offset
-        // between the code page and its data section can change between runtime versions, and we
-        // can't predict which scratch register the thunk template chose either. Reading the
-        // LDR-literal displacements straight from the bytes — and using the BR instruction's
-        // register to decide which LDR loaded Target vs MethodDesc — keeps the resolver free of
-        // both a stub-page-size table and any hard-coded register choices.
+        // The register numbers (x10/x12 for StubPrecode, x11/x12 for FixupPrecode, x9 for
+        // CallCountingStub) are part of the runtime's stub ABI and stay fixed across versions; the
+        // data-section layout is also stable. What can change between versions is the offset
+        // between the code page and its data section, so we extract the LDR-literal displacements
+        // straight from the bytes instead of consulting a runtime-version-specific page-size table.
         private static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
         {
             isPrestubMD = false;
@@ -205,29 +204,12 @@ namespace BenchmarkDotNet.Disassemblers
             uint instr1 = ReadInstr(buffer, 4);
             uint instr2 = ReadInstr(buffer, 8);
 
-            // StubPrecode shape: LDR Xa, slot ; LDR Xb, slot ; BR Xa (or Xb)
-            // The register used by BR identifies the Target LDR; the other LDR loads MethodDesc.
-            if (IsLdrLiteral64(instr0, out int rt0, out int off0)
-                && IsLdrLiteral64(instr1, out int rt1, out int off1)
-                && IsBrXn(instr2, out int brRt)
-                && rt0 != rt1
-                && (brRt == rt0 || brRt == rt1))
+            // StubPrecode: LDR x10, Target ; LDR x12, MethodDesc ; BR x10
+            if (IsLdrLiteral64(instr0, out int rt0, out int _) && rt0 == 10
+                && IsLdrLiteral64(instr1, out int rt1, out int off1) && rt1 == 12
+                && instr2 == 0xD61F0140u)
             {
-                int mdOff;
-                ulong mdLdrAddress;
-                if (brRt == rt0)
-                {
-                    // instr0 loads Target, instr1 loads MethodDesc.
-                    mdOff = off1;
-                    mdLdrAddress = address + 4;
-                }
-                else
-                {
-                    // instr1 loads Target, instr0 loads MethodDesc.
-                    mdOff = off0;
-                    mdLdrAddress = address;
-                }
-                ulong mdSlot = unchecked(mdLdrAddress + (ulong)(long)mdOff);
+                ulong mdSlot = unchecked(address + 4 + (ulong)(long)off1);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -237,13 +219,10 @@ namespace BenchmarkDotNet.Disassemblers
                 return false;
             }
 
-            // FixupPrecode shape: LDR Xa, slot ; BR Xa ; LDR Xb, slot
-            // Xa loaded Target; the trailing LDR loaded MethodDesc.
-            if (IsLdrLiteral64(instr0, out int rtA, out int _)
-                && IsBrXn(instr1, out int brRtF)
-                && brRtF == rtA
-                && IsLdrLiteral64(instr2, out int rtB, out int off2)
-                && rtA != rtB)
+            // FixupPrecode: LDR x11, Target ; BR x11 ; LDR x12, MethodDesc
+            if (IsLdrLiteral64(instr0, out int rtA, out int _) && rtA == 11
+                && instr1 == 0xD61F0160u
+                && IsLdrLiteral64(instr2, out int rtB, out int off2) && rtB == 12)
             {
                 ulong mdSlot = unchecked(address + 8 + (ulong)(long)off2);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
@@ -255,12 +234,12 @@ namespace BenchmarkDotNet.Disassemblers
                 return false;
             }
 
-            // CallCountingStub: LDR Xa, RemainingCallCount ; LDRH Wb, [Xa] ; SUBS Wb, Wb, #1 ; ...
+            // CallCountingStub: LDR x9, RemainingCallCount ; LDRH w10, [x9] ; SUBS w10, w10, #1
             // No MethodDesc to recover here; read TargetForMethod, which lives 8 bytes after
             // RemainingCallCount in the data section.
-            if (IsLdrLiteral64(instr0, out int rtCount, out int offCount)
-                && IsLdrhFromXn(instr1, rtCount, out int _)
-                && IsSubsImm32(instr2, out int _, out int _))
+            if (IsLdrLiteral64(instr0, out int rtCount, out int offCount) && rtCount == 9
+                && instr1 == 0x7940012Au
+                && instr2 == 0x7100054Au)
             {
                 ulong countSlot = unchecked(address + (ulong)(long)offCount);
                 if (reader.ReadPointer(countSlot + 8, out ulong target) && IsValidAddress(target))
@@ -295,46 +274,6 @@ namespace BenchmarkDotNet.Disassemblers
             if ((imm19 & 0x40000) != 0)
                 imm19 |= unchecked((int)0xFFF80000u);
             offsetBytes = imm19 * 4;
-            return true;
-        }
-
-        // BR Xn: 1101 0110 0001 1111 0000 00 nnnnn 00000. The register-only fields are Rn (bits 9:5).
-        private static bool IsBrXn(uint instr, out int rn)
-        {
-            rn = 0;
-            if ((instr & 0xFFFFFC1Fu) != 0xD61F0000u)
-                return false;
-            rn = (int)((instr >> 5) & 0x1Fu);
-            return true;
-        }
-
-        // LDRH Wt, [Xn, #0]: encoding 0111 1001 01 imm12 nnnnn ttttt with imm12=0. We only need to
-        // validate that Rn matches the register the preceding LDR loaded.
-        private static bool IsLdrhFromXn(uint instr, int expectedRn, out int rt)
-        {
-            rt = 0;
-            if ((instr & 0xFFC00000u) != 0x79400000u)
-                return false;
-            int rn = (int)((instr >> 5) & 0x1Fu);
-            if (rn != expectedRn)
-                return false;
-            // Reject any non-zero imm12 — the call-counting stub uses [Xn, #0].
-            if ((instr & 0x003FFC00u) != 0)
-                return false;
-            rt = (int)(instr & 0x1Fu);
-            return true;
-        }
-
-        // SUBS Wd, Wn, #imm (32-bit immediate): 0111 0001 sh imm12 nnnnn ddddd. We don't care about
-        // the imm value beyond it being recognisable as a SUBS-immediate.
-        private static bool IsSubsImm32(uint instr, out int rd, out int rn)
-        {
-            rd = 0;
-            rn = 0;
-            if ((instr & 0xFF800000u) != 0x71000000u)
-                return false;
-            rd = (int)(instr & 0x1Fu);
-            rn = (int)((instr >> 5) & 0x1Fu);
             return true;
         }
 
@@ -412,27 +351,22 @@ namespace BenchmarkDotNet.Disassemblers
             uint instr1 = ReadInstr(buffer, 4);
             uint instr2 = ReadInstr(buffer, 8);
 
-            // StubPrecode shape: LDR Xa, slot ; LDR Xb, slot ; BR (Xa|Xb). Follow whichever LDR
-            // matches the BR's register — that one loaded the Target.
-            if (IsLdrLiteral64(instr0, out int rt0, out int off0)
-                && IsLdrLiteral64(instr1, out int rt1, out int off1)
-                && IsBrXn(instr2, out int brRt0)
-                && rt0 != rt1 && (brRt0 == rt0 || brRt0 == rt1))
+            // StubPrecode: LDR x10, Target ; LDR x12, MethodDesc ; BR x10. Follow the first LDR.
+            if (IsLdrLiteral64(instr0, out int rt0, out int off0) && rt0 == 10
+                && IsLdrLiteral64(instr1, out int rt1, out int _) && rt1 == 12
+                && instr2 == 0xD61F0140u)
             {
-                ulong targetSlot = brRt0 == rt0
-                    ? unchecked(address + (ulong)(long)off0)
-                    : unchecked(address + 4 + (ulong)(long)off1);
+                ulong targetSlot = unchecked(address + (ulong)(long)off0);
                 if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
                 return false;
             }
 
-            // FixupPrecode shape: LDR Xa, slot ; BR Xa ; LDR Xb, slot. The first LDR loads Target.
-            if (IsLdrLiteral64(instr0, out int rtA, out int offA)
-                && IsBrXn(instr1, out int brRtF)
-                && brRtF == rtA
-                && IsLdrLiteral64(instr2, out int rtB, out int _) && rtA != rtB)
+            // FixupPrecode: LDR x11, Target ; BR x11 ; LDR x12, MethodDesc. Follow the first LDR.
+            if (IsLdrLiteral64(instr0, out int rtA, out int offA) && rtA == 11
+                && instr1 == 0xD61F0160u
+                && IsLdrLiteral64(instr2, out int rtB, out int _) && rtB == 12)
             {
                 ulong targetSlot = unchecked(address + (ulong)(long)offA);
                 if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
@@ -441,11 +375,11 @@ namespace BenchmarkDotNet.Disassemblers
                 return false;
             }
 
-            // CallCountingStub: LDR Xa, RemainingCallCount ; LDRH Wb, [Xa] ; SUBS Wb, Wb, #1.
+            // CallCountingStub: LDR x9, RemainingCallCount ; LDRH w10, [x9] ; SUBS w10, w10, #1.
             // TargetForMethod lives 8 bytes after RemainingCallCount in the data section.
-            if (IsLdrLiteral64(instr0, out int rtCount, out int offCount)
-                && IsLdrhFromXn(instr1, rtCount, out int _)
-                && IsSubsImm32(instr2, out int _, out int _))
+            if (IsLdrLiteral64(instr0, out int rtCount, out int offCount) && rtCount == 9
+                && instr1 == 0x7940012Au
+                && instr2 == 0x7100054Au)
             {
                 ulong countSlot = unchecked(address + (ulong)(long)offCount);
                 if (dataReader.ReadPointer(countSlot + 8, out target) && IsValidAddress(target))
