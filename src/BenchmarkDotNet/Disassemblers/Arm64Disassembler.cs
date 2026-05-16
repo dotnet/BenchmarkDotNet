@@ -234,6 +234,24 @@ namespace BenchmarkDotNet.Disassemblers
                 return false;
             }
 
+            // FixupPrecodeCode_Fixup: LDR x12, MethodDesc ; LDR x11, PrecodeFixupThunk ; BR x11
+            // This is the pre-backpatch shape — the call site has never been routed through the
+            // method's JIT'd entry point yet, so x11 still loads the fixup thunk instead of Target.
+            // Resolve via the MethodDesc slot loaded into x12 (instr0).
+            if (IsLdrLiteral64(instr0, out int rtF0, out int offF0) && rtF0 == 12
+                && IsLdrLiteral64(instr1, out int rtF1, out int _) && rtF1 == 11
+                && instr2 == 0xD61F0160u)
+            {
+                ulong mdSlot = unchecked(address + (ulong)(long)offF0);
+                if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
+                {
+                    address = md;
+                    isPrestubMD = true;
+                    return true;
+                }
+                return false;
+            }
+
             // CallCountingStub: LDR x9, RemainingCallCount ; LDRH w10, [x9] ; SUBS w10, w10, #1
             // No MethodDesc to recover here; read TargetForMethod, which lives 8 bytes after
             // RemainingCallCount in the data section.
