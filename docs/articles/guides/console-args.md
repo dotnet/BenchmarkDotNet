@@ -257,7 +257,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 
 * `-j`, `--job`               (Default: Default) Dry/Short/Medium/Long or Default
 * `-r`, `--runtimes`          Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!
-* `-e`, `--exporters`         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML
+* `-e`, `--exporters`         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics
 * `-m`, `--memory`            (Default: false) Prints memory statistics
 * `-t`, `--threading`         (Default: false) Prints threading statistics
 * `--exceptions`              (Default: false) Prints exception statistics

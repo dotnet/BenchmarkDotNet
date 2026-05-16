@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!")]
         public IEnumerable<string> Runtimes { get; set; } = [];
 
-        [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML")]
+        [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics")]
         public IEnumerable<string> Exporters { get; set; } = [];
 
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
