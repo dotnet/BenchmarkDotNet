@@ -10,26 +10,6 @@ benchmark_error_nanoseconds{method="Foo", param1="value3", param2="value3", para
 benchmark_execution_time_nanoseconds{method="Foo", param1="value1", param2="value1", param3="value1", type="MockBenchmarkClass"} 0.1
 benchmark_execution_time_nanoseconds{method="Foo", param1="value2", param2="value2", param3="value2", type="MockBenchmarkClass"} 0.1
 benchmark_execution_time_nanoseconds{method="Foo", param1="value3", param2="value3", param3="value3", type="MockBenchmarkClass"} 0.1
-# HELP benchmark_gc_gen0_collections_total Total number of Gen 0 garbage collections during the benchmark execution.
-# TYPE benchmark_gc_gen0_collections_total counter
-benchmark_gc_gen0_collections_total{method="Foo", param1="value1", param2="value1", param3="value1", type="MockBenchmarkClass"} 0
-benchmark_gc_gen0_collections_total{method="Foo", param1="value2", param2="value2", param3="value2", type="MockBenchmarkClass"} 0
-benchmark_gc_gen0_collections_total{method="Foo", param1="value3", param2="value3", param3="value3", type="MockBenchmarkClass"} 0
-# HELP benchmark_gc_gen1_collections_total Total number of Gen 1 garbage collections during the benchmark execution.
-# TYPE benchmark_gc_gen1_collections_total counter
-benchmark_gc_gen1_collections_total{method="Foo", param1="value1", param2="value1", param3="value1", type="MockBenchmarkClass"} 0
-benchmark_gc_gen1_collections_total{method="Foo", param1="value2", param2="value2", param3="value2", type="MockBenchmarkClass"} 0
-benchmark_gc_gen1_collections_total{method="Foo", param1="value3", param2="value3", param3="value3", type="MockBenchmarkClass"} 0
-# HELP benchmark_gc_gen2_collections_total Total number of Gen 2 garbage collections during the benchmark execution.
-# TYPE benchmark_gc_gen2_collections_total counter
-benchmark_gc_gen2_collections_total{method="Foo", param1="value1", param2="value1", param3="value1", type="MockBenchmarkClass"} 0
-benchmark_gc_gen2_collections_total{method="Foo", param1="value2", param2="value2", param3="value2", type="MockBenchmarkClass"} 0
-benchmark_gc_gen2_collections_total{method="Foo", param1="value3", param2="value3", param3="value3", type="MockBenchmarkClass"} 0
-# HELP benchmark_gc_total_operations_total Total number of garbage collection operations during the benchmark execution.
-# TYPE benchmark_gc_total_operations_total counter
-benchmark_gc_total_operations_total{method="Foo", param1="value1", param2="value1", param3="value1", type="MockBenchmarkClass"} 0
-benchmark_gc_total_operations_total{method="Foo", param1="value2", param2="value2", param3="value2", type="MockBenchmarkClass"} 0
-benchmark_gc_total_operations_total{method="Foo", param1="value3", param2="value3", param3="value3", type="MockBenchmarkClass"} 0
 # HELP benchmark_label Additional metric label
 # TYPE benchmark_label gauge
 benchmark_label{method="Foo", param1="value1", param2="value1", param3="value1", type="MockBenchmarkClass"} 42

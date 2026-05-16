@@ -6,18 +6,6 @@ benchmark_error_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0
 # TYPE benchmark_execution_time_nanoseconds gauge
 # UNIT benchmark_execution_time_nanoseconds nanoseconds
 benchmark_execution_time_nanoseconds{method="Foo", type="MockBenchmarkClass"} 0.1
-# HELP benchmark_gc_gen0_collections_total Total number of Gen 0 garbage collections during the benchmark execution.
-# TYPE benchmark_gc_gen0_collections_total counter
-benchmark_gc_gen0_collections_total{method="Foo", type="MockBenchmarkClass"} 0
-# HELP benchmark_gc_gen1_collections_total Total number of Gen 1 garbage collections during the benchmark execution.
-# TYPE benchmark_gc_gen1_collections_total counter
-benchmark_gc_gen1_collections_total{method="Foo", type="MockBenchmarkClass"} 0
-# HELP benchmark_gc_gen2_collections_total Total number of Gen 2 garbage collections during the benchmark execution.
-# TYPE benchmark_gc_gen2_collections_total counter
-benchmark_gc_gen2_collections_total{method="Foo", type="MockBenchmarkClass"} 0
-# HELP benchmark_gc_total_operations_total Total number of garbage collection operations during the benchmark execution.
-# TYPE benchmark_gc_total_operations_total counter
-benchmark_gc_total_operations_total{method="Foo", type="MockBenchmarkClass"} 0
 # HELP benchmark_label_with_dash Additional metric label_with-dash
 # TYPE benchmark_label_with_dash gauge
 benchmark_label_with_dash{method="Foo", type="MockBenchmarkClass"} 84
