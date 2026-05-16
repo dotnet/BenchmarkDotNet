@@ -31,9 +31,13 @@ public class OpenMetricsExporter : ExporterBase
             var descriptor = benchmark.Descriptor;
             var parameters = benchmark.Parameters;
             bool hasMemoryDiagnoser = benchmark.Config.HasMemoryDiagnoser();
-            long? allocatedBytesPerOperation = hasMemoryDiagnoser
+            double? allocatedBytesPerOperation = hasMemoryDiagnoser
                 ? gcStats.GetBytesAllocatedPerOperation(benchmark)
                 : null;
+            if (hasMemoryDiagnoser && !allocatedBytesPerOperation.HasValue)
+            {
+                allocatedBytesPerOperation = double.NaN;
+            }
 
             var stats = report.ResultStatistics;
             var metrics = report.Metrics;
@@ -41,13 +45,13 @@ public class OpenMetricsExporter : ExporterBase
                 continue;
 
             AddCommonMetrics(metricsSet, descriptor, parameters, stats, gcStats, allocatedBytesPerOperation);
-            AddAdditionalMetrics(metricsSet, metrics, descriptor, parameters, skipAllocatedMemoryMetric: allocatedBytesPerOperation.HasValue);
+            AddAdditionalMetrics(metricsSet, metrics, descriptor, parameters, skipAllocatedMemoryMetric: hasMemoryDiagnoser, reserveAllocatedBytesMetricName: hasMemoryDiagnoser);
         }
 
         await WriteMetricsAsync(writer, metricsSet, cancellationToken).ConfigureAwait(false);
     }
 
-    private static void AddCommonMetrics(HashSet<OpenMetric> metricsSet, Descriptor descriptor, ParameterInstances parameters, Statistics stats, GcStats gcStats, long? allocatedBytesPerOperation)
+    private static void AddCommonMetrics(HashSet<OpenMetric> metricsSet, Descriptor descriptor, ParameterInstances parameters, Statistics stats, GcStats gcStats, double? allocatedBytesPerOperation)
     {
         metricsSet.AddRange([
             // Mean
@@ -146,7 +150,7 @@ public class OpenMetricsExporter : ExporterBase
         }
     }
 
-    private static void AddAdditionalMetrics(HashSet<OpenMetric> metricsSet, IReadOnlyDictionary<string, Metric> metrics, Descriptor descriptor, ParameterInstances parameters, bool skipAllocatedMemoryMetric)
+    private static void AddAdditionalMetrics(HashSet<OpenMetric> metricsSet, IReadOnlyDictionary<string, Metric> metrics, Descriptor descriptor, ParameterInstances parameters, bool skipAllocatedMemoryMetric, bool reserveAllocatedBytesMetricName)
     {
         var reservedMetricNames = new HashSet<string>
         {
@@ -158,9 +162,13 @@ public class OpenMetricsExporter : ExporterBase
             $"{MetricPrefix}gc_gen2_collections_total",
             $"{MetricPrefix}gc_total_operations_total",
             $"{MetricPrefix}p90_nanoseconds",
-            $"{MetricPrefix}p95_nanoseconds",
-            $"{MetricPrefix}allocated_bytes"
+            $"{MetricPrefix}p95_nanoseconds"
         };
+
+        if (reserveAllocatedBytesMetricName)
+        {
+            reservedMetricNames.Add($"{MetricPrefix}allocated_bytes");
+        }
 
         foreach (var metric in metrics)
         {
