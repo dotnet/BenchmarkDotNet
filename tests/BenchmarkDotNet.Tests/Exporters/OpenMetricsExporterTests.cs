@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -278,6 +279,50 @@ namespace BenchmarkDotNet.Tests.Exporters
             }
 
             return;
+        }
+
+        [Fact]
+        public async Task MemoryDiagnoser_ExportsAllocatedBytesPerOperation()
+        {
+            var config = new ManualConfig().AddDiagnoser(MemoryDiagnoser.Default);
+            var summary = new Summary(
+                "MemoryDiagnoserSummary",
+                [
+                    new BenchmarkReport(
+                        success: true,
+                        benchmarkCase: new BenchmarkCase(
+                            new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
+                            Job.Dry,
+                            new ParameterInstances([]),
+                            ImmutableConfigBuilder.Create(config)),
+                        null!,
+                        null!,
+                        [
+                            new ExecuteResult(
+                                [
+                                    new Measurement(0, IterationMode.Workload, IterationStage.Result, 4, 4, 40)
+                                ],
+                                GcStats.Parse("// GC: 1 2 3 65536 4"))
+                        ],
+                        [
+                            new Metric(AllocatedMemoryMetricDescriptor.Instance, 16384),
+                            new(new FakeMetricDescriptor("label", "label"), 42.0)
+                        ])
+                ],
+                HostEnvironmentInfo.GetCurrent(),
+                "",
+                "",
+                TimeSpan.Zero,
+                CultureInfo.InvariantCulture,
+                [],
+                []);
+
+            var logger = new AccumulationLogger();
+
+            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+
+            var settings = VerifyHelper.Create();
+            await Verifier.Verify(logger.GetLog(), settings);
         }
     }
 }
