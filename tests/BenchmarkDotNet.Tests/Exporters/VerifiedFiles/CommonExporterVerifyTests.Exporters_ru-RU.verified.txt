@@ -596,6 +596,11 @@ MarkdownExporter-stackoverflow
 ############################################
 OpenMetricsExporter
 ############################################
+# HELP benchmark_allocated_bytes Allocated managed memory per single benchmark operation.
+# TYPE benchmark_allocated_bytes gauge
+# UNIT benchmark_allocated_bytes bytes
+benchmark_allocated_bytes{method="Foo", type="MockBenchmarkClass"} NaN
+benchmark_allocated_bytes{method="Bar", type="MockBenchmarkClass"} NaN
 # HELP benchmark_cachemisses Additional metric CacheMisses
 # TYPE benchmark_cachemisses gauge
 benchmark_cachemisses{method="Foo", type="MockBenchmarkClass"} 7
