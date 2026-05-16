@@ -188,7 +188,8 @@ namespace BenchmarkDotNet.Disassemblers
         // (so GetMethodByHandle can recover the live ClrMethod even if the call site is still
         // pointing at PreStub), and to the TargetForMethod slot for call-counting stubs.
         //
-        // The register numbers (x10/x12 for StubPrecode, x11/x12 for FixupPrecode, x9 for
+        // See dotnet/runtime src/coreclr/vm/arm64/thunktemplates.asm/.S for the canonical stub
+        // shapes. The register numbers (x10/x12 for StubPrecode, x11/x12 for FixupPrecode, x9 for
         // CallCountingStub) are part of the runtime's stub ABI and stay fixed across versions; the
         // data-section layout is also stable. What can change between versions is the offset
         // between the code page and its data section, so we extract the LDR-literal displacements

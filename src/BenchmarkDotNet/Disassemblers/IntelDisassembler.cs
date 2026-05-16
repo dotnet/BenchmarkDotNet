@@ -54,11 +54,13 @@ namespace BenchmarkDotNet.Disassemblers
         // rewritten to the resolved slot value; `isPrestubMD` is set when the resolved value is a
         // MethodDesc handle (used downstream to dispatch to GetMethodByHandle).
         //
-        // The data-section layout (slot order within the data page) is stable, but the offset
-        // between the code page and its data section is part of the runtime's allocator policy and
-        // has changed in the past (currently 16 kB on x64). Reading the RIP-relative displacements
-        // out of the encoded instructions themselves avoids any dependency on that code-to-data
-        // gap, so the resolver doesn't need a runtime-version-specific table of stub page sizes.
+        // See dotnet/runtime src/coreclr/vm/amd64/thunktemplates.asm/.S for the canonical stub
+        // shapes. The data-section layout (slot order within the data page) is stable, but the
+        // offset between the code page and its data section is part of the runtime's allocator
+        // policy and has changed in the past (currently 16 kB on x64). Reading the RIP-relative
+        // displacements out of the encoded instructions themselves avoids any dependency on that
+        // code-to-data gap, so the resolver doesn't need a runtime-version-specific table of stub
+        // page sizes.
         private static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
         {
             isPrestubMD = false;
