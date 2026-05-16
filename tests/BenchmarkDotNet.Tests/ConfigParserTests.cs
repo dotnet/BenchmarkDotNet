@@ -7,6 +7,9 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.OpenMetrics;
+using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -27,6 +30,26 @@ namespace BenchmarkDotNet.Tests
     public class ConfigParserTests
     {
         public ITestOutputHelper Output { get; }
+        public static TheoryData<string, IExporter[]> Exporters => new()
+        {
+            { "csv", [CsvExporter.Default] },
+            { "csvmeasurements", [CsvMeasurementsExporter.Default] },
+            { "html", [HtmlExporter.Default] },
+            { "markdown", [MarkdownExporter.Default] },
+            { "atlassian", [MarkdownExporter.Atlassian] },
+            { "stackoverflow", [MarkdownExporter.StackOverflow] },
+            { "github", [MarkdownExporter.GitHub] },
+            { "plain", [PlainExporter.Default] },
+            { "rplot", [CsvMeasurementsExporter.Default, RPlotExporter.Default] },
+            { "json", [JsonExporter.Default] },
+            { "briefjson", [JsonExporter.Brief] },
+            { "fulljson", [JsonExporter.Full] },
+            { "asciidoc", [AsciiDocExporter.Default] },
+            { "xml", [XmlExporter.Default] },
+            { "briefxml", [XmlExporter.Brief] },
+            { "fullxml", [XmlExporter.Full] },
+            { "openmetrics", [OpenMetricsExporter.Default] }
+        };
 
         public ConfigParserTests(ITestOutputHelper output) => Output = output;
 
@@ -51,6 +74,16 @@ namespace BenchmarkDotNet.Tests
             Assert.Empty(config.GetDiagnosers());
             Assert.Empty(config.GetAnalysers());
             Assert.Empty(config.GetLoggers());
+        }
+
+        [Theory]
+        [MemberData(nameof(Exporters))]
+        public void ExportersAreParsedCorrectly(string exporter, IExporter[] expectedExporters)
+        {
+            var config = ConfigParser.Parse(["--exporters", exporter], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(expectedExporters, config.GetExporters().ToArray());
         }
 
         [Fact]
