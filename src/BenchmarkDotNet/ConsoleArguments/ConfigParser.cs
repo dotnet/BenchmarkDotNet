@@ -71,7 +71,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "asciidoc", new[] { AsciiDocExporter.Default } },
                 { "xml", new[] { XmlExporter.Default } },
                 { "briefxml", new[] { XmlExporter.Brief } },
-                { "fullxml", new[] { XmlExporter.Full } }
+                { "fullxml", new[] { XmlExporter.Full } },
+                { "openmetrics", new[] { Exporters.OpenMetrics.OpenMetricsExporter.Default } }
             };
 
         public static (bool isSuccess, IConfig? config, CommandLineOptions? options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
