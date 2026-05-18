@@ -30,13 +30,22 @@ namespace BenchmarkDotNet.Disassemblers
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
 
-        private static bool IsValidAddress(ulong address)
+        protected static bool IsValidAddress(ulong address)
             // -1 (ulong.MaxValue) address is invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
             // 0 is NULL and therefore never valid.
             // Addresses less than the minimum virtual address are also invalid.
             => address != ulong.MaxValue
                 && address != 0
                 && address >= MinValidAddress;
+
+        // When ClrMD's GetMethodByInstructionPointer fails on a call target, the bytes at that
+        // address may be (a) a small JMP/B thunk the JIT inserted because the real callee was too
+        // far for a direct relative branch, or (b) a CoreCLR precode/stub (call-counting stub,
+        // stub precode, fixup precode) — the stable entry point for a tiered method. Architecture
+        // -specific subclasses decode their respective shapes and return the resolved target
+        // (the Target slot for precodes) so TryTranslateAddressToName can retry the lookup.
+        // Best-effort: return false for anything we don't recognise (matches prior behaviour).
+        protected abstract bool TryFollowJumpTrampoline(State state, ulong address, out ulong target);
 
         private DataTarget Attach(int processId)
         {
@@ -268,12 +277,43 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (method is null)
             {
+                // Chase trampolines/precodes iteratively: a near JMP/B thunk may target another
+                // near jump, and a stable-entry precode's Target slot may itself currently point at a
+                // tier-0 → tier-1 promotion stub. Bounded by maxHops so a pathological case
+                // (corrupted snapshot, self-pointing thunk) can't loop; visited-set short-circuits
+                // cycles. 8 hops is far more than CoreCLR is known to chain in practice.
+                ulong current = address;
+                HashSet<ulong>? visited = null;
+                const int maxHops = 8;
+                for (int hop = 0; hop < maxHops; hop++)
+                {
+                    if (!TryFollowJumpTrampoline(state, current, out ulong next))
+                        break;
+                    if (next == current)
+                        break;
+                    visited ??= [];
+                    if (!visited.Add(next))
+                        break;
+                    method = runtime.GetMethodByInstructionPointer(next);
+                    if (method is not null)
+                        break;
+                    current = next;
+                }
+            }
+
+            if (method is null)
+            {
                 var methodDescriptor = runtime.GetMethodByHandle(address);
                 if (methodDescriptor is not null)
                 {
                     if (isAddressPrecodeMD)
                     {
                         state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
+                        // The precode resolves to a method handle, but if the underlying method has
+                        // already been JITted we still want to disassemble its body — otherwise a
+                        // call routed through a stable-entry precode never enqueues its target.
+                        if (methodDescriptor.NativeCode > 0 && !state.HandledMethods.Contains(methodDescriptor))
+                            state.Todo.Enqueue(new MethodInfo(methodDescriptor, depth + 1));
                     }
                     else
                     {

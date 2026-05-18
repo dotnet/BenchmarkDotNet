@@ -138,63 +138,8 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Arm64Disassembler : ClrMdDisassembler
     {
-        internal sealed class RuntimeSpecificData
-        {
-            // See dotnet/runtime src/coreclr/vm/arm64/thunktemplates.asm/.S for the stub code
-            // ldr  x9, DATA_SLOT(CallCountingStub, RemainingCallCountCell)
-            // ldrh w10, [x9]
-            // subs w10, w10, #0x1
-            internal readonly byte[] callCountingStubTemplate = [0x09, 0x00, 0x00, 0x58, 0x2a, 0x01, 0x40, 0x79, 0x4a, 0x05, 0x00, 0x71];
-            // ldr x10, DATA_SLOT(StubPrecode, Target)
-            // ldr x12, DATA_SLOT(StubPrecode, MethodDesc)
-            // br x10
-            internal readonly byte[] stubPrecodeTemplate = [0x4a, 0x00, 0x00, 0x58, 0xec, 0x00, 0x00, 0x58, 0x40, 0x01, 0x1f, 0xd6];
-            // ldr x11, DATA_SLOT(FixupPrecode, Target)
-            // br  x11
-            // ldr x12, DATA_SLOT(FixupPrecode, MethodDesc)
-            internal readonly byte[] fixupPrecodeTemplate = [0x0b, 0x00, 0x00, 0x58, 0x60, 0x01, 0x1f, 0xd6, 0x0c, 0x00, 0x00, 0x58];
-            internal readonly ulong stubPageSize;
-
-            internal RuntimeSpecificData(State state)
-            {
-                stubPageSize = (ulong)Environment.SystemPageSize;
-                if (state.RuntimeVersion.Major >= 8)
-                {
-                    // In .NET 8, the stub page size was changed to min 16kB
-                    stubPageSize = Math.Max(stubPageSize, 16384);
-                }
-
-                // The stubs code depends on the current OS memory page size, so we need to update the templates to reflect that
-                ulong pageSizeShifted = stubPageSize / 32;
-                // Calculate the ldr x9, #offset instruction with offset based on the page size
-                callCountingStubTemplate[1] = (byte)(pageSizeShifted & 0xff);
-                callCountingStubTemplate[2] = (byte)(pageSizeShifted >> 8);
-
-                // Calculate the ldr x10, #offset instruction with offset based on the page size
-                stubPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
-                stubPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
-                // Calculate the ldr x12, #offset instruction with offset based on the page size
-                stubPrecodeTemplate[5] = (byte)((pageSizeShifted - 1) & 0xff);
-                stubPrecodeTemplate[6] = (byte)((pageSizeShifted - 1) >> 8);
-
-                // Calculate the ldr x11, #offset instruction with offset based on the page size
-                fixupPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
-                fixupPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
-                // Calculate the ldr x12, #offset instruction with offset based on the page size
-                fixupPrecodeTemplate[9] = (byte)(pageSizeShifted & 0xff);
-                fixupPrecodeTemplate[10] = (byte)(pageSizeShifted >> 8);
-            }
-        }
-
-        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = [];
-
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
-            if (!runtimeSpecificData.TryGetValue(state.RuntimeVersion, out var data))
-            {
-                runtimeSpecificData.Add(state.RuntimeVersion, data = new RuntimeSpecificData(state));
-            }
-
             const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
             using (CapstoneArm64Disassembler disassembler = CapstoneDisassembler.CreateArm64Disassembler(disassembleMode))
             {
@@ -216,33 +161,8 @@ namespace BenchmarkDotNet.Disassemblers
                     {
                         if (isIndirect && state.RuntimeVersion.Major >= 7)
                         {
-                            // Check if the target is a known stub
-                            // The stubs are allocated in interleaved code / data pages in memory. The data part of the stub
-                            // is at an address one memory page higher than the code.
-                            byte[] buffer = new byte[12];
-
-                            FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, address, buffer);
-
-                            if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length)
-                            {
-                                if (buffer.SequenceEqual(data.callCountingStubTemplate))
-                                {
-                                    const ulong TargetMethodAddressSlotOffset = 8;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + data.stubPageSize + TargetMethodAddressSlotOffset);
-                                }
-                                else if (buffer.SequenceEqual(data.stubPrecodeTemplate))
-                                {
-                                    const ulong MethodDescSlotOffset = 0;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + data.stubPageSize + MethodDescSlotOffset);
-                                    isPrestubMD = true;
-                                }
-                                else if (buffer.SequenceEqual(data.fixupPrecodeTemplate))
-                                {
-                                    const ulong MethodDescSlotOffset = 8;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + data.stubPageSize + MethodDescSlotOffset);
-                                    isPrestubMD = true;
-                                }
-                            }
+                            FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, address, new byte[1]);
+                            TryResolvePrecode(state.Runtime.DataTarget.DataReader, ref address, out isPrestubMD);
                         }
                         TryTranslateAddressToName(address, isPrestubMD, state, depth, currentMethod);
                     }
@@ -260,6 +180,120 @@ namespace BenchmarkDotNet.Disassemblers
                     };
                 }
             }
+        }
+
+        // Counterpart of IntelDisassembler.TryResolvePrecode: recognise the AArch64 precode/stub
+        // shapes by matching the fixed opcode bits and reading slot displacements out of the
+        // encoded LDR-literal instructions. Resolves to the MethodDesc handle when one is present
+        // (so GetMethodByHandle can recover the live ClrMethod even if the call site is still
+        // pointing at PreStub), and to the TargetForMethod slot for call-counting stubs.
+        //
+        // See dotnet/runtime src/coreclr/vm/arm64/thunktemplates.asm/.S for the canonical stub
+        // shapes. The register numbers (x10/x12 for StubPrecode, x11/x12 for FixupPrecode, x9 for
+        // CallCountingStub) are part of the runtime's stub ABI and stay fixed across versions; the
+        // data-section layout is also stable. What can change between versions is the offset
+        // between the code page and its data section, so we extract the LDR-literal displacements
+        // straight from the bytes instead of consulting a runtime-version-specific page-size table.
+        private static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
+        {
+            isPrestubMD = false;
+            byte[] buffer = new byte[12];
+            if (reader.Read(address, buffer) != 12)
+                return false;
+
+            uint instr0 = ReadInstr(buffer, 0);
+            uint instr1 = ReadInstr(buffer, 4);
+            uint instr2 = ReadInstr(buffer, 8);
+
+            // StubPrecode: LDR x10, Target ; LDR x12, MethodDesc ; BR x10
+            if (IsLdrLiteral64(instr0, out int rt0, out int _) && rt0 == 10
+                && IsLdrLiteral64(instr1, out int rt1, out int off1) && rt1 == 12
+                && instr2 == 0xD61F0140u)
+            {
+                ulong mdSlot = unchecked(address + 4 + (ulong)(long)off1);
+                if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
+                {
+                    address = md;
+                    isPrestubMD = true;
+                    return true;
+                }
+                return false;
+            }
+
+            // FixupPrecode: LDR x11, Target ; BR x11 ; LDR x12, MethodDesc
+            if (IsLdrLiteral64(instr0, out int rtA, out int _) && rtA == 11
+                && instr1 == 0xD61F0160u
+                && IsLdrLiteral64(instr2, out int rtB, out int off2) && rtB == 12)
+            {
+                ulong mdSlot = unchecked(address + 8 + (ulong)(long)off2);
+                if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
+                {
+                    address = md;
+                    isPrestubMD = true;
+                    return true;
+                }
+                return false;
+            }
+
+            // FixupPrecodeCode_Fixup: LDR x12, MethodDesc ; LDR x11, PrecodeFixupThunk ; BR x11
+            // This is the pre-backpatch shape — the call site has never been routed through the
+            // method's JIT'd entry point yet, so x11 still loads the fixup thunk instead of Target.
+            // Resolve via the MethodDesc slot loaded into x12 (instr0).
+            if (IsLdrLiteral64(instr0, out int rtF0, out int offF0) && rtF0 == 12
+                && IsLdrLiteral64(instr1, out int rtF1, out int _) && rtF1 == 11
+                && instr2 == 0xD61F0160u)
+            {
+                ulong mdSlot = unchecked(address + (ulong)(long)offF0);
+                if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
+                {
+                    address = md;
+                    isPrestubMD = true;
+                    return true;
+                }
+                return false;
+            }
+
+            // CallCountingStub: LDR x9, RemainingCallCount ; LDRH w10, [x9] ; SUBS w10, w10, #1
+            // No MethodDesc to recover here; read TargetForMethod, which lives 8 bytes after
+            // RemainingCallCount in the data section.
+            if (IsLdrLiteral64(instr0, out int rtCount, out int offCount) && rtCount == 9
+                && instr1 == 0x7940012Au
+                && instr2 == 0x7100054Au)
+            {
+                ulong countSlot = unchecked(address + (ulong)(long)offCount);
+                if (reader.ReadPointer(countSlot + 8, out ulong target) && IsValidAddress(target))
+                {
+                    address = target;
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+        private static uint ReadInstr(byte[] buffer, int offset)
+            => (uint)buffer[offset]
+             | ((uint)buffer[offset + 1] << 8)
+             | ((uint)buffer[offset + 2] << 16)
+             | ((uint)buffer[offset + 3] << 24);
+
+        // LDR (literal), 64-bit form. Encoding: bits[31:24]=0x58, bits[23:5]=imm19 (signed,
+        // word-scaled offset relative to the LDR's own PC), bits[4:0]=Xt. Returns the destination
+        // register and the byte-scaled offset from the LDR instruction's address to the loaded slot.
+        private static bool IsLdrLiteral64(uint instr, out int rt, out int offsetBytes)
+        {
+            rt = 0;
+            offsetBytes = 0;
+            if ((instr & 0xFF000000u) != 0x58000000u)
+                return false;
+            rt = (int)(instr & 0x1Fu);
+            int imm19 = (int)((instr >> 5) & 0x7FFFFu);
+            // Sign-extend 19-bit imm to 32-bit.
+            if ((imm19 & 0x40000) != 0)
+                imm19 |= unchecked((int)0xFFF80000u);
+            offsetBytes = imm19 * 4;
+            return true;
         }
 
         private static bool TryGetReferencedAddress(Arm64Instruction instruction, RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
@@ -296,5 +330,84 @@ namespace BenchmarkDotNet.Disassemblers
                 DisassemblySyntax.Intel => DisassembleSyntax.Intel,
                 _ => DisassembleSyntax.Masm
             };
+
+        // Recognise the AArch64 jump trampoline shape the CLR JIT emits when a call's real target
+        // is out of rel26 range (±128 MB), plus the precode/stub shapes the runtime emits as the
+        // stable entry point for tiered methods (so a direct `BL imm26` landing on the precode
+        // still resolves to the underlying method):
+        //   B imm26   (bits[31:26] = 0b000101)   — target = address + sign_extended(imm26) * 4
+        //   CallCountingStub  (opcode match)     — reads TargetForMethod slot
+        //   StubPrecode       (opcode match)     — reads Target slot (the LDR that BR consumes)
+        //   FixupPrecode      (opcode match)     — reads Target slot (the LDR that BR consumes)
+        // Slot displacements are extracted from the LDR-literal instructions themselves, so the
+        // stub recognition doesn't depend on the runtime's code-to-data offset. Writes the resolved
+        // target into `target` and returns true if one matches.
+        protected override bool TryFollowJumpTrampoline(State state, ulong address, out ulong target)
+        {
+            target = 0;
+            IDataReader dataReader = state.Runtime.DataTarget.DataReader;
+            byte[] buffer = new byte[12];
+            int read = dataReader.Read(address, buffer);
+            if (read < 4)
+                return false;
+
+            uint instr0 = ReadInstr(buffer, 0);
+
+            // B imm26 — bits[31:26] == 0b000101 (0x5)
+            if ((instr0 >> 26) == 0x5)
+            {
+                uint imm26 = instr0 & 0x03FFFFFFu;
+                // Sign-extend the 26-bit immediate to 32 bits, then multiply by 4 (instructions are 4-byte aligned).
+                int offset = (int)(imm26 & 0x02000000u) != 0
+                    ? unchecked((int)(imm26 | 0xFC000000u)) << 2
+                    : (int)imm26 << 2;
+                target = unchecked(address + (ulong)(long)offset);
+                return IsValidAddress(target);
+            }
+
+            if (read < 12)
+                return false;
+            uint instr1 = ReadInstr(buffer, 4);
+            uint instr2 = ReadInstr(buffer, 8);
+
+            // StubPrecode: LDR x10, Target ; LDR x12, MethodDesc ; BR x10. Follow the first LDR.
+            if (IsLdrLiteral64(instr0, out int rt0, out int off0) && rt0 == 10
+                && IsLdrLiteral64(instr1, out int rt1, out int _) && rt1 == 12
+                && instr2 == 0xD61F0140u)
+            {
+                ulong targetSlot = unchecked(address + (ulong)(long)off0);
+                if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
+                    return true;
+                target = 0;
+                return false;
+            }
+
+            // FixupPrecode: LDR x11, Target ; BR x11 ; LDR x12, MethodDesc. Follow the first LDR.
+            if (IsLdrLiteral64(instr0, out int rtA, out int offA) && rtA == 11
+                && instr1 == 0xD61F0160u
+                && IsLdrLiteral64(instr2, out int rtB, out int _) && rtB == 12)
+            {
+                ulong targetSlot = unchecked(address + (ulong)(long)offA);
+                if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
+                    return true;
+                target = 0;
+                return false;
+            }
+
+            // CallCountingStub: LDR x9, RemainingCallCount ; LDRH w10, [x9] ; SUBS w10, w10, #1.
+            // TargetForMethod lives 8 bytes after RemainingCallCount in the data section.
+            if (IsLdrLiteral64(instr0, out int rtCount, out int offCount) && rtCount == 9
+                && instr1 == 0x7940012Au
+                && instr2 == 0x7100054Au)
+            {
+                ulong countSlot = unchecked(address + (ulong)(long)offCount);
+                if (dataReader.ReadPointer(countSlot + 8, out target) && IsValidAddress(target))
+                    return true;
+                target = 0;
+                return false;
+            }
+
+            return false;
+        }
     }
 }
