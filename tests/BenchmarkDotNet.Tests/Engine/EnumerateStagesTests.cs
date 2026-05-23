@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
@@ -161,6 +162,73 @@ namespace BenchmarkDotNet.Tests.Engine
                     stageMeasurements.Add(measurement);
                 }
             }
+        }
+
+        [Fact]
+        public void LongRunningBenchmarksExitJitStageEarly()
+        {
+            // #3114: a benchmark whose single invocation exceeds IterationTime shouldn't drag
+            // the JIT stage through the full tier-promotion loop. The pre-loop iteration
+            // absorbs cctors/lazy-init; a confirmation iteration trips the long-running
+            // heuristic and bails.
+            var slowMeasurement = TimeInterval.FromSeconds(4); // ~8x default IterationTime of 500ms
+            var job = Job.Default.WithInvocationCount(1).WithUnrollFactor(1);
+            var engineParameters = CreateEngineParameters(job);
+
+            int jitWorkloadCount = 0;
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    if (stage is EngineJitStage && iterationData.mode == IterationMode.Workload)
+                    {
+                        jitWorkloadCount++;
+                    }
+                    var measurement = new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, iterationData.invokeCount, slowMeasurement.Nanoseconds);
+                    stageMeasurements.Add(measurement);
+                }
+
+                if (stage is EngineJitStage) break;
+            }
+
+            // Non-tiered runtimes yield exactly one iteration; tiered runtimes yield two
+            // (the pre-loop one, then a single confirmation before bailing).
+            Assert.Equal(JitInfo.IsTiered ? 2 : 1, jitWorkloadCount);
+        }
+
+        [Fact]
+        public void SlowFirstIterationButFastSteadyStateDoesNotExitJitStageEarly()
+        {
+            // If only the first iteration looks long-running (e.g. expensive cctor / lazy init),
+            // the confirmation iteration disagrees and the tiering loop continues as before.
+            if (!JitInfo.IsTiered) return; // Tier-promotion loop is skipped entirely on non-tiered runtimes.
+
+            var slowFirst = TimeInterval.FromSeconds(4).Nanoseconds;
+            var fastRest = TimeInterval.FromMicroseconds(1).Nanoseconds;
+            var engineParameters = CreateEngineParameters(Job.Default.WithInvocationCount(1).WithUnrollFactor(1));
+
+            int jitWorkloadCount = 0;
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    if (stage is EngineJitStage && iterationData.mode == IterationMode.Workload)
+                    {
+                        jitWorkloadCount++;
+                    }
+                    var ns = jitWorkloadCount == 1 && stage is EngineJitStage ? slowFirst : fastRest;
+                    stageMeasurements.Add(new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, iterationData.invokeCount, ns));
+                }
+
+                if (stage is EngineJitStage) break;
+            }
+
+            // Pre-loop iter + confirmation + full tiering loop (one yield per tier since the user
+            // pinned InvocationCount=1, matching JitInfo.MaxTierPromotions * TieredCallCountThreshold)
+            // + one stabilization iteration. Just assert it ran the full tiering loop rather than bailing.
+            Assert.True(jitWorkloadCount > 2, $"Expected the tiering loop to run after confirmation disagreed, got {jitWorkloadCount} jitting iterations.");
         }
 
         [Fact]
