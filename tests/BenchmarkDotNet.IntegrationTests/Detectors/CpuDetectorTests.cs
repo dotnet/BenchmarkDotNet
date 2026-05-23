@@ -15,6 +15,8 @@ public class CpuDetectorTests(ITestOutputHelper Output)
 
         // Assert
         cpuInfo.Should().NotBeNull();
+        cpuInfo.ToFullBrandName().Should().NotBe("Unknown processor");
+
         Output.WriteLine(cpuInfo.ToFullBrandName());
         if (cpuInfo.MaxFrequencyHz == null || cpuInfo.NominalFrequencyHz == null)
             return;
