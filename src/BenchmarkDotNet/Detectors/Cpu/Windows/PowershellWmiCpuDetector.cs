@@ -23,8 +23,14 @@ internal class PowershellWmiCpuDetector : ICpuDetector
                                $"{WmiCpuInfoKeyNames.NumberOfLogicalProcessors}, " +
                                $"{WmiCpuInfoKeyNames.MaxClockSpeed}";
 
-        string? output = ProcessHelper.RunAndReadOutput(PowerShellLocator.LocateOnWindows() ?? "PowerShell",
-            $"Get-CimInstance Win32_Processor -Property {argList} | Format-List {argList}");
+        var exePath = PowerShellLocator.LocateOnWindows() ?? "powershell";
+        var command = $"Get-CimInstance Win32_Processor -Property {argList} | Format-List {argList}";
+        var envVars = new Dictionary<string, string>
+        {
+            ["TERM"] = "dumb" // Suppress outputting ANSI escape sequences.
+        };
+
+        string? output = ProcessHelper.RunAndReadOutput(exePath, $"-Command \"{command}\"", environmentVariables: envVars);
 
         if (output.IsBlank())
             return null;

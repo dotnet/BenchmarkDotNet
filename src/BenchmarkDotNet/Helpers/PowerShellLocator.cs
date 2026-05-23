@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Detectors;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
@@ -7,70 +8,71 @@ namespace BenchmarkDotNet.Helpers;
 /// <summary>
 /// Locates PowerShell on a system, currently only supports on Windows.
 /// </summary>
-internal class PowerShellLocator
+[SupportedOSPlatform("windows")]
+internal static class PowerShellLocator
 {
-    private static readonly string WindowsPowershellPath =
-        $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}" +
-        $"v1.0{Path.DirectorySeparatorChar}powershell.exe";
+    private const string FallbackCommand = "powershell";
 
-    [SupportedOSPlatform("windows")]
-    internal static string? LocateOnWindows()
+    private static readonly string WindowsPowerShellPath =
+        Path.Combine(
+            Environment.SystemDirectory,
+            "WindowsPowerShell",
+            "v1.0",
+            "powershell.exe");
+
+    private static readonly Lazy<string> CachedExePath = new(LocateOnWindowsCore);
+
+    internal static string LocateOnWindows()
+        => CachedExePath.Value;
+
+    private static string LocateOnWindowsCore()
     {
-        if (OsDetector.IsWindows() == false)
-            return null;
-
-        string powershellPath;
+        if (!OsDetector.IsWindows())
+            throw new PlatformNotSupportedException();
 
         try
         {
-            string programFiles = Environment.Is64BitOperatingSystem
-                ? Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
-                : Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            // Try to find PowerShell Core (`pwsh.exe`)
+            if (TryLocatePwshExe(out var pwshExePath))
+                return pwshExePath;
 
-            string powershell7PlusPath = $"{programFiles}{Path.DirectorySeparatorChar}Powershell{Path.DirectorySeparatorChar}";
-
-            bool checkForPowershell7Plus = true;
-
-            if (Directory.Exists(powershell7PlusPath))
-            {
-                string[] subDirectories = Directory.EnumerateDirectories(powershell7PlusPath, "*", SearchOption.AllDirectories)
-                    .ToArray();
-
-                //Use the highest number string directory for PowerShell so that we get the newest major PowerShell version
-                // Example version directories are 6, 7, and in the future 8.
-                string? subDirectory = subDirectories.Where(x => Regex.IsMatch(x, "[0-9]"))
-                    .Select(x => x)
-                    .OrderByDescending(x => x)
-                    .FirstOrDefault();
-
-                if (subDirectory is not null)
-                {
-                    powershell7PlusPath = $"{subDirectory}{Path.DirectorySeparatorChar}pwsh.exe";
-                }
-                else
-                {
-                    checkForPowershell7Plus = false;
-                }
-            }
-
-            // Optimistically, use Cross-platform new PowerShell when available but fallback to Windows PowerShell if not available.
-            if (checkForPowershell7Plus)
-            {
-                powershellPath = File.Exists(powershell7PlusPath) ? powershell7PlusPath : WindowsPowershellPath;
-            }
-            else
-            {
-                powershellPath = WindowsPowershellPath;
-            }
-
-            if (File.Exists(powershellPath) == false)
-                powershellPath = "PowerShell";
+            // Try to find Windows PowerShell (`powershell.exe)
+            if (File.Exists(WindowsPowerShellPath))
+                return WindowsPowerShellPath;
         }
         catch
         {
-            powershellPath = "PowerShell";
+            // ignored
         }
 
-        return powershellPath;
+        // Fallback to `powershell` command, which should be available in PATH.
+        return FallbackCommand;
+    }
+
+    private static bool TryLocatePwshExe([NotNullWhen(true)] out string? pwshExePath)
+    {
+        pwshExePath = null;
+
+        string programFiles = Environment.Is64BitOperatingSystem
+            ? Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+            : Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
+        string root = Path.Combine(programFiles, "PowerShell");
+
+        if (!Directory.Exists(root))
+            return false;
+
+        // Find latest version of PowerShell Core install directory.(e.g. `C:\Program Files\PowerShell\7`)
+        var latestVersionDirectory = Directory
+            .EnumerateDirectories(root, "*", SearchOption.TopDirectoryOnly)
+            .Where(path => Regex.IsMatch(Path.GetFileName(path), @"^\d+$"))
+            .OrderByDescending(path => int.Parse(Path.GetFileName(path)))
+            .FirstOrDefault();
+
+        if (latestVersionDirectory is null)
+            return false;
+
+        pwshExePath = Path.Combine(latestVersionDirectory, "pwsh.exe");
+        return File.Exists(pwshExePath);
     }
 }
