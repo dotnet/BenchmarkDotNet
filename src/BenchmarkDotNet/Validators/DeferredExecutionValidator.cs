@@ -24,23 +24,42 @@ namespace BenchmarkDotNet.Validators
                 )
                 .ToAsyncEnumerable();
 
-        private bool IsDeferredExecution(Type returnType)
+        private static bool IsDeferredExecution(Type returnType)
         {
             if (returnType.IsByRef && !returnType.IsGenericType)
                 return IsDeferredExecution(returnType.GetElementType()!);
 
-            if (returnType.IsGenericType && (returnType.GetGenericTypeDefinition() == typeof(Task<>) || returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
-                return IsDeferredExecution(returnType.GetGenericArguments().Single());
+            if (returnType.IsAwaitable(out var awaitableInfo))
+                return IsNestedDeferredExecution(awaitableInfo.ResultType);
 
-            if (returnType == typeof(IEnumerable) || returnType == typeof(IQueryable))
-                return true;
+            if (returnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
+                return IsNestedDeferredExecution(asyncEnumerableInfo.ItemType);
 
-            if (!returnType.IsGenericType)
-                return false;
+            return IsDeferredExecutionCore(returnType);
 
-            return returnType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                || returnType.GetGenericTypeDefinition() == typeof(IQueryable<>)
-                || returnType.GetGenericTypeDefinition() == typeof(Lazy<>);
+            // We support consuming returned awaitables and async enumerables, but we don't support nested consumption, e.g. Task<Task> or IAsyncEnumerable<IAsyncEnumerable<int>>.
+            static bool IsNestedDeferredExecution(Type returnType)
+            {
+                return IsDeferredExecutionCore(returnType)
+                    || returnType.IsAwaitable(out _)
+                    || returnType.IsAsyncEnumerable(out _);
+            }
+
+            static bool IsDeferredExecutionCore(Type returnType)
+            {
+                if (returnType == typeof(IEnumerable) || returnType == typeof(IEnumerator) || returnType == typeof(IQueryable))
+                    return true;
+
+                if (!returnType.IsGenericType)
+                    return false;
+
+                var genericTypeDefinition = returnType.GetGenericTypeDefinition();
+
+                return genericTypeDefinition == typeof(IEnumerable<>)
+                    || genericTypeDefinition == typeof(IEnumerator<>)
+                    || genericTypeDefinition == typeof(IQueryable<>)
+                    || genericTypeDefinition == typeof(Lazy<>);
+            }
         }
     }
 }

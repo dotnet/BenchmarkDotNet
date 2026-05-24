@@ -65,48 +65,6 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public async Task MultipleGlobalSetupsAreDiscovered()
-        {
-            var validationErrors = await ExecutionValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleGlobalSetups))).ToArrayAsync();
-
-            Assert.NotEmpty(validationErrors);
-            Assert.StartsWith("Only single [GlobalSetup] method is allowed per type", validationErrors.Single().Message);
-        }
-
-        public class MultipleGlobalSetups
-        {
-            [GlobalSetup]
-            public void First() { }
-
-            [GlobalSetup]
-            public void Second() { }
-
-            [Benchmark]
-            public void NonThrowing() { }
-        }
-
-        [Fact]
-        public async Task MultipleGlobalCleanupsAreDiscovered()
-        {
-            var validationErrors = await ExecutionValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(MultipleGlobalCleanups))).ToArrayAsync();
-
-            Assert.NotEmpty(validationErrors);
-            Assert.StartsWith("Only single [GlobalCleanup] method is allowed per type", validationErrors.Single().Message);
-        }
-
-        public class MultipleGlobalCleanups
-        {
-            [GlobalCleanup]
-            public void First() { }
-
-            [GlobalCleanup]
-            public void Second() { }
-
-            [Benchmark]
-            public void NonThrowing() { }
-        }
-
-        [Fact]
         public async Task VirtualGlobalSetupsAreSupported()
         {
             Assert.False(OverridesGlobalSetup.WasCalled);
@@ -259,29 +217,6 @@ namespace BenchmarkDotNet.Tests.Validators
                 if (Field == default)
                     throw new Exception("Field is missing Params attribute");
             }
-
-            [Benchmark]
-            public void NonThrowing() { }
-        }
-
-        [Fact]
-        public async Task NonPublicFieldsWithParamsAreDiscovered()
-        {
-            var validationErrors = await ExecutionValidator.FailOnError
-                .ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams)))
-                .ToArrayAsync();
-
-            Assert.NotEmpty(validationErrors);
-            Assert.StartsWith("Fields marked with [Params] must be public", validationErrors.Single().Message);
-        }
-
-        public class NonPublicFieldWithParams
-        {
-#pragma warning disable CS0649, BDN1202
-            [Params(1)]
-            [UsedImplicitly]
-            internal int Field;
-#pragma warning restore CS0649, BDN1202
 
             [Benchmark]
             public void NonThrowing() { }
