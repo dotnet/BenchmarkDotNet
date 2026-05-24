@@ -299,6 +299,28 @@ namespace BenchmarkDotNet.Tests.Validators
             public int Bar() => ++Value;
         }
 
+        // #2083
+        [Fact]
+        public async Task GlobalSetupRunsForEachParamsValue()
+            => await AssertConsistent<GlobalSetupPerParamsValue>();
+
+        public class GlobalSetupPerParamsValue
+        {
+            [Params(2, 3)]
+            public int N { get; set; }
+
+            private int _expected;
+
+            [GlobalSetup]
+            public void Setup() => _expected = N * 10;
+
+            [Benchmark]
+            public int FromSetup() => _expected;
+
+            [Benchmark]
+            public int FromParam() => N * 10;
+        }
+
         private static async Task AssertConsistent<TBenchmark>()
         {
             var validationErrors = await ReturnValueValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmark))).ToArrayAsync();

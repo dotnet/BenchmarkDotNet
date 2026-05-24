@@ -143,6 +143,35 @@ namespace BenchmarkDotNet.Tests.Validators
             public void NonThrowing() { }
         }
 
+        // #848
+        [Fact]
+        public async Task ParamsSourcePropertyIsSetBeforeGlobalSetup()
+        {
+            var validationErrors = await ExecutionValidator.FailOnError
+                .ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(GlobalSetupThatRequiresParamsSourceToBeSetFirst)))
+                .ToArrayAsync();
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class GlobalSetupThatRequiresParamsSourceToBeSetFirst
+        {
+            [ParamsSource(nameof(GetValues))]
+            public int Field { get; set; }
+
+            public static IEnumerable<int> GetValues() => [100];
+
+            [GlobalSetup]
+            public void Failing()
+            {
+                if (Field == default)
+                    throw new Exception("ParamsSource property was not set before GlobalSetup");
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+        }
+
         [Fact]
         public async Task NonFailingGlobalCleanupsAreOmitted()
         {
