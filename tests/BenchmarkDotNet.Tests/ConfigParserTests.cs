@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [MemberData(nameof(Exporters))]
+        [MemberData(nameof(Exporters), DisableDiscoveryEnumeration = true)]
         public void ExportersAreParsedCorrectly(string exporter, IExporter[] expectedExporters)
         {
             var config = ConfigParser.Parse(["--exporters", exporter], new OutputLogger(Output)).config;
