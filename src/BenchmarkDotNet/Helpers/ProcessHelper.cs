@@ -1,9 +1,12 @@
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+
+#if NETSTANDARD
+using BenchmarkDotNet.Extensions;
+#endif
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -81,6 +84,59 @@ namespace BenchmarkDotNet.Helpers
             var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
 
             return (process.ExitCode, output);
+        }
+
+        /// <summary>
+        /// Run powershell/pwsh command and return the console output.
+        /// In the case of any exception, null will be returned.
+        /// </summary>
+        internal static string? RunPowerShellCommandAndReadOutput(string command, ILogger? logger = null, Dictionary<string, string>? environmentVariables = null)
+        {
+            string fileName = OsDetector.IsWindows()
+                ? PowerShellLocator.LocateOnWindows() ?? "powershell"
+                : "pwsh";
+
+            var arguments = $"""
+                -NoProfile -Command "$ErrorActionPreference='Stop';{command}"
+                """;
+
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = fileName,
+                WorkingDirectory = "",
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+            };
+
+            environmentVariables ??= [];
+
+            // Suppress outputting ANSI escape sequences.
+            if (!environmentVariables.ContainsKey("TERM"))
+                environmentVariables.Add("TERM", "dumb");
+
+            foreach (var variable in environmentVariables)
+                processStartInfo.Environment.Add(variable.Key, variable.Value);
+
+            using var process = new Process { StartInfo = processStartInfo };
+            using (new ProcessCleanupHelper(process, logger ?? NullLogger.Instance))
+            {
+                try
+                {
+                    process.Start();
+                }
+                catch (Exception)
+                {
+                    if (XUnitHelper.IsIntegrationTest.Value)
+                        throw;
+
+                    return null;
+                }
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                return output;
+            }
         }
 
         internal static bool TestCommandExists(string commandName, string arguments = "--version")
