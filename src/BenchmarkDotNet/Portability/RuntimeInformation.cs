@@ -3,10 +3,10 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using System.Diagnostics;
-using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Text.Json;
 using static System.Runtime.InteropServices.RuntimeInformation;
 
 namespace BenchmarkDotNet.Portability
@@ -255,61 +255,67 @@ namespace BenchmarkDotNet.Portability
 
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {
-            var products = new List<Antivirus>();
-            if (OsDetector.IsWindows())
-            {
-                try
-                {
-                    using (var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct"))
-                    using (var data = wmi.Get())
-                        foreach (var o in data)
-                        {
-                            var av = (ManagementObject)o;
-                            if (av != null)
-                            {
-                                string name = av["displayName"].ToString()!;
-                                string path = av["pathToSignedProductExe"].ToString()!;
-                                products.Add(new Antivirus(name, path));
-                            }
-                        }
-                }
-                catch
-                {
-                    // Never mind
-                }
-            }
+            if (!OsDetector.IsWindows())
+                return [];
 
-            return products;
+            try
+            {
+                const string TargetPropertyNames = "displayName, pathToSignedProductExe";
+                string? output = ProcessHelper.RunPowerShellCommandAndReadOutput($"""
+                    ConvertTo-Json @(Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct -Property {TargetPropertyNames} | select {TargetPropertyNames})
+                    """);
+
+                if (output.IsBlank())
+                    return [];
+
+                var results = JsonSerializer.Deserialize<Dictionary<string, string>[]>(output)!;
+
+                return results.Select(x => new Antivirus(
+                    x["displayName"],
+                    x["pathToSignedProductExe"])
+                ).ToArray();
+            }
+            catch
+            {
+                if (XUnitHelper.IsIntegrationTest.Value)
+                    throw;
+
+                // Never mind
+                return [];
+            }
         }
 
         internal static VirtualMachineHypervisor? GetVirtualMachineHypervisor()
         {
             VirtualMachineHypervisor[] hypervisors = [HyperV.Default, VirtualBox.Default, VMware.Default];
 
-            if (OsDetector.IsWindows())
-            {
-                try
-                {
-                    using (var searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
-                    {
-                        using (var items = searcher.Get())
-                        {
-                            foreach (var item in items)
-                            {
-                                string manufacturer = item["Manufacturer"]?.ToString()!;
-                                string model = item["Model"]?.ToString()!;
-                                return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // Never mind
-                }
-            }
+            if (!OsDetector.IsWindows())
+                return null;
 
-            return null;
+            try
+            {
+                const string TargetPropertyNames = "Manufacturer, Model";
+                string? output = ProcessHelper.RunPowerShellCommandAndReadOutput(
+                    $"""
+                    Get-CimInstance Win32_ComputerSystem -Property {TargetPropertyNames} | select {TargetPropertyNames} | ConvertTo-Json
+                    """);
+
+                if (output.IsBlank())
+                    return null;
+
+                var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(output)!;
+                var manufacturer = dict["Manufacturer"];
+                var model = dict["Model"];
+                return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
+            }
+            catch (Exception)
+            {
+                if (XUnitHelper.IsIntegrationTest.Value)
+                    throw;
+
+                // Never mind
+                return null;
+            }
         }
     }
 }
