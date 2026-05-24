@@ -1,11 +1,9 @@
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using System.Collections;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -17,168 +15,96 @@ namespace BenchmarkDotNet.Validators
         private ReturnValueValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override async ValueTask ExecuteBenchmarksAsync(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors, CancellationToken cancellationToken)
+        protected override async IAsyncEnumerable<ValidationError> ValidateAsyncCore(ValidationParameters validationParameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
+            var errors = new List<ValidationError>();
+            foreach (var typeGroup in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
             {
-                List<(BenchmarkCase benchmark, object? returnValue)> results = [];
-                bool hasErrorsInGroup = false;
-
-                foreach (var benchmark in parameterGroup.DistinctBy(i => i.Descriptor.WorkloadMethod))
+                foreach (var parameterGroup in typeGroup.GroupBy(i => i.Parameters, ParameterEqualityComparer.Instance))
                 {
-                    try
+                    List<(BenchmarkCase benchmark, object? returnValue)> results = [];
+                    int currentErrorCount = errors.Count;
+
+                    foreach (var benchmark in parameterGroup.DistinctBy(i => i.Descriptor.WorkloadMethod))
                     {
-                        InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark, cancellationToken);
-                        var workloadMethod = benchmark.Descriptor.WorkloadMethod;
-                        var result = workloadMethod.Invoke(benchmarkTypeInstance, null);
-                        if (workloadMethod.ReturnType.IsAwaitable(out var awaitableInfo))
+                        if (!TryCreateBenchmarkTypeInstance(benchmark.Descriptor.Type, errors, cancellationToken, out var benchmarkTypeInstance))
                         {
-                            if (result is null)
-                            {
-                                errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Awaitable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
-                                continue;
-                            }
-                            (var hasResult, result) = await DynamicAwaitHelper.AwaitResult(result, awaitableInfo).ConfigureAwait(true);
-                            if (hasResult)
-                            {
-                                results.Add((benchmark, result!));
-                            }
+                            continue;
                         }
-                        else if (workloadMethod.ReturnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
+                        if (!TryFillParamsAndGetArgs(benchmark, benchmarkTypeInstance, errors, out var args, cancellationToken))
                         {
-                            if (result is null)
-                            {
-                                errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Async enumerable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
-                                continue;
-                            }
-                            result = await DynamicAwaitHelper.ToListAsync(result, asyncEnumerableInfo).ConfigureAwait(true);
-                            results.Add((benchmark, result));
+                            continue;
                         }
-                        else if (workloadMethod.ReturnType != typeof(void))
+                        if (await TryToCallSetupOrCleanup<GlobalSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalSetupMethod, errors, cancellationToken).ConfigureAwait(true))
                         {
-                            results.Add((benchmark, result!));
+                            if (await TryToCallSetupOrCleanup<IterationSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationSetupMethod, errors, cancellationToken).ConfigureAwait(true))
+                            {
+                                var (hasResult, result) = await ExecuteBenchmarkAsync(benchmarkTypeInstance, benchmark, args, errors, cancellationToken).ConfigureAwait(true);
+                                if (hasResult)
+                                {
+                                    results.Add((benchmark, result));
+                                }
+                                await TryToCallSetupOrCleanup<IterationCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationCleanupMethod, errors, cancellationToken).ConfigureAwait(true);
+                            }
+                            await TryToCallSetupOrCleanup<GlobalCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalCleanupMethod, errors, cancellationToken).ConfigureAwait(true);
                         }
                     }
-                    catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
-                    {
-                        hasErrorsInGroup = true;
 
+                    if (currentErrorCount < errors.Count || results.Count == 0)
+                        continue;
+
+                    if (results.Any(result => !DeepEqualityComparer.Instance.Equals(result.returnValue, results[0].returnValue)))
+                    {
                         errors.Add(new ValidationError(
                             TreatsWarningsAsErrors,
-                            $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
-                            benchmark));
+                            $"Inconsistent benchmark return values in {typeGroup.Key.GetDisplayName()}: {string.Join(", ", results.Select(r => $"{r.benchmark.Descriptor.WorkloadMethodDisplayInfo}: {r.returnValue}"))} {parameterGroup.Key.DisplayInfo}"));
                     }
                 }
+            }
 
-                if (hasErrorsInGroup || results.Count == 0)
-                    continue;
-
-                if (results.Any(result => !InDepthEqualityComparer.Instance.Equals(result.returnValue, results[0].returnValue)))
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Inconsistent benchmark return values in {results[0].benchmark.Descriptor.TypeInfo}: {string.Join(", ", results.Select(r => $"{r.benchmark.Descriptor.WorkloadMethodDisplayInfo}: {r.returnValue}"))} {parameterGroup.Key.DisplayInfo}"));
-                }
+            foreach (var error in errors)
+            {
+                yield return error;
             }
         }
 
-        private class ParameterInstancesEqualityComparer : IEqualityComparer<ParameterInstances>
+        private async ValueTask<(bool hasResult, object? result)> ExecuteBenchmarkAsync(object benchmarkTypeInstance, BenchmarkCase benchmark, object?[]? args, List<ValidationError> errors, CancellationToken cancellationToken)
         {
-            public static ParameterInstancesEqualityComparer Instance { get; } = new ParameterInstancesEqualityComparer();
-
-            public bool Equals(ParameterInstances? x, ParameterInstances? y)
+            try
             {
-                if (ReferenceEquals(x, y))
-                    return true;
-
-                if (x == null || y == null)
-                    return false;
-
-                if (x.Count != y.Count)
-                    return false;
-
-                return x.Items.OrderBy(i => i.Name).Zip(y.Items.OrderBy(i => i.Name), (a, b) => a.Name == b.Name && Equals(a.Value, b.Value)).All(i => i);
-            }
-
-            public int GetHashCode(ParameterInstances obj)
-            {
-                if (obj.Count == 0)
-                    return 0;
-
-                var hashCode = new HashCode();
-                foreach (var instance in obj.Items.OrderBy(i => i.Name))
+                var workloadMethod = benchmark.Descriptor.WorkloadMethod;
+                var result = workloadMethod.Invoke(benchmarkTypeInstance, args);
+                if (workloadMethod.ReturnType.IsAwaitable(out var awaitableInfo))
                 {
-                    hashCode.Add(instance.Name);
-                    hashCode.Add(instance.Value);
-                }
-                return hashCode.ToHashCode();
-            }
-        }
-
-        private class InDepthEqualityComparer : IEqualityComparer
-        {
-            public static InDepthEqualityComparer Instance { get; } = new InDepthEqualityComparer();
-
-            [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
-            public new bool Equals(object? x, object? y)
-            {
-                if (ReferenceEquals(x, y) || object.Equals(x, y))
-                    return true;
-
-                if (x == null || y == null)
-                    return false;
-
-                return CompareEquatable(x, y) || CompareEquatable(y, x) || CompareStructural(x, y) || CompareStructural(y, x);
-            }
-
-            private static bool CompareEquatable(object x, object y)
-            {
-                var yType = y.GetType();
-
-                var equatableInterface = x.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType
-                                                                                         && i.GetGenericTypeDefinition() == typeof(IEquatable<>)
-                                                                                         && i.GetGenericArguments().Single().IsAssignableFrom(yType));
-
-                if (equatableInterface == null)
-                    return false;
-
-                var method = equatableInterface.GetMethod(nameof(IEquatable<object>.Equals), BindingFlags.Public | BindingFlags.Instance);
-                return (bool?)method?.Invoke(x, [y]) ?? false;
-            }
-
-            private bool CompareStructural(object x, object y)
-            {
-                if (x is IStructuralEquatable xStructuralEquatable)
-                    return xStructuralEquatable.Equals(y, this);
-
-                var xArray = ToStructuralEquatable(x);
-                var yArray = ToStructuralEquatable(y);
-
-                if (xArray != null && yArray != null)
-                    return Equals(xArray, yArray);
-
-                return false;
-
-                Array? ToStructuralEquatable(object obj)
-                {
-                    switch (obj)
+                    if (result is null)
                     {
-                        case Array array:
-                            return array;
-
-                        case IDictionary dict:
-                            return dict.Keys.Cast<object>().OrderBy(k => k).Select(k => (k, dict[k])).ToArray();
-
-                        case IEnumerable enumerable:
-                            return enumerable.Cast<object>().ToArray();
-
-                        default:
-                            return null;
+                        errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Awaitable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
+                        return default;
                     }
+                    return await DynamicAwaitHelper.AwaitResult(result, awaitableInfo).ConfigureAwait(false);
+                }
+                else if (workloadMethod.ReturnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
+                {
+                    if (result is null)
+                    {
+                        errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Async enumerable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
+                        return default;
+                    }
+                    return (true, await DynamicAwaitHelper.ToListAsync(result, asyncEnumerableInfo).ConfigureAwait(false));
+                }
+                else
+                {
+                    return (workloadMethod.ReturnType != typeof(void), result);
                 }
             }
-
-            public int GetHashCode(object obj) => StructuralComparisons.StructuralEqualityComparer.GetHashCode(obj);
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+            {
+                errors.Add(new ValidationError(
+                    TreatsWarningsAsErrors,
+                    $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
+                    benchmark));
+                return default;
+            }
         }
     }
 }
