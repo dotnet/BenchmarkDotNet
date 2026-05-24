@@ -10,9 +10,7 @@ namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 internal class MosCpuDetector : ICpuDetector
 {
     [SupportedOSPlatform("windows")]
-    public bool IsApplicable() => OsDetector.IsWindows() &&
-                                  RuntimeInformation.IsFullFramework &&
-                                  !RuntimeInformation.IsMono;
+    public bool IsApplicable() => OsDetector.IsWindows() && !RuntimeInformation.IsMono;
 
     [SupportedOSPlatform("windows")]
     public CpuInfo? Detect()
