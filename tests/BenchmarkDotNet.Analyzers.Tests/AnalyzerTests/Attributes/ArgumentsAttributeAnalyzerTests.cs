@@ -353,13 +353,17 @@ public class ArgumentsAttributeAnalyzerTests
                 "\"value\", 100, false"
             ];
 
+            HashSet<string> hashSet = new();
+
             foreach (var attributeUsageBase in attributeUsagesBase)
             {
                 foreach (var nameColonUsage in nameColonUsages)
                 {
                     foreach (var priorityNamedParameterUsage in priorityNamedParameterUsages)
                     {
-                        yield return string.Join("\n    ", valueLists.Select((vv, i) => $"[{{|#{i}:{string.Format(attributeUsageBase, nameColonUsage, vv, priorityNamedParameterUsage)}|}}]"));
+                        var value = string.Join("\n    ", valueLists.Select((vv, i) => $"[{{|#{i}:{string.Format(attributeUsageBase, nameColonUsage, vv, priorityNamedParameterUsage)}|}}]"));
+                        if (hashSet.Add(value))
+                            yield return value;
                     }
                 }
             }
