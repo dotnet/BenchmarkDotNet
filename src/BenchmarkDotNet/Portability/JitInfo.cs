@@ -60,6 +60,8 @@ internal static class JitInfo
     /// </summary>
     public static readonly bool IsTiered =
         IsNetCore
+        // IsNetCore returns true in new Mono, but it does not have a tiered JIT.
+        && !IsMono
         // JITMinOpts disables tiered compilation (all methods are effectively tier0 instead of tier1).
         && !IsEnvVarEnabled(EnvMinOpts)
         && ((CoreRuntime.TryGetVersion(out var version) && version.Major >= 3)
@@ -188,9 +190,11 @@ internal static class JitInfo
 
     private static bool GetIsRyuJit()
     {
+        if (IsMono) // Mono does not use RyuJIT.
+            return false;
         if (IsNetCore) // CoreCLR supports only RyuJIT.
             return true;
-        if (IsMono || !IsFullFramework) // If it's not Core or Framework, it's not RyuJIT.
+        if (!IsFullFramework) // If it's not Core or Framework, it's not RyuJIT.
             return false;
         if (!Is64BitPlatform()) // Framework supports RyuJIT only in 64-bit process.
             return false;
