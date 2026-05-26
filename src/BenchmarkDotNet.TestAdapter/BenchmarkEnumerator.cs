@@ -3,6 +3,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.TestAdapter
 {
@@ -18,41 +19,28 @@ namespace BenchmarkDotNet.TestAdapter
         /// <returns>The benchmarks inside the assembly.</returns>
         public static BenchmarkRunInfo[] GetBenchmarksFromAssemblyPath(string assemblyPath)
         {
-#if NET462
+#if NET462_OR_GREATER
             // Temporary workaround for BenchmarkDotNet assembly loading issue that occurred under the following conditions:
             //   1. Run BenchmarkDotNet.Samples project with following command.
             //     > dotnet test -c Release --list-tests --framework net462 -tl:off
             //   2. When using `BenchmarkDotNet.TestAdapter` package and targeting .NET Framework.
+            string[] assemblyNames =
+            [
+                "BenchmarkDotNet",
+                "System.Collections.Immutable",
+                "System.Memory",
+                "System.Threading.Tasks.Extensions",
+            ];
+
             AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) =>
             {
-                if (eventArgs.Name.StartsWith("BenchmarkDotNet, Version="))
+                var targetAssemblyName = assemblyNames.FirstOrDefault(assemblyName => eventArgs.Name.StartsWith($"{assemblyName}, Version="));
+                if (targetAssemblyName != null)
                 {
                     var baseDir = Path.GetDirectoryName(assemblyPath);
-                    var path = Path.Combine(baseDir, "BenchmarkDotNet.dll");
+                    var path = Path.Combine(baseDir, $"{targetAssemblyName}.dll");
                     if (File.Exists(path))
-                    {
                         return Assembly.LoadFrom(path);
-                    }
-                }
-
-                if (eventArgs.Name.StartsWith("System.Collections.Immutable, Version="))
-                {
-                    var baseDir = Path.GetDirectoryName(assemblyPath);
-                    var path = Path.Combine(baseDir, "System.Collections.Immutable.dll");
-                    if (File.Exists(path))
-                    {
-                        return Assembly.LoadFrom(path);
-                    }
-                }
-
-                if (eventArgs.Name.StartsWith("System.Memory, Version="))
-                {
-                    var baseDir = Path.GetDirectoryName(assemblyPath);
-                    var path = Path.Combine(baseDir, "System.Memory.dll");
-                    if (File.Exists(path))
-                    {
-                        return Assembly.LoadFrom(path);
-                    }
                 }
 
                 // Fallback to default assembly resolver
