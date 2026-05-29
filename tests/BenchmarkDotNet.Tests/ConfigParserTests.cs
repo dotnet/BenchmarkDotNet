@@ -1,7 +1,9 @@
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -21,8 +23,10 @@ using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using Perfolizer.Horology;
+using Perfolizer.Mathematics.OutlierDetection;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Tests
@@ -650,6 +654,20 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void CanParseGnuStyleOption()
+        {
+            // Arrange
+            var logger = new AccumulationLogger();
+            var results = ConfigParser.Parse(["--inProcess=false", "--affinity=1"], logger);
+
+            // Assert
+            results.isSuccess.Should().BeTrue();
+            logger.GetLog().Should().BeEmpty();
+            results.options!.RunInProcess.Should().BeFalse();
+            results.options!.Affinity.Should().Be(1);
+        }
+
+        [Fact]
         public void UserCanSpecifyCustomDefaultJobAndOverwriteItsSettingsViaConsoleArgs()
         {
             var globalConfig = DefaultConfig.Instance
@@ -847,6 +865,211 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Null(updatedArgs);
             Assert.False(isSuccess);
+        }
+
+        [Fact]
+        public void VerifySerializeToArgs()
+        {
+            // Act
+            var result = ConfigParser.Parse([""], NullLogger.Instance);
+
+            // Assert
+            result.isSuccess.Should().BeTrue();
+            var args = ConfigParser.SerializeToArgs(result.options!);
+            args.Should().BeEmpty(); // Default value is not serialized.
+        }
+
+        [Fact]
+        public void VerifyDefaultValue()
+        {
+            // Arrange
+            var logger = new AccumulationLogger();
+
+            // Act
+            var result = ConfigParser.Parse([""], logger);
+
+            result.isSuccess.Should().BeTrue();
+
+            var config = result.config!;
+            var options = result.options!;
+
+
+            // Assert
+
+            // Verify options that has default value.
+            using (var scope = new AssertionScope())
+            {
+                options.BaseJob.Should().Be("Default");
+                options.Outliers.Should().Be(OutlierMode.RemoveUpper);
+                options.ListBenchmarkCaseMode.Should().Be(ListBenchmarkCaseMode.Disabled);
+                options.DisassemblerRecursiveDepth.Should().Be(1);
+                options.WasmJavaScriptEngine.Should().Be("v8");
+                options.WasmJavaScriptEngineArguments.Should().Be("--expose_wasm");
+                options.AOTCompilerMode.Should().Be(MonoAotCompilerMode.mini);
+                options.WasmRuntimeFlavor.Should().Be(RuntimeFlavor.Mono);
+                options.WasmProcessTimeoutMinutes.Should().Be(10);
+            }
+
+            // Verify other options.
+            using (var scope = new AssertionScope())
+            {
+                options.Runtimes.Should().BeEmpty();
+                options.Exporters.Should().BeEmpty();
+                options.UseMemoryDiagnoser.Should().BeFalse();
+                options.UseThreadingDiagnoser.Should().BeFalse();
+                options.UseExceptionDiagnoser.Should().BeFalse();
+                options.UseDisassemblyDiagnoser.Should().BeFalse();
+                options.Profiler.Should().BeEmpty();
+                options.Filters.Should().BeEmpty();
+                options.HiddenColumns.Should().BeEmpty();
+                options.RunInProcess.Should().BeFalse();
+                options.ArtifactsDirectory.Should().BeNull();
+                options.Affinity.Should().BeNull();
+                options.DisplayAllStatistics.Should().BeFalse();
+                options.AllCategories.Should().BeEmpty();
+                options.AnyCategories.Should().BeEmpty();
+                options.AttributeNames.Should().BeEmpty();
+                options.Join.Should().BeFalse();
+                options.KeepBenchmarkFiles.Should().BeFalse();
+                options.DontOverwriteResults.Should().BeFalse();
+                options.HardwareCounters.Should().BeEmpty();
+                options.CliPath.Should().BeNull();
+                options.RestorePath.Should().BeNull();
+                options.RestorePath.Should().BeNull();
+                options.CoreRunPaths.Should().BeEmpty();
+                options.MonoPath.Should().BeNull();
+                options.ClrVersion.Should().BeEmpty();
+                options.ILCompilerVersion.Should().BeEmpty();
+                options.IlcPackages.Should().BeNull();
+                options.LaunchCount.Should().BeNull();
+                options.WarmupIterationCount.Should().BeNull();
+                options.MinWarmupIterationCount.Should().BeNull();
+                options.MaxWarmupIterationCount.Should().BeNull();
+                options.IterationTimeInMilliseconds.Should().BeNull();
+                options.IterationCount.Should().BeNull();
+                options.MinIterationCount.Should().BeNull();
+                options.MaxIterationCount.Should().BeNull();
+                options.InvocationCount.Should().BeNull();
+                options.UnrollFactor.Should().BeNull();
+                options.RunStrategy.Should().BeNull();
+                options.RunOncePerIteration.Should().BeFalse();
+                options.PrintInformation.Should().BeFalse();
+                options.ApplesToApples.Should().BeFalse();
+                options.DisassemblerFilters.Should().BeEmpty();
+                options.DisassemblerDiff.Should().BeFalse();
+                options.LogBuildOutput.Should().BeFalse();
+                options.GenerateMSBuildBinLog.Should().BeFalse();
+                options.TimeOutInSeconds.Should().BeNull();
+                options.WakeLock.Should().BeNull();
+                options.StopOnFirstError.Should().BeFalse();
+                options.StatisticalTestThreshold.Should().BeEmpty();
+                options.DisableLogFile.Should().BeFalse();
+                options.MaxParameterColumnWidth.Should().BeNull();
+                options.EnvironmentVariables.Should().BeEmpty();
+                options.MemoryRandomization.Should().BeFalse();
+                options.WasmMainJsTemplate.Should().BeNull();
+                options.CustomRuntimePack.Should().BeEmpty();
+                options.AOTCompilerPath.Should().BeNull();
+                options.NoForcedGCs.Should().BeFalse();
+                options.EvaluateOverhead.Should().BeFalse();
+                options.Resume.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public void VerifyHelpMessage()
+        {
+            // Arrange
+            var logger = new AccumulationLogger();
+
+            // Act
+            bool isSuccess = ConfigParser.Parse(["--help"], logger).isSuccess;
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            var helpMessage = logger.GetLog().Trim();
+            helpMessage.Should().BeEquivalentTo(
+                """
+                Description:
+                  BenchmarkDotNet Command Line options
+
+                Usage:
+                  testhost [options]
+
+                Options:
+                  -j, --job <job>                                                                     Dry/Short/Medium/Long or Default [default: Default]
+                  -r, --runtimes <runtimes>                                                           Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!
+                  -e, --exporters <exporters>                                                         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics
+                  -m, --memory                                                                        Prints memory statistics
+                  -t, --threading                                                                     Prints threading statistics
+                  --exceptions                                                                        Prints exception statistics
+                  -d, --disasm                                                                        Gets disassembly of benchmarked code
+                  -p, --profiler <profiler>                                                           Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory
+                  -f, --filter <filter>                                                               Glob patterns
+                  -h, --hide <hide>                                                                   Hides columns by name
+                  -i, --inProcess                                                                     Run benchmarks in Process
+                  -a, --artifacts <artifacts>                                                         Valid path to accessible directory
+                  --outliers <DontRemove|RemoveAll|RemoveLower|RemoveUpper>                           DontRemove/RemoveUpper/RemoveLower/RemoveAll [default: RemoveUpper]
+                  --affinity <affinity>                                                               Affinity mask to set for the benchmark process
+                  --allStats                                                                          Displays all statistics (min, max & more)
+                  --allCategories <allCategories>                                                     Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
+                  --anyCategories <anyCategories>                                                     Any Categories to run
+                  --attribute <attribute>                                                             Run all methods with given attribute (applied to class or method)
+                  --join                                                                              Prints single table with results for all benchmarks
+                  --keepFiles                                                                         Determines if all auto-generated files should be kept or removed after running the benchmarks.
+                  --noOverwrite                                                                       Determines if the exported result files should not be overwritten (by default they are overwritten).
+                  --counters <counters>                                                               Hardware Counters
+                  --cli <cli>                                                                         Path to dotnet cli (optional).
+                  --packages <packages>                                                               The directory to restore packages to (optional).
+                  --coreRun <coreRun>                                                                 Path(s) to CoreRun (optional).
+                  --monoPath <monoPath>                                                               Optional path to Mono which should be used for running benchmarks.
+                  --clrVersion <clrVersion>                                                           Optional version of private CLR build used as the value of COMPLUS_Version env var.
+                  --ilCompilerVersion <ilCompilerVersion>                                             Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
+                  --ilcPackages <ilcPackages>                                                         Optional path to shipping packages produced by local dotnet/runtime build.
+                  --launchCount <launchCount>                                                         How many times we should launch process with target benchmark. The default is 1.
+                  --warmupCount <warmupCount>                                                         How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.
+                  --minWarmupCount <minWarmupCount>                                                   Minimum count of warmup iterations that should be performed. The default is 6.
+                  --maxWarmupCount <maxWarmupCount>                                                   Maximum count of warmup iterations that should be performed. The default is 50.
+                  --iterationTime <iterationTime>                                                     Desired time of execution of an iteration in milliseconds. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default
+                  --iterationCount <iterationCount>                                                   How many target iterations should be performed. By default calculated by the heuristic.
+                  --minIterationCount <minIterationCount>                                             Minimum number of iterations to run. The default is 15.
+                  --maxIterationCount <maxIterationCount>                                             Maximum number of iterations to run. The default is 100.
+                  --invocationCount <invocationCount>                                                 Invocation count in a single iteration. By default calculated by the heuristic.
+                  --unrollFactor <unrollFactor>                                                       How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default
+                  --strategy <ColdStart|Monitoring|Throughput>                                        The RunStrategy that should be used. Throughput/ColdStart/Monitoring.
+                  --platform <AnyCpu|Arm|Arm64|Armv6|LoongArch64|Ppc64le|RiscV64|S390x|Wasm|X64|X86>  The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.
+                  --runOncePerIteration                                                               Run the benchmark exactly once per iteration.
+                  --info                                                                              Print environment information.
+                  --apples                                                                            Runs apples-to-apples comparison for specified Jobs.
+                  --list <Disabled|Flat|Tree>                                                         Prints all of the available benchmark names. Flat/Tree [default: Disabled]
+                  --disasmDepth <disasmDepth>                                                         Sets the recursive depth for the disassembler. [default: 1]
+                  --disasmFilter <disasmFilter>                                                       Glob patterns applied to full method signatures by the disassembler.
+                  --disasmDiff                                                                        Generates diff reports for the disassembler.
+                  --logBuildOutput                                                                    Log Build output.
+                  --generateBinLog                                                                    Generate msbuild binlog for builds
+                  --buildTimeout <buildTimeout>                                                       Build timeout in seconds.
+                  --wakeLock <Display|None|System>                                                    Prevents the system from entering sleep or turning off the display. None/System/Display.
+                  --stopOnFirstError                                                                  Stop on first error.
+                  --statisticalTest <statisticalTest>                                                 Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns)
+                  --disableLogFile                                                                    Disables the logfile.
+                  --maxWidth <maxWidth>                                                               Max parameter column width, the default is 20.
+                  --envVars <envVars>                                                                 Colon separated environment variables (key:value)
+                  --memoryRandomization                                                               Specifies whether Engine should allocate some random-sized memory between iterations.
+                  --wasmEngine <wasmEngine>                                                           Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain. [default: v8]
+                  --wasmArgs <wasmArgs>                                                               Arguments for the javascript engine used by Wasm toolchain. [default: --expose_wasm]
+                  --wasmMainJsTemplate <wasmMainJsTemplate>                                           Path to main.mjs template.
+                  --customRuntimePack <customRuntimePack>                                             Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.
+                  --AOTCompilerPath <AOTCompilerPath>                                                 Path to Mono AOT compiler, used for MonoAotLLVM.
+                  --AOTCompilerMode <llvm|mini|wasm>                                                  Mono AOT compiler mode, either 'mini' or 'llvm' [default: mini]
+                  --wasmRuntimeFlavor <CoreCLR|Mono>                                                  Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack. [default: Mono]
+                  --wasmProcessTimeout <wasmProcessTimeout>                                           Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it. [default: 10]
+                  --noForcedGCs                                                                       Specifying would not forcefully induce any GCs.
+                  --evaluateOverhead                                                                  Specifying would not run the evaluation overhead iterations.
+                  --resume                                                                            Continue the execution if the last run was stopped.
+                  -?, -h, --help                                                                      Show help and usage information
+                  --version                                                                           Show version information
+                """,
+                o => o.IgnoringNewlineStyle());
         }
 
         private string GetDummyWasmEngine()
