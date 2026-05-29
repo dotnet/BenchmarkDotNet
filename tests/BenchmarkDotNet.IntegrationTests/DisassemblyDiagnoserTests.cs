@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
@@ -36,7 +37,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
             else if (RuntimeInformation.IsNetCore)
             {
-                if (RuntimeInformation.GetCurrentPlatform() is Platform.X86 or Platform.X64)
+                // Skip test on `macos(x64)` because test randomly failed on CI.
+                // See: https://github.com/dotnet/BenchmarkDotNet/issues/3086
+                if (RuntimeInformation.GetCurrentPlatform() is Platform.X86 or Platform.X64 && !OsDetector.IsMacOS())
                 {
                     yield return [Jit.RyuJit, Platform.X64, CsProjCoreToolchain.NetCoreApp80]; // .NET Core x64
                     // We could add Platform.X86 here, but it would make our CI more complicated.
