@@ -7,9 +7,9 @@
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Frosting" Version="6.2.0" />
     <PackageReference Include="Cake.FileHelpers" Version="9.0.0" />
-    <PackageReference Include="Cake.Git" Version="5.0.1" />
+    <PackageReference Include="Cake.Frosting" Version="6.2.0" />
+    <PackageReference Include="Cake.Frosting.Git" Version="5.0.1" />
     <PackageReference Include="Docfx.App" Version="2.78.5" />
     <PackageReference Include="Octokit" Version="14.0.0" />
   </ItemGroup>
