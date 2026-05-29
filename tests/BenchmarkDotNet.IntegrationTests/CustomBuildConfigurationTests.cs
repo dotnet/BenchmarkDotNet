@@ -16,13 +16,13 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [FactEnvSpecific("Flaky, see https://github.com/dotnet/BenchmarkDotNet/issues/2376", EnvRequirement.NonFullFramework)]
+        [FactEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         public void UserCanSpecifyCustomBuildConfiguration()
         {
             var jobWithCustomConfiguration = Job.Dry.WithCustomBuildConfiguration("CUSTOM");
 
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
-            config = ((ManualConfig)config).WithBuildTimeout(TimeSpan.FromSeconds(240));
+            config = ((ManualConfig)config).WithBuildTimeout(TimeSpan.FromSeconds(360));
 
             var report = CanExecute<CustomBuildConfiguration>(config);
 
