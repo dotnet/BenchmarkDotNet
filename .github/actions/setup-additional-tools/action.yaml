@@ -11,16 +11,24 @@ runs:
     - name: Set up node
       uses: actions/setup-node@v6
       with:
-        node-version: "24"
+        node-version: "24.15.0" # Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3154
 
     - name: Set up v8
+      shell: bash
+      run: npx jsvu --os=default --engines=v8
+
+    - name: Add `GITHUB_PATH` environment variable
       shell: pwsh
       run: |
-        npm install jsvu -g
-        jsvu --os=default --engines=v8
-        
         $jsvuDir = Join-Path $HOME '.jsvu/bin'
         Add-Content -Path $env:GITHUB_PATH -Value $jsvuDir
+
+    - name: Add `GITHUB_PATH` environment variable and verify command exists
+      shell: pwsh
+      run: |
+        if (-not (Get-Command v8 -ErrorAction SilentlyContinue)) {
+            throw "v8 command is not found."
+        }
 
     - name: Install wasm-tools workload
       shell: bash
