@@ -313,13 +313,13 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--maxWidth`                Max parameter column width, the default is 20.
 * `--envVars`                 Colon separated environment variables (key:value)
 * `--memoryRandomization`     Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.
-* `--wasmEngine`              Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
+* `--wasmEngine`              (Default: v8) Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
 * `--wasmArgs`                (Default: --expose_wasm) Arguments for the javascript engine used by Wasm toolchain.
 * `--customRuntimePack`       Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.
 * `--AOTCompilerPath`         Path to Mono AOT compiler, used for MonoAotLLVM.
 * `--AOTCompilerMode`         (Default: mini) Mono AOT compiler mode, either 'mini' or 'llvm'
-* `--wasmDataDir`             Wasm data directory
-* `--wasmCoreCLR`             (Default: false) Use CoreCLR runtime pack (Microsoft.NETCore.App.Runtime.browser-wasm) instead of the Mono runtime pack for WASM benchmarks.
+* `--wasmRuntimeFlavor`       (Default: Mono) Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.
+* `--wasmProcessTimeout`      (Default: 10) Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.
 * `--noForcedGCs`             Specifying would not forcefully induce any GCs.
 * `--evaluateOverhead`        Specifies whether to run and evaluate overhead iterations.
 * `--resume`                  (Default: false) Continue the execution if the last run was stopped.
