@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
 
-[assembly: Guid("16c47abf-43e0-4db4-8151-36ca7a4082ae")]
+[assembly: Guid("dfaa2493-0fd1-4d10-83b1-6014693da3d7")]
 
 [assembly: CaptureConsole]
