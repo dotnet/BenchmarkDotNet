@@ -988,13 +988,20 @@ namespace BenchmarkDotNet.Tests
             // Assert
             isSuccess.Should().BeTrue();
             var helpMessage = logger.GetLog().Trim();
+
+            // TODO: Remove temporary workaround code after migrated to xUnit v3
+            var exeName = "BenchmarkDotNet.Tests";
+            helpMessage = helpMessage.Replace("  testhost.net472.arm64", $"  {exeName}")
+                                     .Replace("  testhost.net472", $"  {exeName}")
+                                     .Replace("  testhost", $"  {exeName}");
+
             helpMessage.Should().BeEquivalentTo(
                 """
                 Description:
                   BenchmarkDotNet Command Line options
 
                 Usage:
-                  testhost [options]
+                  BenchmarkDotNet.Tests [options]
 
                 Options:
                   -j, --job <job>                                                                     Dry/Short/Medium/Long or Default [default: Default]
