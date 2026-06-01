@@ -1,9 +1,10 @@
+using Cake.Common;
+using Cake.Common.Tools.DotNet;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Cake.Common.Tools.DotNet;
-using Octokit;
 
 namespace BenchmarkDotNet.Build.Helpers;
 
@@ -57,5 +58,28 @@ public static class Utils
 
         var oldValue = match.Groups[1].Value;
         return content.Replace(oldValue, newValue);
+    }
+
+    public static string[] GetTargetFrameworks(BuildContext context)
+    {
+        var jobName = context.Environment.GetEnvironmentVariable("GITHUB_JOB");
+
+        switch (jobName)
+        {
+            case "test-windows-core":
+                return ["net8.0"];
+
+            case "test-windows-full":
+                return ["net472"];
+
+            case "test-linux":
+            case "test-macos":
+                return ["net8.0"];
+
+            default:
+                return context.IsRunningOnWindows()
+                    ? ["net472", "net8.0"]
+                    : ["net8.0"];
+        }
     }
 }
