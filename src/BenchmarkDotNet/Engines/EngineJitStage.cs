@@ -208,21 +208,15 @@ internal sealed class EngineJitStage : EngineStage
                     }
                 }
 
-                // A new tier was published; the tier it carried tells us whether the method reached tier1.
                 if (listener!.ReachedTier1)
                 {
-                    if (!JitInfo.IsOSRDuplicated)
-                    {
-                        break;
-                    }
-                    // We need to handle the case of the benchmark method reached tier1, but it calls another method that is OSR'd.
-                    // The listener only tracks the benchmark method and an unknown callee can't be watched, so
-                    // stop consulting it and let the loop run one more promotion iteration on the fixed delay
-                    // to give such a callee time. MaxTierPromotions already budgets +1 for OSR, so cap the loop
-                    // to one further iteration: Min(remainingTiers, 2) yields Min(remainingTiers - 1, 1) more
-                    // passes once the for-loop's --remainingTiers is applied.
+                    // If the method has reached tier1 we will not receive any more JIT events for it.
+                    // In case OSR is enabled and the method calls another method that is OSR'd, a runtime bug causes that other method to duplicate a tier (JitInfo.MaxTierPromotions already accounts for it).
+                    // Or the method could have been pre-warmed before the stage started, but the benchmark case uses a different control flow that calls different methods that were not pre-warmed.
+                    // In either case, the listener only tracks the benchmark method, and unknown callees can't be watched,
+                    // so stop consulting it and let the loop run the remaining calculated promotion iterations on the fixed delay.
                     useListener = false;
-                    remainingTiers = Math.Min(remainingTiers, 2);
+                    listener!.WaitForTieringActive(parameters.Host.CancellationToken);
                 }
             }
             else
