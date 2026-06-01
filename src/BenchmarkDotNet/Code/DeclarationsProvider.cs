@@ -33,9 +33,8 @@ namespace BenchmarkDotNet.Code
             return ReplaceCore(smartStringBuilder)
                 .Replace("$DisassemblerEntryMethodImpl$", GetWorkloadMethodCall(GetPassArgumentsDirect()))
                 .Replace("$OperationsPerInvoke$", Descriptor.OperationsPerInvoke.ToString())
-                .Replace("$WorkloadMethodResolve$", GetWorkloadMethodResolve())
-                .Replace("$WorkloadMethodReturnTypeModifiers$", GetWorkloadMethodReturnTypeModifiers())
-                .Replace("$WorkloadMethodReturnType$", GetWorkloadMethodReturnTypeName())
+                .Replace("$WorkloadMethodName$", Descriptor.WorkloadMethod.Name)
+                .Replace("$WorkloadMethodParameterTypes$", GetWorkloadMethodParameterTypes())
                 .Replace("$WorkloadTypeName$", Descriptor.Type.GetCorrectCSharpTypeName());
         }
 
@@ -92,34 +91,24 @@ namespace BenchmarkDotNet.Code
         protected string GetWorkloadMethodCall(string passArguments)
              => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments});";
 
-        // Resolve the benchmark MethodInfo at runtime so the jit stage can watch its tier-up via JIT events.
-        // Method-group conversion to the generated __WorkloadMethodDelegate, then read its .Method: the compiler
-        // binds the correct overload and verifies the signature at build time, so it's overload- and inheritance-safe
-        // without rendering parameter type lists. We deliberately avoid resolving by metadata token — the benchmark
-        // assembly is built separately and conditional compilation (e.g. #if) can shift token RIDs.
-        private string GetWorkloadMethodResolve()
+        // Renders the benchmark method's parameter types as a Type[] for __ResolveWorkloadMethod to match overloads
+        // exactly. Each is a typeof(...) of the element type, re-wrapping by-ref/pointer via reflection (typeof can't
+        // express `T&`), so resolution never has to name the method's (possibly unspellable) return type.
+        private string GetWorkloadMethodParameterTypes()
         {
-            var method = Descriptor.WorkloadMethod;
-            return $"((__WorkloadMethodDelegate){GetMethodPrefix(method)}.{method.Name}).Method";
+            var parameters = Descriptor.WorkloadMethod.GetParameters();
+            if (parameters.Length == 0)
+                return "global::System.Array.Empty<global::System.Type>()";
+            return $"new global::System.Type[] {{ {string.Join(", ", parameters.Select(p => GetTypeOfExpression(p.ParameterType)))} }}";
         }
 
-        // The delegate return type, split into modifiers ("", "ref", "ref readonly") and the (non-byref) type name,
-        // because the benchmark method's return ref-kind must match the delegate's for the method-group conversion.
-        private string GetWorkloadMethodReturnTypeName()
+        private static string GetTypeOfExpression(System.Type type)
         {
-            var returnType = Descriptor.WorkloadMethod.ReturnType;
-            return (returnType.IsByRef ? returnType.GetElementType()! : returnType).GetCorrectCSharpTypeName();
-        }
-
-        private string GetWorkloadMethodReturnTypeModifiers()
-        {
-            var method = Descriptor.WorkloadMethod;
-            if (!method.ReturnType.IsByRef)
-                return string.Empty;
-            // ref readonly returns carry an InAttribute required modifier on the return; plain ref returns don't.
-            bool isReadOnly = method.ReturnParameter.GetRequiredCustomModifiers()
-                .Any(modifier => modifier.FullName == "System.Runtime.InteropServices.InAttribute");
-            return isReadOnly ? "ref readonly" : "ref";
+            if (type.IsByRef)
+                return $"{GetTypeOfExpression(type.GetElementType()!)}.MakeByRefType()";
+            if (type.IsPointer)
+                return $"{GetTypeOfExpression(type.GetElementType()!)}.MakePointerType()";
+            return $"typeof({type.GetCorrectCSharpTypeName()})";
         }
 
         protected string GetPassArgumentsDirect()

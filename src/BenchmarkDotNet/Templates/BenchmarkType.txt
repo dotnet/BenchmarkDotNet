@@ -70,16 +70,39 @@
             $CancellationTokenAssignment$
         }
 
-        private unsafe delegate $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ __WorkloadMethodDelegate($ArgumentsDefinition$);
-
         $DeclareFieldsContainer$
 
         private global::System.Reflection.MethodInfo __ResolveWorkloadMethod()
         {
-            unsafe
+            global::System.Type[] parameterTypes = $WorkloadMethodParameterTypes$;
+            foreach (global::System.Reflection.MethodInfo candidate in typeof($WorkloadTypeName$).GetMethods(
+                global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Static |
+                global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic))
             {
-                return $WorkloadMethodResolve$;
+                if (candidate.Name != "$WorkloadMethodName$")
+                {
+                    continue;
+                }
+                global::System.Reflection.ParameterInfo[] parameters = candidate.GetParameters();
+                if (parameters.Length != parameterTypes.Length)
+                {
+                    continue;
+                }
+                global::System.Boolean isMatch = true;
+                for (global::System.Int32 i = 0; i < parameters.Length; i++)
+                {
+                    if (parameters[i].ParameterType != parameterTypes[i])
+                    {
+                        isMatch = false;
+                        break;
+                    }
+                }
+                if (isMatch)
+                {
+                    return candidate;
+                }
             }
+            return null;
         }
 
         private $GlobalSetupModifiers$ global::System.Threading.Tasks.ValueTask __GlobalSetup()

@@ -31,11 +31,6 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             "__ResolveWorkloadMethod"
         ];
 
-        private static readonly HashSet<string> IgnoredRunnableNestedTypeNames =
-        [
-            "__WorkloadMethodDelegate"
-        ];
-
         private static readonly IReadOnlyDictionary<OpCode, OpCode> AltOpCodes = new Dictionary<OpCode, OpCode>()
         {
             { OpCodes.Br_S, OpCodes.Br },
@@ -415,7 +410,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             var nested2ByName = type2.NestedTypes.ToLookup(t => t.Name);
             foreach (var nested1 in type1.NestedTypes)
             {
-                if (ignoredStateMachineNames.Contains(nested1.FullName) || IgnoredRunnableNestedTypeNames.Contains(nested1.Name))
+                if (ignoredStateMachineNames.Contains(nested1.FullName))
                     continue;
                 var nested2 = nested2ByName[nested1.Name].SingleOrDefault()
                     ?? type2.NestedTypes.SingleOrDefault(t => AreSameTypeIgnoreNested(nested1, t));
