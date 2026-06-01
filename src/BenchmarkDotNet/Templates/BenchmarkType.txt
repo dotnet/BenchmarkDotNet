@@ -39,6 +39,7 @@
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
+                WorkloadMethod = instance.__ResolveWorkloadMethod(),
                 WorkloadActionUnroll = instance.WorkloadActionUnroll,
                 WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
                 OverheadActionNoUnroll = instance.OverheadActionNoUnroll,
@@ -69,7 +70,17 @@
             $CancellationTokenAssignment$
         }
 
+        private unsafe delegate $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ __WorkloadMethodDelegate($ArgumentsDefinition$);
+
         $DeclareFieldsContainer$
+
+        private global::System.Reflection.MethodInfo __ResolveWorkloadMethod()
+        {
+            unsafe
+            {
+                return $WorkloadMethodResolve$;
+            }
+        }
 
         private $GlobalSetupModifiers$ global::System.Threading.Tasks.ValueTask __GlobalSetup()
         {

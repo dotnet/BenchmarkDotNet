@@ -70,6 +70,18 @@ internal static class JitInfo
             // Disabled by default in netcoreapp2.X, check if it's enabled.
             : IsEnabled(EnvTieredCompilation, KnobTieredCompilation));
 
+    // On-stack-replacement *shouldn't* interfere with promotion velocity, but there is a bug where OSR may cause a method to be tier0 instrumented twice.
+    // https://github.com/dotnet/runtime/issues/117787#issuecomment-3090771091
+    public static readonly bool IsOSRDuplicated =
+        IsTiered
+        // Added experimentally in .Net 5.
+        && Environment.Version.Major >= 5
+        && (Environment.Version.Major >= 7
+            // Enabled by default in .Net 7, check if it's disabled.
+            ? !IsEnvVarDisabled(EnvOSR)
+            // Disabled by default in earlier versions, check if it's enabled.
+            : IsEnvVarEnabled(EnvOSR));
+
     /// <summary>
     /// The maximum numbers of jit tiers that a method may be promoted through. This is the maximum number of jit tiers - 1.
     /// </summary>
@@ -88,10 +100,8 @@ internal static class JitInfo
             // Tier0 instrumented
             ++maxPromotions;
         }
-        if (GetIsOSR())
+        if (IsOSRDuplicated)
         {
-            // On-stack-replacement *shouldn't* interfere with promotion velocity, but there is a bug where OSR may cause a method to be tier0 instrumented twice.
-            // https://github.com/dotnet/runtime/issues/117787#issuecomment-3090771091
             ++maxPromotions;
         }
         return maxPromotions;
@@ -106,15 +116,6 @@ internal static class JitInfo
                 ? !IsDisabled(EnvPGO, KnobPGO)
                 // Disabled by default in earlier versions, check if it's enabled.
                 : IsEnabled(EnvPGO, KnobPGO));
-
-        static bool GetIsOSR() =>
-            // Added experimentally in .Net 5.
-            Environment.Version.Major >= 5
-            && (Environment.Version.Major >= 7
-                // Enabled by default in .Net 7, check if it's disabled.
-                ? !IsEnvVarDisabled(EnvOSR)
-                // Disabled by default in earlier versions, check if it's enabled.
-                : IsEnvVarEnabled(EnvOSR));
     }
 
     /// <summary>
@@ -180,7 +181,7 @@ internal static class JitInfo
     /// </summary>
     public static readonly TimeSpan BackgroundCompilationDelay =
         IsTiered
-            // It's impossible for us to know exactly how long to wait without hooking into JIT notifications (which we can't do in-process).
+            // It's impossible for us to know exactly how long to wait without hooking into JIT notifications.
             // 100ms should be enough most of the time, but we bump it up to 250ms for higher confidence.
             // When https://github.com/dotnet/runtime/issues/101868 is resolved, if AggressiveTiering is enabled, we can skip the wait time and return TimeSpan.Zero.
             ? TimeSpan.FromMilliseconds(250)

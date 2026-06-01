@@ -226,9 +226,9 @@ namespace BenchmarkDotNet.Tests.Engine
                 if (stage is EngineJitStage) break;
             }
 
-            // Pre-loop iter + confirmation + full tiering loop (one yield per tier since the user
-            // pinned InvocationCount=1, matching JitInfo.MaxTierPromotions * TieredCallCountThreshold)
-            // + one stabilization iteration. Just assert it ran the full tiering loop rather than bailing.
+            // Pre-loop iter + confirmation + full tiering loop (one yield per tier since the user pinned
+            // InvocationCount=1, matching JitInfo.MaxTierPromotions * TieredCallCountThreshold) + the trailing
+            // stabilization iteration. Just assert it ran the full tiering loop rather than bailing.
             Assert.True(jitWorkloadCount > 2, $"Expected the tiering loop to run after confirmation disagreed, got {jitWorkloadCount} jitting iterations.");
         }
 
@@ -347,6 +347,8 @@ namespace BenchmarkDotNet.Tests.Engine
             Func<long, IClock, ValueTask<ClockSpan>> emptyAction = (_, _) => new(default(ClockSpan));
             return new()
             {
+                WorkloadMethod = emptyAction.Method,
+                EnableJitListener = false,
                 GlobalSetupAction = () => new(),
                 GlobalCleanupAction = () => new(),
                 Host = host,

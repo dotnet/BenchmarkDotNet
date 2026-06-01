@@ -33,6 +33,9 @@ namespace BenchmarkDotNet.Code
             return ReplaceCore(smartStringBuilder)
                 .Replace("$DisassemblerEntryMethodImpl$", GetWorkloadMethodCall(GetPassArgumentsDirect()))
                 .Replace("$OperationsPerInvoke$", Descriptor.OperationsPerInvoke.ToString())
+                .Replace("$WorkloadMethodResolve$", GetWorkloadMethodResolve())
+                .Replace("$WorkloadMethodReturnTypeModifiers$", GetWorkloadMethodReturnTypeModifiers())
+                .Replace("$WorkloadMethodReturnType$", GetWorkloadMethodReturnTypeName())
                 .Replace("$WorkloadTypeName$", Descriptor.Type.GetCorrectCSharpTypeName());
         }
 
@@ -88,6 +91,36 @@ namespace BenchmarkDotNet.Code
 
         protected string GetWorkloadMethodCall(string passArguments)
              => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments});";
+
+        // Resolve the benchmark MethodInfo at runtime so the jit stage can watch its tier-up via JIT events.
+        // Method-group conversion to the generated __WorkloadMethodDelegate, then read its .Method: the compiler
+        // binds the correct overload and verifies the signature at build time, so it's overload- and inheritance-safe
+        // without rendering parameter type lists. We deliberately avoid resolving by metadata token — the benchmark
+        // assembly is built separately and conditional compilation (e.g. #if) can shift token RIDs.
+        private string GetWorkloadMethodResolve()
+        {
+            var method = Descriptor.WorkloadMethod;
+            return $"((__WorkloadMethodDelegate){GetMethodPrefix(method)}.{method.Name}).Method";
+        }
+
+        // The delegate return type, split into modifiers ("", "ref", "ref readonly") and the (non-byref) type name,
+        // because the benchmark method's return ref-kind must match the delegate's for the method-group conversion.
+        private string GetWorkloadMethodReturnTypeName()
+        {
+            var returnType = Descriptor.WorkloadMethod.ReturnType;
+            return (returnType.IsByRef ? returnType.GetElementType()! : returnType).GetCorrectCSharpTypeName();
+        }
+
+        private string GetWorkloadMethodReturnTypeModifiers()
+        {
+            var method = Descriptor.WorkloadMethod;
+            if (!method.ReturnType.IsByRef)
+                return string.Empty;
+            // ref readonly returns carry an InAttribute required modifier on the return; plain ref returns don't.
+            bool isReadOnly = method.ReturnParameter.GetRequiredCustomModifiers()
+                .Any(modifier => modifier.FullName == "System.Runtime.InteropServices.InAttribute");
+            return isReadOnly ? "ref readonly" : "ref";
+        }
 
         protected string GetPassArgumentsDirect()
             => string.Join(
