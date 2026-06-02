@@ -80,6 +80,44 @@ public class JitListenerTests
         AssertTierUpOrDeclined(observer);
     }
 
+    // Tests a benchmark method whose own hot loop is On-Stack-Replaced (OSR) mid-execution. Where OSR is enabled
+    // (by default in .NET 7+) this drives the method through an OSR publication on top of its normal tier-ups, and the
+    // stage must still reach OptimizedTier1 — JitInfo.MaxTierPromotions reserves an extra promotion for the OSR-induced
+    // double tier0-instrumentation. Where OSR is off it is simply a hot-loop method that tiers up normally; either way
+    // it ends at tier1.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_Osr()
+    {
+        Func<long, long> workloadMethod = Osr;
+
+        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+
+        RunJitStageToCompletion(workloadMethod);
+
+        AssertTierUpOrDeclined(observer);
+    }
+
+    // Tests a benchmark method that calls (without inlining) a separate method whose hot loop is OSR'd. The listener
+    // only watches the benchmark method, never the callee, so it can't observe the callee's tiering at all — this
+    // exercises the runtime bug where an OSR'd callee gets tier0-instrumented twice (JitInfo.MaxTierPromotions reserves
+    // the extra promotion the stage spends on it). The benchmark method itself must still be driven to OptimizedTier1.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_CallsOsr()
+    {
+        Func<long, long> workloadMethod = CallsOsr;
+        Func<long, long> calleeMethod = OsrCallee;
+
+        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        // The stage only drives (and the engine's listener only watches) the benchmark method, but every call to it
+        // calls the OSR'd callee, so the callee should be driven all the way to tier1 too. Watch it independently.
+        using var calleeObserver = JitListener.Create(calleeMethod.Method, enabled: true);
+
+        RunJitStageToCompletion(workloadMethod);
+
+        AssertTierUpOrDeclined(observer);
+        AssertTierUpOrDeclined(calleeObserver);
+    }
+
     // A pinned optimization level makes a method ineligible for tiered compilation regardless of the assembly, so the
     // listener declines to watch it (Create returns null). In an optimized build that attribute is the sole reason; in a
     // DisableOptimizations build the assembly excludes it too — either way there is nothing for the listener to observe.
@@ -179,6 +217,30 @@ public class JitListenerTests
     private static long NoOptimization(long x) => x * x + 1;
     [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
     private static long AggressiveOptimization(long x) => x * x + 1;
+
+    // A loop long enough to cross the OSR back-edge threshold so these methods are On-Stack-Replaced where OSR is
+    // enabled. Timing is irrelevant (RunJitStageToCompletion records 0ns measurements, so the stage never takes its
+    // long-running early-exit), so the only requirement is enough iterations to trigger OSR.
+    private const int OsrLoopCount = 1_000_000;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long Osr(long x)
+    {
+        long sum = x;
+        for (int i = 0; i < OsrLoopCount; i++)
+            sum += i;
+        return sum;
+    }
+    // The benchmark method: it does nothing but call the OSR'd method, which NoInlining keeps as a separate jit unit.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long CallsOsr(long x) => OsrCallee(x);
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long OsrCallee(long x)
+    {
+        long sum = x;
+        for (int i = 0; i < OsrLoopCount; i++)
+            sum += i;
+        return sum;
+    }
 
     // Minimal host that surfaces a cancellation token so the stage's unbounded per-tier wait stays interruptible.
     private sealed class CancellableHost(CancellationToken cancellationToken) : IHost

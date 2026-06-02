@@ -43,13 +43,18 @@ internal sealed class JitListener : EventListener
     private const string MethodLoadVerbosePrefix = "MethodLoadVerbose";
 
     // Optimization tier is packed into MethodFlags bits [7..9]: (MethodFlags >> 7) & 0x7.
-    // The initial tier0 quick compile is QuickJitted = 3, intermediate instrumented/OSR
-    // publications report other values (and just count as "a recompilation happened"),
-    // and the fully-optimized steady-state tier1 is OptimizedTier1 = 4.
+    // The initial tier0 quick compile is QuickJitted = 3; the intermediate instrumented (PGO) publication reports
+    // another value and just counts as "a recompilation happened"; and the fully-optimized steady-state tier1 is
+    // OptimizedTier1 = 4. OptimizedTier1OSR = 5 is special: an on-stack-replacement of a still-running body with a
+    // hot loop. It fires off the loop's back-edge counter, NOT off the call-count threshold, so it's orthogonal to
+    // the call-count tier ladder the stage drives — and a watched method that OSRs in both its tier0 and instrumented
+    // bodies emits two of them on the way to tier1. We therefore ignore OSR publications for our method (see
+    // HandleMethodLoad) so they don't consume the stage's per-tier publication budget and stall it short of tier1.
     private const int OptimizationTierShift = 7;
     private const int OptimizationTierMask = 0x7;
     private const int QuickJittedTier0 = 3;
     private const int OptimizedTier1 = 4;
+    private const int OptimizedTier1OSR = 5;
 
     private readonly int metadataToken;
     private readonly string methodName;
@@ -203,6 +208,13 @@ internal sealed class JitListener : EventListener
         if (Convert.ToInt32(payload[loadTokenIndex]) != metadataToken)
             return;
         if (payload[loadNameIndex] as string != methodName)
+            return;
+
+        // An OSR publication is not a step on the call-count tier ladder (it fires off a hot loop's back-edge counter,
+        // and the method goes on to be call-count-promoted past it), so don't let it count as a tier-up the stage is
+        // waiting on — otherwise a method that OSRs in multiple bodies overruns the stage's publication budget and
+        // stops short of tier1.
+        if (tier == OptimizedTier1OSR)
             return;
 
         if (tier == OptimizedTier1)
