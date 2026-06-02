@@ -4,6 +4,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using RunMode = BenchmarkDotNet.Diagnosers.RunMode;
@@ -114,7 +115,7 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
             .AddJob(job);
     }
 
-    [Theory]
+    [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
     [MemberData(nameof(GetTestCombinations))]
     public void MultipleInProcessDiagnosersWork(RunMode[] runModes, ToolchainType toolchain)
     {

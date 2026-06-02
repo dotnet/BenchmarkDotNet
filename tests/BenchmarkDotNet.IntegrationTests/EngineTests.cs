@@ -3,6 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
@@ -79,9 +80,9 @@ namespace BenchmarkDotNet.IntegrationTests
             Job.Default.GetToolchain()
         ];
 
-        // #1120
-        [Theory]
-        [MemberData(nameof(GetToolchains))]
+        // https://github.com/dotnet/BenchmarkDotNet/issues/1120
+        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void BenchmarkIsInvokedWithSameStack(IToolchain toolchain)
         {
             CanExecute<StackBench>(DefaultConfig.Instance

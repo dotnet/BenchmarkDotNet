@@ -4,6 +4,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public RunStrategyTests(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
+        [FactEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         public void RunStrategiesAreSupported()
         {
             var config = ManualConfig.CreateEmpty()
