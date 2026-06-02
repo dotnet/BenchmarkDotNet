@@ -467,12 +467,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             string GetToken()
             {
                 var result = token.ToString();
-                if (result.Contains(' '))
-                {
-                    // Workaround for CommandLine library issue with parsing these kind of args.
-                    return " " + result;
-                }
-
                 return result;
             }
         }
