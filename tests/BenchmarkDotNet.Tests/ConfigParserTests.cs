@@ -228,12 +228,15 @@ namespace BenchmarkDotNet.Tests
             job.Run.RunStrategy.Should().Be(RunStrategy.Monitoring);
         }
 
-        [FactEnvSpecific(
-            "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
-            EnvRequirement.DotNetCoreOnly)]
+        [Fact]
         public void UnknownConfigMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(["--unknown"], new OutputLogger(Output)).isSuccess);
+            var logger = new AccumulationLogger();
+            var results = ConfigParser.Parse(["--unknown"], logger);
+
+            // Assert
+            results.isSuccess.Should().BeFalse();
+            logger.GetLog().Should().Contain("Option 'unknown' is unknown.");
         }
 
         [Fact]
@@ -936,17 +939,20 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        [Fact(Skip = "This should be handled somehow at CommandLineParser level. See https://github.com/commandlineparser/commandline/pull/892")]
+        [Fact]
         public void UserCanSpecifyWasmArgs()
         {
             var parsedConfiguration = ConfigParser.Parse(["--runtimes", "monowasm80", "--wasmArgs", "--expose_wasm --module", GetDummyWasmEngine()], new OutputLogger(Output));
-            Assert.True(parsedConfiguration.isSuccess);
-            Assert.NotNull(parsedConfiguration.config);
+
+            // Assert
+            parsedConfiguration.isSuccess.Should().BeTrue();
+            parsedConfiguration.config.Should().NotBeNull();
+
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
-                var wasmToolchain = Assert.IsAssignableFrom<CsProjWasmToolchain>(job.GetToolchain());
-                Assert.Equal(" --expose_wasm --module", ((WasmSettings)wasmToolchain.Settings).JavaScriptEngineArguments);
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                wasmRuntime.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
             }
         }
 
@@ -954,13 +960,16 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyWasmArgsUsingEquals()
         {
             var parsedConfiguration = ConfigParser.Parse(["--runtimes", "monowasm80", "--wasmArgs=--expose_wasm --module", GetDummyWasmEngine()], new OutputLogger(Output));
-            Assert.True(parsedConfiguration.isSuccess);
-            Assert.NotNull(parsedConfiguration.config);
+
+            // Assert
+            parsedConfiguration.isSuccess.Should().BeTrue();
+            parsedConfiguration.config.Should().NotBeNull();
+
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
-                var wasmToolchain = Assert.IsAssignableFrom<CsProjWasmToolchain>(job.GetToolchain());
-                Assert.Equal("--expose_wasm --module", ((WasmSettings)wasmToolchain.Settings).JavaScriptEngineArguments);
+                var wasmRuntime = job.Environment.Runtime.Should().BeOfType<WasmRuntime>().Subject;
+                wasmRuntime.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
             }
         }
 
@@ -975,8 +984,11 @@ namespace BenchmarkDotNet.Tests
                 GetDummyWasmEngine()
             ]);
             var parsedConfiguration = ConfigParser.Parse([$"@{tempResponseFile}"], new OutputLogger(Output));
-            Assert.True(parsedConfiguration.isSuccess);
-            Assert.NotNull(parsedConfiguration.config);
+
+            // Assert
+            parsedConfiguration.isSuccess.Should().BeTrue();
+            parsedConfiguration.config.Should().NotBeNull();
+
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
