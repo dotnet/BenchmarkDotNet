@@ -16,7 +16,6 @@
     <CLSCompliant>true</CLSCompliant>
     <ComVisible>false</ComVisible>
 
-    <UseSharedCompilation>false</UseSharedCompilation>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
