@@ -1010,6 +1010,16 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("dummyFile.js", ((WasmSettings)wasmToolchain.Settings).MainJsTemplate?.Name);
         }
 
+        [Fact]
+        public void CheckExtraArguments()
+        {
+            var results = ConfigParser.Parse(["--", "arg1", "arg2"], NullLogger.Instance);
+
+            // Assert
+            results.isSuccess.Should().BeTrue();
+            results.options!.ExtraArguments.Should().BeEquivalentTo(["arg1", "arg2"]);
+        }
+
         [Theory]
         [InlineData("--filter abc", "--filter *")]
         [InlineData("-f abc", "--filter *")]
