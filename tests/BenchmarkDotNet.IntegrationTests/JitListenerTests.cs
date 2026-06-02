@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -11,17 +10,6 @@ namespace BenchmarkDotNet.IntegrationTests;
 
 public class JitListenerTests
 {
-    // The jit stage's behavior depends on whether the benchmark method's assembly is optimized, and this test
-    // assembly is built both ways across configurations, so each case asserts whichever applies:
-    //   * Optimized build: the target method participates in tiered compilation, so the stage drives it to
-    //     OptimizedTier1. We verify through a SECOND, independent JitListener created before the stage runs —
-    //     multiple EventListeners each receive the same runtime events, so it observes exactly what the stage's
-    //     internal listener does, and unlike the internal listener (disposed when the stage ends) it outlives the stage.
-    //   * DisableOptimizations build (e.g. Debug): the assembly is JITted at minopts and never tiers, so the listener
-    //     declines to watch it (Create returns null) and the stage falls back to the fixed-delay loop.
-    private static readonly bool OptimizationsDisabled =
-        typeof(JitListenerTests).Assembly.GetCustomAttribute<System.Diagnostics.DebuggableAttribute>()?.IsJITOptimizerDisabled ?? false;
-
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
     public void JitStage_Cold()
     {
@@ -29,9 +17,9 @@ public class JitListenerTests
 
         using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
 
-        RunJitStageToCompletion(workloadMethod);
+        RunJitStageToCompletion(workloadMethod, observer);
 
-        AssertTierUpOrDeclined(observer);
+        AssertReachedFinalTier(observer);
     }
 
     // Tests the case of InProcess benchmarking the same method multiple times.
@@ -42,42 +30,50 @@ public class JitListenerTests
 
         using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
 
-        // The first jit stage brings the method to tier1 (in an optimized build); running the jit stage again for the
-        // same method should succeed without issue and leave the method in tier1.
-        RunJitStageToCompletion(workloadMethod);
-        RunJitStageToCompletion(workloadMethod);
+        // The first jit stage brings the method to tier1 (in an optimized build) and our observer records it. Running
+        // the jit stage again for the same (now tier1) method should also succeed; it gets a fresh listener, because
+        // the stage drove the first to completion and reusing one across runs would leave its tiering signals ambiguous.
+        RunJitStageToCompletion(workloadMethod, observer);
+        using var observer2 = JitListener.Create(workloadMethod.Method, enabled: true);
+        RunJitStageToCompletion(workloadMethod, observer2);
 
-        AssertTierUpOrDeclined(observer);
+        AssertReachedFinalTier(observer);
     }
 
     // Tests the case of InProcess benchmarking a method that the user already invoked before starting the benchmarks when call counting is active.
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
     public void JitStage_AlreadyTier0()
     {
+        Func<long, long> workloadMethod = AlreadyTier0;
+        // Watch from before the pre-invoke, and hand this listener to the stage so it doesn't create a second one
+        // (see RunJitStageToCompletion): in a minopt build the pre-invoke is the method's only compile.
+        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0(42));
         // Sleep long enough for the tiered call counting to begin.
         Engine.SleepIfPositive(JitInfo.TieredDelay + JitInfo.TieredDelay);
-        Func<long, long> workloadMethod = AlreadyTier0;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        RunJitStageToCompletion(workloadMethod, observer);
 
-        RunJitStageToCompletion(workloadMethod);
-
-        AssertTierUpOrDeclined(observer);
+        AssertReachedFinalTier(observer);
     }
 
     // Tests the case of InProcess benchmarking a method that the user already invoked before starting the benchmarks when call counting is delayed.
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
     public void JitStage_AlreadyTier0DelayedCallCounting()
     {
-        DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0DelayedCallCounting(42));
         Func<long, long> workloadMethod = AlreadyTier0DelayedCallCounting;
-
+        // Watch from before the pre-invoke, and hand this listener to the stage (see RunJitStageToCompletion). We do
+        // NOT sleep first: this test's whole point is that the call-counting delay is still pending when the stage
+        // starts. Because the stage reuses this one listener, the pre-invoke's event is never lost to a second
+        // listener's session churn, so no wait is needed to observe the final tier.
         using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
 
-        RunJitStageToCompletion(workloadMethod);
+        DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0DelayedCallCounting(42));
 
-        AssertTierUpOrDeclined(observer);
+        RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
     }
 
     // Tests a benchmark method whose own hot loop is On-Stack-Replaced (OSR) mid-execution. Where OSR is enabled
@@ -92,9 +88,9 @@ public class JitListenerTests
 
         using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
 
-        RunJitStageToCompletion(workloadMethod);
+        RunJitStageToCompletion(workloadMethod, observer);
 
-        AssertTierUpOrDeclined(observer);
+        AssertReachedFinalTier(observer);
     }
 
     // Tests a benchmark method that calls (without inlining) a separate method whose hot loop is OSR'd. The listener
@@ -112,51 +108,54 @@ public class JitListenerTests
         // calls the OSR'd callee, so the callee should be driven all the way to tier1 too. Watch it independently.
         using var calleeObserver = JitListener.Create(calleeMethod.Method, enabled: true);
 
-        RunJitStageToCompletion(workloadMethod);
+        RunJitStageToCompletion(workloadMethod, observer);
 
-        AssertTierUpOrDeclined(observer);
-        AssertTierUpOrDeclined(calleeObserver);
+        AssertReachedFinalTier(observer);
+        AssertReachedFinalTier(calleeObserver);
     }
 
-    // A pinned optimization level makes a method ineligible for tiered compilation regardless of the assembly, so the
-    // listener declines to watch it (Create returns null). In an optimized build that attribute is the sole reason; in a
-    // DisableOptimizations build the assembly excludes it too — either way there is nothing for the listener to observe.
+    // A method pinned to a single optimization level never tiers, but the listener still watches it and recognizes
+    // its one-and-only compile as a final tier (MinOptJitted or Optimized) — so the stage observes "done" rather than
+    // depending on an attribute heuristic to decline up front.
 
+    // [MethodImpl(NoOptimization)] pins the method to minopts, so its final tier is MinOptJitted.
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
-    public void Create_DeclinesNoOptimizationMethod()
+    public void JitStage_NoOptimization()
     {
-        // [MethodImpl(NoOptimization)] pins the method to minopts, so it never tiers.
         Func<long, long> workloadMethod = NoOptimization;
-        using var listener = JitListener.Create(workloadMethod.Method, enabled: true);
-        Assert.Null(listener);
+
+        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+
+        RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
     }
 
+    // [MethodImpl(AggressiveOptimization)] pins the method straight to optimized code, so it never goes through
+    // tier0 -> tier1 and its final tier is Optimized (or OptimizedTier1, depending on runtime).
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
-    public void Create_DeclinesAggressiveOptimizationMethod()
+    public void JitStage_AggressiveOptimization()
     {
-        // [MethodImpl(AggressiveOptimization)] pins the method straight to tier1, so it never goes through tier0 -> tier1.
         Func<long, long> workloadMethod = AggressiveOptimization;
-        using var listener = JitListener.Create(workloadMethod.Method, enabled: true);
-        Assert.Null(listener);
+
+        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+
+        RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
     }
 
-    private static void AssertTierUpOrDeclined(JitListener? observer)
+    private static void AssertReachedFinalTier(JitListener? observer)
     {
-        if (OptimizationsDisabled)
-        {
-            // The method can't tier, so the listener declines to watch it (Create returns null) and the stage falls
-            // back to the fixed-delay loop without ever reaching tier1.
-            Assert.Null(observer);
-        }
-        else
-        {
-            // requires EventSource support in the test host (it's enabled by default)
-            Assert.NotNull(observer);
-            Assert.True(observer!.ReachedTier1, "the jit stage should have driven the benchmark method to tier1");
-        }
+        // No wait needed: the tier-up event is delivered while the stage is still running (it spans hundreds of ms of
+        // tiering delays), so by the time the stage returns the observer has already recorded the final tier.
+        Assert.NotNull(observer);
+        Assert.True(observer.ReachedFinalTier, "the jit stage should have driven the benchmark method to its final tier");
     }
 
-    private static void RunJitStageToCompletion(Func<long, long> workloadMethod)
+    // The test owns the listener and passes it in; the stage uses that exact instance (it never creates its own), so
+    // there is never a second EventListener whose setup/teardown could flush an event in flight to the test's listener.
+    private static void RunJitStageToCompletion(Func<long, long> workloadMethod, JitListener? listener)
     {
         // The per-tier publication wait is unbounded, cancellable only via the host's token. When the method tiers, the
         // stage re-bursts until the runtime reports the next-tier compile began, so the wait isn't actually hit — but a
@@ -189,7 +188,7 @@ public class JitListenerTests
             InProcessDiagnoserHandler = new([], host, BenchmarkDotNet.Diagnosers.RunMode.None, null!),
         };
 
-        var stage = new EngineJitStage(evaluateOverhead: false, parameters);
+        var stage = new EngineJitStage(evaluateOverhead: false, parameters, listener);
         var measurements = stage.GetMeasurementList();
         while (stage.GetShouldRunIteration(measurements, out var data))
         {

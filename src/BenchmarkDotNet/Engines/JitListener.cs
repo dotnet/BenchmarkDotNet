@@ -13,8 +13,8 @@ namespace BenchmarkDotNet.Engines;
 //   * MethodLoadVerbose (per-method, JIT keyword) reports each tier publication and carries the tier. A burst that
 //     reaches the call-count threshold triggers the next tier's compile, which publishes a (non-tier0) load — so the
 //     first such publication after a burst is the AUTHORITATIVE "the burst tiered up" signal, and the tier it carries
-//     tells us when the method reached tier1. The stage keeps invoking until it sees one. (WaitForPublication /
-//     ReachedTier1.) We deliberately do NOT use MethodJittingStarted (compile-began): it carries no tier, so the
+//     tells us when the method reached its final tier. The stage keeps invoking until it sees one. (WaitForPublication /
+//     ReachedFinalTier.) We deliberately do NOT use MethodJittingStarted (compile-began): it carries no tier, so the
 //     tier0 compile's start is indistinguishable from a tier-up's and would race the tier0 publish that filters it.
 //   * TieredCompilationPause/Resume (the call-counting delay bracket, Compilation keyword) gate the bursts: a burst
 //     issued while the delay is active isn't counted (the counting stub is deferred), so the stage waits until the
@@ -27,9 +27,10 @@ namespace BenchmarkDotNet.Engines;
 // process-wide, which we must NOT pay during the measurement stages. It is created at the start of the jit stage
 // and disposed at the end.
 //
-// Create returns null (and the caller falls back to the fixed delay) when EventSource is unavailable — it can be
-// disabled via the System.Diagnostics.Tracing.EventSource.IsSupported feature switch — or the method isn't eligible
-// for tiered compilation (its assembly has optimizations disabled, or it's pinned to a single optimization level).
+// Create returns null (and the caller falls back to the fixed delay) when the runtime has no tiered JIT, or when
+// EventSource is unavailable — it can be disabled via the System.Diagnostics.Tracing.EventSource.IsSupported feature
+// switch. It otherwise watches the method regardless of whether it looks tier-eligible: a method that can't tier just
+// publishes its single final tier (see the tier constants below), which the stage observes and treats as "done".
 internal sealed class JitListener : EventListener
 {
     private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
@@ -44,14 +45,25 @@ internal sealed class JitListener : EventListener
 
     // Optimization tier is packed into MethodFlags bits [7..9]: (MethodFlags >> 7) & 0x7.
     // The initial tier0 quick compile is QuickJitted = 3; the intermediate instrumented (PGO) publication reports
-    // another value and just counts as "a recompilation happened"; and the fully-optimized steady-state tier1 is
-    // OptimizedTier1 = 4. OptimizedTier1OSR = 5 is special: an on-stack-replacement of a still-running body with a
-    // hot loop. It fires off the loop's back-edge counter, NOT off the call-count threshold, so it's orthogonal to
-    // the call-count tier ladder the stage drives — and a watched method that OSRs in both its tier0 and instrumented
-    // bodies emits two of them on the way to tier1. We therefore ignore OSR publications for our method (see
-    // HandleMethodLoad) so they don't consume the stage's per-tier publication budget and stall it short of tier1.
+    // another value and just counts as "a recompilation happened". A method is fully warmed once it reaches one of
+    // the runtime's FINAL tiers — those from which no further tier-up is coming:
+    //   * OptimizedTier1 = 4 — the usual steady state for a tier-eligible method.
+    //   * Optimized = 2 (NativeCodeVersion::OptimizationTierOptimized) — a method compiled straight to optimized code
+    //     without a tier1 promotion: AggressiveOptimization, or a method with a loop when TC_QuickJitForLoops is off.
+    //   * MinOptJitted = 1 — a method that never tiers at all: NoOptimization, or any method in an
+    //     optimization-disabled assembly. This is its first and only compile.
+    // Since Create now watches every method (not just ones that look tier-eligible), a non-tiering method publishes
+    // exactly one of MinOptJitted/Optimized and we recognize it as final immediately, rather than predicting it from
+    // attributes. OptimizedTier1OSR = 5 is special: an on-stack-replacement of a still-running body with a hot loop.
+    // It fires off the loop's back-edge counter, NOT off the call-count threshold, so unlike every other tier it is
+    // never the method's active entry-point code version and is never call-counted — it's orthogonal to the
+    // call-count tier ladder the stage drives, and a watched method that OSRs in both its tier0 and instrumented
+    // bodies emits two of them on the way to its final tier. We therefore ignore OSR publications for our method (see
+    // HandleMethodLoad) so they don't consume the stage's per-tier publication budget and stall it short of the final tier.
     private const int OptimizationTierShift = 7;
     private const int OptimizationTierMask = 0x7;
+    private const int MinOptJitted = 1;
+    private const int Optimized = 2;
     private const int QuickJittedTier0 = 3;
     private const int OptimizedTier1 = 4;
     private const int OptimizedTier1OSR = 5;
@@ -62,7 +74,7 @@ internal sealed class JitListener : EventListener
     private readonly ManualResetEventSlim tieringActiveSignal = new(false);
     private readonly ManualResetEventSlim tieringActivePrimedSignal = new(false);
 
-    private volatile bool reachedTier1;
+    private volatile bool reachedFinalTier;
     private volatile bool canObserve;
 
     // Cached payload indices (field order is stable within a process for a given event version).
@@ -80,7 +92,7 @@ internal sealed class JitListener : EventListener
 
     internal static JitListener? Create(MethodInfo method, bool enabled)
     {
-        if (!enabled || !JitInfo.IsTiered || !IsTierable(method))
+        if (!enabled || !JitInfo.IsTiered)
         {
             return null;
         }
@@ -93,14 +105,10 @@ internal sealed class JitListener : EventListener
         return listener;
     }
 
-    private static bool IsTierable(MethodInfo method)
-        => !AreOptimizationsDisabledFor(method)
-            && (method.MethodImplementationFlags & (MethodImplAttributes.NoOptimization | CodeGenHelper.AggressiveOptimizationOptionForEmit)) == 0;
-
     internal static bool AreOptimizationsDisabledFor(MemberInfo member)
         => member.Module.Assembly.GetCustomAttribute<System.Diagnostics.DebuggableAttribute>()?.IsJITOptimizerDisabled ?? false;
 
-    internal bool ReachedTier1 => reachedTier1;
+    internal bool ReachedFinalTier => reachedFinalTier;
 
     // Reports (within the timeout) whether the call-counting machinery is active in the process: a tier0 (QuickJitted)
     // publication for ANY method, or a TieredCompilation Pause/Resume — any of which guarantees a Resume is coming to
@@ -213,12 +221,15 @@ internal sealed class JitListener : EventListener
         // An OSR publication is not a step on the call-count tier ladder (it fires off a hot loop's back-edge counter,
         // and the method goes on to be call-count-promoted past it), so don't let it count as a tier-up the stage is
         // waiting on — otherwise a method that OSRs in multiple bodies overruns the stage's publication budget and
-        // stops short of tier1.
+        // stops short of the final tier.
         if (tier == OptimizedTier1OSR)
             return;
 
-        if (tier == OptimizedTier1)
-            reachedTier1 = true;
+        // Any of the runtime's final tiers means the method is fully warmed and will emit no further tier-ups —
+        // whether it tiered all the way up (OptimizedTier1), was compiled straight to optimized code (Optimized), or
+        // never tiers at all (MinOptJitted).
+        if (tier == OptimizedTier1 || tier == Optimized || tier == MinOptJitted)
+            reachedFinalTier = true;
 
         publicationSignal.Set();
     }

@@ -35,7 +35,6 @@ namespace BenchmarkDotNet.Engines
             Parameters = new()
             {
                 WorkloadMethod = engineParameters.WorkloadMethod ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadMethod)),
-                EnableJitListener = engineParameters.EnableJitListener,
                 WorkloadActionNoUnroll = engineParameters.WorkloadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionNoUnroll)),
                 WorkloadActionUnroll = engineParameters.WorkloadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionUnroll)),
                 OverheadActionNoUnroll = engineParameters.OverheadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionNoUnroll)),

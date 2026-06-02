@@ -23,9 +23,19 @@ internal sealed class EngineJitStage : EngineStage
 
     private readonly IEnumerator<IterationData> enumerator;
     private readonly bool evaluateOverhead;
+    // Watches for the method's background tier-up via JIT events so we can proceed as soon as each tier is published.
+    // Null when watching is disabled or EventSource is disabled, in which case we fall back to the fixed delay.
+    private readonly JitListener? listener;
 
-    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters) : base(IterationStage.Jitting, IterationMode.Workload, parameters)
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters)
+        : this(evaluateOverhead, parameters, JitListener.Create(parameters.WorkloadMethod, parameters.EnableJitListener))
     {
+    }
+
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, JitListener? listener)
+        : base(IterationStage.Jitting, IterationMode.Workload, parameters)
+    {
+        this.listener = listener;
         enumerator = EnumerateIterations();
         this.evaluateOverhead = evaluateOverhead;
     }
@@ -61,6 +71,7 @@ internal sealed class EngineJitStage : EngineStage
             iterationData = enumerator.Current;
             return true;
         }
+        listener?.Dispose();
         enumerator.Dispose();
         iterationData = default;
         return false;
@@ -68,14 +79,6 @@ internal sealed class EngineJitStage : EngineStage
 
     private IEnumerator<IterationData> EnumerateIterations()
     {
-        // Watch for the method's background tier-up via JIT events so we can proceed as soon as each tier is
-        // published instead of waiting a fixed delay. Null when watching is disabled, EventSource is disabled,
-        // or the method is not eligible for tiered compilation, in which case we fall back to the fixed delay.
-        // Created BEFORE the first invoke so it observes the method's very first (tier0) jit and the surrounding
-        // TieredCompilation events from the start.
-        using JitListener? listener = JitListener.Create(parameters.WorkloadMethod, parameters.EnableJitListener);
-        bool useListener = listener != null;
-
         // If the user pinned InvocationCount (e.g. via [IterationSetup]/[IterationCleanup] which implies RunOncePerIteration),
         // honor it so IterationSetup/Cleanup runs around each invocation. #3102
         bool hasUserInvocationCount = parameters.TargetJob.HasValue(RunMode.InvocationCountCharacteristic);
@@ -95,6 +98,7 @@ internal sealed class EngineJitStage : EngineStage
             yield break;
         }
 
+        bool useListener = listener != null;
         if (JitInfo.TieredDelay > TimeSpan.Zero)
         {
             if (useListener)
@@ -208,9 +212,9 @@ internal sealed class EngineJitStage : EngineStage
                     }
                 }
 
-                if (listener!.ReachedTier1)
+                if (listener!.ReachedFinalTier)
                 {
-                    // If the method has reached tier1 we will not receive any more JIT events for it.
+                    // If the method has reached its final tier we will not receive any more JIT events for it.
                     // In case OSR is enabled and the method calls another method that is OSR'd, a runtime bug causes that other method to duplicate a tier (JitInfo.MaxTierPromotions already accounts for it).
                     // Or the method could have been pre-warmed before the stage started, but the benchmark case uses a different control flow that calls different methods that were not pre-warmed.
                     // In either case, the listener only tracks the benchmark method, and unknown callees can't be watched,

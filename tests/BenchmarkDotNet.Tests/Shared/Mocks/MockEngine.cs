@@ -23,7 +23,6 @@ namespace BenchmarkDotNet.Tests.Mocks
             {
                 TargetJob = job,
                 WorkloadMethod = emptyAction.Method,
-                EnableJitListener = false,
                 WorkloadActionUnroll = emptyAction,
                 WorkloadActionNoUnroll = emptyAction,
                 OverheadActionUnroll = emptyAction,
