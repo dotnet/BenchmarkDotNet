@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Build.Helpers;
 using Cake.Common.Diagnostics;
 using Cake.Common.Tools.DotNet;
-using Cake.Common.Tools.DotNet.Test;
+using Cake.Common.Tools.DotNet.Run;
 using Cake.Core;
 using Cake.Core.IO;
 using System.Linq;
@@ -34,9 +34,9 @@ public class UnitTestRunner(BuildContext context)
     private DirectoryPath TestOutputDirectory { get; } = context.RootDirectory
         .Combine("TestResults");
 
-    private DotNetTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
+    private DotNetRunSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
-        var settings = new DotNetTestSettings
+        var settings = new DotNetRunSettings
         {
             Configuration = context.BuildConfiguration,
             Framework = tfm,
@@ -46,7 +46,6 @@ public class UnitTestRunner(BuildContext context)
             {
                 ["Platform"] = "" // force the tool to not look for the .dll in platform-specific directory
             },
-            PathType = DotNetTestPathType.Auto,
             ArgumentCustomization = args
                 => args.Append("--report-xunit-trx")
                        .AppendSwitchQuoted("--report-xunit-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
@@ -68,7 +67,7 @@ public class UnitTestRunner(BuildContext context)
         var settings = GetTestSettingsParameters(trxFile, tfm);
 
         context.Information($"Run tests for {projectFile} ({tfm}), result file: '{trxFile}'");
-        context.DotNetTest(projectFile.FullPath, settings);
+        context.DotNetRun(projectFile.FullPath, settings);
     }
 
     private void RunUnitTests(string tfm)
