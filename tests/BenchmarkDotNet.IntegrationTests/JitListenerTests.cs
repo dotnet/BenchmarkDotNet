@@ -15,7 +15,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = Cold;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -28,13 +28,13 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = AlreadyTier1;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         // The first jit stage brings the method to tier1 (in an optimized build) and our observer records it. Running
         // the jit stage again for the same (now tier1) method should also succeed; it gets a fresh listener, because
         // the stage drove the first to completion and reusing one across runs would leave its tiering signals ambiguous.
         RunJitStageToCompletion(workloadMethod, observer);
-        using var observer2 = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer2 = JitListener.Create(workloadMethod.Method);
         RunJitStageToCompletion(workloadMethod, observer2);
 
         AssertReachedFinalTier(observer);
@@ -47,7 +47,7 @@ public class JitListenerTests
         Func<long, long> workloadMethod = AlreadyTier0;
         // Watch from before the pre-invoke, and hand this listener to the stage so it doesn't create a second one
         // (see RunJitStageToCompletion): in a minopt build the pre-invoke is the method's only compile.
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0(42));
         // Sleep long enough for the tiered call counting to begin.
@@ -67,7 +67,7 @@ public class JitListenerTests
         // NOT sleep first: this test's whole point is that the call-counting delay is still pending when the stage
         // starts. Because the stage reuses this one listener, the pre-invoke's event is never lost to a second
         // listener's session churn, so no wait is needed to observe the final tier.
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0DelayedCallCounting(42));
 
@@ -86,7 +86,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = Osr;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -103,10 +103,10 @@ public class JitListenerTests
         Func<long, long> workloadMethod = CallsOsr;
         Func<long, long> calleeMethod = OsrCallee;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
         // The stage only drives (and the engine's listener only watches) the benchmark method, but every call to it
         // calls the OSR'd callee, so the callee should be driven all the way to tier1 too. Watch it independently.
-        using var calleeObserver = JitListener.Create(calleeMethod.Method, enabled: true);
+        using var calleeObserver = JitListener.Create(calleeMethod.Method);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -124,7 +124,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = NoOptimization;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -138,7 +138,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = AggressiveOptimization;
 
-        using var observer = JitListener.Create(workloadMethod.Method, enabled: true);
+        using var observer = JitListener.Create(workloadMethod.Method);
 
         RunJitStageToCompletion(workloadMethod, observer);
 

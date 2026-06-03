@@ -18,10 +18,10 @@ namespace BenchmarkDotNet.Engines;
 //     tier0 compile's start is indistinguishable from a tier-up's and would race the tier0 publish that filters it.
 //   * TieredCompilationPause/Resume (the call-counting delay bracket, Compilation keyword) gate the bursts: a burst
 //     issued while the delay is active isn't counted (the counting stub is deferred), so the stage waits until the
-//     delay is observed inactive — a Resume, when the stubs are installed — before bursting (WaitForTieringActive), and
-//     up front checks whether any method's tier0 JIT or an already-active delay is underway
-//     (WaitForTieringActivePrimed) so it can force one if not. These only avoid wasting bursts — correctness
-//     comes from the publication.
+//     delay is observed inactive — a Resume, when the stubs are installed — before bursting (WaitForTieringActive). Up
+//     front (WaitForInitialTieringActive) it waits for any method's tier0 JIT or a Pause/Resume to confirm a Resume is
+//     coming; if none arrives the method was pre-warmed and its stub is already installed, so it fakes the inactive
+//     state and proceeds. These only avoid wasting bursts — correctness comes from the publication.
 //
 // This is intentionally a per-stage listener: enabling the Jit keyword emits an event for every method jitted
 // process-wide, which we must NOT pay during the measurement stages. It is created at the start of the jit stage
@@ -40,6 +40,12 @@ internal sealed class JitListener : EventListener
     private const EventKeywords CompilationKeyword = (EventKeywords)0x1000000000;
     private const string TieredCompilationResumeEvent = "TieredCompilationResume";
     private const string TieredCompilationPauseEvent = "TieredCompilationPause";
+    // The background tiering worker brackets each batch with these: Start when it begins draining its queue, Stop when
+    // it finishes (Stop's PendingMethodCount payload is how many remain — 0 = drained). Unlike per-method JIT events
+    // these fire ONLY for actual tiered background work, so a Start is a clean "an untracked callee is tiering up"
+    // signal. Used to wait out such callees once the watched method itself is fully warmed.
+    private const string TieredCompilationBackgroundJitStartEvent = "TieredCompilationBackgroundJitStart";
+    private const string TieredCompilationBackgroundJitStopEvent = "TieredCompilationBackgroundJitStop";
     // Event-name prefix (the runtime appends a version suffix, e.g. MethodLoadVerbose_V2).
     private const string MethodLoadVerbosePrefix = "MethodLoadVerbose";
 
@@ -73,6 +79,13 @@ internal sealed class JitListener : EventListener
     private readonly ManualResetEventSlim publicationSignal = new(false);
     private readonly ManualResetEventSlim tieringActiveSignal = new(false);
     private readonly ManualResetEventSlim tieringActivePrimedSignal = new(false);
+    // Reflect the background tiering worker's STATE (used only after the watched method reaches its final tier, to
+    // wait out untracked callees). The runtime brackets each batch with BackgroundJitStart..Stop and the worker is
+    // single-threaded, so these stay complementary: busy while a batch is running, idle otherwise. Tracking state
+    // rather than a start edge means a batch already in flight when the stage looks is observed — there is no manual
+    // reset that could wipe a "started" we hadn't seen yet.
+    private readonly ManualResetEventSlim backgroundJitBusySignal = new(false);
+    private readonly ManualResetEventSlim backgroundJitIdleSignal = new(true);
 
     private volatile bool reachedFinalTier;
     private volatile bool canObserve;
@@ -81,6 +94,7 @@ internal sealed class JitListener : EventListener
     private int loadTokenIndex = -1;
     private int loadFlagsIndex = -1;
     private int loadNameIndex = -1;
+    private int backgroundJitStopPendingIndex = -1;
 
     private JitListener(MethodInfo method)
     {
@@ -90,7 +104,7 @@ internal sealed class JitListener : EventListener
         methodName = method.Name;
     }
 
-    internal static JitListener? Create(MethodInfo method, bool enabled)
+    internal static JitListener? Create(MethodInfo method, bool enabled = true)
     {
         if (!enabled || !JitInfo.IsTiered)
         {
@@ -105,19 +119,39 @@ internal sealed class JitListener : EventListener
         return listener;
     }
 
-    internal static bool AreOptimizationsDisabledFor(MemberInfo member)
-        => member.Module.Assembly.GetCustomAttribute<System.Diagnostics.DebuggableAttribute>()?.IsJITOptimizerDisabled ?? false;
-
     internal bool ReachedFinalTier => reachedFinalTier;
 
-    // Reports (within the timeout) whether the call-counting machinery is active in the process: a tier0 (QuickJitted)
-    // publication for ANY method, or a TieredCompilation Pause/Resume — any of which guarantees a Resume is coming to
-    // gate on. The stage checks this once before the tier loop: a false result means tiering is quiet and the watched
-    // method was likely pre-warmed past tier0, so no delay is coming on its own and one must be forced to get a Resume.
-    internal bool WaitForTieringActivePrimed(TimeSpan timeout, CancellationToken cancellationToken)
-        => tieringActivePrimedSignal.Wait(timeout, cancellationToken);
+    // Waits until the call-counting delay is observed inactive (a TieredCompilationResume), so the stage's first burst
+    // will be counted. It first waits up to a timeout for any sign the tiering machinery is active — a tier0 (QuickJitted)
+    // publication for ANY method, or a TieredCompilation Pause/Resume — which guarantees a Resume is coming to gate on.
+    // (The stage calls this AFTER its first invoke, so a freshly-tier0 watched method has already fired its Pause.) If
+    // nothing arrives within the timeout, tiering is quiet: the watched method was pre-warmed past tier0, its stub is
+    // already installed, and no delay is coming on its own — so we fake the active state and proceed. The lock + IsSet
+    // re-check makes that fake atomic against a real event landing right at the timeout boundary (the event handlers
+    // take the same lock), so we never overwrite one; and we wait OUTSIDE the lock so the handlers never block on us.
+    internal void WaitForInitialTieringActive(CancellationToken cancellationToken)
+    {
+        // No call-counting delay (e.g. AggressiveTiering) — counting is armed immediately, nothing to gate on.
+        if (JitInfo.TieredDelay <= TimeSpan.Zero)
+        {
+            return;
+        }
+        if (!tieringActivePrimedSignal.Wait(JitInfo.TieredDelay + TimeSpan.FromMilliseconds(50), cancellationToken))
+        {
+            lock (tieringActivePrimedSignal)
+            {
+                if (!tieringActivePrimedSignal.IsSet)
+                {
+                    tieringActivePrimedSignal.Set();
+                    tieringActiveSignal.Set();
+                }
+            }
+        }
+        WaitForTieringActive(cancellationToken);
+    }
 
-    // Waits until the call-counting delay is inactive (a TieredCompilationResume was observed).
+    // Waits until the call-counting delay is inactive (a TieredCompilationResume was observed). Re-gates each burst in
+    // the tier loop after WaitForInitialTieringActive established the delay was inactive up front.
     internal void WaitForTieringActive(CancellationToken cancellationToken)
     {
         // No call-counting delay (e.g. AggressiveTiering) — counting is armed immediately, nothing to gate on.
@@ -139,6 +173,18 @@ internal sealed class JitListener : EventListener
         publicationSignal.Reset();
         return true;
     }
+
+    // Waits (up to the timeout) for the background tiering worker to be running a batch — either one already in flight
+    // or one that starts within the window. True if it is/becomes busy; false if it stays idle the whole timeout,
+    // meaning no background tiering is underway (quiet).
+    internal bool WaitForBackgroundJitBusy(TimeSpan timeout, CancellationToken cancellationToken)
+        => backgroundJitBusySignal.Wait(timeout, cancellationToken);
+
+    // Waits for the background tiering worker to go idle (its queue drained — a BackgroundJitStop with
+    // PendingMethodCount == 0). No timeout: the caller only waits after observing the worker busy, and a running
+    // batch always finishes, so idle is guaranteed to arrive (the host's token still bounds it).
+    internal void WaitForBackgroundJitIdle(CancellationToken cancellationToken)
+        => backgroundJitIdleSignal.Wait(cancellationToken);
 
     protected override void OnEventSourceCreated(EventSource source)
     {
@@ -165,20 +211,61 @@ internal sealed class JitListener : EventListener
         // Reset on Pause); tieringActivePrimedSignal just records that some delay activity occurred (set by either).
         if (name == TieredCompilationResumeEvent)
         {
-            tieringActiveSignal.Set();
-            tieringActivePrimedSignal.Set();
+            lock (tieringActivePrimedSignal)
+            {
+                tieringActiveSignal.Set();
+                tieringActivePrimedSignal.Set();
+            }
             return;
         }
         if (name == TieredCompilationPauseEvent)
         {
-            tieringActiveSignal.Reset();
-            tieringActivePrimedSignal.Set();
+            lock (tieringActivePrimedSignal)
+            {
+                tieringActiveSignal.Reset();
+                tieringActivePrimedSignal.Set();
+            }
+            return;
+        }
+        if (name == TieredCompilationBackgroundJitStartEvent)
+        {
+            // The worker began a batch. Reset idle before setting busy so a reader never sees both set at once.
+            backgroundJitIdleSignal.Reset();
+            backgroundJitBusySignal.Set();
+            return;
+        }
+        if (name == TieredCompilationBackgroundJitStopEvent)
+        {
+            HandleBackgroundJitStop(e);
             return;
         }
 
         if (name.StartsWith(MethodLoadVerbosePrefix, StringComparison.Ordinal))
         {
             HandleMethodLoad(e);
+        }
+    }
+
+    private void HandleBackgroundJitStop(EventWrittenEventArgs e)
+    {
+        var payloadNames = e.PayloadNames;
+        var payload = e.Payload;
+        if (payloadNames is null || payload is null)
+            return;
+
+        if (backgroundJitStopPendingIndex < 0)
+        {
+            backgroundJitStopPendingIndex = payloadNames.IndexOf("PendingMethodCount");
+            if (backgroundJitStopPendingIndex < 0)
+                return;
+        }
+
+        // The worker stopped; once nothing is left queued it has gone idle (its batch — e.g. an OSR'd callee's
+        // tier-up — is complete). Reset busy before setting idle so a reader never sees both set at once.
+        if (Convert.ToInt64(payload[backgroundJitStopPendingIndex]) == 0)
+        {
+            backgroundJitBusySignal.Reset();
+            backgroundJitIdleSignal.Set();
         }
     }
 
@@ -202,27 +289,30 @@ internal sealed class JitListener : EventListener
 
         // A QuickJitted (tier0) publication — for ANY method, not just the one we watch — means an eligible method was
         // just tier0-compiled and is about to run, so its first call will start or join the call-counting delay and a
-        // TieredCompilationResume is coming. That is exactly (and all) the up-front gate (WaitForTieringActivePrimed)
+        // TieredCompilationResume is coming. That is exactly (and all) the up-front gate (WaitForInitialTieringActive)
         // needs: it only asks "is the tiering machinery active, so a Resume will arrive to gate on?", which is a
         // process-wide question. (Pause/Resume prime it too; this also covers the brief window before the first call
         // fires Pause.) The tier0 compile itself is the baseline, not a tier-up, so we never raise a publication for it.
         if (tier == QuickJittedTier0)
         {
-            tieringActivePrimedSignal.Set();
+            lock (tieringActivePrimedSignal)
+            {
+                tieringActivePrimedSignal.Set();
+            }
             return;
         }
-
-        // Everything below concerns OUR method reaching its next tier, so filter to it.
-        if (Convert.ToInt32(payload[loadTokenIndex]) != metadataToken)
-            return;
-        if (payload[loadNameIndex] as string != methodName)
-            return;
 
         // An OSR publication is not a step on the call-count tier ladder (it fires off a hot loop's back-edge counter,
         // and the method goes on to be call-count-promoted past it), so don't let it count as a tier-up the stage is
         // waiting on — otherwise a method that OSRs in multiple bodies overruns the stage's publication budget and
         // stops short of the final tier.
         if (tier == OptimizedTier1OSR)
+            return;
+
+        // Everything below concerns OUR method reaching its next tier, so filter to it.
+        if (Convert.ToInt32(payload[loadTokenIndex]) != metadataToken)
+            return;
+        if (payload[loadNameIndex] as string != methodName)
             return;
 
         // Any of the runtime's final tiers means the method is fully warmed and will emit no further tier-ups —
@@ -241,5 +331,7 @@ internal sealed class JitListener : EventListener
         publicationSignal.Dispose();
         tieringActivePrimedSignal.Dispose();
         tieringActiveSignal.Dispose();
+        backgroundJitBusySignal.Dispose();
+        backgroundJitIdleSignal.Dispose();
     }
 }
