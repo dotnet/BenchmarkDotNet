@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -9,6 +10,7 @@ namespace BenchmarkDotNet.Engines;
 // and we purposefully don't spend too much time in this stage, so we can't guarantee it.
 // This should succeed for 99%+ of microbenchmarks. For any sufficiently short benchmarks where this fails,
 // the following stages (Pilot and Warmup) will likely take it the rest of the way. Long-running benchmarks may never fully reach tier1.
+[AggressivelyOptimizeMethods] // Reduce JIT event noise from the jit stage itself.
 internal sealed class EngineJitStage : EngineStage
 {
     // After a tier's single burst fails to tier-up, we nudge one invocation at a time and wait out the async
@@ -18,6 +20,10 @@ internal sealed class EngineJitStage : EngineStage
 
     // How long to wait for the JIT to be quiet (not compiling any tiered methods in the background).
     private static readonly TimeSpan JitQuiescenceWindow = TimeSpan.FromMilliseconds(50);
+
+    // How long to wait for an observed-busy background JIT batch to drain before assuming its BackgroundJitStop was
+    // dropped by EventPipe and proceeding. Generous — it only bites on a dropped event; a real drain completes sooner.
+    private static readonly TimeSpan BackgroundJitDrainTimeout = TimeSpan.FromSeconds(10);
 
     internal bool didStopEarly = false;
     internal Measurement lastMeasurement;
@@ -229,7 +235,7 @@ internal sealed class EngineJitStage : EngineStage
                 // after the worker momentarily went idle is still caught within the window.
                 while (listener.WaitForBackgroundJitBusy(JitQuiescenceWindow, parameters.Host.CancellationToken))
                 {
-                    listener.WaitForBackgroundJitIdle(parameters.Host.CancellationToken);
+                    listener.WaitForBackgroundJitIdle(BackgroundJitDrainTimeout, parameters.Host.CancellationToken);
                 }
             }
             else
@@ -251,7 +257,7 @@ internal sealed class EngineJitStage : EngineStage
     {
         if (listener!.WaitForBackgroundJitBusy(JitQuiescenceWindow, cancellationToken))
         {
-            listener.WaitForBackgroundJitIdle(cancellationToken);
+            listener.WaitForBackgroundJitIdle(BackgroundJitDrainTimeout, cancellationToken);
         }
         return listener.WaitForPublication(TimeSpan.Zero, cancellationToken);
     }

@@ -1,5 +1,6 @@
 using System.Diagnostics.Tracing;
 using System.Reflection;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines;
@@ -31,6 +32,7 @@ namespace BenchmarkDotNet.Engines;
 // EventSource is unavailable — it can be disabled via the System.Diagnostics.Tracing.EventSource.IsSupported feature
 // switch. It otherwise watches the method regardless of whether it looks tier-eligible: a method that can't tier just
 // publishes its single final tier (see the tier constants below), which the stage observes and treats as "done".
+[AggressivelyOptimizeMethods] // Reduce JIT event noise from the listener itself.
 internal sealed class JitListener : EventListener
 {
     private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
@@ -74,8 +76,15 @@ internal sealed class JitListener : EventListener
     private const int OptimizedTier1 = 4;
     private const int OptimizedTier1OSR = 5;
 
+    // Margin added on top of the call-counting delay when waiting for a TieredCompilationResume, before assuming it
+    // was dropped (EventPipe sheds events under buffer pressure) and proceeding as if the delay had elapsed. We add it
+    // to TieredDelay rather than use a flat cap so a deliberately huge delay can't make the cap shorter than the delay
+    // itself. Generous vs the ~100ms default delay, so it only ever fires on an actual drop, not on the normal path.
+    private static readonly TimeSpan TieringActiveTimeoutMargin = TimeSpan.FromSeconds(1);
+
     private readonly int metadataToken;
     private readonly string methodName;
+    private readonly object lockObj = new();
     private readonly ManualResetEventSlim publicationSignal = new(false);
     private readonly ManualResetEventSlim tieringActiveSignal = new(false);
     private readonly ManualResetEventSlim tieringActivePrimedSignal = new(false);
@@ -138,7 +147,7 @@ internal sealed class JitListener : EventListener
         }
         if (!tieringActivePrimedSignal.Wait(JitInfo.TieredDelay + TimeSpan.FromMilliseconds(50), cancellationToken))
         {
-            lock (tieringActivePrimedSignal)
+            lock (lockObj)
             {
                 if (!tieringActivePrimedSignal.IsSet)
                 {
@@ -151,13 +160,25 @@ internal sealed class JitListener : EventListener
     }
 
     // Waits until the call-counting delay is inactive (a TieredCompilationResume was observed). Re-gates each burst in
-    // the tier loop after WaitForInitialTieringActive established the delay was inactive up front.
+    // the tier loop after WaitForInitialTieringActive established the delay was inactive up front. Bounded: a Resume can
+    // be dropped by EventPipe under buffer pressure, so rather than block forever we wait up to TieredDelay plus a margin and
+    // then assume the delay elapsed (stubs installed) and proceed — the same fallback WaitForInitialTieringActive uses.
+    // The cap only bites on a dropped event; a real Resume normally arrives within the call-counting delay (~100ms).
     internal void WaitForTieringActive(CancellationToken cancellationToken)
     {
         // No call-counting delay (e.g. AggressiveTiering) — counting is armed immediately, nothing to gate on.
-        if (JitInfo.TieredDelay > TimeSpan.Zero)
+        if (JitInfo.TieredDelay <= TimeSpan.Zero)
         {
-            tieringActiveSignal.Wait(Timeout.InfiniteTimeSpan, cancellationToken);
+            return;
+        }
+        if (!tieringActiveSignal.Wait(JitInfo.TieredDelay + TieringActiveTimeoutMargin, cancellationToken))
+        {
+            // The primed signal is already set (WaitForInitialTieringActive ran first), so only flip the active
+            // signal. Lock so this can't interleave with a concurrent Pause/Resume handler.
+            lock (lockObj)
+            {
+                tieringActiveSignal.Set();
+            }
         }
     }
 
@@ -180,11 +201,24 @@ internal sealed class JitListener : EventListener
     internal bool WaitForBackgroundJitBusy(TimeSpan timeout, CancellationToken cancellationToken)
         => backgroundJitBusySignal.Wait(timeout, cancellationToken);
 
-    // Waits for the background tiering worker to go idle (its queue drained — a BackgroundJitStop with
-    // PendingMethodCount == 0). No timeout: the caller only waits after observing the worker busy, and a running
-    // batch always finishes, so idle is guaranteed to arrive (the host's token still bounds it).
-    internal void WaitForBackgroundJitIdle(CancellationToken cancellationToken)
-        => backgroundJitIdleSignal.Wait(cancellationToken);
+    // Waits (up to the timeout) for the background tiering worker to go idle (its queue drained — a BackgroundJitStop
+    // with PendingMethodCount == 0). The caller only waits after observing the worker busy, and a running batch always
+    // finishes — but the BackgroundJitStop that announces it can be dropped by EventPipe under buffer pressure (most
+    // likely right here, since a busy drain floods the same buffers with MethodLoadVerbose). So on timeout we force the
+    // idle state and proceed: this wait is only best-effort warming of untracked callees, and leaving busy stuck set
+    // would also poison every later quiescence check. The cap only bites on a dropped Stop.
+    internal void WaitForBackgroundJitIdle(TimeSpan timeout, CancellationToken cancellationToken)
+    {
+        if (!backgroundJitIdleSignal.Wait(timeout, cancellationToken))
+        {
+            lock (lockObj)
+            {
+                // Reset busy before setting idle so a reader never sees both set at once (matches HandleBackgroundJitStop).
+                backgroundJitBusySignal.Reset();
+                backgroundJitIdleSignal.Set();
+            }
+        }
+    }
 
     protected override void OnEventSourceCreated(EventSource source)
     {
@@ -211,7 +245,7 @@ internal sealed class JitListener : EventListener
         // Reset on Pause); tieringActivePrimedSignal just records that some delay activity occurred (set by either).
         if (name == TieredCompilationResumeEvent)
         {
-            lock (tieringActivePrimedSignal)
+            lock (lockObj)
             {
                 tieringActiveSignal.Set();
                 tieringActivePrimedSignal.Set();
@@ -220,7 +254,7 @@ internal sealed class JitListener : EventListener
         }
         if (name == TieredCompilationPauseEvent)
         {
-            lock (tieringActivePrimedSignal)
+            lock (lockObj)
             {
                 tieringActiveSignal.Reset();
                 tieringActivePrimedSignal.Set();
@@ -229,9 +263,12 @@ internal sealed class JitListener : EventListener
         }
         if (name == TieredCompilationBackgroundJitStartEvent)
         {
-            // The worker began a batch. Reset idle before setting busy so a reader never sees both set at once.
-            backgroundJitIdleSignal.Reset();
-            backgroundJitBusySignal.Set();
+            lock (lockObj)
+            {
+                // The worker began a batch. Reset idle before setting busy so a reader never sees both set at once.
+                backgroundJitIdleSignal.Reset();
+                backgroundJitBusySignal.Set();
+            }
             return;
         }
         if (name == TieredCompilationBackgroundJitStopEvent)
@@ -264,8 +301,11 @@ internal sealed class JitListener : EventListener
         // tier-up — is complete). Reset busy before setting idle so a reader never sees both set at once.
         if (Convert.ToInt64(payload[backgroundJitStopPendingIndex]) == 0)
         {
-            backgroundJitBusySignal.Reset();
-            backgroundJitIdleSignal.Set();
+            lock (lockObj)
+            {
+                backgroundJitBusySignal.Reset();
+                backgroundJitIdleSignal.Set();
+            }
         }
     }
 
@@ -295,7 +335,7 @@ internal sealed class JitListener : EventListener
         // fires Pause.) The tier0 compile itself is the baseline, not a tier-up, so we never raise a publication for it.
         if (tier == QuickJittedTier0)
         {
-            lock (tieringActivePrimedSignal)
+            lock (lockObj)
             {
                 tieringActivePrimedSignal.Set();
             }
