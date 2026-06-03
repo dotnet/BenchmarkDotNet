@@ -47,7 +47,7 @@ public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
         try
         {
             var module = ModuleDefinition.FromFile(TargetAssembly, createRuntimeContext: false);
-            var runtimeContext = new RuntimeContext(module.OriginalTargetRuntime, new ReferencePathAssemblyResolver(ReferencePaths));
+            var runtimeContext = new RuntimeContext(module.OriginalTargetRuntime, new PathAssemblyResolver(ReferencePaths));
             runtimeContext.AddAssembly(module.Assembly!);
 
             bool anyAdjustments = false;
