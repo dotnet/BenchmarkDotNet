@@ -36,6 +36,12 @@ public class UnitTestRunner(BuildContext context)
 
     private DotNetRunSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
+        // Enabled `Trace` level logging when debug logging is enabled on GitHub Actions.
+        // https://docs.github.com/en/actions/how-tos/monitor-workflows/enable-debug-logging
+        var diagnosticVerbosity = context.EnvironmentVariable("ACTIONS_STEP_DEBUG") == "true"
+             ? "Trace"
+             : "Warning"; // Logging Warning/Error/Critical level logs by default.
+
         var settings = new DotNetRunSettings
         {
             Configuration = context.BuildConfiguration,
@@ -53,7 +59,8 @@ public class UnitTestRunner(BuildContext context)
                        .AppendSwitch("--output", "Detailed")
                        .AppendSwitch("--show-stdout", "Failed")
                        .Append("--diagnostic")
-                       .AppendSwitch("--diagnostic-verbosity", "Trace")
+                       .AppendSwitch("--diagnostic-verbosity", diagnosticVerbosity)
+                       .Append("--no-launch-profile"),
         };
         return settings;
     }
