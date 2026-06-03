@@ -313,6 +313,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--maxWidth`                Max parameter column width, the default is 20.
 * `--envVars`                 Colon separated environment variables (key:value)
 * `--memoryRandomization`     Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.
+* `--jitTieringMode`          (Default: Auto) Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip.
 * `--wasmEngine`              (Default: v8) Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
 * `--wasmArgs`                (Default: --expose_wasm) Arguments for the javascript engine used by Wasm toolchain.
 * `--customRuntimePack`       Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.

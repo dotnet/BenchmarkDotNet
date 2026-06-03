@@ -33,6 +33,7 @@ namespace BenchmarkDotNet.Engines
             Register(AccuracyMode.MinInvokeCountCharacteristic, () => 4);
             Register(AccuracyMode.EvaluateOverheadCharacteristic, () => false);
             Register(RunMode.MemoryRandomizationCharacteristic, () => false);
+            Register(RunMode.JitTieringModeCharacteristic, () => JitTieringMode.Auto);
             Register(AccuracyMode.OutlierModeCharacteristic, job =>
             {
                 // if Memory Randomization was enabled and the benchmark is truly multimodal

@@ -2,6 +2,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 
@@ -229,6 +230,80 @@ namespace BenchmarkDotNet.Tests.Engine
             // pinned InvocationCount=1, matching JitInfo.MaxTierPromotions * TieredCallCountThreshold)
             // + one stabilization iteration. Just assert it ran the full tiering loop rather than bailing.
             Assert.True(jitWorkloadCount > 2, $"Expected the tiering loop to run after confirmation disagreed, got {jitWorkloadCount} jitting iterations.");
+        }
+
+        [FactEnvSpecific("Requires tiered JIT", EnvRequirement.DotNetCoreOnly)]
+        public void ForceJitTieringModeRunsFullTieringLoopEvenForLongRunningBenchmarks()
+        {
+            // Tier-promotion loop is skipped entirely on non-tiered runtimes, so there is nothing to force.
+            if (!JitInfo.IsTiered) return;
+
+            // A benchmark whose single invocation far exceeds IterationTime would normally trip the
+            // long-running heuristic and bail (see LongRunningBenchmarksExitJitStageEarly).
+            // JitTieringMode.Force opts out of that heuristic and always promotes through every tier.
+            var slowMeasurement = TimeInterval.FromSeconds(4); // ~8x default IterationTime of 500ms
+            var job = Job.Default.WithInvocationCount(1).WithUnrollFactor(1).WithJitTieringMode(JitTieringMode.Force);
+            var engineParameters = CreateEngineParameters(job);
+
+            int jitWorkloadCount = 0;
+            bool didStopEarly = false;
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    if (stage is EngineJitStage && iterationData.mode == IterationMode.Workload)
+                    {
+                        jitWorkloadCount++;
+                    }
+                    stageMeasurements.Add(new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, iterationData.invokeCount, slowMeasurement.Nanoseconds));
+                }
+
+                if (stage is EngineJitStage jitStage)
+                {
+                    didStopEarly = jitStage.didStopEarly;
+                    break;
+                }
+            }
+
+            Assert.False(didStopEarly, "Force mode should never bail out of the JIT stage early.");
+            Assert.True(jitWorkloadCount > 2, $"Expected the full tiering loop to run under Force mode, got {jitWorkloadCount} jitting iterations.");
+        }
+
+        [Fact]
+        public void SkipJitTieringModeSkipsTierPromotion()
+        {
+            // JitTieringMode.Skip runs only the initial workload iteration and leaves tier promotion to the
+            // following Pilot/Warmup stages (as on non-tiered runtimes). Unlike the long-running bail-out,
+            // it does not flag the benchmark as long-running, so the Pilot stage still runs normally.
+            var fastMeasurement = TimeInterval.FromMicroseconds(1); // would normally run the full tiering loop
+            var job = Job.Default.WithInvocationCount(1).WithUnrollFactor(1).WithJitTieringMode(JitTieringMode.Skip);
+            var engineParameters = CreateEngineParameters(job);
+
+            int jitWorkloadCount = 0;
+            bool didStopEarly = false;
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            {
+                var stageMeasurements = stage.GetMeasurementList();
+                while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
+                {
+                    if (stage is EngineJitStage && iterationData.mode == IterationMode.Workload)
+                    {
+                        jitWorkloadCount++;
+                    }
+                    stageMeasurements.Add(new Measurement(0, iterationData.mode, iterationData.stage, iterationData.index, iterationData.invokeCount, fastMeasurement.Nanoseconds));
+                }
+
+                if (stage is EngineJitStage jitStage)
+                {
+                    didStopEarly = jitStage.didStopEarly;
+                    break;
+                }
+            }
+
+            // Only the single pre-loop workload iteration runs; the tier-promotion loop is skipped.
+            Assert.Equal(1, jitWorkloadCount);
+            Assert.False(didStopEarly, "Skip mode should not flag the benchmark as long-running.");
         }
 
         [Fact]

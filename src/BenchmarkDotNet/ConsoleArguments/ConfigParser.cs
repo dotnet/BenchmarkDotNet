@@ -455,6 +455,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.RunOncePerIteration();
             if (options.MemoryRandomization)
                 baseJob = baseJob.WithMemoryRandomization();
+            if (options.JitTieringMode != Engines.JitTieringMode.Auto)
+                baseJob = baseJob.WithJitTieringMode(options.JitTieringMode);
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
             if (options.EvaluateOverhead is bool evaluateOverhead)

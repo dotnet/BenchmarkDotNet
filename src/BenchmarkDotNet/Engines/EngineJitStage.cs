@@ -74,8 +74,9 @@ internal sealed class EngineJitStage : EngineStage
         }
         yield return GetWorkloadIterationData(userInvokeCount);
 
-        // If the jit is not tiered, we're done.
-        if (!JitInfo.IsTiered)
+        JitTieringMode jitTieringMode = parameters.TargetJob.ResolveValue(RunMode.JitTieringModeCharacteristic, parameters.Resolver);
+        // If the jit is not tiered, or the user wants to skip, we're done.
+        if (!JitInfo.IsTiered || jitTieringMode == JitTieringMode.Skip)
         {
             yield break;
         }
@@ -90,9 +91,11 @@ internal sealed class EngineJitStage : EngineStage
         // it agrees. Same cutoff value that pilot stage uses.
         // We do not bail out immediately if the first iteration is long-running because it could
         // be due to cctors or other lazy initialization that won't be hit in steady-state. #2004
+        // JitTieringMode.Force opts out of this heuristic and always promotes through every tier.
         TimeInterval iterationTime = parameters.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, parameters.Resolver);
         long remainingCalls = JitInfo.TieredCallCountThreshold;
-        if (iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double)userInvokeCount) < 1.5)
+        if (jitTieringMode == JitTieringMode.Auto
+            && iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double)userInvokeCount) < 1.5)
         {
             ++iterationIndex;
             yield return GetWorkloadIterationData(userInvokeCount);
