@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Tests</AssemblyTitle>
     <TargetFrameworks>net8.0;net10.0;net472</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <AssemblyName>BenchmarkDotNet.Tests</AssemblyName>
     <PackageId>BenchmarkDotNet.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -11,7 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Using Include="Xunit" />
-    <Using Include="Xunit.Abstractions" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
@@ -20,13 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
-    <PackageReference Include="Verify.Xunit" Version="31.12.5" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Verify.XunitV3" Version="31.13.2" />
+    <PackageReference Include="xunit.v3" Version="4.0.0-pre.128" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
@@ -43,7 +38,7 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-      
+
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

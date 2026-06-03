@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
     <TargetFrameworks>net462;net48;net8.0;net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -16,13 +17,10 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Using Include="Xunit" />
-    <Using Include="Xunit.Abstractions" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\Loggers\OutputLogger.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\XUnit\SmartAssert.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Shared\SmartAssert.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\TestConfigs.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\Extensions.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\MisconfiguredEnvironmentException.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
@@ -37,12 +35,9 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="2.2.3" />
+    <PackageReference Include="TUnit" Version="1.43.11" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>

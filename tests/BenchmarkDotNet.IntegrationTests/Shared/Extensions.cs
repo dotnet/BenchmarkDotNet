@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.IntegrationTests.Xunit
+namespace BenchmarkDotNet.IntegrationTests
 {
     public static class Extensions
     {

@@ -10,6 +10,10 @@
     <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))</SolutionDir>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+  </PropertyGroup>
+
   <!-- ProjectReferences are not transitive, so we need to directly include the analyzers and code fixers for all test projects. -->
   <ItemGroup Condition="'$(AssemblyName)' != 'BenchmarkDotNet.Analyzers.Tests'">
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />

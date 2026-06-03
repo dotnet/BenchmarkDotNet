@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="10.1.300" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Update="System.ValueTuple" Version="4.6.2" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />

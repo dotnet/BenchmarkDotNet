@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
+<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
   <PropertyGroup>
     <OriginalCSProjPath>$CSPROJPATH$</OriginalCSProjPath>
     <MonoPropsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Mono.props'))</MonoPropsPath>
@@ -21,6 +21,7 @@
     <SelfContained>true</SelfContained>
     <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
   </PropertyGroup>
 
   <ItemGroup>
