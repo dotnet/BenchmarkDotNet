@@ -23,15 +23,20 @@ jobs:
       matrix:
         # Note: ARM64 on linux/macos are not supported.
         # https://github.com/microsoft/codecoverage/blob/main/docs/supported-os.md
-        os: [windows-latest, ubuntu-latest, macos-15-intel, windows-11-arm]
+        os: [windows-latest, ubuntu-latest, macos-26-intel, windows-11-arm]
     steps:
       - uses: actions/checkout@v6
 
-      # Ensure DOTNET_ROOT environment variable set on macos-15-intel 
+      # Ensure DOTNET_ROOT environment variable set on macOS
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
-            8.x  
+            8.x
+
+      # Setup additional tools
+      - name: Setup additional tools for Wasm/NativeAot tests
+        if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
+        uses: ./.github/actions/setup-additional-tools
 
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
@@ -47,10 +52,10 @@ jobs:
           dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Tests -c Release --no-build --framework net8.0"
           dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.Analyzers.Tests  -c Release --no-build --framework net8.0"
 
-      - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
-        if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
+      - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests
+        if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
         run: |
-          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net8.0 --filter "(FullyQualifiedName!~DotMemoryTests) & (FullyQualifiedName!~DotTraceTests) & (FullyQualifiedName!~WasmIsSupported) & (FullyQualifiedName!~WasmSupportsInProcessDiagnosers)"'
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net8.0"
 
       - name: Shutdown dotnet-coverage server.
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
@@ -69,6 +74,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Setup additional tools for Wasm/NativeAot tests
+        if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
+        uses: ./.github/actions/setup-additional-tools
+        
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
 
@@ -86,7 +95,7 @@ jobs:
       - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests 
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}} 
         run: |
-          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net472 --filter "(FullyQualifiedName!~DotMemoryTests) & (FullyQualifiedName!~DotTraceTests) & (FullyQualifiedName!~WasmIsSupported) & (FullyQualifiedName!~WasmSupportsInProcessDiagnosers)"'
+          dotnet coverage connect bdn_coverage 'dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net472'
 
       - name: Shutdown dotnet-coverage server.
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
