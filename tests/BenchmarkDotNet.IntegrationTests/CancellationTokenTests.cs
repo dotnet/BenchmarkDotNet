@@ -115,7 +115,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await BenchmarkRunner.RunAsync<SimpleBenchmark>(config, cancellationToken: cts.Token));
     }
 
-    [Theory]
+    [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
     [InlineDataEnvSpecific("v8", "JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
     [InlineData("node")]
     public async Task RunWithCancellationTokenIsCancelled_Wasm(string javaScriptEngine)

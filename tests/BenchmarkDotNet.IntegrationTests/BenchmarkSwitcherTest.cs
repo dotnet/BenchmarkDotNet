@@ -283,7 +283,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(results.All(r => r.BenchmarksCases.All(bc => bc.Job == Job.Dry)));
         }
 
-        [Fact]
+        [FactEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         public void JobNotDefinedButStillBenchmarkIsExecuted()
         {
             var types = new[] { typeof(JustBenchmark) };
