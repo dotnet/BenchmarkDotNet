@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Build.Helpers;
-using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Test;
@@ -70,14 +69,14 @@ public class UnitTestRunner(BuildContext context)
 
     public void RunUnitTests()
     {
-        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net472", "net8.0"] : ["net8.0"];
+        string[] targetFrameworks = Utils.GetTargetFrameworks(context);
         foreach (var targetFramework in targetFrameworks)
             RunUnitTests(targetFramework);
     }
 
     public void RunAnalyzerTests()
     {
-        string[] targetFrameworks = context.IsRunningOnWindows() ? ["net472", "net8.0"] : ["net8.0"];
+        string[] targetFrameworks = Utils.GetTargetFrameworks(context);
         foreach (var targetFramework in targetFrameworks)
             RunTests(AnalyzerTestsProjectFile, "analyzer", targetFramework);
     }
