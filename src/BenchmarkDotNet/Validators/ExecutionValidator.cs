@@ -28,14 +28,14 @@ namespace BenchmarkDotNet.Validators
                 {
                     continue;
                 }
-                if (await TryToCallSetupOrCleanup<GlobalSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalSetupMethod, errors, cancellationToken).ConfigureAwait(true))
+                if (await TryToCallSetupOrCleanup<GlobalSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalSetupMethod, errors, cancellationToken).ConfigureAwait())
                 {
-                    if (await TryToCallSetupOrCleanup<IterationSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationSetupMethod, errors, cancellationToken).ConfigureAwait(true))
+                    if (await TryToCallSetupOrCleanup<IterationSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationSetupMethod, errors, cancellationToken).ConfigureAwait())
                     {
-                        await ExecuteBenchmarkAsync(benchmarkTypeInstance, benchmark, args, errors, cancellationToken).ConfigureAwait(true);
-                        await TryToCallSetupOrCleanup<IterationCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationCleanupMethod, errors, cancellationToken).ConfigureAwait(true);
+                        await ExecuteBenchmarkAsync(benchmarkTypeInstance, benchmark, args, errors, cancellationToken).ConfigureAwait();
+                        await TryToCallSetupOrCleanup<IterationCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationCleanupMethod, errors, cancellationToken).ConfigureAwait();
                     }
-                    await TryToCallSetupOrCleanup<GlobalCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalCleanupMethod, errors, cancellationToken).ConfigureAwait(true);
+                    await TryToCallSetupOrCleanup<GlobalCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalCleanupMethod, errors, cancellationToken).ConfigureAwait();
                 }
             }
 

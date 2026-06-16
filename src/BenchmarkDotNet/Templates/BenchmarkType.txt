@@ -34,7 +34,7 @@
                 await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.SeparateLogic, host.CancellationToken).ConfigureAwait(false);
                 return;
             }
-            await compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait(true);
+            await global::BenchmarkDotNet.Helpers.AwaitHelper.ConfigureAwait(compositeInProcessDiagnoserHandler.HandleAsync(global::BenchmarkDotNet.Engines.BenchmarkSignal.BeforeEngine, host.CancellationToken));
 
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
@@ -54,7 +54,7 @@
                 InProcessDiagnoserHandler = compositeInProcessDiagnoserHandler
             };
 
-            global::BenchmarkDotNet.Engines.RunResults results = await new $EngineFactoryType$().Create(engineParameters).RunAsync().ConfigureAwait(true);
+            global::BenchmarkDotNet.Engines.RunResults results = await global::BenchmarkDotNet.Helpers.AwaitHelper.ConfigureAwait(new $EngineFactoryType$().Create(engineParameters).RunAsync());
             host.ReportResults(results); // printing costs memory, do this after runs
 
             instance.__TrickTheJIT__(); // compile the method for disassembler, but without actual run of the benchmark ;)

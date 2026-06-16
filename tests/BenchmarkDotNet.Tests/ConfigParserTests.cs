@@ -748,6 +748,19 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
+        [Fact]
+        public void UsersCanSpecifyConsumeTasksSynchronously()
+        {
+            var parsedConfiguration = ConfigParser.Parse(["--consumeTasksSynchronously", "true"], new OutputLogger(Output));
+            Assert.NotNull(parsedConfiguration.config);
+            Assert.True(parsedConfiguration.isSuccess);
+
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                Assert.True(job.Run.ConsumeTasksSynchronously);
+            }
+        }
+
         [Fact(Skip = "This should be handled somehow at CommandLineParser level. See https://github.com/commandlineparser/commandline/pull/892")]
         public void UserCanSpecifyWasmArgs()
         {

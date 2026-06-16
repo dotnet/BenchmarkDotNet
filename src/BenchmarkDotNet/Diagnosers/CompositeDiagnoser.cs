@@ -2,6 +2,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var diagnoser in diagnosers)
             {
-                await diagnoser.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait(true);
+                await diagnoser.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait();
             }
         }
 
@@ -84,7 +85,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 if (router.ShouldHandle(runMode))
                 {
-                    await router.handler.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait(true);
+                    await router.handler.HandleAsync(signal, parameters, cancellationToken).ConfigureAwait();
                 }
             }
 

@@ -299,6 +299,9 @@ namespace BenchmarkDotNet.Jobs
         /// <inheritdoc cref="AccuracyMode.EvaluateOverhead"/>
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
 
+        /// <inheritdoc cref="RunMode.ConsumeTasksSynchronously"/>
+        public static Job WithConsumeTasksSynchronously(this Job job, bool value) => job.WithCore(j => j.Run.ConsumeTasksSynchronously = value);
+
         /// <summary>
         /// Specifies which outliers should be removed from the distribution
         /// </summary>
