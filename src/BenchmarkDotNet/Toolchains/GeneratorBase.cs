@@ -27,6 +27,10 @@ namespace BenchmarkDotNet.Toolchains
             {
                 artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);
 
+                // Cleanup artifact files/directories before generating project files.
+                foreach (var path in GetArtifactsToCleanup(artifactsPaths))
+                    FileCleanupHelper.Cleanup(path);
+
                 // There is no async file copy API, so we just do it synchronously. We are likely on a ThreadPool thread here anyway if this generator is ran in parallel.
                 CopyAllRequiredFiles(artifactsPaths);
 
