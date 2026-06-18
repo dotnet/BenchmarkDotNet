@@ -15,4 +15,14 @@
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet.CodeFixers\BenchmarkDotNet.CodeFixers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <PolySharpIncludeRuntimeSupportedAttributes>true</PolySharpIncludeRuntimeSupportedAttributes>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.16.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>
