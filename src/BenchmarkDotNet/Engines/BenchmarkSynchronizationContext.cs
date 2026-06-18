@@ -127,7 +127,8 @@ internal sealed class SingleThreadPumpContext
     {
         EnsureValid();
 
-        var awaiter = valueTask.GetAwaiter();
+        // Ensure the continuation is not posted to the current SynchronizationContext.
+        var awaiter = valueTask.ConfigureAwait(false).GetAwaiter();
         if (awaiter.IsCompleted)
         {
             return awaiter.GetResult();

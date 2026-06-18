@@ -294,6 +294,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--maxIterationCount`       Maximum number of iterations to run. The default is 100.
 * `--invocationCount`         Invocation count in a single iteration. By default calculated by the heuristic.
 * `--unrollFactor`            How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default
+* `--consumeTasksSynchronously` (Default: false) Specifies whether to consume (Value)Task-returning benchmarks synchronously.
 * `--strategy`                The RunStrategy that should be used. Throughput/ColdStart/Monitoring.
 * `--platform`                The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.
 * `--runOncePerIteration`     (Default: false) Run the benchmark exactly once per iteration.
