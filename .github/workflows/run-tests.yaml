@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       # Checkout
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # Add Windows Defender Exclusions
       - uses: ./.github/actions/add-windowsdefender-exclusions
       # Setup additional tools
@@ -66,7 +66,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       # Checkout
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # Add Windows Defender Exclusions
       - uses: ./.github/actions/add-windowsdefender-exclusions
       # Setup additional tools
@@ -108,7 +108,7 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
@@ -149,7 +149,7 @@ jobs:
           - runs-on: 'macos-26-intel'
             arch: 'x64'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
@@ -182,14 +182,14 @@ jobs:
   test-pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run task 'pack'
         run: ./build.cmd pack
 
   spellcheck-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         name: Setup node
         with:

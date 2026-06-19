@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'dotnet/BenchmarkDotNet' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set date
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: Pack
