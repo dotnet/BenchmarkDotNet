@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.Samples
         // Setup your csproj like this:
         /*
         <PropertyGroup>
-          <!-- Use 8.0.0 as default package version if not specified -->
-          <SihVersion Condition="'$(SihVersion)' == ''">8.0.0</SciVersion>
+          <!-- Use 10.0.0 as default package version if not specified -->
+          <SihVersion Condition="'$(SihVersion)' == ''">10.0.0</SciVersion>
         </PropertyGroup>
         <ItemGroup>
           <PackageReference Include="System.IO.Hashing" Version="$(SihVersion)" />
@@ -30,9 +30,9 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 string[] targetVersions = [
-                    "8.0.0",
-                    "9.0.0",
                     "10.0.0",
+                    "10.0.5",
+                    "10.0.9",
                 ];
 
                 foreach (var version in targetVersions)
