@@ -11,7 +11,7 @@ runs:
     - name: Set up node
       uses: actions/setup-node@v6
       with:
-        node-version: "24.15.0" # Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3154
+        node-version: "22" # Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3154
 
     - name: Set up v8
       shell: bash
