@@ -25,7 +25,7 @@ jobs:
         # https://github.com/microsoft/codecoverage/blob/main/docs/supported-os.md
         os: [windows-latest, ubuntu-latest, macos-26-intel, windows-11-arm]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Ensure DOTNET_ROOT environment variable set on macOS
       - uses: actions/setup-dotnet@v5
@@ -72,7 +72,7 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
@@ -113,7 +113,7 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/download-artifact@v8
         with:

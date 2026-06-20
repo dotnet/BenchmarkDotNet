@@ -20,10 +20,10 @@ jobs:
     # --- Init ---
 
     - name: Checkout sources
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Checkout changelog
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: docs-changelog
         path: docs/_changelog
@@ -68,7 +68,7 @@ jobs:
       run: ./build.cmd version-increment
 
     - name: Commit changes
-      uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
+      uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10.0.0
       with:
         message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }} and update released analyzer rules"
         author_name: GitHub Actions
@@ -99,7 +99,7 @@ jobs:
         discussion_category_name: Announcements
 
     - name: Close old milestone
-      uses: Akkjon/close-milestone@v2.2.0
+      uses: Akkjon/close-milestone@2dd67f0346a3cb6159a33c7467ae5fbd17e5affc # v2.2.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
