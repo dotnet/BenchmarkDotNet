@@ -15,7 +15,9 @@ namespace BenchmarkDotNet.Engines
         internal abstract bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static IEnumerable<EngineStage> EnumerateStages(EngineParameters parameters)
+        // skipJitDelays is used by EnumerateStagesTests to skip waiting when it's only testing the stage logic, not real JIT compilation.
+        // Real JIT compilation is tested in JitListenerTests.
+        internal static IEnumerable<EngineStage> EnumerateStages(EngineParameters parameters, bool skipJitDelays = false)
         {
             var strategy = parameters.TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, parameters.Resolver);
             var invokeCount = parameters.TargetJob.ResolveValue(RunMode.InvocationCountCharacteristic, parameters.Resolver, 1);
@@ -31,7 +33,7 @@ namespace BenchmarkDotNet.Engines
                     int minInvokeCount = parameters.TargetJob.ResolveValue(AccuracyMode.MinInvokeCountCharacteristic, parameters.Resolver);
 
                     // AOT technically doesn't have a JIT, but we run jit stage regardless because of static constructors. #2004
-                    var jitStage = new EngineJitStage(evaluateOverhead, parameters);
+                    var jitStage = new EngineJitStage(evaluateOverhead, parameters, skipJitDelays);
                     yield return jitStage;
 
                     bool hasUnrollFactor = parameters.TargetJob.HasValue(RunMode.UnrollFactorCharacteristic);

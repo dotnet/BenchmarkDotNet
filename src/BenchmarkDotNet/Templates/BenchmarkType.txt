@@ -39,7 +39,7 @@
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
-                WorkloadMethod = instance.__ResolveWorkloadMethod(),
+                WorkloadMethod = instance.__ResolveWorkloadMethod(host),
                 WorkloadActionUnroll = instance.WorkloadActionUnroll,
                 WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
                 OverheadActionNoUnroll = instance.OverheadActionNoUnroll,
@@ -72,36 +72,48 @@
 
         $DeclareFieldsContainer$
 
-        private global::System.Reflection.MethodInfo __ResolveWorkloadMethod()
+        private global::System.Reflection.MethodInfo __ResolveWorkloadMethod(global::BenchmarkDotNet.Engines.IHost host)
         {
-            global::System.Type[] parameterTypes = $WorkloadMethodParameterTypes$;
-            foreach (global::System.Reflection.MethodInfo candidate in typeof($WorkloadTypeName$).GetMethods(
-                global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Static |
-                global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic))
+            // Best-effort: the jit stage uses the resolved method to watch its JIT tier-up events, and falls back to a
+            // fixed delay when WorkloadMethod is null. So neither a missed match nor a reflection failure (e.g. a
+            // same-named overload's parameter type fails to load) may break the benchmark — report and return null.
+            try
             {
-                if (candidate.Name != "$WorkloadMethodName$")
+                global::System.Type[] parameterTypes = $WorkloadMethodParameterTypes$;
+                foreach (global::System.Reflection.MethodInfo candidate in typeof($WorkloadTypeName$).GetMethods(
+                    global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Static |
+                    global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic))
                 {
-                    continue;
-                }
-                global::System.Reflection.ParameterInfo[] parameters = candidate.GetParameters();
-                if (parameters.Length != parameterTypes.Length)
-                {
-                    continue;
-                }
-                global::System.Boolean isMatch = true;
-                for (global::System.Int32 i = 0; i < parameters.Length; i++)
-                {
-                    if (parameters[i].ParameterType != parameterTypes[i])
+                    if (candidate.Name != "$WorkloadMethodName$")
                     {
-                        isMatch = false;
-                        break;
+                        continue;
+                    }
+                    global::System.Reflection.ParameterInfo[] parameters = candidate.GetParameters();
+                    if (parameters.Length != parameterTypes.Length)
+                    {
+                        continue;
+                    }
+                    global::System.Boolean isMatch = true;
+                    for (global::System.Int32 i = 0; i < parameters.Length; i++)
+                    {
+                        if (parameters[i].ParameterType != parameterTypes[i])
+                        {
+                            isMatch = false;
+                            break;
+                        }
+                    }
+                    if (isMatch)
+                    {
+                        return candidate;
                     }
                 }
-                if (isMatch)
-                {
-                    return candidate;
-                }
             }
+            catch (global::System.Exception e)
+            {
+                host.SendError($"Exception during __ResolveWorkloadMethod!{(global::System.Environment.NewLine)}{e}");
+                return null;
+            }
+            host.WriteLine("// Could not resolve the benchmark method '$WorkloadMethodName$' to watch JIT tier-up events; the jit stage will fall back to a fixed delay.");
             return null;
         }
 

@@ -109,9 +109,9 @@ internal sealed class JitListener : EventListener
         methodName = method.Name;
     }
 
-    internal static JitListener? Create(MethodInfo method, bool enabled = true)
+    internal static JitListener? Create(MethodInfo? method)
     {
-        if (!enabled || !JitInfo.IsTiered)
+        if (method is null || !JitInfo.IsTiered)
         {
             return null;
         }

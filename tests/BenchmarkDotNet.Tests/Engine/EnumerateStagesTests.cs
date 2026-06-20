@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(job);
 
             bool didRunStages = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 Assert.True(stage is not EngineJitStage);
                 didRunStages = true;
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default);
 
             bool didRunActualStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 Assert.NotEqual(IterationMode.Overhead, stage.Mode);
 
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(iterationTime)));
 
             bool didRunActualStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(job);
 
             bool didRunUnroll = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Tests.Engine
             // A short measurement encourages the JIT stage to batch many invocations into a single iteration,
             // which is the regression introduced by #2806.
             var fastMeasurement = TimeInterval.FromMicroseconds(1);
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(job);
 
             int jitWorkloadCount = 0;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -210,7 +210,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default.WithInvocationCount(1).WithUnrollFactor(1));
 
             int jitWorkloadCount = 0;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
             int jitWorkloadCount = 0;
             bool didStopEarly = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -282,7 +282,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
             int jitWorkloadCount = 0;
             bool didStopEarly = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -316,7 +316,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default);
 
             bool didRunPilotStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -347,8 +347,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Func<long, IClock, ValueTask<ClockSpan>> emptyAction = (_, _) => new(default(ClockSpan));
             return new()
             {
-                WorkloadMethod = emptyAction.Method,
-                EnableJitListener = false,
+                WorkloadMethod = null,
                 GlobalSetupAction = () => new(),
                 GlobalCleanupAction = () => new(),
                 Host = host,

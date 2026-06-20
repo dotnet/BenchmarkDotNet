@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Engines
             var job = engineParameters.TargetJob ?? throw new ArgumentNullException(nameof(EngineParameters.TargetJob));
             Parameters = new()
             {
-                WorkloadMethod = engineParameters.WorkloadMethod ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadMethod)),
+                WorkloadMethod = engineParameters.WorkloadMethod,
                 WorkloadActionNoUnroll = engineParameters.WorkloadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionNoUnroll)),
                 WorkloadActionUnroll = engineParameters.WorkloadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionUnroll)),
                 OverheadActionNoUnroll = engineParameters.OverheadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionNoUnroll)),

@@ -30,24 +30,26 @@ internal sealed class EngineJitStage : EngineStage
 
     private readonly IEnumerator<IterationData> enumerator;
     private readonly bool evaluateOverhead;
+    private readonly bool skipDelays;
     // Watches for the method's background tier-up via JIT events so we can proceed as soon as each tier is published.
     // Null when watching is disabled or EventSource is disabled, in which case we fall back to the fixed delay.
     private readonly JitListener? listener;
     // True when this stage created the listener and must dispose it; false when a caller (a test) injected one it owns.
     private readonly bool disposeListener;
 
-    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters)
-        : this(evaluateOverhead, parameters, JitListener.Create(parameters.WorkloadMethod, parameters.EnableJitListener), disposeListener: true)
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, bool skipDelays)
+        : this(evaluateOverhead, parameters, JitListener.Create(parameters.WorkloadMethod), disposeListener: true, skipDelays: skipDelays)
     {
     }
 
-    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, JitListener? listener, bool disposeListener = false)
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, JitListener? listener, bool disposeListener = false, bool skipDelays = false)
         : base(IterationStage.Jitting, IterationMode.Workload, parameters)
     {
         this.listener = listener;
         this.disposeListener = disposeListener;
         enumerator = EnumerateIterations();
         this.evaluateOverhead = evaluateOverhead;
+        this.skipDelays = skipDelays;
     }
 
     internal override List<Measurement> GetMeasurementList() => new(GetMaxMeasurementCount());
@@ -119,7 +121,7 @@ internal sealed class EngineJitStage : EngineStage
             // invoke above already fired the watched method's Pause if it was tier0. See WaitForInitialTieringActive.
             listener!.WaitForInitialTieringActive(parameters.Host.CancellationToken);
         }
-        else if (JitInfo.TieredDelay > TimeSpan.Zero)
+        else if (!skipDelays && JitInfo.TieredDelay > TimeSpan.Zero)
         {
             // Fall back to a fixed wait for the call-counting delay to elapse.
             Thread.Sleep(JitInfo.TieredDelay + TimeSpan.FromMilliseconds(10));
@@ -238,7 +240,7 @@ internal sealed class EngineJitStage : EngineStage
                     listener.WaitForBackgroundJitIdle(BackgroundJitDrainTimeout, parameters.Host.CancellationToken);
                 }
             }
-            else
+            else if (!skipDelays)
             {
                 // No listener at all (no tiered JIT, or EventSource unavailable): fall back to the fixed delay.
                 Engine.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
