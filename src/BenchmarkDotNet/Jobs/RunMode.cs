@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<int> MinWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinWarmupIterationCount));
         public static readonly Characteristic<int> MaxWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxWarmupIterationCount));
         public static readonly Characteristic<bool> MemoryRandomizationCharacteristic = CreateCharacteristic<bool>(nameof(MemoryRandomization));
+        public static readonly Characteristic<JitTieringMode> JitTieringModeCharacteristic = CreateCharacteristic<JitTieringMode>(nameof(JitTieringMode));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
@@ -188,6 +189,20 @@ namespace BenchmarkDotNet.Jobs
         {
             get => MemoryRandomizationCharacteristic[this];
             set => MemoryRandomizationCharacteristic[this] = value;
+        }
+
+        /// <summary>
+        /// Controls the behavior of the JIT stage when tiering is enabled.
+        /// <list type="bullet">
+        /// <item><see cref="JitTieringMode.Auto"/> (default): Promote through every tier for short-running benchmarks only.</item>
+        /// <item><see cref="JitTieringMode.Force"/>: Always promote through every tier, regardless of invocation time.</item>
+        /// <item><see cref="JitTieringMode.Skip"/>: Skip tier promotion entirely.</item>
+        /// </list>
+        /// </summary>
+        public JitTieringMode JitTieringMode
+        {
+            get => JitTieringModeCharacteristic[this];
+            set => JitTieringModeCharacteristic[this] = value;
         }
 
         internal BdnExecution ToPerfonar() => new()

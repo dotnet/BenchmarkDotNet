@@ -199,6 +199,9 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithMemoryRandomization(this Job job, bool enable = true) => job.WithCore(j => j.Run.MemoryRandomization = enable);
 
+        /// <inheritdoc cref="RunMode.JitTieringMode"/>
+        public static Job WithJitTieringMode(this Job job, JitTieringMode mode) => job.WithCore(j => j.Run.JitTieringMode = mode);
+
         // Infrastructure
         public static Job WithToolchain(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
 

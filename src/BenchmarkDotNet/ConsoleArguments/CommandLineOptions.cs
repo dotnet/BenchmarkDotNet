@@ -198,6 +198,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("memoryRandomization", Required = false, HelpText = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.")]
         public bool MemoryRandomization { get; set; }
 
+        [Option("jitTieringMode", Required = false, Default = JitTieringMode.Auto, HelpText = "Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip.")]
+        public JitTieringMode JitTieringMode { get; set; }
+
         [Option("wasmEngine", Required = false, HelpText = "Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.", Default = "v8")]
         public string? WasmJavaScriptEngine { get; set; } = "v8";
 

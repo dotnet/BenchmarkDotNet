@@ -11,9 +11,6 @@ namespace BenchmarkDotNet.Engines;
 // the following stages (Pilot and Warmup) will likely take it the rest of the way. Long-running benchmarks may never fully reach tier1.
 internal sealed class EngineJitStage : EngineStage
 {
-    // It is not worth spending a long time in jit stage for macro-benchmarks.
-    private static readonly TimeInterval MaxTieringTime = TimeInterval.FromSeconds(10);
-
     // Jit call counting delay is only for when the app starts up. We don't need to wait for every benchmark if multiple benchmarks are ran in-process.
     private static TimeSpan s_tieredDelay = JitInfo.TieredDelay;
 
@@ -77,8 +74,9 @@ internal sealed class EngineJitStage : EngineStage
         }
         yield return GetWorkloadIterationData(userInvokeCount);
 
-        // If the jit is not tiered, we're done.
-        if (!JitInfo.IsTiered)
+        JitTieringMode jitTieringMode = parameters.TargetJob.ResolveValue(RunMode.JitTieringModeCharacteristic, parameters.Resolver);
+        // If the jit is not tiered, or the user wants to skip, we're done.
+        if (!JitInfo.IsTiered || jitTieringMode == JitTieringMode.Skip)
         {
             yield break;
         }
@@ -88,49 +86,42 @@ internal sealed class EngineJitStage : EngineStage
         // Don't make the next jit stage wait if it's ran in the same process.
         s_tieredDelay = TimeSpan.Zero;
 
-        // Attempt to promote methods to tier1, but don't spend too much time in jit stage.
-        StartedClock startedClock = parameters.TargetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, parameters.Resolver)!.Start();
-
-        int remainingTiers = JitInfo.MaxTierPromotions;
-        long lastInvokeCount = userInvokeCount;
-        while (remainingTiers > 0)
+        // If the first iteration suggests a long-running benchmark (a single invocation already
+        // takes ~2/3 of IterationTime or more), run one confirmation iteration and bail out if
+        // it agrees. Same cutoff value that pilot stage uses.
+        // We do not bail out immediately if the first iteration is long-running because it could
+        // be due to cctors or other lazy initialization that won't be hit in steady-state. #2004
+        // JitTieringMode.Force opts out of this heuristic and always promotes through every tier.
+        TimeInterval iterationTime = parameters.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, parameters.Resolver);
+        long remainingCalls = JitInfo.TieredCallCountThreshold;
+        if (jitTieringMode == JitTieringMode.Auto
+            && iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double)userInvokeCount) < 1.5)
         {
-            --remainingTiers;
-            long remainingCalls = JitInfo.TieredCallCountThreshold;
+            ++iterationIndex;
+            yield return GetWorkloadIterationData(userInvokeCount);
+            if (iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double)userInvokeCount) < 1.5)
+            {
+                didStopEarly = true;
+                yield break;
+            }
+            remainingCalls -= userInvokeCount;
+        }
+
+        // Promote methods to tier1.
+        for (int remainingTiers = JitInfo.MaxTierPromotions; remainingTiers > 0; --remainingTiers)
+        {
             while (remainingCalls > 0)
             {
-                long invokeCount;
-                if (hasUserInvocationCount)
-                {
-                    invokeCount = userInvokeCount;
-                }
-                else
-                {
-                    // If we can run a batch of calls within the time limit (based on the last measurement), do that instead of multiple single-invocation iterations.
-                    // For long-running benchmarks where even a small batch wouldn't fit, fall back to one invocation per iteration.
-                    var remainingTimeLimit = MaxTieringTime.ToNanoseconds() - startedClock.GetElapsed().GetNanoseconds();
-                    var lastMeasurementSingleInvocationTime = lastMeasurement.Nanoseconds / lastInvokeCount;
-                    long allowedCallsWithinTimeLimit = (long)Math.Floor(remainingTimeLimit / lastMeasurementSingleInvocationTime);
-                    invokeCount = allowedCallsWithinTimeLimit > 0
-                        ? Math.Min(remainingCalls, allowedCallsWithinTimeLimit)
-                        : 1;
-                }
-                lastInvokeCount = invokeCount;
-
+                // Run the whole tier's call budget in a single iteration unless the user pinned InvocationCount.
+                long invokeCount = hasUserInvocationCount ? userInvokeCount : remainingCalls;
                 remainingCalls -= invokeCount;
                 ++iterationIndex;
                 // The generated __Overhead method is aggressively optimized, so we don't need to run it again.
                 yield return GetWorkloadIterationData(invokeCount);
-
-                if ((remainingTiers > 0 || remainingCalls > 0)
-                    && startedClock.GetElapsed().GetTimeValue() >= MaxTieringTime)
-                {
-                    didStopEarly = true;
-                    yield break;
-                }
             }
 
             Engine.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
+            remainingCalls = JitInfo.TieredCallCountThreshold;
         }
 
         // Empirical evidence shows that the first call after the method is tiered up may take longer,
