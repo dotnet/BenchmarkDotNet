@@ -167,7 +167,7 @@ internal sealed class EngineJitStage : EngineStage
                 // Background compilation can take an indeterminate amount of time. Ideally we would wait for the MethodJittingStarted event,
                 // but it doesn't carry tier information, so we can't skip it for the async tier0 events (if we try there is a race condition).
                 // The only thing we can do safely is wait for the compilation to complete with a sensible timeout via the MethodLoadVerbose event that carries the tier info.
-                // If the publication doesn't arrive in the window the tier-up may still be compiling, so wait for the
+                // If the publication doesn't arrive in the window, the tier-up may still be compiling, so wait for the
                 // JIT to go quiet and re-check (TryQuiescentPublication) before spending nudges.
                 bool tieredUp = listener!.WaitForPublication(JitInfo.BackgroundCompilationDelay, parameters.Host.CancellationToken)
                     || TryQuiescentPublication(parameters.Host.CancellationToken);

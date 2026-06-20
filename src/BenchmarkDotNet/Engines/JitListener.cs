@@ -85,19 +85,15 @@ internal sealed class JitListener : EventListener
     private readonly int metadataToken;
     private readonly string methodName;
     private readonly object lockObj = new();
-    private readonly ManualResetEventSlim publicationSignal = new(false);
+    private readonly SemaphoreSlim publicationSignal = new(0);
     private readonly ManualResetEventSlim tieringActiveSignal = new(false);
     private readonly ManualResetEventSlim tieringActivePrimedSignal = new(false);
-    // Reflect the background tiering worker's STATE (used only after the watched method reaches its final tier, to
-    // wait out untracked callees). The runtime brackets each batch with BackgroundJitStart..Stop and the worker is
-    // single-threaded, so these stay complementary: busy while a batch is running, idle otherwise. Tracking state
-    // rather than a start edge means a batch already in flight when the stage looks is observed — there is no manual
-    // reset that could wipe a "started" we hadn't seen yet.
     private readonly ManualResetEventSlim backgroundJitBusySignal = new(false);
     private readonly ManualResetEventSlim backgroundJitIdleSignal = new(true);
 
     private volatile bool reachedFinalTier;
     private volatile bool canObserve;
+    private bool disposed;
 
     // Cached payload indices (field order is stable within a process for a given event version).
     private int loadTokenIndex = -1;
@@ -183,17 +179,10 @@ internal sealed class JitListener : EventListener
     }
 
     // Waits for a new tier publication (a non-tier0 MethodLoadVerbose for the method) — i.e. the latest burst drove
-    // the method to its next tier and the runtime published it. True if one arrived before the timeout; false otherwise.
+    // the method to its next tier and the runtime published it. Consumes one queued publication permit. True if one
+    // arrived before the timeout; false otherwise. Wait(TimeSpan.Zero, ...) is a non-blocking probe (TryQuiescentPublication).
     internal bool WaitForPublication(TimeSpan timeout, CancellationToken cancellationToken)
-    {
-        if (!publicationSignal.Wait(timeout, cancellationToken))
-        {
-            return false;
-        }
-        // Reset for the next tier. We can't use AutoResetEvent because it doesn't support CancellationToken.
-        publicationSignal.Reset();
-        return true;
-    }
+        => publicationSignal.Wait(timeout, cancellationToken);
 
     // Waits (up to the timeout) for the background tiering worker to be running a batch — either one already in flight
     // or one that starts within the window. True if it is/becomes busy; false if it stays idle the whole timeout,
@@ -247,6 +236,8 @@ internal sealed class JitListener : EventListener
         {
             lock (lockObj)
             {
+                if (disposed)
+                    return;
                 tieringActiveSignal.Set();
                 tieringActivePrimedSignal.Set();
             }
@@ -256,6 +247,8 @@ internal sealed class JitListener : EventListener
         {
             lock (lockObj)
             {
+                if (disposed)
+                    return;
                 tieringActiveSignal.Reset();
                 tieringActivePrimedSignal.Set();
             }
@@ -265,6 +258,8 @@ internal sealed class JitListener : EventListener
         {
             lock (lockObj)
             {
+                if (disposed)
+                    return;
                 // The worker began a batch. Reset idle before setting busy so a reader never sees both set at once.
                 backgroundJitIdleSignal.Reset();
                 backgroundJitBusySignal.Set();
@@ -303,6 +298,8 @@ internal sealed class JitListener : EventListener
         {
             lock (lockObj)
             {
+                if (disposed)
+                    return;
                 backgroundJitBusySignal.Reset();
                 backgroundJitIdleSignal.Set();
             }
@@ -337,6 +334,8 @@ internal sealed class JitListener : EventListener
         {
             lock (lockObj)
             {
+                if (disposed)
+                    return;
                 tieringActivePrimedSignal.Set();
             }
             return;
@@ -361,11 +360,20 @@ internal sealed class JitListener : EventListener
         if (tier == OptimizedTier1 || tier == Optimized || tier == MinOptJitted)
             reachedFinalTier = true;
 
-        publicationSignal.Set();
+        lock (lockObj)
+        {
+            if (disposed)
+                return;
+            publicationSignal.Release();
+        }
     }
 
     public override void Dispose()
     {
+        lock (lockObj)
+        {
+            disposed = true;
+        }
         // base.Dispose disables the events we enabled (when no other listener wants them).
         base.Dispose();
         publicationSignal.Dispose();
