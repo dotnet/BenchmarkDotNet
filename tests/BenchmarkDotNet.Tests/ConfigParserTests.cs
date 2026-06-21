@@ -1082,6 +1082,7 @@ namespace BenchmarkDotNet.Tests
                   --maxWidth <maxWidth>                                                               Max parameter column width, the default is 20.
                   --envVars <envVars>                                                                 Colon separated environment variables (key:value)
                   --memoryRandomization                                                               Specifies whether Engine should allocate some random-sized memory between iterations.
+                  --jitTieringMode <Auto|Force|Skip>                                                  Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip. [default: Auto]
                   --wasmEngine <wasmEngine>                                                           Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain. [default: v8]
                   --wasmArgs <wasmArgs>                                                               Arguments for the javascript engine used by Wasm toolchain. [default: --expose_wasm]
                   --wasmMainJsTemplate <wasmMainJsTemplate>                                           Path to main.mjs template.

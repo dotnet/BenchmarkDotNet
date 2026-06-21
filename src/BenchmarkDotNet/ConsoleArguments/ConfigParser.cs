@@ -139,6 +139,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.MaxParameterColumnWidthOption,
                     CommandLineOptions.EnvironmentVariablesOption,
                     CommandLineOptions.MemoryRandomizationOption,
+                    CommandLineOptions.JitTieringModeOption,
                     CommandLineOptions.WasmJavascriptEngineOption,
                     CommandLineOptions.WasmJavaScriptEngineArgumentsOption,
                     CommandLineOptions.WasmMainJsTemplateOption,
@@ -232,6 +233,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ["--maxwidth"] = "--maxWidth",
                 ["--envvars"] = "--envVars",
                 ["--memoryrandomization"] = "--memoryRandomization",
+                ["--jittieringmode"] = "--jitTieringMode",
                 ["--wasmengine"] = "--wasmEngine",
                 ["--wasmargs"] = "--wasmArgs",
                 ["--wasmmainjstemplate"] = "--wasmMainJsTemplate",
@@ -574,6 +576,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 MaxParameterColumnWidth = parseResult.GetValue(CommandLineOptions.MaxParameterColumnWidthOption),
                 EnvironmentVariables = parseResult.GetValue(CommandLineOptions.EnvironmentVariablesOption) ?? [],
                 MemoryRandomization = parseResult.GetValue(CommandLineOptions.MemoryRandomizationOption),
+                JitTieringMode = parseResult.GetValue(CommandLineOptions.JitTieringModeOption),
                 WasmJavaScriptEngine = parseResult.GetValue(CommandLineOptions.WasmJavascriptEngineOption) ?? "",
                 WasmJavaScriptEngineArguments = parseResult.GetValue(CommandLineOptions.WasmJavaScriptEngineArgumentsOption) ?? "",
                 WasmMainJsTemplate = parseResult.GetValue(CommandLineOptions.WasmMainJsTemplateOption),
@@ -779,6 +782,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.IlcPackages != null)
             { result.Add("--ilcPackages"); result.Add(options.IlcPackages.FullName); }
+
+            if (options.JitTieringMode != Engines.JitTieringMode.Auto)
+            { result.Add("--jitTieringMode"); result.Add(options.JitTieringMode.ToString()); }
 
             if (options.WasmJavaScriptEngine.IsNotBlank() && options.WasmJavaScriptEngine != "v8")
             { result.Add("--wasmEngine"); result.Add(options.WasmJavaScriptEngine); }
