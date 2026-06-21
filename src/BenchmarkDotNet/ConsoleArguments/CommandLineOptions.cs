@@ -382,6 +382,13 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Specifies whether Engine should allocate some random-sized memory between iterations.",
         };
 
+        public JitTieringMode JitTieringMode { get; set; }
+        public static readonly Option<JitTieringMode> JitTieringModeOption = new("--jitTieringMode")
+        {
+            DefaultValueFactory = _ => JitTieringMode.Auto,
+            Description = "Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip.",
+        };
+
         public string WasmJavaScriptEngine { get; set; } = "";
         public static readonly Option<string> WasmJavascriptEngineOption = new("--wasmEngine")
         {
