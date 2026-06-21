@@ -808,22 +808,7 @@ namespace BenchmarkDotNet.Running
         {
             foreach (string path in artifactsToCleanup)
             {
-                try
-                {
-                    if (Directory.Exists(path))
-                    {
-                        Directory.Delete(path, recursive: true);
-                    }
-                    else if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                    }
-                }
-                catch (Exception)
-                {
-                    // sth is locking our auto-generated files
-                    // there is very little we can do about it
-                }
+                FileCleanupHelper.Cleanup(path);
             }
         }
 
