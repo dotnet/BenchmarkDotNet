@@ -8,23 +8,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public static class HardwareCounters
     {
-        private static readonly Dictionary<HardwareCounter, string> EtwTranslations
-            = new Dictionary<HardwareCounter, string>
-            {
-                { HardwareCounter.Timer, "Timer" },
-                { HardwareCounter.TotalIssues, "TotalIssues" },
-                { HardwareCounter.BranchInstructions, "BranchInstructions" },
-                { HardwareCounter.CacheMisses, "CacheMisses" },
-                { HardwareCounter.BranchMispredictions, "BranchMispredictions" },
-                { HardwareCounter.TotalCycles, "TotalCycles" },
-                { HardwareCounter.UnhaltedCoreCycles, "UnhaltedCoreCycles" },
-                { HardwareCounter.InstructionRetired, "InstructionRetired" },
-                { HardwareCounter.UnhaltedReferenceCycles, "UnhaltedReferenceCycles" },
-                { HardwareCounter.LlcReference, "LLCReference" },
-                { HardwareCounter.LlcMisses, "LLCMisses" },
-                { HardwareCounter.BranchInstructionRetired, "BranchInstructionRetired" },
-                { HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired" }
-            };
+        public static Func<Dictionary<string, ProfileSourceInfo>> GetProfileSources { get; internal set; } = TraceEventProfileSources.GetInfo;
 
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
@@ -43,21 +27,33 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (TraceEventSession.IsElevated() != true)
                 yield return new ValidationError(true, "Must be elevated (Admin) to use ETW Kernel Session (required for Hardware Counters and EtwProfiler).");
 
-            var availableCpuCounters = TraceEventProfileSources.GetInfo();
+            var availableCpuCounters = GetProfileSources();
 
             foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
             {
-                if (!EtwTranslations.TryGetValue(hardwareCounter, out string counterName))
+                string[] counterVariants = validationParameters.Config
+                    .GetHardwareCounterProviders()
+                    .SelectMany(x => x.GetVariants(hardwareCounter))
+                    .ToArray();
+
+                if (counterVariants.Length == 0)
                 {
                     yield return new ValidationError(true,
                         $"Counter {hardwareCounter} not recognized. " +
-                        $"Please make sure that you are using counter available on your machine. " +
-                        $"You can get the list of available counters by running `tracelog.exe -profilesources Help`");
+                        $"Please ensure that you are using a counter that is supported by your hardware counter provider. ");
                     continue;
                 }
 
-                if (!availableCpuCounters.ContainsKey(counterName))
-                    yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V");
+                foreach (string counterVariant in counterVariants)
+                {
+                    if (!availableCpuCounters.ContainsKey(counterVariant))
+                    {
+                        yield return new ValidationError(true,
+                            $"The counter {counterVariant} is not available. " +
+                            $"Please make sure you are Windows 8+ without Hyper-V and that you are using counter available on your machine. " +
+                            $"You can get the list of available counters by running `tracelog.exe -profilesources Help`");
+                    }
+                }
             }
 
             foreach (var benchmark in validationParameters.Benchmarks)
@@ -69,11 +65,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
         }
 
-        internal static PreciseMachineCounter FromCounter(HardwareCounter counter, Func<ProfileSourceInfo, int> intervalSelector)
+        internal static IEnumerable<PreciseMachineCounter> FromCounter(HardwareCounter counter, IEnumerable<string> counterVariants,
+            Func<ProfileSourceInfo, int> intervalSelector)
         {
-            var profileSource = TraceEventProfileSources.GetInfo()[EtwTranslations[counter]]; // it can't fail, diagnoser validates that first
-
-            return new PreciseMachineCounter(profileSource.ID, profileSource.Name, counter, intervalSelector(profileSource));
+            var profileSourceInfos = GetProfileSources();
+            foreach (var counterVariant in counterVariants)
+            {
+                if (profileSourceInfos.TryGetValue(counterVariant, out var profileSource))
+                {
+                    yield return new PreciseMachineCounter(profileSource.ID, profileSource.Name, counter, intervalSelector(profileSource));
+                }
+            }
         }
 
         internal static void Enable(IEnumerable<PreciseMachineCounter> counters)

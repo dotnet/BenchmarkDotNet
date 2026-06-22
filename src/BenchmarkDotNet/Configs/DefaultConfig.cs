@@ -125,6 +125,8 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => [];
 
+        public IEnumerable<IHardwareCounterProvider> GetHardwareCounterProviders() => [DefaultHardwareCounterProvider.Instance];
+
         public IEnumerable<HardwareCounter> GetHardwareCounters() => [];
 
         public IEnumerable<IFilter> GetFilters() => [];

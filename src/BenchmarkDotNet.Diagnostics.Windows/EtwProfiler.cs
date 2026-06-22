@@ -92,7 +92,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
-                .Select(counter => HardwareCounters.FromCounter(counter, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
+                .SelectMany(counter =>
+                {
+                    var counterVariants = parameters.Config
+                        .GetHardwareCounterProviders()
+                        .SelectMany(x => x.GetVariants(counter));
+
+                    return HardwareCounters.FromCounter(counter, counterVariants, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval);
+                })
+                .Distinct()
                 .ToArray();
 
             if (counters.Any()) // we need to enable the counters before starting the kernel session
