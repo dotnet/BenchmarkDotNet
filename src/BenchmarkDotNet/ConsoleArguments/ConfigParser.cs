@@ -249,9 +249,10 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static bool HasDuplicateOptions(string[] args)
         {
             // Gets canonical option names.
-            var options = args.Where(x => x.StartsWith("-") && x != "--")
-                              .Select(x => x.Split('=')[0].ToLowerInvariant())
-                              .Select(x => AliasToCanonical.TryGetValue(x, out var c) ? c : x);
+            var options = args
+                .Select(x => x.Split(['=', ':'])[0])
+                .Where(x => x != "--" && (x.StartsWith("--", StringComparison.Ordinal) || AliasToCanonical.ContainsKey(x)))
+                .Select(x => AliasToCanonical.TryGetValue(x, out var c) ? c : x);
 
             // Return true if any canonical option name appears more than once.
             return options.GroupBy(x => x).Any(g => g.Count() > 1);
