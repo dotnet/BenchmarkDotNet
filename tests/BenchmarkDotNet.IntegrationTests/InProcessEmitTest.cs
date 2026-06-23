@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance);
         }
 
-        private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger)
+        private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger, bool consumeTasksSynchronously = false)
         {
             var config = new ManualConfig()
                 .AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray())
@@ -44,12 +44,14 @@ namespace BenchmarkDotNet.IntegrationTests
                     Job.Dry
                         .WithToolchain(InProcessEmitToolchain.Default)
                         .WithInvocationCount(4)
-                        .WithUnrollFactor(4))
+                        .WithUnrollFactor(4)
+                        .WithConsumeTasksSynchronously(consumeTasksSynchronously))
                 .AddJob(
                     Job.Dry
                         .WithToolchain(new RoslynToolchain())
                         .WithInvocationCount(4)
-                        .WithUnrollFactor(4))
+                        .WithUnrollFactor(4)
+                        .WithConsumeTasksSynchronously(consumeTasksSynchronously))
                 .WithOptions(ConfigOptions.KeepBenchmarkFiles)
                 .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
 
@@ -103,20 +105,21 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [TheoryEnvSpecific("We can't use Roslyn toolchain for .NET Core because we don't know which assemblies to reference and .NET Core does not support dynamic assembly saving", EnvRequirement.FullFrameworkOnly)]
-        [InlineData(typeof(SampleBenchmark))]
-        [InlineData(typeof(RunnableVoidCaseBenchmark))]
-        [InlineData(typeof(RunnableRefStructCaseBenchmark))]
-        [InlineData(typeof(RunnableStructCaseBenchmark))]
-        [InlineData(typeof(RunnableClassCaseBenchmark))]
-        [InlineData(typeof(RunnableManyArgsCaseBenchmark))]
-        [InlineData(typeof(RunnableTaskCaseBenchmark))]
-        [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableBenchmarks))]
-        [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableCallerOverride))]
-        [InlineData(typeof(AsyncEnumerableBenchmarksTests.CustomAsyncEnumerableBenchmarks))]
-        public void InProcessBenchmarkEmitsSameIL(Type benchmarkType)
+        [InlineData(typeof(SampleBenchmark), false)]
+        [InlineData(typeof(RunnableVoidCaseBenchmark), false)]
+        [InlineData(typeof(RunnableRefStructCaseBenchmark), false)]
+        [InlineData(typeof(RunnableStructCaseBenchmark), false)]
+        [InlineData(typeof(RunnableClassCaseBenchmark), false)]
+        [InlineData(typeof(RunnableManyArgsCaseBenchmark), false)]
+        [InlineData(typeof(RunnableTaskCaseBenchmark), false)]
+        [InlineData(typeof(RunnableTaskCaseBenchmark), true)]
+        [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableBenchmarks), false)]
+        [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableCallerOverride), false)]
+        [InlineData(typeof(AsyncEnumerableBenchmarksTests.CustomAsyncEnumerableBenchmarks), false)]
+        public void InProcessBenchmarkEmitsSameIL(Type benchmarkType, bool consumeTasksSynchronously)
         {
             var logger = new OutputLogger(Output);
-            var config = CreateInProcessAndRoslynConfig(logger);
+            var config = CreateInProcessAndRoslynConfig(logger, consumeTasksSynchronously);
 
             var summary = CanExecute(benchmarkType, config);
 

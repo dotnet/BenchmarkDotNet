@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<int> MinWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinWarmupIterationCount));
         public static readonly Characteristic<int> MaxWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxWarmupIterationCount));
         public static readonly Characteristic<bool> MemoryRandomizationCharacteristic = CreateCharacteristic<bool>(nameof(MemoryRandomization));
+        public static readonly Characteristic<bool> ConsumeTasksSynchronouslyCharacteristic = CreateCharacteristic<bool>(nameof(ConsumeTasksSynchronously));
         public static readonly Characteristic<JitTieringMode> JitTieringModeCharacteristic = CreateCharacteristic<JitTieringMode>(nameof(JitTieringMode));
 
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
@@ -189,6 +190,19 @@ namespace BenchmarkDotNet.Jobs
         {
             get => MemoryRandomizationCharacteristic[this];
             set => MemoryRandomizationCharacteristic[this] = value;
+        }
+
+        /// <summary>
+        /// Specifies whether (Value)Task-returning benchmarks should be consumed synchronously.
+        /// False by default.
+        /// </summary>
+        /// <remarks>
+        /// Intended to make async benchmark results comparable to historical results obtained from older BenchmarkDotNet versions. Recommended to leave false for new benchmarks.
+        /// </remarks>
+        public bool ConsumeTasksSynchronously
+        {
+            get => ConsumeTasksSynchronouslyCharacteristic[this];
+            set => ConsumeTasksSynchronouslyCharacteristic[this] = value;
         }
 
         /// <summary>

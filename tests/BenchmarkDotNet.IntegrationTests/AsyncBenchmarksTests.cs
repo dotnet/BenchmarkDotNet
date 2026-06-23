@@ -43,10 +43,32 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public AsyncBenchmarksTests(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
-        public void TaskReturningMethodsAreAwaited()
+        public static IEnumerable<IToolchain> GetToolchains() =>
+        [
+            new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
+            new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
+            new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
+            new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true }),
+            Job.Default.GetToolchain()
+        ];
+
+        public static TheoryData<IToolchain, bool> GetToolchainsWithConsumeTasksSynchronously()
         {
-            var summary = CanExecute<TaskDelayMethods>();
+            var data = new TheoryData<IToolchain, bool>();
+            foreach (var toolchain in GetToolchains())
+            {
+                data.Add(toolchain, false);
+                data.Add(toolchain, true);
+            }
+            return data;
+        }
+
+        [Theory]
+        [MemberData(nameof(GetToolchainsWithConsumeTasksSynchronously), DisableDiscoveryEnumeration = true)]
+        public void TaskReturningMethodsAreAwaited(IToolchain toolchain, bool consumeTasksSynchronously)
+        {
+            var summary = CanExecute<TaskDelayMethods>(CreateSimpleConfig(
+                job: Job.Dry.WithToolchain(toolchain).WithConsumeTasksSynchronously(consumeTasksSynchronously)));
 
             foreach (var report in summary.Reports)
                 foreach (var measurement in report.AllMeasurements)
@@ -58,29 +80,24 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
         }
 
-        [Fact]
-        public void TaskReturningMethodsAreAwaited_AlreadyComplete() => CanExecute<TaskImmediateMethods>();
-
-        public static TheoryData<IToolchain> GetToolchains() =>
-        [
-            new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-            new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
-            new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-            new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true }),
-            Job.Default.GetToolchain()
-        ];
+        [Theory]
+        [MemberData(nameof(GetToolchainsWithConsumeTasksSynchronously), DisableDiscoveryEnumeration = true)]
+        public void TaskReturningMethodsAreAwaited_AlreadyComplete(IToolchain toolchain, bool consumeTasksSynchronously)
+            => CanExecute<TaskImmediateMethods>(CreateSimpleConfig(
+                job: Job.Dry.WithToolchain(toolchain).WithConsumeTasksSynchronously(consumeTasksSynchronously)));
 
         [Theory]
-        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
-        public void TaskYieldWithNullSyncContext(IToolchain toolchain)
-            => CanExecute<NullSyncContextBenchmarks>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
+        [MemberData(nameof(GetToolchainsWithConsumeTasksSynchronously), DisableDiscoveryEnumeration = true)]
+        public void TaskYieldWithNullSyncContext(IToolchain toolchain, bool consumeTasksSynchronously)
+            => CanExecute<NullSyncContextBenchmarks>(CreateSimpleConfig(
+                job: Job.Dry.WithToolchain(toolchain).WithConsumeTasksSynchronously(consumeTasksSynchronously)));
 
         // #3103
         [Theory]
-        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
-        public void AsyncWorkloadRestartsAfterMemoryRandomization(IToolchain toolchain)
+        [MemberData(nameof(GetToolchainsWithConsumeTasksSynchronously), DisableDiscoveryEnumeration = true)]
+        public void AsyncWorkloadRestartsAfterMemoryRandomization(IToolchain toolchain, bool consumeTasksSynchronously)
             => CanExecute<RandomMemoryAsyncBenchmarks>(CreateSimpleConfig(
-                job: Job.Dry.WithToolchain(toolchain).WithIterationCount(3).WithMemoryRandomization(true)));
+                job: Job.Dry.WithToolchain(toolchain).WithIterationCount(3).WithMemoryRandomization(true).WithConsumeTasksSynchronously(consumeTasksSynchronously)));
 
         public class RandomMemoryAsyncBenchmarks
         {

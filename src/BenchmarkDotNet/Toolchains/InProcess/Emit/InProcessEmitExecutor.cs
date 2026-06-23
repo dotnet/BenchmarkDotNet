@@ -48,12 +48,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                     runThread.Start();
                 }
 
-                exitCode = await taskCompletionSource.Task.ConfigureAwait(true);
+                exitCode = await taskCompletionSource.Task.ConfigureAwait();
                 runThread.Join();
             }
             else
             {
-                exitCode = await ExecuteCore(host, executeParameters).ConfigureAwait(true);
+                exitCode = await ExecuteCore(host, executeParameters).ConfigureAwait();
             }
             host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
 

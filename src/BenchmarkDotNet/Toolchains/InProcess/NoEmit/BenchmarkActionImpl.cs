@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Helpers;
 using Perfolizer.Horology;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -701,4 +702,208 @@ public class BenchmarkActionConfiguredCancelableAsyncEnumerable<T> : BenchmarkAc
 
     public override void Cleanup()
         => workloadValueTaskSource.Complete();
+}
+
+// Blocking variants used when Job.Run.ConsumeTasksSynchronously is enabled. They drive the workload
+// through AwaitHelper.GetResult so the iteration loop stays synchronous, matching the pre-async-refactor behavior
+// so historical results stay comparable.
+
+[AggressivelyOptimizeMethods]
+public sealed class BenchmarkActionBlockingTask : BenchmarkActionBase
+{
+    private readonly Func<Task> callback;
+    private readonly Action blockingCallback;
+    private readonly Action unrolledBlockingCallback;
+
+    [SetsRequiredMembers]
+    public BenchmarkActionBlockingTask(object? instance, MethodInfo method, int unrollFactor)
+    {
+        callback = CreateWorkload<Func<Task>>(instance, method);
+        blockingCallback = InvokeBlocking;
+        unrolledBlockingCallback = Unroll(blockingCallback, unrollFactor);
+        InvokeSingle = InvokeOnce;
+        InvokeUnroll = WorkloadActionUnroll;
+        InvokeNoUnroll = WorkloadActionNoUnroll;
+    }
+
+    private void InvokeBlocking() => AwaitHelper.GetResult(callback());
+
+    private ValueTask InvokeOnce()
+    {
+        blockingCallback();
+        return new();
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+    {
+        // The workload is consumed synchronously via the blocking AwaitHelper.GetResult. BenchmarkDotNet never
+        // installs a SynchronizationContext, so user awaits resume on the thread pool instead of being posted
+        // back to this (blocked) thread.
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            unrolledBlockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
+    {
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            blockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+}
+
+[AggressivelyOptimizeMethods]
+public sealed class BenchmarkActionBlockingTask<T> : BenchmarkActionBase
+{
+    private readonly Func<Task<T>> callback;
+    private readonly Action blockingCallback;
+    private readonly Action unrolledBlockingCallback;
+
+    [SetsRequiredMembers]
+    public BenchmarkActionBlockingTask(object? instance, MethodInfo method, int unrollFactor)
+    {
+        callback = CreateWorkload<Func<Task<T>>>(instance, method);
+        blockingCallback = InvokeBlocking;
+        unrolledBlockingCallback = Unroll(blockingCallback, unrollFactor);
+        InvokeSingle = InvokeOnce;
+        InvokeUnroll = WorkloadActionUnroll;
+        InvokeNoUnroll = WorkloadActionNoUnroll;
+    }
+
+    private void InvokeBlocking() => AwaitHelper.GetResult(callback());
+
+    private ValueTask InvokeOnce()
+    {
+        blockingCallback();
+        return new();
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+    {
+        // The workload is consumed synchronously via the blocking AwaitHelper.GetResult. BenchmarkDotNet never
+        // installs a SynchronizationContext, so user awaits resume on the thread pool instead of being posted
+        // back to this (blocked) thread.
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            unrolledBlockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
+    {
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            blockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+}
+
+[AggressivelyOptimizeMethods]
+public sealed class BenchmarkActionBlockingValueTask : BenchmarkActionBase
+{
+    private readonly Func<ValueTask> callback;
+    private readonly Action blockingCallback;
+    private readonly Action unrolledBlockingCallback;
+
+    [SetsRequiredMembers]
+    public BenchmarkActionBlockingValueTask(object? instance, MethodInfo method, int unrollFactor)
+    {
+        callback = CreateWorkload<Func<ValueTask>>(instance, method);
+        blockingCallback = InvokeBlocking;
+        unrolledBlockingCallback = Unroll(blockingCallback, unrollFactor);
+        InvokeSingle = InvokeOnce;
+        InvokeUnroll = WorkloadActionUnroll;
+        InvokeNoUnroll = WorkloadActionNoUnroll;
+    }
+
+    private void InvokeBlocking() => AwaitHelper.GetResult(callback());
+
+    private ValueTask InvokeOnce()
+    {
+        blockingCallback();
+        return new();
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+    {
+        // The workload is consumed synchronously via the blocking AwaitHelper.GetResult. BenchmarkDotNet never
+        // installs a SynchronizationContext, so user awaits resume on the thread pool instead of being posted
+        // back to this (blocked) thread.
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            unrolledBlockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
+    {
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            blockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+}
+
+[AggressivelyOptimizeMethods]
+public sealed class BenchmarkActionBlockingValueTask<T> : BenchmarkActionBase
+{
+    private readonly Func<ValueTask<T>> callback;
+    private readonly Action blockingCallback;
+    private readonly Action unrolledBlockingCallback;
+
+    [SetsRequiredMembers]
+    public BenchmarkActionBlockingValueTask(object? instance, MethodInfo method, int unrollFactor)
+    {
+        callback = CreateWorkload<Func<ValueTask<T>>>(instance, method);
+        blockingCallback = InvokeBlocking;
+        unrolledBlockingCallback = Unroll(blockingCallback, unrollFactor);
+        InvokeSingle = InvokeOnce;
+        InvokeUnroll = WorkloadActionUnroll;
+        InvokeNoUnroll = WorkloadActionNoUnroll;
+    }
+
+    private void InvokeBlocking() => AwaitHelper.GetResult(callback());
+
+    private ValueTask InvokeOnce()
+    {
+        blockingCallback();
+        return new();
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionUnroll(long invokeCount, IClock clock)
+    {
+        // The workload is consumed synchronously via the blocking AwaitHelper.GetResult. BenchmarkDotNet never
+        // installs a SynchronizationContext, so user awaits resume on the thread pool instead of being posted
+        // back to this (blocked) thread.
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            unrolledBlockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
+
+    private ValueTask<ClockSpan> WorkloadActionNoUnroll(long invokeCount, IClock clock)
+    {
+        var startedClock = clock.Start();
+        while (--invokeCount >= 0)
+        {
+            blockingCallback();
+        }
+        return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+    }
 }

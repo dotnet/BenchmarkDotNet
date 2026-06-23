@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -72,7 +73,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 var returnType = benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType;
                 RunnableEmitter runnableEmitter;
                 if (returnType.IsAwaitable(out var awaitableInfo))
-                    runnableEmitter = new AsyncCoreEmitter(buildPartition, moduleBuilder, benchmark, awaitableInfo);
+                {
+                    if (benchmark.BenchmarkCase.Job.ResolveValue(RunMode.ConsumeTasksSynchronouslyCharacteristic, buildPartition.Resolver)
+                        && AwaitHelper.IsBuiltInTaskType(returnType))
+                    {
+                        runnableEmitter = new SyncTaskCoreEmitter(buildPartition, moduleBuilder, benchmark);
+                    }
+                    else
+                    {
+                        runnableEmitter = new AsyncCoreEmitter(buildPartition, moduleBuilder, benchmark, awaitableInfo);
+                    }
+                }
                 else if (returnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
                     runnableEmitter = new AsyncEnumerableCoreEmitter(buildPartition, moduleBuilder, benchmark, asyncEnumerableInfo);
                 else

@@ -1,24 +1,33 @@
+using BenchmarkDotNet.Attributes.CompilerServices;
 using JetBrains.Annotations;
 using System.ComponentModel;
 
 namespace BenchmarkDotNet.Engines;
 
-// Used to ensure async continuations are posted back to the same thread that the benchmark process was started on.
+// Used to ensure async continuations are posted back to the thread that started the benchmarks.
 [UsedImplicitly]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public readonly ref struct BenchmarkSynchronizationContext : IDisposable
 {
-    private readonly BenchmarkDotNetSynchronizationContext context;
+    // If this is non-null, we post task continuations to it, otherwise we use task.ConfigureAwait(true) (see AwaitHelper).
+    [ThreadStatic]
+    internal static SingleThreadPumpContext? Current;
 
-    private BenchmarkSynchronizationContext(BenchmarkDotNetSynchronizationContext context)
+    private readonly SingleThreadPumpContext context;
+
+    private BenchmarkSynchronizationContext(SingleThreadPumpContext context)
     {
         this.context = context;
     }
 
     public static BenchmarkSynchronizationContext CreateAndSetCurrent()
     {
-        var context = new BenchmarkDotNetSynchronizationContext(SynchronizationContext.Current);
-        SynchronizationContext.SetSynchronizationContext(context);
+        if (Current is not null)
+        {
+            throw new InvalidOperationException($"{nameof(BenchmarkSynchronizationContext)} is already in use.");
+        }
+        var context = new SingleThreadPumpContext();
+        Current = context;
         return new(context);
     }
 
@@ -29,73 +38,97 @@ public readonly ref struct BenchmarkSynchronizationContext : IDisposable
         => context.ExecuteUntilComplete(valueTask);
 }
 
-internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationContext
+// We implement a specialized context that does not inherit from SynchronizationContext, because we never install a SynchronizationContext.Current.
+[AggressivelyOptimizeMethods]
+internal sealed class SingleThreadPumpContext
 {
-    private readonly SynchronizationContext? previousContext;
-    private readonly object syncRoot = new();
-    // Use 2 arrays to reduce lock contention while executing. The common case is only 1 callback will be queued at a time.
-    private (SendOrPostCallback d, object? state)[]? queue = new (SendOrPostCallback d, object? state)[1];
-    private (SendOrPostCallback d, object? state)[]? executing = new (SendOrPostCallback d, object? state)[1];
-    private int queueCount = 0;
-    private bool isCompleted;
-
-    internal BenchmarkDotNetSynchronizationContext(SynchronizationContext? previousContext)
+    // Pooled so we don't allocate per await. Carries the continuation to run, and doubles as an intrusive node
+    // for the free list (touched only on the pump thread) and the ready list (written by completing threads).
+    private sealed class Waiter
     {
-        this.previousContext = previousContext;
+        public readonly Action OnCompleted;
+        public Action? Continuation;
+        public Waiter? Next;
+        private readonly SingleThreadPumpContext owner;
+
+        public Waiter(SingleThreadPumpContext owner)
+        {
+            this.owner = owner;
+            OnCompleted = Complete;
+        }
+
+        private void Complete() => owner.MarkReady(this);
     }
 
-    public override SynchronizationContext CreateCopy()
-        => this;
+    private readonly Thread callerThread;
+    private readonly object syncRoot = new();
+    private Waiter? freeWaiters;
+    private Waiter? readyWaiters;
+    private bool isCompleted;
+    private bool disposed;
+    private int outstanding;
 
-    public override void Post(SendOrPostCallback d, object? state)
+    internal SingleThreadPumpContext()
     {
-        if (d is null) throw new ArgumentNullException(nameof(d));
+        callerThread = Thread.CurrentThread;
+    }
 
+    private void EnsureValid()
+    {
+        if (disposed)
+            throw new ObjectDisposedException(nameof(SingleThreadPumpContext));
+        if (callerThread != Thread.CurrentThread)
+            throw new InvalidOperationException($"{nameof(SingleThreadPumpContext)} can only be used from the thread it was created on.");
+    }
+
+    internal Action GetPassthroughContinuation(Action continuation)
+    {
+        ArgumentNullException.ThrowIfNull(continuation);
+        EnsureValid();
+        var waiter = freeWaiters;
+        if (waiter is null)
+        {
+            waiter = new Waiter(this);
+        }
+        else
+        {
+            freeWaiters = waiter.Next;
+        }
+        waiter.Continuation = continuation;
+        waiter.Next = null;
+        outstanding++;
+        return waiter.OnCompleted;
+    }
+
+    internal void Post(Action continuation) => GetPassthroughContinuation(continuation).Invoke();
+
+    private void MarkReady(Waiter waiter)
+    {
         lock (syncRoot)
         {
-            ThrowIfDisposed();
-
-            int index = queueCount;
-            if (++queueCount > queue!.Length)
-            {
-                Array.Resize(ref queue, queue.Length * 2);
-            }
-            queue[index] = (d, state);
-
+            waiter.Next = readyWaiters;
+            readyWaiters = waiter;
             Monitor.Pulse(syncRoot);
         }
     }
 
-    private void ThrowIfDisposed() => _ = queue ?? throw new ObjectDisposedException(nameof(BenchmarkDotNetSynchronizationContext));
-
     internal void Dispose()
     {
-        int count;
-        (SendOrPostCallback d, object? state)[] executing;
-        lock (syncRoot)
+        EnsureValid();
+        if (outstanding != 0)
         {
-            ThrowIfDisposed();
-
-            // Flush any remaining posted callbacks.
-            count = queueCount;
-            queueCount = 0;
-            executing = queue!;
-            queue = null;
+            throw new InvalidOperationException($"{nameof(SingleThreadPumpContext)} disposed while there are still pending continuations.");
         }
-        this.executing = null;
-        for (int i = 0; i < count; ++i)
-        {
-            executing[i].d(executing[i].state);
-            executing[i] = default;
-        }
-        SetSynchronizationContext(previousContext);
+        disposed = true;
+        BenchmarkSynchronizationContext.Current = null;
     }
 
     internal T ExecuteUntilComplete<T>(ValueTask<T> valueTask)
     {
-        ThrowIfDisposed();
+        EnsureValid();
 
-        var awaiter = valueTask.GetAwaiter();
+        // Ensure the continuation is not posted to the current SynchronizationContext.
+        var awaiter = valueTask.ConfigureAwait(false).GetAwaiter();
         if (awaiter.IsCompleted)
         {
             return awaiter.GetResult();
@@ -104,53 +137,29 @@ internal sealed class BenchmarkDotNetSynchronizationContext : SynchronizationCon
         isCompleted = false;
         awaiter.UnsafeOnCompleted(OnCompleted);
 
-        var spinner = new SpinWait();
         while (true)
         {
-            int count;
-            (SendOrPostCallback d, object? state)[] executing;
+            Waiter waiter;
             lock (syncRoot)
             {
-                if (isCompleted)
+                while (readyWaiters is null && !isCompleted)
+                {
+                    Monitor.Wait(syncRoot);
+                }
+                if (readyWaiters is null)
                 {
                     return awaiter.GetResult();
                 }
-
-                count = queueCount;
-                queueCount = 0;
-                executing = queue!;
-                queue = this.executing;
-
-                if (count == 0)
-                {
-                    if (spinner.NextSpinWillYield)
-                    {
-                        // Yield the thread and wait for completion or for a posted callback.
-                        // Thread-safety note: isCompleted and queueCount must be checked inside the lock body
-                        // before calling Monitor.Wait to avoid missing the pulse and waiting forever.
-                        Monitor.Wait(syncRoot);
-                        goto ResetAndContinue;
-                    }
-                    else
-                    {
-                        goto SpinAndContinue;
-                    }
-                }
-            }
-            this.executing = executing;
-            for (int i = 0; i < count; ++i)
-            {
-                var (d, state) = executing[i];
-                executing[i] = default;
-                d(state);
+                waiter = readyWaiters;
+                readyWaiters = waiter.Next;
             }
 
-        ResetAndContinue:
-            spinner = new();
-            continue;
-
-        SpinAndContinue:
-            spinner.SpinOnce();
+            var continuation = waiter.Continuation!;
+            waiter.Continuation = null;
+            waiter.Next = freeWaiters; // return to the pool before invoking, so a re-suspend can reuse it
+            freeWaiters = waiter;
+            outstanding--;
+            continuation.Invoke();
         }
     }
 
