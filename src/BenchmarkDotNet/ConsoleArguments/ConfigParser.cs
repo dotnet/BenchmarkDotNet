@@ -278,7 +278,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     continue;
                 }
 
-                var values = arg.Split(['='], 2);
+                var values = arg.Split(['=', ':'], 2);
 
                 var key = values[0];
                 var value = values.Length > 1 ? values[1] : null;

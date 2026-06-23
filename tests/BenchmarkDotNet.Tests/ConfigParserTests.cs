@@ -60,6 +60,7 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData("--job=dry", "--exporters", "html", "rplot")]
         [InlineData("--JOB=dry", "--EXPORTERS", "html", "rplot")] // case insensitive
+        [InlineData("--job:dry", "--exporters", "html", "rplot")]
         [InlineData("-j", "dry", "-e", "html", "rplot")] // alias
         public void SimpleConfigParsedCorrectly(params string[] args)
         {
@@ -602,10 +603,23 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(["--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"],
                 new OutputLogger(Output)).config;
 
-            Assert.NotNull(config);
-            Assert.Equal(2, config.GetHardwareCounters().Count());
-            Assert.Single(config.GetHardwareCounters(), counter => counter == HardwareCounter.CacheMisses);
-            Assert.Single(config.GetHardwareCounters(), counter => counter == HardwareCounter.InstructionRetired);
+            config.Should().NotBeNull();
+            config.GetHardwareCounters().Should().HaveCount(2);
+            config.GetHardwareCounters().Should().BeEquivalentTo(
+            [
+                HardwareCounter.CacheMisses,
+                HardwareCounter.InstructionRetired
+            ]);
+
+            // Test option values that are sepecified with `=` 
+            config = ConfigParser.Parse([$"--counters={nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"], NullLogger.Instance).config;
+            config.Should().NotBeNull();
+            config.GetHardwareCounters().Should().HaveCount(2);
+
+            // Test option values that are sepecified with `:` 
+            config = ConfigParser.Parse([$"--counters:{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"], NullLogger.Instance).config;
+            config.Should().NotBeNull();
+            config.GetHardwareCounters().Should().HaveCount(2);
         }
 
         [Fact]
