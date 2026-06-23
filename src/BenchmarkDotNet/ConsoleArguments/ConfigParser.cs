@@ -155,6 +155,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.ResumeOption,
                 };
 
+                // Remove `-h` alias from help option.
+                var helpOption = rootCommand.Options.OfType<HelpOption>().Single();
+                helpOption.Aliases.Remove("-h");
+                helpOption.Aliases.Remove("/h");
+
                 return rootCommand;
             }
         }
