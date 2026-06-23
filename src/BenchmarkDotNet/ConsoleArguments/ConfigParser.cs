@@ -335,7 +335,10 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             var parseResult = RootCommand.Parse(args);
 
-            if (args.Any(a => a == "-h" || a == "--help" || a == "-?" || a == "--version"))
+            if (args.Any(a =>
+                a.Equals("--help", StringComparison.OrdinalIgnoreCase)
+             || a.Equals("--version", StringComparison.OrdinalIgnoreCase)
+             || a == "-?"))
             {
                 using var invariantUICultureScope = Helpers.CultureInfoHelper.CreateInvariantUICultureScope();
                 using var writer = new StringWriter();
