@@ -1107,7 +1107,7 @@ namespace BenchmarkDotNet.Tests
                   --noForcedGCs                                                                       Specifying would not forcefully induce any GCs.
                   --evaluateOverhead                                                                  Specifies whether to run and evaluate overhead iterations.
                   --resume                                                                            Continue the execution if the last run was stopped.
-                  -?, -h, --help                                                                      Show help and usage information
+                  -?, --help                                                                          Show help and usage information
                   --version                                                                           Show version information
                 """,
                 o => o.IgnoringNewlineStyle());

@@ -27,6 +27,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Metrology;
 using System.CommandLine;
+using System.CommandLine.Help;
 using System.Globalization;
 using System.Text;
 
@@ -152,6 +153,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.EvaluateOverheadOption,
                     CommandLineOptions.ResumeOption,
                 };
+
+                // Remove `-h` alias from help option.
+                var helpOption = rootCommand.Options.OfType<HelpOption>().Single();
+                helpOption.Aliases.Remove("-h");
+                helpOption.Aliases.Remove("/h");
 
                 return rootCommand;
             }
