@@ -27,7 +27,6 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IAnalyser> analysers = [];
         private readonly List<IValidator> validators = [];
         private readonly List<Job> jobs = [];
-        private readonly List<IHardwareCounterProvider> hardwareCounterProviders = [DefaultHardwareCounterProvider.Instance];
         private readonly HashSet<HardwareCounter> hardwareCounters = [];
         private readonly List<IFilter> filters = [];
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = [];
@@ -41,7 +40,6 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => analysers;
         public IEnumerable<IValidator> GetValidators() => validators;
         public IEnumerable<Job> GetJobs() => jobs;
-        public IEnumerable<IHardwareCounterProvider> GetHardwareCounterProviders() => hardwareCounterProviders;
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
@@ -54,6 +52,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public CultureInfo? CultureInfo { get; set; }
         [PublicAPI] public IOrderer? Orderer { get; set; }
         [PublicAPI] public ICategoryDiscoverer? CategoryDiscoverer { get; set; }
+        [PublicAPI] public IHardwareCounterProvider HardwareCounterProvider { get; set; } = DefaultHardwareCounterProvider.Instance;
         [PublicAPI] public SummaryStyle? SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
         [PublicAPI] public WakeLockType WakeLock { get; set; } = DefaultConfig.Instance.WakeLock;
@@ -99,6 +98,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithCategoryDiscoverer(ICategoryDiscoverer categoryDiscoverer)
         {
             CategoryDiscoverer = categoryDiscoverer;
+            return this;
+        }
+
+        public ManualConfig WithHardwareCounterProvider(IHardwareCounterProvider hardwareCounterProvider)
+        {
+            HardwareCounterProvider = hardwareCounterProvider;
             return this;
         }
 
@@ -165,12 +170,6 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)
         {
             hardwareCounters.AddRange(newHardwareCounters);
-            return this;
-        }
-
-        public ManualConfig AddHardwareCounterProvider(params IHardwareCounterProvider[] newHardwareCounterProviders)
-        {
-            hardwareCounterProviders.AddRangeDistinct(newHardwareCounterProviders);
             return this;
         }
 

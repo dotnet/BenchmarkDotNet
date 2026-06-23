@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Configs
 
         [PublicAPI] public static ManualConfig WithOrderer(this IConfig config, IOrderer orderer) => config.With(m => m.WithOrderer(orderer));
 
-        [PublicAPI] public static ManualConfig AddHardwareCounterProvider(this IConfig config, params IHardwareCounterProvider[] newHardwareCounterProviders)
-            => config.With(c => c.AddHardwareCounterProvider(newHardwareCounterProviders));
+        [PublicAPI] public static ManualConfig WithHardwareCounterProvider(this IConfig config, IHardwareCounterProvider newHardwareCounterProvider)
+            => config.With(c => c.HardwareCounterProvider = newHardwareCounterProvider);
 
         [PublicAPI] public static ManualConfig AddHardwareCounters(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
 

@@ -94,10 +94,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 .GetHardwareCounters()
                 .SelectMany(counter =>
                 {
-                    var counterVariants = parameters.Config
-                        .GetHardwareCounterProviders()
-                        .SelectMany(x => x.GetVariants(counter));
-
+                    var counterVariants = parameters.Config.HardwareCounterProvider.GetVariants(counter);
                     return HardwareCounters.FromCounter(counter, counterVariants, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval);
                 })
                 .Distinct()

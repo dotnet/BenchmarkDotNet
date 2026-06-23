@@ -61,6 +61,7 @@ namespace BenchmarkDotNet.Configs
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public ICategoryDiscoverer? CategoryDiscoverer => DefaultCategoryDiscoverer.Instance;
+        public IHardwareCounterProvider HardwareCounterProvider => DefaultHardwareCounterProvider.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;

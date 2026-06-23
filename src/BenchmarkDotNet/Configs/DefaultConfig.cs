@@ -84,7 +84,10 @@ namespace BenchmarkDotNet.Configs
         }
 
         public IOrderer? Orderer => null;
+
         public ICategoryDiscoverer? CategoryDiscoverer => null;
+
+        public IHardwareCounterProvider HardwareCounterProvider => DefaultHardwareCounterProvider.Instance;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
@@ -124,8 +127,6 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => [];
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => [];
-
-        public IEnumerable<IHardwareCounterProvider> GetHardwareCounterProviders() => [DefaultHardwareCounterProvider.Instance];
 
         public IEnumerable<HardwareCounter> GetHardwareCounters() => [];
 

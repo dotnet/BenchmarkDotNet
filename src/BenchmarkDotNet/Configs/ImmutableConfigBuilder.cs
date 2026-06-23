@@ -42,7 +42,6 @@ namespace BenchmarkDotNet.Configs
             var uniqueLoggers = source.GetLoggers().ToImmutableHashSet();
             var configAnalyse = new List<Conclusion>();
 
-            var uniqueHardwareCounterProviders = source.GetHardwareCounterProviders().ToImmutableArray();
             var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
@@ -60,7 +59,6 @@ namespace BenchmarkDotNet.Configs
             return new ImmutableConfig(
                 uniqueColumnProviders,
                 uniqueLoggers,
-                uniqueHardwareCounterProviders,
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
@@ -76,6 +74,7 @@ namespace BenchmarkDotNet.Configs
                 source.CultureInfo ?? DefaultCultureInfo.Instance,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance,
+                source.HardwareCounterProvider ?? DefaultHardwareCounterProvider.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
                 source.BuildTimeout,

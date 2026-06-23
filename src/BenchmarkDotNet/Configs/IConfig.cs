@@ -23,7 +23,6 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
-        IEnumerable<IHardwareCounterProvider> GetHardwareCounterProviders();
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
@@ -32,7 +31,7 @@ namespace BenchmarkDotNet.Configs
 
         IOrderer? Orderer { get; }
         ICategoryDiscoverer? CategoryDiscoverer { get; }
-
+        IHardwareCounterProvider HardwareCounterProvider { get; }
         SummaryStyle? SummaryStyle { get; }
 
         ConfigUnionRule UnionRule { get; }

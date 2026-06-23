@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public static class HardwareCounters
     {
-        public static Func<Dictionary<string, ProfileSourceInfo>> GetProfileSources { get; internal set; } = TraceEventProfileSources.GetInfo;
+        public static Func<Dictionary<string, ProfileSourceInfo>> GetProfileSources { get; set; } = TraceEventProfileSources.GetInfo;
 
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
@@ -31,10 +31,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
             {
-                string[] counterVariants = validationParameters.Config
-                    .GetHardwareCounterProviders()
-                    .SelectMany(x => x.GetVariants(hardwareCounter))
-                    .ToArray();
+                string[] counterVariants = validationParameters.Config.HardwareCounterProvider.GetVariants(hardwareCounter).ToArray();
 
                 if (counterVariants.Length == 0)
                 {
