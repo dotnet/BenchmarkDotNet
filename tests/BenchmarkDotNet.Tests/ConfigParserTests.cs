@@ -1155,7 +1155,6 @@ namespace BenchmarkDotNet.Tests
                 options.HardwareCounters.Should().BeEmpty();
                 options.CliPath.Should().BeNull();
                 options.RestorePath.Should().BeNull();
-                options.RestorePath.Should().BeNull();
                 options.CoreRunPaths.Should().BeEmpty();
                 options.MonoPath.Should().BeNull();
                 options.ClrVersion.Should().BeEmpty();
