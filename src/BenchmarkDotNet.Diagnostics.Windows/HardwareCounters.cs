@@ -8,9 +8,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public static class HardwareCounters
     {
-        public static Func<Dictionary<string, ProfileSourceInfo>> GetProfileSources { get; set; } = TraceEventProfileSources.GetInfo;
-
-        public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
+        public static IEnumerable<ValidationError> Validate(
+            ValidationParameters validationParameters,
+            IHardwareCounterProvider provider,
+            bool mandatory)
         {
             if (!OsDetector.IsWindows())
             {
@@ -27,11 +28,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (TraceEventSession.IsElevated() != true)
                 yield return new ValidationError(true, "Must be elevated (Admin) to use ETW Kernel Session (required for Hardware Counters and EtwProfiler).");
 
-            var availableCpuCounters = GetProfileSources();
+            var availableCpuCounters = provider.GetAvailableCounters();
 
             foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
             {
-                string[] counterVariants = validationParameters.Config.HardwareCounterProvider.GetVariants(hardwareCounter).ToArray();
+                string[] counterVariants = validationParameters.Config.HardwareCounterProfile.GetVariants(hardwareCounter).ToArray();
 
                 if (counterVariants.Length == 0)
                 {
@@ -62,24 +63,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
         }
 
-        internal static IEnumerable<PreciseMachineCounter> FromCounter(HardwareCounter counter, IEnumerable<string> counterVariants,
+        public static IEnumerable<PreciseMachineCounter> FromCounter(
+            HardwareCounter counter,
+            IHardwareCounterProfile profile,
+            IHardwareCounterProvider provider,
             Func<ProfileSourceInfo, int> intervalSelector)
         {
-            var profileSourceInfos = GetProfileSources();
-            foreach (var counterVariant in counterVariants)
+            var profileSourceInfos = provider.GetAvailableCounters();
+            foreach (var counterVariant in profile.GetVariants(counter))
             {
                 if (profileSourceInfos.TryGetValue(counterVariant, out var profileSource))
                 {
                     yield return new PreciseMachineCounter(profileSource.ID, profileSource.Name, counter, intervalSelector(profileSource));
                 }
             }
-        }
-
-        internal static void Enable(IEnumerable<PreciseMachineCounter> counters)
-        {
-            TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
-                counters.Select(counter => counter.ProfileSourceId).ToArray(),
-                counters.Select(counter => counter.Interval).ToArray());
         }
     }
 }

@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Configs
 
         IOrderer? Orderer { get; }
         ICategoryDiscoverer? CategoryDiscoverer { get; }
-        IHardwareCounterProvider HardwareCounterProvider { get; }
+        IHardwareCounterProfile HardwareCounterProfile { get; }
         SummaryStyle? SummaryStyle { get; }
 
         ConfigUnionRule UnionRule { get; }

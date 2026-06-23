@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Diagnosers;
 
-public class DefaultHardwareCounterProvider : IHardwareCounterProvider
+public sealed class DefaultHardwareCounterProfile : IHardwareCounterProfile
 {
     private static readonly Dictionary<HardwareCounter, string> EtwTranslations
         = new ()
@@ -20,7 +20,7 @@ public class DefaultHardwareCounterProvider : IHardwareCounterProvider
             { HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired" }
         };
 
-    public static readonly IHardwareCounterProvider Instance = new DefaultHardwareCounterProvider();
+    public static readonly IHardwareCounterProfile Instance = new DefaultHardwareCounterProfile();
 
     public IEnumerable<string> GetVariants(HardwareCounter hardwareCounter)
     {

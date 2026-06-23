@@ -53,7 +53,6 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<ILogger> GetLoggers() => [ConsoleLogger.Default];
         public IEnumerable<IDiagnoser> GetDiagnosers() => [];
         public IEnumerable<IAnalyser> GetAnalysers() => [];
-        public IEnumerable<IHardwareCounterProvider> GetHardwareCounterProviders() => [DefaultHardwareCounterProvider.Instance];
         public IEnumerable<HardwareCounter> GetHardwareCounters() => [];
         public IEnumerable<EventProcessor> GetEventProcessors() => [];
         public IEnumerable<IFilter> GetFilters() => [];
@@ -61,7 +60,7 @@ namespace BenchmarkDotNet.Configs
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public ICategoryDiscoverer? CategoryDiscoverer => DefaultCategoryDiscoverer.Instance;
-        public IHardwareCounterProvider HardwareCounterProvider => DefaultHardwareCounterProvider.Instance;
+        public IHardwareCounterProfile HardwareCounterProfile => DefaultHardwareCounterProfile.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;

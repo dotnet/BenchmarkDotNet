@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Configs
                 source.CultureInfo ?? DefaultCultureInfo.Instance,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance,
-                source.HardwareCounterProvider ?? DefaultHardwareCounterProvider.Instance,
+                source.HardwareCounterProfile ?? DefaultHardwareCounterProfile.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
                 source.BuildTimeout,
