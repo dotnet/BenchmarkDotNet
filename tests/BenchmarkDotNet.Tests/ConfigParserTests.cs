@@ -1091,7 +1091,7 @@ namespace BenchmarkDotNet.Tests
                   --wasmRuntimeFlavor <CoreCLR|Mono>                                                  Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack. [default: Mono]
                   --wasmProcessTimeout <wasmProcessTimeout>                                           Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it. [default: 10]
                   --noForcedGCs                                                                       Specifying would not forcefully induce any GCs.
-                  --evaluateOverhead                                                                  Specifying would not run the evaluation overhead iterations.
+                  --evaluateOverhead                                                                  Specifies whether to run and evaluate overhead iterations.
                   --resume                                                                            Continue the execution if the last run was stopped.
                   -?, -h, --help                                                                      Show help and usage information
                   --version                                                                           Show version information

@@ -451,7 +451,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool EvaluateOverhead { get; set; }
         public static readonly Option<bool> EvaluateOverheadOption = new("--evaluateOverhead")
         {
-            Description = "Specifying would not run the evaluation overhead iterations.",
+            Description = "Specifies whether to run and evaluate overhead iterations.",
         };
 
         public bool Resume { get; set; }
