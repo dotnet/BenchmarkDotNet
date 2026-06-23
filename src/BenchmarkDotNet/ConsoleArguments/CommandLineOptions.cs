@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         };
 
         public DirectoryInfo? RestorePath { get; set; }
-        public static readonly Option<FileInfo> RestorePathOption = new("--packages")
+        public static readonly Option<DirectoryInfo> RestorePathOption = new("--packages")
         {
             Description = "The directory to restore packages to (optional).",
         };
