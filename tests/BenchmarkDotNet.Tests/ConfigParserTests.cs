@@ -1005,6 +1005,7 @@ namespace BenchmarkDotNet.Tests
                 options.AOTCompilerPath.Should().BeNull();
                 options.NoForcedGCs.Should().BeFalse();
                 options.EvaluateOverhead.Should().BeFalse();
+                options.ConsumeTasksSynchronously.Should().BeFalse();
                 options.Resume.Should().BeFalse();
             }
         }
@@ -1106,6 +1107,7 @@ namespace BenchmarkDotNet.Tests
                   --wasmProcessTimeout <wasmProcessTimeout>                                           Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it. [default: 10]
                   --noForcedGCs                                                                       Specifying would not forcefully induce any GCs.
                   --evaluateOverhead                                                                  Specifies whether to run and evaluate overhead iterations.
+                  --consumeTasksSynchronously                                                         Specifies whether to consume (Value)Task-returning benchmarks synchronously.
                   --resume                                                                            Continue the execution if the last run was stopped.
                   -?, --help                                                                          Show help and usage information
                   --version                                                                           Show version information
