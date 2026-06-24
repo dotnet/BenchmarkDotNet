@@ -6,18 +6,34 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Samples
 {
-    [HardwareCounters(
-        HardwareCounter.BranchMispredictions,
-        HardwareCounter.BranchInstructions)]
-    public class IntroHardwareCounters
+    public class HardwareCounterProfile : IHardwareCounterProfile
+    {
+        public IEnumerable<string> GetVariants(HardwareCounter hardwareCounter)
+        {
+            if (hardwareCounter == HardwareCounter.CacheMisses)
+            {
+                yield return "IcacheMisses";
+                yield return "DcacheMisses";
+            }
+            else
+            {
+                yield return hardwareCounter.ToString();
+            }
+        }
+    }
+
+    [HardwareCounters(HardwareCounter.CacheMisses, HardwareCounter.BranchInstructions)]
+    public class IntroHardwareCountersWithProfile
     {
         public static void Run() =>
-            BenchmarkRunner.Run<IntroHardwareCounters>(DefaultConfig.Instance.AddJob(Job.Dry));
+            BenchmarkRunner.Run<IntroHardwareCountersWithProfile>(DefaultConfig.Instance
+                .AddJob(Job.Dry)
+                .WithHardwareCounterProfile(new HardwareCounterProfile()));
 
         private const int N = 32767;
         private readonly int[] sorted, unsorted;
 
-        public IntroHardwareCounters()
+        public IntroHardwareCountersWithProfile()
         {
             var random = new Random(0);
             unsorted = new int[N];
