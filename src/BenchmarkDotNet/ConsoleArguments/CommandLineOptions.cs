@@ -454,6 +454,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Specifies whether to run and evaluate overhead iterations.",
         };
 
+        public bool ConsumeTasksSynchronously { get; set; }
+        public static readonly Option<bool> ConsumeTasksSynchronouslyOption = new("--consumeTasksSynchronously")
+        {
+            Description = "Specifies whether to consume (Value)Task-returning benchmarks synchronously.",
+        };
+
         public bool Resume { get; set; }
         public static readonly Option<bool> ResumeOption = new("--resume")
         {
