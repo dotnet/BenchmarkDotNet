@@ -152,6 +152,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.WasmProcessTimeoutMinutesOption,
                     CommandLineOptions.NoForcedGCsOption,
                     CommandLineOptions.EvaluateOverheadOption,
+                    CommandLineOptions.ConsumeTasksSynchronouslyOption,
                     CommandLineOptions.ResumeOption,
                 };
 
@@ -249,7 +250,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ["--wasmruntimeflavor"] = "--wasmRuntimeFlavor",
                 ["--wasmprocesstimeout"] = "--wasmProcessTimeout",
                 ["--noforcedgcs"] = "--noForcedGCs",
-                ["--evaluateOverhead"] = "--evaluateOverhead",
+                ["--evaluateoverhead"] = "--evaluateOverhead",
+                ["--consumetaskssynchronously"] = "--consumeTasksSynchronously",
                 ["--resume"] = "--resume",
             };
 
@@ -638,6 +640,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 WasmProcessTimeoutMinutes = parseResult.GetValue(CommandLineOptions.WasmProcessTimeoutMinutesOption),
                 NoForcedGCs = parseResult.GetValue(CommandLineOptions.NoForcedGCsOption),
                 EvaluateOverhead = parseResult.GetValue(CommandLineOptions.EvaluateOverheadOption),
+                ConsumeTasksSynchronously = parseResult.GetValue(CommandLineOptions.ConsumeTasksSynchronouslyOption),
                 Resume = parseResult.GetValue(CommandLineOptions.ResumeOption),
             };
 
@@ -682,6 +685,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.DisassemblerDiff) result.Add("--disasmDiff");
             if (options.NoForcedGCs) result.Add("--noForcedGCs");
             if (options.EvaluateOverhead) result.Add("--evaluateOverhead");
+            if (options.ConsumeTasksSynchronously) result.Add("--consumeTasksSynchronously");
             if (options.Resume) result.Add("--resume");
 
             // Multi values options
@@ -1089,6 +1093,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithGcForce(false);
             if (options.EvaluateOverhead)
                 baseJob = baseJob.WithEvaluateOverhead(true);
+            if (options.ConsumeTasksSynchronously)
+                baseJob = baseJob.WithConsumeTasksSynchronously(true);
 
             if (options.EnvironmentVariables.Any())
             {
