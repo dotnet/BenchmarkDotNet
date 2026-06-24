@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public CultureInfo? CultureInfo { get; set; }
         [PublicAPI] public IOrderer? Orderer { get; set; }
         [PublicAPI] public ICategoryDiscoverer? CategoryDiscoverer { get; set; }
-        [PublicAPI] public IHardwareCounterProfile HardwareCounterProfile { get; set; } = DefaultHardwareCounterProfile.Instance;
+        [PublicAPI] public IHardwareCounterProfile? HardwareCounterProfile { get; set; }
         [PublicAPI] public SummaryStyle? SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
         [PublicAPI] public WakeLockType WakeLock { get; set; } = DefaultConfig.Instance.WakeLock;

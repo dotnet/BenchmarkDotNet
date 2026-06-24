@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Configs
 
         public ICategoryDiscoverer? CategoryDiscoverer => null;
 
-        public IHardwareCounterProfile HardwareCounterProfile => DefaultHardwareCounterProfile.Instance;
+        public IHardwareCounterProfile? HardwareCounterProfile => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 

@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Configs
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public ICategoryDiscoverer? CategoryDiscoverer => DefaultCategoryDiscoverer.Instance;
-        public IHardwareCounterProfile HardwareCounterProfile => DefaultHardwareCounterProfile.Instance;
+        public IHardwareCounterProfile? HardwareCounterProfile => null;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;

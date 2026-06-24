@@ -66,10 +66,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public static IEnumerable<PreciseMachineCounter> FromCounter(
             HardwareCounter counter,
             IHardwareCounterProfile profile,
-            IHardwareCounterProvider provider,
+            IReadOnlyDictionary<string, ProfileSourceInfo> profileSourceInfos,
             Func<ProfileSourceInfo, int> intervalSelector)
         {
-            var profileSourceInfos = provider.GetAvailableCounters();
             foreach (var counterVariant in profile.GetVariants(counter))
             {
                 if (profileSourceInfos.TryGetValue(counterVariant, out var profileSource))

@@ -92,9 +92,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void Start(DiagnoserActionParameters parameters)
         {
+            var profileSourceInfos = HardwareCounterProvider.GetAvailableCounters();
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
-                .SelectMany(counter => HardwareCounters.FromCounter(counter, parameters.Config.HardwareCounterProfile, HardwareCounterProvider,
+                .SelectMany(counter => HardwareCounters.FromCounter(counter, parameters.Config.HardwareCounterProfile, profileSourceInfos,
                     config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
                 .ToArray();
 
