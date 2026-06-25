@@ -9,10 +9,10 @@ public sealed class DefaultHardwareCounterProvider : IHardwareCounterProvider
 
     public Dictionary<string, ProfileSourceInfo> GetAvailableCounters() => TraceEventProfileSources.GetInfo();
 
-    public void Configure(IEnumerable<PreciseMachineCounter> counters)
+    public void Configure(IEnumerable<PreciseMachineCounter> machineCounters)
     {
         TraceEventProfileSources.Set( // it's a must have to get the events enabled!!
-            counters.Select(counter => counter.ProfileSourceId).ToArray(),
-            counters.Select(counter => counter.Interval).ToArray());
+            machineCounters.Select(counter => counter.ProfileSourceId).ToArray(),
+            machineCounters.Select(counter => counter.Interval).ToArray());
     }
 }

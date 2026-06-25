@@ -34,6 +34,7 @@
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.CustomPaths/BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.DisabledOptimizations/BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.EnabledOptimizations/BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.ETW/BenchmarkDotNet.IntegrationTests.ETW.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.FSharp/BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning/BenchmarkDotNet.IntegrationTests.ManualRunning.csproj" />

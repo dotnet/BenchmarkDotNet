@@ -7,5 +7,5 @@ public interface IHardwareCounterProvider
 {
     Dictionary<string, ProfileSourceInfo> GetAvailableCounters();
 
-    void Configure(IEnumerable<PreciseMachineCounter> counters);
+    void Configure(IEnumerable<PreciseMachineCounter> machineCounters);
 }
