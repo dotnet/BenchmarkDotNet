@@ -6,25 +6,36 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Samples
 {
-    public class HardwareCounterProfile : IHardwareCounterProfile
-    {
-        public IEnumerable<string> GetVariants(HardwareCounter hardwareCounter)
-        {
-            if (hardwareCounter == HardwareCounter.CacheMisses)
-            {
-                yield return "IcacheMisses";
-                yield return "DcacheMisses";
-            }
-            else
-            {
-                yield return hardwareCounter.ToString();
-            }
-        }
-    }
-
+    /// <summary>
+    /// Demonstration of benchmark setup using <see cref="HardwareCounter"/>, which cannot be automatically matched to your configuration.
+    /// </summary>
+    /// <remarks>
+    /// Before starting, make sure the values from <see cref="HardwareCounterProfile"/> are available on your configuration.
+    /// You can get a list of available counters using the command `tracelog.exe -profilesources Help`.
+    /// </remarks>
     [HardwareCounters(HardwareCounter.CacheMisses, HardwareCounter.BranchInstructions)]
     public class IntroHardwareCountersWithProfile
     {
+        /// <summary>
+        /// The profile replaces the value from <see cref="HardwareCounter"/> with the one expected by your configuration.
+        /// </summary>
+        class HardwareCounterProfile : IHardwareCounterProfile
+        {
+            public IEnumerable<string> GetVariants(HardwareCounter hardwareCounter)
+            {
+                if (hardwareCounter == HardwareCounter.CacheMisses)
+                {
+                    // Example for `AMD Ryzen 7 5700G`
+                    yield return "IcacheMisses";
+                    yield return "DcacheMisses";
+                }
+                else
+                {
+                    yield return hardwareCounter.ToString();
+                }
+            }
+        }
+
         public static void Run() =>
             BenchmarkRunner.Run<IntroHardwareCountersWithProfile>(DefaultConfig.Instance
                 .AddJob(Job.Dry)

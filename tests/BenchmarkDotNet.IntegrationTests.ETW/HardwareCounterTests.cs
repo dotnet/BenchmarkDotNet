@@ -45,7 +45,7 @@ public class HardwareCounterTests(ITestOutputHelper output) : BenchmarkTestExecu
     }
 
     /// <summary>
-    /// Подменяет реальные счетчики на кастомные.
+    /// Replaces real counters with custom ones.
     /// </summary>
     private class FakeHardwareCounterProvider : IHardwareCounterProvider
     {
