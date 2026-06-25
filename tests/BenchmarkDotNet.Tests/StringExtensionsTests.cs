@@ -1,3 +1,4 @@
+using AwesomeAssertions;
 using BenchmarkDotNet.Extensions;
 using System.Text;
 
@@ -33,6 +34,9 @@ namespace BenchmarkDotNet.Tests
         [InlineData(null, "")]
         [InlineData("", "")]
         [InlineData(" ", "")]
+        [InlineData("--test", "--test")]
+        [InlineData(" --test", "--test")]
+        [InlineData("--test ", "--test")]
         [InlineData("-n win-x64", "-n win-x64")]
         [InlineData(" -n win-x64", "-n win-x64")]
         [InlineData("-n win-x64 ", "-n win-x64")]
@@ -40,12 +44,46 @@ namespace BenchmarkDotNet.Tests
         [InlineData(" a ", "a")]
         [InlineData("        a        ", "a")]
         [InlineData("   \r\n  a   \r\n", "a")]
-        public void AppendArgumentMakesSureOneSpaceBeforeStringArgument(string? input, string expectedOutput)
+        public void AppendArgumentWithEmptyStringBuilder(string? input, string expectedOutput)
         {
+            // Arrange
             var stringBuilder = new StringBuilder();
+
+            // Act
             var result = stringBuilder.AppendArgument(input).ToString();
 
-            Assert.Equal(expectedOutput, result);
+            // Assert
+            result.Should().Be(expectedOutput);
+        }
+
+        [Theory]
+        [InlineData(null, "")]
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("--test", "--test")]
+        [InlineData(" --test", "--test")]
+        [InlineData(" --test ", "--test")]
+        [InlineData("-n win-x64", "-n win-x64")]
+        [InlineData(" -n win-x64", "-n win-x64")]
+        [InlineData("-n win-x64 ", "-n win-x64")]
+        [InlineData(" -n Win-x64 ", "-n Win-x64")]
+        [InlineData(" a ", "a")]
+        [InlineData("        a        ", "a")]
+        [InlineData("   \r\n  a   \r\n", "a")]
+        public void AppendArgumentMultipleTimes(string? input, string expectedOutput)
+        {
+            // Arrange
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendArgument("--firstArg");
+
+            // Act
+            var result = stringBuilder.AppendArgument(input).ToString();
+
+            // Assert
+            if (expectedOutput.IsBlank())
+                result.Should().Be($"--firstArg");
+            else
+                result.Should().Be($"--firstArg {expectedOutput}");
         }
 
         [Theory]
