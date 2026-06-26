@@ -13,6 +13,10 @@ runs:
       with:
         node-version: "22" # Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3154
 
+    - name: Print Node.js version
+      shell: bash
+      run: node --version
+
     - name: Set up v8
       shell: bash
       run: npx jsvu --os=default --engines=v8
