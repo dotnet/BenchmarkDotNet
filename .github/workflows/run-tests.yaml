@@ -34,15 +34,16 @@ jobs:
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
-      - name: Run task 'unit-tests'
-        shell: cmd
-        run: ./build.cmd unit-tests -e
-      - name: Run task 'analyzer-tests'
-        shell: cmd
-        run: ./build.cmd analyzer-tests -e
-      - name: Run task 'in-tests-core'
-        shell: cmd
-        run: ./build.cmd in-tests-core -e
+      - parallel:
+        - name: Run task 'unit-tests'
+          shell: cmd
+          run: ./build.cmd unit-tests -e
+        - name: Run task 'analyzer-tests'
+          shell: cmd
+          run: ./build.cmd analyzer-tests -e
+        - name: Run task 'in-tests-core'
+          shell: cmd
+          run: ./build.cmd in-tests-core -e
       # Report test results with unique name
       - name: Report tests results
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
@@ -77,15 +78,16 @@ jobs:
       - name: Run task 'build'
         shell: cmd
         run: ./build.cmd build
-      - name: Run task 'unit-tests'
-        shell: cmd
-        run: ./build.cmd unit-tests -e
-      - name: Run task 'analyzer-tests'
-        shell: cmd
-        run: ./build.cmd analyzer-tests -e
-      - name: Run task 'in-tests-full'
-        shell: cmd
-        run: ./build.cmd in-tests-full -e
+      - parallel:
+        - name: Run task 'unit-tests'
+          shell: cmd
+          run: ./build.cmd unit-tests -e
+        - name: Run task 'analyzer-tests'
+          shell: cmd
+          run: ./build.cmd analyzer-tests -e
+        - name: Run task 'in-tests-full'
+          shell: cmd
+          run: ./build.cmd in-tests-full -e
       # Report test results with unique name
       - name: Report tests results
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
@@ -116,12 +118,13 @@ jobs:
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
-      - name: Run task 'analyzer-tests'
-        run: ./build.cmd analyzer-tests -e
-      - name: Run task 'unit-tests'
-        run: ./build.cmd unit-tests -e
-      - name: Run task 'in-tests-core'
-        run: ./build.cmd in-tests-core -e
+      - parallel:
+        - name: Run task 'analyzer-tests'
+          run: ./build.cmd analyzer-tests -e
+        - name: Run task 'unit-tests'
+          run: ./build.cmd unit-tests -e
+        - name: Run task 'in-tests-core'
+          run: ./build.cmd in-tests-core -e
       # Report test results with unique name
       - name: Report tests results
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
@@ -157,12 +160,13 @@ jobs:
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
-      - name: Run task 'analyzer-tests'
-        run: ./build.cmd analyzer-tests -e
-      - name: Run task 'unit-tests'
-        run: ./build.cmd unit-tests -e
-      - name: Run task 'in-tests-core'
-        run: ./build.cmd in-tests-core -e
+      - parallel:
+        - name: Run task 'analyzer-tests'
+          run: ./build.cmd analyzer-tests -e
+        - name: Run task 'unit-tests'
+          run: ./build.cmd unit-tests -e
+        - name: Run task 'in-tests-core'
+          run: ./build.cmd in-tests-core -e
       # Report test results with unique name
       - name: Report tests results
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
