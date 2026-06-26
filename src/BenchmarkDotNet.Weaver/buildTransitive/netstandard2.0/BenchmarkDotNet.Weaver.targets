@@ -1,28 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
-
-  <PropertyGroup>
-    <BenchmarkDotNetShouldWeaveAssemblies Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == ''">true</BenchmarkDotNetShouldWeaveAssemblies>
-    <BenchmarkDotNetWeaveAssembliesAfterTargets Condition="'$(BenchmarkDotNetWeaveAssembliesAfterTargets)' == ''">CoreCompile</BenchmarkDotNetWeaveAssembliesAfterTargets>
-    <BenchmarkDotNetWeaveAssembliesBeforeTargets Condition="'$(BenchmarkDotNetWeaveAssembliesBeforeTargets)' == ''">CopyFilesToOutputDirectory</BenchmarkDotNetWeaveAssembliesBeforeTargets>
-    <BenchmarkDotNetWeaveAssemblyPath Condition="'$(BenchmarkDotNetWeaveAssemblyPath)' == ''">$(IntermediateOutputPath)$(TargetName)$(TargetExt)</BenchmarkDotNetWeaveAssemblyPath>
-    <BenchmarkDotNetWeaveAssembliesStampFile Condition="'$(BenchmarkDotNetWeaveAssembliesStampFile)' == ''">$(IntermediateOutputPath)BenchmarkDotNetWeaver.stamp</BenchmarkDotNetWeaveAssembliesStampFile>
-  </PropertyGroup>
-  
-  <Target Name="BenchmarkDotNetWeaveAssemblies"
-      AfterTargets="$(BenchmarkDotNetWeaveAssembliesAfterTargets)"
-      BeforeTargets="$(BenchmarkDotNetWeaveAssembliesBeforeTargets)"
-      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true'"
-      Inputs="$(BenchmarkDotNetWeaveAssemblyPath)"
-      Outputs="$(BenchmarkDotNetWeaveAssembliesStampFile)">
-
-    <WeaveAssemblyTask TargetAssembly="$(BenchmarkDotNetWeaveAssemblyPath)" ReferencePaths="@(ReferencePath)" TreatWarningsAsErrors="$(TreatWarningsAsErrors)" />
-
-    <!-- Create stamp file for incrementality -->
-    <Touch Files="$(BenchmarkDotNetWeaveAssembliesStampFile)" AlwaysCreate="true" />
-    <ItemGroup>
-      <FileWrites Include="$(BenchmarkDotNetWeaveAssembliesStampFile)" />
-    </ItemGroup>
-  </Target>
+  <!-- The weaving logic is shared with BenchmarkDotNet.Annotations.targets. See the common file for details. -->
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Weaver.Common.targets" />
 </Project>
