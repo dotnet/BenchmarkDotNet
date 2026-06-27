@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 internal static class BenchmarkActionFactory
 {
-    private static IBenchmarkAction CreateCore(IBenchmarkActionFactory? factory, object instance, MethodInfo targetMethod, int unrollFactor)
+    private static IBenchmarkAction CreateCore(IBenchmarkActionFactory? factory, object instance, MethodInfo targetMethod, int unrollFactor, bool consumeTasksSynchronously = false)
     {
         if (factory?.TryCreate(instance, targetMethod, unrollFactor, out var benchmarkAction) == true)
         {
@@ -41,10 +41,14 @@ internal static class BenchmarkActionFactory
         }
 
         if (resultType == typeof(Task))
-            return new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
+            return consumeTasksSynchronously
+                ? new BenchmarkActionBlockingTask(resultInstance, targetMethod, unrollFactor)
+                : new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
 
         if (resultType == typeof(ValueTask))
-            return new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
+            return consumeTasksSynchronously
+                ? new BenchmarkActionBlockingValueTask(resultInstance, targetMethod, unrollFactor)
+                : new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
 
         if (resultType.GetTypeInfo().IsGenericType)
         {
@@ -52,14 +56,18 @@ internal static class BenchmarkActionFactory
             var argType = resultType.GenericTypeArguments[0];
             if (typeof(Task<>) == genericType)
                 return Create(
-                    typeof(BenchmarkActionTask<>).MakeGenericType(argType),
+                    consumeTasksSynchronously
+                        ? typeof(BenchmarkActionBlockingTask<>).MakeGenericType(argType)
+                        : typeof(BenchmarkActionTask<>).MakeGenericType(argType),
                     resultInstance,
                     targetMethod,
                     unrollFactor);
 
-            if (typeof(ValueTask<>).IsAssignableFrom(genericType))
+            if (typeof(ValueTask<>) == genericType)
                 return Create(
-                    typeof(BenchmarkActionValueTask<>).MakeGenericType(argType),
+                    consumeTasksSynchronously
+                        ? typeof(BenchmarkActionBlockingValueTask<>).MakeGenericType(argType)
+                        : typeof(BenchmarkActionValueTask<>).MakeGenericType(argType),
                     resultInstance,
                     targetMethod,
                     unrollFactor);
@@ -125,8 +133,8 @@ internal static class BenchmarkActionFactory
 
     private static readonly MethodInfo FallbackSignature = new Action(BenchmarkActionBase.OverheadStatic).GetMethodInfo();
 
-    public static IBenchmarkAction CreateWorkload(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance, int unrollFactor) =>
-        CreateCore(factory, instance, descriptor.WorkloadMethod, unrollFactor);
+    public static IBenchmarkAction CreateWorkload(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance, int unrollFactor, bool consumeTasksSynchronously = false) =>
+        CreateCore(factory, instance, descriptor.WorkloadMethod, unrollFactor, consumeTasksSynchronously);
 
     public static IBenchmarkAction CreateOverhead(IBenchmarkActionFactory? factory, Descriptor descriptor, object instance, int unrollFactor) =>
         CreateCore(factory, instance, FallbackSignature, unrollFactor);

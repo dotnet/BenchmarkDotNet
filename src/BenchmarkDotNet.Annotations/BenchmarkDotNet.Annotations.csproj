@@ -43,6 +43,8 @@
         <!-- Include the BenchmarkDotNet.Weaver dlls in tasks without making it an explicit dependency. -->
         <Content Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\bin\Release\$(TargetFramework)\**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
         <Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
+        <!-- Bundle the shared weaving logic that BenchmarkDotNet.Annotations.targets imports (kept in sync with the Weaver package). -->
+        <Content Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\buildTransitive\netstandard2.0\BenchmarkDotNet.Weaver.Common.targets" Pack="true" PackagePath="buildTransitive/netstandard2.0" />
       </ItemGroup>
     </When>
     <Otherwise>

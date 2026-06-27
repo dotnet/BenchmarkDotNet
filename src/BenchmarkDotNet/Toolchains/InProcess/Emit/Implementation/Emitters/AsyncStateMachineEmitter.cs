@@ -12,7 +12,7 @@ partial class RunnableEmitter
     // Roslyn generates ordinals in declaration order of every member.
     // We don't necessarily emit members in the same order (or at all in the case of Runnable_#.Run), so we map it to the expected Roslyn ordinal.
     // This doesn't really matter for the runtime, but it helps with the NaiveRunnableEmitDiff tests.
-    private readonly Dictionary<string, int> s_asyncMethodToOrdinalMap = new()
+    protected virtual IReadOnlyDictionary<string, int> AsyncMethodToOrdinalMap { get; } = new Dictionary<string, int>
     {
         { GlobalSetupMethodName, 5 },
         { GlobalCleanupMethodName, 6 },
@@ -134,7 +134,7 @@ partial class RunnableEmitter
             [CompilerGenerated]
             private struct <__GlobalSetup>d__4 : IAsyncStateMachine
          */
-        int ordinal = s_asyncMethodToOrdinalMap[callerMethodName];
+        int ordinal = AsyncMethodToOrdinalMap[callerMethodName];
         var asyncStateMachineTypeBuilder = runnableBuilder.DefineNestedType(
             $"<{callerMethodName}>d__{ordinal}",
             TypeAttributes.NestedPrivate | TypeAttributes.AutoLayout | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,

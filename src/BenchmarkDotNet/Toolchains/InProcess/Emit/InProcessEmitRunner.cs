@@ -17,7 +17,7 @@ internal static class InProcessEmitRunner
     {
         // the first thing to do is to let diagnosers hook in before anything happens
         // so all jit-related diagnosers can catch first jit compilation!
-        await host.BeforeAnythingElseAsync().ConfigureAwait(true);
+        await host.BeforeAnythingElseAsync().ConfigureAwait();
 
         try
         {
@@ -25,7 +25,7 @@ internal static class InProcessEmitRunner
                 .GeneratedAssembly
                 .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
 
-            await RunCore(runnableType, host, parameters).ConfigureAwait(true);
+            await RunCore(runnableType, host, parameters).ConfigureAwait();
 
             return 0;
         }
@@ -87,7 +87,7 @@ internal static class InProcessEmitRunner
             await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken).ConfigureAwait(false);
             return;
         }
-        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait(true);
+        await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait();
 
         var engineParameters = new EngineParameters()
         {
@@ -112,7 +112,7 @@ internal static class InProcessEmitRunner
             .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
             .Create(engineParameters)
             .RunAsync()
-            .ConfigureAwait(true);
+            .ConfigureAwait();
         host.ReportResults(results);
 
         runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);

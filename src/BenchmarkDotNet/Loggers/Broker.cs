@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -76,7 +77,7 @@ namespace BenchmarkDotNet.Loggers
                 IpcConnection ipcConnection;
                 using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token))
                 {
-                    ipcConnection = await ipcListener.AcceptConnection(linkedCts.Token).ConfigureAwait(true);
+                    ipcConnection = await ipcListener.AcceptConnection(linkedCts.Token).ConfigureAwait();
                 }
 
                 using var ic = ipcConnection;
@@ -98,7 +99,7 @@ namespace BenchmarkDotNet.Loggers
 
                 while (true)
                 {
-                    var line = await ipcConnection.ReadLineAsync(cancellationTokenSource.Token).ConfigureAwait(true);
+                    var line = await ipcConnection.ReadLineAsync(cancellationTokenSource.Token).ConfigureAwait();
 
                     if (line == null)
                         return Result.EndOfStream;
@@ -125,7 +126,7 @@ namespace BenchmarkDotNet.Loggers
                         var resultsStringBuilder = new StringBuilder();
                         for (int i = 0; i < resultsLinesCount;)
                         {
-                            line = await ipcConnection.ReadLineAsync(cancellationTokenSource.Token).ConfigureAwait(true);
+                            line = await ipcConnection.ReadLineAsync(cancellationTokenSource.Token).ConfigureAwait();
 
                             if (line == null)
                                 return Result.EndOfStream;
@@ -150,16 +151,16 @@ namespace BenchmarkDotNet.Loggers
                     {
                         try
                         {
-                            await Diagnoser.HandleAsync(signal, DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
+                            await Diagnoser.HandleAsync(signal, DiagnoserActionParameters, cancellationToken).ConfigureAwait();
                         }
                         // If the benchmark was canceled, the child process may still be waiting for an acknowledgement,
                         // because it sends the AfterAll signal in a finally block, and we need to allow the process to exit gracefully,
                         // so we send the acknowledgement always.
                         finally
                         {
-                            using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait(true))
+                            using (await writeSemaphore.EnterScopeAsync(CancellationToken.None).ConfigureAwait())
                             {
-                                await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment).ConfigureAwait(true);
+                                await ipcConnection.WriteLineAsync(Engine.Signals.Acknowledgment).ConfigureAwait();
                             }
                         }
 

@@ -60,7 +60,7 @@
 
   <PropertyGroup>
     <!-- Increment this when the BenchmarkDotNet.Weaver package needs to be re-packed. -->
-    <WeaverVersionSuffix>-5</WeaverVersionSuffix>
+    <WeaverVersionSuffix>-6</WeaverVersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>

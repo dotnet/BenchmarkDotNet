@@ -231,6 +231,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("evaluateOverhead", Required = false, HelpText = "Specifies whether to run and evaluate overhead iterations.")]
         public bool? EvaluateOverhead { get; set; }
 
+        [Option("consumeTasksSynchronously", Required = false, Default = false, HelpText = "Specifies whether to consume (Value)Task-returning benchmarks synchronously.")]
+        public bool ConsumeTasksSynchronously { get; set; }
+
         [Option("resume", Required = false, Default = false, HelpText = "Continue the execution if the last run was stopped.")]
         public bool Resume { get; set; }
 

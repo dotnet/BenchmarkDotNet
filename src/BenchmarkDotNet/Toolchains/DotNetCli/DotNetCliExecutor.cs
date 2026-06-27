@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.LaunchIndex,
                     executeParameters.DiagnoserRunMode,
                     cancellationToken
-                ).ConfigureAwait(true);
+                ).ConfigureAwait();
             }
             finally
             {
@@ -91,11 +91,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait();
 
                 process.Start();
 
-                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait();
 
                 processOutputReader.BeginRead();
 

@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Environments
 
             // TODO: find a better place
             Register(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, () => false);
+            Register(RunMode.ConsumeTasksSynchronouslyCharacteristic, () => false);
             Register(RunMode.UnrollFactorCharacteristic, job =>
             {
                 // TODO: move it to another place and use the main resolver

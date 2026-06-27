@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 { RunMode.IterationTimeCharacteristic, DontValidate },
                 { RunMode.InvocationCountCharacteristic, DontValidate },
                 { RunMode.UnrollFactorCharacteristic, DontValidate },
+                { RunMode.ConsumeTasksSynchronouslyCharacteristic, DontValidate },
                 { AccuracyMode.AnalyzeLaunchVarianceCharacteristic, DontValidate },
                 { AccuracyMode.EvaluateOverheadCharacteristic, DontValidate },
                 { AccuracyMode.MaxRelativeErrorCharacteristic, DontValidate },

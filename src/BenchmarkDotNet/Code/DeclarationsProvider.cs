@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -90,6 +91,24 @@ namespace BenchmarkDotNet.Code
 
         protected string GetWorkloadMethodCall(string passArguments)
              => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments});";
+
+        protected string GetLoadArguments()
+            => string.Join(
+                Environment.NewLine,
+                Descriptor.WorkloadMethod.GetParameters()
+                    .Select((parameter, index) =>
+                    {
+                        var refModifier = parameter.ParameterType.IsByRef ? "ref" : string.Empty;
+                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.__fieldsContainer.argField{index};";
+                    })
+            );
+
+        protected string GetPassArguments()
+            => string.Join(
+                ", ",
+                Descriptor.WorkloadMethod.GetParameters()
+                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} arg{index}")
+            );
 
         // Renders the benchmark method's parameter types as a Type[] for __ResolveWorkloadMethods to match overloads
         // exactly. Each is a typeof(...) of the element type, re-wrapping by-ref/pointer via reflection (typeof can't
@@ -189,24 +208,69 @@ namespace BenchmarkDotNet.Code
             return smartStringBuilder
                 .Replace("$CoreImpl$", coreImpl);
         }
+    }
 
-        private string GetLoadArguments()
-            => string.Join(
-                Environment.NewLine,
-                Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) =>
+    // Used when Job.Run.ConsumeTasksSynchronously is enabled for (Value)Task(<T>)-returning workloads.
+    // Generates a synchronous loop that blocks on the returned task via AwaitHelper.GetResult, matching the
+    // pre-async-refactor behavior so historical results stay comparable.
+    internal sealed class SyncTaskDeclarationsProvider(BenchmarkCase benchmark) : DeclarationsProvider(benchmark)
+    {
+        public override string[] GetExtraFields() => [];
+
+        protected override SmartStringBuilder ReplaceCore(SmartStringBuilder smartStringBuilder)
+        {
+            string loadArguments = GetLoadArguments();
+            string passArguments = GetPassArguments();
+            string workloadMethodCall = $"global::{typeof(AwaitHelper).FullName}.{nameof(AwaitHelper.GetResult)}({GetWorkloadMethodCall(passArguments).TrimEnd(';')});";
+            string coreImpl = $$"""
+            private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
                     {
-                        var refModifier = parameter.ParameterType.IsByRef ? "ref" : string.Empty;
-                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.__fieldsContainer.argField{index};";
-                    })
-            );
+                        {{loadArguments}}
+                        {{StartClockSyncCode}}
+                        while (--invokeCount >= 0)
+                        {
+                            this.__Overhead({{passArguments}});@Unroll@
+                        }
+                        {{ReturnSyncCode}}
+                    }
 
-        private string GetPassArguments()
-            => string.Join(
-                ", ",
-                Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} arg{index}")
-            );
+                    private {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
+                    {
+                        {{loadArguments}}
+                        {{StartClockSyncCode}}
+                        while (--invokeCount >= 0)
+                        {
+                            this.__Overhead({{passArguments}});
+                        }
+                        {{ReturnSyncCode}}
+                    }
+
+                    private {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
+                    {
+                        {{loadArguments}}
+                        {{StartClockSyncCode}}
+                        while (--invokeCount >= 0)
+                        {
+                            {{workloadMethodCall}}@Unroll@
+                        }
+                        {{ReturnSyncCode}}
+                    }
+
+                    private {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
+                    {
+                        {{loadArguments}}
+                        {{StartClockSyncCode}}
+                        while (--invokeCount >= 0)
+                        {
+                            {{workloadMethodCall}}
+                        }
+                        {{ReturnSyncCode}}
+                    }
+            """;
+
+            return smartStringBuilder
+                .Replace("$CoreImpl$", coreImpl);
+        }
     }
 
     internal abstract class AsyncDeclarationsProviderBase(BenchmarkCase benchmark) : DeclarationsProvider(benchmark)

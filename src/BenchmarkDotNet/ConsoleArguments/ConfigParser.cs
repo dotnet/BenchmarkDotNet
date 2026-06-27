@@ -461,6 +461,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithGcForce(false);
             if (options.EvaluateOverhead is bool evaluateOverhead)
                 baseJob = baseJob.WithEvaluateOverhead(evaluateOverhead);
+            if (options.ConsumeTasksSynchronously)
+                baseJob = baseJob.WithConsumeTasksSynchronously(true);
 
             if (options.EnvironmentVariables.Any())
             {

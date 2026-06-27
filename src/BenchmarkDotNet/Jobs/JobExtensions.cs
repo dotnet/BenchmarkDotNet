@@ -296,11 +296,11 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithMinInvokeCount(this Job job, int value) => job.WithCore(j => j.Accuracy.MinInvokeCount = value);
 
-        /// <summary>
-        /// Specifies if the overhead should be evaluated (Idle runs) and it's average value subtracted from every result.
-        /// False by default.
-        /// </summary>
+        /// <inheritdoc cref="AccuracyMode.EvaluateOverhead"/>
         public static Job WithEvaluateOverhead(this Job job, bool value) => job.WithCore(j => j.Accuracy.EvaluateOverhead = value);
+
+        /// <inheritdoc cref="RunMode.ConsumeTasksSynchronously"/>
+        public static Job WithConsumeTasksSynchronously(this Job job, bool value) => job.WithCore(j => j.Run.ConsumeTasksSynchronously = value);
 
         /// <summary>
         /// Specifies which outliers should be removed from the distribution

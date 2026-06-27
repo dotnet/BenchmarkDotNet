@@ -128,9 +128,11 @@ namespace BenchmarkDotNet.Extensions
             {
                 return stringBuilder;
             }
-            argument = " " + argument.Trim();
-            stringBuilder.Append(argument);
 
+            if (stringBuilder.Length != 0)
+                stringBuilder.Append(' ');
+
+            stringBuilder.Append(argument.Trim());
             return stringBuilder;
         }
 

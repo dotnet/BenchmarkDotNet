@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
-            await host.BeforeAnythingElseAsync().ConfigureAwait(true);
+            await host.BeforeAnythingElseAsync().ConfigureAwait();
 
             try
             {
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                await ((ValueTask)methodInfo.Invoke(null, [host, parameters, benchmarkActionFactory])!).ConfigureAwait(true);
+                await ((ValueTask)methodInfo.Invoke(null, [host, parameters, benchmarkActionFactory])!).ConfigureAwait();
 
                 return 0;
             }
@@ -137,10 +137,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var target = benchmarkCase.Descriptor;
                 var job = new Job().Apply(benchmarkCase.Job).Freeze();
                 int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
+                bool consumeTasksSynchronously = benchmarkCase.Job.ResolveValue(RunMode.ConsumeTasksSynchronouslyCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type)!;
-                var workloadAction = BenchmarkActionFactory.CreateWorkload(benchmarkActionFactory, target, instance, unrollFactor);
+                var workloadAction = BenchmarkActionFactory.CreateWorkload(benchmarkActionFactory, target, instance, unrollFactor, consumeTasksSynchronously);
                 var overheadAction = BenchmarkActionFactory.CreateOverhead(benchmarkActionFactory, target, instance, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(benchmarkActionFactory, target, instance);
                 var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(benchmarkActionFactory, target, instance);
@@ -173,7 +174,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.SeparateLogic, host.CancellationToken).ConfigureAwait(false);
                     return;
                 }
-                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait(true);
+                await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeEngine, host.CancellationToken).ConfigureAwait();
 
                 var engineParameters = new EngineParameters
                 {
@@ -185,7 +186,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     OverheadActionUnroll = overheadAction.InvokeUnroll,
                     GlobalSetupAction = async () =>
                     {
-                        await globalSetupAction.InvokeSingle().ConfigureAwait(true);
+                        await globalSetupAction.InvokeSingle().ConfigureAwait();
                         workloadAction.Setup();
                         overheadAction.Setup();
                     },
@@ -208,7 +209,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     .ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!
                     .Create(engineParameters)
                     .RunAsync()
-                    .ConfigureAwait(true);
+                    .ConfigureAwait();
                 host.ReportResults(results); // printing costs memory, do this after runs
 
                 await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken).ConfigureAwait(false);

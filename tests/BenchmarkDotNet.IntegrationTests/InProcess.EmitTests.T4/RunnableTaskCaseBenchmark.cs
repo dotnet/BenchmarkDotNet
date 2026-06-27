@@ -19,6 +19,18 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
     /// </summary>
     public class RunnableTaskCaseBenchmark
     {
+        [GlobalSetup]
+        public async ValueTask GlobalSetup() => await Task.Yield();
+
+        [GlobalCleanup]
+        public async Task GlobalCleanup() => await Task.Yield();
+
+        [IterationSetup]
+        public async ValueTask IterationSetup() => await Task.Yield();
+
+        [IterationCleanup]
+        public async Task IterationCleanup() => await Task.Yield();
+
         // ---- Begin TaskCase(Task) ----
 
         [Benchmark]

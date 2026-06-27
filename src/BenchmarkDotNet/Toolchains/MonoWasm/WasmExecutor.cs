@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
-            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken).ConfigureAwait(true);
+            using ProcessListener processListener = await CreateProcessListenerAsync(benchmarkCase, benchmarkId, artifactsPaths, resolver, diagnoserRunMode, cancellationToken).ConfigureAwait();
             try
             {
                 bool isFileBasedIpc = processListener.Listener is FileStdOutListener;
@@ -150,10 +150,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     ((FileStdOutListener)processListener.Listener).AttachProcessOutputReader(processOutputReader);
                 }
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait(true);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait();
                 return await Execute(processListener.Process, benchmarkCase, processOutputReader,
                     benchmarkId, logger, launchIndex, diagnoser,
-                    compositeInProcessDiagnoser, processListener.Listener, cancellationToken).ConfigureAwait(true);
+                    compositeInProcessDiagnoser, processListener.Listener, cancellationToken).ConfigureAwait();
             }
             finally
             {
@@ -195,11 +195,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
+                await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait();
 
                 process.Start();
 
-                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait(true);
+                await diagnoser.HandleAsync(HostSignal.AfterProcessStart, broker.DiagnoserActionParameters, cancellationToken).ConfigureAwait();
 
                 processOutputReader.BeginRead();
 

@@ -1,3 +1,4 @@
+using AwesomeAssertions;
 using BenchmarkDotNet.Extensions;
 using System.Text;
 
@@ -33,29 +34,66 @@ namespace BenchmarkDotNet.Tests
         [InlineData(null, "")]
         [InlineData("", "")]
         [InlineData(" ", "")]
-        [InlineData("-n win-x64", " -n win-x64")]
-        [InlineData(" -n win-x64", " -n win-x64")]
-        [InlineData("-n win-x64 ", " -n win-x64")]
-        [InlineData(" -n Win-x64 ", " -n Win-x64")]
-        [InlineData(" a ", " a")]
-        [InlineData("        a        ", " a")]
-        [InlineData("   \r\n  a   \r\n", " a")]
-        public void AppendArgumentMakesSureOneSpaceBeforeStringArgument(string? input, string expectedOutput)
+        [InlineData("--test", "--test")]
+        [InlineData(" --test", "--test")]
+        [InlineData("--test ", "--test")]
+        [InlineData("-n win-x64", "-n win-x64")]
+        [InlineData(" -n win-x64", "-n win-x64")]
+        [InlineData("-n win-x64 ", "-n win-x64")]
+        [InlineData(" -n Win-x64 ", "-n Win-x64")]
+        [InlineData(" a ", "a")]
+        [InlineData("        a        ", "a")]
+        [InlineData("   \r\n  a   \r\n", "a")]
+        public void AppendArgumentWithEmptyStringBuilder(string? input, string expectedOutput)
         {
+            // Arrange
             var stringBuilder = new StringBuilder();
+
+            // Act
             var result = stringBuilder.AppendArgument(input).ToString();
 
-            Assert.Equal(expectedOutput, result);
+            // Assert
+            result.Should().Be(expectedOutput);
         }
 
         [Theory]
         [InlineData(null, "")]
-        [InlineData("http://test.com/", " http://test.com/")]
-        [InlineData(" http://test.com/", " http://test.com/")]
-        [InlineData("http://test.com/ ", " http://test.com/")]
-        [InlineData(" http://test.com/ ", " http://test.com/")]
-        [InlineData("\r\n  http://test.com/  \r\n", " http://test.com/")]
-        public void AppendArgumentMakesSureOneSpaceBeforeObjectArgument(string? input, string expectedOutput)
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("--test", "--test")]
+        [InlineData(" --test", "--test")]
+        [InlineData(" --test ", "--test")]
+        [InlineData("-n win-x64", "-n win-x64")]
+        [InlineData(" -n win-x64", "-n win-x64")]
+        [InlineData("-n win-x64 ", "-n win-x64")]
+        [InlineData(" -n Win-x64 ", "-n Win-x64")]
+        [InlineData(" a ", "a")]
+        [InlineData("        a        ", "a")]
+        [InlineData("   \r\n  a   \r\n", "a")]
+        public void AppendArgumentMultipleTimes(string? input, string expectedOutput)
+        {
+            // Arrange
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendArgument("--firstArg");
+
+            // Act
+            var result = stringBuilder.AppendArgument(input).ToString();
+
+            // Assert
+            if (expectedOutput.IsBlank())
+                result.Should().Be($"--firstArg");
+            else
+                result.Should().Be($"--firstArg {expectedOutput}");
+        }
+
+        [Theory]
+        [InlineData(null, "")]
+        [InlineData("http://test.com/", "http://test.com/")]
+        [InlineData(" http://test.com/", "http://test.com/")]
+        [InlineData("http://test.com/ ", "http://test.com/")]
+        [InlineData(" http://test.com/ ", "http://test.com/")]
+        [InlineData("\r\n  http://test.com/  \r\n", "http://test.com/")]
+        public void AppendArgumentWithObjectArgument(string? input, string expectedOutput)
         {
             Uri? uri = input != null ? new Uri(input) : null; // Use Uri for our object type since that is what is used in code
             var stringBuilder = new StringBuilder();
