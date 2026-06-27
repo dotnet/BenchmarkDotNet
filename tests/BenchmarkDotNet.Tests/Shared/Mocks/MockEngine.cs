@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             Parameters = new EngineParameters
             {
                 TargetJob = job,
-                WorkloadMethod = null,
+                WorkloadMethods = [],
                 WorkloadActionUnroll = emptyAction,
                 WorkloadActionNoUnroll = emptyAction,
                 OverheadActionUnroll = emptyAction,

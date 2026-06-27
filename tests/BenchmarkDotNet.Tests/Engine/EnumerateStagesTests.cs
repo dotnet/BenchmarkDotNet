@@ -347,7 +347,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Func<long, IClock, ValueTask<ClockSpan>> emptyAction = (_, _) => new(default(ClockSpan));
             return new()
             {
-                WorkloadMethod = null,
+                WorkloadMethods = [],
                 GlobalSetupAction = () => new(),
                 GlobalCleanupAction = () => new(),
                 Host = host,

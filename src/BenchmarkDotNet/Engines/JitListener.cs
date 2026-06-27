@@ -5,24 +5,44 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Engines;
 
-// Observes background JIT tier-up of a single (benchmark) method by listening to the runtime's JIT events
-// in-process, so the jit stage can proceed as soon as the next tier is actually reached instead of waiting a
-// fixed delay. The runtime only announces transitions (there is no API to poll a method's current tier), so we
-// must be listening while they happen.
+// Observes background JIT tier-up of one or more (benchmark) methods by listening to the runtime's JIT events
+// in-process, so the jit stage can proceed as soon as the call tree is actually warmed instead of waiting a fixed
+// delay. The runtime only announces transitions (there is no API to poll a method's current tier), so we must be
+// listening while they happen. A single listener can watch several methods at once — ReachedFinalTier is the aggregate
+// (true only once EVERY watched method has reached its final tier). (Today the stage watches just the benchmark method;
+// watching multiple is in place so scenarios that drive several methods need no contract change. #147)
+//
+// The core signal is JIT QUIESCENCE, not the individual tier-up. A burst tiers up the watched method AND its (untracked)
+// callees on the same background worker; proceeding the instant the watched method publishes tier1 would leave its
+// callees still compiling and race them into the next burst / the following stage. So each tier the stage waits for the
+// background worker to go idle (WaitForQuiescentTierUp): once it's quiet the whole tree reached this tier, and the
+// watched methods' tier counts can be read race-free.
 //
 // The events it watches, and their roles:
-//   * MethodLoadVerbose (per-method, JIT keyword) reports each tier publication and carries the tier. A burst that
-//     reaches the call-count threshold triggers the next tier's compile, which publishes a (non-tier0) load — so the
-//     first such publication after a burst is the AUTHORITATIVE "the burst tiered up" signal, and the tier it carries
-//     tells us when the method reached its final tier. The stage keeps invoking until it sees one. (WaitForPublication /
-//     ReachedFinalTier.) We deliberately do NOT use MethodJittingStarted (compile-began): it carries no tier, so the
-//     tier0 compile's start is indistinguishable from a tier-up's and would race the tier0 publish that filters it.
-//   * TieredCompilationPause/Resume (the call-counting delay bracket, Compilation keyword) gate the bursts: a burst
-//     issued while the delay is active isn't counted (the counting stub is deferred), so the stage waits until the
-//     delay is observed inactive — a Resume, when the stubs are installed — before bursting (WaitForTieringActive). Up
-//     front (WaitForInitialTieringActive) it waits for any method's tier0 JIT or a Pause/Resume to confirm a Resume is
-//     coming; if none arrives the method was pre-warmed and its stub is already installed, so it fakes the inactive
-//     state and proceeds. These only avoid wasting bursts — correctness comes from the publication.
+//   * TieredCompilationBackgroundJitStart/Stop (Compilation keyword) bracket the background tiering worker draining its
+//     queue — Start when it begins, Stop when it finishes (Stop's PendingMethodCount payload is how many remain; 0 =
+//     drained). These fire ONLY for actual tiered background work, so they are how we detect quiescence: a burst's
+//     methods and their callees tier up in a train of back-to-back batches, and WaitForQuiescentTierUp waits for the
+//     worker to be idle and STAY idle for a short settle window. A batch that began-and-finished before we looked is not
+//     lost — it already bumped the tier counts, which we only read after observing the worker idle (see MethodLoadVerbose).
+//   * MethodLoadVerbose (per-method, JIT keyword) reports each tier publication and carries the tier. A non-tier0 load
+//     for a watched method bumps its tier-up count (so callers can detect it advanced beyond a given tier) and, when the
+//     tier is a final one, marks it done. We deliberately do NOT use MethodJittingStarted (compile-began): it carries no
+//     tier, so the tier0 compile's start is indistinguishable from a tier-up's and would race the tier0 publish that
+//     filters it.
+//   * TieredCompilationPause/Resume (the tiering delay bracket, Compilation keyword) bound the call-counting delay. Two
+//     roles: (1) a burst issued while the delay is active isn't counted (the counting stub is deferred), so the stage
+//     waits until the delay is observed inactive — a Resume — before bursting (WaitForTieringActive); up front
+//     (WaitForInitialTieringActive) it waits for any method's tier0 JIT or a Pause/Resume to confirm a Resume is coming,
+//     and if none arrives the method was pre-warmed so it fakes the inactive state and proceeds. (2) While the delay is
+//     active the background worker is paused — it won't compile even already-enqueued tier-ups until the Resume — so
+//     "worker idle" during a pause is NOT quiescence. WaitForQuiescentTierUp therefore calls WaitForTieringActive each
+//     loop turn to wait the pause out before timing the idle settle window.
+//
+// The busy/idle state is a ManualResetEventSlim pair; the per-method tier/completion counts are mutated under syncRoot
+// (which OnEventWritten already holds) but declared volatile so the waiters read them lock-free — their ordering comes
+// from draining the in-flight batch first, not from the lock. So the waiters are lock-free (the events handle their own
+// timeouts and cancellation), and WaitForTieringActive composes naturally into the quiescence loop.
 //
 // This is intentionally a per-stage listener: enabling the Jit keyword emits an event for every method jitted
 // process-wide, which we must NOT pay during the measurement stages. It is created at the start of the jit stage
@@ -30,22 +50,20 @@ namespace BenchmarkDotNet.Engines;
 //
 // Create returns null (and the caller falls back to the fixed delay) when the runtime has no tiered JIT, or when
 // EventSource is unavailable — it can be disabled via the System.Diagnostics.Tracing.EventSource.IsSupported feature
-// switch. It otherwise watches the method regardless of whether it looks tier-eligible: a method that can't tier just
+// switch. It otherwise watches each method regardless of whether it looks tier-eligible: a method that can't tier just
 // publishes its single final tier (see the tier constants below), which the stage observes and treats as "done".
 [AggressivelyOptimizeMethods] // Reduce JIT event noise from the listener itself.
 internal sealed class JitListener : EventListener
 {
     private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
     private const EventKeywords JitKeyword = (EventKeywords)0x10;
-    // The "Compilation" keyword carries the TieredCompilation/Pause|Resume events that bracket the runtime's
-    // call-counting delay. Low volume (a handful per delay cycle), so enabling it adds no meaningful cost.
+    // The "Compilation" keyword carries the TieredCompilation/Pause|Resume and BackgroundJit Start/Stop events. Low
+    // volume (a handful per delay/batch cycle), so enabling it adds no meaningful cost.
     private const EventKeywords CompilationKeyword = (EventKeywords)0x1000000000;
     private const string TieredCompilationResumeEvent = "TieredCompilationResume";
     private const string TieredCompilationPauseEvent = "TieredCompilationPause";
     // The background tiering worker brackets each batch with these: Start when it begins draining its queue, Stop when
-    // it finishes (Stop's PendingMethodCount payload is how many remain — 0 = drained). Unlike per-method JIT events
-    // these fire ONLY for actual tiered background work, so a Start is a clean "an untracked callee is tiering up"
-    // signal. Used to wait out such callees once the watched method itself is fully warmed.
+    // it finishes (Stop's PendingMethodCount payload is how many remain — 0 = drained). They are the quiescence signal.
     private const string TieredCompilationBackgroundJitStartEvent = "TieredCompilationBackgroundJitStart";
     private const string TieredCompilationBackgroundJitStopEvent = "TieredCompilationBackgroundJitStop";
     // Event-name prefix (the runtime appends a version suffix, e.g. MethodLoadVerbose_V2).
@@ -67,7 +85,7 @@ internal sealed class JitListener : EventListener
     // never the method's active entry-point code version and is never call-counted — it's orthogonal to the
     // call-count tier ladder the stage drives, and a watched method that OSRs in both its tier0 and instrumented
     // bodies emits two of them on the way to its final tier. We therefore ignore OSR publications for our method (see
-    // HandleMethodLoad) so they don't consume the stage's per-tier publication budget and stall it short of the final tier.
+    // HandleMethodLoad) so they don't inflate its tier count and stall the stage short of the final tier.
     private const int OptimizationTierShift = 7;
     private const int OptimizationTierMask = 0x7;
     private const int MinOptJitted = 1;
@@ -82,15 +100,29 @@ internal sealed class JitListener : EventListener
     // itself. Generous vs the ~100ms default delay, so it only ever fires on an actual drop, not on the normal path.
     private static readonly TimeSpan TieringActiveTimeoutMargin = TimeSpan.FromSeconds(1);
 
-    private readonly int metadataToken;
-    private readonly string methodName;
-    private readonly object lockObj = new();
-    private readonly SemaphoreSlim publicationSignal = new(0);
+    // How long the background worker must stay idle (no new batch) for us to declare quiescence. A burst's methods and
+    // their callees tier up in a TRAIN of back-to-back background batches (a few tens of ms apart), so the window has to
+    // bridge those gaps and only conclude "quiet" once a full window passes with no new batch. 30ms comfortably spans
+    // the inter-batch gap while keeping the per-tier settle cost small.
+    private static readonly TimeSpan QuiescenceSettleWindow = TimeSpan.FromMilliseconds(30);
+    // How long to wait for an observed-busy background JIT batch to drain before assuming its BackgroundJitStop was
+    // dropped (EventPipe sheds events under pressure) and proceeding. Generous — it only bites on a dropped Stop, and a
+    // large compile queue can legitimately take a while; leaving "busy" stuck would poison every later quiescence check.
+    private static readonly TimeSpan BackgroundJitDrainTimeout = TimeSpan.FromSeconds(10);
+
+    // One entry per watched method. Small (a handful at most), so HandleMethodLoad scans it linearly per publication.
+    private readonly WatchedMethod[] watchedMethods;
+    private readonly object syncRoot = new();
     private readonly ManualResetEventSlim tieringActiveSignal = new(false);
     private readonly ManualResetEventSlim tieringActivePrimedSignal = new(false);
+    // The background tiering worker's busy/idle state (Start..Stop-with-0-pending). Kept as a paired flip-flop so a
+    // reader never sees both set at once. Set/Reset under syncRoot.
     private readonly ManualResetEventSlim backgroundJitBusySignal = new(false);
     private readonly ManualResetEventSlim backgroundJitIdleSignal = new(true);
 
+    // Number of watched methods that have reached a final tier (guarded by syncRoot). reachedFinalTier mirrors
+    // "finalTierCount == watchedMethods.Length" for a lock-free read; both flip together once every method is done.
+    private int finalTierCount;
     private volatile bool reachedFinalTier;
     private volatile bool canObserve;
     private bool disposed;
@@ -101,21 +133,27 @@ internal sealed class JitListener : EventListener
     private int loadNameIndex = -1;
     private int backgroundJitStopPendingIndex = -1;
 
-    private JitListener(MethodInfo method)
+    private JitListener(WatchedMethod[] methods)
     {
-        // NOTE: the base EventListener ctor calls OnEventSourceCreated before these fields are set,
-        // but that callback only enables events / probes canObserve and never reads them.
-        metadataToken = method.MetadataToken;
-        methodName = method.Name;
+        // NOTE: the base EventListener ctor calls OnEventSourceCreated before this field is set, but that callback only
+        // enables events / probes canObserve and never reads watchedMethods.
+        watchedMethods = methods;
     }
 
-    internal static JitListener? Create(MethodInfo? method)
+    // Watches every method in the collection. Returns null — so the caller falls back to the fixed delay — when there
+    // is nothing to watch, the runtime has no tiered JIT, or EventSource is unavailable.
+    internal static JitListener? Create(IEnumerable<MethodInfo> methods)
     {
-        if (method is null || !JitInfo.IsTiered)
+        if (!JitInfo.IsTiered)
         {
             return null;
         }
-        var listener = new JitListener(method);
+        var watched = methods.Select(m => new WatchedMethod(m)).ToArray();
+        if (watched.Length == 0)
+        {
+            return null;
+        }
+        var listener = new JitListener(watched);
         if (!listener.canObserve)
         {
             listener.Dispose();
@@ -124,6 +162,7 @@ internal sealed class JitListener : EventListener
         return listener;
     }
 
+    // True only once EVERY watched method has reached a final tier.
     internal bool ReachedFinalTier => reachedFinalTier;
 
     // Waits until the call-counting delay is observed inactive (a TieredCompilationResume), so the stage's first burst
@@ -143,7 +182,7 @@ internal sealed class JitListener : EventListener
         }
         if (!tieringActivePrimedSignal.Wait(JitInfo.TieredDelay + TimeSpan.FromMilliseconds(50), cancellationToken))
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 if (!tieringActivePrimedSignal.IsSet)
                 {
@@ -171,42 +210,94 @@ internal sealed class JitListener : EventListener
         {
             // The primed signal is already set (WaitForInitialTieringActive ran first), so only flip the active
             // signal. Lock so this can't interleave with a concurrent Pause/Resume handler.
-            lock (lockObj)
+            lock (syncRoot)
             {
                 tieringActiveSignal.Set();
             }
         }
     }
 
-    // Waits for a new tier publication (a non-tier0 MethodLoadVerbose for the method) — i.e. the latest burst drove
-    // the method to its next tier and the runtime published it. Consumes one queued publication permit. True if one
-    // arrived before the timeout; false otherwise. Wait(TimeSpan.Zero, ...) is a non-blocking probe (TryQuiescentPublication).
-    internal bool WaitForPublication(TimeSpan timeout, CancellationToken cancellationToken)
-        => publicationSignal.Wait(timeout, cancellationToken);
+    // Waits for the background tiering worker to go quiet, then reports whether every still-tiering watched method has
+    // advanced beyond `previousTierCounter` tier-ups (or already reached its final tier). Quiescence is what makes
+    // proceeding safe: when the worker is idle, this tier's compiles (the watched method(s) AND their untracked callees,
+    // which tier up in a train of back-to-back batches) have all landed, so the next burst / the following stage won't
+    // race them. We wait for the worker to be idle and STAY idle for a settle window — a new batch within the window (a
+    // callee tiering up, or the watched-method batch starting after a slow enqueue) wakes us to drain it and re-settle;
+    // a full window with no new batch means the tree is warm. We read the (volatile) tier counts only AFTER observing
+    // the worker idle, so a batch that started-and-finished before we looked has already bumped them. (When the caller
+    // has stopped observing the watched methods it ignores the result and just uses this to drain untracked callees.)
+    internal bool WaitForQuiescentTierUp(int previousTierCounter, CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            // Wait out any tiering pause first: while paused, the worker won't compile even already-enqueued methods, so
+            // "idle" isn't quiescent — WaitForTieringActive returns once counting is active again (the delay elapsed /
+            // a Resume was observed). In the common case (not paused) it returns immediately.
+            WaitForTieringActive(cancellationToken);
+            // Wait the settle window for the worker to (re)start a batch. A burst's methods and their callees tier up in
+            // a train of back-to-back batches, so if one starts we drain it and re-check; if none starts within the
+            // window the tree has settled.
+            if (!WaitForBackgroundJitBusy(QuiescenceSettleWindow, cancellationToken))
+            {
+                return AllAdvanced(previousTierCounter);
+            }
+            WaitForBackgroundJitIdle(BackgroundJitDrainTimeout, cancellationToken);
+        }
+    }
 
-    // Waits (up to the timeout) for the background tiering worker to be running a batch — either one already in flight
-    // or one that starts within the window. True if it is/becomes busy; false if it stays idle the whole timeout,
-    // meaning no background tiering is underway (quiet).
-    internal bool WaitForBackgroundJitBusy(TimeSpan timeout, CancellationToken cancellationToken)
+    // Waits up to the timeout for every still-tiering watched method to advance beyond `previousTierCounter`, WITHOUT
+    // waiting out a full settle window. Used to cheaply detect a tier-up while nudging one call at a time: it returns
+    // immediately if they've already advanced, otherwise waits out any pause and gives the worker a short window
+    // (jitBusyTimeout) to pick the nudge up, draining it if it does. The caller does a final WaitForQuiescentTierUp
+    // afterwards to settle callees. True if all advanced; false otherwise.
+    internal bool WaitForTierUp(int previousTierCounter, TimeSpan jitBusyTimeout, CancellationToken cancellationToken)
+    {
+        if (AllAdvanced(previousTierCounter))
+        {
+            return true;
+        }
+        WaitForTieringActive(cancellationToken);
+        if (WaitForBackgroundJitBusy(jitBusyTimeout, cancellationToken))
+        {
+            WaitForBackgroundJitIdle(BackgroundJitDrainTimeout, cancellationToken);
+        }
+        return AllAdvanced(previousTierCounter);
+    }
+
+    // Waits up to the timeout for the background tiering worker to be running a batch. True if it is/becomes busy.
+    private bool WaitForBackgroundJitBusy(TimeSpan timeout, CancellationToken cancellationToken)
         => backgroundJitBusySignal.Wait(timeout, cancellationToken);
 
     // Waits (up to the timeout) for the background tiering worker to go idle (its queue drained — a BackgroundJitStop
     // with PendingMethodCount == 0). The caller only waits after observing the worker busy, and a running batch always
-    // finishes — but the BackgroundJitStop that announces it can be dropped by EventPipe under buffer pressure (most
-    // likely right here, since a busy drain floods the same buffers with MethodLoadVerbose). So on timeout we force the
-    // idle state and proceed: this wait is only best-effort warming of untracked callees, and leaving busy stuck set
-    // would also poison every later quiescence check. The cap only bites on a dropped Stop.
-    internal void WaitForBackgroundJitIdle(TimeSpan timeout, CancellationToken cancellationToken)
+    // finishes — but the BackgroundJitStop can be dropped by EventPipe under buffer pressure (most likely right here,
+    // since a busy drain floods the same buffers with MethodLoadVerbose). So on timeout we force the idle state and
+    // proceed: leaving "busy" stuck would poison every later quiescence check. The cap only bites on a dropped Stop.
+    private void WaitForBackgroundJitIdle(TimeSpan timeout, CancellationToken cancellationToken)
     {
         if (!backgroundJitIdleSignal.Wait(timeout, cancellationToken))
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 // Reset busy before setting idle so a reader never sees both set at once (matches HandleBackgroundJitStop).
                 backgroundJitBusySignal.Reset();
                 backgroundJitIdleSignal.Set();
             }
         }
+    }
+
+    // Whether every watched method either advanced its tier count or already reached its final tier.
+    private bool AllAdvanced(int previousTierCount)
+    {
+        for (int i = 0; i < watchedMethods.Length; i++)
+        {
+            var method = watchedMethods[i];
+            if (!method.reachedFinalTier && method.tierUpCount <= previousTierCount)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected override void OnEventSourceCreated(EventSource source)
@@ -234,7 +325,7 @@ internal sealed class JitListener : EventListener
         // Reset on Pause); tieringActivePrimedSignal just records that some delay activity occurred (set by either).
         if (name == TieredCompilationResumeEvent)
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 if (disposed)
                     return;
@@ -245,7 +336,7 @@ internal sealed class JitListener : EventListener
         }
         if (name == TieredCompilationPauseEvent)
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 if (disposed)
                     return;
@@ -256,11 +347,12 @@ internal sealed class JitListener : EventListener
         }
         if (name == TieredCompilationBackgroundJitStartEvent)
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 if (disposed)
                     return;
-                // The worker began a batch. Reset idle before setting busy so a reader never sees both set at once.
+                // The worker began a batch (the watched method(s) and/or untracked callees tiering up). Reset idle
+                // before setting busy so a reader never sees both set at once.
                 backgroundJitIdleSignal.Reset();
                 backgroundJitBusySignal.Set();
             }
@@ -292,14 +384,14 @@ internal sealed class JitListener : EventListener
                 return;
         }
 
-        // The worker stopped; once nothing is left queued it has gone idle (its batch — e.g. an OSR'd callee's
-        // tier-up — is complete). Reset busy before setting idle so a reader never sees both set at once.
+        // The worker stopped; once nothing is left queued the batch is fully drained and the JIT is idle.
         if (Convert.ToInt64(payload[backgroundJitStopPendingIndex]) == 0)
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 if (disposed)
                     return;
+                // Reset busy before setting idle so a reader never sees both set at once.
                 backgroundJitBusySignal.Reset();
                 backgroundJitIdleSignal.Set();
             }
@@ -329,10 +421,10 @@ internal sealed class JitListener : EventListener
         // TieredCompilationResume is coming. That is exactly (and all) the up-front gate (WaitForInitialTieringActive)
         // needs: it only asks "is the tiering machinery active, so a Resume will arrive to gate on?", which is a
         // process-wide question. (Pause/Resume prime it too; this also covers the brief window before the first call
-        // fires Pause.) The tier0 compile itself is the baseline, not a tier-up, so we never raise a publication for it.
+        // fires Pause.) The tier0 compile itself is the baseline, not a tier-up, so we never count it.
         if (tier == QuickJittedTier0)
         {
-            lock (lockObj)
+            lock (syncRoot)
             {
                 if (disposed)
                     return;
@@ -342,41 +434,64 @@ internal sealed class JitListener : EventListener
         }
 
         // An OSR publication is not a step on the call-count tier ladder (it fires off a hot loop's back-edge counter,
-        // and the method goes on to be call-count-promoted past it), so don't let it count as a tier-up the stage is
-        // waiting on — otherwise a method that OSRs in multiple bodies overruns the stage's publication budget and
-        // stops short of the final tier.
+        // and the method goes on to be call-count-promoted past it), so don't let it count as a tier-up — otherwise a
+        // method that OSRs in multiple bodies overruns its tier count and the stage stops short of the final tier.
         if (tier == OptimizedTier1OSR)
             return;
 
-        // Everything below concerns OUR method reaching its next tier, so filter to it.
-        if (Convert.ToInt32(payload[loadTokenIndex]) != metadataToken)
-            return;
-        if (payload[loadNameIndex] as string != methodName)
+        // Everything below concerns one of OUR watched methods reaching its next tier, so find the matching one (if any).
+        int token = Convert.ToInt32(payload[loadTokenIndex]);
+        string? name = payload[loadNameIndex] as string;
+        WatchedMethod? matched = null;
+        foreach (var candidate in watchedMethods)
+        {
+            if (candidate.MetadataToken == token && candidate.Name == name)
+            {
+                matched = candidate;
+                break;
+            }
+        }
+        if (matched is null)
             return;
 
         // Any of the runtime's final tiers means the method is fully warmed and will emit no further tier-ups —
         // whether it tiered all the way up (OptimizedTier1), was compiled straight to optimized code (Optimized), or
         // never tiers at all (MinOptJitted).
-        if (tier == OptimizedTier1 || tier == Optimized || tier == MinOptJitted)
-            reachedFinalTier = true;
+        bool isFinalTier = tier == OptimizedTier1 || tier == Optimized || tier == MinOptJitted;
 
-        lock (lockObj)
+        lock (syncRoot)
         {
             if (disposed)
                 return;
-            publicationSignal.Release();
+            // Count this tier-up so callers can detect the method advanced beyond a given tier.
+            matched.tierUpCount++;
+            // Track per-method completion so reachedFinalTier flips only once the LAST watched method is done.
+            if (isFinalTier && !matched.reachedFinalTier)
+            {
+                matched.reachedFinalTier = true;
+                if (++finalTierCount == watchedMethods.Length)
+                    reachedFinalTier = true;
+            }
         }
+    }
+
+    private sealed class WatchedMethod(MethodInfo method)
+    {
+        internal volatile int tierUpCount;
+        internal volatile bool reachedFinalTier;
+
+        internal int MetadataToken => method.MetadataToken;
+        internal string Name => method.Name;
     }
 
     public override void Dispose()
     {
-        lock (lockObj)
+        lock (syncRoot)
         {
             disposed = true;
         }
         // base.Dispose disables the events we enabled (when no other listener wants them).
         base.Dispose();
-        publicationSignal.Dispose();
         tieringActivePrimedSignal.Dispose();
         tieringActiveSignal.Dispose();
         backgroundJitBusySignal.Dispose();

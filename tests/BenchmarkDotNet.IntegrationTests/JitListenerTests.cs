@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -15,7 +16,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = Cold;
 
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -28,13 +29,13 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = AlreadyTier1;
 
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         // The first jit stage brings the method to tier1 (in an optimized build) and our observer records it. Running
         // the jit stage again for the same (now tier1) method should also succeed; it gets a fresh listener, because
         // the stage drove the first to completion and reusing one across runs would leave its tiering signals ambiguous.
         RunJitStageToCompletion(workloadMethod, observer);
-        using var observer2 = JitListener.Create(workloadMethod.Method);
+        using var observer2 = JitListener.Create([workloadMethod.Method]);
         RunJitStageToCompletion(workloadMethod, observer2);
 
         AssertReachedFinalTier(observer);
@@ -47,7 +48,7 @@ public class JitListenerTests
         Func<long, long> workloadMethod = AlreadyTier0;
         // Watch from before the pre-invoke, and hand this listener to the stage so it doesn't create a second one
         // (see RunJitStageToCompletion): in a minopt build the pre-invoke is the method's only compile.
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0(42));
         // Sleep long enough for the tiered call counting to begin.
@@ -67,7 +68,7 @@ public class JitListenerTests
         // NOT sleep first: this test's whole point is that the call-counting delay is still pending when the stage
         // starts. Because the stage reuses this one listener, the pre-invoke's event is never lost to a second
         // listener's session churn, so no wait is needed to observe the final tier.
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(AlreadyTier0DelayedCallCounting(42));
 
@@ -86,7 +87,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = Osr;
 
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -103,10 +104,10 @@ public class JitListenerTests
         Func<long, long> workloadMethod = CallsOsr;
         Func<long, long> calleeMethod = OsrCallee;
 
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
         // The stage only drives (and the engine's listener only watches) the benchmark method, but every call to it
         // calls the OSR'd callee, so the callee should be driven all the way to tier1 too. Watch it independently.
-        using var calleeObserver = JitListener.Create(calleeMethod.Method);
+        using var calleeObserver = JitListener.Create([calleeMethod.Method]);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -124,7 +125,7 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = NoOptimization;
 
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         RunJitStageToCompletion(workloadMethod, observer);
 
@@ -138,9 +139,57 @@ public class JitListenerTests
     {
         Func<long, long> workloadMethod = AggressiveOptimization;
 
-        using var observer = JitListener.Create(workloadMethod.Method);
+        using var observer = JitListener.Create([workloadMethod.Method]);
 
         RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
+    }
+
+    // A single listener can watch several methods at once. Here one listener watches two distinct methods, and the
+    // stage drives both (the workload action calls each per invocation). ReachedFinalTier is the aggregate, so it only
+    // becomes true once BOTH have reached their final tier — exercising the multi-method path that scenarios like
+    // dotnet/BenchmarkDotNet#147 (driving several methods) will rely on.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_MultipleMethods()
+    {
+        Func<long, long> first = MultiFirst;
+        Func<long, long> second = MultiSecond;
+
+        using var observer = JitListener.Create([first.Method, second.Method]);
+
+        RunJitStageToCompletion(observer, [first.Method, second.Method], i => { first(i); second(i); });
+
+        AssertReachedFinalTier(observer);
+    }
+
+    // Watched methods need not be invoked at the same rate (e.g. dotnet/BenchmarkDotNet#147 may call one more often
+    // than another). Here the "fast" method is invoked twice per iteration and the "slow" one once, so the fast method
+    // crosses its call-count thresholds — and thus tiers up — sooner. Each method banks its own publication permits, so
+    // the fast method's extra/earlier promotions aren't dropped while the slow one catches up; both must still reach
+    // their final tier.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_MultipleMethodsUnevenInvocationRates()
+    {
+        Func<long, long> fast = MultiUnevenFast;
+        Func<long, long> slow = MultiUnevenSlow;
+
+        using var observer = JitListener.Create([fast.Method, slow.Method]);
+
+        int invokeCount = 0;
+        int tieredCount = 0;
+        RunJitStageToCompletion(observer, [fast.Method, slow.Method], i =>
+        {
+            fast(i);
+            fast(i);
+            fast(i);
+            if (++tieredCount > 0 && tieredCount <= JitInfo.MaxTierPromotions && ++invokeCount * 3 > JitInfo.TieredCallCountThreshold)
+            {
+                Thread.Sleep(200); // Sleep to let the JIT compile the fast method before the slow method.
+                invokeCount = 0;
+            }
+            slow(i);
+        });
 
         AssertReachedFinalTier(observer);
     }
@@ -156,6 +205,11 @@ public class JitListenerTests
     // The test owns the listener and passes it in; the stage uses that exact instance (it never creates its own), so
     // there is never a second EventListener whose setup/teardown could flush an event in flight to the test's listener.
     private static void RunJitStageToCompletion(Func<long, long> workloadMethod, JitListener? listener)
+        => RunJitStageToCompletion(listener, [workloadMethod.Method], i => workloadMethod(i));
+
+    // Core harness: the stage watches/drives the given workloadMethods, and each iteration runs invokeOnce (which the
+    // caller wires to actually call those methods) invokeCount times so they go through call counting and tier up.
+    private static void RunJitStageToCompletion(JitListener? listener, MethodInfo[] workloadMethods, Action<long> invokeOnce)
     {
         // The per-tier publication wait is unbounded, cancellable only via the host's token. When the method tiers, the
         // stage re-bursts until the runtime reports the next-tier compile began, so the wait isn't actually hit — but a
@@ -165,16 +219,16 @@ public class JitListenerTests
         Func<long, IClock, ValueTask<ClockSpan>> empty = (_, _) => new(default(ClockSpan));
         Func<long, IClock, ValueTask<ClockSpan>> workload = (invokeCount, _) =>
         {
-            // Really invoke the benchmark method so it goes through call counting and tiers up for real.
+            // Really invoke the benchmark method(s) so they go through call counting and tier up for real.
             for (long i = 0; i < invokeCount; i++)
-                workloadMethod(i);
+                invokeOnce(i);
             return new(default(ClockSpan));
         };
 
         var parameters = new EngineParameters
         {
             Host = host,
-            WorkloadMethod = workloadMethod.Method,
+            WorkloadMethods = workloadMethods,
             WorkloadActionNoUnroll = workload,
             WorkloadActionUnroll = workload,
             OverheadActionNoUnroll = empty,
@@ -216,6 +270,16 @@ public class JitListenerTests
     private static long NoOptimization(long x) => x * x + 1;
     [MethodImpl(MethodImplOptions.NoInlining | CodeGenHelper.AggressiveOptimizationOption)]
     private static long AggressiveOptimization(long x) => x * x + 1;
+    // Two distinct methods watched together by one listener (JitStage_MultipleMethods).
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long MultiFirst(long x) => x * x + 1;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long MultiSecond(long x) => x * x + 1;
+    // Watched together but invoked at different rates (JitStage_MultipleMethodsUnevenInvocationRates).
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long MultiUnevenFast(long x) => x * x + 1;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long MultiUnevenSlow(long x) => x * x + 1;
 
     // A loop long enough to cross the OSR back-edge threshold so these methods are On-Stack-Replaced where OSR is
     // enabled. Timing is irrelevant (RunJitStageToCompletion records 0ns measurements, so the stage never takes its

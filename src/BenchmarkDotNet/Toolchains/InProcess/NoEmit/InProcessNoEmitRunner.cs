@@ -178,7 +178,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    WorkloadMethod = target.WorkloadMethod,
+                    WorkloadMethods = [target.WorkloadMethod],
                     WorkloadActionNoUnroll = workloadAction.InvokeNoUnroll,
                     WorkloadActionUnroll = workloadAction.InvokeUnroll,
                     OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,

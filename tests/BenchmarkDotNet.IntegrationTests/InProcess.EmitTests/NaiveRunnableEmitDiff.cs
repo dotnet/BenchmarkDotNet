@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         [
             "Run",
             ".ctor",
-            "__ResolveWorkloadMethod"
+            "__ResolveWorkloadMethods"
         ];
 
         private static readonly IReadOnlyDictionary<OpCode, OpCode> AltOpCodes = new Dictionary<OpCode, OpCode>()

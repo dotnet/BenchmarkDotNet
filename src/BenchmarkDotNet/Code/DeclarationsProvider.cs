@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Code
         protected string GetWorkloadMethodCall(string passArguments)
              => $"{GetMethodPrefix(Descriptor.WorkloadMethod)}.{Descriptor.WorkloadMethod.Name}({passArguments});";
 
-        // Renders the benchmark method's parameter types as a Type[] for __ResolveWorkloadMethod to match overloads
+        // Renders the benchmark method's parameter types as a Type[] for __ResolveWorkloadMethods to match overloads
         // exactly. Each is a typeof(...) of the element type, re-wrapping by-ref/pointer via reflection (typeof can't
         // express `T&`), so resolution never has to name the method's (possibly unspellable) return type.
         private string GetWorkloadMethodParameterTypes()

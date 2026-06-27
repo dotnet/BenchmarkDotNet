@@ -39,7 +39,7 @@
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
-                WorkloadMethod = instance.__ResolveWorkloadMethod(host),
+                WorkloadMethods = instance.__ResolveWorkloadMethods(host),
                 WorkloadActionUnroll = instance.WorkloadActionUnroll,
                 WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
                 OverheadActionNoUnroll = instance.OverheadActionNoUnroll,
@@ -72,11 +72,11 @@
 
         $DeclareFieldsContainer$
 
-        private global::System.Reflection.MethodInfo __ResolveWorkloadMethod(global::BenchmarkDotNet.Engines.IHost host)
+        private global::System.Reflection.MethodInfo[] __ResolveWorkloadMethods(global::BenchmarkDotNet.Engines.IHost host)
         {
-            // Best-effort: the jit stage uses the resolved method to watch its JIT tier-up events, and falls back to a
-            // fixed delay when WorkloadMethod is null. So neither a missed match nor a reflection failure (e.g. a
-            // same-named overload's parameter type fails to load) may break the benchmark — report and return null.
+            // Best-effort: the jit stage uses the resolved method(s) to watch their JIT tier-up events, and falls back
+            // to a fixed delay when none are resolved. So neither a missed match nor a reflection failure (e.g. a
+            // same-named overload's parameter type fails to load) may break the benchmark — report and return empty.
             try
             {
                 global::System.Type[] parameterTypes = $WorkloadMethodParameterTypes$;
@@ -104,17 +104,17 @@
                     }
                     if (isMatch)
                     {
-                        return candidate;
+                        return new global::System.Reflection.MethodInfo[] { candidate };
                     }
                 }
             }
             catch (global::System.Exception e)
             {
-                host.SendError($"Exception during __ResolveWorkloadMethod!{(global::System.Environment.NewLine)}{e}");
-                return null;
+                host.SendError($"Exception during __ResolveWorkloadMethods!{(global::System.Environment.NewLine)}{e}");
+                return global::System.Array.Empty<global::System.Reflection.MethodInfo>();
             }
             host.WriteLine("// Could not resolve the benchmark method '$WorkloadMethodName$' to watch JIT tier-up events; the jit stage will fall back to a fixed delay.");
-            return null;
+            return global::System.Array.Empty<global::System.Reflection.MethodInfo>();
         }
 
         private $GlobalSetupModifiers$ global::System.Threading.Tasks.ValueTask __GlobalSetup()

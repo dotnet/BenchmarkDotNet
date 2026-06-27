@@ -19,10 +19,10 @@ namespace BenchmarkDotNet.Engines
         public Job TargetJob { get; set; } = Job.Default;
 
         /// <summary>
-        /// The benchmark method, used by the jit stage to watch for its tier-up via JIT events.
-        /// If <see langword="null"/>, falls back to a fixed delay.
+        /// The benchmark method(s), used by the jit stage to watch for their tier-up via JIT events.
+        /// When empty (nothing to watch, or resolution failed), the jit stage falls back to a fixed delay.
         /// </summary>
-        public required MethodInfo? WorkloadMethod { get; set; }
+        public required IEnumerable<MethodInfo> WorkloadMethods { get; set; }
 
         public long OperationsPerInvoke { get; set; } = 1;
         public required Func<ValueTask> GlobalSetupAction { get; set; }
