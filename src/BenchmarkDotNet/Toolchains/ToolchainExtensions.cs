@@ -73,6 +73,9 @@ namespace BenchmarkDotNet.Toolchains
                                 RuntimeMoniker.Mono60 => GetToolchain(RuntimeMoniker.Net60),
                                 RuntimeMoniker.Mono70 => GetToolchain(RuntimeMoniker.Net70),
                                 RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
+                                RuntimeMoniker.Mono90 => GetToolchain(RuntimeMoniker.Net90),
+                                RuntimeMoniker.Mono10_0 => GetToolchain(RuntimeMoniker.Net10_0),
+                                RuntimeMoniker.Mono11_0 => GetToolchain(RuntimeMoniker.Net11_0),
                                 _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, mono.Name))
                             };
                         }
@@ -197,6 +200,15 @@ namespace BenchmarkDotNet.Toolchains
 
                 case RuntimeMoniker.Mono80:
                     return MonoToolchain.Mono80;
+
+                case RuntimeMoniker.Mono90:
+                    return MonoToolchain.Mono90;
+
+                case RuntimeMoniker.Mono10_0:
+                    return MonoToolchain.Mono10_0;
+
+                case RuntimeMoniker.Mono11_0:
+                    return MonoToolchain.Mono11_0;
 
                 case RuntimeMoniker.R2R80:
                     return R2RToolchain.R2R80;

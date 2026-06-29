@@ -10,6 +10,9 @@ namespace BenchmarkDotNet.Toolchains.Mono
         [PublicAPI] public static readonly IToolchain Mono60 = From(new NetCoreAppSettings("net6.0", "mono60"));
         [PublicAPI] public static readonly IToolchain Mono70 = From(new NetCoreAppSettings("net7.0", "mono70"));
         [PublicAPI] public static readonly IToolchain Mono80 = From(new NetCoreAppSettings("net8.0", "mono80"));
+        [PublicAPI] public static readonly IToolchain Mono90 = From(new NetCoreAppSettings("net9.0", "mono90"));
+        [PublicAPI] public static readonly IToolchain Mono10_0 = From(new NetCoreAppSettings("net10.0", "mono10_0"));
+        [PublicAPI] public static readonly IToolchain Mono11_0 = From(new NetCoreAppSettings("net11.0", "mono11_0"));
 
         private MonoToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor, customDotNetCliPath)
