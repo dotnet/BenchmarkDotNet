@@ -53,6 +53,13 @@ namespace BenchmarkDotNet.Helpers
 
         public async ValueTask DisposeAsync()
         {
+            // DisposeAsync bypasses the base Dispose() entry point, so honor the same run-once guard to avoid
+            // racing the OnCancelKeyPress / OnProcessExit handlers when a run is aborted.
+            if (!MarkDisposed())
+            {
+                return;
+            }
+
             try
             {
                 if (!process.HasExited)
