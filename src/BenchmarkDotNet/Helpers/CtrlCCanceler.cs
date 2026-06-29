@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Helpers
         {
             this.logger = logger;
             this.cts = cts;
+            DisposeAtProcessTermination.EnsureCancelKeyPressKeepAlive();
             Console.CancelKeyPress += OnCancelKeyPress;
         }
 
