@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // TODO: Add Aliases here for extern alias #2289
                 ));
             }
-            
+
             using var projectStream = File.Create(artifactsPaths.ProjectFilePath);
 #if NETSTANDARD2_0
             doc.Save(projectStream, SaveOptions.None);
