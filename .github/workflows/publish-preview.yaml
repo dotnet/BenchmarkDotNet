@@ -1,0 +1,39 @@
+name: publish-preview
+run-name: Publish preview nupkg 0.16.0-${{ inputs.suffix }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      suffix:
+        description: 'Prerelease suffix (produces <VersionPrefix>-<suffix>, e.g. preview.1)'
+        required: true
+        default: 'preview.1'
+
+env:
+  DOTNET_VERSION: "8.0.410"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: deploy # Only maintainers can execute this workflow (gates the NuGet.org push)
+    if: ${{ github.repository == 'dotnet/BenchmarkDotNet' }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Pack
+        run: ./build.cmd pack /p:VersionSuffix=${{ inputs.suffix }} /p:WeaverVersionSuffix=\"\"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nupkgs
+          path: artifacts/*.nupkg
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
