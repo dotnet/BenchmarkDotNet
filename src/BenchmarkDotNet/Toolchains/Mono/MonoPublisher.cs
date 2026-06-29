@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -31,6 +29,6 @@ public class MonoPublisher(string tfm, string customDotNetCliPath) : DotNetCliPu
     {
         var runtimeIdentifier = CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier();
         // /p:RuntimeIdentifiers is set explicitly here because --self-contained requires it, see https://github.com/dotnet/sdk/issues/10566
-        return $"--self-contained -r {runtimeIdentifier} /p:UseMonoRuntime=true /p:RuntimeIdentifiers={runtimeIdentifier}";
+        return $"--self-contained -r {runtimeIdentifier} /p:RuntimeIdentifiers={runtimeIdentifier}";
     }
 }

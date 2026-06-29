@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains
                                 RuntimeMoniker.Mono90 => GetToolchain(RuntimeMoniker.Net90),
                                 RuntimeMoniker.Mono10_0 => GetToolchain(RuntimeMoniker.Net10_0),
                                 RuntimeMoniker.Mono11_0 => GetToolchain(RuntimeMoniker.Net11_0),
-                                _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
+                                _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, mono.Name))
                             };
                         }
                         else
