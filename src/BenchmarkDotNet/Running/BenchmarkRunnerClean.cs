@@ -35,6 +35,22 @@ namespace BenchmarkDotNet.Running
 
         internal static async ValueTask<Summary[]> Run(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken)
         {
+            try
+            {
+                return await RunCore(benchmarkRunInfos, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception e) when (!cancellationToken.IsCancellationRequested && ExceptionHelper.IsCancelation(e))
+            {
+                // The run was cancelled via Ctrl+C (CtrlCCanceler cancels an internal linked token, so the
+                // caller-provided token is not cancellation-requested here). CtrlCCanceler already logged the
+                // cancellation, so we just swallow the exception instead of letting it bubble up as an unhandled
+                // exception with a full stack trace. When the caller's own token is cancelled, we let it propagate.
+                return [Summary.ValidationFailed("Canceled via ctrl+c", string.Empty, string.Empty)];
+            }
+        }
+
+        private static async ValueTask<Summary[]> RunCore(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken)
+        {
             using var taskbarProgress = new TaskbarProgress(TaskbarProgressState.Indeterminate);
 
             var resolver = DefaultResolver;
