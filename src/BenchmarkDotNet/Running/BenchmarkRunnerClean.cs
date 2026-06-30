@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Running
                 // caller-provided token is not cancellation-requested here). CtrlCCanceler already logged the
                 // cancellation, so we just swallow the exception instead of letting it bubble up as an unhandled
                 // exception with a full stack trace. When the caller's own token is cancelled, we let it propagate.
-                return [];
+                return [Summary.ValidationFailed("Canceled via ctrl+c", string.Empty, string.Empty)];
             }
         }
 
