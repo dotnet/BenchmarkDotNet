@@ -39,6 +39,7 @@
             global::BenchmarkDotNet.Engines.EngineParameters engineParameters = new global::BenchmarkDotNet.Engines.EngineParameters()
             {
                 Host = host,
+                WorkloadMethods = instance.__ResolveWorkloadMethods(host),
                 WorkloadActionUnroll = instance.WorkloadActionUnroll,
                 WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
                 OverheadActionNoUnroll = instance.OverheadActionNoUnroll,
@@ -70,6 +71,51 @@
         }
 
         $DeclareFieldsContainer$
+
+        private global::System.Reflection.MethodInfo[] __ResolveWorkloadMethods(global::BenchmarkDotNet.Engines.IHost host)
+        {
+            // Best-effort: the jit stage uses the resolved method(s) to watch their JIT tier-up events, and falls back
+            // to a fixed delay when none are resolved. So neither a missed match nor a reflection failure (e.g. a
+            // same-named overload's parameter type fails to load) may break the benchmark — report and return empty.
+            try
+            {
+                global::System.Type[] parameterTypes = $WorkloadMethodParameterTypes$;
+                foreach (global::System.Reflection.MethodInfo candidate in typeof($WorkloadTypeName$).GetMethods(
+                    global::System.Reflection.BindingFlags.Instance | global::System.Reflection.BindingFlags.Static |
+                    global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic))
+                {
+                    if (candidate.Name != "$WorkloadMethodName$")
+                    {
+                        continue;
+                    }
+                    global::System.Reflection.ParameterInfo[] parameters = candidate.GetParameters();
+                    if (parameters.Length != parameterTypes.Length)
+                    {
+                        continue;
+                    }
+                    global::System.Boolean isMatch = true;
+                    for (global::System.Int32 i = 0; i < parameters.Length; i++)
+                    {
+                        if (parameters[i].ParameterType != parameterTypes[i])
+                        {
+                            isMatch = false;
+                            break;
+                        }
+                    }
+                    if (isMatch)
+                    {
+                        return new global::System.Reflection.MethodInfo[] { candidate };
+                    }
+                }
+            }
+            catch (global::System.Exception e)
+            {
+                host.SendError($"Exception during __ResolveWorkloadMethods!{(global::System.Environment.NewLine)}{e}");
+                return global::System.Array.Empty<global::System.Reflection.MethodInfo>();
+            }
+            host.WriteLine("// Could not resolve the benchmark method '$WorkloadMethodName$' to watch JIT tier-up events; the jit stage will fall back to a fixed delay.");
+            return global::System.Array.Empty<global::System.Reflection.MethodInfo>();
+        }
 
         private $GlobalSetupModifiers$ global::System.Threading.Tasks.ValueTask __GlobalSetup()
         {

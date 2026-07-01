@@ -92,6 +92,7 @@ internal static class InProcessEmitRunner
         var engineParameters = new EngineParameters()
         {
             Host = host,
+            WorkloadMethods = [benchmarkCase.Descriptor.WorkloadMethod],
             WorkloadActionUnroll = LoopCallbackFromMethod(instance, WorkloadActionUnrollMethodName),
             WorkloadActionNoUnroll = LoopCallbackFromMethod(instance, WorkloadActionNoUnrollMethodName),
             OverheadActionNoUnroll = LoopCallbackFromMethod(instance, OverheadActionNoUnrollMethodName),

@@ -25,10 +25,10 @@ partial class RunnableEmitter
                 ? base.AsyncMethodToOrdinalMap
                 : new Dictionary<string, int>
                 {
-                    { GlobalSetupMethodName, 2 },
-                    { GlobalCleanupMethodName, 3 },
-                    { IterationSetupMethodName, 4 },
-                    { IterationCleanupMethodName, 5 },
+                    { GlobalSetupMethodName, 3 },
+                    { GlobalCleanupMethodName, 4 },
+                    { IterationSetupMethodName, 5 },
+                    { IterationCleanupMethodName, 6 },
                 };
 
         protected override void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
