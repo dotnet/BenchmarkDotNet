@@ -84,7 +84,10 @@ namespace BenchmarkDotNet.Configs
         }
 
         public IOrderer? Orderer => null;
+
         public ICategoryDiscoverer? CategoryDiscoverer => null;
+
+        public IHardwareCounterProfile? HardwareCounterProfile => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
