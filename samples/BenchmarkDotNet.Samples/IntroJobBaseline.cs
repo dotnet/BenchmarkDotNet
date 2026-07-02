@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Net462, baseline: true)]
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Mono)]
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Net50)]
+    [UseLocalJobOnly]
     public class IntroJobBaseline
     {
         [Benchmark]
