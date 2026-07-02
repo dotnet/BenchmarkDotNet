@@ -20,9 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
 
-        [FactEnvSpecific(
-            "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
-            EnvRequirement.DotNetCoreOnly)]
+        [Fact]
         public void WhenInvalidCommandLineArgumentIsPassedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
             var logger = new OutputLogger(Output);

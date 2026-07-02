@@ -125,6 +125,9 @@ namespace BenchmarkDotNet.Running
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return [];
 
+            if (parsedConfig == null && options == null)
+                return []; // Help or version information was printed.
+
             if (args == null && Environment.GetCommandLineArgs().Length > 1) // The first element is the executable file name
                 logger.WriteLineHint("You haven't passed command line arguments to BenchmarkSwitcher.Run method. Running with default configuration.");
 
