@@ -1,12 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
-#if NETSTANDARD
-using Microsoft.DotNet.PlatformAbstractions;
-#endif
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -64,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             if (targetFrameworkMoniker.IsNotBlank())
                 return targetFrameworkMoniker;
-            if (!RuntimeInformation.IsNetCore)
+            if (!Portability.RuntimeInformation.IsNetCore)
                 throw new NotSupportedException("You must specify the target framework moniker in explicit way using builder.TargetFrameworkMoniker(tfm) method");
 
             return CoreRuntime.GetCurrentVersion().MsBuildMoniker;
@@ -130,12 +127,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
             string osPart = OsDetector.IsWindows() ? "win" : (OsDetector.IsMacOS() ? "osx" : "linux");
 
-            string architecture =
-#if NETSTANDARD
-                RuntimeEnvironment.RuntimeArchitecture;
-#else
-                System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
-#endif
+            string architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
 
             return $"{osPart}-{architecture}";
         }
