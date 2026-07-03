@@ -5,7 +5,6 @@ using Perfolizer.Models;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using static System.Runtime.InteropServices.RuntimeInformation;
-using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace BenchmarkDotNet.Detectors;
 
@@ -53,8 +52,8 @@ public class OsDetector
             }
         }
 
-        string operatingSystem = RuntimeEnvironment.OperatingSystem;
-        string operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
+        string operatingSystem = OSDescription;
+        string operatingSystemVersion = Environment.OSVersion.ToString();
         if (IsWindows())
         {
             int? ubr = GetWindowsUbr();
