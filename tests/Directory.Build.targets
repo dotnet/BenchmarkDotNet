@@ -1,0 +1,4 @@
+<Project>
+  <!-- Manually import `BenchmarkDotNet.targets` for build that using ProjectReference -->
+  <Import Project="$(MSBuildThisFileDirectory)..\src\BenchmarkDotNet\BenchmarkDotNet.targets" />
+</Project>
