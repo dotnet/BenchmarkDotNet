@@ -1,10 +1,10 @@
-﻿<Project>
+<Project>
 
   <PropertyGroup>
     <!-- If the RuntimeIdentifier is explicitly specified. Use the specified target platform. -->
     <BenchmarkDotNetTargetPlatform>$(RuntimeIdentifier)</BenchmarkDotNetTargetPlatform>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(BenchmarkDotNetTargetPlatform)' == ''">
     <!-- If RuntimeIdentifier is not specified Use current build platform -->
     <!-- List of runtimes supported by Gee.External.Capstone: https://github.com/9ee1/Capstone.NET/tree/master/Gee.External.Capstone/runtimes -->
@@ -18,7 +18,7 @@
     <BenchmarkDotNetTargetPlatform Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">$(BenchmarkDotNetTargetPlatform)-arm64</BenchmarkDotNetTargetPlatform>
   </PropertyGroup>
 
-  <Target Name="FilterBenchmarkDotNetPackageAssets" AfterTargets="ResolvePackageAssets">
+  <Target Name="BdnFilterPackageAssets" AfterTargets="ResolvePackageAssets">
     <!-- Remove `runtimes/{RuntimeIdentifier}` files that is not matched to target platform. -->
     <ItemGroup Condition="'$(BenchmarkDotNetTargetPlatform)' != '' AND $(BenchmarkDotNetTargetPlatform) != 'all'">
       <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)"
@@ -27,8 +27,21 @@
 
     <!-- Remove unnecessary satellite assemblies. -->
     <ItemGroup>
-      <ResourceCopyLocalItems Remove="@(ResourceCopyLocalItems)"
-                              Condition="'%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.CodeAnalysis.Common' OR '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.CodeAnalysis.CSharp'"/>
+      <ResourceCopyLocalItems
+        Remove="@(ResourceCopyLocalItems)"
+        Condition="'%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.CodeAnalysis.Common'
+                   OR
+                   '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.CodeAnalysis.CSharp'
+                   OR
+                   '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.TestPlatform.AdapterUtilities'
+                   OR
+                   '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.TestPlatform.ObjectModel'
+                   OR
+                   '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.TestPlatform.TestHost'
+                   OR
+                   '%(ResourceCopyLocalItems.NuGetPackageId)' == 'Microsoft.TestPlatform.TranslationLayer'
+                  "/>
     </ItemGroup>
   </Target>
+
 </Project>
