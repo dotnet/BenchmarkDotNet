@@ -1,10 +1,12 @@
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using Microsoft.Win32;
 using Perfolizer.Models;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using static System.Runtime.InteropServices.RuntimeInformation;
+using System.Runtime.InteropServices;
+
+#if NETSTANDARD
+using BenchmarkDotNet.Extensions;
+#endif
 
 namespace BenchmarkDotNet.Detectors;
 
@@ -52,14 +54,21 @@ public class OsDetector
             }
         }
 
-        string operatingSystem = OSDescription;
-        string operatingSystemVersion = Environment.OSVersion.ToString();
         if (IsWindows())
         {
+            var osVersion = RuntimeInformation.OSDescription.Split(' ').LastOrDefault() ?? ""; // `Microsoft Windows 10.0.26200`
             int? ubr = GetWindowsUbr();
-            if (ubr != null)
-                operatingSystemVersion += $".{ubr}";
+            return new OsInfo
+            {
+                Name = "Windows",
+                Version = ubr == null
+                    ? osVersion
+                    : $"{osVersion}.{ubr}",
+            };
         }
+
+        string operatingSystem = RuntimeInformation.OSDescription;
+        string operatingSystemVersion = Environment.OSVersion.ToString();
         return new OsInfo
         {
             Name = operatingSystem,
@@ -115,7 +124,7 @@ public class OsDetector
 #if NET6_0_OR_GREATER
         OperatingSystem.IsWindows(); // prefer linker-friendly OperatingSystem APIs
 #else
-        IsOSPlatform(OSPlatform.Windows);
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
 
 
@@ -124,7 +133,7 @@ public class OsDetector
 #if NET6_0_OR_GREATER
         OperatingSystem.IsLinux();
 #else
-        IsOSPlatform(OSPlatform.Linux);
+        RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 #endif
 
     [SupportedOSPlatformGuard("macos")]
@@ -133,7 +142,7 @@ public class OsDetector
 #if NET6_0_OR_GREATER
         OperatingSystem.IsMacOS();
 #else
-        IsOSPlatform(OSPlatform.OSX);
+        RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 #endif
 
     [SupportedOSPlatformGuard("android")]
@@ -159,6 +168,6 @@ public class OsDetector
 #if NET6_0_OR_GREATER
         OperatingSystem.IsTvOS();
 #else
-        IsOSPlatform(OSPlatform.Create("TVOS"));
+        RuntimeInformation.IsOSPlatform(OSPlatform.Create("TVOS"));
 #endif
 }
