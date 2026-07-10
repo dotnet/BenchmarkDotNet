@@ -203,10 +203,7 @@ namespace BenchmarkDotNet.Validators
                 : customDotNetCliPath!;
 
             rawSdkVersion = ProcessHelper.RunAndReadOutput(exePath, "--version") ?? "";
-
-            // Trim `-preview`/`-rc` part.
-            var versionText = rawSdkVersion.Split('-')[0];
-            if (Version.TryParse(versionText, out sdkVersion))
+            if (Version.TryParse(CoreRuntime.GetParsableVersionPart(rawSdkVersion), out sdkVersion))
                 return true;
 
             sdkVersion = null;
