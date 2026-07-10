@@ -148,22 +148,22 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 cancellationToken);
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
-            => new StringBuilder()
+            => new StringBuilder(256)
                 .AppendArgument("restore")
-                .AppendArgument($"\"{filePath}\"")
+                .AppendArgument($"\"{filePath.ToRelativePath(artifactsPaths)}\"")
                 // restore doesn't support -f argument.
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths, true, excludeOutput)
+                .MaybeAppendExtraArguments(artifactsPaths, isRestore: true, excludeOutput: excludeOutput)
                 .ToString();
 
         internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
-            => new StringBuilder()
+            => new StringBuilder(256)
                 .AppendArgument("build")
-                .AppendArgument($"\"{filePath}\"")
+                .AppendArgument($"\"{filePath.ToRelativePath(artifactsPaths)}\"")
                 .AppendArgument($"-f {tfm}")
                 .AppendArgument($"-c {buildPartition.BuildConfiguration}")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
@@ -171,13 +171,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths, excludeOutput: excludeOutput)
+                .MaybeAppendExtraArguments(artifactsPaths, isBuild: true, excludeOutput: excludeOutput)
                 .ToString();
 
         internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null)
-            => new StringBuilder()
+            => new StringBuilder(256)
                 .AppendArgument("publish")
-                .AppendArgument($"\"{filePath}\"")
+                .AppendArgument($"\"{filePath.ToRelativePath(artifactsPaths)}\"")
                 .AppendArgument($"-f {tfm}")
                 .AppendArgument($"-c {buildPartition.BuildConfiguration}")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendOutputPaths(artifactsPaths)
+                .MaybeAppendExtraArguments(artifactsPaths, isPublish: true)
                 .ToString();
 
         private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string? suffix)
@@ -193,7 +193,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!buildPartition.GenerateMSBuildBinLog || suffix.IsBlank())
                 return string.Empty;
 
-            return $"\"-bl:{buildPartition.ProgramName}-{suffix}.binlog\"";
+            return $"-bl:\"{buildPartition.ProgramName}-{suffix}.binlog\"";
         }
 
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -228,18 +228,37 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         // We force the project to output binaries to a new directory.
         // Specifying --output and --no-dependencies breaks the build (because the previous build was not done using the custom output path),
         // so we don't include it if we're building no-deps (only supported for integration tests).
-        internal static StringBuilder MaybeAppendOutputPaths(this StringBuilder stringBuilder, ArtifactsPaths artifactsPaths, bool isRestore = false, bool excludeOutput = false)
-            => excludeOutput
-                ? stringBuilder
-                : stringBuilder
-                    // Use AltDirectorySeparatorChar so it's not interpreted as an escaped quote `\"`.
-                    // Use a subdirectory for ArtifactsPath so that DefaultItemExcludes (which the SDK
-                    // sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
-                    .AppendArgument($"/p:ArtifactsPath=\"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}.artifacts{Path.AltDirectorySeparatorChar}\"")
-                    .AppendArgument($"/p:OutDir=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
-                    // OutputPath is legacy, per-project version of OutDir. We set both just in case. https://github.com/dotnet/msbuild/issues/87
-                    .AppendArgument($"/p:OutputPath=\"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
-                    .AppendArgument($"/p:PublishDir=\"{artifactsPaths.PublishDirectoryPath}{Path.AltDirectorySeparatorChar}\"")
-                    .AppendArgument(isRestore ? string.Empty : $"--output \"{artifactsPaths.BinariesDirectoryPath}{Path.AltDirectorySeparatorChar}\"");
+        internal static StringBuilder MaybeAppendExtraArguments(
+            this StringBuilder stringBuilder,
+            ArtifactsPaths artifactsPaths,
+            bool isRestore = false,
+            bool isBuild = false,
+            bool isPublish = false,
+            bool excludeOutput = false)
+        {
+            if (!excludeOutput)
+            {
+                // Use a subdirectory for ArtifactsPath so that DefaultItemExcludes (which the SDK
+                // sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
+                stringBuilder.AppendArgument($"--artifacts-path .artifacts");
+
+                if (!isRestore)
+                    stringBuilder.AppendArgument($"--output \"{artifactsPaths.BinariesDirectoryPath.ToRelativePath(artifactsPaths)}\"");
+            }
+
+            if (isPublish)
+                stringBuilder.AppendArgument($"/p:PublishDir=\"{artifactsPaths.PublishDirectoryPath}\"");
+
+            return stringBuilder;
+        }
+
+        internal static string ToRelativePath(this string path, ArtifactsPaths artifactsPaths)
+        {
+            var buildArtifactsDirectoryPath = $"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.DirectorySeparatorChar}";
+            if (path.StartsWith(buildArtifactsDirectoryPath))
+                return path.Substring(buildArtifactsDirectoryPath.Length);
+
+            return path;
+        }
     }
 }

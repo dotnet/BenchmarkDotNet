@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using System.ComponentModel;
@@ -20,10 +21,19 @@ namespace BenchmarkDotNet.Validators
                 yield return cliPathError;
                 yield break;
             }
+
             var requiredSdkVersion = benchmark.GetRuntime().RuntimeMoniker.GetRuntimeVersion();
             if (!GetInstalledDotNetSdks(customDotNetCliPath).Any(sdk => sdk >= requiredSdkVersion))
             {
                 yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime!.RuntimeMoniker} is not installed.", benchmark);
+                yield break;
+            }
+
+            // Validate actual .NET SDK version. (.NET 8 SDK is minimum requirement to use ArtifactsPath)
+            if (TryGetDotNetSdkVersion(customDotNetCliPath, out string rawVersionText, out Version? sdkVersion))
+            {
+                if (sdkVersion.Major < 8)
+                    yield return new ValidationError(true, $"The .NET 8 SDK is the minimum requirement for building the project. Resolved SDK version: {rawVersionText}", benchmark);
             }
         }
 
@@ -181,6 +191,26 @@ namespace BenchmarkDotNet.Validators
                 return "4.5";
 
             return "";
+        }
+
+        private static bool TryGetDotNetSdkVersion(
+            string? customDotNetCliPath,
+            out string rawSdkVersion,
+            [NotNullWhen(true)] out Version? sdkVersion)
+        {
+            string exePath = customDotNetCliPath.IsBlank()
+                ? "dotnet"
+                : customDotNetCliPath!;
+
+            rawSdkVersion = ProcessHelper.RunAndReadOutput(exePath, "--version") ?? "";
+
+            // Trim `-preview`/`-rc` part.
+            var versionText = rawSdkVersion.Split('-')[0];
+            if (Version.TryParse(versionText, out sdkVersion))
+                return true;
+
+            sdkVersion = null;
+            return false;
         }
     }
 }
