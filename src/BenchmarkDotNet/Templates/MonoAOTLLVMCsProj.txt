@@ -1,4 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
+<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
+
   <PropertyGroup>
     <OriginalCSProjPath>$CSPROJPATH$</OriginalCSProjPath>
     <MonoPropsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Mono.props'))</MonoPropsPath>
@@ -73,7 +75,6 @@
      </AotInputAssemblies>
    </ItemGroup>
 
-
    <MonoAOTCompiler
         CompilerBinaryPath="$COMPILERBINARYPATH$"
         Mode="Normal"
@@ -93,4 +94,5 @@
    </Target>
 
   <Import Project="$(MonoTargetsPath)" Condition="Exists($(MonoTargetsPath))" />
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
 </Project>
