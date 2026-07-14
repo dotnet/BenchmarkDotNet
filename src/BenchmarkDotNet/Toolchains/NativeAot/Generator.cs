@@ -138,8 +138,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $"""
             <Project Sdk="Microsoft.NET.Sdk">
               <PropertyGroup>
-                <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
-                <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
                 <OutputType>Exe</OutputType>
                 <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
                 <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
