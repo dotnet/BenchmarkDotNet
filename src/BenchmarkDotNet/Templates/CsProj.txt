@@ -1,8 +1,6 @@
 <Project Sdk="$SDKNAME$">
 
   <PropertyGroup>
-    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
-    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
     <AssemblyTitle>$PROGRAMNAME$</AssemblyTitle>
     <TargetFrameworks>$TFM$</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
