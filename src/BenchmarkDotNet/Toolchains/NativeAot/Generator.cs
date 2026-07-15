@@ -137,6 +137,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $"""
             <Project Sdk="Microsoft.NET.Sdk">
+              <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
               <PropertyGroup>
                 <OutputType>Exe</OutputType>
                 <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
@@ -179,6 +180,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
               <PropertyGroup>
                 <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '8.0')">latest</LangVersion>
               </PropertyGroup>
+              <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
             </Project>
             """;
 
