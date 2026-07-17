@@ -101,6 +101,9 @@ namespace BenchmarkDotNet.Engines
             // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size. #1120
             foreach (var stage in EngineStage.EnumerateStages(Parameters))
             {
+                // Ensure that any resources (like JitListener) are cleaned up.
+                using var _ = stage;
+
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     await Host.BeforeMainRunAsync().ConfigureAwait();

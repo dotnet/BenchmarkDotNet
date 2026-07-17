@@ -13,9 +13,8 @@ namespace BenchmarkDotNet.Engines;
 [AggressivelyOptimizeMethods] // Reduce JIT event noise from the jit stage itself.
 internal sealed class EngineJitStage : EngineStage
 {
-    // After a tier's single burst fails to tier-up, we nudge one invocation at a time, giving the background worker a
-    // short window (~10ms) to pick each nudge up before trying the next — so we stop the instant the tier-up lands
-    // instead of overshooting by re-bursting the whole budget. Passed to WaitForTierUp as its busy-wait timeout.
+    // How long to give the background worker to pick up each nudge before trying the next, so we stop the instant a
+    // tier-up lands instead of overshooting.
     private static readonly TimeSpan EventDeliveryLag = TimeSpan.FromMilliseconds(10);
 
     internal bool didStopEarly = false;
@@ -24,29 +23,31 @@ internal sealed class EngineJitStage : EngineStage
     private readonly IEnumerator<IterationData> enumerator;
     private readonly bool evaluateOverhead;
     private readonly bool skipDelays;
-    // Watches the benchmark method(s)' background tier-up via JIT events so we can proceed once the JIT goes quiet after
-    // each tier (the whole call tree warmed), instead of waiting a fixed delay. Null when there's nothing to watch or
-    // EventSource is disabled, in which case we fall back to the fixed delay.
     private readonly JitListener? listener;
-    // True when this stage created the listener and must dispose it; false when a caller (a test) injected one it owns.
-    private readonly bool disposeListener;
 
     internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, bool skipDelays)
-        : this(evaluateOverhead, parameters, JitListener.Create(parameters.WorkloadMethods), disposeListener: true, skipDelays: skipDelays)
+        : this(evaluateOverhead, parameters, JitListener.Create(parameters.WorkloadMethods), skipDelays: skipDelays)
     {
     }
 
-    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, JitListener? listener, bool disposeListener = false, bool skipDelays = false)
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, JitListener? listener, bool skipDelays = false)
         : base(IterationStage.Jitting, IterationMode.Workload, parameters)
     {
         this.listener = listener;
-        this.disposeListener = disposeListener;
         enumerator = EnumerateIterations();
         this.evaluateOverhead = evaluateOverhead;
         this.skipDelays = skipDelays;
     }
 
     internal override List<Measurement> GetMeasurementList() => new(GetMaxMeasurementCount());
+
+    public override void Dispose()
+    {
+        // Do NOT clear fields, they are read in EngineStage.EnumerateStages after the Engine disposes this.
+        listener?.Dispose();
+        enumerator.Dispose();
+        base.Dispose();
+    }
 
     private int GetMaxMeasurementCount()
     {
@@ -76,11 +77,6 @@ internal sealed class EngineJitStage : EngineStage
             iterationData = enumerator.Current;
             return true;
         }
-        if (disposeListener)
-        {
-            listener?.Dispose();
-        }
-        enumerator.Dispose();
         iterationData = default;
         return false;
     }
@@ -109,9 +105,8 @@ internal sealed class EngineJitStage : EngineStage
         bool observeMethod = listener != null;
         if (observeMethod)
         {
-            // Before the tier loop, wait until the call-counting delay is inactive so the first burst is counted —
-            // or, if tiering is quiet because the method was pre-warmed past tier0, fake it and proceed. The first
-            // invoke above already fired the watched method's Pause if it was tier0. See WaitForInitialTieringActive.
+            // Wait until the call-counting delay is inactive so the first burst is counted. The invoke above already
+            // fired the watched method's Pause if it was tier0. See WaitForInitialTieringActive.
             listener!.WaitForInitialTieringActive(parameters.Host.CancellationToken);
         }
         else if (!skipDelays && JitInfo.TieredDelay > TimeSpan.Zero)
@@ -141,12 +136,7 @@ internal sealed class EngineJitStage : EngineStage
         // Promote methods to tier1.
         for (int tierCount = 0; tierCount < JitInfo.MaxTierPromotions; ++tierCount, remainingCalls = JitInfo.TieredCallCountThreshold)
         {
-            // Run ONE full burst of this tier's call budget, gated so it's counted rather than wasted into a
-            // deferred window. After it, wait for the background JIT to go QUIET (WaitForQuiescentTierUp): once the
-            // worker is idle, this tier's compiles — the watched method(s) AND their untracked callees — have all
-            // landed, so the next burst / the following stage won't race them. The per-tier counter persists, so if
-            // the burst didn't tier the watched method(s) up we nudge the rest one at a time below rather than
-            // re-bursting the whole budget.
+            // Gate the burst so its calls are counted rather than wasted into a deferred window.
             listener?.WaitForTieringActive(parameters.Host.CancellationToken);
             while (remainingCalls > 0)
             {
@@ -160,31 +150,38 @@ internal sealed class EngineJitStage : EngineStage
 
             if (listener != null)
             {
-                // Wait for the background JIT to go quiet (the watched method(s) and their callees settle), then read
-                // whether the watched method(s) actually advanced this burst. Once we've stopped observing them the
-                // advanced result is ignored, but this still drains untracked-callee tier-ups before the next burst.
+                // Settle this tier's compiles — the watched methods AND their untracked callees — so the next burst and
+                // the following stage don't race them. Still worth doing for the callees once we've stopped observing,
+                // in which case `advanced` is ignored.
                 bool advanced = listener.WaitForQuiescentTierUp(tierCount, parameters.Host.CancellationToken);
                 if (observeMethod)
                 {
                     if (!advanced)
                     {
-                        // The burst didn't tier the watched method(s) up. With NO call-counting delay, the burst's whole
-                        // budget was counted, so a miss means they were pre-warmed past this tier (or are otherwise
-                        // unobservable) — nudging can't help, so stop consulting the listener for them. We don't bail out
-                        // entirely because the benchmark may call other (un-pre-warmed) methods via different control
-                        // flow (e.g. an InProcess toolchain with arguments/params); the remaining bursts warm those + callees.
+                        // The burst didn't tier them up. With NO call-counting delay the whole budget was counted, so a
+                        // miss means they were pre-warmed past this tier (or are otherwise unobservable) and nudging
+                        // can't help — stop consulting the listener. Don't bail out entirely: the benchmark may reach
+                        // other, un-pre-warmed methods via different control flow (e.g. InProcess with arguments/params),
+                        // which the remaining bursts still warm.
                         if (JitInfo.TieredDelay <= TimeSpan.Zero)
                         {
                             observeMethod = false;
                             continue;
                         }
 
-                        // Otherwise the call-counting delay was probably active for the first ~10ms of the burst due to event
-                        // delivery lag, so some invocations didn't count and we just need a few more. Re-bursting the whole
-                        // budget would overshoot wastefully (up to threshold * call-time), so nudge one invocation at a time,
-                        // detecting the tier-up cheaply (WaitForTierUp, no full quiescence settle per nudge), then
-                        // settle once at the end so this tier's callees are warm.
+                        // Otherwise the burst went uncounted because this tier's counting stub was never installed.
+                        // Counting is per code version: every tier-up publishes a FRESH stub, whose install is deferred to
+                        // the next Resume if the delay happens to be active right then (any brand-new tier0 method's first
+                        // call can re-open it; a method's own promotion never does). An installed stub is never revoked by
+                        // a later Pause, so a deferred install is the ONLY way a full burst fails to count — the calls
+                        // simply weren't counted, and a few more will do.
+                        //
+                        // Our gate didn't prevent it because events lag ~10ms: the Resume we gated on was real, but a Pause
+                        // opened after it hadn't reached us, leaving the gate stale-Set. So re-gate rather than burst blind
+                        // — that Pause has likely landed by now, and the Resume flushes the pending stub.
                         listener.WaitForTieringActive(parameters.Host.CancellationToken);
+                        // Nudge one invocation at a time instead of re-bursting the whole budget (which would overshoot by
+                        // up to threshold * call-time), detecting the tier-up without a full quiescence settle per nudge.
                         long nudgeCalls = hasUserInvocationCount ? userInvokeCount : 1;
                         for (long nudged = 0; nudged < JitInfo.TieredCallCountThreshold && !advanced; nudged += nudgeCalls)
                         {
@@ -192,15 +189,13 @@ internal sealed class EngineJitStage : EngineStage
                             yield return GetWorkloadIterationData(nudgeCalls);
                             advanced = listener.WaitForTierUp(tierCount, EventDeliveryLag, parameters.Host.CancellationToken);
                         }
-                        // Settle the callees pushed by the nudges (and re-read the tier state race-free); this also
-                        // catches a tier-up whose publication arrived just after the last cheap WaitForTierUp window.
+                        // Settle the callees the nudges pushed, and catch a tier-up published just after the last nudge's window.
                         advanced = listener.WaitForQuiescentTierUp(tierCount, parameters.Host.CancellationToken);
                         if (!advanced)
                         {
-                            // Even nudging didn't tier them up — most likely pre-warmed to their final tier before the
-                            // stage started (e.g. via InProcess toolchains). Stop consulting the listener (same as the
-                            // no-delay case above). We already spent ~2 tiers' worth here, so skip a tier (the extra
-                            // ++tierCount on top of the loop's) so we don't overspend the budget.
+                            // Not even nudging tiered them up — most likely pre-warmed to their final tier before the
+                            // stage started. Stop consulting the listener, and skip a tier (the extra ++tierCount) since
+                            // we already spent ~2 tiers' budget here.
                             observeMethod = false;
                             ++tierCount;
                             continue;
@@ -209,11 +204,9 @@ internal sealed class EngineJitStage : EngineStage
 
                     if (listener.ReachedFinalTier)
                     {
-                        // ReachedFinalTier is the aggregate: every watched method is fully warmed, so we will not
-                        // receive any more tier-up JIT events for the method(s) we track. (OSR adds a quirk: a runtime
-                        // bug double-instruments an OSR'd callee, which JitInfo.MaxTierPromotions already budgets for.)
-                        // Keep bursting to push any untracked callees through their tiers — the quiescence wait above
-                        // handles them — but stop consulting the listener for the watched method(s).
+                        // Every watched method is warmed, so no more tier-up events are coming for them. Keep bursting
+                        // anyway to push untracked callees through their tiers (an OSR'd one can lag — a runtime bug
+                        // double-instruments it, which JitInfo.MaxTierPromotions budgets for), just stop consulting.
                         observeMethod = false;
                     }
                 }

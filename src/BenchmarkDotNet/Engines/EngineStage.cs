@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
 {
-    internal abstract class EngineStage(IterationStage stage, IterationMode mode, EngineParameters parameters)
+    internal abstract class EngineStage(IterationStage stage, IterationMode mode, EngineParameters parameters) : IDisposable
     {
         internal readonly IterationStage Stage = stage;
         internal readonly IterationMode Mode = mode;
@@ -13,6 +13,8 @@ namespace BenchmarkDotNet.Engines
 
         internal abstract List<Measurement> GetMeasurementList();
         internal abstract bool GetShouldRunIteration(List<Measurement> measurements, out IterationData iterationData);
+
+        public virtual void Dispose() { }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         // skipJitDelays is used by EnumerateStagesTests to skip waiting when it's only testing the stage logic, not real JIT compilation.

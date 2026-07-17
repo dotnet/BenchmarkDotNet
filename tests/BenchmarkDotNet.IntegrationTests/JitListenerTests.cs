@@ -23,7 +23,11 @@ public class JitListenerTests
         AssertReachedFinalTier(observer);
     }
 
-    // Tests the case of InProcess benchmarking the same method multiple times.
+    // Tests InProcess benchmarking the same method multiple times: run 2's stage sees an ALREADY-tier1 method under a
+    // fresh listener (reusing observer would take its ReachedFinalTier shortcut and skip this path entirely).
+    // Only run 1 is asserted: an already-tier1 method emits no events, so asserting observer2 would fail by
+    // construction. Run 2 asserts nothing — it verifies the stage COMPLETES rather than waiting forever for a tier-up
+    // that is never coming (an earlier design hung exactly here), enforced by RunJitStageToCompletion's cancellation.
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
     public void JitStage_AlreadyTier1()
     {
@@ -31,9 +35,6 @@ public class JitListenerTests
 
         using var observer = JitListener.Create([workloadMethod.Method]);
 
-        // The first jit stage brings the method to tier1 (in an optimized build) and our observer records it. Running
-        // the jit stage again for the same (now tier1) method should also succeed; it gets a fresh listener, because
-        // the stage drove the first to completion and reusing one across runs would leave its tiering signals ambiguous.
         RunJitStageToCompletion(workloadMethod, observer);
         using var observer2 = JitListener.Create([workloadMethod.Method]);
         RunJitStageToCompletion(workloadMethod, observer2);
@@ -163,11 +164,7 @@ public class JitListenerTests
         AssertReachedFinalTier(observer);
     }
 
-    // Watched methods need not be invoked at the same rate (e.g. dotnet/BenchmarkDotNet#147 may call one more often
-    // than another). Here the "fast" method is invoked twice per iteration and the "slow" one once, so the fast method
-    // crosses its call-count thresholds — and thus tiers up — sooner. Each method banks its own publication permits, so
-    // the fast method's extra/earlier promotions aren't dropped while the slow one catches up; both must still reach
-    // their final tier.
+    // Watched methods need not be invoked at the same rate (e.g. #147 may call one more often than another).
     [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
     public void JitStage_MultipleMethodsUnevenInvocationRates()
     {
@@ -176,22 +173,188 @@ public class JitListenerTests
 
         using var observer = JitListener.Create([fast.Method, slow.Method]);
 
-        int invokeCount = 0;
-        int tieredCount = 0;
+        // Each time the fast method has accumulated a tier's worth of calls it is due to tier up, so pause well past the
+        // ~100ms call-counting delay to let the background JIT actually publish that tier-up before the slow method
+        // reaches its own threshold. Staggering the two methods' publications is the entire point of the test —
+        // without it they tier up together and this is just JitStage_MultipleMethods with extra steps. Stop after
+        // MaxTierPromotions crossings: the fast method is fully warmed by then, so more sleeping would only cost time.
+        int fastCallsSinceCrossing = 0;
+        int fastTierCrossings = 0;
         RunJitStageToCompletion(observer, [fast.Method, slow.Method], i =>
         {
             fast(i);
             fast(i);
             fast(i);
-            if (++tieredCount > 0 && tieredCount <= JitInfo.MaxTierPromotions && ++invokeCount * 3 > JitInfo.TieredCallCountThreshold)
+            fastCallsSinceCrossing += 3;
+            if (fastTierCrossings < JitInfo.MaxTierPromotions && fastCallsSinceCrossing >= JitInfo.TieredCallCountThreshold)
             {
-                Thread.Sleep(200); // Sleep to let the JIT compile the fast method before the slow method.
-                invokeCount = 0;
+                ++fastTierCrossings;
+                fastCallsSinceCrossing = 0;
+                Thread.Sleep(200);
             }
             slow(i);
         });
 
+        Assert.Equal(JitInfo.MaxTierPromotions, fastTierCrossings);
         AssertReachedFinalTier(observer);
+    }
+
+    // Generic benchmark types ([GenericTypeArguments]) are where identifying the method is hardest: every instantiation
+    // of GenericBench<T>.Method shares one metadata token AND one simple name. See WatchedMethod.
+
+    // Value-type arguments aren't canonicalized, so this takes the exact MethodID path.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_GenericTypeWithValueTypeArgument()
+    {
+        Func<long, long> workloadMethod = GenericBench<int>.Method;
+
+        using var observer = JitListener.Create([workloadMethod.Method]);
+
+        RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
+    }
+
+    // A reference-type argument is canonicalized: CoreCLR publishes the shared __Canon body, which reflection can't hand
+    // us, so this takes the name-matching path. If the runtime's spelling ever drifts from ours, matching silently stops
+    // and this fails.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_GenericTypeWithReferenceTypeArgument()
+    {
+        Func<long, long> workloadMethod = GenericBench<string>.Method;
+
+        using var observer = JitListener.Create([workloadMethod.Method]);
+
+        RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
+    }
+
+    // Generic methods are rejected rather than half-supported — see JitListener.Create. Ungated, because the check runs
+    // before the tiered-JIT test: this is the one case that also runs on net472.
+    [Theory]
+    [InlineData(typeof(int))]    // identifiable, but rejected anyway
+    [InlineData(typeof(string))] // never identifiable
+    public void JitListener_ThrowsForGenericMethod(Type argument)
+    {
+        MethodInfo genericMethod = typeof(JitListenerTests)
+            .GetMethod(nameof(GenericMethod), BindingFlags.NonPublic | BindingFlags.Static)!
+            .MakeGenericMethod(argument);
+
+        Assert.Throws<NotSupportedException>(() => JitListener.Create([genericMethod]));
+    }
+
+    // Two reference-type instantiations watched at once. CoreCLR compiles ONE __Canon body for both, and publishes one
+    // event for it, so that single event legitimately is both watched methods — they really did tier up together.
+    // ReachedFinalTier (the aggregate) must still become true; matching only the first would strand the second forever.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_GenericTypeWithTwoReferenceTypeArguments()
+    {
+        Func<long, long> first = SharedGenericBench<string>.Method;
+        Func<long, long> second = SharedGenericBench<object>.Method;
+
+        using var observer = JitListener.Create([first.Method, second.Method]);
+
+        RunJitStageToCompletion(observer, [first.Method, second.Method], i => { first(i); second(i); });
+
+        AssertReachedFinalTier(observer);
+    }
+
+    // A mix of reference-type and value-type arguments: the reference one canonicalizes to __Canon while the value one
+    // stays exact, so this pins down the multi-argument rendering rather than just the single-argument case.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_GenericTypeWithMixedArguments()
+    {
+        Func<long, long> workloadMethod = PairBench<string, int>.Method;
+
+        using var observer = JitListener.Create([workloadMethod.Method]);
+
+        RunJitStageToCompletion(workloadMethod, observer);
+
+        AssertReachedFinalTier(observer);
+    }
+
+    // False-positive guards, one per matching strategy: watch one instantiation, drive a different one sharing its token
+    // AND simple name. Crediting the driven method's tier-up to the watched one would exit the jit stage believing a
+    // never-run method was warm. Stand-ins are private to these tests so nothing else can tier them up.
+
+    // Value-type instantiations aren't canonicalized -> exact MethodID path.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_DistinctValueTypeInstantiationsAreNotConfused()
+    {
+        Func<long, long> watched = DistinctBench<int>.Method;
+        Func<long, long> driven = DistinctBench<long>.Method;
+
+        using var observer = JitListener.Create([watched.Method]);
+
+        RunJitStageToCompletion(observer, [driven.Method], i => driven(i));
+
+        Assert.NotNull(observer);
+        Assert.False(observer.ReachedFinalTier,
+            "DistinctBench<long>'s tier-up must not be credited to the watched DistinctBench<int>");
+    }
+
+    // The same guard on the name-matching path: both are canonicalized, so only the declaring type name separates them
+    // (...[System.__Canon,System.Int32] vs ...[System.__Canon,System.Int64]).
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_DistinctCanonicalizedInstantiationsAreNotConfused()
+    {
+        Func<long, long> watched = DistinctPairBench<string, int>.Method;
+        Func<long, long> driven = DistinctPairBench<string, long>.Method;
+
+        using var observer = JitListener.Create([watched.Method]);
+
+        RunJitStageToCompletion(observer, [driven.Method], i => driven(i));
+
+        Assert.NotNull(observer);
+        Assert.False(observer.ReachedFinalTier,
+            "DistinctPairBench<string, long>'s tier-up must not be credited to the watched DistinctPairBench<string, int>");
+    }
+
+    // Overloads share a simple name AND a declaring type, so they are told apart only by their metadata token (each
+    // overload is its own MethodDef row). These guard that, once per matching strategy: watch one overload, drive the
+    // other, and require the driven one's tier-up not to be credited to the watched one.
+
+    // Non-generic, so matched by MethodID — each overload has its own MethodDesc.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_OverloadsAreNotConfused()
+    {
+        Func<long, long> watched = OverloadBench.Method;
+        Func<int, long> driven = OverloadBench.Method;
+
+        using var observer = JitListener.Create([watched.Method]);
+
+        RunJitStageToCompletion(observer, [driven.Method], i => driven((int) i));
+
+        Assert.NotNull(observer);
+        Assert.False(observer.ReachedFinalTier,
+            "OverloadBench.Method(int)'s tier-up must not be credited to the watched OverloadBench.Method(long)");
+    }
+
+    // Canonicalized, so matched by name — where both overloads share the name AND the declaring type, leaving the
+    // metadata token as the only discriminator.
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitStage_CanonicalizedOverloadsAreNotConfused()
+    {
+        Func<long, long> watched = OverloadPairBench<string, int>.Method;
+        Func<int, long> driven = OverloadPairBench<string, int>.Method;
+
+        using var observer = JitListener.Create([watched.Method]);
+
+        RunJitStageToCompletion(observer, [driven.Method], i => driven((int) i));
+
+        Assert.NotNull(observer);
+        Assert.False(observer.ReachedFinalTier,
+            "OverloadPairBench<string, int>.Method(int)'s tier-up must not be credited to the watched Method(long) overload");
+    }
+
+    // GetModuleId reflects on a private runtime field, and degrades silently to "don't compare" if it ever disappears —
+    // so this is the only test that can notice, and the only signal that the hack still works on a new runtime. (A
+    // wrong-but-non-zero value is caught instead by the canonicalized JitStage_Generic* tests, which stop matching.)
+    [FactEnvSpecific("Only CoreCLR supports tiered JIT", EnvRequirement.DotNetCoreOnly)]
+    public void JitListener_ResolvesModuleId()
+    {
+        Assert.NotEqual(0UL, JitListener.GetModuleId(typeof(JitListenerTests).Module));
     }
 
     private static void AssertReachedFinalTier(JitListener? observer)
@@ -211,9 +374,10 @@ public class JitListenerTests
     // caller wires to actually call those methods) invokeCount times so they go through call counting and tier up.
     private static void RunJitStageToCompletion(JitListener? listener, MethodInfo[] workloadMethods, Action<long> invokeOnce)
     {
-        // The per-tier publication wait is unbounded, cancellable only via the host's token. When the method tiers, the
-        // stage re-bursts until the runtime reports the next-tier compile began, so the wait isn't actually hit — but a
-        // large timeout guards against a hang if tiering somehow stalls, instead of wedging the whole test run.
+        // The stage's per-tier quiescence wait loops for as long as the background JIT keeps starting new batches, and is
+        // cancellable only via the host's token. In practice it settles in tens of ms, so this never fires — it is here so
+        // that a stall (or a listener bug that waits for a tier-up which is never coming, as JitStage_AlreadyTier1 guards
+        // against) fails this one test instead of wedging the whole run.
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
         var host = new CancellableHost(timeout.Token);
         Func<long, IClock, ValueTask<ClockSpan>> empty = (_, _) => new(default(ClockSpan));
@@ -280,6 +444,58 @@ public class JitListenerTests
     private static long MultiUnevenFast(long x) => x * x + 1;
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static long MultiUnevenSlow(long x) => x * x + 1;
+
+    // Generic stand-ins. GenericBench is instantiated over one value type and one reference type by separate tests, so
+    // each test drives a distinct instantiation and can't tier another's up. SharedGenericBench is separate from it so
+    // that the two-reference-type test starts from cold instantiations of its own.
+    private static class GenericBench<T>
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+    }
+    private static class SharedGenericBench<T>
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+    }
+    // Two value-type instantiations, driven against each other by JitStage_DistinctValueTypeInstantiationsAreNotConfused.
+    private static class DistinctBench<T>
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+    }
+    // Mixed reference/value arguments (JitStage_GenericTypeWithMixedArguments).
+    private static class PairBench<T1, T2>
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+    }
+    // Two canonicalized instantiations differing only in their value-type argument, driven against each other by
+    // JitStage_DistinctCanonicalizedInstantiationsAreNotConfused.
+    private static class DistinctPairBench<T1, T2>
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+    }
+    // Never driven — JitListener_ThrowsForGenericMethod only needs its MethodInfo.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long GenericMethod<T>(long x) => x * x + 1;
+    // Overload pairs, driven against each other by the *OverloadsAreNotConfused tests. Each pair shares a name and a
+    // declaring type and differs only in its parameter type — i.e. only in its metadata token.
+    private static class OverloadBench
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(int x) => x * x + 1;
+    }
+    private static class OverloadPairBench<T1, T2>
+    {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(long x) => x * x + 1;
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static long Method(int x) => x * x + 1;
+    }
 
     // A loop long enough to cross the OSR back-edge threshold so these methods are On-Stack-Replaced where OSR is
     // enabled. Timing is irrelevant (RunJitStageToCompletion records 0ns measurements, so the stage never takes its
