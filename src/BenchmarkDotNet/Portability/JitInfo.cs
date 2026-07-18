@@ -15,13 +15,16 @@ internal static class JitInfo
     private const string EnvMinOpts = "JITMinOpts";
     private const string EnvTieredCompilation = "TieredCompilation";
     private const string EnvQuickJit = "TC_QuickJit";
+    private const string EnvQuickJitForLoops = "TC_QuickJitForLoops";
     private const string EnvPGO = "TieredPGO";
     private const string EnvCallCountThreshold = "TC_CallCountThreshold";
     private const string EnvAggressiveTiering = "TC_AggressiveTiering";
+    private const string EnvDelaySingleProcMultiplier = "TC_DelaySingleProcMultiplier";
     private const string EnvOSR = "TC_OnStackReplacement";
 
     private const string KnobTieredCompilation = "System.Runtime.TieredCompilation";
     private const string KnobQuickJit = "System.Runtime.TieredCompilation.QuickJit";
+    private const string KnobQuickJitForLoops = "System.Runtime.TieredCompilation.QuickJitForLoops";
     private const string KnobPGO = "System.Runtime.TieredPGO";
     private const string KnobCallCountThreshold = "System.Runtime.TieredCompilation.CallCountThreshold";
     private const string KnobCallCountingDelayMs = "System.Runtime.TieredCompilation.CallCountingDelayMs";
@@ -85,12 +88,12 @@ internal static class JitInfo
         int maxPromotions = 1;
         if (GetIsDPGO())
         {
-            // Tier0 instrumented
+            // Instrumented tier
             ++maxPromotions;
         }
         if (GetIsOSR())
         {
-            // On-stack-replacement *shouldn't* interfere with promotion velocity, but there is a bug where OSR may cause a method to be tier0 instrumented twice.
+            // On-stack-replacement *shouldn't* interfere with promotion velocity, but there is a bug where OSR may cause a method to be double instrumented.
             // https://github.com/dotnet/runtime/issues/117787#issuecomment-3090771091
             ++maxPromotions;
         }
@@ -110,11 +113,14 @@ internal static class JitInfo
         static bool GetIsOSR() =>
             // Added experimentally in .Net 5.
             Environment.Version.Major >= 5
+            // Disabled if QuickJit is disabled.
+            && !IsDisabled(EnvQuickJit, KnobQuickJit)
             && (Environment.Version.Major >= 7
+                // TC_OnStackReplacement and TC_QuickJitForLoops are a pair, if either is disabled, OSR is disabled.
                 // Enabled by default in .Net 7, check if it's disabled.
-                ? !IsEnvVarDisabled(EnvOSR)
+                ? !IsEnvVarDisabled(EnvOSR) && !IsDisabled(EnvQuickJitForLoops, KnobQuickJitForLoops)
                 // Disabled by default in earlier versions, check if it's enabled.
-                : IsEnvVarEnabled(EnvOSR));
+                : IsEnvVarEnabled(EnvOSR) && IsEnabled(EnvQuickJitForLoops, KnobQuickJitForLoops));
     }
 
     /// <summary>
@@ -135,15 +141,22 @@ internal static class JitInfo
         }
         if (TryParseEnvVar(EnvCallCountThreshold, out int callCountThreshold))
         {
-            return callCountThreshold;
+            return Clamp(callCountThreshold);
         }
         // CallCountThreshold was added as a knob in .Net 8.
         if (Environment.Version.Major >= 8 && TryParseKnob(KnobCallCountThreshold, out callCountThreshold))
         {
-            return callCountThreshold;
+            return Clamp(callCountThreshold);
         }
         // Default 30 if it's not configured.
         return 30;
+
+        // The runtime reads the configured value as a DWORD and clamps it: 0 means 1, and anything larger than
+        // UINT16_MAX is capped. A negative value is a huge DWORD to the runtime, so it caps rather than becoming 1.
+        static int Clamp(int threshold)
+            => threshold == 0 ? 1
+            : threshold < 0 || threshold > ushort.MaxValue ? ushort.MaxValue
+            : threshold;
     }
 
     /// <summary>
@@ -162,17 +175,39 @@ internal static class JitInfo
         {
             return TimeSpan.Zero;
         }
-        if (TryParseEnvVar(EnvCallCountingDelayMs, out int callCountDelay))
+        return TimeSpan.FromMilliseconds(ApplySingleProcMultiplier(GetConfiguredDelayMs()));
+
+        static int GetConfiguredDelayMs()
         {
-            return TimeSpan.FromMilliseconds(callCountDelay);
+            if (TryParseEnvVar(EnvCallCountingDelayMs, out int callCountDelay))
+            {
+                return callCountDelay;
+            }
+            // CallCountingDelayMs was added as a knob in .Net 8.
+            if (Environment.Version.Major >= 8 && TryParseKnob(KnobCallCountingDelayMs, out callCountDelay))
+            {
+                return callCountDelay;
+            }
+            // Default 100 if it's not configured.
+            return 100;
         }
-        // CallCountingDelayMs was added as a knob in .Net 8.
-        if (Environment.Version.Major >= 8 && TryParseKnob(KnobCallCountingDelayMs, out callCountDelay))
+
+        // The runtime multiplies the delay when the process sees a single processor. The multiplier defaults to 10 in a release
+        // runtime (2 in a debug one, which we don't model), and the runtime skips it if the product overflows a DWORD.
+        static long ApplySingleProcMultiplier(int delayMs)
         {
-            return TimeSpan.FromMilliseconds(callCountDelay);
+            if (delayMs <= 0 || Environment.ProcessorCount != 1)
+            {
+                return delayMs;
+            }
+            int multiplier = TryParseEnvVar(EnvDelaySingleProcMultiplier, out int configured) ? configured : 10;
+            if (multiplier <= 1)
+            {
+                return delayMs;
+            }
+            long newDelayMs = (long)delayMs * multiplier;
+            return newDelayMs > uint.MaxValue ? delayMs : newDelayMs;
         }
-        // Default 100 if it's not configured.
-        return TimeSpan.FromMilliseconds(100);
     }
 
     /// <summary>
