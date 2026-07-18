@@ -204,8 +204,8 @@ namespace BenchmarkDotNet.Engines
                 await Host.SendSignalAsync(HostSignal.BeforeExtraIteration).ConfigureAwait();
                 await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.BeforeExtraIteration, Host.CancellationToken).ConfigureAwait();
 
-                // GC collect before measuring allocations.
-                ForceGcCollect();
+                // GC collect before measuring allocations if the user didn't suppress it.
+                GcCollect();
 
                 // #1542
                 // If the jit is tiered, we put the current thread to sleep so it can kick in, compile its stuff,
@@ -216,10 +216,7 @@ namespace BenchmarkDotNet.Engines
                 ClockSpan clockSpan;
                 try
                 {
-                    using (FinalizerBlocker.MaybeStart())
-                    {
-                        (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor).ConfigureAwait();
-                    }
+                    (gcStats, clockSpan) = await MeasureWithGc(extraIterationData.workloadAction!, extraIterationData.invokeCount / extraIterationData.unrollFactor).ConfigureAwait();
 
                     await Parameters.InProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterExtraIteration, Host.CancellationToken).ConfigureAwait();
                     await Host.SendSignalAsync(HostSignal.AfterExtraIteration).ConfigureAwait();
@@ -340,72 +337,6 @@ namespace BenchmarkDotNet.Engines
 
             public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
-        }
-
-        // Very long key and value so this shouldn't be used outside of unit tests.
-        internal const string UnitTestBlockFinalizerEnvKey = "BENCHMARKDOTNET_UNITTEST_BLOCK_FINALIZER_FOR_MEMORYDIAGNOSER";
-        internal const string UnitTestBlockFinalizerEnvValue = UnitTestBlockFinalizerEnvKey + "_ACTIVE";
-
-        // To prevent finalizers interfering with allocation measurements for unit tests,
-        // we block the finalizer thread until we've completed the measurement.
-        // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
-        private readonly struct FinalizerBlocker : IDisposable
-        {
-            private readonly object hangLock;
-
-            private FinalizerBlocker(object hangLock) => this.hangLock = hangLock;
-
-            private sealed class Impl
-            {
-                // ManualResetEvent(Slim) allocates when it is waited and yields the thread,
-                // so we use Monitor.Wait instead which does not allocate managed memory.
-                // This behavior is not documented, but was observed with the VS Profiler.
-                private readonly object hangLock = new();
-                private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
-
-                ~Impl()
-                {
-                    lock (hangLock)
-                    {
-                        enteredFinalizerEvent.Set();
-                        Monitor.Wait(hangLock);
-                    }
-                }
-
-                [MethodImpl(MethodImplOptions.NoInlining)]
-                internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
-                {
-                    var impl = new Impl();
-                    return (impl.hangLock, impl.enteredFinalizerEvent);
-                }
-            }
-
-            internal static FinalizerBlocker MaybeStart()
-            {
-                if (Environment.GetEnvironmentVariable(UnitTestBlockFinalizerEnvKey) != UnitTestBlockFinalizerEnvValue)
-                {
-                    return default;
-                }
-                var (hangLock, enteredFinalizerEvent) = Impl.CreateWeakly();
-                do
-                {
-                    GC.Collect();
-                    // Do NOT call GC.WaitForPendingFinalizers.
-                }
-                while (!enteredFinalizerEvent.IsSet);
-                return new FinalizerBlocker(hangLock);
-            }
-
-            public void Dispose()
-            {
-                if (hangLock is not null)
-                {
-                    lock (hangLock)
-                    {
-                        Monitor.Pulse(hangLock);
-                    }
-                }
-            }
         }
     }
 }

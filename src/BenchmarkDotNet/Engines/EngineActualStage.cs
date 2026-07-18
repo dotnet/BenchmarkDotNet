@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -6,6 +7,7 @@ using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {
+    [AggressivelyOptimizeMethods]
     internal abstract class EngineActualStage(IterationMode iterationMode, long invokeCount, int unrollFactor, EngineParameters parameters) : EngineStage(IterationStage.Actual, iterationMode, parameters)
     {
         internal const int MaxOverheadIterationCount = 20;
@@ -33,6 +35,7 @@ namespace BenchmarkDotNet.Engines
                 : unrollFactor == 1 ? parameters.OverheadActionNoUnroll : parameters.OverheadActionUnroll);
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EngineActualStageAuto : EngineActualStage
     {
         private readonly double maxRelativeError;
@@ -94,6 +97,7 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EngineActualStageSpecific(int maxIterationCount, IterationMode iterationMode, long invokeCount, int unrollFactor, EngineParameters parameters)
         : EngineActualStage(iterationMode, invokeCount, unrollFactor, parameters)
     {

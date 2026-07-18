@@ -1,14 +1,17 @@
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -19,6 +22,7 @@ using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Validators;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -32,14 +36,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            // InProcessEmit reports flaky allocations in current .Net 8.
-            if (!RuntimeInformation.IsNetCore)
-                yield return new object[] { InProcessEmitToolchain.Default };
+            yield return [InProcessEmitToolchain.Default];
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
 
-            yield return new object[] { Job.Default.GetToolchain() };
+            yield return [Job.Default.GetToolchain()];
         }
 
         public class AccurateAllocations
@@ -70,7 +72,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 8.0)", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR])]
+        [FactEnvSpecific("We don't want to test NativeAOT twice (.NET Framework and .NET Core)", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
             if (OsDetector.IsMacOS())
@@ -79,13 +81,15 @@ namespace BenchmarkDotNet.IntegrationTests
             MemoryDiagnoserIsAccurate(NativeAotToolchain.Net80);
         }
 
-        [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 8.0), and it's not supported on Windows+Arm", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonGitHubDraftPR])]
+        [FactEnvSpecific("We don't want to test MonoVM twice (.NET Framework and .NET Core), and it's not supported on Windows+Arm",
+            [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsModernMono()
         {
             MemoryDiagnoserIsAccurate(MonoToolchain.Mono80);
         }
 
-        [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
+        [TheoryEnvSpecific("We don't want to test Wasm twice (.NET Framework and .NET Core), and JSVU does not support ARM on Windows or Linux",
+            [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
         [InlineData(MonoAotCompilerMode.mini)]
         // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
         [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
@@ -181,7 +185,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 { nameof(TimeConsumingBenchmark.TimeConsuming), 0 }
             },
-            disableTieredJit: false, iterationCount: 10); // 1 iteration is not enough to repro the problem
+            iterationCount: 10); // 1 iteration is not enough to repro the problem
         }
 
         public class NoBoxing
@@ -346,10 +350,9 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators,
-            bool disableTieredJit = true, int iterationCount = 1, Runtime? runtime = null)
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, int iterationCount = 1, Runtime? runtime = null)
         {
-            var config = CreateConfig(toolchain, runtime, disableTieredJit, iterationCount);
+            var config = CreateConfig(toolchain, runtime, iterationCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -385,26 +388,18 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain,
-            Runtime? runtime,
-            // Tiered JIT can allocate some memory on a background thread, let's disable it by default to make our tests less flaky (#1542).
-            // This was mostly fixed in net7.0, but tiered jit thread is not guaranteed to not allocate, so we disable it just in case.
-            bool disableTieredJit = true,
+        private IConfig CreateConfig(IToolchain toolchain, Runtime? runtime,
             // Single iteration is enough for most of the tests.
-            int iterationCount = 1,
-            // Don't run warmup by default to save some time for our CI runs
-            int warmupCount = 0)
+            int iterationCount = 1)
         {
             var job = Job.ShortRun
                 .WithEvaluateOverhead(false) // no need to run idle for this test
-                .WithWarmupCount(warmupCount)
+                .WithWarmupCount(0) // JIT stage already warms up the method.
                 .WithIterationCount(iterationCount)
                 .WithGcForce(false)
                 .WithGcServer(false)
                 .WithGcConcurrent(false)
-                // To prevent finalizers allocating out of our control, we hang the finalizer thread.
-                // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
-                .WithEnvironmentVariable(Engines.Engine.UnitTestBlockFinalizerEnvKey, Engines.Engine.UnitTestBlockFinalizerEnvValue)
+                .WithJitTieringMode(JitTieringMode.Force)
                 .WithToolchain(toolchain);
 
             if (runtime is not null)
@@ -413,16 +408,12 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             return ManualConfig.CreateEmpty()
-                .AddJob(disableTieredJit
-                    ? job.WithEnvironmentVariables(
-                        new EnvironmentVariable("DOTNET_TieredCompilation", "0"),
-                        new EnvironmentVariable("COMPlus_TieredCompilation", "0")
-                    )
-                    : job)
+                .AddJob(job)
                 .WithBuildTimeout(TimeSpan.FromSeconds(480)) // Increase timeout for `MemoryDiagnoserSupportsModernMono` test on macos(x64)
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)
-                .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                .AddDiagnoser(new FinalizerBlockerDiagnoser())
+                .AddLogger(new OutputLogger(output));
         }
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
@@ -454,6 +445,94 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Where(field => !field.IsStatic && !field.IsLiteral)
                 .Distinct()
                 .Sum(field => GetSize(field.FieldType));
+        }
+
+        // To prevent finalizers interfering with allocation measurements, we block the finalizer thread during the extra iteration.
+        // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
+        public sealed class FinalizerBlockerDiagnoser : IInProcessDiagnoser
+        {
+            public IEnumerable<string> Ids => [nameof(FinalizerBlockerDiagnoser)];
+            public IEnumerable<IExporter> Exporters => [];
+            public IEnumerable<IAnalyser> Analysers => [];
+            public void DeserializeResults(BenchmarkCase benchmarkCase, string serializedResults) { }
+            public void DisplayResults(ILogger logger) { }
+            public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
+            public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
+            public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
+            public BenchmarkDotNet.Diagnosers.RunMode GetRunMode(BenchmarkCase benchmarkCase)
+                // Mono Wasm throws PlatformNotSupportedException from Monitor.Wait, and defers finalization to the JS event loop (single-threaded),
+                // so it's impossible for us to prevent the finalizer from running. The good thing is that means it cannot run during our synchronous
+                // benchmarks, but it also means we should never add any async-yielding benchmark memory tests for Wasm.
+                => benchmarkCase.GetToolchain() is WasmToolchain
+                    ? BenchmarkDotNet.Diagnosers.RunMode.None
+                    : BenchmarkDotNet.Diagnosers.RunMode.ExtraIteration;
+            public InProcessDiagnoserHandlerData GetHandlerData(BenchmarkCase benchmarkCase) => new(typeof(FinalizerBlockerDiagnoserHandler), null);
+        }
+
+        public sealed class FinalizerBlockerDiagnoserHandler : IInProcessDiagnoserHandler
+        {
+            private object? hangLock;
+
+            private sealed class Impl
+            {
+                // ManualResetEvent(Slim) allocates when it is waited and yields the thread,
+                // so we use Monitor.Wait instead which does not allocate managed memory.
+                // This behavior is not documented, but was observed with the VS Profiler.
+                private readonly object hangLock = new();
+                private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
+
+                ~Impl()
+                {
+                    lock (hangLock)
+                    {
+                        enteredFinalizerEvent.Set();
+                        Monitor.Wait(hangLock);
+                    }
+                }
+
+                [MethodImpl(MethodImplOptions.NoInlining)]
+                internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
+                {
+                    var impl = new Impl();
+                    return (impl.hangLock, impl.enteredFinalizerEvent);
+                }
+            }
+
+            private void Start()
+            {
+                (hangLock, var enteredFinalizerEvent) = Impl.CreateWeakly();
+                do
+                {
+                    GC.Collect();
+                    // Do NOT call GC.WaitForPendingFinalizers.
+                }
+                while (!enteredFinalizerEvent.IsSet);
+            }
+
+            private void Stop()
+            {
+                lock (hangLock!)
+                {
+                    Monitor.Pulse(hangLock);
+                }
+            }
+
+            public ValueTask HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken)
+            {
+                switch (signal)
+                {
+                    case BenchmarkSignal.BeforeExtraIteration:
+                        Start();
+                        break;
+                    case BenchmarkSignal.AfterExtraIteration:
+                        Stop();
+                        break;
+                }
+                return new();
+            }
+
+            public void Initialize(string? serializedConfig) { }
+            public string SerializeResults() => string.Empty;
         }
     }
 }
