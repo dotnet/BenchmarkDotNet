@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Engines
             var job = engineParameters.TargetJob ?? throw new ArgumentNullException(nameof(EngineParameters.TargetJob));
             Parameters = new()
             {
+                WorkloadMethods = engineParameters.WorkloadMethods ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadMethods)),
                 WorkloadActionNoUnroll = engineParameters.WorkloadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionNoUnroll)),
                 WorkloadActionUnroll = engineParameters.WorkloadActionUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.WorkloadActionUnroll)),
                 OverheadActionNoUnroll = engineParameters.OverheadActionNoUnroll ?? throw new ArgumentNullException(nameof(EngineParameters.OverheadActionNoUnroll)),
@@ -100,6 +101,9 @@ namespace BenchmarkDotNet.Engines
             // Enumerate the stages and run iterations in a loop to ensure each benchmark invocation is called with a constant stack size. #1120
             foreach (var stage in EngineStage.EnumerateStages(Parameters))
             {
+                // Ensure that any resources (like JitListener) are cleaned up.
+                using var _ = stage;
+
                 if (stage.Stage == IterationStage.Actual && stage.Mode == IterationMode.Workload)
                 {
                     await Host.BeforeMainRunAsync().ConfigureAwait();

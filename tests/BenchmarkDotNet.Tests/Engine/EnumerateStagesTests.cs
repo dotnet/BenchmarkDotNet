@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(job);
 
             bool didRunStages = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 Assert.True(stage is not EngineJitStage);
                 didRunStages = true;
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default);
 
             bool didRunActualStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 Assert.NotEqual(IterationMode.Overhead, stage.Mode);
 
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(iterationTime)));
 
             bool didRunActualStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(job);
 
             bool didRunUnroll = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Tests.Engine
             // A short measurement encourages the JIT stage to batch many invocations into a single iteration,
             // which is the regression introduced by #2806.
             var fastMeasurement = TimeInterval.FromMicroseconds(1);
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(job);
 
             int jitWorkloadCount = 0;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -210,7 +210,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default.WithInvocationCount(1).WithUnrollFactor(1));
 
             int jitWorkloadCount = 0;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -226,9 +226,9 @@ namespace BenchmarkDotNet.Tests.Engine
                 if (stage is EngineJitStage) break;
             }
 
-            // Pre-loop iter + confirmation + full tiering loop (one yield per tier since the user
-            // pinned InvocationCount=1, matching JitInfo.MaxTierPromotions * TieredCallCountThreshold)
-            // + one stabilization iteration. Just assert it ran the full tiering loop rather than bailing.
+            // Pre-loop iter + confirmation + full tiering loop (one yield per tier since the user pinned
+            // InvocationCount=1, matching JitInfo.MaxTierPromotions * TieredCallCountThreshold) + the trailing
+            // stabilization iteration. Just assert it ran the full tiering loop rather than bailing.
             Assert.True(jitWorkloadCount > 2, $"Expected the tiering loop to run after confirmation disagreed, got {jitWorkloadCount} jitting iterations.");
         }
 
@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
             int jitWorkloadCount = 0;
             bool didStopEarly = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -282,7 +282,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
             int jitWorkloadCount = 0;
             bool didStopEarly = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -316,7 +316,7 @@ namespace BenchmarkDotNet.Tests.Engine
             var engineParameters = CreateEngineParameters(Job.Default);
 
             bool didRunPilotStage = false;
-            foreach (var stage in EngineStage.EnumerateStages(engineParameters))
+            foreach (var stage in EngineStage.EnumerateStages(engineParameters, skipJitDelays: true))
             {
                 var stageMeasurements = stage.GetMeasurementList();
                 while (stage.GetShouldRunIteration(stageMeasurements, out var iterationData))
@@ -347,6 +347,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Func<long, IClock, ValueTask<ClockSpan>> emptyAction = (_, _) => new(default(ClockSpan));
             return new()
             {
+                WorkloadMethods = [],
                 GlobalSetupAction = () => new(),
                 GlobalCleanupAction = () => new(),
                 Host = host,

@@ -14,16 +14,16 @@ partial class RunnableEmitter
     // This doesn't really matter for the runtime, but it helps with the NaiveRunnableEmitDiff tests.
     protected virtual IReadOnlyDictionary<string, int> AsyncMethodToOrdinalMap { get; } = new Dictionary<string, int>
     {
-        { GlobalSetupMethodName, 4 },
-        { GlobalCleanupMethodName, 5 },
-        { IterationSetupMethodName, 6 },
-        { IterationCleanupMethodName, 7 },
-        { OverheadActionUnrollMethodName, 11 },
-        { OverheadActionNoUnrollMethodName, 12 },
-        { WorkloadActionUnrollMethodName, 13 },
-        { WorkloadActionNoUnrollMethodName, 14 },
-        { StartWorkloadMethodName, 15 },
-        { WorkloadCoreMethodName, 16 },
+        { GlobalSetupMethodName, 5 },
+        { GlobalCleanupMethodName, 6 },
+        { IterationSetupMethodName, 7 },
+        { IterationCleanupMethodName, 8 },
+        { OverheadActionUnrollMethodName, 12 },
+        { OverheadActionNoUnrollMethodName, 13 },
+        { WorkloadActionUnrollMethodName, 14 },
+        { WorkloadActionNoUnrollMethodName, 15 },
+        { StartWorkloadMethodName, 16 },
+        { WorkloadCoreMethodName, 17 },
     };
 
     private record struct AsyncStateMachineFields(FieldInfo StateField, FieldInfo BuilderField, FieldInfo? ThisField);

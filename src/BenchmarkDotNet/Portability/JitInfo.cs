@@ -180,7 +180,7 @@ internal static class JitInfo
     /// </summary>
     public static readonly TimeSpan BackgroundCompilationDelay =
         IsTiered
-            // It's impossible for us to know exactly how long to wait without hooking into JIT notifications (which we can't do in-process).
+            // It's impossible for us to know exactly how long to wait without hooking into JIT notifications.
             // 100ms should be enough most of the time, but we bump it up to 250ms for higher confidence.
             // When https://github.com/dotnet/runtime/issues/101868 is resolved, if AggressiveTiering is enabled, we can skip the wait time and return TimeSpan.Zero.
             ? TimeSpan.FromMilliseconds(250)

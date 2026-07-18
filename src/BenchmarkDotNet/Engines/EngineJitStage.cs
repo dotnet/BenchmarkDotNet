@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -9,29 +10,50 @@ namespace BenchmarkDotNet.Engines;
 // and we purposefully don't spend too much time in this stage, so we can't guarantee it.
 // This should succeed for 99%+ of microbenchmarks. For any sufficiently short benchmarks where this fails,
 // the following stages (Pilot and Warmup) will likely take it the rest of the way. Long-running benchmarks may never fully reach tier1.
+[AggressivelyOptimizeMethods] // Reduce JIT event noise from the jit stage itself.
 internal sealed class EngineJitStage : EngineStage
 {
-    // Jit call counting delay is only for when the app starts up. We don't need to wait for every benchmark if multiple benchmarks are ran in-process.
-    private static TimeSpan s_tieredDelay = JitInfo.TieredDelay;
+    // How long to give the background worker to pick up each nudge before trying the next, so we stop the instant a
+    // tier-up lands instead of overshooting.
+    private static readonly TimeSpan EventDeliveryLag = TimeSpan.FromMilliseconds(10);
 
     internal bool didStopEarly = false;
     internal Measurement lastMeasurement;
 
     private readonly IEnumerator<IterationData> enumerator;
     private readonly bool evaluateOverhead;
+    private readonly bool skipDelays;
+    private readonly JitListener? listener;
 
-    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters) : base(IterationStage.Jitting, IterationMode.Workload, parameters)
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, bool skipDelays)
+        : this(evaluateOverhead, parameters, JitListener.Create(parameters.WorkloadMethods), skipDelays: skipDelays)
     {
+    }
+
+    internal EngineJitStage(bool evaluateOverhead, EngineParameters parameters, JitListener? listener, bool skipDelays = false)
+        : base(IterationStage.Jitting, IterationMode.Workload, parameters)
+    {
+        this.listener = listener;
         enumerator = EnumerateIterations();
         this.evaluateOverhead = evaluateOverhead;
+        this.skipDelays = skipDelays;
     }
 
     internal override List<Measurement> GetMeasurementList() => new(GetMaxMeasurementCount());
 
+    public override void Dispose()
+    {
+        // Do NOT clear fields, they are read in EngineStage.EnumerateStages after the Engine disposes this.
+        listener?.Dispose();
+        enumerator.Dispose();
+        base.Dispose();
+    }
+
     private int GetMaxMeasurementCount()
     {
+        int nudgeMultiplier = JitInfo.TieredDelay > TimeSpan.Zero ? 2 : 1;
         int count = JitInfo.IsTiered
-            ? JitInfo.MaxTierPromotions * JitInfo.TieredCallCountThreshold + 2
+            ? JitInfo.MaxTierPromotions * JitInfo.TieredCallCountThreshold * nudgeMultiplier + 2
             : 1;
         if (evaluateOverhead)
         {
@@ -44,7 +66,7 @@ internal sealed class EngineJitStage : EngineStage
     {
         if (measurements.Count > 0)
         {
-            var measurement = measurements[measurements.Count - 1];
+            var measurement = measurements[^1];
             if (measurement.IterationMode == IterationMode.Workload)
             {
                 lastMeasurement = measurement;
@@ -55,7 +77,6 @@ internal sealed class EngineJitStage : EngineStage
             iterationData = enumerator.Current;
             return true;
         }
-        enumerator.Dispose();
         iterationData = default;
         return false;
     }
@@ -81,16 +102,22 @@ internal sealed class EngineJitStage : EngineStage
             yield break;
         }
 
-        // Wait enough time for jit call counting to begin.
-        Engine.SleepIfPositive(s_tieredDelay);
-        // Don't make the next jit stage wait if it's ran in the same process.
-        s_tieredDelay = TimeSpan.Zero;
+        bool observeMethod = listener != null;
+        if (observeMethod)
+        {
+            // Wait until the call-counting delay is inactive so the first burst is counted. The invoke above already
+            // fired the watched method's Pause if it was tier0. See WaitForInitialTieringActive.
+            listener!.WaitForInitialTieringActive(parameters.Host.CancellationToken);
+        }
+        else if (!skipDelays && JitInfo.TieredDelay > TimeSpan.Zero)
+        {
+            // Fall back to a fixed wait for the call-counting delay to elapse.
+            Thread.Sleep(JitInfo.TieredDelay + TimeSpan.FromMilliseconds(10));
+        }
 
-        // If the first iteration suggests a long-running benchmark (a single invocation already
-        // takes ~2/3 of IterationTime or more), run one confirmation iteration and bail out if
-        // it agrees. Same cutoff value that pilot stage uses.
-        // We do not bail out immediately if the first iteration is long-running because it could
-        // be due to cctors or other lazy initialization that won't be hit in steady-state. #2004
+        // Long-running early-exit: if a single invocation already takes ~2/3 of IterationTime, this is a long-running
+        // benchmark — bail and let the Pilot/Warmup stages finish tiering. The first invoke can be inflated by JIT or
+        // cctors, so confirm with one more iteration before bailing (it could be a one-time cost). #2004
         // JitTieringMode.Force opts out of this heuristic and always promotes through every tier.
         TimeInterval iterationTime = parameters.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, parameters.Resolver);
         long remainingCalls = JitInfo.TieredCallCountThreshold;
@@ -104,12 +131,13 @@ internal sealed class EngineJitStage : EngineStage
                 didStopEarly = true;
                 yield break;
             }
-            remainingCalls -= userInvokeCount;
         }
 
         // Promote methods to tier1.
-        for (int remainingTiers = JitInfo.MaxTierPromotions; remainingTiers > 0; --remainingTiers)
+        for (int tierCount = 0; tierCount < JitInfo.MaxTierPromotions; ++tierCount, remainingCalls = JitInfo.TieredCallCountThreshold)
         {
+            // Gate the burst so its calls are counted rather than wasted into a deferred window.
+            listener?.WaitForTieringActive(parameters.Host.CancellationToken);
             while (remainingCalls > 0)
             {
                 // Run the whole tier's call budget in a single iteration unless the user pinned InvocationCount.
@@ -120,8 +148,74 @@ internal sealed class EngineJitStage : EngineStage
                 yield return GetWorkloadIterationData(invokeCount);
             }
 
-            Engine.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
-            remainingCalls = JitInfo.TieredCallCountThreshold;
+            if (listener != null)
+            {
+                // Settle this tier's compiles — the watched methods AND their untracked callees — so the next burst and
+                // the following stage don't race them. Still worth doing for the callees once we've stopped observing,
+                // in which case `advanced` is ignored.
+                bool advanced = listener.WaitForQuiescentTierUp(tierCount, parameters.Host.CancellationToken);
+                if (observeMethod)
+                {
+                    if (!advanced)
+                    {
+                        // The burst didn't tier them up. With NO call-counting delay the whole budget was counted, so a
+                        // miss means they were pre-warmed past this tier (or are otherwise unobservable) and nudging
+                        // can't help — stop consulting the listener. Don't bail out entirely: the benchmark may reach
+                        // other, un-pre-warmed methods via different control flow (e.g. InProcess with arguments/params),
+                        // which the remaining bursts still warm.
+                        if (JitInfo.TieredDelay <= TimeSpan.Zero)
+                        {
+                            observeMethod = false;
+                            continue;
+                        }
+
+                        // Otherwise the burst went uncounted because this tier's counting stub was never installed.
+                        // Counting is per code version: every tier-up publishes a FRESH stub, whose install is deferred to
+                        // the next Resume if the delay happens to be active right then (any brand-new tier0 method's first
+                        // call can re-open it; a method's own promotion never does). An installed stub is never revoked by
+                        // a later Pause, so a deferred install is the ONLY way a full burst fails to count — the calls
+                        // simply weren't counted, and a few more will do.
+                        //
+                        // Our gate didn't prevent it because events lag ~10ms: the Resume we gated on was real, but a Pause
+                        // opened after it hadn't reached us, leaving the gate stale-Set. So re-gate rather than burst blind
+                        // — that Pause has likely landed by now, and the Resume flushes the pending stub.
+                        listener.WaitForTieringActive(parameters.Host.CancellationToken);
+                        // Nudge one invocation at a time instead of re-bursting the whole budget (which would overshoot by
+                        // up to threshold * call-time), detecting the tier-up without a full quiescence settle per nudge.
+                        long nudgeCalls = hasUserInvocationCount ? userInvokeCount : 1;
+                        for (long nudged = 0; nudged < JitInfo.TieredCallCountThreshold && !advanced; nudged += nudgeCalls)
+                        {
+                            ++iterationIndex;
+                            yield return GetWorkloadIterationData(nudgeCalls);
+                            advanced = listener.WaitForTierUp(tierCount, EventDeliveryLag, parameters.Host.CancellationToken);
+                        }
+                        // Settle the callees the nudges pushed, and catch a tier-up published just after the last nudge's window.
+                        advanced = listener.WaitForQuiescentTierUp(tierCount, parameters.Host.CancellationToken);
+                        if (!advanced)
+                        {
+                            // Not even nudging tiered them up — most likely pre-warmed to their final tier before the
+                            // stage started. Stop consulting the listener, and skip a tier (the extra ++tierCount) since
+                            // we already spent ~2 tiers' budget here.
+                            observeMethod = false;
+                            ++tierCount;
+                            continue;
+                        }
+                    }
+
+                    if (listener.ReachedFinalTier)
+                    {
+                        // Every watched method is warmed, so no more tier-up events are coming for them. Keep bursting
+                        // anyway to push untracked callees through their tiers (an OSR'd one can lag — a runtime bug
+                        // double-instruments it, which JitInfo.MaxTierPromotions budgets for), just stop consulting.
+                        observeMethod = false;
+                    }
+                }
+            }
+            else if (!skipDelays)
+            {
+                // No listener (nothing to watch, or EventSource unavailable), fall back to the fixed delay.
+                Engine.SleepIfPositive(JitInfo.BackgroundCompilationDelay);
+            }
         }
 
         // Empirical evidence shows that the first call after the method is tiered up may take longer,

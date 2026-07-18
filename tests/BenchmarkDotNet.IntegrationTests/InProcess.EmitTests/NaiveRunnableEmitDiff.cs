@@ -27,7 +27,8 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         private static readonly HashSet<string> IgnoredRunnableMethodNames =
         [
             "Run",
-            ".ctor"
+            ".ctor",
+            "__ResolveWorkloadMethods"
         ];
 
         private static readonly IReadOnlyDictionary<OpCode, OpCode> AltOpCodes = new Dictionary<OpCode, OpCode>()

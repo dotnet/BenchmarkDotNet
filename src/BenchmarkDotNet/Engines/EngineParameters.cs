@@ -1,3 +1,4 @@
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -16,6 +17,13 @@ namespace BenchmarkDotNet.Engines
         public required Func<long, IClock, ValueTask<ClockSpan>> OverheadActionNoUnroll { get; set; }
         public required Func<long, IClock, ValueTask<ClockSpan>> OverheadActionUnroll { get; set; }
         public Job TargetJob { get; set; } = Job.Default;
+
+        /// <summary>
+        /// The benchmark method(s), used by the jit stage to watch for their tier-up via JIT events.
+        /// When empty (nothing to watch, or resolution failed), the jit stage falls back to a fixed delay.
+        /// </summary>
+        public required IEnumerable<MethodInfo> WorkloadMethods { get; set; }
+
         public long OperationsPerInvoke { get; set; } = 1;
         public required Func<ValueTask> GlobalSetupAction { get; set; }
         public required Func<ValueTask> GlobalCleanupAction { get; set; }

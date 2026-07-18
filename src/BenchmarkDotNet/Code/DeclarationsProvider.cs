@@ -34,6 +34,8 @@ namespace BenchmarkDotNet.Code
             return ReplaceCore(smartStringBuilder)
                 .Replace("$DisassemblerEntryMethodImpl$", GetWorkloadMethodCall(GetPassArgumentsDirect()))
                 .Replace("$OperationsPerInvoke$", Descriptor.OperationsPerInvoke.ToString())
+                .Replace("$WorkloadMethodName$", Descriptor.WorkloadMethod.Name)
+                .Replace("$WorkloadMethodParameterTypes$", GetWorkloadMethodParameterTypes())
                 .Replace("$WorkloadTypeName$", Descriptor.Type.GetCorrectCSharpTypeName());
         }
 
@@ -107,6 +109,26 @@ namespace BenchmarkDotNet.Code
                 Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} arg{index}")
             );
+
+        // Renders the benchmark method's parameter types as a Type[] for __ResolveWorkloadMethods to match overloads
+        // exactly. Each is a typeof(...) of the element type, re-wrapping by-ref/pointer via reflection (typeof can't
+        // express `T&`), so resolution never has to name the method's (possibly unspellable) return type.
+        private string GetWorkloadMethodParameterTypes()
+        {
+            var parameters = Descriptor.WorkloadMethod.GetParameters();
+            if (parameters.Length == 0)
+                return "global::System.Array.Empty<global::System.Type>()";
+            return $"new global::System.Type[] {{ {string.Join(", ", parameters.Select(p => GetTypeOfExpression(p.ParameterType)))} }}";
+        }
+
+        private static string GetTypeOfExpression(System.Type type)
+        {
+            if (type.IsByRef)
+                return $"{GetTypeOfExpression(type.GetElementType()!)}.MakeByRefType()";
+            if (type.IsPointer)
+                return $"{GetTypeOfExpression(type.GetElementType()!)}.MakePointerType()";
+            return $"typeof({type.GetCorrectCSharpTypeName()})";
+        }
 
         protected string GetPassArgumentsDirect()
             => string.Join(
