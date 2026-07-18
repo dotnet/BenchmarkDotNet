@@ -36,7 +36,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            yield return [InProcessEmitToolchain.Default];
+            // xunit v2 allocates every 100ms on a background timer that makes the tests flaky on Mac/Linux (MSTestEnableParentProcessQuery).
+            // TODO: remove the guard when the test framework is updated.
+            if (OsDetector.IsWindows())
+                yield return [InProcessEmitToolchain.Default];
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
