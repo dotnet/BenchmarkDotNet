@@ -76,6 +76,11 @@ namespace BenchmarkDotNet.Portability
                && IsAot
                && !IsWasm && !IsMono; // Wasm and MonoAOTLLVM are also AOT
 
+        // File-based apps contains specific RuntimeHostConfigurationOptions. 
+        // https://github.com/dotnet/dotnet/blob/v10.0.302/src/sdk/documentation/general/dotnet-run-file.md
+        public static bool IsFileBasedApp => AppContext.GetData("EntryPointFilePath") != null
+                                          && AppContext.GetData("EntryPointFileDirectoryPath") != null;
+
         public static readonly bool IsRunningInContainer = string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
