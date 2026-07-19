@@ -1,0 +1,4 @@
+# Verify snapshot files must keep LF line endings on every platform.
+# Verify.XunitV3 rejects a verified file that contains a CR with core.autocrlf.
+*.verified.* text eol=lf
+*.received.* text eol=lf
