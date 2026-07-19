@@ -38,7 +38,7 @@ public class UnitTestRunner(BuildContext context)
     {
         // Enabled `Trace` level logging when debug logging is enabled on GitHub Actions.
         // https://docs.github.com/en/actions/how-tos/monitor-workflows/enable-debug-logging
-        var diagnosticVerbosity = context.EnvironmentVariable("ACTIONS_STEP_DEBUG") == "true"
+        var diagnosticVerbosity = context.Environment.GetEnvironmentVariable("ACTIONS_STEP_DEBUG") == "true"
              ? "Trace"
              : "Warning"; // Logging Warning/Error/Critical level logs by default.
 
