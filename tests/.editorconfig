@@ -5,3 +5,7 @@ root = false
 # xUnit1051: Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken to allow test cancellation to be more responsive.
 dotnet_diagnostic.xUnit1051.severity = suggestion
 
+# Verify settings
+[*.{received,verified}.{txt}]
+charset = utf-8-bom
+trim_trailing_whitespace = false
