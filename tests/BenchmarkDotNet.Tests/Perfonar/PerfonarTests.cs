@@ -24,7 +24,7 @@ public class PerfonarTests(ITestOutputHelper output)
     {
         var table = TableDataMap[key];
         string markdown = table.ToMarkdown(new PerfonarTableStyle());
-        string json = LightJsonSerializer.Serialize(table.RootEntry, new LightJsonSettings { Indent = true });
+        string json = LightJsonSerializer.Serialize(table.RootEntry, new LightJsonSettings { Indent = true }).Replace("\r\n","\n");
         return VerifyString(key, markdown + "\n" + json);
     }
 
