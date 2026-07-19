@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
@@ -6,6 +7,7 @@ using Perfolizer.Horology;
 namespace BenchmarkDotNet.Engines
 {
     // TODO: use clockResolution
+    [AggressivelyOptimizeMethods]
     internal abstract class EnginePilotStage(long invokeCount, int unrollFactor, int minInvokeCount, EngineParameters parameters) : EngineStage(IterationStage.Pilot, IterationMode.Workload, parameters)
     {
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
@@ -29,6 +31,7 @@ namespace BenchmarkDotNet.Engines
                 unrollFactor == 1 ? parameters.WorkloadActionNoUnroll : parameters.WorkloadActionUnroll);
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EnginePilotStageInitial(long invokeCount, int unrollFactor, int minInvokeCount, EngineParameters parameters) : EnginePilotStage(invokeCount, unrollFactor, minInvokeCount, parameters)
     {
         internal bool evaluateOverhead = true;
@@ -79,6 +82,7 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EnginePilotStageAuto(long invokeCount, int unrollFactor, int minInvokeCount, EngineParameters parameters) : EnginePilotStage(invokeCount, unrollFactor, minInvokeCount, parameters)
     {
         private readonly TimeInterval minIterationTime = parameters.TargetJob.ResolveValue(AccuracyMode.MinIterationTimeCharacteristic, parameters.Resolver);
@@ -125,6 +129,7 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EnginePilotStageSpecific(long invokeCount, int unrollFactor, int minInvokeCount, EngineParameters parameters) : EnginePilotStage(invokeCount, unrollFactor, minInvokeCount, parameters)
     {
         private readonly double targetIterationTime = parameters.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, parameters.Resolver).ToNanoseconds();

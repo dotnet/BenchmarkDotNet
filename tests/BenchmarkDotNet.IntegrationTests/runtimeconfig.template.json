@@ -1,7 +1,0 @@
-﻿{
-  "runtimeOptions": {
-    "configProperties": {
-      "System.Runtime.TieredCompilation": false
-    }
-  }
-}

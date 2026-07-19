@@ -1,8 +1,10 @@
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Engines
 {
+    [AggressivelyOptimizeMethods]
     internal abstract class EngineWarmupStage(IterationMode iterationMode, long invokeCount, int unrollFactor, EngineParameters parameters) : EngineStage(IterationStage.Warmup, iterationMode, parameters)
     {
         private const int MinOverheadIterationCount = 4;
@@ -32,6 +34,7 @@ namespace BenchmarkDotNet.Engines
                 : unrollFactor == 1 ? parameters.OverheadActionNoUnroll : parameters.OverheadActionUnroll);
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EngineWarmupStageAuto(IterationMode iterationMode, int minIterationCount, int maxIterationCount, long invokeCount, int unrollFactor, EngineParameters parameters)
         : EngineWarmupStage(iterationMode, invokeCount, unrollFactor, parameters)
     {
@@ -74,6 +77,7 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
+    [AggressivelyOptimizeMethods]
     internal sealed class EngineWarmupStageSpecific(int maxIterationCount, IterationMode iterationMode, long invokeCount, int unrollFactor, EngineParameters parameters)
         : EngineWarmupStage(iterationMode, invokeCount, unrollFactor, parameters)
     {
