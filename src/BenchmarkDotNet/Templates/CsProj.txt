@@ -1,4 +1,5 @@
 <Project Sdk="$SDKNAME$">
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
 
   <PropertyGroup>
     <AssemblyTitle>$PROGRAMNAME$</AssemblyTitle>
@@ -44,4 +45,5 @@
 
   $RUNTIMESETTINGS$
 
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
 </Project>
