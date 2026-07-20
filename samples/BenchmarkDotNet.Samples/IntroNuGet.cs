@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Samples
     /// Only supported with CsProj toolchains.
     /// </remarks>
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroNuGet
     {
         // Setup your csproj like this:

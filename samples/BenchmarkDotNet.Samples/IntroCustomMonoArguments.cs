@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(ConfigWithCustomArguments))]
+    [UseLocalJobOnly]
     public class IntroCustomMonoArguments
     {
         public class ConfigWithCustomArguments : ManualConfig

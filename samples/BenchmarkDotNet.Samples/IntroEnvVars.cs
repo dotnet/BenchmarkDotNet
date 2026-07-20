@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(ConfigWithCustomEnvVars))]
+    [UseLocalJobOnly]
     public class IntroEnvVars
     {
         private class ConfigWithCustomEnvVars : ManualConfig

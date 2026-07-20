@@ -4,6 +4,7 @@ namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
     [MediumRunJob]
+    [UseLocalJobOnly]
     [KeepBenchmarkFiles]
 
     [AsciiDocExporter]

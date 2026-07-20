@@ -89,11 +89,30 @@ namespace BenchmarkDotNet.Running
         {
             config = config ?? DefaultConfig.Instance;
 
-            var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
             var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
-
-            foreach (var configFromAttribute in assemblyAttributes.Concat(typeAttributes))
+            foreach (var configFromAttribute in assemblyAttributes)
                 config = ManualConfig.Union(config, configFromAttribute.Config);
+
+            var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>().ToArray();
+            if (typeAttributes.Any(x => x is UseLocalJobOnlyAttribute))
+            {
+                // UseLocalJobOnlyAttribute can't be combined with other benchmark attribute that setting non-default UnionRule.
+                if (typeAttributes.Any(x => x.Config.UnionRule != ConfigUnionRule.Union))
+                    throw new InvalidBenchmarkDeclarationException($"{type.Name} using UseLocalJobOnlyAttribute, but other benchmar attributes setting another UnionRule.");
+
+                // Aggregate attribute-based configs.
+                var typeConfig = ManualConfig.CreateEmpty();
+                foreach (var configFromAttribute in typeAttributes)
+                    typeConfig = ManualConfig.Union(typeConfig, configFromAttribute.Config);
+
+                typeConfig.WithUnionRule(ConfigUnionRule.UnionAndUseLocalJob);
+                config = ManualConfig.Union(config, typeConfig);
+            }
+            else
+            {
+                foreach (var configFromAttribute in typeAttributes)
+                    config = ManualConfig.Union(config, configFromAttribute.Config);
+            }
 
             return ImmutableConfigBuilder.Create(config);
         }
