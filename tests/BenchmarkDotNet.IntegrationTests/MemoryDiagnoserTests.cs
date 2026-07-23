@@ -305,11 +305,17 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
             // TODO: Skip test on macos. Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2779
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-                return;
+            if (OsDetector.IsMacOS())
+                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/2779");
 
-            if (toolchain.IsInProcess)
+            if (OsDetector.IsWindows() && toolchain.IsInProcess)
+            {
                 ValidateTelemetryOptOut();
+
+                // Skip test on `windows(arm64)`.
+                if (RuntimeInformation.OSArchitecture == Architecture.Arm64 && Portability.RuntimeInformation.IsNetCore)
+                    Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/2779");
+            }
 
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
@@ -320,9 +326,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             static void ValidateTelemetryOptOut()
             {
-                if (!OsDetector.IsWindows())
-                    return;
-
                 // When MTP telemetry feature is enabled, extra allocation (792 bytes) occurred randomly on Windows.
                 var optout = Environment.GetEnvironmentVariable("TESTINGPLATFORM_TELEMETRY_OPTOUT");
                 switch (optout)
