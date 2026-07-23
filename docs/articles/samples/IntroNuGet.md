@@ -13,11 +13,12 @@ It allows comparing different versions of the same package (if there are no brea
 
 ### Output
 
-| Method                    | Job    | Arguments           | Mean     | Error     | StdDev    |
-|-------------------------- |------- |-------------------- |---------:|----------:|----------:|
-| ToImmutableArrayBenchmark | v9.0.0 | /p:SciVersion=9.0.0 | 1.173 μs | 0.0057 μs | 0.0086 μs |
-| ToImmutableArrayBenchmark | v9.0.3 | /p:SciVersion=9.0.3 | 1.173 μs | 0.0038 μs | 0.0058 μs |
-| ToImmutableArrayBenchmark | v9.0.5 | /p:SciVersion=9.0.5 | 1.172 μs | 0.0107 μs | 0.0157 μs |
+| Method                   | Job     | Arguments                       | Mean     | Error    | StdDev   |
+|------------------------- |-------- |-------------------------------- |---------:|---------:|---------:|
+| SerializeAnonymousObject | v13.0.1 | /p:NewtonsoftJsonVersion=13.0.1 | 652.7 ns | 10.68 ns | 15.98 ns |
+| SerializeAnonymousObject | v13.0.2 | /p:NewtonsoftJsonVersion=13.0.2 | 654.0 ns |  8.62 ns | 12.89 ns |
+| SerializeAnonymousObject | v13.0.3 | /p:NewtonsoftJsonVersion=13.0.3 | 678.6 ns | 17.62 ns | 26.38 ns |
+| SerializeAnonymousObject | v13.0.4 | /p:NewtonsoftJsonVersion=13.0.4 | 637.2 ns | 16.95 ns | 24.84 ns |
 
 ### Links
 
