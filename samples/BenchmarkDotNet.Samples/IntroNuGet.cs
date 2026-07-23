@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using Newtonsoft.Json;
 using System.IO.Hashing;
 
 namespace BenchmarkDotNet.Samples
@@ -17,11 +18,11 @@ namespace BenchmarkDotNet.Samples
         // Setup your csproj like this:
         /*
         <PropertyGroup>
-          <!-- Use 10.0.0 as default package version if not specified -->
-          <SihVersion Condition="'$(SihVersion)' == ''">10.0.0</SciVersion>
+          <!-- Use 13.0.1 as default package version if not specified -->
+          <NewtonsoftJsonVersion Condition="'$(NewtonsoftJsonVersion)' == ''">13.0.1</NewtonsoftJsonVersion>
         </PropertyGroup>
         <ItemGroup>
-          <PackageReference Include="System.IO.Hashing" Version="$(SihVersion)" />
+          <PackageReference Include="Newtonsoft.Json" Version="[$(NewtonsoftJsonVersion)]" />
         </ItemGroup>
         */
         // All versions of the package must be source-compatible with your benchmark code.
@@ -30,34 +31,27 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 string[] targetVersions = [
-                    "10.0.0",
-                    "10.0.5",
-                    "10.0.9",
+                    "13.0.1",
+                    "13.0.2",
+                    "13.0.3",
+                    "13.0.4",
                 ];
 
                 foreach (var version in targetVersions)
                 {
                     AddJob(Job.MediumRun
-                        .WithMsBuildArguments($"/p:SihVersion={version}")
+                        .WithMsBuildArguments($"/p:NewtonsoftJsonVersion={version}")
                         .WithId($"v{version}")
                     );
                 }
             }
         }
 
-        private static readonly byte[] values;
-
-        static IntroNuGet()
-        {
-            var rand = new Random(Seed: 0);
-            values = new byte[10_000];
-            rand.NextBytes(values);
-        }
-
         [Benchmark]
-        public void XxHash3Benchmark()
+        public void SerializeAnonymousObject()
         {
-            var results = XxHash3.Hash(values);
+            JsonConvert.SerializeObject(
+                new { hello = "world", price = 1.99, now = DateTime.UtcNow });
         }
     }
 }
