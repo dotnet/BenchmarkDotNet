@@ -24,8 +24,9 @@ internal class MosCpuDetector : ICpuDetector
         double maxFrequency = 0;
         double nominalFrequency = 0;
 
-        using (var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor"))
+        try
         {
+            using var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())
             {
                 string? name = moProcessor[WmiCpuInfoKeyNames.Name]?.ToString();
@@ -44,6 +45,12 @@ internal class MosCpuDetector : ICpuDetector
                     maxFrequency = Math.Max(maxFrequency, tempMaxFrequency);
                 }
             }
+        }
+        catch
+        {
+            // System.TypeInitializationException: The type initializer for 'System.Management.ManagementPath' threw an exception.
+            // --->System.NotSupportedException: Built-in COM has been disabled via a feature switch.See https://aka.ms/dotnet-illink/com for more information.
+            return null;
         }
 
         string? processorName = processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null;
