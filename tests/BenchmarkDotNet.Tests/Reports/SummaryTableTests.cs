@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
             var joinedSummary = Summary.Join([taggedSummary, otherSummary], default);
 
-            Assert.Equal(["", "tagged"], joinedSummary.Table.Columns.Single(c => c.Header == "Tag").Content);
+            Assert.Equal(["-", "tagged"], joinedSummary.Table.Columns.Single(c => c.Header == "Tag").Content);
         }
 
         [Fact] // Issue #1070

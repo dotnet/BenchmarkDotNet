@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Reports
             ColumnCount = columns.Length;
             FullHeader = columns.Select(c => c.GetColumnTitle(style)).ToArray();
 
-            FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.BenchmarkCase, style) ?? string.Empty).ToArray()).ToArray();
+            FullContent = summary.Reports.Select(r => columns.Select(c => c.GetValue(summary, r.BenchmarkCase, style) ?? "-").ToArray()).ToArray();
             IsDefault = columns.Select(c => summary.Reports.All(r => c.IsDefault(summary, r.BenchmarkCase))).ToArray();
 
             var highlightGroupKeys = summary.BenchmarksCases.Select(b => b.Config.Orderer.GetHighlightGroupKey(b)).ToArray();
