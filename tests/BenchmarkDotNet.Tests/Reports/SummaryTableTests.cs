@@ -87,6 +87,17 @@ namespace BenchmarkDotNet.Tests.Reports
             Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Right, table.Columns.First(c => c.Header == "Param").Justify);
         }
 
+        [Fact] // Issue #2656
+        public void JoinedSummaryHandlesMissingColumnValues()
+        {
+            var taggedSummary = MockFactory.CreateSummary(typeof(TaggedBenchmark));
+            var otherSummary = MockFactory.CreateSummary(typeof(OtherBenchmark));
+
+            var joinedSummary = Summary.Join([taggedSummary, otherSummary], default);
+
+            Assert.Equal(["NA", "tagged"], joinedSummary.Table.Columns.Single(c => c.Header == "Tag").Content);
+        }
+
         [Fact] // Issue #1070
         public void CustomOrdererIsSupported()
         {
@@ -475,6 +486,27 @@ namespace BenchmarkDotNet.Tests.Reports
             // assert
             Assert.Equal(["-", "-"], lockContentionCount!);
             Assert.Equal(["-", "-"], completedWorkItemCount!);
+        }
+
+        [Config(typeof(TagColumnConfig))]
+        public class TaggedBenchmark
+        {
+            [Benchmark]
+            public void Tagged() { }
+        }
+
+        public class OtherBenchmark
+        {
+            [Benchmark]
+            public void Other() { }
+        }
+
+        public class TagColumnConfig : ManualConfig
+        {
+            public TagColumnConfig()
+            {
+                AddColumn(new TagColumn("Tag", methodName => methodName == nameof(TaggedBenchmark.Tagged) ? "tagged" : null!));
+            }
         }
         #endregion
     }
