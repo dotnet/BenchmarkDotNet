@@ -37,10 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            // xunit v2 allocates every 100ms on a background timer that makes the tests flaky on Mac/Linux (MSTestEnableParentProcessQuery).
-            // TODO: remove the guard when the test framework is updated.
-            if (OsDetector.IsWindows())
-                yield return [InProcessEmitToolchain.Default];
+            yield return [InProcessEmitToolchain.Default];
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
@@ -229,6 +226,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
         {
+            if (toolchain.IsInProcess && OsDetector.IsWindows() && !Portability.RuntimeInformation.IsNetCore)
+            {
+                // Randomly failed on Windows(x64)+.NET Framework.
+                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/pull/3065#issuecomment-5064984074");
+            }
+
             AssertAllocations(toolchain, typeof(NoBoxing), new Dictionary<string, long>
             {
                 { nameof(NoBoxing.ReturnsValueType), 0 }
@@ -251,6 +254,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
+            if (toolchain.IsInProcess && OsDetector.IsWindows() && !Portability.RuntimeInformation.IsNetCore)
+            {
+                // Randomly failed on Windows(x64/arm64)+.NET Framework.
+                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3203");
+            }
+
             AssertAllocations(toolchain, typeof(NonAllocatingAsynchronousBenchmarks), new Dictionary<string, long>
             {
                 { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTask), 0 },
@@ -304,15 +313,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
-            // TODO: Skip test on macos. Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2779
-            if (OsDetector.IsMacOS())
-                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/2779");
-
             if (OsDetector.IsWindows() && toolchain.IsInProcess)
             {
                 ValidateTelemetryOptOut();
 
-                // Skip test on `windows(arm64)`.
+                // Skip test on `windows(arm64)` because extra memory allocation still occurred.
                 if (RuntimeInformation.OSArchitecture == Architecture.Arm64 && Portability.RuntimeInformation.IsNetCore)
                     Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/2779");
             }
