@@ -1,8 +1,8 @@
-﻿{
+{
   "shadowCopy": false,
   "methodDisplay": "method",
   "diagnosticMessages": true,
-  "longRunningTestSeconds": 60,
+  "longRunningTestSeconds": 0,
   "parallelizeAssembly": false,
   "parallelizeTestCollections": false
 }
