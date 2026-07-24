@@ -57,14 +57,14 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
     [InlineData("node")]
     public void BenchmarkWithCancellationTokenProperty_ReceivesToken_Wasm(string javaScriptEngine)
     {
-        var dotnetVersion = "net8.0";
+        var dotnetVersion = "net10.0";
         var logger = new OutputLogger(Output);
         var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: MonoAotCompilerMode.mini);
 
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", false, javaScriptEngine))
+                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
                 .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
             .WithBuildTimeout(TimeSpan.FromSeconds(240))
             .WithOption(ConfigOptions.LogBuildOutput, true)
@@ -123,14 +123,14 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         var cts = new CancellationTokenSource();
         var diagnoser = new CancelAfterFirstIterationDiagnoser(cts);
 
-        var dotnetVersion = "net8.0";
+        var dotnetVersion = "net10.0";
         var logger = new OutputLogger(Output);
         var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: MonoAotCompilerMode.mini);
 
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", false, javaScriptEngine))
+                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
                 .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
             .AddDiagnoser(diagnoser)
             .WithBuildTimeout(TimeSpan.FromSeconds(240))
