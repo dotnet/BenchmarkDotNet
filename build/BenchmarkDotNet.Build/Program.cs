@@ -85,7 +85,7 @@ public class InstallWasmToolsWorkload : FrostingTask<BuildContext>, IHelpProvide
 
     public override void Run(BuildContext context)
     {
-        context.BuildRunner.InstallWorkload("wasm-tools-net8");
+        context.BuildRunner.InstallWorkload("wasm-tools"); // It need to specify `wasm-tools-net10` when using newer version of .NET SDK.
     }
 
     public HelpInfo GetHelp()
@@ -164,7 +164,7 @@ public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
 public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "in-tests-core";
-    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net8.0");
+    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net10.0");
     public HelpInfo GetHelp() => new();
 }
 

@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Samples
     public class IntroWasmCmdConfig
     {
         // Example:
-        // --runtimes wasmnet8.0
+        // --runtimes wasmnet10.0
         // --cli /path/to/dotnet (optional)
         // --wasmEngine v8 (optional)
         // --wasmArgs "--expose_wasm" (optional)
@@ -34,9 +34,9 @@ namespace BenchmarkDotNet.Samples
             // Optional: set this to use a custom `dotnet` (for example, a local dotnet/runtime build).
             const string cliPath = "";
 
-            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net8.0", RuntimeMoniker.WasmNet80, "Wasm .net8.0", false, "v8");
+            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net10.0", RuntimeMoniker.WasmNet10_0, "Wasm .net10.0", false, "v8");
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
-                targetFrameworkMoniker: "net8.0", runtimeFrameworkVersion: "", name: "Wasm",
+                targetFrameworkMoniker: "net10.0", runtimeFrameworkVersion: "", name: "Wasm",
                 customDotNetCliPath: cliPath);
             var toolChain = WasmToolchain.From(netCoreAppSettings);
 

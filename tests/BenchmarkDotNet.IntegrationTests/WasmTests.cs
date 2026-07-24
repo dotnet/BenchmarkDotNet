@@ -72,14 +72,14 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private ManualConfig GetConfig(MonoAotCompilerMode aotCompilerMode, string javaScriptEngine, FileInfo? mainJsTemplate = null, WasmIpcType ipcType = WasmIpcType.Auto)
         {
-            var dotnetVersion = "net8.0";
+            var dotnetVersion = "net10.0";
             var logger = new OutputLogger(Output);
             var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
 
             return ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet80, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType))
+                    .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", aotCompilerMode == MonoAotCompilerMode.wasm, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType))
                     .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
                 .WithBuildTimeout(TimeSpan.FromSeconds(480)) // Increase timeout for `WasmSupportsInProcessDiagnosers` test on macos(x64)
                 .WithOption(ConfigOptions.LogBuildOutput, true)
