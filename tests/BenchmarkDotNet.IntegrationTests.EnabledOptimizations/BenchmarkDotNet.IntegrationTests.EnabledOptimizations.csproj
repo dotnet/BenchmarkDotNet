@@ -9,7 +9,7 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    
+
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>

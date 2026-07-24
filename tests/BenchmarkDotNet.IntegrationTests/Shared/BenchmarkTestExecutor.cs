@@ -1,11 +1,11 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
+using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -76,8 +76,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
                 config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
-            if (!config.GetLoggers().OfType<ConsoleLogger>().Any())
-                config = config.AddLogger(ConsoleLogger.Default);
 
             if (!config.GetColumnProviders().Any())
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);

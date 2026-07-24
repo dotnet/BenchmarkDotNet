@@ -1,0 +1,10 @@
+{
+  "platformOptions": {
+  },
+  "environmentVariables": {
+    "TESTINGPLATFORM_TELEMETRY_OPTOUT": "true",
+    "TESTINGPLATFORM_UI_LANGUAGE": "en-us"
+  },
+  "xUnit": {
+  }
+}

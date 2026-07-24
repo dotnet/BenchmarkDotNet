@@ -25,6 +25,7 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Validators;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -55,7 +56,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurate(IToolchain toolchain)
         {
@@ -140,7 +142,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -155,7 +158,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void EmptyMethod() { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
@@ -180,15 +184,39 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         // #1542
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TieredJitShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
+            if (toolchain.IsInProcess)
+                ValidateMtpProgressDisabled();
+
             AssertAllocations(toolchain, typeof(TimeConsumingBenchmark), new Dictionary<string, long>
             {
                 { nameof(TimeConsumingBenchmark.TimeConsuming), 0 }
             },
             iterationCount: 10); // 1 iteration is not enough to repro the problem
+
+            static void ValidateMtpProgressDisabled()
+            {
+                if (!OsDetector.IsWindows() || RuntimeInformation.OSArchitecture != Architecture.Arm64)
+                    return;
+
+                // On Windows(arm64) environment following test failed with extra memory allocations (1 or 2 bytes)
+                //  TieredJitShouldNotInterfereAllocationResults
+                var args = Environment.GetCommandLineArgs();
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == "--progress=off")
+                        return;
+
+                    if (i < args.Length - 1 && args[i] == "--progress" && args[i + 1] == "off")
+                        return;
+                }
+
+                throw new NotSupportedException("Measure memory allocation requires setting `--progress off`");
+            }
         }
 
         public class NoBoxing
@@ -196,7 +224,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTuple<int> ReturnsValueType() => new ValueTuple<int>(0);
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
         {
@@ -217,7 +246,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTask<int> CompletedValueTaskOfT() => new ValueTask<int>(default(int));
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
@@ -242,7 +272,8 @@ namespace BenchmarkDotNet.IntegrationTests
             private void DoNotInline(object left, object right) { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocatedMemoryShouldBeScaledForOperationsPerInvoke(IToolchain toolchain)
         {
@@ -268,14 +299,23 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly)]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly, SkipTestWithoutData = true)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
             // TODO: Skip test on macos. Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2779
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-                return;
+            if (OsDetector.IsMacOS())
+                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/2779");
+
+            if (OsDetector.IsWindows() && toolchain.IsInProcess)
+            {
+                ValidateTelemetryOptOut();
+
+                // Skip test on `windows(arm64)`.
+                if (RuntimeInformation.OSArchitecture == Architecture.Arm64 && Portability.RuntimeInformation.IsNetCore)
+                    Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/2779");
+            }
 
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
@@ -283,6 +323,20 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
             });
+
+            static void ValidateTelemetryOptOut()
+            {
+                // When MTP telemetry feature is enabled, extra allocation (792 bytes) occurred randomly on Windows.
+                var optout = Environment.GetEnvironmentVariable("TESTINGPLATFORM_TELEMETRY_OPTOUT");
+                switch (optout)
+                {
+                    case "1":
+                    case "true":
+                        break;
+                    default:
+                        throw new NotSupportedException("Measure memory allocation requires setting `TESTINGPLATFORM_TELEMETRY_OPTOUT=true`");
+                }
+            }
         }
 
         public class MultiThreadedAllocation
@@ -338,7 +392,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("Full Framework cannot measure precisely enough", EnvRequirement.DotNetCoreOnly)]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough", EnvRequirement.DotNetCoreOnly, SkipTestWithoutData = true)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)

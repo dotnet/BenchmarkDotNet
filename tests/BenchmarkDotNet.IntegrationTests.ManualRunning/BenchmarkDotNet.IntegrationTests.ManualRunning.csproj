@@ -3,6 +3,9 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyTitle>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <!-- Suppress warning MSB3277: Found conflicts between different versions of "System.Buffers" that could not be resolved. -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+    <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.ManualRunning</PackageId>
@@ -14,7 +17,6 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-    <Using Include="Xunit.Abstractions" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(CustomProp)'=='true'">
@@ -24,11 +26,13 @@
   <PropertyGroup Condition="'$(ExtraDefineConstants)'!=''">
     <DefineConstants>$(DefineConstants);$(ExtraDefineConstants)</DefineConstants>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\Loggers\OutputLogger.cs" Link="Shared\Loggers\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\BenchmarkDotNet.Tests\Shared\XUnit\**\*.cs" Link="Shared\XUnit\%(RecursiveDir)%(Filename)%(Extension)"/>
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\BenchmarkTestExecutor.cs" Link="Shared\BenchmarkTestExecutor.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\MisconfiguredEnvironmentException.cs" Link="Shared\MisconfiguredEnvironmentException.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\Extensions.cs" Link="Shared\Extensions.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\TestConfigs.cs" Link="Shared\TestConfigs.cs" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Shared\Loggers\OutputLogger.cs" Link="Shared\Loggers\OutputLogger.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,12 +47,7 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="4.0.0-pre.154" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>

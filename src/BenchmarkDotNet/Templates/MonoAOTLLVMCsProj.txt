@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
+<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
   <PropertyGroup>
     <OriginalCSProjPath>$CSPROJPATH$</OriginalCSProjPath>
     <MonoPropsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Mono.props'))</MonoPropsPath>

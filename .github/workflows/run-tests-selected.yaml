@@ -89,12 +89,13 @@ jobs:
         run: |
           $PSNativeCommandUseErrorActionPreference = $true
           $iterationCount = ${{ inputs.iteration_count }}
+          
+          Write-Host ("OSArchitecture" + [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)
 
           foreach($i in 1..$iterationCount) {
             Write-Output ('##[group]Executing Iteration: {0}/${{ inputs.iteration_count }}' -f $i)
 
-            dotnet test -c Release --framework ${{ inputs.framework }} --filter ${{ inputs.filter }} -tl:off --no-build --logger "console;verbosity=normal"
-
+            dotnet test -c Release --framework ${{ inputs.framework }} --no-build --filter "${{ inputs.filter }}" --no-ansi --progress off --output Detailed
             Write-Output '##[endgroup]'
           }
 
