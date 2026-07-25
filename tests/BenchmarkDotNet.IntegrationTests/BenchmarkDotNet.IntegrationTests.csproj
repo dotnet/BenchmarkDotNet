@@ -14,6 +14,10 @@
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>$(NoWarn);CA2007;CA1825</NoWarn>
     <ServerGarbageCollection>true</ServerGarbageCollection>
+
+    <!-- TODO: Remove this setting after https://github.com/dotnet/runtime/pull/131069 issue is resolved, and backported to .NET 10. -->
+    <!-- Disable Dynamic adaptation to application sizes (DATAS) -->
+    <GarbageCollectionAdaptationMode>0</GarbageCollectionAdaptationMode>
   </PropertyGroup>
   <ItemGroup>
     <Using Include="Xunit" />
