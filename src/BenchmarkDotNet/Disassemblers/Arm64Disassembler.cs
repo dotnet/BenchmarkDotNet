@@ -197,20 +197,15 @@ namespace BenchmarkDotNet.Disassemblers
         private static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
         {
             isPrestubMD = false;
-            byte[] buffer = new byte[12];
-            if (reader.Read(address, buffer) != 12)
+            if (!TryReadStubHead(reader, address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2))
                 return false;
-
-            uint instr0 = ReadInstr(buffer, 0);
-            uint instr1 = ReadInstr(buffer, 4);
-            uint instr2 = ReadInstr(buffer, 8);
 
             // StubPrecode: LDR x10, Target ; LDR x12, MethodDesc ; BR x10
             if (IsLdrLiteral64(instr0, out int rt0, out int _) && rt0 == 10
                 && IsLdrLiteral64(instr1, out int rt1, out int off1) && rt1 == 12
                 && instr2 == 0xD61F0140u)
             {
-                ulong mdSlot = unchecked(address + 4 + (ulong)(long)off1);
+                ulong mdSlot = unchecked(parseBase + 4 + (ulong)(long)off1);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -225,7 +220,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0xD61F0160u
                 && IsLdrLiteral64(instr2, out int rtB, out int off2) && rtB == 12)
             {
-                ulong mdSlot = unchecked(address + 8 + (ulong)(long)off2);
+                ulong mdSlot = unchecked(parseBase + 8 + (ulong)(long)off2);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -243,7 +238,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && IsLdrLiteral64(instr1, out int rtF1, out int _) && rtF1 == 11
                 && instr2 == 0xD61F0160u)
             {
-                ulong mdSlot = unchecked(address + (ulong)(long)offF0);
+                ulong mdSlot = unchecked(parseBase + (ulong)(long)offF0);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -260,7 +255,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0x7940012Au
                 && instr2 == 0x7100054Au)
             {
-                ulong countSlot = unchecked(address + (ulong)(long)offCount);
+                ulong countSlot = unchecked(parseBase + (ulong)(long)offCount);
                 if (reader.ReadPointer(countSlot + 8, out ulong target) && IsValidAddress(target))
                 {
                     address = target;
@@ -270,6 +265,39 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             return false;
+        }
+
+        // .NET 10 prefixes some AArch64 precode/stub shapes with `DMB ISH` for concurrent
+        // stub-patching safety. Detect and skip the barrier so the existing 3-instruction pattern
+        // match still works, and return the effective PC of the first real stub instruction so
+        // LDR-literal offsets are calculated relative to it.
+        // Encoding: DMB ISH = 0xD50339BF.
+        private const uint DmbIshInstr = 0xD50339BFu;
+
+        private static bool TryReadStubHead(IDataReader reader, ulong address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2)
+        {
+            parseBase = address;
+            instr0 = instr1 = instr2 = 0;
+
+            byte[] buffer = new byte[16];
+            int read = reader.Read(address, buffer);
+            if (read < 12)
+                return false;
+
+            int offset = 0;
+            uint first = ReadInstr(buffer, 0);
+            if (first == DmbIshInstr)
+            {
+                if (read < 16)
+                    return false;
+                offset = 4;
+                parseBase = address + 4;
+            }
+
+            instr0 = ReadInstr(buffer, offset + 0);
+            instr1 = ReadInstr(buffer, offset + 4);
+            instr2 = ReadInstr(buffer, offset + 8);
+            return true;
         }
 
         private static uint ReadInstr(byte[] buffer, int offset)
@@ -346,17 +374,16 @@ namespace BenchmarkDotNet.Disassemblers
         {
             target = 0;
             IDataReader dataReader = state.Runtime.DataTarget.DataReader;
-            byte[] buffer = new byte[12];
-            int read = dataReader.Read(address, buffer);
-            if (read < 4)
+
+            // B imm26 shape is 4 bytes and cannot be prefixed with DMB (the barrier is only
+            // emitted for precode/stub shapes, not for JIT-emitted jump trampolines).
+            byte[] head = new byte[4];
+            if (dataReader.Read(address, head) < 4)
                 return false;
-
-            uint instr0 = ReadInstr(buffer, 0);
-
-            // B imm26 — bits[31:26] == 0b000101 (0x5)
-            if ((instr0 >> 26) == 0x5)
+            uint firstInstr = ReadInstr(head, 0);
+            if ((firstInstr >> 26) == 0x5)
             {
-                uint imm26 = instr0 & 0x03FFFFFFu;
+                uint imm26 = firstInstr & 0x03FFFFFFu;
                 // Sign-extend the 26-bit immediate to 32 bits, then multiply by 4 (instructions are 4-byte aligned).
                 int offset = (int)(imm26 & 0x02000000u) != 0
                     ? unchecked((int)(imm26 | 0xFC000000u)) << 2
@@ -365,17 +392,15 @@ namespace BenchmarkDotNet.Disassemblers
                 return IsValidAddress(target);
             }
 
-            if (read < 12)
+            if (!TryReadStubHead(dataReader, address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2))
                 return false;
-            uint instr1 = ReadInstr(buffer, 4);
-            uint instr2 = ReadInstr(buffer, 8);
 
             // StubPrecode: LDR x10, Target ; LDR x12, MethodDesc ; BR x10. Follow the first LDR.
             if (IsLdrLiteral64(instr0, out int rt0, out int off0) && rt0 == 10
                 && IsLdrLiteral64(instr1, out int rt1, out int _) && rt1 == 12
                 && instr2 == 0xD61F0140u)
             {
-                ulong targetSlot = unchecked(address + (ulong)(long)off0);
+                ulong targetSlot = unchecked(parseBase + (ulong)(long)off0);
                 if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
@@ -387,7 +412,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0xD61F0160u
                 && IsLdrLiteral64(instr2, out int rtB, out int _) && rtB == 12)
             {
-                ulong targetSlot = unchecked(address + (ulong)(long)offA);
+                ulong targetSlot = unchecked(parseBase + (ulong)(long)offA);
                 if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
@@ -400,7 +425,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0x7940012Au
                 && instr2 == 0x7100054Au)
             {
-                ulong countSlot = unchecked(address + (ulong)(long)offCount);
+                ulong countSlot = unchecked(parseBase + (ulong)(long)offCount);
                 if (dataReader.ReadPointer(countSlot + 8, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
