@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -151,11 +152,11 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                ? PerfolizerMeasurementFormatter.Instance.Format(
+                ? UnitHelper.Format(
                     TimeInterval.FromNanoseconds(value).ToMeasurement(style.TimeUnit),
                     format,
                     style.CultureInfo,
-                    new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true))
+                    style.PrintUnitsInContent)
                 : value.ToString(format, style.CultureInfo);
         }
 

@@ -24,48 +24,48 @@ Type = Bench, Jit = RyuJit
 @Net80Affinity18:      Runtime = Net80, Affinity = 18
 @Net90Affinity19:      Runtime = Net90, Affinity = 19
 
-| Method | Job                  |    Center |  Spread |
-|:-------|:---------------------|----------:|--------:|
-| Foo    | HostProcessAffinity0 |   2.00 ns | 0.81 ns |
-| Bar    | HostProcessAffinity0 |   7.00 ns | 0.81 ns |
-| Foo    | Squid                |  12.00 ns | 0.81 ns |
-| Bar    | Squid                |  17.00 ns | 0.81 ns |
-| Foo    | MonoAffinity2        |  22.00 ns | 0.81 ns |
-| Bar    | MonoAffinity2        |  27.00 ns | 0.81 ns |
-| Foo    | Net461Affinity3      |  32.00 ns | 0.81 ns |
-| Bar    | Net461Affinity3      |  37.00 ns | 0.81 ns |
-| Foo    | Net462Affinity4      |  42.00 ns | 0.81 ns |
-| Bar    | Net462Affinity4      |  47.00 ns | 0.81 ns |
-| Foo    | Net47Affinity5       |  52.00 ns | 0.81 ns |
-| Bar    | Net47Affinity5       |  57.00 ns | 0.81 ns |
-| Foo    | Net471Affinity6      |  62.00 ns | 0.81 ns |
-| Bar    | Net471Affinity6      |  67.00 ns | 0.81 ns |
-| Foo    | Net472Affinity7      |  72.00 ns | 0.81 ns |
-| Bar    | Net472Affinity7      |  77.00 ns | 0.81 ns |
-| Foo    | Net48Affinity8       |  82.00 ns | 0.81 ns |
-| Bar    | Net48Affinity8       |  87.00 ns | 0.81 ns |
-| Foo    | Net481Affinity9      |  92.00 ns | 0.81 ns |
-| Bar    | Net481Affinity9      |  97.00 ns | 0.81 ns |
-| Foo    | Liger                | 102.00 ns | 0.81 ns |
-| Bar    | Liger                | 107.00 ns | 0.81 ns |
-| Foo    | Rat                  | 112.00 ns | 0.81 ns |
-| Bar    | Rat                  | 117.00 ns | 0.81 ns |
-| Foo    | Skate                | 122.00 ns | 0.81 ns |
-| Bar    | Skate                | 127.00 ns | 0.81 ns |
-| Foo    | Perch                | 132.00 ns | 0.81 ns |
-| Bar    | Perch                | 137.00 ns | 0.81 ns |
-| Foo    | Roach                | 142.00 ns | 0.81 ns |
-| Bar    | Roach                | 147.00 ns | 0.81 ns |
-| Foo    | Net50Affinity15      | 152.00 ns | 0.81 ns |
-| Bar    | Net50Affinity15      | 157.00 ns | 0.81 ns |
-| Foo    | Net60Affinity16      | 162.00 ns | 0.81 ns |
-| Bar    | Net60Affinity16      | 167.00 ns | 0.81 ns |
-| Foo    | Net70Affinity17      | 172.00 ns | 0.81 ns |
-| Bar    | Net70Affinity17      | 177.00 ns | 0.81 ns |
-| Foo    | Net80Affinity18      | 182.00 ns | 0.81 ns |
-| Bar    | Net80Affinity18      | 187.00 ns | 0.81 ns |
-| Foo    | Net90Affinity19      | 192.00 ns | 0.81 ns |
-| Bar    | Net90Affinity19      | 197.00 ns | 0.81 ns |
+| Method | Job                  |   Center | Spread |
+|:-------|:---------------------|---------:|-------:|
+| Foo    | HostProcessAffinity0 |   2.00ns | 0.81ns |
+| Bar    | HostProcessAffinity0 |   7.00ns | 0.81ns |
+| Foo    | Squid                |  12.00ns | 0.81ns |
+| Bar    | Squid                |  17.00ns | 0.81ns |
+| Foo    | MonoAffinity2        |  22.00ns | 0.81ns |
+| Bar    | MonoAffinity2        |  27.00ns | 0.81ns |
+| Foo    | Net461Affinity3      |  32.00ns | 0.81ns |
+| Bar    | Net461Affinity3      |  37.00ns | 0.81ns |
+| Foo    | Net462Affinity4      |  42.00ns | 0.81ns |
+| Bar    | Net462Affinity4      |  47.00ns | 0.81ns |
+| Foo    | Net47Affinity5       |  52.00ns | 0.81ns |
+| Bar    | Net47Affinity5       |  57.00ns | 0.81ns |
+| Foo    | Net471Affinity6      |  62.00ns | 0.81ns |
+| Bar    | Net471Affinity6      |  67.00ns | 0.81ns |
+| Foo    | Net472Affinity7      |  72.00ns | 0.81ns |
+| Bar    | Net472Affinity7      |  77.00ns | 0.81ns |
+| Foo    | Net48Affinity8       |  82.00ns | 0.81ns |
+| Bar    | Net48Affinity8       |  87.00ns | 0.81ns |
+| Foo    | Net481Affinity9      |  92.00ns | 0.81ns |
+| Bar    | Net481Affinity9      |  97.00ns | 0.81ns |
+| Foo    | Liger                | 102.00ns | 0.81ns |
+| Bar    | Liger                | 107.00ns | 0.81ns |
+| Foo    | Rat                  | 112.00ns | 0.81ns |
+| Bar    | Rat                  | 117.00ns | 0.81ns |
+| Foo    | Skate                | 122.00ns | 0.81ns |
+| Bar    | Skate                | 127.00ns | 0.81ns |
+| Foo    | Perch                | 132.00ns | 0.81ns |
+| Bar    | Perch                | 137.00ns | 0.81ns |
+| Foo    | Roach                | 142.00ns | 0.81ns |
+| Bar    | Roach                | 147.00ns | 0.81ns |
+| Foo    | Net50Affinity15      | 152.00ns | 0.81ns |
+| Bar    | Net50Affinity15      | 157.00ns | 0.81ns |
+| Foo    | Net60Affinity16      | 162.00ns | 0.81ns |
+| Bar    | Net60Affinity16      | 167.00ns | 0.81ns |
+| Foo    | Net70Affinity17      | 172.00ns | 0.81ns |
+| Bar    | Net70Affinity17      | 177.00ns | 0.81ns |
+| Foo    | Net80Affinity18      | 182.00ns | 0.81ns |
+| Bar    | Net80Affinity18      | 187.00ns | 0.81ns |
+| Foo    | Net90Affinity19      | 192.00ns | 0.81ns |
+| Bar    | Net90Affinity19      | 197.00ns | 0.81ns |
 
 {
   "engine": {

@@ -6,12 +6,12 @@ Type = Bench
 @Net481LegacyJit: Runtime = Net481, Jit = LegacyJit
 @Net70RyuJit:     Runtime = Net70, Jit = RyuJit
 
-| Method | Job             |  Center |  Spread |
-|:-------|:----------------|--------:|--------:|
-| Foo    | Net481LegacyJit | 11.0 ns | 0.81 ns |
-| Bar    | Net481LegacyJit | 21.0 ns | 0.81 ns |
-| Foo    | Net70RyuJit     | 31.0 ns | 0.81 ns |
-| Bar    | Net70RyuJit     | 41.0 ns | 0.81 ns |
+| Method | Job             | Center | Spread |
+|:-------|:----------------|-------:|-------:|
+| Foo    | Net481LegacyJit | 11.0ns | 0.81ns |
+| Bar    | Net481LegacyJit | 21.0ns | 0.81ns |
+| Foo    | Net70RyuJit     | 31.0ns | 0.81ns |
+| Bar    | Net70RyuJit     | 41.0ns | 0.81ns |
 
 {
   "engine": {

@@ -3,10 +3,10 @@ MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 phys
 
 Type = Bench, Runtime = Net70, Jit = RyuJit
 
-| Method |  Center |  Spread |
-|:-------|--------:|--------:|
-| Foo    | 31.0 ns | 0.81 ns |
-| Bar    | 41.0 ns | 0.81 ns |
+| Method | Center | Spread |
+|:-------|-------:|-------:|
+| Foo    | 31.0ns | 0.81ns |
+| Bar    | 41.0ns | 0.81ns |
 
 {
   "engine": {

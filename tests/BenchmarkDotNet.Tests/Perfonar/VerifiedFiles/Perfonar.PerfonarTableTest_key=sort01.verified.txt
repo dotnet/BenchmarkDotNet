@@ -1,7 +1,7 @@
-﻿| Method |  Center |
-|:-------|--------:|
-| Bar    | 20.0 ms |
-| Foo    | 10.0 ms |
+﻿| Method | Center |
+|:-------|-------:|
+| Bar    | 20.0ms |
+| Foo    | 10.0ms |
 
 {
   "nested": [

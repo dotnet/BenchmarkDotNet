@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -44,25 +45,24 @@ namespace BenchmarkDotNet.Columns
             var cultureInfo = summary.GetCultureInfo();
 
             bool printUnits = style.PrintUnitsInContent || style.PrintUnitsInHeader;
-            var unitPresentation = new UnitPresentation(style.PrintUnitsInContent, minUnitWidth: 0, gap: true);
             string numberFormat = descriptor.NumberFormat;
 
             if (printUnits && descriptor.UnitType == UnitType.CodeSize)
             {
                 var measurement = SizeValue.FromBytes((long)metric.Value).ToMeasurement(style.CodeSizeUnit);
-                return PerfolizerMeasurementFormatter.Instance.Format(measurement, numberFormat, cultureInfo, unitPresentation);
+                return UnitHelper.Format(measurement, numberFormat, cultureInfo, style.PrintUnitsInContent);
             }
             if (printUnits && descriptor.UnitType == UnitType.Size)
             {
                 var measurement = SizeValue.FromBytes((long)metric.Value).ToMeasurement(style.SizeUnit);
-                return PerfolizerMeasurementFormatter.Instance.Format(measurement, numberFormat, cultureInfo, unitPresentation);
+                return UnitHelper.Format(measurement, numberFormat, cultureInfo, style.PrintUnitsInContent);
             }
             if (printUnits && descriptor.UnitType == UnitType.Time)
             {
                 if (numberFormat.IsBlank())
                     numberFormat = "N4";
                 var measurement = TimeInterval.FromNanoseconds(metric.Value).ToMeasurement(style.TimeUnit);
-                return PerfolizerMeasurementFormatter.Instance.Format(measurement, numberFormat, cultureInfo, unitPresentation);
+                return UnitHelper.Format(measurement, numberFormat, cultureInfo, style.PrintUnitsInContent);
             }
 
             return metric.Value.ToString(numberFormat, cultureInfo);

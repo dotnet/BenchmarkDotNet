@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,14 +18,14 @@ namespace BenchmarkDotNet.Extensions
             switch (column.UnitType)
             {
                 case UnitType.CodeSize:
-                    return $"{column.ColumnName} [{style.CodeSizeUnit.Abbreviation}]";
+                    return $"{column.ColumnName} [{style.CodeSizeUnit.GetAbbreviation()}]";
                 case UnitType.Size:
                     return style.SizeUnit != null
-                        ? $"{column.ColumnName} [{style.SizeUnit.Abbreviation}]"
+                        ? $"{column.ColumnName} [{style.SizeUnit.GetAbbreviation()}]"
                         : $"{column.ColumnName}";
                 case UnitType.Time:
                     return style.TimeUnit != null
-                        ? $"{column.ColumnName} [{style.TimeUnit.Abbreviation}]"
+                        ? $"{column.ColumnName} [{style.TimeUnit.GetAbbreviation()}]"
                         : $"{column.ColumnName}";
                 case UnitType.Dimensionless:
                     return column.ColumnName;

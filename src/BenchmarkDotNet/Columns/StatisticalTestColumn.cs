@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Columns
 
         public static StatisticalTestColumn Create(string threshold, SignificanceLevel? significanceLevel = null)
         {
-            if (!Threshold.TryParse(threshold, out var parsedThreshold))
+            if (!Threshold.TryParse(UnitHelper.NormalizeUnits(threshold), out var parsedThreshold))
                 throw new ArgumentException($"Can't parse threshold '{threshold}'");
             return new StatisticalTestColumn(parsedThreshold, significanceLevel);
         }
@@ -37,7 +38,11 @@ namespace BenchmarkDotNet.Columns
             if (current.Sample.Size == 1 && baseline.Sample.Size == 1)
                 return "?";
 
+            // See ZeroMeasurementHelper: moving to Pragmastat.Toolkit.Compare2 would change the
+            // reported verdicts, so it needs its own change rather than riding along with a bump.
+#pragma warning disable CS0618 // Type or member is obsolete
             var test = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
+#pragma warning restore CS0618
             var comparisonResult = test.Perform(current.Sample, baseline.Sample, Threshold, SignificanceLevel);
             return comparisonResult switch
             {

@@ -99,13 +99,8 @@ namespace BenchmarkDotNet.Environments
 
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
             {
-                string frequency = PerfolizerMeasurementFormatter.Instance.Format(
-                    ChronometerFrequency.ToMeasurement(FrequencyUnit.Hz),
-                    unitPresentation: UnitHelper.DefaultPresentation);
-                string resolution = PerfolizerMeasurementFormatter.Instance.Format(
-                    ChronometerResolution.ToMeasurement(),
-                    format: "0.000",
-                    unitPresentation: UnitHelper.DefaultPresentation);
+                string frequency = UnitHelper.Format(ChronometerFrequency.ToMeasurement(FrequencyUnit.Hz));
+                string resolution = UnitHelper.Format(ChronometerResolution.ToMeasurement(), format: "0.000");
                 string timer = HardwareTimerKind.ToString().ToUpper();
                 yield return $"Frequency: {frequency}, Resolution: {resolution}, Timer: {timer}";
             }
