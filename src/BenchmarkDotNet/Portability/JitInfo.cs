@@ -11,6 +11,7 @@ namespace BenchmarkDotNet.Portability;
 internal static class JitInfo
 {
     public const string EnvCallCountingDelayMs = "TC_CallCountingDelayMs";
+    public const string EnvOSR = "TC_OnStackReplacement";
 
     private const string EnvMinOpts = "JITMinOpts";
     private const string EnvTieredCompilation = "TieredCompilation";
@@ -20,7 +21,6 @@ internal static class JitInfo
     private const string EnvCallCountThreshold = "TC_CallCountThreshold";
     private const string EnvAggressiveTiering = "TC_AggressiveTiering";
     private const string EnvDelaySingleProcMultiplier = "TC_DelaySingleProcMultiplier";
-    private const string EnvOSR = "TC_OnStackReplacement";
 
     private const string KnobTieredCompilation = "System.Runtime.TieredCompilation";
     private const string KnobQuickJit = "System.Runtime.TieredCompilation.QuickJit";
