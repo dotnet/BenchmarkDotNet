@@ -9,7 +9,7 @@ public static class PerfonarTestExtensions
     {
         for (int i = 0; i < metrics.Length; i++)
         {
-            var measurement = PerfolizerMeasurementFormatter.Instance.Parse(metrics[i]);
+            var measurement = MeasurementFormatter.Default.Parse(metrics[i]);
             entry.Add(new EntryInfo
             {
                 IterationIndex = i,

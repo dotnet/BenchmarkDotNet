@@ -29,7 +29,11 @@ namespace BenchmarkDotNet.Mathematics
 
         private static bool AreSame(Statistics x, Statistics y)
         {
+            // See ZeroMeasurementHelper: moving to Pragmastat.Toolkit.Compare2 would change the
+            // computed ranks, so it needs its own change rather than riding along with a bump.
+#pragma warning disable CS0618 // Type or member is obsolete
             var test = new SimpleEquivalenceTest(MannWhitneyTest.Instance);
+#pragma warning restore CS0618
             var comparisonResult = test.Perform(x.Sample, y.Sample, MathHelper.DefaultThreshold, MathHelper.DefaultSignificanceLevel);
             return comparisonResult == ComparisonResult.Indistinguishable;
         }

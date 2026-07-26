@@ -318,7 +318,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.StatisticalTestThreshold.IsNotBlank())
             {
-                options.StatisticalTestThreshold = options.StatisticalTestThreshold.Trim();
+                options.StatisticalTestThreshold = UnitHelper.NormalizeUnits(options.StatisticalTestThreshold.Trim());
                 if (IsUnitlessNumber(options.StatisticalTestThreshold))
                 {
                     string original = options.StatisticalTestThreshold;

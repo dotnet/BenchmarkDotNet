@@ -3,12 +3,12 @@ MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 phys
 
 Type = Bench
 
-| Method | Runtime |  Center |  Spread |
-|:-------|:--------|--------:|--------:|
-| Foo    | Net481  | 11.0 ns | 0.81 ns |
-| Bar    | Net481  | 21.0 ns | 0.81 ns |
-| Foo    | Net70   | 31.0 ns | 0.81 ns |
-| Bar    | Net70   | 41.0 ns | 0.81 ns |
+| Method | Runtime | Center | Spread |
+|:-------|:--------|-------:|-------:|
+| Foo    | Net481  | 11.0ns | 0.81ns |
+| Bar    | Net481  | 21.0ns | 0.81ns |
+| Foo    | Net70   | 31.0ns | 0.81ns |
+| Bar    | Net70   | 41.0ns | 0.81ns |
 
 {
   "engine": {

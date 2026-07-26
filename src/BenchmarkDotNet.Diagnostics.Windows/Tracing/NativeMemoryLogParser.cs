@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -245,7 +246,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
             logger.WriteLine(
                 $"Native memory allocated per single operation: " +
-                $"{PerfolizerMeasurementFormatter.Instance.Format(
+                $"{UnitHelper.Format(
                     SizeValue.FromBytes(memoryAllocatedPerOperation).ToMeasurement(SizeUnit.B),
                     formatProvider: benchmarkCase.Config.CultureInfo)}");
             logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
@@ -254,7 +255,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             {
                 logger.WriteLine(
                     $"Native memory leak per single operation: " +
-                    $"{PerfolizerMeasurementFormatter.Instance.Format(
+                    $"{UnitHelper.Format(
                         SizeValue.FromBytes(memoryLeakPerOperation).ToMeasurement(SizeUnit.B),
                         formatProvider: benchmarkCase.Config.CultureInfo)}");
             }

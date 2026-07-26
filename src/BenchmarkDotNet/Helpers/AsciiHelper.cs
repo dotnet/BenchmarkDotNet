@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Helpers
         /// <summary>
         /// The 'μ' symbol
         /// </summary>
-        private const string Mu = "\u03BC";
+        internal const string Mu = "\u03BC";
 
         public static string ToAscii(this string s)
         {
