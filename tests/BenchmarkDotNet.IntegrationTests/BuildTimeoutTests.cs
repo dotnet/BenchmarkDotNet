@@ -27,10 +27,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                 .WithBuildTimeout(timeout)
                 .AddJob(Job.Dry
-                    .WithRuntime(NativeAotRuntime.Net80)
+                    .WithRuntime(NativeAotRuntime.Net10_0)
                     .WithToolchain(NativeAotToolchain.CreateBuilder()
-                        .UseNuGet("8.0.0", "https://api.nuget.org/v3/index.json")
-                        .TargetFrameworkMoniker("net8.0")
+                        .UseNuGet("10.0.0", "https://api.nuget.org/v3/index.json")
+                        .TargetFrameworkMoniker("net10.0")
                         .ToToolchain()));
 
             var summary = CanExecute<NativeAotBenchmark>(config, fullValidation: false);

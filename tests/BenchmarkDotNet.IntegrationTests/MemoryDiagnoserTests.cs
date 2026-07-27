@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (OsDetector.IsMacOS())
                 return; // currently not supported
 
-            MemoryDiagnoserIsAccurate(NativeAotToolchain.Net80);
+            MemoryDiagnoserIsAccurate(NativeAotToolchain.Net10_0);
         }
 
         [FactEnvSpecific("We don't want to test MonoVM twice (.NET Framework and .NET Core), and it's not supported on Windows+Arm",
@@ -103,10 +103,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var arraySizeOverhead = ptrSize * 2; // bounds + max_length
             var intTaskSize = 40; // We can't use CalculateRequiredSpace for AllocateTask since it calculates the size with IntPtr.Size.
 
-            var netCoreAppSettings = new NetCoreAppSettings("net8.0", runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
+            var netCoreAppSettings = new NetCoreAppSettings("net10.0", runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
 
             var runtime = new WasmRuntime(
-                netCoreAppSettings.TargetFrameworkMoniker, RuntimeMoniker.WasmNet80,
+                netCoreAppSettings.TargetFrameworkMoniker, RuntimeMoniker.WasmNet10_0,
                 "Wasm", aotCompilerMode == MonoAotCompilerMode.wasm, "v8");
 
             AssertAllocations(WasmToolchain.From(netCoreAppSettings), typeof(AccurateAllocations), new Dictionary<string, long>

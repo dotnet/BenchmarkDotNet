@@ -22,5 +22,6 @@ public class JobIdGeneratorTests
         {"Job-OOTPKI", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp80) },
         {"Job-QAODSR", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp90) },
         {"Job-KHMDUZ", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp80).WithRuntime(CoreRuntime.Core80) },
+        {"Job-JMDAGQ", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0) },
     };
 }

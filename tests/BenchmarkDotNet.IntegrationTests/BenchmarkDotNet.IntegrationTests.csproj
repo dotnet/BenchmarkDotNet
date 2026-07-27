@@ -2,8 +2,9 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests</AssemblyTitle>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net472;net8.0</TargetFrameworks>
-    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">net8.0</TargetFramework>
+    <!-- net8.0 is required for Mono80IsSupported test-->
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net472;net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">net8.0;net10.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests</PackageId>
@@ -13,6 +14,10 @@
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>$(NoWarn);CA2007;CA1825</NoWarn>
     <ServerGarbageCollection>true</ServerGarbageCollection>
+
+    <!-- TODO: Remove this setting after https://github.com/dotnet/runtime/pull/131069 issue is resolved, and backported to .NET 10. -->
+    <!-- Disable Dynamic adaptation to application sizes (DATAS) -->
+    <GarbageCollectionAdaptationMode>0</GarbageCollectionAdaptationMode>
   </PropertyGroup>
   <ItemGroup>
     <Using Include="Xunit" />

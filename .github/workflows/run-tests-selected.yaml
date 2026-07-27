@@ -32,10 +32,10 @@ on:
         description: Specify target framework
         required: true
         options:
-          - net8.0
+          - net10.0
           - net472
           # Following target framework is used for `MultipleFrameworks` tests
-          - net10.0
+          - net8.0
           - net462
           - net48
       filter:

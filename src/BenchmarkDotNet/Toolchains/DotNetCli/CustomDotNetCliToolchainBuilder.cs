@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        /// <param name="targetFrameworkMoniker">TFM, example: net8.0</param>
+        /// <param name="targetFrameworkMoniker">TFM, example: net10.0</param>
         [PublicAPI]
         [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker)
