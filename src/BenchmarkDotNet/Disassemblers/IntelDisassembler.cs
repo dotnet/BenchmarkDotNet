@@ -12,15 +12,29 @@ namespace BenchmarkDotNet.Disassemblers
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
             decoder.IP = startAddress;
 
+            // Track values loaded by MOV reg, imm64 so we can resolve subsequent CALL/JMP through
+            // the register (e.g. `mov rax, imm64; call qword ptr [rax]`). The JIT emits this
+            // 2-instruction form instead of a RIP-relative `call [rip+disp32]` when the target
+            // slot is out of ±2 GB range from the call site — common under fragmented layouts.
+            var trackedRegs = new System.Collections.Generic.Dictionary<Register, ulong>();
+
             while (reader.CanReadByte)
             {
                 decoder.Decode(out var instruction);
+
+                UpdateRegisterTracking(instruction, trackedRegs);
 
                 bool isIndirect = instruction.IsCallFarIndirect || instruction.IsCallNearIndirect || instruction.IsJmpFarIndirect || instruction.IsJmpNearIndirect;
                 bool isPrestubMD = false;
 
                 ulong address = 0;
-                if (TryGetReferencedAddress(instruction, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address))
+                bool haveAddress = TryGetReferencedAddress(instruction, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address);
+                if (!haveAddress && isIndirect
+                    && TryResolveIndirectThroughTrackedReg(instruction, trackedRegs, out address))
+                {
+                    haveAddress = true;
+                }
+                if (haveAddress)
                 {
                     if (isIndirect)
                     {
@@ -130,6 +144,52 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             return false;
+        }
+
+        // Update the register-value tracker as we walk the instruction stream. We only track
+        // constants loaded by `MOV reg, imm64` (and its 32-bit-immediate sign-extended forms).
+        // Any other write to a register invalidates that entry. This is intentionally simple:
+        // it handles the common JIT-emitted `MOV reg, imm64 ; CALL/JMP [reg]` pattern without
+        // trying to model general dataflow.
+        private static void UpdateRegisterTracking(Instruction instruction, System.Collections.Generic.Dictionary<Register, ulong> trackedRegs)
+        {
+            if (instruction.Mnemonic == Mnemonic.Mov
+                && instruction.OpCount == 2
+                && instruction.Op0Kind == OpKind.Register
+                && (instruction.Op1Kind == OpKind.Immediate64
+                    || instruction.Op1Kind == OpKind.Immediate32to64
+                    || instruction.Op1Kind == OpKind.Immediate32))
+            {
+                trackedRegs[instruction.Op0Register] = instruction.GetImmediate(1);
+                return;
+            }
+
+            // Conservative invalidation: any instruction whose first operand is a register
+            // clobbers our tracked value for that register.
+            if (instruction.OpCount > 0 && instruction.Op0Kind == OpKind.Register)
+            {
+                trackedRegs.Remove(instruction.Op0Register);
+            }
+        }
+
+        // Handle `CALL/JMP qword ptr [reg]` (or `[reg+disp]`) where we've previously tracked
+        // `reg` via a `MOV reg, imm64`. In that case the referenced slot lives at `reg + disp`,
+        // which the base-line `TryGetReferencedAddress` can't compute since MemoryDisplacement64
+        // there is just `disp`, not `reg + disp`.
+        private static bool TryResolveIndirectThroughTrackedReg(Instruction instruction, System.Collections.Generic.Dictionary<Register, ulong> trackedRegs, out ulong slotAddress)
+        {
+            slotAddress = 0;
+            if (instruction.OpCount == 0 || instruction.Op0Kind != OpKind.Memory)
+                return false;
+            if (instruction.IsIPRelativeMemoryOperand)
+                return false;
+            Register memBase = instruction.MemoryBase;
+            if (memBase == Register.None || instruction.MemoryIndex != Register.None)
+                return false;
+            if (!trackedRegs.TryGetValue(memBase, out ulong baseValue))
+                return false;
+            slotAddress = baseValue + instruction.MemoryDisplacement64;
+            return slotAddress > ushort.MaxValue;
         }
 
         private static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
