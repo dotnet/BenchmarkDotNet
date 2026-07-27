@@ -163,10 +163,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             CanExecute<WithInlineable>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.Monitoring));
 
-            var disassemblyResult = disassemblyDiagnoser.Results.Values.SingleOrDefault(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
-
-            if (disassemblyResult == null)
-                disassemblyResult = disassemblyDiagnoser.Results.Values.Single(); // Benchmark method is got inlined.
+            var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
             Assert.Empty(disassemblyResult.Errors);
             Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.ToString()!.Contains("ret"))));
