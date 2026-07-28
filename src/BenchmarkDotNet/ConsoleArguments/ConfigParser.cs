@@ -75,6 +75,47 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "openmetrics", new[] { Exporters.OpenMetrics.OpenMetricsExporter.Default } }
             };
 
+        /// <summary>
+        /// Resolves a single <c>--exporters</c> value. A built-in name (see <see cref="AvailableExporters"/>) maps to its
+        /// exporter(s); any other value is treated as an assembly-qualified type name of a custom <see cref="IExporter"/>
+        /// with a public parameterless constructor. Used by both validation and config creation so the two can't drift.
+        /// </summary>
+        private static bool TryResolveExporters(string name, [NotNullWhen(true)] out IExporter[]? exporters, [NotNullWhen(false)] out string? error)
+        {
+            if (AvailableExporters.TryGetValue(name, out var builtIn))
+            {
+                exporters = builtIn;
+                error = null;
+                return true;
+            }
+
+            exporters = null;
+
+            var type = Type.GetType(name, throwOnError: false, ignoreCase: false);
+            if (type == null)
+            {
+                error = $"The provided exporter \"{name}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}. "
+                    + "To use a custom exporter, pass its assembly-qualified type name (e.g. \"My.Namespace.MyExporter, MyAssembly\").";
+                return false;
+            }
+
+            if (!typeof(IExporter).IsAssignableFrom(type))
+            {
+                error = $"The provided exporter type \"{type.FullName}\" does not implement {nameof(IExporter)}.";
+                return false;
+            }
+
+            if (type.GetConstructor(Type.EmptyTypes) == null)
+            {
+                error = $"The provided exporter type \"{type.FullName}\" must have a public parameterless constructor to be used as an exporter.";
+                return false;
+            }
+
+            exporters = [(IExporter)Activator.CreateInstance(type)!];
+            error = null;
+            return true;
+        }
+
         public static (bool isSuccess, IConfig? config, CommandLineOptions? options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
             (bool isSuccess, IConfig? config, CommandLineOptions? options) result = default;
@@ -264,9 +305,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string exporter in options.Exporters)
-                if (!AvailableExporters.ContainsKey(exporter))
+                if (!TryResolveExporters(exporter, out _, out string? exporterError))
                 {
-                    logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}.");
+                    logger.WriteLineError(exporterError);
                     return false;
                 }
 
@@ -354,7 +395,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.AddJob(baseJob);
 
-            config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
+            // Validate() already gated every exporter through TryResolveExporters, so resolution here cannot fail.
+            config.AddExporter(options.Exporters.SelectMany(exporter => TryResolveExporters(exporter, out var resolved, out _) ? resolved : []).ToArray());
 
             config.AddHardwareCounters(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))

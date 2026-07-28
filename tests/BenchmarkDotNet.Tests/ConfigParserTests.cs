@@ -6,6 +6,8 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.OpenMetrics;
@@ -84,6 +86,69 @@ namespace BenchmarkDotNet.Tests
 
             Assert.NotNull(config);
             Assert.Equal(expectedExporters, config.GetExporters().ToArray());
+        }
+
+        [Fact]
+        public void CustomExporterIsResolvedFromAssemblyQualifiedTypeName()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", typeof(CustomExporter).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.True(isSuccess);
+            Assert.NotNull(config);
+            Assert.Single(config.GetExporters());
+            Assert.IsType<CustomExporter>(config.GetExporters().Single());
+        }
+
+        [Fact]
+        public void BuiltInAndCustomExportersCanBeCombined()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", "json", typeof(CustomExporter).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.True(isSuccess);
+            Assert.NotNull(config);
+            Assert.Contains(JsonExporter.Default, config.GetExporters());
+            Assert.Contains(config.GetExporters(), e => e is CustomExporter);
+        }
+
+        [Fact]
+        public void UnknownExporterNameFailsParsing()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", "does-not-exist"], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+        }
+
+        [Fact]
+        public void CustomExporterThatDoesNotImplementIExporterFailsParsing()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", typeof(NotAnExporter).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+        }
+
+        [Fact]
+        public void CustomExporterWithoutParameterlessConstructorFailsParsing()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", typeof(ExporterWithoutParameterlessCtor).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+        }
+
+        public class CustomExporter : ExporterBase
+        {
+            public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken) => new();
+        }
+
+        public class NotAnExporter { }
+
+        public class ExporterWithoutParameterlessCtor : ExporterBase
+        {
+            public ExporterWithoutParameterlessCtor(int _) { }
+
+            public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken) => new();
         }
 
         [Fact]
