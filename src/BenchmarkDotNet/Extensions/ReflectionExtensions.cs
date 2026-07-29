@@ -131,9 +131,9 @@ namespace BenchmarkDotNet.Extensions
             var displayNames = new string[types.Count];
             for (int i = 0; i < types.Count; i++)
             {
-                string? @namespace = types[i].Namespace;
-                displayNames[i] = ambiguousNames.Contains(simpleNames[i]) && !string.IsNullOrEmpty(@namespace)
-                    ? $"{@namespace}.{simpleNames[i]}"
+                string? fullName = types[i].FullName;
+                displayNames[i] = ambiguousNames.Contains(simpleNames[i]) && !string.IsNullOrEmpty(fullName)
+                    ? fullName
                     : simpleNames[i];
             }
 
