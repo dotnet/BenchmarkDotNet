@@ -67,6 +67,8 @@ namespace BenchmarkDotNet.Configs
 
         public string? ArtifactsPath => null; // DefaultConfig.ArtifactsPath will be used if the user does not specify it in explicit way
 
+        public string? Title => null; // the default "BenchmarkRun-joined-{timestamp}" title will be used if the user does not specify it in explicit way
+
         public CultureInfo? CultureInfo => null;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => [];
 

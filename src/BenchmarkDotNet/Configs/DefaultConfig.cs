@@ -117,6 +117,8 @@ namespace BenchmarkDotNet.Configs
             }
         }
 
+        public string? Title => null;
+
         public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public IEnumerable<Job> GetJobs() => [];

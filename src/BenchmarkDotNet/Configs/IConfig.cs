@@ -41,6 +41,13 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         string? ArtifactsPath { get; }
 
+        /// <summary>
+        /// the title of the summary and the base name of the exported result files produced when
+        /// <see cref="ConfigOptions.JoinSummary"/> is set; when not specified, a default value
+        /// ("BenchmarkRun-joined-{timestamp}") is used
+        /// </summary>
+        string? Title { get; }
+
         CultureInfo? CultureInfo { get; }
 
         /// <summary>

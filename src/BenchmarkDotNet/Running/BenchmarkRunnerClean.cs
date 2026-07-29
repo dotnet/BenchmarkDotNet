@@ -172,9 +172,10 @@ namespace BenchmarkDotNet.Running
 
                 if (supportedBenchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
                 {
-                    var joinedSummary = Summary.Join(results, runsChronometer.GetElapsed());
+                    var joinConfig = supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config;
+                    var joinedSummary = Summary.Join(results, runsChronometer.GetElapsed(), joinConfig.Title);
 
-                    await PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary, cancellationToken).ConfigureAwait();
+                    await PrintSummary(compositeLogger, joinConfig, joinedSummary, cancellationToken).ConfigureAwait();
 
                     results.Clear();
                     results.Add(joinedSummary);

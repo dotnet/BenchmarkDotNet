@@ -81,6 +81,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("join", Required = false, Default = false, HelpText = "Prints single table with results for all benchmarks")]
         public bool Join { get; set; }
 
+        [Option("title", Required = false, HelpText = "Custom title for the joined summary and the base name of its exported result files")]
+        public string? Title { get; set; }
+
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
 
