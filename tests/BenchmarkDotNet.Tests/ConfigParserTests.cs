@@ -1105,7 +1105,7 @@ namespace BenchmarkDotNet.Tests
                 Options:
                   -j, --job <job>                                                                     Dry/Short/Medium/Long or Default [default: Default]
                   -r, --runtimes <runtimes>                                                           Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!
-                  -e, --exporters <exporters>                                                         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics
+                  -e, --exporters <exporters>                                                         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics. A custom IExporter can also be selected by its assembly-qualified type name, e.g. "My.Namespace.MyExporter, MyAssembly".
                   -m, --memory                                                                        Prints memory statistics
                   -t, --threading                                                                     Prints threading statistics
                   --exceptions                                                                        Prints exception statistics
