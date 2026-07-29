@@ -98,6 +98,28 @@ namespace BenchmarkDotNet.Tests.Reports
             Assert.Equal(["NA", "tagged"], joinedSummary.Table.Columns.Single(c => c.Header == "Tag").Content);
         }
 
+        [Fact] // Issue #2621
+        public void JoinedSummaryUsesCustomTitleWhenProvided()
+        {
+            var taggedSummary = MockFactory.CreateSummary(typeof(TaggedBenchmark));
+            var otherSummary = MockFactory.CreateSummary(typeof(OtherBenchmark));
+
+            var joinedSummary = Summary.Join([taggedSummary, otherSummary], default, "MyCustomTitle");
+
+            Assert.Equal("MyCustomTitle", joinedSummary.Title);
+        }
+
+        [Fact] // Issue #2621
+        public void JoinedSummaryFallsBackToDefaultTitleWhenNoneProvided()
+        {
+            var taggedSummary = MockFactory.CreateSummary(typeof(TaggedBenchmark));
+            var otherSummary = MockFactory.CreateSummary(typeof(OtherBenchmark));
+
+            var joinedSummary = Summary.Join([taggedSummary, otherSummary], default);
+
+            Assert.StartsWith("BenchmarkRun-joined-", joinedSummary.Title);
+        }
+
         [Fact] // Issue #1070
         public void CustomOrdererIsSupported()
         {

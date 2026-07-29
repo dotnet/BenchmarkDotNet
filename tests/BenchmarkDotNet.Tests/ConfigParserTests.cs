@@ -400,6 +400,24 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void TitleParsedCorrectly()
+        {
+            var config = ConfigParser.Parse(["--title", "MyCustomTitle"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal("MyCustomTitle", config.Title);
+        }
+
+        [Fact]
+        public void WhenTitleIsNotSpecifiedItIsNull()
+        {
+            var config = ConfigParser.Parse([], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Null(config.Title);
+        }
+
+        [Fact]
         public void PackagesPathParsedCorrectly()
         {
             var fakeRestoreDirectory = new FileInfo(typeof(object).Assembly.Location).Directory!.FullName;
