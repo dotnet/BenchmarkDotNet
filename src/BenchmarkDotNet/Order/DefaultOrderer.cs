@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Order
             }
         }
 
-        public string? GetHighlightGroupKey(BenchmarkCase benchmarkCase)
+        public virtual string? GetHighlightGroupKey(BenchmarkCase benchmarkCase)
         {
             switch (SummaryOrderPolicy)
             {
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Order
             }
         }
 
-        public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
+        public virtual string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase)
         {
             var explicitRules = benchmarkCase.Config.GetLogicalGroupRules().ToList();
             var implicitRules = new List<BenchmarkLogicalGroupRule>();
