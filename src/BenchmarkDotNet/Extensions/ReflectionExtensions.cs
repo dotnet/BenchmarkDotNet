@@ -113,6 +113,34 @@ namespace BenchmarkDotNet.Extensions
         internal static string GetDisplayName(this Type type) => GetDisplayName(type.GetTypeInfo());
 
         /// <summary>
+        /// Returns a display name per type, aligned with <paramref name="types"/>. When more than one
+        /// type shares the same simple <see cref="GetDisplayName(Type)"/> (e.g. same class name in
+        /// different namespaces), the colliding names are qualified with their namespace so they can be
+        /// told apart; unambiguous names are left as-is.
+        /// </summary>
+        internal static string[] GetDisambiguatedDisplayNames(this IReadOnlyList<Type> types)
+        {
+            var simpleNames = new string[types.Count];
+            for (int i = 0; i < types.Count; i++)
+                simpleNames[i] = types[i].GetDisplayName();
+
+            var ambiguousNames = new HashSet<string>(
+                simpleNames.GroupBy(name => name).Where(group => group.Count() > 1).Select(group => group.Key),
+                StringComparer.Ordinal);
+
+            var displayNames = new string[types.Count];
+            for (int i = 0; i < types.Count; i++)
+            {
+                string? fullName = types[i].FullName;
+                displayNames[i] = ambiguousNames.Contains(simpleNames[i]) && !string.IsNullOrEmpty(fullName)
+                    ? fullName
+                    : simpleNames[i];
+            }
+
+            return displayNames;
+        }
+
+        /// <summary>
         /// returns simple, human friendly display name
         /// </summary>
         private static string GetDisplayName(this TypeInfo typeInfo)
