@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
@@ -302,6 +303,90 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void WhenUserProvidesProfileOnlyTheJobsWithMatchingIdAreExecuted()
+        {
+            var types = new[] { typeof(ClassB) };
+            var switcher = new BenchmarkSwitcher(types);
+            var configWithNamedJobs = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithId("first"))
+                .AddJob(Job.Dry.WithId("second"));
+
+            var results = switcher.Run(["--filter", "*Method3", "--profile", "second"], configWithNamedJobs);
+
+            var jobs = results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)).ToArray();
+            Assert.Equal("second", Assert.Single(jobs).ResolvedId);
+        }
+
+        [Fact]
+        public void WhenUserProvidesProfileGlobPatternAllTheMatchingJobsAreExecuted()
+        {
+            var types = new[] { typeof(ClassB) };
+            var switcher = new BenchmarkSwitcher(types);
+            var configWithNamedJobs = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithId("net8"))
+                .AddJob(Job.Dry.WithId("net9"))
+                .AddJob(Job.Dry.WithId("debug"));
+
+            var results = switcher.Run(["--filter", "*Method3", "--profile", "net*"], configWithNamedJobs);
+
+            var jobIds = results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job.ResolvedId)).OrderBy(id => id).ToArray();
+            Assert.Equal(["net8", "net9"], jobIds);
+        }
+
+        [Fact]
+        public void WhenUserProvidesProfileTheJobsDefinedViaAttributesAreSelectableToo()
+        {
+            var types = new[] { typeof(WithTwoNamedJobAttributes) };
+            var switcher = new BenchmarkSwitcher(types);
+            var config = ManualConfig.CreateEmpty();
+
+            var results = switcher.Run(["--filter", "*WithTwoNamedJobAttributes*", "--profile", "secondAttributeJob"], config);
+
+            var jobs = results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)).ToArray();
+            Assert.Equal("secondAttributeJob", Assert.Single(jobs).ResolvedId);
+        }
+
+        [Fact]
+        public void WhenProfileReturnsNothingTheAvailableProfilesAreDisplayedAndNoBenchmarksAreExecuted()
+        {
+            var logger = new OutputLogger(Output);
+            var configWithNamedJobs = ManualConfig.CreateEmpty().AddLogger(logger)
+                .AddJob(Job.Dry.WithId("first"))
+                .AddJob(Job.Dry.WithId("second"));
+
+            var summaries = BenchmarkSwitcher
+                .FromTypes([typeof(ClassB)])
+                .Run(["--filter", "*Method3", "--profile", "WRONG"], configWithNamedJobs);
+
+            Assert.Empty(summaries);
+
+            string log = logger.GetLog();
+            Assert.Contains("The profile 'WRONG' that you have provided returned 0 benchmarks.", log);
+            Assert.Contains("Available profiles:", log);
+            Assert.Contains("first", log);
+            Assert.Contains("second", log);
+            // the profile is not a benchmark name, so we must not suggest benchmark names
+            Assert.DoesNotContain("Please remember that the filter is applied to full benchmark name", log);
+        }
+
+        [Fact]
+        public void WhenUserProvidesBothProfileAndFilterBothAreApplied()
+        {
+            var logger = new OutputLogger(Output);
+            var configWithNamedJobs = ManualConfig.CreateEmpty().AddLogger(logger)
+                .AddJob(Job.Dry.WithId("first"))
+                .AddJob(Job.Dry.WithId("second"));
+
+            // the profile exists, but the filter matches nothing, so this is a wrong *filter*, not a wrong profile
+            var summaries = BenchmarkSwitcher
+                .FromTypes([typeof(ClassB)])
+                .Run(["--filter", "WRONG", "--profile", "first"], configWithNamedJobs);
+
+            Assert.Empty(summaries);
+            Assert.Contains("The filter 'WRONG' that you have provided returned 0 benchmarks.", logger.GetLog());
+        }
+
+        [Fact]
         public void WhenUserCreatesStaticBenchmarkMethodWeDisplayAnError_FromTypes()
         {
             var logger = new OutputLogger(Output);
@@ -411,6 +496,14 @@ namespace BenchmarkDotNet.IntegrationTests
     }
 
     public class JustBenchmark
+    {
+        [Benchmark]
+        public void Method() { }
+    }
+
+    [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 1, iterationCount: 1, id: "firstAttributeJob")]
+    [SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 2, iterationCount: 1, id: "secondAttributeJob")]
+    public class WithTwoNamedJobAttributes
     {
         [Benchmark]
         public void Method() { }
