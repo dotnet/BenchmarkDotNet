@@ -274,7 +274,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--anyCategories`           Any Categories to run
 * `--attribute`               Run all methods with given attribute (applied to class or method)
 * `--join`                    (Default: false) Prints single table with results for all benchmarks
-* `--title`                   Custom title for the joined summary and the base name of its exported result files
+* `--title`                   Custom title for the produced summaries and the base name of the result files exported for them
 * `--keepFiles`               (Default: false) Determines if all auto-generated files should be kept or removed after running the benchmarks.
 * `--noOverwrite`             (Default: false) Determines if the exported result files should not be overwritten (be default they are overwritten).
 * `--counters`                Hardware Counters

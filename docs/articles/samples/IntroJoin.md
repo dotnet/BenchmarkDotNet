@@ -16,7 +16,7 @@ If you are using `BenchmarkSwitcher` and want to run all the benchmarks with a c
 --join --allCategories=IntroJoinA
 ```
 
-By default the joined summary and its exported result files are named `BenchmarkRun-joined-{timestamp}`.
+By default the joined summary and its exported result files are named `BenchmarkRun-joined`.
 You can override this with a custom title via the `--title` option (or `ManualConfig.WithTitle(...)` in code),
 which is handy when you run many sets of joined benchmarks and want to tell the exports apart:
 
