@@ -3,6 +3,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -117,7 +118,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
             var joinedSummary = Summary.Join([taggedSummary, otherSummary], default);
 
-            Assert.StartsWith("BenchmarkRun-joined-", joinedSummary.Title);
+            Assert.Equal(TitleHelper.JoinedSummaryTitle, joinedSummary.Title);
         }
 
         [Fact] // Issue #1070

@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Reports
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan, string? title = null)
             => new Summary(
-                title ?? $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}",
+                title ?? TitleHelper.GetJoinedSummaryTitle(customTitle: null),
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
                 summaries.First().ResultsDirectoryPath,

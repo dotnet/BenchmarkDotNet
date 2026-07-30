@@ -44,8 +44,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
 
         /// <summary>
-        /// sets the title of the summary and the base name of the exported result files produced when
-        /// <see cref="ConfigOptions.JoinSummary"/> is set
+        /// sets the title of the produced summaries and the base name of the result files exported for them
         /// </summary>
         [PublicAPI] public static ManualConfig WithTitle(this IConfig config, string title) => config.With(m => m.WithTitle(title));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
