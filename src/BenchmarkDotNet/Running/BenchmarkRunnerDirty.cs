@@ -16,9 +16,9 @@ namespace BenchmarkDotNet.Running
     {
         [PublicAPI]
         public static Summary Run<T>(
-     IConfig? config = null,
-     string[]? args = null,
-     CancellationToken cancellationToken = default)
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
@@ -27,10 +27,10 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary Run(
-    Type type,
-    IConfig? config = null,
-    string[]? args = null,
-    CancellationToken cancellationToken = default)
+            Type type,
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
@@ -39,10 +39,10 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary[] Run(
-    Type[] types,
-    IConfig? config = null,
-    string[]? args = null,
-    CancellationToken cancellationToken = default)
+            Type[] types,
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
@@ -51,10 +51,10 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary Run(
-    Type type,
-    MethodInfo[] methods,
-    IConfig? config = null,
-    CancellationToken cancellationToken = default)
+            Type type,
+            MethodInfo[] methods,
+            IConfig? config = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
@@ -63,10 +63,10 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary[] Run(
-    Assembly assembly,
-    IConfig? config = null,
-    string[]? args = null,
-    CancellationToken cancellationToken = default)
+            Assembly assembly,
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
@@ -78,13 +78,13 @@ namespace BenchmarkDotNet.Running
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
-     RunAsync(benchmarkRunInfo, cancellationToken));
+                RunAsync(benchmarkRunInfo, cancellationToken));
         }
 
         [PublicAPI]
         public static Summary[] Run(
-    BenchmarkRunInfo[] benchmarkRunInfos,
-    CancellationToken cancellationToken = default)
+            BenchmarkRunInfo[] benchmarkRunInfos,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(
