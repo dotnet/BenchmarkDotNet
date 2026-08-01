@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 .WithOptions(ConfigOptions.DisableOptimizationsValidator)
                 .AddJob(job)
                 .AddLogger(logger);
-            var summary = BenchmarkRunner.Run<T>(config);
+            var summary = BenchmarkRunner.Run<T>(config, cancellationToken: TestContext.Current.CancellationToken);
 
             var exporter = MarkdownExporter.Mock;
             ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
