@@ -25,9 +25,9 @@ public class UniqueIdGeneratorTests
         // Assert
         uids.Should().BeEquivalentTo(
         [
-            "1b61bc29-076c-8aec-8328-aea9075252d1",
-            "1f2340bc-6788-8475-89a2-2db2150530dd",
-            "17acc5a4-e46f-81d9-adc6-3b173360451d",
+            "1ed4411f-c92d-8f60-aadd-fbd8cc0c3270",
+            "1b3f5c2e-38be-8d60-8a0f-220aa548549b",
+            "16d91eb5-6b8d-8399-8843-bee86dd80bce",
         ]);
 
         uids.Should().AllSatisfy(Validate);
@@ -54,17 +54,17 @@ public class UniqueIdGeneratorTests
         // Assert
         uids.Should().BeEquivalentTo(
         [
-            "155d621e-0e90-8856-85e0-2417c2be972b",
-            "109d9783-e792-8f51-9c64-2d2f734081da",
-            "1fb185df-b999-8325-b1fe-7cd4a89f5d80",
+            "171ce586-f86d-8b4f-ad25-617e3f02c6cf",
+            "1daf0e59-c7d1-8d97-84f2-7bdf6b45ff73",
+            "164dce04-85a5-8215-a9b2-2c1a742fa2ea",
 
-            "17cd4765-f9ad-8dc3-9047-0c955e68a0e5",
-            "1a15c08b-0b56-8df1-a643-0b8bf487d5d2",
-            "163eee05-81d5-8e7c-906d-244be9d2625f",
+            "15ef264f-fcde-89bd-9d7e-42e7307b2d29",
+            "1b3fce88-39fe-87ae-96fe-d1024fd1cc09",
+            "1c8797a3-aded-8850-b983-32f592e25bf4",
 
-            "16433a2e-983a-8deb-bbd2-9a9b8b653bcd",
-            "16a7f2d3-c14b-84a9-baaa-ca1269efdfe0",
-            "172e05ae-eae0-8282-8455-1135f67df34f",
+            "164ffb49-b0d1-8099-8e55-e82bc5f48d71",
+            "1c3e6d12-1e8b-85bc-a3a1-8e84bfa378ba",
+            "1a4c7c21-9459-8ad6-b101-23386b4b0996",
         ]);
 
         uids.Should().AllSatisfy(Validate);

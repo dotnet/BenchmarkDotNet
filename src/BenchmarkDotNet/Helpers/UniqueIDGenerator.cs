@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Helpers.Hashing;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using System.Text;
 
@@ -14,10 +15,11 @@ internal sealed class UniqueIdGenerator
 
     public static string FromBenchmarkCase(BenchmarkCase benchmarkCase)
     {
-        // Note: Assembly's target framework is not included on hash caluculation (Align to MSTest behaviors)
+        // Note: The target framework of the Assembly is not included in the hash calculation (aligning to the MSTest behaviors).
         var hashBytes = new XxHash128()
             .Append(benchmarkCase.Descriptor.Type.Assembly.GetName().Name)
             .Append(benchmarkCase.Descriptor.Type.Namespace)
+            .Append(benchmarkCase.Descriptor.Type.GetNestedTypeName()) // Append nested type name that is not included on DisplayInfo.
             .Append(benchmarkCase.Descriptor.DisplayInfo)
             .Append(benchmarkCase.Job.DisplayInfo)
             .Append(benchmarkCase.Parameters.DisplayInfo)
@@ -31,7 +33,7 @@ internal sealed class UniqueIdGenerator
     }
 
     // This function is based on following testfx implementation.
-    // https://github.com/microsoft/testfx/blob/v4.3.2/src/Adapter/MSTestAdapter.PlatformServices/ObjectModel/UnitTestElement.cs#L245
+    // https://github.com/microsoft/testfx/blob/v4.3.3/src/Adapter/MSTestAdapter.PlatformServices/ObjectModel/UnitTestElement.cs#L245
     private static Guid VersionedGuidFromHash(Span<byte> hashBytes, byte hashVersion)
     {
         int firstByte = 0;
@@ -75,5 +77,13 @@ file static class Extensions
         if (!string.IsNullOrEmpty(value))
             hasher.Append(Encoding.UTF8.GetBytes(value));
         return hasher;
+    }
+
+    public static string GetNestedTypeName(this Type type)
+    {
+        string typeName = type.Name;
+        for (var t = type.DeclaringType; t != null; t = t.DeclaringType)
+            typeName = $"{t.Name}+{typeName}";
+        return typeName;
     }
 }
