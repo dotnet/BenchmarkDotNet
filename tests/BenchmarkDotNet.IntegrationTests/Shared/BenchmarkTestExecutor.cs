@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true)
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config));
+            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config), cancellationToken: TestContext.Current.CancellationToken);
 
             if (fullValidation)
             {
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public async ValueTask<Summary> CanExecuteAsync(Type type, IConfig? config = null, bool fullValidation = true)
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config));
+            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config), cancellationToken: TestContext.Current.CancellationToken);
 
             if (fullValidation)
             {
