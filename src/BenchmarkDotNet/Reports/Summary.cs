@@ -89,9 +89,9 @@ namespace BenchmarkDotNet.Reports
             => new Summary(title, [], HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero,
                 DefaultCultureInfo.Instance, validationErrors ?? [], []);
 
-        internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
+        internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan, string? title = null)
             => new Summary(
-                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}",
+                title ?? TitleHelper.GetJoinedSummaryTitle(customTitle: null),
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
                 summaries.First().ResultsDirectoryPath,

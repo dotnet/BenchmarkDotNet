@@ -424,6 +424,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;
 
+            if (options.Title.IsNotBlank())
+                config.Title = options.Title;
+
             var filters = GetFilters(options).ToArray();
             if (filters.Length > 1)
                 config.AddFilter(new UnionFilter(filters));

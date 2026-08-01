@@ -49,6 +49,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
         [PublicAPI] public string? ArtifactsPath { get; set; }
+        [PublicAPI] public string? Title { get; set; }
         [PublicAPI] public CultureInfo? CultureInfo { get; set; }
         [PublicAPI] public IOrderer? Orderer { get; set; }
         [PublicAPI] public ICategoryDiscoverer? CategoryDiscoverer { get; set; }
@@ -79,6 +80,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithArtifactsPath(string artifactsPath)
         {
             ArtifactsPath = artifactsPath;
+            return this;
+        }
+
+        public ManualConfig WithTitle(string title)
+        {
+            Title = title;
             return this;
         }
 
@@ -221,6 +228,7 @@ namespace BenchmarkDotNet.Configs
             Orderer = config.Orderer ?? Orderer;
             CategoryDiscoverer = config.CategoryDiscoverer ?? CategoryDiscoverer;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
+            Title = config.Title ?? Title;
             CultureInfo = config.CultureInfo ?? CultureInfo;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRangeDistinct(config.GetLogicalGroupRules());

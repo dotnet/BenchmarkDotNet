@@ -10,6 +10,16 @@ By default, files with results will be located in
 `.\BenchmarkDotNet.Artifacts\results` directory, but this can be changed via the `ArtifactsPath` property in the `IConfig`. 
 Default exporters are: csv, html and markdown.
 
+The exported files are named after the title of the summary they belong to, which by default is the full name of
+the benchmarked type (or `BenchmarkRun-joined` when the results of many types are joined into a single summary).
+You can override it via the `Title` property in the `IConfig` (`--title` on the command line); when the run reports
+more than one summary, the name of the benchmarked type is appended to the title, so that the results of one type
+don't overwrite the results of another:
+
+```cs
+ManualConfig.Create(DefaultConfig.Instance).WithTitle("MyBenchmarks"); // MyBenchmarks-report-github.md
+```
+
 ---
 
 [!include[IntroExport](../samples/IntroExport.md)]

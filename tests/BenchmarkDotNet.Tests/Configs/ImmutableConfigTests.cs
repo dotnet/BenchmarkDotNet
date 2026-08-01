@@ -321,6 +321,22 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [Fact]
+        public void WhenTitleIsNullItStaysNullSoTheDefaultIsUsedLater()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Null(final.Title);
+        }
+
+        [Fact]
+        public void CustomTitleIsPreserved()
+        {
+            var mutable = ManualConfig.CreateEmpty().WithTitle("MyCustomTitle");
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal("MyCustomTitle", final.Title);
+        }
+
+        [Fact]
         public void WhenOrdererIsNullDefaultValueShouldBeUsed()
         {
             var mutable = ManualConfig.CreateEmpty();

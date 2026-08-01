@@ -3,6 +3,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -96,6 +97,28 @@ namespace BenchmarkDotNet.Tests.Reports
             var joinedSummary = Summary.Join([taggedSummary, otherSummary], default);
 
             Assert.Equal(["NA", "tagged"], joinedSummary.Table.Columns.Single(c => c.Header == "Tag").Content);
+        }
+
+        [Fact] // Issue #2621
+        public void JoinedSummaryUsesCustomTitleWhenProvided()
+        {
+            var taggedSummary = MockFactory.CreateSummary(typeof(TaggedBenchmark));
+            var otherSummary = MockFactory.CreateSummary(typeof(OtherBenchmark));
+
+            var joinedSummary = Summary.Join([taggedSummary, otherSummary], default, "MyCustomTitle");
+
+            Assert.Equal("MyCustomTitle", joinedSummary.Title);
+        }
+
+        [Fact] // Issue #2621
+        public void JoinedSummaryFallsBackToDefaultTitleWhenNoneProvided()
+        {
+            var taggedSummary = MockFactory.CreateSummary(typeof(TaggedBenchmark));
+            var otherSummary = MockFactory.CreateSummary(typeof(OtherBenchmark));
+
+            var joinedSummary = Summary.Join([taggedSummary, otherSummary], default);
+
+            Assert.Equal(TitleHelper.JoinedSummaryTitle, joinedSummary.Title);
         }
 
         [Fact] // Issue #1070

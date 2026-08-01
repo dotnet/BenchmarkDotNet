@@ -69,36 +69,15 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public async Task ExporterUsesFullyQualifiedTypeNameAsFileName()
+        // the file names are derived from the title alone, see TitleHelperTests for how the runner builds it
+        [Theory]
+        [InlineData(typeof(Generic<int>))] // a summary that reports a single type
+        [InlineData(typeof(ClassA), typeof(ClassB))] // a summary that joins the results of many types
+        public async Task ExporterUsesSummaryTitleAsFileName(params Type[] typesWithBenchmarks)
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var mockSummary = GetMockSummary(resultsDirectoryPath, config: null, typeof(Generic<int>));
-            var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt";
-            string? actualFilePath = null;
-
-            try
-            {
-                await exporter.ExportAsync(mockSummary, NullLogger.Instance, CancellationToken.None);
-                actualFilePath = exporter.GetArtifactFullName(mockSummary);
-
-                Assert.Equal(expectedFilePath, actualFilePath);
-            }
-            finally
-            {
-                if (File.Exists(actualFilePath))
-                    File.Delete(actualFilePath);
-            }
-        }
-
-        [Fact]
-        public async Task ExporterUsesSummaryTitleAsFileNameWhenBenchmarksJoinedToSingleSummary()
-        {
-            string resultsDirectoryPath = Path.GetTempPath();
-            var exporter = new MockExporter();
-            var joinConfig = ManualConfig.CreateEmpty().WithOptions(ConfigOptions.JoinSummary);
-            var mockSummary = GetMockSummary(resultsDirectoryPath, joinConfig, typeof(ClassA), typeof(ClassB));
+            var mockSummary = GetMockSummary(resultsDirectoryPath, config: null, typesWithBenchmarks);
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
             string? actualFilePath = null;
 

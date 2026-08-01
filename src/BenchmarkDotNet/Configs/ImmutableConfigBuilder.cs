@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueEventProcessors,
                 source.UnionRule,
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath!,
+                source.Title,
                 source.CultureInfo ?? DefaultCultureInfo.Instance,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance,
