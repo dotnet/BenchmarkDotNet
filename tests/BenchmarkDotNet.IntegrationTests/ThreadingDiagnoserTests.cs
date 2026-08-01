@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var config = CreateConfig(toolchain);
 
-            var summary = BenchmarkRunner.Run<CompletedWorkItemCount>(config);
+            var summary = BenchmarkRunner.Run<CompletedWorkItemCount>(config, cancellationToken: TestContext.Current.CancellationToken);
             try
             {
                 summary.CheckPlatformLinkerIssues();
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var config = CreateConfig(toolchain);
 
-            var summary = BenchmarkRunner.Run<LockContentionCount>(config);
+            var summary = BenchmarkRunner.Run<LockContentionCount>(config, cancellationToken: TestContext.Current.CancellationToken);
             try
             {
                 summary.CheckPlatformLinkerIssues();

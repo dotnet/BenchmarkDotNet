@@ -409,7 +409,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateConfig(toolchain, runtime, iterationCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
-            var summary = BenchmarkRunner.Run(benchmarks);
+            var summary = BenchmarkRunner.Run(benchmarks, cancellationToken: TestContext.Current.CancellationToken);
             try
             {
                 summary.CheckPlatformLinkerIssues();
