@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([])
-                .Run(["--DOES_NOT_EXIST"], config);
+                .Run(["--DOES_NOT_EXIST"], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries);
             Assert.Contains("Option 'DOES_NOT_EXIST' is unknown.", logger.GetLog());
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([])
-                .Run(["--info"], config);
+                .Run(["--info"], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries);
             Assert.Contains(HostEnvironmentInfo.GetInformation(), logger.GetLog());
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([typeof(ClassC)])
-                .Run(["--filter", "*"], config);
+                .Run(["--filter", "*"], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries);
             Assert.Contains(GetValidationErrorForType(typeof(ClassC)), logger.GetLog());
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([])
-                .Run(["--filter", "*"], config);
+                .Run(["--filter", "*"], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries);
             Assert.Contains("No benchmarks were found.", logger.GetLog());
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.IntegrationTests
             const string filter = "WRONG";
             var summaries = BenchmarkSwitcher
                 .FromTypes([typeof(ClassA), typeof(ClassB)])
-                .Run(["--filter", filter], config);
+                .Run(["--filter", filter], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries);
             Assert.Contains($"The filter '{filter}' that you have provided returned 0 benchmarks.", logger.GetLog());
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = BenchmarkSwitcher
                 .FromTypes([typeof(ClassA)])
-                .Run(["--list", "flat"], config);
+                .Run(["--list", "flat"], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries);
             Assert.Contains("BenchmarkDotNet.IntegrationTests.ClassA.Method1", logger.GetLog());
@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 var summaries = BenchmarkSwitcher
                     .FromTypes([typeof(ClassA)])
-                    .RunAll(config);
+                    .RunAll(config, cancellationToken: TestContext.Current.CancellationToken);
 
                 var summary = summaries.Single();
                 logFilePath = summary.LogFilePath;
@@ -161,7 +161,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 var summaries = BenchmarkSwitcher
                     .FromTypes([typeof(ClassA)])
-                    .RunAll(config);
+                    .RunAll(config, cancellationToken: TestContext.Current.CancellationToken);
 
                 var summary = summaries.Single();
                 logFilePath = summary.LogFilePath;
@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
                 .With([typeof(WithDryAttributeAndCategory)])
-                .Run([], config);
+                .Run([], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries); // summaries is empty because the returnValue configured for mock returns 0 types
             Assert.Equal(1, userInteractionMock.AskUserCalledTimes);
@@ -203,7 +203,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
                 .With(types)
-                .Run([categoriesConsoleLineArgument, TestCategory], config);
+                .Run([categoriesConsoleLineArgument, TestCategory], config, TestContext.Current.CancellationToken);
 
             Assert.Single(summaries);
             Assert.Equal(0, userInteractionMock.AskUserCalledTimes);
@@ -221,7 +221,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
                 .With(types)
-                .Run([categoriesConsoleLineArgument, TestCategory, "--filter", "nothing"], config);
+                .Run([categoriesConsoleLineArgument, TestCategory, "--filter", "nothing"], config, TestContext.Current.CancellationToken);
 
             Assert.Empty(summaries); // the summaries is empty because the provided filter returns nothing
             Assert.Equal(0, userInteractionMock.AskUserCalledTimes);
@@ -239,7 +239,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var switcher = new BenchmarkSwitcher(types);
 
             // BenchmarkSwitcher only picks up config values via the args passed in, not via class annotations (e.g "[DryConfig]")
-            var results = switcher.Run(["-j", "Dry", "--filter", "*ClassB.Method4"], config);
+            var results = switcher.Run(["-j", "Dry", "--filter", "*ClassB.Method4"], config, TestContext.Current.CancellationToken);
             Assert.Single(results);
             Assert.Single(results.SelectMany(r => r.BenchmarksCases));
             Assert.Single(results.SelectMany(r => r.BenchmarksCases.Select(bc => bc.Job)));
@@ -255,7 +255,7 @@ namespace BenchmarkDotNet.IntegrationTests
             MockExporter mockExporter = new MockExporter();
             var configWithJobDefined = ManualConfig.CreateEmpty().AddExporter(mockExporter).AddJob(Job.Dry);
 
-            var results = switcher.Run(["--filter", "*Method3"], configWithJobDefined);
+            var results = switcher.Run(["--filter", "*Method3"], configWithJobDefined, TestContext.Current.CancellationToken);
 
             Assert.True(mockExporter.exported);
 
@@ -273,7 +273,7 @@ namespace BenchmarkDotNet.IntegrationTests
             MockExporter mockExporter = new MockExporter();
             var configWithoutJobDefined = ManualConfig.CreateEmpty().AddExporter(mockExporter);
 
-            var results = switcher.Run(["--filter", "*WithDryAttribute*"], configWithoutJobDefined);
+            var results = switcher.Run(["--filter", "*WithDryAttribute*"], configWithoutJobDefined, TestContext.Current.CancellationToken);
 
             Assert.True(mockExporter.exported);
 
@@ -291,7 +291,7 @@ namespace BenchmarkDotNet.IntegrationTests
             MockExporter mockExporter = new MockExporter();
             var configWithoutJobDefined = ManualConfig.CreateEmpty().AddExporter(mockExporter);
 
-            var results = switcher.Run(["--filter", "*"], configWithoutJobDefined);
+            var results = switcher.Run(["--filter", "*"], configWithoutJobDefined, TestContext.Current.CancellationToken);
 
             Assert.True(mockExporter.exported);
 
@@ -309,7 +309,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summariesForType = BenchmarkSwitcher
                 .FromTypes([typeof(Static.BenchmarkClassWithStaticMethodsOnly)])
-                .Run(["--filter", "*"], config);
+                .Run(["--filter", "*"], config, TestContext.Current.CancellationToken);
 
             Assert.True(summariesForType.Single().HasCriticalValidationErrors);
             Assert.Contains("static", logger.GetLog());
@@ -323,7 +323,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summariesForAssembly = BenchmarkSwitcher
                 .FromAssembly(typeof(Static.BenchmarkClassWithStaticMethodsOnly).Assembly)
-                .Run(["--filter", "*"], config);
+                .Run(["--filter", "*"], config, TestContext.Current.CancellationToken);
 
             Assert.True(summariesForAssembly.Single().HasCriticalValidationErrors);
             Assert.Contains("static", logger.GetLog());
@@ -339,9 +339,9 @@ namespace BenchmarkDotNet.IntegrationTests
             var switcher = new BenchmarkSwitcher(types);
 
             // the first run should execute all benchmarks
-            Assert.Single(switcher.Run(["--filter", "*WithDryAttributeAndCategory*"], config));
+            Assert.Single(switcher.Run(["--filter", "*WithDryAttributeAndCategory*"], config, TestContext.Current.CancellationToken));
             // resuming after succesfull run should run nothing
-            Assert.Empty(switcher.Run(["--resume", "--filter", "*WithDryAttributeAndCategory*"], config));
+            Assert.Empty(switcher.Run(["--resume", "--filter", "*WithDryAttributeAndCategory*"], config, TestContext.Current.CancellationToken));
         }
 
         private class UserInteractionMock : IUserInteraction
