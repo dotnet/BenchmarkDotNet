@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summary = BenchmarkRunner.Run<EmptyBenchmark>(config, args);
+            var summary = BenchmarkRunner.Run<EmptyBenchmark>(config, args, TestContext.Current.CancellationToken);
 
             if (args == null)
             {
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summary = BenchmarkRunner.Run<NotEmptyBenchmark>(config, args);
+            var summary = BenchmarkRunner.Run<NotEmptyBenchmark>(config, args, TestContext.Current.CancellationToken);
             Assert.False(summary.HasCriticalValidationErrors);
             Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
             Assert.DoesNotContain(GetValidationErrorForType(typeof(NotEmptyBenchmark)), logger.GetLog());
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summary = BenchmarkRunner.Run(typeof(EmptyBenchmark), config, args);
+            var summary = BenchmarkRunner.Run(typeof(EmptyBenchmark), config, args, TestContext.Current.CancellationToken);
 
             if (args == null)
             {
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(typeof(NotEmptyBenchmark), config, args);
+            var summaries = BenchmarkRunner.Run(typeof(NotEmptyBenchmark), config, args, TestContext.Current.CancellationToken);
             Assert.False(summaries.HasCriticalValidationErrors);
             Assert.DoesNotContain(summaries.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
             Assert.DoesNotContain(GetValidationErrorForType(typeof(NotEmptyBenchmark)), logger.GetLog());
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run([typeof(EmptyBenchmark), typeof(EmptyBenchmark2)], config, args);
+            var summaries = BenchmarkRunner.Run([typeof(EmptyBenchmark), typeof(EmptyBenchmark2)], config, args, TestContext.Current.CancellationToken);
             if (args != null)
             {
                 Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
@@ -157,7 +157,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run([typeof(NotEmptyBenchmark)], config, args);
+            var summaries = BenchmarkRunner.Run([typeof(NotEmptyBenchmark)], config, args, TestContext.Current.CancellationToken);
             var summary = summaries[0];
             Assert.False(summary.HasCriticalValidationErrors);
             Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summary = BenchmarkRunner.Run(BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), config));
+            var summary = BenchmarkRunner.Run(BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), config), TestContext.Current.CancellationToken);
             Assert.True(summary.HasCriticalValidationErrors);
             Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
             Assert.Contains(GetValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
@@ -184,7 +184,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summary = BenchmarkRunner.Run(BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), config));
+            var summary = BenchmarkRunner.Run(BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), config), TestContext.Current.CancellationToken);
             Assert.False(summary.HasCriticalValidationErrors);
             Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
             Assert.DoesNotContain(GetValidationErrorForType(typeof(NotEmptyBenchmark)), logger.GetLog());
@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var summaries = BenchmarkRunner.Run([
                 BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark), config),
                 BenchmarkConverter.TypeToBenchmarks(typeof(EmptyBenchmark2), config)
-            ]);
+            ], TestContext.Current.CancellationToken);
             var summary = summaries[0];
             Assert.True(summary.HasCriticalValidationErrors);
             Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(EmptyBenchmark)));
@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run([BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), config)]);
+            var summaries = BenchmarkRunner.Run([BenchmarkConverter.TypeToBenchmarks(typeof(NotEmptyBenchmark), config)], TestContext.Current.CancellationToken);
             var summary = summaries[0];
             Assert.False(summary.HasCriticalValidationErrors);
             Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
@@ -231,7 +231,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run([typeof(EmptyBenchmark), typeof(NotEmptyBenchmark)], config, args);
+            var summaries = BenchmarkRunner.Run([typeof(EmptyBenchmark), typeof(NotEmptyBenchmark)], config, args, TestContext.Current.CancellationToken);
             if (args != null)
             {
                 Assert.Contains(GetExpandedValidationErrorForType(typeof(EmptyBenchmark)), logger.GetLog());
@@ -266,12 +266,12 @@ namespace BenchmarkDotNet.IntegrationTests
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
-                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args, TestContext.Current.CancellationToken);
                 Assert.Contains(GetAssemblylValidationError(assemblyBuilder), logger.GetLog());
             }
             else
             {
-                var summaries = BenchmarkRunner.Run(assemblyBuilder, null, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, null, args, TestContext.Current.CancellationToken);
                 var summary = summaries[0];
                 Assert.True(summary.HasCriticalValidationErrors);
                 Assert.Contains(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());
@@ -312,12 +312,12 @@ namespace BenchmarkDotNet.IntegrationTests
             if (args != null)
             {
                 GetConfigWithLogger(out var logger, out var config);
-                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, config, args, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.DoesNotContain(GetAssemblylValidationError(assemblyBuilder), logger.GetLog());
             }
             else
             {
-                var summaries = BenchmarkRunner.Run(assemblyBuilder);
+                var summaries = BenchmarkRunner.Run(assemblyBuilder, cancellationToken: TestContext.Current.CancellationToken);
                 var summary = summaries[0];
                 Assert.False(summary.HasCriticalValidationErrors);
                 Assert.DoesNotContain(summary.ValidationErrors, validationError => validationError.Message == GetGeneralValidationError());
@@ -352,7 +352,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             config.AddFilter(new NameFilter(name => name != "Benchmark")); // Filter out only benchmark method on MockBenchmark
 
-            var summaries = BenchmarkRunner.Run(assemblyBuilder, config);
+            var summaries = BenchmarkRunner.Run(assemblyBuilder, config, cancellationToken: TestContext.Current.CancellationToken);
             Assert.DoesNotContain(GetValidationErrorForType(benchmarkTypeBuilder), logger.GetLog());
             Assert.Contains(GetExporterNoBenchmarksError(), logger.GetLog());
         }
