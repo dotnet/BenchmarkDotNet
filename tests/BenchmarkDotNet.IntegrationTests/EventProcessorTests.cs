@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
             if (validator != null)
                 config = config.AddValidator(validator);
-            _ = BenchmarkRunner.Run(types, config);
+            _ = BenchmarkRunner.Run(types, config, cancellationToken: TestContext.Current.CancellationToken);
             return eventProcessor.Events;
         }
 
