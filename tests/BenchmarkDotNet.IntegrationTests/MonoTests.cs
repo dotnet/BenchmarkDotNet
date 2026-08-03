@@ -1,8 +1,6 @@
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 
@@ -20,24 +18,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddLogger(logger)
                 .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240));
-            CanExecute<MonoBenchmark>(config);
-        }
-
-        public class MonoBenchmark
-        {
-            [Benchmark]
-            public void Check()
-            {
-                if (Type.GetType("Mono.RuntimeStructs") == null)
-                {
-                    throw new Exception("This is not Mono runtime");
-                }
-
-                if (RuntimeInformation.GetCurrentRuntime() != MonoRuntime.Mono80)
-                {
-                    throw new Exception("Incorrect runtime detection");
-                }
-            }
+            // MonoBenchmark lives in a separate project that targets net8.0, because Mono packages
+            // are no longer published for net9.0+ and this project no longer targets net8.0.
+            CanExecute<MonoBenchmarks.MonoBenchmark>(config);
         }
     }
 }

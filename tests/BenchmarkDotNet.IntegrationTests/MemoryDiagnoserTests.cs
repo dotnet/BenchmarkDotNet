@@ -88,7 +88,19 @@ namespace BenchmarkDotNet.IntegrationTests
             [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsModernMono()
         {
-            MemoryDiagnoserIsAccurate(MonoToolchain.Mono80);
+            // This mirrors MemoryDiagnoserIsAccurate, but runs a copy of AccurateAllocations that lives in a
+            // separate net8.0-targeting project - Mono packages are no longer published for net9.0+, so the
+            // benchmark must be built against net8.0 and this project no longer targets net8.0.
+            long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
+            long arraySizeOverhead = IntPtr.Size; // array length
+            objectAllocationOverhead += IntPtr.Size; // Mono has an extra word
+
+            AssertAllocations(MonoToolchain.Mono80, typeof(MonoBenchmarks.AccurateAllocations), new Dictionary<string, long>
+            {
+                { nameof(MonoBenchmarks.AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(MonoBenchmarks.AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(MonoBenchmarks.AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
+            });
         }
 
         [TheoryEnvSpecific("We don't want to test Wasm twice (.NET Framework and .NET Core), and JSVU does not support ARM on Windows or Linux",
@@ -415,7 +427,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithBuildTimeout(TimeSpan.FromSeconds(480)) // Increase timeout for `MemoryDiagnoserSupportsModernMono` test on macos(x64)
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)
-                .AddDiagnoser(new FinalizerBlockerDiagnoser())
+                .AddDiagnoser(new SharedDiagnosers.FinalizerBlockerDiagnoser())
                 .AddLogger(new OutputLogger(output));
         }
 
@@ -450,92 +462,5 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Sum(field => GetSize(field.FieldType));
         }
 
-        // To prevent finalizers interfering with allocation measurements, we block the finalizer thread during the extra iteration.
-        // https://github.com/dotnet/runtime/issues/101536#issuecomment-2077647417
-        public sealed class FinalizerBlockerDiagnoser : IInProcessDiagnoser
-        {
-            public IEnumerable<string> Ids => [nameof(FinalizerBlockerDiagnoser)];
-            public IEnumerable<IExporter> Exporters => [];
-            public IEnumerable<IAnalyser> Analysers => [];
-            public void DeserializeResults(BenchmarkCase benchmarkCase, string serializedResults) { }
-            public void DisplayResults(ILogger logger) { }
-            public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
-            public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
-            public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
-            public BenchmarkDotNet.Diagnosers.RunMode GetRunMode(BenchmarkCase benchmarkCase)
-                // Mono Wasm throws PlatformNotSupportedException from Monitor.Wait, and defers finalization to the JS event loop (single-threaded),
-                // so it's impossible for us to prevent the finalizer from running. The good thing is that means it cannot run during our synchronous
-                // benchmarks, but it also means we should never add any async-yielding benchmark memory tests for Wasm.
-                => benchmarkCase.GetToolchain() is WasmToolchain
-                    ? BenchmarkDotNet.Diagnosers.RunMode.None
-                    : BenchmarkDotNet.Diagnosers.RunMode.ExtraIteration;
-            public InProcessDiagnoserHandlerData GetHandlerData(BenchmarkCase benchmarkCase) => new(typeof(FinalizerBlockerDiagnoserHandler), null);
-        }
-
-        public sealed class FinalizerBlockerDiagnoserHandler : IInProcessDiagnoserHandler
-        {
-            private object? hangLock;
-
-            private sealed class Impl
-            {
-                // ManualResetEvent(Slim) allocates when it is waited and yields the thread,
-                // so we use Monitor.Wait instead which does not allocate managed memory.
-                // This behavior is not documented, but was observed with the VS Profiler.
-                private readonly object hangLock = new();
-                private readonly ManualResetEventSlim enteredFinalizerEvent = new(false);
-
-                ~Impl()
-                {
-                    lock (hangLock)
-                    {
-                        enteredFinalizerEvent.Set();
-                        Monitor.Wait(hangLock);
-                    }
-                }
-
-                [MethodImpl(MethodImplOptions.NoInlining)]
-                internal static (object hangLock, ManualResetEventSlim enteredFinalizerEvent) CreateWeakly()
-                {
-                    var impl = new Impl();
-                    return (impl.hangLock, impl.enteredFinalizerEvent);
-                }
-            }
-
-            private void Start()
-            {
-                (hangLock, var enteredFinalizerEvent) = Impl.CreateWeakly();
-                do
-                {
-                    GC.Collect();
-                    // Do NOT call GC.WaitForPendingFinalizers.
-                }
-                while (!enteredFinalizerEvent.IsSet);
-            }
-
-            private void Stop()
-            {
-                lock (hangLock!)
-                {
-                    Monitor.Pulse(hangLock);
-                }
-            }
-
-            public ValueTask HandleAsync(BenchmarkSignal signal, InProcessDiagnoserActionArgs args, CancellationToken cancellationToken)
-            {
-                switch (signal)
-                {
-                    case BenchmarkSignal.BeforeExtraIteration:
-                        Start();
-                        break;
-                    case BenchmarkSignal.AfterExtraIteration:
-                        Stop();
-                        break;
-                }
-                return new();
-            }
-
-            public void Initialize(string? serializedConfig) { }
-            public string SerializeResults() => string.Empty;
-        }
     }
 }

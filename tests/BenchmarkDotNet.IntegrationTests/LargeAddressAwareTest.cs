@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty().WithBuildTimeout(TimeSpan.FromSeconds(240));
             // Running 32-bit benchmarks with .Net Core requires passing the path to 32-bit SDK,
             // which makes this test more complex than it's worth in CI, so we only test 64-bit.
-            config.AddJob(Job.Dry.WithRuntime(CoreRuntime.Core80).WithPlatform(platform).WithId(platform.ToString()));
+            config.AddJob(Job.Dry.WithRuntime(CoreRuntime.Core10_0).WithPlatform(platform).WithId(platform.ToString()));
             config.AddColumnProvider(DefaultColumnProviders.Instance)
                   .AddLogger(new OutputLogger(output));
 
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(report => report.ExecuteResults.Any()));
             Assert.Equal(1, summary.Reports.Count(report => report.BenchmarkCase.Job.Environment.Runtime is CoreRuntime));
 
-            Assert.Contains(".NET 8.0", summary.AllRuntimes);
+            Assert.Contains(".NET 10.0", summary.AllRuntimes);
         }
 
         [FactEnvSpecific("Framework is only on Windows", EnvRequirement.WindowsOnly)]
