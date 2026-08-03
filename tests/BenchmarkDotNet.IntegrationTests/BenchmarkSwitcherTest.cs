@@ -374,7 +374,25 @@ namespace BenchmarkDotNet.IntegrationTests
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    // ClassA and ClassB are shared with other test files and live in SharedBenchmarkClasses.cs.
+    public class ClassA
+    {
+        [Benchmark]
+        public void Method1() { }
+        [Benchmark]
+        public void Method2() { }
+    }
+
+    public class ClassB
+    {
+        [Benchmark]
+        public void Method1() { }
+        [Benchmark]
+        public void Method2() { }
+        [Benchmark]
+        public void Method3() { }
+        [Benchmark]
+        public void Method4() { }
+    }
 
     public class ClassC
     {
@@ -397,6 +415,18 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void Method() { }
     }
+
+    public class MockExporter : ExporterBase
+    {
+        public bool exported = false;
+        public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken)
+        {
+            exported = true;
+            return new();
+        }
+    }
+
+
 }
 
 namespace BenchmarkDotNet.NOTIntegrationTests

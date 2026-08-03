@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.MonoBenchmarks</AssemblyTitle>
+    <AssemblyName>$(AssemblyTitle)</AssemblyName>
+    <!-- net8.0 is required for Mono tests (Mono desktop nuget packages are no longer published for net9.0+, see #3000).
+        Keeping these benchmarks in their own project means the main IntegrationTests project doesn't need a net8.0 tfm. -->
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <!-- The in-process diagnoser handler used by the Mono memory test is compiled into the benchmark, so it must be reachable here. #3218 -->
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SharedDiagnosers\BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
+</Project>
