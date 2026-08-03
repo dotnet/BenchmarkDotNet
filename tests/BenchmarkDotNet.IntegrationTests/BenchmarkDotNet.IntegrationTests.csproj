@@ -2,9 +2,10 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests</AssemblyTitle>
-    <!-- net8.0 is required for Mono80IsSupported test-->
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net472;net8.0;net10.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
+    <!-- net8.0 is only built on-demand for the Mono tests (Mono nuget packages are no longer published for net9.0+). -->
+    <TargetFrameworks Condition="'$(BuildMono80Target)' == 'true'">$(TargetFrameworks);net8.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests</PackageId>
@@ -29,17 +30,27 @@
     </Content>
     <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(BuildMono80Target)' != 'true'">
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly\BenchmarkDotNet.IntegrationTests.ConfigPerAssembly.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.EnabledOptimizations\BenchmarkDotNet.IntegrationTests.EnabledOptimizations.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj" />
-    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <Compile Include="..\BenchmarkDotNet.Tests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <!-- The net8.0 build exists only so the Mono benchmarks (which must target net8.0) can reference this assembly;
+       it is never a test host. These test files reference the net10.0-only helper projects excluded above, so they
+       are dropped from the net8.0 build. Keep this list in sync with the helper ProjectReferences above. -->
+  <ItemGroup Condition="'$(BuildMono80Target)' == 'true'">
+    <Compile Remove="AssemblyConfigTests.cs" />
+    <Compile Remove="JitOptimizationsTests.cs" />
+    <Compile Remove="FSharpTests.cs" />
+    <Compile Remove="ReferencesTests.cs" />
+    <Compile Remove="BenchmarkSwitcherTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />

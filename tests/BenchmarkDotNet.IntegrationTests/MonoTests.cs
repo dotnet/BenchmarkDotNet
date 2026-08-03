@@ -18,7 +18,9 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
                 .AddLogger(logger)
-                .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80))
+                // net8.0 build of this project is only produced on-demand; see BuildMono80Target in the csproj.
+                .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80)
+                    .WithMsBuildArguments("/p:BuildMono80Target=true"))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240));
             CanExecute<MonoBenchmark>(config);
         }

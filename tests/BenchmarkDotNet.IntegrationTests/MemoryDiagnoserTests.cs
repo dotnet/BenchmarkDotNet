@@ -405,6 +405,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithJitTieringMode(JitTieringMode.Force)
                 .WithToolchain(toolchain);
 
+            if (toolchain is MonoToolchain)
+            {
+                // net8.0 build of this project is only produced on-demand; see BuildMono80Target in the csproj.
+                job = job.WithMsBuildArguments("/p:BuildMono80Target=true");
+            }
+
             if (runtime is not null)
             {
                 job = job.WithRuntime(runtime);

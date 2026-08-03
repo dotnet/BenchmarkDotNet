@@ -4,7 +4,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.R2R;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -13,53 +12,17 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public R2RTests(ITestOutputHelper output) : base(output) { }
 
-        private ManualConfig GetConfig()
-        {
-            var toolchain = R2RToolchain.From(
-                new NetCoreAppSettings(
-                    targetFrameworkMoniker: GetTargetFrameworkMoniker(),
-                    runtimeFrameworkVersion: null!,
-                    name: "R2RTest"));
-
-            return ManualConfig.CreateEmpty()
-                .AddJob(Job.Dry
-                    .WithRuntime(GetCurrentR2RRuntime())
-                    .WithToolchain(toolchain))
-                .WithBuildTimeout(TimeSpan.FromSeconds(360));
-        }
-
-        private static string GetTargetFrameworkMoniker()
-        {
-#if NET10_0_OR_GREATER
-            return "net10.0";
-#elif NET9_0_OR_GREATER
-            return "net9.0";
-#elif NET8_0_OR_GREATER
-            return "net8.0";
-#else
-            throw new NotSupportedException("R2R tests require .NET 8.0 or later");
-#endif
-        }
-
-        private static R2RRuntime GetCurrentR2RRuntime()
-        {
-#if NET10_0_OR_GREATER
-            return R2RRuntime.Net10_0;
-#elif NET9_0_OR_GREATER
-            return R2RRuntime.Net90;
-#elif NET8_0_OR_GREATER
-            return R2RRuntime.Net80;
-#else
-            throw new NotSupportedException("R2R tests require .NET 8.0 or later");
-#endif
-        }
-
         [FactEnvSpecific("R2R requires .NET Core runtime", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void R2RToolchainCanExecuteBenchmarks()
         {
             try
             {
-                var summary = CanExecute<R2RBenchmark>(GetConfig());
+                var config = ManualConfig.CreateEmpty()
+                    .AddJob(Job.Dry
+                        .WithRuntime(R2RRuntime.Net10_0)
+                        .WithToolchain(R2RToolchain.NetCoreApp10_0))
+                    .WithBuildTimeout(TimeSpan.FromSeconds(360));
+                var summary = CanExecute<R2RBenchmark>(config);
 
                 Assert.True(summary.Reports.Length > 0, "Expected at least one benchmark report");
                 Assert.True(summary.Reports[0].Success, "Benchmark should have executed successfully");
