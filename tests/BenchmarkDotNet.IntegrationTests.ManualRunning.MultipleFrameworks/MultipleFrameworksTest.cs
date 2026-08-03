@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Tests;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
@@ -9,15 +10,11 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     {
         private const string TfmEnvVarName = "TfmEnvVarName";
 
-        public MultipleFrameworksTest(ITestOutputHelper output) : base(output)
-        {
-        }
-
-        [Theory]
-        [InlineData(RuntimeMoniker.Net461)]
-        [InlineData(RuntimeMoniker.Net48)]
-        [InlineData(RuntimeMoniker.NetCoreApp20)]
-        [InlineData(RuntimeMoniker.Net80)]
+        [Test]
+        [TUnit.Core.Arguments(RuntimeMoniker.Net462)]
+        [TUnit.Core.Arguments(RuntimeMoniker.Net48)]
+        [TUnit.Core.Arguments(RuntimeMoniker.Net80)]
+        [TUnit.Core.Arguments(RuntimeMoniker.Net10_0)]
         public void EachFrameworkIsRebuilt(RuntimeMoniker runtime)
         {
             var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(runtime.GetRuntime()).WithEnvironmentVariable(TfmEnvVarName, runtime.ToString()));

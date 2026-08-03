@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
