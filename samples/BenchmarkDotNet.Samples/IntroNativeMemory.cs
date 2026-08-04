@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
+    [UseLocalJobOnly]
     [NativeMemoryProfiler]
     [MemoryDiagnoser]
     public class IntroNativeMemory

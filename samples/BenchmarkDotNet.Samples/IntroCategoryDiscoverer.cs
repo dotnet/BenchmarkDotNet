@@ -6,6 +6,7 @@ using System.Reflection;
 namespace BenchmarkDotNet.Samples
 {
     [DryJob]
+    [UseLocalJobOnly]
     [CategoriesColumn]
     [CustomCategoryDiscoverer]
     public class IntroCategoryDiscoverer
