@@ -33,9 +33,18 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             "UserSecretsId",
             "EnablePreviewFeatures",
             "RuntimeHostConfigurationOption",
-            "WarningsAsErrors",
             "Features",
-            "GarbageCollectionAdaptationMode" // TODO: Remove this setting after https://github.com/dotnet/runtime/pull/131069 issue is resolved, and backported to .NET 10.
+
+            "WarningsAsErrors",
+            "WarningsNotAsErrors",
+            "WarningLevel",
+            "NoWarn",
+            "MSBuildWarningsAsErrors",
+            "MSBuildWarningsNotAsErrors",
+            "MSBuildWarningsAsMessages",
+            "SuppressTfmSupportBuildWarnings",
+
+            "GarbageCollectionAdaptationMode", // TODO: Remove this setting after https://github.com/dotnet/runtime/pull/131069 issue is resolved, and backported to .NET 10.
         }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }

@@ -147,6 +147,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
                 <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
                 <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+                <MSBuildTreatWarningsAsErrors>false</MSBuildTreatWarningsAsErrors>
                 <DebugSymbols>false</DebugSymbols>
                 <UseSharedCompilation>false</UseSharedCompilation>
                 <Deterministic>true</Deterministic>
@@ -160,7 +161,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
                 <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
                 <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-                <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
                 {GetInstructionSetSettings(buildPartition)}
               </PropertyGroup>
               {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
