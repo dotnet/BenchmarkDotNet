@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.Results;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -30,7 +31,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             ),
         ];
 
-        internal static bool TryToExplainFailureReason(BuildResult buildResult, [NotNullWhen(true)] out string? reason)
+        // CS0234 (doesn't exist in namespace) / CS0246 (could not be found) / CS0400 (could not be found in the global namespace).
+        private static readonly Regex MissingTypeRegex = new(
+            @"error CS(?:0234|0246|0400): The type or namespace name '(?<name>[^']+)'(?: does not exist in the namespace '(?<namespace>[^']+)'| could not be found)",
+            RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
+        internal static bool TryToExplainFailureReason(BuildResult buildResult, IReadOnlyList<Type> inProcessDiagnoserHandlerTypes, [NotNullWhen(true)] out string? reason)
         {
             reason = null;
 
@@ -39,7 +45,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return false;
             }
 
-            foreach (var errorLine in buildResult.ErrorMessage.Split('\r', '\n').Where(line => line.IsNotBlank()))
+            var errorLines = buildResult.ErrorMessage.Split('\r', '\n').Where(line => line.IsNotBlank()).ToArray();
+
+            // The generated benchmark references the project that defines the benchmarks; anything else it is compiled
+            // against (BenchmarkDotNet itself, in-process diagnoser handlers) must be reachable from that project. When
+            // it isn't, the build fails with a cryptic missing-type error - translate it into an actionable one. See #3218.
+            if (TryToExplainMissingReference(errorLines, inProcessDiagnoserHandlerTypes, out reason))
+            {
+                return true;
+            }
+
+            foreach (var errorLine in errorLines)
                 foreach (var rule in Rules)
                 {
                     var match = rule.regex.Match(errorLine);
@@ -53,51 +69,127 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return false;
         }
 
+        private static bool TryToExplainMissingReference(string[] errorLines, IReadOnlyList<Type> handlerTypes, [NotNullWhen(true)] out string? reason)
+        {
+            reason = null;
+
+            foreach (var errorLine in errorLines)
+            {
+                var match = MissingTypeRegex.Match(errorLine);
+                if (!match.Success)
+                {
+                    continue;
+                }
+
+                // The compiler reports the first unresolved segment of the fully-qualified name, e.g.
+                // "'SharedDiagnosers' does not exist in the namespace 'BenchmarkDotNet.IntegrationTests'".
+                string missingQualifiedName = match.Groups["namespace"].Success
+                    ? $"{match.Groups["namespace"].Value}.{match.Groups["name"].Value}"
+                    : match.Groups["name"].Value;
+
+                // The compiler reports generic arity for open/constructed generics (e.g. 'ValueTask<>'); strip it so the
+                // name matches the (non-generic) full names collected above.
+                int genericMarker = missingQualifiedName.IndexOf('<');
+                if (genericMarker >= 0)
+                {
+                    missingQualifiedName = missingQualifiedName.Substring(0, genericMarker);
+                }
+
+                // 1. An in-process diagnoser handler that lives in an assembly the benchmark project doesn't reference.
+                foreach (var handlerType in handlerTypes)
+                {
+                    string? handlerFullName = handlerType.FullName?.Replace('+', '.');
+                    if (handlerFullName is not null
+                        && (handlerFullName == missingQualifiedName || handlerFullName.StartsWith(missingQualifiedName + ".", StringComparison.Ordinal)))
+                    {
+                        string assemblyName = handlerType.Assembly.GetName().Name!;
+                        reason = $"The in-process diagnoser handler '{handlerType.Name}' (from assembly '{assemblyName}') could not be found while building the benchmark." + Environment.NewLine +
+                            "In-process diagnoser handlers are compiled into the benchmark, so the project that defines your benchmarks must reference the assembly that contains the handler." + Environment.NewLine +
+                            $"Add a reference to '{assemblyName}' in your benchmark project.";
+                        return true;
+                    }
+                }
+
+                // 2. A type from BenchmarkDotNet or one of its dependencies (e.g. Perfolizer) - the benchmark project
+                //    must reference BenchmarkDotNet itself (a transitive reference that doesn't flow, e.g. one with
+                //    PrivateAssets, is not enough).
+                if (BenchmarkDotNetEcosystemNames.Value.Contains(missingQualifiedName))
+                {
+                    reason = $"A BenchmarkDotNet (or BenchmarkDotNet dependency) type could not be found while building the benchmark: '{missingQualifiedName}'." + Environment.NewLine +
+                        "The project that defines your benchmarks must reference BenchmarkDotNet.";
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Full names and (ancestor) namespaces of every public type in the BenchmarkDotNet libraries the generated
+        // benchmark is compiled against (see BenchmarkDotNetReferences - shared with the Roslyn toolchain so they stay in
+        // sync). Used to recognize when a missing type reported by the compiler means the benchmark project didn't
+        // reference BenchmarkDotNet. Built once, only used on failure.
+        private static readonly Lazy<HashSet<string>> BenchmarkDotNetEcosystemNames = new(() =>
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var assembly in BenchmarkDotNetReferences.Assemblies)
+                foreach (var type in assembly.GetExportedTypes())
+                {
+                    if (type.FullName is not null)
+                    {
+                        names.Add(type.FullName.Replace('+', '.'));
+                    }
+
+                    for (string? ns = type.Namespace; !string.IsNullOrEmpty(ns);)
+                    {
+                        names.Add(ns!);
+                        int lastDot = ns!.LastIndexOf('.');
+                        ns = lastDot < 0 ? null : ns.Substring(0, lastDot);
+                    }
+                }
+
+            // Types that come from a package on .NET Framework (ValueTask). Add them by full name only - NOT their namespace,
+            // which is a framework namespace we must not treat as part of the BenchmarkDotNet closure.
+            foreach (var type in BenchmarkDotNetReferences.Types)
+            {
+                string? fullName = type.FullName?.Replace('+', '.');
+                if (fullName is null)
+                {
+                    continue;
+                }
+
+                int backtick = fullName.IndexOf('`');
+                names.Add(backtick < 0 ? fullName : fullName.Substring(0, backtick));
+            }
+
+            return names;
+        });
+
+        // e.g. ".NETFramework,Version=v4.7.2" or ".NETCoreApp,Version=v8.0"
+        private static readonly Regex FrameworkMonikerRegex = new(
+            @"^\.NET(?<framework>Framework|CoreApp),Version=v(?<version>\d+(?:\.\d+)+)$",
+            RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
+        // Parses a long framework name into its short moniker (net472 / net8.0). The version is parsed rather than mapped
+        // via a lookup so future .NET versions are handled automatically. Anything that isn't a long framework name
+        // (an already-short moniker, an unexpected format) is returned unchanged - we don't want to throw.
         private static string Map(Capture capture)
         {
-            switch (capture.Value)
+            var match = FrameworkMonikerRegex.Match(capture.Value);
+            if (!match.Success)
             {
-                case ".NETFramework,Version=v4.6.1":
-                    return "net461";
-                case ".NETFramework,Version=v4.6.2":
-                    return "net462";
-                case ".NETFramework,Version=v4.7":
-                    return "net47";
-                case ".NETFramework,Version=v4.7.1":
-                    return "net471";
-                case ".NETFramework,Version=v4.7.2":
-                    return "net472";
-                case ".NETFramework,Version=v4.8":
-                    return "net48";
-                case ".NETFramework,Version=v4.8.1":
-                    return "net481";
-                case ".NETCoreApp,Version=v2.0":
-                    return "netcoreapp2.0";
-                case ".NETCoreApp,Version=v2.1":
-                    return "netcoreapp2.1";
-                case ".NETCoreApp,Version=v2.2":
-                    return "netcoreapp2.2";
-                case ".NETCoreApp,Version=v3.0":
-                    return "netcoreapp3.0";
-                case ".NETCoreApp,Version=v3.1":
-                    return "netcoreapp3.1";
-                case ".NETCoreApp,Version=v5.0":
-                    return "net5.0";
-                case ".NETCoreApp,Version=v6.0":
-                    return "net6.0";
-                case ".NETCoreApp,Version=v7.0":
-                    return "net7.0";
-                case ".NETCoreApp,Version=v8.0":
-                    return "net8.0";
-                case ".NETCoreApp,Version=v9.0":
-                    return "net9.0";
-                case ".NETCoreApp,Version=v10.0":
-                    return "net10.0";
-                case ".NETCoreApp,Version=v11.0":
-                    return "net11.0";
-                default:
-                    return capture.Value; // we don't want to throw for future versions of .NET
+                return capture.Value;
             }
+
+            string version = match.Groups["version"].Value;
+            if (match.Groups["framework"].Value == "Framework")
+            {
+                // .NET Framework: v4.7.2 -> net472, v4.8 -> net48, v4.8.1 -> net481
+                return "net" + version.Replace(".", "");
+            }
+
+            // .NETCoreApp: net5.0 and later use the "netX.Y" moniker, earlier versions use "netcoreappX.Y".
+            int major = int.Parse(version.Substring(0, version.IndexOf('.')), CultureInfo.InvariantCulture);
+            return major >= 5 ? "net" + version : "netcoreapp" + version;
         }
     }
 }

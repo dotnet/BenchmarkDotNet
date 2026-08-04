@@ -169,7 +169,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!buildResult.IsBuildSuccess)
             {
-                if (!buildResult.TryToExplainFailureReason(out string? reason))
+                if (!buildResult.TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out string? reason))
                 {
                     reason = buildResult.ErrorMessage;
                 }
