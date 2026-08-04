@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -54,9 +55,14 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 [
                     benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
                     typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
-                    typeof(System.Threading.Tasks.ValueTask).Assembly, // TaskExtensions
+                    typeof(ValueTask).Assembly, // TaskExtensions
                     typeof(Perfolizer.Horology.IClock).Assembly // Perfolizer
                 ])
+                // In-process diagnoser handlers
+                .Concat(benchmarkCase.Config.GetDiagnosers()
+                    .OfType<IInProcessDiagnoser>()
+                    .Select(diagnoser => diagnoser.GetHandlerData(benchmarkCase).HandlerType?.GetTypeInfo().Assembly)
+                    .WhereNotNull())
                 .Distinct();
     }
 }
