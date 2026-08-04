@@ -249,14 +249,15 @@ namespace BenchmarkDotNet.Code
 
         private static string GetInProcessDiagnoserRouters(BenchmarkBuildInfo buildInfo)
         {
-            var sourceCodes = buildInfo.CompositeInProcessDiagnoser.InProcessDiagnosers
-                .Select((d, i) => ToSourceCode(d, buildInfo.BenchmarkCase, i))
+            var compositeInProcessDiagnoser = buildInfo.CompositeInProcessDiagnoser;
+            var handlerData = compositeInProcessDiagnoser.GetHandlerData(buildInfo.BenchmarkCase);
+            var sourceCodes = compositeInProcessDiagnoser.InProcessDiagnosers
+                .Select((diagnoser, index) => ToSourceCode(diagnoser, handlerData[index], buildInfo.BenchmarkCase, index))
                 .WhereNotNull();
             return string.Join($",\n", sourceCodes);
 
-            static string? ToSourceCode(IInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase, int index)
+            static string? ToSourceCode(IInProcessDiagnoser diagnoser, InProcessDiagnoserHandlerData handlerData, BenchmarkCase benchmarkCase, int index)
             {
-                var handlerData = diagnoser.GetHandlerData(benchmarkCase);
                 if (handlerData.HandlerType is null)
                 {
                     return null;

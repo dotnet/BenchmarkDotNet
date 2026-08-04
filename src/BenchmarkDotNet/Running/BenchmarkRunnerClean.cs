@@ -284,7 +284,7 @@ namespace BenchmarkDotNet.Running
 
                         if (buildResult.GenerateException != null)
                             logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException}");
-                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string? reason))
+                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(benchmarkRunInfo.CompositeInProcessDiagnoser.GetInProcessDiagnoserHandlerTypes(benchmark), out string? reason))
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
@@ -453,7 +453,7 @@ namespace BenchmarkDotNet.Running
             {
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
                 {
-                    if (!buildResults[buildPartition].TryToExplainFailureReason(out _))
+                    if (!buildResults[buildPartition].TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out _))
                         buildResults[buildPartition] = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait();
 
                     eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
