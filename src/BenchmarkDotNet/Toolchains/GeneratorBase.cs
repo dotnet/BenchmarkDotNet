@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Toolchains
                 // There is no async file copy API, so we just do it synchronously. We are likely on a ThreadPool thread here anyway if this generator is ran in parallel.
                 CopyAllRequiredFiles(artifactsPaths);
 
+                await GenerateCustomBuildHooksAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
                 await GenerateCodeAsync(buildPartition, artifactsPaths, cancellationToken).ConfigureAwait(false);
                 await GenerateAppConfigAsync(buildPartition, artifactsPaths, cancellationToken).ConfigureAwait(false);
                 await GenerateNuGetConfigAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
@@ -100,6 +101,11 @@ namespace BenchmarkDotNet.Toolchains
         /// generates .csproj file with a reference to the project with benchmarks
         /// </summary>
         [PublicAPI] protected virtual ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken) => new();
+
+        /// <summary>
+        /// generates .props and .targets files to customize build.
+        /// </summary>
+        [PublicAPI] protected virtual ValueTask GenerateCustomBuildHooksAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken) => new();
 
         /// <summary>
         /// generates a script can be used when debugging compilation issues

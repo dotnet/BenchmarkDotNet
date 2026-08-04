@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
+   <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
 
    <!-- Properties same as standard CsProj.txt template -->
    <PropertyGroup>
@@ -69,4 +70,6 @@
       </Crossgen2Pack>
     </ItemGroup>
   </Target>
+
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
 </Project>

@@ -1,4 +1,6 @@
-﻿<Project Sdk="$SDKNAME$" DefaultTargets="publish">
+<Project Sdk="$SDKNAME$" DefaultTargets="publish">
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
+
   <PropertyGroup>
     <OriginalCSProjPath>$CSPROJPATH$</OriginalCSProjPath>
     <WasmPropsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.props'))</WasmPropsPath>
@@ -59,4 +61,5 @@ $CORECLR_OVERRIDES$
   </Target>
 
   <Import Project="$(WasmTargetsPath)" Condition="Exists($(WasmTargetsPath))" />
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
 </Project>
