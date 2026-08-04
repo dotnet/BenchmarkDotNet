@@ -10,6 +10,9 @@
 $CORECLR_OVERRIDES$
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <MSBuildTreatWarningsAsErrors>false</MSBuildTreatWarningsAsErrors>
+    <RunAnalyzers>false</RunAnalyzers>
     <RuntimeConfig>Release</RuntimeConfig>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFrameworks>$TFM$</TargetFrameworks>
