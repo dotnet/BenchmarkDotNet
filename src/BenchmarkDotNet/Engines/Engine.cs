@@ -312,6 +312,7 @@ namespace BenchmarkDotNet.Engines
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         [UsedImplicitly]
