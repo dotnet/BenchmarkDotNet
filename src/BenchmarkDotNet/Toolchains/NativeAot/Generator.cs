@@ -269,7 +269,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
             // TFM is the MSBuild moniker, not the BDN moniker, so it resolves to Net10_0 instead of NativeAot10_0.
             // TODO: Get the correct moniker from the NativeAotRuntime (#2609)
-            runtimeMoniker += RuntimeMoniker.NativeAot60 - RuntimeMoniker.Net60;
+            runtimeMoniker += RuntimeMoniker.NativeAot70 - RuntimeMoniker.Net70;
 
             if (platform == RuntimeInformation.GetCurrentPlatform() // "native" does not support cross-compilation (so does BDN for now)
                 && runtimeMoniker >= RuntimeMoniker.NativeAot80)

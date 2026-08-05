@@ -383,7 +383,7 @@ namespace BenchmarkDotNet.Tests
         public void IlCompilerPathParsedCorrectly()
         {
             var fakePath = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
-            var config = ConfigParser.Parse(["-r", "nativeaot60", "--ilcPackages", fakePath.FullName], new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", fakePath.FullName], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -600,7 +600,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
+            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot8.0", "nativeAOT9.0", "nativeAOT10.0"],
                 new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
@@ -611,14 +611,14 @@ namespace BenchmarkDotNet.Tests
                 job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp2.0" &&
                 coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp20);
             Assert.Single(config.GetJobs(), job =>
-                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60);
-            Assert.Single(config.GetJobs(), job =>
-                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70);
-            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" &&
                 nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80);
+            Assert.Single(config.GetJobs(), job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net9.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot90);
+            Assert.Single(config.GetJobs(), job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net10.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot10_0);
         }
 
         [Theory]
