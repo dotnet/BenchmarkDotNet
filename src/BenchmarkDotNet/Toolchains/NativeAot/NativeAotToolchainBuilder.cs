@@ -30,7 +30,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         {
             ilCompilerVersion = microsoftDotNetILCompilerVersion;
 
-            Feeds[Generator.NativeAotNuGetFeed] = nuGetFeedUrl ?? throw new ArgumentNullException(nameof(nuGetFeedUrl));
+            if (nuGetFeedUrl.IsNotBlank())
+                Feeds[Generator.NativeAotNuGetFeed] = nuGetFeedUrl;
 
             DisplayName(ilCompilerVersion.IsBlank() ? "Latest ILCompiler" : $"ILCompiler {ilCompilerVersion}");
 
