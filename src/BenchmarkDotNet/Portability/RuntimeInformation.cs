@@ -161,7 +161,7 @@ namespace BenchmarkDotNet.Portability
 
             string GetDetailedVersion()
             {
-                // Single-file publish and NativeAot app has empty assembly location.
+                // Single-file publish and NativeAot app have empty assembly location.
                 string coreclrLocation = GetCoreLibDllLocation();
                 if (coreclrLocation.IsBlank())
                     return CoreRuntime.GetVersionFromFrameworkDescription();
