@@ -190,16 +190,20 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return customProperties;
         }
 
-
         private string GetILCompilerPackageReference()
             => ilCompilerVersion.IsBlank() ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
 
         private string GetTrimmingSettings()
-            => rootAllApplicationAssemblies
-                // Use the defaults
-                ? ""
-                // TrimMode is set in explicit way as for older versions it might have different default value
-                : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
+        {
+            if (rootAllApplicationAssemblies)
+                return ""; // Use the defaults
+
+            // TrimMode is set in explicit way as for older versions it might have different default value
+            if (TargetFrameworkMoniker.StartsWith("net6.0"))
+                return "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
+            else
+                return "<TrimMode>full</TrimMode>";
+        }
 
         private string GetInstructionSetSettings(BuildPartition buildPartition)
         {

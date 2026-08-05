@@ -104,8 +104,8 @@ namespace BenchmarkDotNet.Environments
                 return true;
             }
 
-            string coreclrLocation = typeof(object).Assembly.Location;
-            // Single-file publish has empty assembly location.
+            // Single-file publish and NativeAot aoo has empty assembly location.
+            string coreclrLocation = RuntimeInformation.GetCoreLibDllLocation();
             if (coreclrLocation.IsNotBlank())
             {
                 var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(coreclrLocation);

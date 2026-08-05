@@ -634,10 +634,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
 
                 case RuntimeMoniker.NativeAot90:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
 
                 case RuntimeMoniker.NativeAot10_0:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
 
                 case RuntimeMoniker.NativeAot11_0:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json");
