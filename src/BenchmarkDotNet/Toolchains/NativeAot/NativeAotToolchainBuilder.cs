@@ -17,8 +17,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private string ilcOptimizationPreference = "Speed";
         private string? ilcInstructionSet;
 
-        private bool isIlCompilerConfigured;
-
         /// <summary>
         /// creates a NativeAOT toolchain targeting NuGet build of Microsoft.DotNet.ILCompiler
         /// Based on https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project
@@ -34,8 +32,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 Feeds[Generator.NativeAotNuGetFeed] = nuGetFeedUrl;
 
             DisplayName(ilCompilerVersion.IsBlank() ? "Latest ILCompiler" : $"ILCompiler {ilCompilerVersion}");
-
-            isIlCompilerConfigured = true;
 
             return this;
         }
@@ -56,8 +52,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             Feeds["dotnet11"] = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json";
             useTempFolderForRestore = true;
             DisplayName("local ILCompiler build");
-
-            isIlCompilerConfigured = true;
 
             return this;
         }
