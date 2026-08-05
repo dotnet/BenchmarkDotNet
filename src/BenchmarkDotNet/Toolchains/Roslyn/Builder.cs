@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -137,7 +138,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static string[] GetFrameworkAssembliesPaths()
         {
-            string? frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            string? frameworkAssembliesDirectory = Path.GetDirectoryName(RuntimeInformation.GetCoreLibDllLocation());
             if (frameworkAssembliesDirectory == null)
                 return [];
 

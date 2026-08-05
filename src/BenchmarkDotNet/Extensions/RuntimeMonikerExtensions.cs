@@ -49,8 +49,6 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core11_0;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
-                case RuntimeMoniker.NativeAot60:
-                    return NativeAotRuntime.Net60;
                 case RuntimeMoniker.NativeAot70:
                     return NativeAotRuntime.Net70;
                 case RuntimeMoniker.NativeAot80:
@@ -107,7 +105,6 @@ namespace BenchmarkDotNet.Extensions
             RuntimeMoniker.Net90 => new Version(9, 0),
             RuntimeMoniker.Net10_0 => new Version(10, 0),
             RuntimeMoniker.Net11_0 => new Version(11, 0),
-            RuntimeMoniker.NativeAot60 => new Version(6, 0),
             RuntimeMoniker.NativeAot70 => new Version(7, 0),
             RuntimeMoniker.NativeAot80 => new Version(8, 0),
             RuntimeMoniker.NativeAot90 => new Version(9, 0),
