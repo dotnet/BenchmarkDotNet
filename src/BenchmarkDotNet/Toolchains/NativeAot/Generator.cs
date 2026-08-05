@@ -194,16 +194,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             => ilCompilerVersion.IsBlank() ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
 
         private string GetTrimmingSettings()
-        {
-            if (rootAllApplicationAssemblies)
-                return ""; // Use the defaults
-
-            // TrimMode is set in explicit way as for older versions it might have different default value
-            if (TargetFrameworkMoniker.StartsWith("net6.0"))
-                return "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
-            else
-                return "<TrimMode>full</TrimMode>";
-        }
+            => rootAllApplicationAssemblies
+                ? ""
+                : "<TrimMode>full</TrimMode>";
 
         private string GetInstructionSetSettings(BuildPartition buildPartition)
         {
