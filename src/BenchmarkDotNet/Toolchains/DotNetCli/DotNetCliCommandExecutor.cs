@@ -7,6 +7,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
@@ -56,9 +57,38 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
 
-            return process.ExitCode <= 0
-                ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())
-                : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
+            if (process.ExitCode != 0)
+            {
+                return DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
+            }
+
+            // A successful build's output is otherwise discarded (see DotNetCliCommandResult.ToBuildResult), so
+            // build/restore warnings (e.g. NU1701, NU1702) would be invisible unless LogBuildOutput is set. When the
+            // full output isn't already being streamed, surface just the warning lines so they aren't silently lost.
+            if (!parameters.LogOutput)
+                LogBuildWarnings(parameters.Logger, outputReader.GetOutputLines());
+
+            return DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText());
+        }
+
+        // Matches an MSBuild/NuGet warning line, e.g. "...csproj : warning NU1702: ..." or "...targets(1,5): warning NETSDK1138: ...".
+        private static readonly Regex BuildWarningRegex = new(@": warning [A-Za-z]+\d+:", RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
+        // Surfaces just the warning lines from an otherwise-discarded successful build output, deduplicated
+        // (MSBuild repeats a warning per target framework and again in the summary).
+        private static void LogBuildWarnings(ILogger logger, ImmutableArray<string> outputLines)
+        {
+            HashSet<string>? seen = null;
+            foreach (var line in outputLines)
+            {
+                if (!BuildWarningRegex.IsMatch(line))
+                    continue;
+
+                string warning = line.Trim();
+                seen ??= new HashSet<string>(StringComparer.Ordinal);
+                if (seen.Add(warning))
+                    logger.WriteLineWarning($"// {warning}");
+            }
         }
 
         internal static string GetDotNetSdkVersion()
