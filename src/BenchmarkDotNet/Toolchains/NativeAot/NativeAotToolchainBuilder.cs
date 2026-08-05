@@ -132,9 +132,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         [PublicAPI]
         public override IToolchain ToToolchain()
         {
-            if (!isIlCompilerConfigured)
-                throw new InvalidOperationException("You need to use UseNuGet or UseLocalBuild methods to tell us which ILCompiler to use.");
-
             return new NativeAotToolchain(
                 displayName: displayName!,
                 ilCompilerVersion: ilCompilerVersion!,
