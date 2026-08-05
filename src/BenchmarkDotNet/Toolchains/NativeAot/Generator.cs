@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <MSBuildTreatWarningsAsErrors>false</MSBuildTreatWarningsAsErrors>
                 <DebugSymbols>false</DebugSymbols>
                 <RunAnalyzers>false</RunAnalyzers>
-                <PublishAot Condition="$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))">true</PublishAot>
+                <PublishAot>true</PublishAot>
                 <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
                 <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
                 {GetTrimmingSettings()}
