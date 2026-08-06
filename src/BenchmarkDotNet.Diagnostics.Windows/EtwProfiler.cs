@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
         private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
+        public IHardwareCounterProvider HardwareCounterProvider { get; set; } = new DefaultHardwareCounterProvider();
+
         private Session kernelSession = default!;
         private Session userSession = default!;
         private Session heapSession = default!;
@@ -55,7 +57,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
 
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
-            => HardwareCounters.Validate(validationParameters, mandatory: false).ToAsyncEnumerable();
+            => HardwareCounters.Validate(validationParameters, HardwareCounterProvider, mandatory: false).ToAsyncEnumerable();
 
         public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {
@@ -64,7 +66,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Start(parameters);
             else if (signal == HostSignal.AfterProcessExit)
                 Stop(parameters);
-            return new();
+            return new ();
         }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
@@ -90,13 +92,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void Start(DiagnoserActionParameters parameters)
         {
+            var profileSourceInfos = HardwareCounterProvider.GetAvailableCounters();
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
-                .Select(counter => HardwareCounters.FromCounter(counter, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
+                .SelectMany(counter => HardwareCounters.FromCounter(counter, parameters.Config.HardwareCounterProfile, profileSourceInfos,
+                    config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
                 .ToArray();
 
             if (counters.Any()) // we need to enable the counters before starting the kernel session
-                HardwareCounters.Enable(counters);
+                HardwareCounterProvider.Configure(counters);
 
             try
             {
