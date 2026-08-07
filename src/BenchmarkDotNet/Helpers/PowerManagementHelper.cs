@@ -1,64 +1,64 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Text;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+
+#pragma warning disable CA1416 // This call site is reachable on all platforms. 'PowerManagementHelper.CurrentPlan' is only supported on: 'windows' 6.1 and later.
 
 namespace BenchmarkDotNet.Helpers
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal class PowerManagementHelper
     {
-        private const uint ErrorMoreData = 234;
-        private const uint SuccessCode = 0;
-
-        internal static Guid? CurrentPlan
+        internal static unsafe Guid? CurrentPlan
         {
             get
             {
-                IntPtr activeGuidPtr = IntPtr.Zero;
-                uint res = PowerGetActiveScheme(IntPtr.Zero, ref activeGuidPtr);
-                if (res != SuccessCode)
+                WIN32_ERROR res = PInvoke.PowerGetActiveScheme(null, out var activePolicyGuidPtr);
+                if (res != WIN32_ERROR.NO_ERROR)
                     return null;
 
-                return Marshal.PtrToStructure<Guid>(activeGuidPtr);
+                var activePolicyGuid = *activePolicyGuidPtr;
+
+                PInvoke.LocalFree((HLOCAL)activePolicyGuidPtr);
+
+                return activePolicyGuid;
             }
         }
 
-        internal static string CurrentPlanFriendlyName
+        internal unsafe static string CurrentPlanFriendlyName
         {
             get
             {
-                uint buffSize = 0;
-                StringBuilder buffer = new StringBuilder();
-                IntPtr activeGuidPtr = IntPtr.Zero;
-                uint res = PowerGetActiveScheme(IntPtr.Zero, ref activeGuidPtr);
-                if (res != SuccessCode)
-                    return "";
-                res = PowerReadFriendlyName(IntPtr.Zero, activeGuidPtr, IntPtr.Zero, IntPtr.Zero, buffer, ref buffSize);
-                if (res == ErrorMoreData)
-                {
-                    buffer.Capacity = (int)buffSize;
-                    res = PowerReadFriendlyName(IntPtr.Zero, activeGuidPtr,
-                        IntPtr.Zero, IntPtr.Zero, buffer, ref buffSize);
-                }
-                if (res != SuccessCode)
+                WIN32_ERROR res = PInvoke.PowerGetActiveScheme(null, out var activeGuidPtr);
+                if (res != WIN32_ERROR.NO_ERROR)
                     return "";
 
-                return buffer.ToString();
+                Guid activeSchemaGuid = *activeGuidPtr;
+                PInvoke.LocalFree((HLOCAL)activeGuidPtr);
+
+                Span<byte> buffer = stackalloc byte[260];
+                uint bufferSize = (uint)buffer.Length;
+
+                res = PInvoke.PowerReadFriendlyName(null, activeSchemaGuid, null, null, buffer, ref bufferSize);
+                if (res == WIN32_ERROR.ERROR_MORE_DATA)
+                {
+                    buffer = new byte[(int)bufferSize];
+                    res = PInvoke.PowerReadFriendlyName(null, activeSchemaGuid, null, null, buffer, ref bufferSize);
+                    bufferSize = (uint)buffer.Length;
+                }
+
+                if (res != WIN32_ERROR.NO_ERROR)
+                    return "";
+
+                ReadOnlySpan<char> chars = MemoryMarshal.Cast<byte, char>(buffer.Slice(0, (int)bufferSize));
+                return chars.TrimEnd('\0').ToString(); // Trim null terminator of PWSTR.
             }
         }
 
         internal static bool Set(Guid newPolicy)
         {
-            return PowerSetActiveScheme(IntPtr.Zero, ref newPolicy) == 0;
+            return PInvoke.PowerSetActiveScheme(null, newPolicy) == WIN32_ERROR.NO_ERROR;
         }
-
-        [DllImport("powrprof.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        private static extern uint PowerReadFriendlyName(IntPtr RootPowerKey, IntPtr SchemeGuid, IntPtr SubGroupOfPowerSettingGuid, IntPtr PowerSettingGuid, StringBuilder Buffer, ref uint BufferSize);
-
-        [DllImport("powrprof.dll", ExactSpelling = true)]
-        private static extern int PowerSetActiveScheme(IntPtr ReservedZero, ref Guid policyGuid);
-
-        [DllImport("powrprof.dll", ExactSpelling = true)]
-        private static extern uint PowerGetActiveScheme(IntPtr UserRootPowerKey, ref IntPtr ActivePolicyGuid);
     }
 }
