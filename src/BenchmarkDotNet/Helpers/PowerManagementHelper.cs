@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-
-#pragma warning disable CA1416 // This call site is reachable on all platforms. 'PowerManagementHelper.CurrentPlan' is only supported on: 'windows' 6.1 and later.
 
 namespace BenchmarkDotNet.Helpers
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SupportedOSPlatform("windows6.0.6000")]
     internal class PowerManagementHelper
     {
         internal static unsafe Guid? CurrentPlan

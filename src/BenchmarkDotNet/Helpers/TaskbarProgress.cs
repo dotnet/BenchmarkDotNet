@@ -17,9 +17,7 @@ namespace BenchmarkDotNet.Helpers
 
     internal class TaskbarProgress : DisposeAtProcessTermination
     {
-        private static readonly bool OsVersionIsSupported = OsDetector.IsWindows()
-            // Must be windows 7 or greater
-            && Environment.OSVersion.Version >= new Version(6, 1);
+        private static readonly bool OsVersionIsSupported = OsDetector.IsWindows7OrLater();
 
         private Com? com;
         private Terminal? terminal;

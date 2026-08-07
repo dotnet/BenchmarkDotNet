@@ -1,16 +1,16 @@
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Windows.Win32;
 using Windows.Win32.System.Power;
 using Windows.Win32.System.Threading;
 
 namespace BenchmarkDotNet.Running;
 
-#pragma warning disable CA1416
-
 internal partial class WakeLock
 {
+    [SupportedOSPlatform("windows6.1")]
     public static SafeFileHandle PowerCreateRequest(string reason)
     {
         IntPtr reasonPtr = Marshal.StringToHGlobalAuto(reason);
@@ -41,6 +41,7 @@ internal partial class WakeLock
         }
     }
 
+    [SupportedOSPlatform("windows6.1")]
     private static void PowerSetRequest(SafeFileHandle safePowerHandle, POWER_REQUEST_TYPE requestType)
     {
         if (PInvoke.PowerSetRequest(safePowerHandle, requestType))
@@ -49,6 +50,7 @@ internal partial class WakeLock
         throw new Win32Exception();
     }
 
+    [SupportedOSPlatform("windows6.1")]
     private static void PowerClearRequest(SafeFileHandle safePowerHandle, POWER_REQUEST_TYPE requestType)
     {
         if (PInvoke.PowerClearRequest(safePowerHandle, requestType))

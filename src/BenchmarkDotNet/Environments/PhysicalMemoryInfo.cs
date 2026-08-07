@@ -1,5 +1,7 @@
+using BenchmarkDotNet.Detectors;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Windows.Win32;
 using Windows.Win32.System.SystemInformation;
@@ -37,13 +39,13 @@ namespace BenchmarkDotNet.Environments
         {
             try
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (OsDetector.IsWindows7OrLater())
                     return GetWindowsMemory();
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                if (OsDetector.IsLinux())
                     return GetLinuxMemory();
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                if (OsDetector.IsMacOS())
                     return GetMacMemory();
             }
             catch (Exception)
@@ -54,13 +56,12 @@ namespace BenchmarkDotNet.Environments
             return null;
         }
 
+        [SupportedOSPlatform("windows5.1.2600")]
         private static PhysicalMemoryInfo? GetWindowsMemory()
         {
-#pragma warning disable CA1416 // This call site is reachable on all platforms. 'PInvoke.GlobalMemoryStatusEx(ref MEMORYSTATUSEX)' is only supported on: 'windows' 5.1.2600 and later.
             var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
                 return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys);
-#pragma warning restore CA1416 
 
             return null;
         }

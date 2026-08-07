@@ -4,6 +4,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
+using System.Runtime.Versioning;
 using Windows.Win32.System.Power;
 
 namespace BenchmarkDotNet.Running;
@@ -18,16 +19,14 @@ internal partial class WakeLock
         if (wakeLockType == WakeLockType.None)
             return null;
 
-        if (!OsDetector.IsWindows())
-            return null;
-
         // Must be windows 7 or greater
-        if (Environment.OSVersion.Version < new Version(6, 1))
+        if (!OsDetector.IsWindows7OrLater())
             return null;
 
         return new WakeLockSentinel(wakeLockType, reason, logger);
     }
 
+    [SupportedOSPlatform("windows6.1")]
     private class WakeLockSentinel : DisposeAtProcessTermination
     {
         private readonly WakeLockType wakeLockType;
