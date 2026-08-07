@@ -57,7 +57,7 @@
   <!-- Settings for PolySharp -->
   <PropertyGroup>
     <PolySharpIncludeRuntimeSupportedAttributes>true</PolySharpIncludeRuntimeSupportedAttributes>
-    <!-- Required to avoid confilicts with CSWin32-->
+    <!-- Required to avoid conflicts with CSWin32-->
     <PolySharpExcludeGeneratedTypes>System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute</PolySharpExcludeGeneratedTypes>
   </PropertyGroup>
   <ItemGroup>
