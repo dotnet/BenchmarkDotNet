@@ -18,3 +18,5 @@
   href: vsprofiler.md
 - name: VSTest
   href: vstest.md
+- name: Microsoft.Testing.Platform
+  href: testingplatform.md

@@ -5,6 +5,11 @@ name: Running with VSTest
 
 # Running with VSTest
 
+> [!NOTE]
+> BenchmarkDotNet also ships an adapter for [Microsoft.Testing.Platform](xref:docs.testingplatform),
+>   the test platform that succeeds VSTest.
+> You only need one of the two.
+
 BenchmarkDotNet supports discovering and executing benchmarks through VSTest.
 This provides an alternative user experience to running benchmarks with the CLI
   and may be preferable for those who like their IDE's VSTest integrations that they may have used when running unit tests.
