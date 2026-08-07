@@ -2,12 +2,13 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using Microsoft.Win32;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Text.Json;
 using static System.Runtime.InteropServices.RuntimeInformation;
 
 namespace BenchmarkDotNet.Portability
@@ -261,61 +262,52 @@ namespace BenchmarkDotNet.Portability
 
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {
-            var products = new List<Antivirus>();
-            if (OsDetector.IsWindows())
-            {
-                try
-                {
-                    using (var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct"))
-                    using (var data = wmi.Get())
-                        foreach (var o in data)
-                        {
-                            var av = (ManagementObject)o;
-                            if (av != null)
-                            {
-                                string name = av["displayName"].ToString()!;
-                                string path = av["pathToSignedProductExe"].ToString()!;
-                                products.Add(new Antivirus(name, path));
-                            }
-                        }
-                }
-                catch
-                {
-                    // Never mind
-                }
-            }
+            if (!OsDetector.IsWindows())
+                return [];
 
-            return products;
+            try
+            {
+                var command = "ConvertTo-Json @(Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct | select displayName, pathToSignedProductExe)";
+
+                string? output = ProcessHelper.RunPowerShellCommandAndReadOutput(command);
+
+                if (output.IsBlank())
+                    return [];
+
+                var results = JsonSerializer.Deserialize<JsonElement[]>(output)!;
+                return results.Select(node =>
+                {
+                    string name = node.GetProperty("displayName").GetString()!;
+                    string path = node.GetProperty("pathToSignedProductExe").GetString()!;
+                    return new Antivirus(name, path);
+                }).ToList();
+            }
+            catch
+            {
+                // Never mind
+                return [];
+            }
         }
 
         internal static VirtualMachineHypervisor? GetVirtualMachineHypervisor()
         {
+            if (!OsDetector.IsWindows())
+                return null;
+
             VirtualMachineHypervisor[] hypervisors = [HyperV.Default, VirtualBox.Default, VMware.Default];
 
-            if (OsDetector.IsWindows())
+            try
             {
-                try
-                {
-                    using (var searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
-                    {
-                        using (var items = searcher.Get())
-                        {
-                            foreach (var item in items)
-                            {
-                                string manufacturer = item["Manufacturer"]?.ToString()!;
-                                string model = item["Model"]?.ToString()!;
-                                return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // Never mind
-                }
+                using var key = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS")!;
+                string model = key.GetValue("SystemProductName") as string ?? "";
+                string manufacturer = key.GetValue("SystemManufacturer") as string ?? "";
+                return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
             }
-
-            return null;
+            catch
+            {
+                // Never mind
+                return null;
+            }
         }
 
         // Suppress warning IL3000: 'System.Reflection.Assembly.Location.get' always returns an empty string for assemblies embedded in a single-file app.
