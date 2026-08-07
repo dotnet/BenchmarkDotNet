@@ -175,6 +175,6 @@ public class OsDetector
 #if NET6_0_OR_GREATER
         OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(6, 1);
 #else
-        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Environment.OSVersion.Version >= Version.Parse("6.1");
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Environment.OSVersion.Version >= new Version(6, 1);
 #endif
 }
