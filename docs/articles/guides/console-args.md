@@ -187,6 +187,56 @@ Now, the default settings are: `WarmupCount=1` but you might still overwrite it 
 dotnet run -c Release -- --warmupCount 2
 ```
 
+## Benchmark profiles
+
+Most of the console arguments describe a *single* job, so they can not express "run these benchmarks
+for this particular combination of settings, and that other combination too". Instead of trying to
+spell such combinations out on the command line, you can define them in code, give each of them an
+`Id`, and then select them from the command line with `--profile`:
+
+* `--profile` - runs only the jobs whose `Id` matches. Glob patterns are supported and the matching
+is case insensitive. Not to be confused with `--profiler`.
+
+```cs
+static void Main(string[] args)
+    => BenchmarkSwitcher
+        .FromAssembly(typeof(Program).Assembly)
+        .Run(args, GetGlobalConfig());
+
+static IConfig GetGlobalConfig()
+    => DefaultConfig.Instance
+        .AddJob(Job.Default.WithToolchain(InProcessEmitToolchain.Instance).WithId("debug"))
+        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80).WithId("net8"))
+        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core90).WithId("net9"));
+```
+
+Example: run the benchmarks in process, which is handy when you want to debug them.
+
+```log
+dotnet run -c Release -- --filter '*JsonSerialization*' --profile debug
+```
+
+Example: compare .NET 8.0 with .NET 9.0, without running the `debug` job. Just like `--filter`,
+`--profile` accepts more than one value, separated by spaces.
+
+```log
+dotnet run -c Release -- --filter '*' --profile net8 net9
+```
+
+The very same thing works for the jobs that are defined via attributes, because `[SimpleJob]` accepts
+an `id` argument:
+
+```cs
+[SimpleJob(RuntimeMoniker.Net80, id: "net8")]
+[SimpleJob(RuntimeMoniker.Net90, id: "net9")]
+public class JsonSerialization { /* ... */ }
+```
+
+`--profile` narrows down what the other filters have selected, so it can be freely combined with
+`--filter`, `--allCategories`, `--anyCategories` and `--attribute`. Jobs that were given no explicit
+`Id` are still selectable by their generated one (`DefaultJob`, or `Job-XXXXXX`); if nothing matches,
+the list of available profiles is printed for you.
+
 ## Response files support
 
 Benchmark.NET supports parsing parameters via response files. for example you can create file `run.rsp` with following content
@@ -252,6 +302,8 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
     `--envVars ENV_VAR_KEY_1:value_1 ENV_VAR_KEY_2:value_2`
 * Hide Mean and Ratio columns (use double quotes for multi-word columns: "Alloc Ratio"):
     `-h Mean Ratio`
+* Run only the jobs whose Id is 'net8' or 'net9' (Ids are assigned in code, e.g. Job.Default.WithId("net8")):
+    `--filter * --profile net8 net9`
 
 ## More
 
@@ -264,6 +316,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `-d, --disasm`              (Default: false) Gets disassembly of benchmarked code
 * `-p, --profiler`            Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory
 * `-f, --filter`              Glob patterns
+* `--profile`                 Runs only the jobs with matching Id(s). Ids are assigned in code via Job.WithId(...) or the 'id' argument of [SimpleJob]. Glob patterns are supported. Not to be confused with --profiler.
 * `-h, --hide`                Hides columns by name
 * `-i, --inProcess`           (Default: false) Run benchmarks in Process
 * `-a, --artifacts`           Valid path to accessible directory
