@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
             printer = listBenchmarkCaseMode switch
             {
                 ListBenchmarkCaseMode.Tree => new TreeBenchmarkCasesPrinter(),
+                ListBenchmarkCaseMode.Json => new JsonBenchmarkCasesPrinter(),
                 _ => new FlatBenchmarkCasesPrinter(),
             };
         }

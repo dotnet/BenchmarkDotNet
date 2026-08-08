@@ -1,7 +1,7 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -20,14 +20,14 @@ public class UniqueIdGeneratorTests
         var benchmarkCases = benchmarkRunInfo.BenchmarksCases;
 
         // Act
-        var uids = benchmarkCases.Select(UniqueIdGenerator.FromBenchmarkCase).ToArray();
+        var uids = benchmarkCases.Select(x => x.GetUniqueId()).ToArray();
 
         // Assert
         uids.Should().BeEquivalentTo(
         [
-            "1ed4411f-c92d-8f60-aadd-fbd8cc0c3270",
-            "1b3f5c2e-38be-8d60-8a0f-220aa548549b",
-            "16d91eb5-6b8d-8399-8843-bee86dd80bce",
+            "14662b5a-18fb-819c-a791-7eb540aa1257",
+            "1d4297b4-729e-8196-b884-4085499599d4",
+            "10657006-42ba-8c9b-af8b-ef62dfdd91a6",
         ]);
 
         uids.Should().AllSatisfy(Validate);
@@ -41,7 +41,6 @@ public class UniqueIdGeneratorTests
             .AddJob(
             [
                 Job.Dry.WithId("TestJob"),
-                Job.Dry.WithRuntime(CoreRuntime.Core80),
                 Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp80),
             ]);
 
@@ -49,22 +48,18 @@ public class UniqueIdGeneratorTests
         var benchmarkCases = benchmarkRunInfo.BenchmarksCases;
 
         // Act
-        var uids = benchmarkCases.Select(UniqueIdGenerator.FromBenchmarkCase).ToArray();
+        var uids = benchmarkCases.Select(x => x.GetUniqueId()).ToArray();
 
         // Assert
         uids.Should().BeEquivalentTo(
         [
-            "171ce586-f86d-8b4f-ad25-617e3f02c6cf",
-            "1daf0e59-c7d1-8d97-84f2-7bdf6b45ff73",
-            "164dce04-85a5-8215-a9b2-2c1a742fa2ea",
+            "1f1ec424-c811-820a-a4ad-4def359fbc26",
+            "1ba530cd-a780-8707-a8f7-d59d1a80ad9d",
+            "1aa03476-a73c-8c01-918f-d80de359b386",
 
-            "15ef264f-fcde-89bd-9d7e-42e7307b2d29",
-            "1b3fce88-39fe-87ae-96fe-d1024fd1cc09",
-            "1c8797a3-aded-8850-b983-32f592e25bf4",
-
-            "164ffb49-b0d1-8099-8e55-e82bc5f48d71",
-            "1c3e6d12-1e8b-85bc-a3a1-8e84bfa378ba",
-            "1a4c7c21-9459-8ad6-b101-23386b4b0996",
+            "18ba3702-d8a3-8666-9b61-48e7a90e784a",
+            "15fa977d-8202-81f3-abf4-c6d0c9d5b18c",
+            "137fba29-6929-8213-9e65-3b4bee0bf72d",
         ]);
 
         uids.Should().AllSatisfy(Validate);

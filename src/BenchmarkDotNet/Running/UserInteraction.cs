@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineInfo($"\t{displayName}");
             }
 
-            logger.WriteLineInfo("To print all available benchmarks use `--list flat` or `--list tree`.");
+            logger.WriteLineInfo("To print all available benchmarks use `--list flat` or `--list tree` or `--list json`.");
             logger.WriteLineInfo("To learn more about filtering use `--help`.");
         }
 
