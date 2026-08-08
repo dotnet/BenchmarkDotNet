@@ -10,23 +10,24 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 
         public BenchmarkCasesPrinter(ListBenchmarkCaseMode listBenchmarkCaseMode)
         {
-            printer = listBenchmarkCaseMode == ListBenchmarkCaseMode.Tree
-                ? (IBenchmarkCasesPrinter)new TreeBenchmarkCasesPrinter()
-                : new FlatBenchmarkCasesPrinter();
+            printer = listBenchmarkCaseMode switch
+            {
+                ListBenchmarkCaseMode.Tree => new TreeBenchmarkCasesPrinter(),
+                ListBenchmarkCaseMode.Json => new JsonBenchmarkCasesPrinter(),
+                _ => new FlatBenchmarkCasesPrinter(),
+            };
         }
 
         public static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
         {
             var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
+            var benchmarkCases = TypeFilter
+                .Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+                .SelectMany(p => p.BenchmarksCases);
 
-            var testNames = TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                .SelectMany(p => p.BenchmarksCases)
-                .Select(p => p.Descriptor.GetFilterName())
-                .Distinct();
-
-            printer.Print(testNames, nonNullLogger);
+            printer.Print(benchmarkCases, nonNullLogger);
         }
 
-        public void Print(IEnumerable<string> testNames, ILogger logger) => printer.Print(testNames, logger);
+        public void Print(IEnumerable<BenchmarkCase> benchmarkCases, ILogger logger) => printer.Print(benchmarkCases, logger);
     }
 }
