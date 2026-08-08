@@ -46,26 +46,32 @@ namespace BenchmarkDotNet.Running
 
         private void ApplyUserPowerPlan()
         {
-            if (powerPlanChanged && OsDetector.IsWindows())
+            if (!powerPlanChanged)
+                return;
+
+            if (!OsDetector.IsWindows7OrLater())
+                return;
+
+            try
             {
-                try
+                if (userCurrentPowerPlan != null && PowerManagementHelper.Set(userCurrentPowerPlan.Value))
                 {
-                    if (userCurrentPowerPlan != null && PowerManagementHelper.Set(userCurrentPowerPlan.Value))
-                    {
-                        powerPlanChanged = false;
-                        var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
-                        logger.WriteLineInfo($"Successfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
-                    }
+                    powerPlanChanged = false;
+                    var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
+                    logger.WriteLineInfo($"Successfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
                 }
-                catch (Exception ex)
-                {
-                    logger.WriteLineError($"Cannot revert power plan (error message: {ex.Message})");
-                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLineError($"Cannot revert power plan (error message: {ex.Message})");
             }
         }
 
         private void ApplyPlanByGuid(Guid guid)
         {
+            if (!OsDetector.IsWindows7OrLater())
+                return;
+
             try
             {
                 if (isInitialized == false)

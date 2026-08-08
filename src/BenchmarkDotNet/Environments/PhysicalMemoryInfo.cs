@@ -1,6 +1,10 @@
+using BenchmarkDotNet.Detectors;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
+using Windows.Win32;
+using Windows.Win32.System.SystemInformation;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -35,13 +39,13 @@ namespace BenchmarkDotNet.Environments
         {
             try
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (OsDetector.IsWindows7OrLater())
                     return GetWindowsMemory();
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                if (OsDetector.IsLinux())
                     return GetLinuxMemory();
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                if (OsDetector.IsMacOS())
                     return GetMacMemory();
             }
             catch (Exception)
@@ -52,36 +56,13 @@ namespace BenchmarkDotNet.Environments
             return null;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        private class MEMORYSTATUSEX
-        {
-            public uint dwLength;
-            public uint dwMemoryLoad;
-            public ulong ullTotalPhys;
-            public ulong ullAvailPhys;
-            public ulong ullTotalPageFile;
-            public ulong ullAvailPageFile;
-            public ulong ullTotalVirtual;
-            public ulong ullAvailVirtual;
-            public ulong ullAvailExtendedVirtual;
-
-            public MEMORYSTATUSEX()
-            {
-                dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
-            }
-        }
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
-
+        [SupportedOSPlatform("windows5.1.2600")]
         private static PhysicalMemoryInfo? GetWindowsMemory()
         {
-            var memStatus = new MEMORYSTATUSEX();
-            if (GlobalMemoryStatusEx(memStatus))
-            {
+            var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+            if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
                 return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys);
-            }
+
             return null;
         }
 

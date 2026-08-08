@@ -48,9 +48,17 @@
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.298">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>
     <PolySharpIncludeRuntimeSupportedAttributes>true</PolySharpIncludeRuntimeSupportedAttributes>
+    <!-- Required to avoid conflicts with CSWin32-->
+    <PolySharpExcludeGeneratedTypes>System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute</PolySharpExcludeGeneratedTypes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PolySharp" Version="1.16.0">

@@ -127,7 +127,6 @@ public class OsDetector
         RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
 
-
     [SupportedOSPlatformGuard("linux")]
     internal static bool IsLinux() =>
 #if NET6_0_OR_GREATER
@@ -169,5 +168,13 @@ public class OsDetector
         OperatingSystem.IsTvOS();
 #else
         RuntimeInformation.IsOSPlatform(OSPlatform.Create("TVOS"));
+#endif
+
+    [SupportedOSPlatformGuard("windows6.1")]
+    internal static bool IsWindows7OrLater() =>
+#if NET6_0_OR_GREATER
+        OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(6, 1);
+#else
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Environment.OSVersion.Version >= new Version(6, 1);
 #endif
 }

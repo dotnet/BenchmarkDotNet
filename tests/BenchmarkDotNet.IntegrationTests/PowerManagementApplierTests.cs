@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
@@ -16,6 +17,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("Setting high-performance plan is suitable only on Windows", EnvRequirement.WindowsOnly)]
         public void TestSettingAndRevertingBackGuid()
         {
+            if (!OsDetector.IsWindows7OrLater())
+                return;
+
             var userPlan = PowerManagementHelper.CurrentPlan;
 
             using var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
@@ -33,6 +37,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("Setting high-performance plan is suitable only on Windows", EnvRequirement.WindowsOnly)]
         public void TestPowerPlanShouldNotChange()
         {
+            if (!OsDetector.IsWindows7OrLater())
+                return;
+
             var userPlan = PowerManagementHelper.CurrentPlan;
             using var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
 
