@@ -147,11 +147,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
                 <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
                 <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+                <MSBuildTreatWarningsAsErrors>false</MSBuildTreatWarningsAsErrors>
                 <DebugSymbols>false</DebugSymbols>
-                <UseSharedCompilation>false</UseSharedCompilation>
-                <Deterministic>true</Deterministic>
                 <RunAnalyzers>false</RunAnalyzers>
-                <PublishAot Condition="$([MSBuild]::VersionGreaterThan('$(NETCoreSdkVersion)', '6.0'))">true</PublishAot>
+                <PublishAot>true</PublishAot>
                 <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
                 <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
                 {GetTrimmingSettings()}
@@ -160,7 +159,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
                 <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
                 <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-                <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings> <!-- Suppress warning for nuget package used in old (unsupported) tfm. -->
                 {GetInstructionSetSettings(buildPartition)}
               </PropertyGroup>
               {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
@@ -192,16 +190,13 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return customProperties;
         }
 
-
         private string GetILCompilerPackageReference()
             => ilCompilerVersion.IsBlank() ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
 
         private string GetTrimmingSettings()
             => rootAllApplicationAssemblies
-                // Use the defaults
                 ? ""
-                // TrimMode is set in explicit way as for older versions it might have different default value
-                : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
+                : "<TrimMode>full</TrimMode>";
 
         private string GetInstructionSetSettings(BuildPartition buildPartition)
         {
@@ -274,7 +269,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
             // TFM is the MSBuild moniker, not the BDN moniker, so it resolves to Net10_0 instead of NativeAot10_0.
             // TODO: Get the correct moniker from the NativeAotRuntime (#2609)
-            runtimeMoniker += RuntimeMoniker.NativeAot60 - RuntimeMoniker.Net60;
+            runtimeMoniker += RuntimeMoniker.NativeAot70 - RuntimeMoniker.Net70;
 
             if (platform == RuntimeInformation.GetCurrentPlatform() // "native" does not support cross-compilation (so does BDN for now)
                 && runtimeMoniker >= RuntimeMoniker.NativeAot80)

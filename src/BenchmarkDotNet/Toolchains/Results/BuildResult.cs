@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Failure");
 
-        internal bool TryToExplainFailureReason([NotNullWhen(true)] out string? reason) => MsBuildErrorMapper.TryToExplainFailureReason(this, out reason);
+        internal bool TryToExplainFailureReason(IReadOnlyList<Type> inProcessDiagnoserHandlerTypes, [NotNullWhen(true)] out string? reason)
+            => MsBuildErrorMapper.TryToExplainFailureReason(this, inProcessDiagnoserHandlerTypes, out reason);
     }
 }

@@ -96,7 +96,6 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
                 return true;
             case RuntimeMoniker.NotRecognized:
             case RuntimeMoniker.Mono:
-            case RuntimeMoniker.NativeAot60:
             case RuntimeMoniker.NativeAot70:
             case RuntimeMoniker.NativeAot80:
             case RuntimeMoniker.NativeAot90:

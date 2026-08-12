@@ -1,109 +1,61 @@
+using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using Windows.Win32;
+using Windows.Win32.System.Power;
+using Windows.Win32.System.Threading;
 
 namespace BenchmarkDotNet.Running;
 
 internal partial class WakeLock
 {
-    private static class PInvoke
+    [SupportedOSPlatform("windows6.1")]
+    public static SafeFileHandle PowerCreateRequest(string reason)
     {
-        public static SafePowerHandle PowerCreateRequest(string reason)
+        IntPtr reasonPtr = Marshal.StringToHGlobalAuto(reason);
+        try
         {
-            IntPtr reasonPtr = Marshal.StringToHGlobalAuto(reason);
-            try
+            const uint POWER_REQUEST_CONTEXT_VERSION = 0U;
+            var context = new REASON_CONTEXT()
             {
-                REASON_CONTEXT context = new REASON_CONTEXT()
+                Version = POWER_REQUEST_CONTEXT_VERSION,
+                Flags = POWER_REQUEST_CONTEXT_FLAGS.POWER_REQUEST_CONTEXT_SIMPLE_STRING,
+                Reason = new REASON_CONTEXT._Reason_e__Union
                 {
-                    Version = POWER_REQUEST_CONTEXT_VERSION,
-                    Flags = POWER_REQUEST_CONTEXT_FLAGS.POWER_REQUEST_CONTEXT_SIMPLE_STRING,
-                    Reason = new REASON_CONTEXT.REASON_CONTEXT_UNION { SimpleReasonString = reasonPtr }
+                    SimpleReasonString = new Windows.Win32.Foundation.PWSTR(reasonPtr)
+                },
+            };
 
-                };
-                SafePowerHandle safePowerHandle = PowerCreateRequest(context);
-                if (safePowerHandle.IsInvalid) { throw new Win32Exception(); }
-                return safePowerHandle;
-            }
-            finally
-            {
-                if (reasonPtr != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(reasonPtr);
-                }
-            }
-        }
+            var safePowerHandle = PInvoke.PowerCreateRequest(context);
 
-        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
-        private static extern SafePowerHandle PowerCreateRequest(REASON_CONTEXT Context);
-
-        public static void PowerSetRequest(SafePowerHandle safePowerHandle, POWER_REQUEST_TYPE requestType)
-        {
-            if (!InvokePowerSetRequest(safePowerHandle, requestType))
-            {
+            if (safePowerHandle.IsInvalid)
                 throw new Win32Exception();
-            }
+
+            return safePowerHandle;
         }
-
-        [DllImport("kernel32.dll", EntryPoint = "PowerSetRequest", ExactSpelling = true, SetLastError = true)]
-        private static extern bool InvokePowerSetRequest(SafePowerHandle PowerRequest, POWER_REQUEST_TYPE RequestType);
-
-        public static void PowerClearRequest(SafePowerHandle safePowerHandle, POWER_REQUEST_TYPE requestType)
+        finally
         {
-            if (!InvokePowerClearRequest(safePowerHandle, requestType))
-            {
-                throw new Win32Exception();
-            }
+            if (reasonPtr != IntPtr.Zero)
+                Marshal.FreeHGlobal(reasonPtr);
         }
+    }
 
-        [DllImport("kernel32.dll", EntryPoint = "PowerClearRequest", ExactSpelling = true, SetLastError = true)]
-        private static extern bool InvokePowerClearRequest(SafePowerHandle PowerRequest, POWER_REQUEST_TYPE RequestType);
+    [SupportedOSPlatform("windows6.1")]
+    private static void PowerSetRequest(SafeFileHandle safePowerHandle, POWER_REQUEST_TYPE requestType)
+    {
+        if (PInvoke.PowerSetRequest(safePowerHandle, requestType))
+            return;
 
-        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
-        public static extern bool CloseHandle(nint hObject);
+        throw new Win32Exception();
+    }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct REASON_CONTEXT
-        {
-            public uint Version;
+    [SupportedOSPlatform("windows6.1")]
+    private static void PowerClearRequest(SafeFileHandle safePowerHandle, POWER_REQUEST_TYPE requestType)
+    {
+        if (PInvoke.PowerClearRequest(safePowerHandle, requestType))
+            return;
 
-            public POWER_REQUEST_CONTEXT_FLAGS Flags;
-
-            public REASON_CONTEXT_UNION Reason;
-
-            [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode)]
-            public struct REASON_CONTEXT_UNION
-            {
-                [FieldOffset(0)]
-                public nint SimpleReasonString;
-
-                // The DETAILED structure is not (yet) used, but needed for ARM CPUs, otherwise PowerCreateRequest fails, see #2745
-                [FieldOffset(0)]
-                public DETAILED Detailed;
-
-                [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-                public struct DETAILED
-                {
-                    public nint LocalizedReasonModule;
-                    public uint LocalizedReasonId;
-                    public uint ReasonStringCount;
-                    public nint ReasonStrings;
-                }
-            }
-        }
-
-        private const uint POWER_REQUEST_CONTEXT_VERSION = 0U;
-
-        private enum POWER_REQUEST_CONTEXT_FLAGS : uint
-        {
-            POWER_REQUEST_CONTEXT_DETAILED_STRING = 2U,
-            POWER_REQUEST_CONTEXT_SIMPLE_STRING = 1U,
-        }
-
-        public enum POWER_REQUEST_TYPE
-        {
-            PowerRequestDisplayRequired = 0,
-            PowerRequestSystemRequired = 1,
-            PowerRequestAwayModeRequired = 2,
-            PowerRequestExecutionRequired = 3,
-        }
+        throw new Win32Exception();
     }
 }

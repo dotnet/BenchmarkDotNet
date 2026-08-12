@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             compilationOptions = compilationOptions.WithIgnoreCorLibraryDuplicatedTypes();
 
             var references = Generator
-                .GetAllReferences(buildPartition.RepresentativeBenchmarkCase)
+                .GetAllReferences(buildPartition.Benchmarks[0])
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)
                 .Distinct()
@@ -137,7 +138,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         private static string[] GetFrameworkAssembliesPaths()
         {
-            string? frameworkAssembliesDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            string? frameworkAssembliesDirectory = Path.GetDirectoryName(RuntimeInformation.GetCoreLibDllLocation());
             if (frameworkAssembliesDirectory == null)
                 return [];
 

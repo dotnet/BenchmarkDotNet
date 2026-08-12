@@ -113,11 +113,6 @@ namespace BenchmarkDotNet.Jobs
         Net11_0,
 
         /// <summary>
-        /// NativeAOT compiled as net6.0
-        /// </summary>
-        NativeAot60,
-
-        /// <summary>
         /// NativeAOT compiled as net7.0
         /// </summary>
         NativeAot70,

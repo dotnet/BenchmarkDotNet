@@ -160,9 +160,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 if (ValidationErrorReporter.ReportIfAny(errors, host))
                     return;
 
+                var handlerData = parameters.CompositeInProcessDiagnoser.GetHandlerData(benchmarkCase);
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
                     parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
-                        .Select((d, i) => Diagnosers.InProcessDiagnoserRouter.Create(d, benchmarkCase, i))
+                        .Select((d, i) => Diagnosers.InProcessDiagnoserRouter.Create(d, handlerData[i], benchmarkCase, i))
                         .Where(r => r.handler != null)
                         .ToArray(),
                     host,

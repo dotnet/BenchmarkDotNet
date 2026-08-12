@@ -14,10 +14,10 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         }
 
         [Theory]
-        [InlineData(RuntimeMoniker.Net461)]
+        [InlineData(RuntimeMoniker.Net462)]
         [InlineData(RuntimeMoniker.Net48)]
-        [InlineData(RuntimeMoniker.NetCoreApp20)]
         [InlineData(RuntimeMoniker.Net80)]
+        [InlineData(RuntimeMoniker.Net10_0)]
         public void EachFrameworkIsRebuilt(RuntimeMoniker runtime)
         {
             var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(runtime.GetRuntime()).WithEnvironmentVariable(TfmEnvVarName, runtime.ToString()));

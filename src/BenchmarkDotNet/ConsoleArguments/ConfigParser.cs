@@ -624,23 +624,20 @@ namespace BenchmarkDotNet.ConsoleArguments
                         return baseJob.WithRuntime(runtime).WithId(runtime.Name);
                     }
 
-                case RuntimeMoniker.NativeAot60:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
-
                 case RuntimeMoniker.NativeAot70:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
 
                 case RuntimeMoniker.NativeAot80:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://api.nuget.org/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
 
                 case RuntimeMoniker.NativeAot90:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
 
                 case RuntimeMoniker.NativeAot10_0:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
 
                 case RuntimeMoniker.NativeAot11_0:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
 
                 case RuntimeMoniker.WasmNet80:
                     return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
@@ -704,7 +701,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
-        private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl)
+        private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl = "")
         {
             var builder = NativeAotToolchain.CreateBuilder();
 
