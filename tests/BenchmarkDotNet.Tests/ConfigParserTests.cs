@@ -1047,6 +1047,7 @@ namespace BenchmarkDotNet.Tests
                 options.AnyCategories.Should().BeEmpty();
                 options.AttributeNames.Should().BeEmpty();
                 options.Join.Should().BeFalse();
+                options.Title.Should().BeEmpty();
                 options.KeepBenchmarkFiles.Should().BeFalse();
                 options.DontOverwriteResults.Should().BeFalse();
                 options.HardwareCounters.Should().BeEmpty();
@@ -1140,6 +1141,7 @@ namespace BenchmarkDotNet.Tests
                   --anyCategories <anyCategories>                                                     Any Categories to run
                   --attribute <attribute>                                                             Run all methods with given attribute (applied to class or method)
                   --join                                                                              Prints single table with results for all benchmarks
+                  --title <title>                                                                     Custom title for the produced summaries and the base name of the result files exported for them
                   --keepFiles                                                                         Determines if all auto-generated files should be kept or removed after running the benchmarks.
                   --noOverwrite                                                                       Determines if the exported result files should not be overwritten (by default they are overwritten).
                   --counters <counters>                                                               Hardware Counters

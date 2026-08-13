@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Prints single table with results for all benchmarks"
         };
 
-        public string Title { get; set; }
+        public string Title { get; set; } = "";
         public static readonly Option<string> TitleOption = new("--title")
         {
             Description = "Custom title for the produced summaries and the base name of the result files exported for them"
