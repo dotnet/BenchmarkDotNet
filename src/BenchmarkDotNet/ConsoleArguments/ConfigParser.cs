@@ -102,6 +102,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.AnyCategoriesOption,
                     CommandLineOptions.AttributeNamesOption,
                     CommandLineOptions.JoinOption,
+                    CommandLineOptions.TitleOption,
                     CommandLineOptions.KeepBenchmarkFilesOption,
                     CommandLineOptions.DontOverwriteResultsOption,
                     CommandLineOptions.HardwareCountersOption,
@@ -201,6 +202,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ["--anyCategories"] = "--anyCategories",
                 ["--attribute"] = "--attribute",
                 ["--join"] = "--join",
+                ["--title"] = "--title",
                 ["--keepFiles"] = "--keepFiles",
                 ["--noOverwrite"] = "--noOverwrite",
                 ["--counters"] = "--counters",
@@ -588,6 +590,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 AnyCategories = parseResult.GetValue(CommandLineOptions.AnyCategoriesOption) ?? [],
                 AttributeNames = parseResult.GetValue(CommandLineOptions.AttributeNamesOption) ?? [],
                 Join = parseResult.GetValue(CommandLineOptions.JoinOption),
+                Title = parseResult.GetValue(CommandLineOptions.TitleOption) ?? "",
                 KeepBenchmarkFiles = parseResult.GetValue(CommandLineOptions.KeepBenchmarkFilesOption),
                 DontOverwriteResults = parseResult.GetValue(CommandLineOptions.DontOverwriteResultsOption),
                 HardwareCounters = parseResult.GetValue(CommandLineOptions.HardwareCountersOption) ?? [],
@@ -697,6 +700,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.Profiler.IsNotBlank())
                 result.AddRange(["--profiler", options.Profiler]);
+
+            if (options.Title.IsNotBlank())
+                result.AddRange(["--title", options.Title]);
 
             if (options.ClrVersion.IsNotBlank())
                 result.AddRange(["--clrVersion", options.ClrVersion]);
