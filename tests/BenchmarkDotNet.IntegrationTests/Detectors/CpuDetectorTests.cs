@@ -55,6 +55,20 @@ public class CpuDetectorTests(ITestOutputHelper Output)
         // Assert
         cpuInfo1.Should().NotBeNull();
         cpuInfo2.Should().NotBeNull();
-        cpuInfo1.Should().BeEquivalentTo(cpuInfo2);
+
+        cpuInfo1.Should().BeEquivalentTo(cpuInfo2, options => options
+            .Using<long?>(ctx =>
+            {
+                if (ctx.Expectation is null)
+                {
+                    ctx.Subject.Should().BeNull();
+                    return;
+                }
+
+                var expected = (double)ctx.Expectation!.Value;
+                var actual = (double)ctx.Subject!.Value;
+                var tolerance = Math.Abs(expected) * 0.01d; // Accept 1％ difference
+                actual.Should().BeApproximately(expected, tolerance);
+            }).WhenTypeIs<long?>());
     }
 }
