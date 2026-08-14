@@ -25,9 +25,6 @@
     <Compile Include="..\BenchmarkDotNet.Tests\Shared\XUnit\SmartAssert.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\BenchmarkDotNet.IntegrationTests.ManualRunning\xunit.runner.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
