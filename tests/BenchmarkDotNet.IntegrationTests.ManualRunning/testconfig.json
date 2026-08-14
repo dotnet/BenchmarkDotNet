@@ -1,4 +1,8 @@
 {
+  "commandLineOptions": {
+    "report-xunit-html": true,
+    "report-xunit-trx": true
+  },
   "platformOptions": {
   },
   "environmentVariables": {
