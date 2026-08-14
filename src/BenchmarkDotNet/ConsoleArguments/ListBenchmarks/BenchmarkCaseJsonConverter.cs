@@ -23,11 +23,6 @@ internal class BenchmarkCaseJsonConverter : JsonConverter<BenchmarkCase>
         writer.WriteProperty("uid", UniqueIdGenerator.FromBenchmarkCase(benchmarkCase)); // TODO: Replace to custom uid implementation
         writer.WriteProperty("filterName", descriptor.GetFilterName());
         writer.WriteProperty("fullName", FullNameProvider.GetBenchmarkName(benchmarkCase));
-
-        // Include benchmark Description property if exists.
-        if (descriptor.DisplayInfo != $"{descriptor.TypeInfo}.{descriptor.WorkloadMethodDisplayInfo}")
-            writer.WriteProperty("description", descriptor.WorkloadMethodDisplayInfo);
-
         writer.WriteArrayProperty("categories", descriptor.Categories);
 
         // Write `job` object
