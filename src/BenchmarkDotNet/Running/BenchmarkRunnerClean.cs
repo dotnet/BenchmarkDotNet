@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Running
                     // .Net SDK 8+ supports ArtifactsPath for proper parallel builds.
                     // Older SDKs may produce builds with incorrect bindings if more than 1 partition is built in parallel.
                     || (partition.RepresentativeBenchmarkCase.GetToolchain().Generator is DotNetCliGenerator
-                        && partition.RepresentativeBenchmarkCase.GetRuntime().RuntimeMoniker.GetRuntimeVersion().Major < 8)
+                        && partition.RepresentativeBenchmarkCase.GetRuntime().Version?.Major < 8)
                 )
                 .ToArray();
             var parallelBuildPartitions = buildPartitions.Except(sequentialBuildPartitions).ToArray();
@@ -289,7 +289,7 @@ namespace BenchmarkDotNet.Running
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
-                        if (!benchmark.Job.GetToolchain().IsInProcess)
+                        if (!benchmark.GetToolchain().IsInProcess)
                         {
                             logger.WriteLine();
                             logger.WriteLineError($"// BenchmarkDotNet has failed to build the auto-generated boilerplate code.");

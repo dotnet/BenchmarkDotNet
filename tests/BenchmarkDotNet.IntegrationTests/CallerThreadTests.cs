@@ -21,8 +21,8 @@ public class CallerThreadTests(ITestOutputHelper output) : BenchmarkTestExecutor
 {
     public static TheoryData<IToolchain> GetToolchains() =>
     [
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-        new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
+        InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         Job.Default.GetToolchain()
     ];
 

@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.Tests.Order;
 
@@ -14,13 +14,10 @@ public class JobOrderTests
         Job[] jobs =
         [
             Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
-                   .WithRuntime(CoreRuntime.Core80)
                    .WithId("v1.4.1"),
             Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp90)
-                   .WithRuntime(CoreRuntime.Core90)
                    .WithId("v1.4.10"),
             Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0)
-                   .WithRuntime(CoreRuntime.Core10_0)
                    .WithId("v1.4.2"),
         ];
 
@@ -54,18 +51,15 @@ public class JobOrderTests
         // Arrange
         Job[] jobs =
         [
-            Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0)
-                   .WithRuntime(CoreRuntime.Core80),
-            Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp90)
-                   .WithRuntime(CoreRuntime.Core90),
-            Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
-                   .WithRuntime(CoreRuntime.Core10_0),
+            Job.Dry.WithRuntime(CoreRuntime.Core80),
+            Job.Dry.WithRuntime(CoreRuntime.Core90),
+            Job.Dry.WithRuntime(CoreRuntime.Core10_0),
         ];
 
         // Act
         // Verify jobs are sorted by Runtime name order.
         var results = jobs.OrderBy(d => d, JobComparer.Default)
-                          .Select(x => x.Job.Environment.GetRuntime().Name)
+                          .Select(x => x.GetRuntime().Name)
                           .ToArray();
 
         // Assert
@@ -92,15 +86,15 @@ public class JobOrderTests
         // Act
         // Verify jobs are sorted by Toolchain name order.
         var results = jobs.OrderBy(d => d, JobComparer.Default)
-                          .Select(x => x.Job.GetToolchain().Name)
+                          .Select(x => x.Job.GetToolchain().ToString())
                           .ToArray();
 
         // Assert
         var expected = new[]
         {
-            CsProjCoreToolchain.NetCoreApp80.Name,
-            CsProjCoreToolchain.NetCoreApp90.Name,
-            CsProjCoreToolchain.NetCoreApp10_0.Name,
+            CsProjCoreToolchain.NetCoreApp80.ToString(),
+            CsProjCoreToolchain.NetCoreApp90.ToString(),
+            CsProjCoreToolchain.NetCoreApp10_0.ToString(),
         };
         Assert.Equal(expected, results);
     }

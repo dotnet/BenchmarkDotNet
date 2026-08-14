@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Order;
+using System.Collections;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -71,7 +72,46 @@ namespace BenchmarkDotNet.Jobs
             return 0;
         }
 
-        public bool Equals(Job? x, Job? y) => Compare(x, y) == 0;
+        public bool Equals(Job? x, Job? y)
+        {
+            if (ReferenceEquals(x, y))
+                return true;
+            if (x is null || y is null)
+                return false;
+            if (x.GetType() != y.GetType())
+                return false;
+
+            // Compare the actual characteristic values, not their string presentations (which is what Compare uses).
+            // Presentation is lossy for some characteristics - most importantly a toolchain presents as just its name
+            // and runtime version, so two jobs that differ only by toolchain settings would otherwise be considered
+            // equal and silently deduplicated.
+            foreach (var characteristic in x.GetAllCharacteristics())
+            {
+                // Child-bearing characteristics (the job modes) are already covered by their leaf characteristics.
+                if (characteristic.HasChildCharacteristics)
+                    continue;
+
+                bool xHasValue = x.HasValue(characteristic);
+                if (xHasValue != y.HasValue(characteristic))
+                    return false;
+                if (xHasValue && !ValuesEqual(characteristic[x], characteristic[y]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static bool ValuesEqual(object? x, object? y)
+        {
+            if (ReferenceEquals(x, y))
+                return true;
+            if (x is null || y is null)
+                return false;
+            // Compare collections (e.g. Arguments, EnvironmentVariables) structurally; their elements have value equality.
+            if (x is not string && x is IEnumerable xItems && y is IEnumerable yItems)
+                return xItems.Cast<object>().SequenceEqual(yItems.Cast<object>());
+            return x.Equals(y);
+        }
 
         public int GetHashCode(Job obj) => obj.Id.GetHashCode();
 

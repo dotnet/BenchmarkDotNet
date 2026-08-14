@@ -11,18 +11,18 @@ public class AsyncEnumerableBenchmarksTests(ITestOutputHelper output) : Benchmar
 {
     public static TheoryData<IToolchain> GetAllToolchains() =>
     [
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
-        new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-        new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
+        InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
+        InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
     ];
 
     // InProcessNoEmitToolchain does not support custom async enumerables or [AsyncCallerType].
     public static TheoryData<IToolchain> GetCustomSupportedToolchains() =>
     [
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
     ];
 
