@@ -1,4 +1,7 @@
 {
+  "commandLineOptions": {
+    "report-trx": true
+  },
   "platformOptions": {
   },
   "environmentVariables": {
