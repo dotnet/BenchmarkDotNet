@@ -20,10 +20,8 @@
     <Project Path="src/BenchmarkDotNet.Diagnostics.dotTrace/BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <Project Path="src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <Project Path="src/BenchmarkDotNet.Exporters.Plotting/BenchmarkDotNet.Exporters.Plotting.csproj" />
-    <Project Path="src/BenchmarkDotNet.TestAdapter.TestingPlatform/BenchmarkDotNet.TestAdapter.TestingPlatform.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
     <Project Path="src/BenchmarkDotNet.TestAdapter/BenchmarkDotNet.TestAdapter.csproj" />
+    <Project Path="src/BenchmarkDotNet.TestingPlatform/BenchmarkDotNet.TestingPlatform.csproj" />
     <Project Path="src/BenchmarkDotNet.Weaver/BenchmarkDotNet.Weaver.csproj" />
     <Project Path="src/BenchmarkDotNet/BenchmarkDotNet.csproj" />
   </Folder>
@@ -42,16 +40,10 @@
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.FSharp/BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning/BenchmarkDotNet.IntegrationTests.ManualRunning.csproj" />
-    <Project Path="tests/BenchmarkDotNet.IntegrationTests.MonoBenchmarks/BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="tests/BenchmarkDotNet.IntegrationTests.SharedDiagnosers/BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.MonoBenchmarks/BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.SharedDiagnosers/BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.Static/BenchmarkDotNet.IntegrationTests.Static.csproj" />
-    <Project Path="tests/BenchmarkDotNet.IntegrationTests.TestingPlatform/BenchmarkDotNet.IntegrationTests.TestingPlatform.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.TestingPlatform/BenchmarkDotNet.IntegrationTests.TestingPlatform.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.VisualBasic/BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj" />
     <Project Path="tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj" />
