@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter.TestingPlatform\BenchmarkDotNet.TestAdapter.TestingPlatform.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.TestingPlatform\BenchmarkDotNet.TestingPlatform.csproj" />
   </ItemGroup>
 
   <!-- Manually import the package's build props, since they are not picked up through a ProjectReference. -->
-  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter.TestingPlatform\build\BenchmarkDotNet.TestAdapter.TestingPlatform.props" />
+  <Import Project="..\..\src\BenchmarkDotNet.TestingPlatform\build\BenchmarkDotNet.TestingPlatform.props" />
 
   <Import Project="..\..\build\common.targets" />
 </Project>
