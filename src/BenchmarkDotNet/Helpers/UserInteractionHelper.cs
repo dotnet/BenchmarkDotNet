@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Helpers
         /// </remarks>
         public static string EscapeCommandExample(string input)
         {
-            return !OsDetector.IsWindows() && input.IndexOf('*') >= 0 ? $"'{input}'" : input;
+            return !OsDetector.IsWindows() && input.Contains('*') ? $"'{input}'" : input;
         }
     }
 }
