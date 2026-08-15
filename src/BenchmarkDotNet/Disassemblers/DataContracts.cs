@@ -252,7 +252,7 @@ internal sealed class State
         }
 
         string versionToParse = targetFrameworkMoniker.Substring(firstDigit, lastDigit - firstDigit + 1);
-        if (!versionToParse.Contains(".")) // Full .NET Framework (net48 etc)
+        if (!versionToParse.Contains('.')) // Full .NET Framework (net48 etc)
             versionToParse = string.Join(".", versionToParse.ToCharArray());
 
         return Version.Parse(versionToParse);
