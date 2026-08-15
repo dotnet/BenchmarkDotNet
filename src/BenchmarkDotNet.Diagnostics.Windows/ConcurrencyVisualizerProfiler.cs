@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void DisplayResults(ILogger logger)
         {
-            if (!benchmarkToCvTraceFile.Any())
+            if (benchmarkToCvTraceFile.Count == 0)
                 return;
 
             logger.WriteLineInfo($"Exported {benchmarkToCvTraceFile.Count} CV trace file(s). Example:");

@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Configs
         {
             var diagnosersForGivenMode = diagnosers.Where(diagnoser => runModeComparer(diagnoser.GetRunMode(benchmarkCase))).ToImmutableHashSet();
 
-            return diagnosersForGivenMode.Any() ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
+            return !diagnosersForGivenMode.IsEmpty ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
         }
 
         public IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; private set; }

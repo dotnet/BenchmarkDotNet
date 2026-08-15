@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
                 string strParent = parentPrecision.HasValue ? 1234.5678.ToString("N" + parentPrecision, TestCultureInfo.Instance) : "NA";
                 var strValues = testData.Values.Select(v => v.ToString("N" + actualPrecision, TestCultureInfo.Instance)).ToList();
-                int maxWidth = strValues.Any() ? Math.Max(strValues.Max(s => s.Length), strParent.Length) + 6 : 0;
+                int maxWidth = strValues.Count != 0 ? Math.Max(strValues.Max(s => s.Length), strParent.Length) + 6 : 0;
                 int parentWidth = maxWidth - (actualPrecision - parentPrecision) ?? 0;
 
                 output.WriteLine("******************************");
