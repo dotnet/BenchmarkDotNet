@@ -241,11 +241,11 @@ namespace BenchmarkDotNet.Tests.Exporters
             public void WriteElementString(string localName, string value)
             {
                 writer.Append(localName);
-                writer.Append(" ");
+                writer.Append(' ');
                 writer.Append(value);
-                writer.Append(" ");
+                writer.Append(' ');
                 writer.Append(localName);
-                writer.Append(" ");
+                writer.Append(' ');
             }
 
             public void WriteEndDocument()
@@ -257,14 +257,14 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 var endElement = openElements.Pop();
                 writer.Append(endElement);
-                writer.Append(" ");
+                writer.Append(' ');
             }
 
             public void WriteStartElement(string localName)
             {
                 openElements.Push(localName);
                 writer.Append(localName);
-                writer.Append(" ");
+                writer.Append(' ');
             }
 
             public override string ToString() => writer.ToString();

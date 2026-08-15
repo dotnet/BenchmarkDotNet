@@ -157,7 +157,7 @@ public struct LegacyConfidenceInterval
         builder.Append(formatter(Lower));
         builder.Append("; ");
         builder.Append(formatter(Upper));
-        builder.Append("]");
+        builder.Append(']');
         builder.Append(GetLevelHint(showLevel));
         return builder.ToString();
     }
