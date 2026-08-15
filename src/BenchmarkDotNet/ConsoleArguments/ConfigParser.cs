@@ -343,7 +343,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (var counterName in options.HardwareCounters)
                 if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
                 {
-                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames(typeof(HardwareCounter)))}.");
+                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames<HardwareCounter>())}.");
                     return false;
                 }
 

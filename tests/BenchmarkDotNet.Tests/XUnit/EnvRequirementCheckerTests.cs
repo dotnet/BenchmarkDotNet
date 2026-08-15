@@ -6,7 +6,7 @@ public class EnvRequirementCheckerTests
     [Fact]
     public void AllEnvRequirementsAreSupported()
     {
-        foreach (var envRequirement in Enum.GetValues(typeof(EnvRequirement)).Cast<EnvRequirement>())
+        foreach (var envRequirement in Enum.GetValues<EnvRequirement>().Cast<EnvRequirement>())
             EnvRequirementChecker.GetSkip(envRequirement);
     }
 }
