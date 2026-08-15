@@ -32,8 +32,8 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
-    <PackageReference Include="TUnit" Version="1.61.0" />
+    <PackageReference Include="AwesomeAssertions" Version="9.5.0" />
+    <PackageReference Include="TUnit" Version="1.65.0" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>

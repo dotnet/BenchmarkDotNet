@@ -47,7 +47,7 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotMemory\BenchmarkDotNet.Diagnostics.dotMemory.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="xunit.v3" Version="4.0.0-pre.154" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>
