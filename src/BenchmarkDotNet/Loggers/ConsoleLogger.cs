@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Loggers
         }
 
         private ConsoleColor GetColor(LogKind logKind) =>
-            colorScheme.ContainsKey(logKind) ? colorScheme[logKind] : DefaultColor;
+            colorScheme.TryGetValue(logKind, out ConsoleColor value) ? value : DefaultColor;
 
         private static Dictionary<LogKind, ConsoleColor> CreateColorfulScheme() =>
             new Dictionary<LogKind, ConsoleColor>
