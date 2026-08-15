@@ -154,11 +154,10 @@ internal class DefaultCpuDetector : ICpuDetector
                         break;
 
                     case LOGICAL_PROCESSOR_RELATIONSHIP.RelationGroup:
-                        ref readonly GROUP_RELATIONSHIP group = ref info->Group;
+                        ref GROUP_RELATIONSHIP group = ref info->Group;
                         for (int i = 0; i < group.ActiveGroupCount; i++)
                         {
-                            var groupInfo = group.GroupInfo[i];
-                            activeProcessorCount += groupInfo.ActiveProcessorCount;
+                            activeProcessorCount += group.GroupInfo[i].ActiveProcessorCount;
                         }
                         break;
 
