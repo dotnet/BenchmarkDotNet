@@ -19,9 +19,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
-    <PackageReference Include="Verify.XunitV3" Version="31.25.0" />
-    <PackageReference Include="xunit.v3" Version="4.0.0-pre.154" />
+    <PackageReference Include="AwesomeAssertions" Version="9.5.0" />
+    <PackageReference Include="Verify.XunitV3" Version="31.28.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
