@@ -63,6 +63,24 @@ namespace BenchmarkDotNet.Exporters
             return name.ToString();
         }
 
+        /// <summary>
+        /// Gets an identifier of a benchmark case that stays the same across processes, which is what lets a benchmark
+        /// discovered in one process be selected for execution in another (for example by a test adapter).
+        /// </summary>
+        /// <param name="benchmarkCase">The benchmark case to identify.</param>
+        /// <returns>The unique identifier of the benchmark case.</returns>
+        /// <remarks>
+        /// The job is always part of the uid, otherwise two cases of the same benchmark that only differ by job would
+        /// collide. The parameters are already part of the method name.
+        /// </remarks>
+        [PublicAPI] 
+        public static string GetBenchmarkUid(BenchmarkCase benchmarkCase)
+        {
+            var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
+            return $"{fullClassName}.{GetMethodName(benchmarkCase)} [{benchmarkCase.GetUnrandomizedJobDisplayInfo()}]";
+        }
+
+
         private static string GetNestedTypes(Type type)
         {
             string nestedTypes = "";

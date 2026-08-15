@@ -1,11 +1,10 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.TestAdapter
+namespace BenchmarkDotNet.Extensions
 {
     /// <summary>
-    /// Helpers for deriving stable identities for a BenchmarkCase. Shared by the VSTest and the
-    /// Microsoft.Testing.Platform adapters, because both need identities that survive across processes.
+    /// Helpers for deriving stable identities for a BenchmarkCase.
     /// </summary>
     internal static class BenchmarkCaseIdentityExtensions
     {
@@ -30,3 +29,4 @@ namespace BenchmarkDotNet.TestAdapter
         }
     }
 }
+

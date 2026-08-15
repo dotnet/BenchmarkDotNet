@@ -53,7 +53,7 @@ The practical consequences of the MTP model are:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="BenchmarkDotNet.TestAdapter.TestingPlatform" Version="0.16.0" />
+  <PackageReference Include="BenchmarkDotNet.TestingPlatform" Version="0.16.0" />
 </ItemGroup>
 ```
 
@@ -72,7 +72,7 @@ The practical consequences of the MTP model are:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet.TestAdapter.TestingPlatform" Version="0.16.0" />
+    <PackageReference Include="BenchmarkDotNet.TestingPlatform" Version="0.16.0" />
   </ItemGroup>
 
 </Project>
@@ -149,7 +149,7 @@ If you want to keep your own entry point, turn off the generated one and registe
 ```
 
 ```csharp
-using BenchmarkDotNet.TestAdapter.TestingPlatform;
+using BenchmarkDotNet.TestingPlatform;
 using Microsoft.Testing.Platform.Builder;
 
 public static class Program

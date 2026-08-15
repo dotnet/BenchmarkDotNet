@@ -15,4 +15,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ManualRunning,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.TestAdapter,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
-[assembly: InternalsVisibleTo("BenchmarkDotNet.TestAdapter.TestingPlatform,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.TestingPlatform,PublicKey=" + BenchmarkDotNetInfo.PublicKey)] 
