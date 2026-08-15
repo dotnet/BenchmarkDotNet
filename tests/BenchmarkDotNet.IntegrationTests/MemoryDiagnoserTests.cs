@@ -201,6 +201,12 @@ namespace BenchmarkDotNet.IntegrationTests
             if (toolchain.IsInProcess)
                 ValidateMtpProgressDisabled();
 
+            if (toolchain.IsInProcess && OsDetector.IsWindows() && Portability.RuntimeInformation.IsNetCore)
+            {
+                // Randomly failed on Windows(x64/arm64)+.NET Framework.
+                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3203");
+            }
+
             AssertAllocations(toolchain, typeof(TimeConsumingBenchmark), new Dictionary<string, long>
             {
                 { nameof(TimeConsumingBenchmark.TimeConsuming), 0 }
