@@ -18,16 +18,6 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
             };
         }
 
-        public static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
-        {
-            var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
-            var benchmarkCases = TypeFilter
-                .Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                .SelectMany(p => p.BenchmarksCases);
-
-            printer.Print(benchmarkCases, nonNullLogger);
-        }
-
         public void Print(IEnumerable<BenchmarkCase> benchmarkCases, ILogger logger) => printer.Print(benchmarkCases, logger);
     }
 }
