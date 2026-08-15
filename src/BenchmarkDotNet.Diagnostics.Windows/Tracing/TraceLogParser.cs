@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = [];
 
-        public bool HasBenchmarkEvents => overheadTimestamps.Any() || workloadTimestamps.Any();
+        public bool HasBenchmarkEvents => overheadTimestamps.Count != 0 || workloadTimestamps.Count != 0;
 
         public void HandleIterationEvent(double timeStamp, IterationMode iterationMode, long totalOperations)
         {

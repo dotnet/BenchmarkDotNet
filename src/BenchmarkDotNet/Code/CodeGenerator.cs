@@ -239,7 +239,7 @@ namespace BenchmarkDotNet.Code
             var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!;
             var factoryType = factory.GetType();
 
-            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))
+            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0))
             {
                 throw new NotSupportedException("Custom factory must have a public parameterless constructor");
             }

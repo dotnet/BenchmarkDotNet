@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Analysers
         private static void PrintFiltered(IEnumerable<Conclusion> conclusions, ConclusionKind kind, string title, Action<string> printLine)
         {
             var filtered = conclusions.Where(c => c.Kind == kind).ToArray();
-            if (filtered.Any())
+            if (filtered.Length != 0)
             {
                 printLine("");
                 printLine($"// * {title} *");

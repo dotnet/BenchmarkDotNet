@@ -229,7 +229,7 @@ namespace BenchmarkDotNet.Configs
             var customDefaultJob = unique.SingleOrDefault(job => job.Meta.IsDefault);
             var defaultJob = customDefaultJob ?? Job.Default;
 
-            if (!result.Any())
+            if (result.Count == 0)
                 result.Add(defaultJob);
 
             foreach (var mutatorJob in unique.Where(job => job.Meta.IsMutator))
