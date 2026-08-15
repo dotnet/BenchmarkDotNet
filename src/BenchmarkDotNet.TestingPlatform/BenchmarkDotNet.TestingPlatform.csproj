@@ -38,8 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="build\BenchmarkDotNet.TestingPlatform.props" Pack="true" PackagePath="build\" />
-    <None Include="build\BenchmarkDotNet.TestingPlatform.props" Pack="true" PackagePath="buildTransitive\" />
+    <!-- A trailing separator in PackagePath is not portable: on Linux it packs the file as `buildTransitive//...`,
+         which trips NU5129. Listing both folders on a single item keeps the paths correct on every platform. -->
+    <None Include="build\BenchmarkDotNet.TestingPlatform.props" Pack="true" PackagePath="build;buildTransitive" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>
