@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var results = CanExecute<ModeBenchmarks>(config);
 
-            Assert.Equal(6, results.BenchmarksCases.Count());
+            Assert.Equal(6, results.BenchmarksCases.Length);
 
             Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Descriptor.WorkloadMethod.Name == "BenchmarkWithVoid"));
             Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.ColdStart && b.Descriptor.WorkloadMethod.Name == "BenchmarkWithReturnValue"));
