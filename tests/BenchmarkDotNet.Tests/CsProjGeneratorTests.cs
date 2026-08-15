@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Tests
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.1", "", "", "", true);
             string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
-            string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
+            string expectedPath = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin", programName);
             Assert.Equal(expectedPath, binariesPath);
         }
 
