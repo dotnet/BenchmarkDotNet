@@ -793,7 +793,7 @@ namespace BenchmarkDotNet.Running
 
             void AddLogger(ILogger logger)
             {
-                if (!loggers.ContainsKey(logger.Id) || loggers[logger.Id].Priority < logger.Priority)
+                if (!loggers.TryGetValue(logger.Id, out ILogger? value) || value.Priority < logger.Priority)
                     loggers[logger.Id] = logger;
             }
 
