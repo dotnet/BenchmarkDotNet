@@ -2,6 +2,7 @@ using BenchmarkDotNet.Loggers;
 using Microsoft.Testing.Platform.Extensions.OutputDevice;
 using Microsoft.Testing.Platform.OutputDevice;
 using System.Text;
+using System.Threading.Channels;
 
 namespace BenchmarkDotNet.TestingPlatform
 {
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.TestingPlatform
     {
         private readonly IOutputDevice outputDevice;
         private readonly IOutputDeviceDataProducer producer;
-        private readonly AsyncWorkQueue workQueue;
+        private readonly ChannelWriter<Func<Task>> workQueue;
         private readonly CancellationToken cancellationToken;
         private readonly StringBuilder currentLine = new();
         private LogKind currentLineKind = LogKind.Default;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.TestingPlatform
         public OutputDeviceLogger(
             IOutputDevice outputDevice,
             IOutputDeviceDataProducer producer,
-            AsyncWorkQueue workQueue,
+            ChannelWriter<Func<Task>> workQueue,
             CancellationToken cancellationToken)
         {
             this.outputDevice = outputDevice;
@@ -59,7 +60,7 @@ namespace BenchmarkDotNet.TestingPlatform
                 _ => new TextOutputDeviceData(text)
             };
 
-            workQueue.Enqueue(() => outputDevice.DisplayAsync(producer, data, cancellationToken));
+            workQueue.TryWrite(() => outputDevice.DisplayAsync(producer, data, cancellationToken));
         }
 
         public void WriteLine(LogKind logKind, string text)
