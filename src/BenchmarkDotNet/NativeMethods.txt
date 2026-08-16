@@ -12,3 +12,4 @@ PowerSetRequest
 PowerGetActiveScheme
 LocalFree
 GlobalMemoryStatusEx
+GetLogicalProcessorInformationEx
