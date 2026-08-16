@@ -6,13 +6,13 @@
 
 using System.Runtime.CompilerServices;
 
-namespace BenchmarkDotNet.Extensions
+namespace BenchmarkDotNet.Helpers.Hashing
 {
-    internal static class Hashing
+    internal static class MurmurHash
     {
         private const uint _defaultSeed = (5381 << 16) + 5381;
 
-        internal static uint HashString(string str) => MurmurHash(_defaultSeed, str.AsSpan());
+        internal static uint HashString(string str) => MurmurHash32(_defaultSeed, str.AsSpan());
 
         /// <summary>
         /// Implements the murmur hash 3 algorithm, using a mock UTF-8 encoding.
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Extensions
         /// * 0x0800 to 0xFFFF : 1110xxxx 10xxxxxx 10xxxxxx
         /// NOTE: This MUST match the StringBuilder version below.
         /// </summary>
-        private static uint MurmurHash(uint hash, ReadOnlySpan<char> span, bool toUpper = false)
+        private static uint MurmurHash32(uint hash, ReadOnlySpan<char> span, bool toUpper = false)
         {
             // Byte length (in pseudo UTF-8 form).
             int len = 0;

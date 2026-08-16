@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("apples", Required = false, Default = false, HelpText = "Runs apples-to-apples comparison for specified Jobs.")]
         public bool ApplesToApples { get; set; }
 
-        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
+        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree/JSON")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 
         [Option("disasmDepth", Required = false, Default = DefaultDisassemblerRecursiveDepth, HelpText = "Sets the recursive depth for the disassembler.")]

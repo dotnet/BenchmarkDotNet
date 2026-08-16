@@ -1,4 +1,4 @@
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
 
-internal class WindowsCpuDetector() : CpuDetector(new MosCpuDetector(), new PowershellWmiCpuDetector(),
+internal class WindowsCpuDetector() : CpuDetector(new DefaultCpuDetector(), new PowershellWmiCpuDetector(),
     new WmicCpuDetector());

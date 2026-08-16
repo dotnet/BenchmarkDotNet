@@ -3,6 +3,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers.Hashing;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing;
@@ -128,7 +129,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 return benchmarkName;
 
             // session name is not really used by humans, we can just give it the hashcode value
-            return $"BenchmarkDotNet.EtwProfiler.Session_{Hashing.HashString(benchmarkName)}";
+            return $"BenchmarkDotNet.EtwProfiler.Session_{MurmurHash.HashString(benchmarkName)}";
         }
     }
 }

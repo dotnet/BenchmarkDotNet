@@ -18,9 +18,9 @@
       "environmentVariables": {
       }
     },
-    "--list": {
+    "--list json": {
       "commandName": "Project",
-      "commandLineArgs": "--list"
+      "commandLineArgs": "--list json"
     },
     "--info": {
       "commandName": "Project",
