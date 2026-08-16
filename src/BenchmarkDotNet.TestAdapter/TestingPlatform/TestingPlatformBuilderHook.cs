@@ -1,13 +1,13 @@
 using Microsoft.Testing.Platform.Builder;
 using System.ComponentModel;
 
-namespace BenchmarkDotNet.TestingPlatform
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
     /// The hook Microsoft.Testing.Platform.MSBuild calls from the entry point it generates for the benchmark project.
     /// </summary>
     /// <remarks>
-    /// This is wired up by the TestingPlatformBuilderHook item in BenchmarkDotNet.TestingPlatform.props.
+    /// This is wired up by the TestingPlatformBuilderHook item in BenchmarkDotNet.TestAdapter.targets.
     /// It is public because the generated code lives in the benchmark assembly, but it is not meant to be called
     /// directly; use <see cref="TestApplicationBuilderExtensions.AddBenchmarkDotNet(ITestApplicationBuilder)"/>
     /// instead when writing an entry point by hand.

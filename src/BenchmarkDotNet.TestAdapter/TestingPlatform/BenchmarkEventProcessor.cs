@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace BenchmarkDotNet.TestingPlatform
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
 
     /// <summary>

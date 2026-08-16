@@ -1,6 +1,6 @@
 using Microsoft.Testing.Platform.Extensions;
 
-namespace BenchmarkDotNet.TestingPlatform 
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
     /// Identifies BenchmarkDotNet to Microsoft.Testing.Platform.
@@ -14,11 +14,11 @@ namespace BenchmarkDotNet.TestingPlatform
         /// <summary>
         /// The uid shared by every extension this package registers.
         /// </summary>
-        public const string ExtensionUid = "BenchmarkDotNet.TestingPlatform";
+        public const string ExtensionUid = "BenchmarkDotNet.TestAdapter";
 
         /// <inheritdoc />
         public string Uid => ExtensionUid;
-          
+
         /// <inheritdoc />
         public string Version => typeof(BenchmarkDotNetExtension).Assembly.GetName().Version?.ToString() ?? "0.0.0";
 
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.TestingPlatform
         public string DisplayName => "BenchmarkDotNet";
 
         /// <inheritdoc />
-        public string Description => "Runs BenchmarkDotNet benchmarks as tests."; 
+        public string Description => "Runs BenchmarkDotNet benchmarks as tests.";
 
         /// <inheritdoc />
         public Task<bool> IsEnabledAsync() => Task.FromResult(true);

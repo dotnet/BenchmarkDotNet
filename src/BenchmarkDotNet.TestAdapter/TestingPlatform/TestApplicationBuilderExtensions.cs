@@ -3,7 +3,7 @@ using Microsoft.Testing.Platform.Capabilities.TestFramework;
 using Microsoft.Testing.Platform.Helpers;
 using System.Reflection;
 
-namespace BenchmarkDotNet.TestingPlatform
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
     /// Extensions for registering BenchmarkDotNet with a Microsoft.Testing.Platform application.

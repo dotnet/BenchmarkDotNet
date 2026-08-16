@@ -6,7 +6,7 @@ using Microsoft.Testing.Platform.Extensions.Messages;
 using System.Reflection;
 using System.Text;
 
-namespace BenchmarkDotNet.TestingPlatform
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
     /// The Microsoft.Testing.Platform view of a single <see cref="BenchmarkCase"/>.

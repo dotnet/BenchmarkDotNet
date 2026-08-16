@@ -1,8 +1,6 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-// BenchmarkEnumerator is compiled into this assembly from the VSTest adapter, where it keeps its own namespace.
-using BenchmarkDotNet.TestAdapter;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.OutputDevice;
@@ -14,7 +12,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Channels;
 
-namespace BenchmarkDotNet.TestingPlatform
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
     /// Discovers and executes the benchmarks of the running assembly through Microsoft.Testing.Platform.

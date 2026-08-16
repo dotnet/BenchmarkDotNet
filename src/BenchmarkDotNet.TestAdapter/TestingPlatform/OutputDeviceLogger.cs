@@ -4,7 +4,7 @@ using Microsoft.Testing.Platform.OutputDevice;
 using System.Text;
 using System.Threading.Channels;
 
-namespace BenchmarkDotNet.TestingPlatform
+namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
     /// Forwards the BenchmarkDotNet log to the platform output device, so that build progress and the result summary
