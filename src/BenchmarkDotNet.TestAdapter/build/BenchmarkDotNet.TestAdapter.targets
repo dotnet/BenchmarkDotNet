@@ -1,0 +1,34 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    The choice of test platform is made here rather than in the .props, because a package's .props is imported before
+    the project file is read: a BenchmarkDotNetUseVSTest or GenerateProgramFile set in the project would not be visible
+    yet. Microsoft.Testing.Platform.MSBuild resolves IsTestingPlatformApplication late for the same reason.
+  -->
+  <PropertyGroup>
+    <!--
+      Microsoft.Testing.Platform is the default. Two things opt out of it:
+
+        * BenchmarkDotNetUseVSTest, for the tooling that has no Microsoft.Testing.Platform support (Visual Studio 2019)
+          and for solutions that mix benchmark projects with VSTest based test projects.
+        * GenerateProgramFile, which is how a project says it already has an entry point of its own, typically one
+          that calls BenchmarkSwitcher. Generating a second one would not compile.
+    -->
+    <IsTestingPlatformApplication Condition="'$(IsTestingPlatformApplication)' == '' and '$(BenchmarkDotNetUseVSTest)' != 'true' and '$(GenerateProgramFile)' != 'false'">true</IsTestingPlatformApplication>
+    <IsTestingPlatformApplication Condition="'$(IsTestingPlatformApplication)' == ''">false</IsTestingPlatformApplication>
+
+    <!-- Required for `dotnet test` to route to Microsoft.Testing.Platform on SDKs older than .NET 10. -->
+    <TestingPlatformDotnetTestSupport Condition="'$(TestingPlatformDotnetTestSupport)' == '' and '$(IsTestingPlatformApplication)' == 'true'">true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <!--
+    Registers BenchmarkDotNet with the entry point that Microsoft.Testing.Platform.MSBuild generates, so that no
+    manual `builder.AddBenchmarkDotNet()` call is needed. See the "Expected extensions items shape" comment in
+    Microsoft.Testing.Platform.MSBuild.targets.
+  -->
+  <ItemGroup Condition="'$(IsTestingPlatformApplication)' == 'true'">
+    <TestingPlatformBuilderHook Include="2C7B4E93-51F8-4E0B-9A8E-6D0D4B4C1F27">
+      <DisplayName>BenchmarkDotNet</DisplayName>
+      <TypeFullName>BenchmarkDotNet.TestAdapter.TestingPlatform.TestingPlatformBuilderHook</TypeFullName>
+    </TestingPlatformBuilderHook>
+  </ItemGroup>
+</Project>
