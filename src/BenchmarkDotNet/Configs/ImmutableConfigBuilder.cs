@@ -88,8 +88,7 @@ namespace BenchmarkDotNet.Configs
             var builder = ImmutableHashSet.CreateBuilder(new TypeComparer<IDiagnoser>());
 
             foreach (var diagnoser in diagnosers)
-                if (!builder.Contains(diagnoser))
-                    builder.Add(diagnoser);
+                builder.Add(diagnoser);
 
             if (!uniqueHardwareCounters.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
             {
@@ -187,13 +186,11 @@ namespace BenchmarkDotNet.Configs
             var builder = ImmutableHashSet.CreateBuilder<IAnalyser>();
 
             foreach (var analyser in analysers)
-                if (!builder.Contains(analyser))
-                    builder.Add(analyser);
+                builder.Add(analyser);
 
             foreach (var diagnoser in uniqueDiagnosers)
                 foreach (var analyser in diagnoser.Analysers)
-                    if (!builder.Contains(analyser))
-                        builder.Add(analyser);
+                    builder.Add(analyser);
 
             return builder.ToImmutable();
         }
@@ -232,7 +229,7 @@ namespace BenchmarkDotNet.Configs
             var customDefaultJob = unique.SingleOrDefault(job => job.Meta.IsDefault);
             var defaultJob = customDefaultJob ?? Job.Default;
 
-            if (!result.Any())
+            if (result.Count == 0)
                 result.Add(defaultJob);
 
             foreach (var mutatorJob in unique.Where(job => job.Meta.IsMutator))

@@ -374,12 +374,12 @@ namespace BenchmarkDotNet.Running
             bool needToShowTimeLegend = summary.Table.Columns.Any(c => c.NeedToShow && c.OriginalColumn.UnitType == UnitType.Time);
             var effectiveTimeUnit = needToShowTimeLegend ? summary.Table.EffectiveSummaryStyle.TimeUnit : null;
 
-            if (columnWithLegends.Any() || effectiveTimeUnit != null)
+            if (columnWithLegends.Length != 0 || effectiveTimeUnit != null)
             {
                 logger.WriteLine();
                 logger.WriteLineHeader("// * Legends *");
                 int maxNameWidth = 0;
-                if (columnWithLegends.Any())
+                if (columnWithLegends.Length != 0)
                     maxNameWidth = Math.Max(maxNameWidth, columnWithLegends.Select(c => c.ColumnName.Length).Max());
                 if (effectiveTimeUnit != null)
                     maxNameWidth = Math.Max(maxNameWidth, effectiveTimeUnit.GetAbbreviation().ToString(cultureInfo).Length + 2);
@@ -793,7 +793,7 @@ namespace BenchmarkDotNet.Running
 
             void AddLogger(ILogger logger)
             {
-                if (!loggers.ContainsKey(logger.Id) || loggers[logger.Id].Priority < logger.Priority)
+                if (!loggers.TryGetValue(logger.Id, out ILogger? value) || value.Priority < logger.Priority)
                     loggers[logger.Id] = logger;
             }
 

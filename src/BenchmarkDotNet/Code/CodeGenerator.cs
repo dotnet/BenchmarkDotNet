@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Code
         {
             string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location)!;
 
-            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.Contains("LINQPAD", StringComparison.OrdinalIgnoreCase))
             {
                 /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies
                  * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"
@@ -239,7 +239,7 @@ namespace BenchmarkDotNet.Code
             var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!;
             var factoryType = factory.GetType();
 
-            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))
+            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0))
             {
                 throw new NotSupportedException("Custom factory must have a public parameterless constructor");
             }

@@ -217,7 +217,22 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
-            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.InstructionLength)));
+        {
+            long total = 0;
+
+            foreach (var method in disassembly.Methods)
+            {
+                foreach (var map in method.Maps)
+                {
+                    foreach (var asm in map.SourceCodes.OfType<Asm>())
+                    {
+                        total += asm.InstructionLength;
+                    }
+                }
+            }
+
+            return total;
+        }
 
         InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         {

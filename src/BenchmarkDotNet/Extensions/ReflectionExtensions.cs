@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.Extensions
             if (typeInfo.IsAbstract || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
                 return false;
 
-            return typeInfo.GetBenchmarks().Any();
+            return typeInfo.GetBenchmarks().Length != 0;
         }
 
         private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
@@ -254,11 +254,11 @@ namespace BenchmarkDotNet.Extensions
 
             var instanceType = argumentInstance.GetType();
 
-            var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Length != 0).ToArray();
             if (implicitCastsDefinedInArgumentInstance.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
                 return true;
 
-            var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
+            var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Length != 0).ToArray();
             if (implicitCastsDefinedInArgumentType.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
                 return true;
 
@@ -267,10 +267,10 @@ namespace BenchmarkDotNet.Extensions
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
-                (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
+                (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Length != 0 || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
 
-        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName!.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
+        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName!.Contains("LINQPAD", StringComparison.OrdinalIgnoreCase);
 
         internal static bool IsByRefLike(this Type type)
 #if NETSTANDARD2_0

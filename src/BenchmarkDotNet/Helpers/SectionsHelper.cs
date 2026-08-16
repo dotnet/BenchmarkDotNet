@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Helpers
             var list = content?.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             if (list != null)
                 foreach (string line in list)
-                    if (line.IndexOf(separator) != -1)
+                    if (line.Contains(separator))
                     {
                         var lineParts = line.Split(separator);
                         if (lineParts.Length >= 2)

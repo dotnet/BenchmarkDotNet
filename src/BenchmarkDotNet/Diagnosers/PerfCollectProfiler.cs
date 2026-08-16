@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void DisplayResults(ILogger logger)
         {
-            if (!benchmarkToTraceFile.Any())
+            if (benchmarkToTraceFile.Count == 0)
                 return;
 
             logger.WriteLineInfo($"Exported {benchmarkToTraceFile.Count} trace file(s). Example:");
@@ -227,7 +227,7 @@ namespace BenchmarkDotNet.Diagnosers
                 .Distinct()
                 .ToArray();
 
-            if (!missingSymbols.Any())
+            if (missingSymbols.Length == 0)
             {
                 return; // the symbol files are already where we need them!
             }

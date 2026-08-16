@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Reports
         public static async ValueTask PrintCommonColumnsAsync(this SummaryTable table, StreamOrLoggerWriter writer, CancellationToken cancellationToken)
         {
             var commonColumns = table.Columns.Where(c => c.IsCommon).ToArray();
-            if (commonColumns.Any())
+            if (commonColumns.Length != 0)
             {
                 int paramsOnLine = 0;
                 foreach (var column in commonColumns)

@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (productVersion.IsNotBlank() && productName.IsNotBlank())
             {
-                if (productName.IndexOf(".NET Core", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (productName.Contains(".NET Core", StringComparison.OrdinalIgnoreCase))
                 {
                     string parsableVersion = GetParsableVersionPart(productVersion);
                     if (Version.TryParse(productVersion, out version) || Version.TryParse(parsableVersion, out version))
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Environments
                 }
 
                 // yes, .NET Core 2.X has a product name == .NET Framework...
-                if (productName.IndexOf(".NET Framework", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (productName.Contains(".NET Framework", StringComparison.OrdinalIgnoreCase))
                 {
                     const string releaseVersionPrefix = "release/";
                     int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix, StringComparison.Ordinal);
