@@ -73,13 +73,12 @@ namespace BenchmarkDotNet.Exporters
         /// The job is always part of the uid, otherwise two cases of the same benchmark that only differ by job would
         /// collide. The parameters are already part of the method name.
         /// </remarks>
-        [PublicAPI] 
+        [PublicAPI]
         public static string GetBenchmarkUid(BenchmarkCase benchmarkCase)
         {
             var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
             return $"{fullClassName}.{GetMethodName(benchmarkCase)} [{benchmarkCase.GetUnrandomizedJobDisplayInfo()}]";
         }
-
 
         private static string GetNestedTypes(Type type)
         {
