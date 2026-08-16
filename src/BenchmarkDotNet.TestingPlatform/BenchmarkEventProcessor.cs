@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.TestingPlatform
             // If the error is not linked to a benchmark case, then set the error on all benchmarks.
             var affected = validationError.BenchmarkCase == null
                 ? nodes.Values
-                : [nodes[FullNameProvider.GetBenchmarkUid(validationError.BenchmarkCase)]];
+                : [nodes[validationError.BenchmarkCase.GetUniqueId()]];
 
             foreach (var node in affected)
             {
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.TestingPlatform
 
             foreach (var benchmarkBuildInfo in buildPartition.Benchmarks)
             {
-                var node = nodes[FullNameProvider.GetBenchmarkUid(benchmarkBuildInfo.BenchmarkCase)];
+                var node = nodes[benchmarkBuildInfo.BenchmarkCase.GetUniqueId()];
                 var pending = GetOrCreatePendingResult(node);
 
                 if (buildResult.GenerateException != null)
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.TestingPlatform
 
         public override void OnStartRunBenchmark(BenchmarkCase benchmarkCase)
         {
-            var node = nodes[FullNameProvider.GetBenchmarkUid(benchmarkCase)];
+            var node = nodes[benchmarkCase.GetUniqueId()];
             var pending = GetOrCreatePendingResult(node);
             pending.StartTime = DateTimeOffset.UtcNow;
 
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.TestingPlatform
 
         public override void OnEndRunBenchmark(BenchmarkCase benchmarkCase, BenchmarkReport report)
         {
-            var node = nodes[FullNameProvider.GetBenchmarkUid(benchmarkCase)];
+            var node = nodes[benchmarkCase.GetUniqueId()];
             var pending = GetOrCreatePendingResult(node);
             pending.Duration = runTimerStopwatch.Elapsed;
             pending.EndTime = DateTimeOffset.UtcNow;

@@ -66,8 +66,10 @@ namespace BenchmarkDotNet.TestingPlatform
             var parametrizedMethodName = FullNameProvider.GetMethodName(benchmarkCase);
             var jobDisplayInfo = benchmarkCase.GetUnrandomizedJobDisplayInfo();
 
-            // Unlike the uid, the job is only part of the display name when it actually adds information.
-            var uid = FullNameProvider.GetBenchmarkUid(benchmarkCase);
+            // The uid is the hash BenchmarkDotNet itself uses (and reports through `--list json`), so that a benchmark
+            // keeps the same identity across processes and across tools. The job is only part of the display name
+            // when it actually adds information.
+            var uid = benchmarkCase.GetUniqueId();
             var displayName = $"{fullClassName}.{parametrizedMethodName}" + (includeJobInName ? $" [{jobDisplayInfo}]" : "");
 
             var properties = new List<IProperty>
