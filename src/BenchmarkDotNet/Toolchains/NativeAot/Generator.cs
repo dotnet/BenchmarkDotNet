@@ -151,6 +151,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <DebugSymbols>false</DebugSymbols>
                 <RunAnalyzers>false</RunAnalyzers>
                 <PublishAot>true</PublishAot>
+                <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
                 <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
                 <OptimizationPreference>{ilcOptimizationPreference}</OptimizationPreference>
                 {GetTrimmingSettings()}

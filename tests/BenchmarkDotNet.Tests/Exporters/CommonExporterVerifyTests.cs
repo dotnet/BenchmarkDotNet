@@ -58,9 +58,11 @@ namespace BenchmarkDotNet.Tests.Exporters
                     logger, CancellationToken.None);
             }
 
+            var result = logger.GetLog().Replace("\r\n", "\n");
+
             var settings = VerifyHelper.Create();
             settings.UseTextForParameters(GetName(cultureInfo));
-            await Verifier.Verify(logger.GetLog(), settings);
+            await Verifier.Verify(result, settings);
         }
 
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)
