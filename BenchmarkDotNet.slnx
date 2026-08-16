@@ -21,9 +21,6 @@
     <Project Path="src/BenchmarkDotNet.Diagnostics.Windows/BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <Project Path="src/BenchmarkDotNet.Exporters.Plotting/BenchmarkDotNet.Exporters.Plotting.csproj" />
     <Project Path="src/BenchmarkDotNet.TestAdapter/BenchmarkDotNet.TestAdapter.csproj" />
-    <Project Path="src/BenchmarkDotNet.TestingPlatform/BenchmarkDotNet.TestingPlatform.csproj">
-      <Build Solution="Release|*" Project="false" />
-    </Project>
     <Project Path="src/BenchmarkDotNet.Weaver/BenchmarkDotNet.Weaver.csproj" />
     <Project Path="src/BenchmarkDotNet/BenchmarkDotNet.csproj" />
   </Folder>
