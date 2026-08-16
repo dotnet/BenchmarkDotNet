@@ -9,7 +9,9 @@ using Microsoft.Testing.Platform.Extensions.OutputDevice;
 using Microsoft.Testing.Platform.Extensions.TestFramework;
 using Microsoft.Testing.Platform.Requests;
 using Microsoft.Testing.Platform.Services;
+using Microsoft.Testing.Platform.TestHost;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace BenchmarkDotNet.TestingPlatform
 {
@@ -83,13 +85,15 @@ namespace BenchmarkDotNet.TestingPlatform
 
         private async Task DiscoverAsync(DiscoverTestExecutionRequest request, ExecuteRequestContext context)
         {
-            foreach (var (_, node) in GetMatchingBenchmarks(request.Filter))
+            foreach (var benchmarks in GetMatchingBenchmarks(request.Filter))
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
 
+                // Exactly one node per uid: publishing a colliding uid twice would leave the platform with two nodes
+                // it cannot tell apart. The collision itself is reported when the benchmarks are run.
                 var message = new TestNodeUpdateMessage(
                     request.Session.SessionUid,
-                    node.ToTestNode(DiscoveredTestNodeStateProperty.CachedInstance));
+                    benchmarks[0].Node.ToTestNode(DiscoveredTestNodeStateProperty.CachedInstance));
 
                 await context.MessageBus.PublishAsync(this, message).ConfigureAwait(false);
             }
@@ -97,15 +101,28 @@ namespace BenchmarkDotNet.TestingPlatform
 
         private async Task RunAsync(RunTestExecutionRequest request, ExecuteRequestContext context)
         {
-            var matches = GetMatchingBenchmarks(request.Filter);
-            if (matches.Count == 0)
-                return;
-
-            var nodes = matches.ToDictionary(match => match.Node.Uid, match => match.Node);
             var sessionUid = request.Session.SessionUid;
             var cancellationToken = context.CancellationToken;
 
+            var runnable = new List<Match>();
+            foreach (var benchmarks in GetMatchingBenchmarks(request.Filter))
+            {
+                if (benchmarks.Count == 1)
+                    runnable.Add(benchmarks[0]);
+                else
+                    await PublishCollisionAsync(context, sessionUid, benchmarks).ConfigureAwait(false);
+            }
+
+            if (runnable.Count == 0)
+                return;
+
+            var nodes = runnable.ToDictionary(match => match.Node.Uid, match => match.Node);
+
             using var workQueue = new AsyncWorkQueue();
+
+            // A failure while publishing has to stop the benchmarks as well, otherwise the run would carry on with
+            // nobody listening and would keep writing to a queue that is about to be disposed.
+            using var runCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             var eventProcessor = new BenchmarkEventProcessor(nodes, testNode =>
             {
@@ -117,7 +134,7 @@ namespace BenchmarkDotNet.TestingPlatform
             // which keeps it in the right place when the platform runs in server mode or inside an IDE.
             var logger = new OutputDeviceLogger(serviceProvider.GetOutputDevice(), this, workQueue, cancellationToken);
 
-            var runInfos = matches
+            var runInfos = runnable
                 .GroupBy(match => match.RunInfo)
                 .Select(group => new BenchmarkRunInfo(
                     group.Select(match => match.Node.BenchmarkCase).ToArray(),
@@ -137,34 +154,93 @@ namespace BenchmarkDotNet.TestingPlatform
                 {
                     try
                     {
-                        BenchmarkRunner.Run(runInfos, cancellationToken);
+                        BenchmarkRunner.Run(runInfos, runCancellation.Token);
                     }
                     finally
                     {
-                        // Benchmarks that never reported a result still need one, unless the run was cancelled: the
-                        // platform expects an OperationCanceledException in that case, and publishing results
-                        // afterwards would contradict it.
-                        if (!cancellationToken.IsCancellationRequested)
-                            eventProcessor.PublishOutstandingResults();
+                        try
+                        {
+                            // Benchmarks that never reported a result still need one, unless the run was cancelled:
+                            // the platform expects an OperationCanceledException in that case, and publishing results
+                            // afterwards would contradict it.
+                            if (!runCancellation.IsCancellationRequested)
+                                eventProcessor.PublishOutstandingResults();
 
-                        logger.Flush();
-                        workQueue.Complete();
+                            logger.Flush();
+                        }
+                        finally
+                        {
+                            // The drain only ends once the queue is completed, so this has to happen no matter what
+                            // else went wrong.
+                            workQueue.Complete();
+                        }
                     }
                 },
                 CancellationToken.None);
 
-            await workQueue.DrainAsync().ConfigureAwait(false);
-            await runTask.ConfigureAwait(false);
+            ExceptionDispatchInfo? drainFailure = null;
+            try
+            {
+                await workQueue.DrainAsync().ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                // Nothing consumes the queue anymore, so the run has to be stopped rather than left orphaned. This is
+                // also the path a cancelled run takes, since the queued writes are handed the platform's token.
+                drainFailure = ExceptionDispatchInfo.Capture(exception);
+                runCancellation.Cancel();
+            }
+
+            try
+            {
+                // BenchmarkDotNet keeps writing to the queue until its thread returns, so the run always has to be
+                // over before the queue is disposed.
+                await runTask.ConfigureAwait(false);
+            }
+            catch when (drainFailure != null)
+            {
+                // The run was stopped because publishing failed, so that failure is the one worth reporting.
+            }
+
+            drainFailure?.Throw();
+        }
+
+        /// <summary>
+        /// Reports benchmarks that share a uid as a single failed test.
+        /// </summary>
+        /// <remarks>
+        /// The platform identifies test nodes by uid, so benchmarks that produce the same one cannot be reported
+        /// separately. Failing them keeps the rest of the run going, which is more useful than aborting the request.
+        /// </remarks>
+        private async Task PublishCollisionAsync(ExecuteRequestContext context, SessionUid sessionUid, List<Match> collision)
+        {
+            var node = collision[0].Node;
+            var error =
+                $"{collision.Count} benchmarks are identified as '{node.Uid}', so they cannot be told apart and none " +
+                "of them were run. Benchmarks are identified by the string representation of their parameters: give " +
+                "the colliding values distinct ToString() results.";
+
+            await context.MessageBus.PublishAsync(
+                this,
+                new TestNodeUpdateMessage(sessionUid, node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance))).ConfigureAwait(false);
+
+            await context.MessageBus.PublishAsync(
+                this,
+                new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)))).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Enumerates the benchmarks of the assembly and keeps the ones the request asked for.
         /// </summary>
         /// <param name="filter">The filter of the request.</param>
-        /// <returns>The matching benchmarks, paired with the run info they belong to.</returns>
-        private List<(BenchmarkRunInfo RunInfo, BenchmarkTestNode Node)> GetMatchingBenchmarks(ITestExecutionFilter filter)
+        /// <returns>
+        /// The matching benchmarks in enumeration order, grouped by uid. A group holding more than one benchmark is a
+        /// uid collision.
+        /// </returns>
+        private List<List<Match>> GetMatchingBenchmarks(ITestExecutionFilter filter)
         {
-            var matches = new List<(BenchmarkRunInfo, BenchmarkTestNode)>();
+            var matches = new List<List<Match>>();
+            var matchesByUid = new Dictionary<string, List<Match>>(StringComparer.Ordinal);
 
             foreach (var runInfo in BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly))
             {
@@ -175,8 +251,17 @@ namespace BenchmarkDotNet.TestingPlatform
                 foreach (var benchmarkCase in runInfo.BenchmarksCases)
                 {
                     var node = BenchmarkTestNode.Create(benchmarkCase, includeJobInName);
-                    if (Matches(filter, node))
-                        matches.Add((runInfo, node));
+                    if (!Matches(filter, node))
+                        continue;
+
+                    if (!matchesByUid.TryGetValue(node.Uid, out var sameUid))
+                    {
+                        sameUid = new List<Match>();
+                        matchesByUid.Add(node.Uid, sameUid);
+                        matches.Add(sameUid);
+                    }
+
+                    sameUid.Add(new Match(runInfo, node));
                 }
             }
 
@@ -193,5 +278,21 @@ namespace BenchmarkDotNet.TestingPlatform
             _ => true
         };
 #pragma warning restore TPEXP
+
+        /// <summary>
+        /// A benchmark that matched the request, together with the run info it belongs to.
+        /// </summary>
+        private sealed class Match
+        {
+            public Match(BenchmarkRunInfo runInfo, BenchmarkTestNode node)
+            {
+                RunInfo = runInfo;
+                Node = node;
+            }
+
+            public BenchmarkRunInfo RunInfo { get; }
+
+            public BenchmarkTestNode Node { get; }
+        }
     }
 }
