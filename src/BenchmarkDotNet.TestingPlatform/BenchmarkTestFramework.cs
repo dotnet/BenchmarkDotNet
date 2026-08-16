@@ -12,6 +12,7 @@ using Microsoft.Testing.Platform.Services;
 using Microsoft.Testing.Platform.TestHost;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Threading.Channels;
 
 namespace BenchmarkDotNet.TestingPlatform
 {
@@ -118,21 +119,30 @@ namespace BenchmarkDotNet.TestingPlatform
 
             var nodes = runnable.ToDictionary(match => match.Node.Uid, match => match.Node);
 
-            using var workQueue = new AsyncWorkQueue();
+            // BenchmarkDotNet reports its progress through synchronous callbacks (EventProcessor and ILogger) while
+            // the message bus and the output device are asynchronous. Blocking on those from inside a callback risks
+            // deadlocking against the synchronization context BenchmarkDotNet installs while it runs, so the callbacks
+            // write to this channel and the drain below does the awaiting. Synchronous continuations are left off, so
+            // that a write can never end up publishing on BenchmarkDotNet's own thread.
+            var workQueue = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                AllowSynchronousContinuations = false
+            });
 
             // A failure while publishing has to stop the benchmarks as well, otherwise the run would carry on with
-            // nobody listening and would keep writing to a queue that is about to be disposed.
+            // nobody listening to it.
             using var runCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             var eventProcessor = new BenchmarkEventProcessor(nodes, testNode =>
             {
                 var message = new TestNodeUpdateMessage(sessionUid, testNode);
-                workQueue.Enqueue(() => context.MessageBus.PublishAsync(this, message));
+                workQueue.Writer.TryWrite(() => context.MessageBus.PublishAsync(this, message));
             });
 
             // BenchmarkDotNet's own console output is replaced so that everything goes through the output device,
             // which keeps it in the right place when the platform runs in server mode or inside an IDE.
-            var logger = new OutputDeviceLogger(serviceProvider.GetOutputDevice(), this, workQueue, cancellationToken);
+            var logger = new OutputDeviceLogger(serviceProvider.GetOutputDevice(), this, workQueue.Writer, cancellationToken);
 
             var runInfos = runnable
                 .GroupBy(match => match.RunInfo)
@@ -172,7 +182,7 @@ namespace BenchmarkDotNet.TestingPlatform
                         {
                             // The drain only ends once the queue is completed, so this has to happen no matter what
                             // else went wrong.
-                            workQueue.Complete();
+                            workQueue.Writer.TryComplete();
                         }
                     }
                 },
@@ -181,7 +191,7 @@ namespace BenchmarkDotNet.TestingPlatform
             ExceptionDispatchInfo? drainFailure = null;
             try
             {
-                await workQueue.DrainAsync().ConfigureAwait(false);
+                await DrainAsync(workQueue.Reader).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -193,8 +203,8 @@ namespace BenchmarkDotNet.TestingPlatform
 
             try
             {
-                // BenchmarkDotNet keeps writing to the queue until its thread returns, so the run always has to be
-                // over before the queue is disposed.
+                // The run has to be over before the request completes, otherwise it would carry on in the background
+                // and its failure would go unobserved.
                 await runTask.ConfigureAwait(false);
             }
             catch when (drainFailure != null)
@@ -203,6 +213,19 @@ namespace BenchmarkDotNet.TestingPlatform
             }
 
             drainFailure?.Throw();
+        }
+
+        /// <summary>
+        /// Runs the queued work items in order, until the queue is completed and empty.
+        /// </summary>
+        /// <param name="reader">The reader of the work queue.</param>
+        private static async Task DrainAsync(ChannelReader<Func<Task>> reader)
+        {
+            while (await reader.WaitToReadAsync().ConfigureAwait(false))
+            {
+                while (reader.TryRead(out var work))
+                    await work().ConfigureAwait(false);
+            }
         }
 
         /// <summary>
