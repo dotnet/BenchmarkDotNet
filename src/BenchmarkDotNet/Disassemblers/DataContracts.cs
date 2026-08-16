@@ -218,13 +218,13 @@ public static class DisassemblerConstants
 
 internal sealed class State
 {
-    internal State(ClrRuntime runtime, string targetFrameworkMoniker)
+    internal State(ClrRuntime runtime, Version runtimeVersion)
     {
         Runtime = runtime;
         Todo = new Queue<MethodInfo>();
         HandledMethods = new HashSet<ClrMethod>(new ClrMethodComparer());
         AddressToNameMapping = [];
-        RuntimeVersion = ParseVersion(targetFrameworkMoniker);
+        RuntimeVersion = runtimeVersion;
     }
 
     internal ClrRuntime Runtime { get; }
@@ -232,31 +232,6 @@ internal sealed class State
     internal HashSet<ClrMethod> HandledMethods { get; }
     internal Dictionary<ulong, string> AddressToNameMapping { get; }
     internal Version RuntimeVersion { get; }
-
-    internal static Version ParseVersion(string targetFrameworkMoniker)
-    {
-        int firstDigit = -1, lastDigit = -1;
-        for (int i = 0; i < targetFrameworkMoniker.Length; i++)
-        {
-            if (char.IsDigit(targetFrameworkMoniker[i]))
-            {
-                if (firstDigit == -1)
-                    firstDigit = i;
-
-                lastDigit = i;
-            }
-            else if (targetFrameworkMoniker[i] == '-')
-            {
-                break; // it can be platform specific like net7.0-windows8
-            }
-        }
-
-        string versionToParse = targetFrameworkMoniker.Substring(firstDigit, lastDigit - firstDigit + 1);
-        if (!versionToParse.Contains(".")) // Full .NET Framework (net48 etc)
-            versionToParse = string.Join(".", versionToParse.ToCharArray());
-
-        return Version.Parse(versionToParse);
-    }
 
     private sealed class ClrMethodComparer : IEqualityComparer<ClrMethod>
     {

@@ -1,5 +1,6 @@
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
 
-public class InProcessEmitSettings : InProcessSettings
+public record InProcessEmitSettings : InProcessSettings
 {
+    public static readonly InProcessEmitSettings Default = new();
 }

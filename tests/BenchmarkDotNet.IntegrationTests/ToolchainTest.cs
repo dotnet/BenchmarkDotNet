@@ -4,12 +4,18 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    public sealed class MockToolchain(string name, Runtime runtime, IGenerator generator, IBuilder builder, IExecutor executor)
+        : Toolchain(name, runtime, generator, builder, executor)
+    {
+    }
+
     public class ToolchainTest(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
         private class MyGenerator : IGenerator
@@ -64,8 +70,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var generator = new MyGenerator();
             var builder = new MyBuilder();
             var executor = new MyExecutor();
-            var myToolchain = new Toolchain("My", generator, builder, executor);
-            var job = new Job(Job.Dry) { Infrastructure = { Toolchain = myToolchain } };
+            var myToolchain = new MockToolchain("My", UnknownRuntime.Instance, generator, builder, executor);
+            var job = new Job(Job.Dry) { Infrastructure = { Toolchain = myToolchain} };
             var config = CreateSimpleConfig(logger).AddJob(job);
 
             CanExecute<ToolchainBenchmark>(config, fullValidation: false);

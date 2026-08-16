@@ -13,13 +13,12 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
-using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.Framework;
 using BenchmarkDotNet.Toolchains.R2R;
 using CommandLine;
 using Perfolizer.Horology;
@@ -28,6 +27,7 @@ using Perfolizer.Metrology;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -285,22 +285,10 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             foreach (string runtime in options.Runtimes)
             {
-                if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker))
+                if (!Runtime.TryParse(runtime, out _))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid.");
                     return false;
-                }
-                else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
-                {
-                    logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{options.AOTCompilerPath}\" does NOT exist. It MUST be provided.");
-                }
-                else if (runtimeMoniker >= RuntimeMoniker.WasmNet80 && runtimeMoniker < RuntimeMoniker.MonoAOTLLVM)
-                {
-                    if (!ProcessHelper.TryResolveExecutableInPath(options.WasmJavaScriptEngine, out _))
-                    {
-                        logger.WriteLineError($"The provided {nameof(options.WasmJavaScriptEngine)} \"{options.WasmJavaScriptEngine}\" does NOT exist.");
-                        return false;
-                    }
                 }
             }
 
@@ -532,11 +520,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 yield return Attributes.InProcessAttribute.GetJob(baseJob, Attributes.InProcessToolchainType.Auto, true);
             }
-            else if (options.ClrVersion.IsNotBlank())
-            {
-                var runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion);
-                yield return baseJob.WithRuntime(runtime).WithId(runtime.Name); // local builds of .NET Runtime
-            }
             else if (options.CliPath != null && options.Runtimes.IsEmpty() && options.CoreRunPaths.IsEmpty())
             {
                 yield return CreateCoreJobWithCli(baseJob, options);
@@ -571,222 +554,38 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
-            if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
+            return Runtime.Parse(runtimeId) switch
             {
-                throw new InvalidOperationException("Impossible, already validated by the Validate method");
-            }
+                ClrRuntime clr => GetFrameworkJob(clr).WithId(clr.ToString()),
+                CoreRuntime core => baseJob.WithId(core.ToString())
+                    .WithToolchain(CsProjCoreToolchain.From(core, new(options))),
+                NativeAotRuntime aot => baseJob.WithId(aot.ToString())
+                    .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options))),
+                R2RRuntime r2r => baseJob.WithId(r2r.ToString())
+                    .WithToolchain(CsProjR2RToolchain.From(r2r, new(options))),
+                MonoWasmRuntime wasm => baseJob.WithId(wasm.ToString())
+                    .WithToolchain(CsProjMonoWasmToolchain.From(wasm, new(options))),
+                MonoWasmAotRuntime wasmAot => baseJob.WithId(wasmAot.ToString())
+                    .WithToolchain(CsProjMonoWasmAotToolchain.From(wasmAot, new(options))),
+                CoreWasmRuntime coreWasm => baseJob.WithId(coreWasm.ToString())
+                    .WithToolchain(CsProjCoreWasmToolchain.From(coreWasm, new(options))),
+                MonoCoreRuntime mono => baseJob.WithId(mono.ToString())
+                    .WithToolchain(CsProjMonoCoreToolchain.From(mono, new(options))),
+                MonoAotRuntime monoAot => baseJob.WithId(monoAot.ToString())
+                    .WithToolchain(RoslynMonoAotToolchain.From(new(options))),
+                MonoRuntime mono => baseJob.WithId(mono.ToString())
+                    .WithToolchain(RoslynMonoToolchain.From(new(options))),
+                _ => throw new NotSupportedException($"Runtime {runtimeId} is not supported"),
+            };
 
-            switch (runtimeMoniker)
+            Job GetFrameworkJob(ClrRuntime clr)
             {
-                case RuntimeMoniker.Net461:
-                case RuntimeMoniker.Net462:
-                case RuntimeMoniker.Net47:
-                case RuntimeMoniker.Net471:
-                case RuntimeMoniker.Net472:
-                case RuntimeMoniker.Net48:
-                case RuntimeMoniker.Net481:
-                    {
-                        var runtime = runtimeMoniker.GetRuntime();
-                        return baseJob
-                            .WithRuntime(runtime)
-                            .WithId(runtime.Name)
-                            .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName ?? "", options.CliPath?.FullName ?? ""));
-                    }
-
-                case RuntimeMoniker.NetCoreApp20:
-                case RuntimeMoniker.NetCoreApp21:
-                case RuntimeMoniker.NetCoreApp22:
-                case RuntimeMoniker.NetCoreApp30:
-                case RuntimeMoniker.NetCoreApp31:
-                case RuntimeMoniker.Net50:
-                case RuntimeMoniker.Net60:
-                case RuntimeMoniker.Net70:
-                case RuntimeMoniker.Net80:
-                case RuntimeMoniker.Net90:
-                case RuntimeMoniker.Net10_0:
-                case RuntimeMoniker.Net11_0:
-                    {
-                        var runtime = runtimeMoniker.GetRuntime();
-                        return baseJob
-                            .WithRuntime(runtime)
-                            .WithId(runtime.Name)
-                            .WithToolchain(CsProjCoreToolchain.From(
-                                new NetCoreAppSettings(
-                                    runtimeId,
-                                    runtimeFrameworkVersion: "",
-                                    name: runtimeId,
-                                    options: options)));
-                    }
-
-                case RuntimeMoniker.Mono:
-                    {
-                        var runtime = new MonoRuntime("Mono", options.MonoPath?.FullName ?? "");
-                        return baseJob.WithRuntime(runtime).WithId(runtime.Name);
-                    }
-
-                case RuntimeMoniker.NativeAot70:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
-
-                case RuntimeMoniker.NativeAot80:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
-
-                case RuntimeMoniker.NativeAot90:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
-
-                case RuntimeMoniker.NativeAot10_0:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
-
-                case RuntimeMoniker.NativeAot11_0:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, ilCompilerVersion: "");
-
-                case RuntimeMoniker.WasmNet80:
-                    return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
-
-                case RuntimeMoniker.WasmNet90:
-                    return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
-
-                case RuntimeMoniker.WasmNet10_0:
-                    return MakeWasmJob(baseJob, options, "net10.0", runtimeMoniker);
-
-                case RuntimeMoniker.WasmNet11_0:
-                    return MakeWasmJob(baseJob, options, "net11.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVM:
-                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVMNet60:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVMNet70:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVMNet80:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVMNet90:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net9.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVMNet10_0:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net10.0", runtimeMoniker);
-
-                case RuntimeMoniker.MonoAOTLLVMNet11_0:
-                    return MakeMonoAOTLLVMJob(baseJob, options, "net11.0", runtimeMoniker);
-
-                case RuntimeMoniker.Mono60:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
-
-                case RuntimeMoniker.Mono70:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
-
-                case RuntimeMoniker.Mono80:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
-
-                case RuntimeMoniker.Mono90:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono90);
-
-                case RuntimeMoniker.Mono10_0:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono10_0);
-
-                case RuntimeMoniker.Mono11_0:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono11_0);
-
-                case RuntimeMoniker.R2R80:
-                case RuntimeMoniker.R2R90:
-                case RuntimeMoniker.R2R10_0:
-                case RuntimeMoniker.R2R11_0:
-                    return CreateR2RJob(baseJob, options, runtimeMoniker.GetRuntime());
-
-                default:
-                    throw new NotSupportedException($"Runtime {runtimeId} is not supported");
+                var settings = new FrameworkSettings(options);
+                return settings.Equals(FrameworkSettings.Default)
+                    // If no custom settings were configured, we just set the runtime so the default toolchain will be auto-selected, which might select the faster Roslyn toolchain.
+                    ? baseJob.WithRuntime(clr)
+                    : baseJob.WithToolchain(CsProjFrameworkToolchain.From(clr, settings));
             }
-        }
-
-        private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl = "")
-        {
-            var builder = NativeAotToolchain.CreateBuilder();
-
-            if (options.CliPath != null)
-                builder.DotNetCli(options.CliPath.FullName);
-            if (options.RestorePath != null)
-                builder.PackagesRestorePath(options.RestorePath.FullName);
-
-            if (options.IlcPackages != null)
-                builder.UseLocalBuild(options.IlcPackages);
-            else if (options.ILCompilerVersion.IsNotBlank())
-                builder.UseNuGet(options.ILCompilerVersion, nuGetFeedUrl);
-            else
-                builder.UseNuGet(ilCompilerVersion, nuGetFeedUrl);
-
-            var runtime = runtimeMoniker.GetRuntime();
-            builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
-
-            return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain()).WithId(runtime.Name);
-        }
-
-        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
-        {
-            return baseJob
-                .WithRuntime(runtime)
-                .WithToolchain(MonoToolchain.From(
-                    new NetCoreAppSettings(
-                        targetFrameworkMoniker: runtime.MsBuildMoniker,
-                        runtimeFrameworkVersion: "",
-                        name: runtime.Name,
-                        options: options)));
-        }
-
-        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
-        {
-            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(
-                aotCompilerPath: options.AOTCompilerPath,
-                aotCompilerMode: options.AOTCompilerMode,
-                msBuildMoniker: msBuildMoniker,
-                moniker: moniker);
-
-            var toolChain = MonoAotLLVMToolChain.From(
-            new NetCoreAppSettings(
-                targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
-                runtimeFrameworkVersion: "",
-                name: monoAotLLVMRuntime.Name,
-                options: options));
-
-            return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain).WithId(monoAotLLVMRuntime.Name);
-        }
-
-        private static Job CreateR2RJob(Job baseJob, CommandLineOptions options, Runtime runtime)
-        {
-            var toolChain = R2RToolchain.From(
-            new NetCoreAppSettings(
-                targetFrameworkMoniker: runtime.MsBuildMoniker,
-                runtimeFrameworkVersion: "",
-                name: runtime.Name,
-                options: options));
-
-            return baseJob.WithRuntime(runtime).WithToolchain(toolChain).WithId(runtime.Name);
-        }
-
-        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
-        {
-            bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
-
-            var wasmRuntime = new WasmRuntime(
-                msBuildMoniker: msBuildMoniker,
-                moniker: moniker,
-                displayName: "Wasm",
-                javaScriptEngine: options.WasmJavaScriptEngine ?? "",
-                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
-                aot: wasmAot,
-                runtimeFlavor: options.WasmRuntimeFlavor,
-                mainJsTemplate: options.WasmMainJsTemplate,
-                processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
-
-            var toolChain = WasmToolchain.From(new NetCoreAppSettings(
-                targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
-                runtimeFrameworkVersion: "",
-                name: wasmRuntime.Name,
-                options: options));
-
-            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain).WithId(wasmRuntime.Name);
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
@@ -818,25 +617,21 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options, FileInfo coreRunPath)
             => baseJob
-                .WithToolchain(new CoreRunToolchain(
-                    coreRunPath,
-                    createCopy: true,
-                    targetFrameworkMoniker:
-                        RuntimeInformation.IsNetCore
-                            ? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker
-                            : CoreRuntime.Latest.MsBuildMoniker, // use most recent tfm, as the toolchain is being used only by dotnet/runtime contributors
-                    customDotNetCliPath: options.CliPath,
-                    restorePath: options.RestorePath,
-                    displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));
+                .WithToolchain(CoreRunToolchain.From(new CoreRunSettings(options)
+                {
+                    SourceCoreRun = coreRunPath,
+                    TargetFrameworkMoniker = RuntimeInformation.GetCurrentRuntime() is CoreRuntime core
+                        ? core.GetTfm() // netcoreappX.Y for < 5, netX.0 for 5+
+                        : CoreRuntime.Latest.GetTfm(), // non-Core host; use most recent tfm, as the toolchain is being used only by dotnet/runtime contributors
+                    DisplayName = GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath),
+                }));
 
         private static Job CreateCoreJobWithCli(Job baseJob, CommandLineOptions options)
-            => baseJob
-                .WithToolchain(CsProjCoreToolchain.From(
-                    new NetCoreAppSettings(
-                        targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
-                        runtimeFrameworkVersion: "",
-                        name: RuntimeInformation.GetCurrentRuntime().Name,
-                        options: options)));
+        {
+            var runtime = (CoreRuntime)RuntimeInformation.GetCurrentRuntime();
+            return baseJob
+                .WithToolchain(CsProjCoreToolchain.From(runtime, new NetCoreAppSettings(options)));
+        }
 
         /// <summary>
         /// we have a limited amount of space when printing the output to the console, so we try to keep things small and simple
@@ -873,22 +668,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
 
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
-        }
-
-        internal static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
-        {
-            int index = runtime.IndexOf('-');
-            if (index >= 0)
-            {
-                runtime = runtime.Substring(0, index);
-            }
-
-            // Monikers older than Net 10 don't use any version delimiter, newer monikers use _ delimiter.
-            if (Enum.TryParse(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker))
-            {
-                return true;
-            }
-            return Enum.TryParse(runtime.Replace('.', '_'), ignoreCase: true, out runtimeMoniker);
         }
     }
 }

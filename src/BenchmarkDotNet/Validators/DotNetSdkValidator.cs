@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -13,26 +13,25 @@ namespace BenchmarkDotNet.Validators
     {
         private static readonly Lazy<List<string>> cachedFrameworkSdks = new Lazy<List<string>>(GetInstalledFrameworkSdks, true);
 
-        public static IEnumerable<ValidationError> ValidateCoreSdks(string? customDotNetCliPath, BenchmarkCase benchmark)
+        public static IEnumerable<ValidationError> ValidateCoreSdks(FileInfo? customDotNetCliPath, BenchmarkCase benchmark)
         {
             if (IsCliPathInvalid(customDotNetCliPath, benchmark, out ValidationError? cliPathError))
             {
                 yield return cliPathError;
                 yield break;
             }
-            var requiredSdkVersion = benchmark.GetRuntime().RuntimeMoniker.GetRuntimeVersion();
-            if (!GetInstalledDotNetSdks(customDotNetCliPath).Any(sdk => sdk >= requiredSdkVersion))
+            var requiredSdkVersion = benchmark.GetRuntime().Version;
+            if (requiredSdkVersion != null && !GetInstalledDotNetSdks(customDotNetCliPath).Any(sdk => sdk >= requiredSdkVersion))
             {
-                yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime moniker {benchmark.Job.Environment.Runtime!.RuntimeMoniker} is not installed.", benchmark);
+                yield return new ValidationError(true, $"The required .NET Core SDK version {requiredSdkVersion} or higher for runtime {benchmark.GetRuntime()} is not installed.", benchmark);
             }
         }
 
         public static IEnumerable<ValidationError> ValidateFrameworkSdks(BenchmarkCase benchmark)
         {
-            var targetRuntime = benchmark.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? benchmark.Job.Environment.Runtime!
-                : ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.Type.Assembly);
-            var requiredSdkVersion = targetRuntime.RuntimeMoniker.GetRuntimeVersion();
+            var targetRuntime = benchmark.GetRuntime() as ClrRuntime
+                ?? ClrRuntime.GetTargetOrCurrentVersion(benchmark.Descriptor.Type.Assembly);
+            var requiredSdkVersion = targetRuntime.Version;
 
             var installedVersionString = cachedFrameworkSdks.Value.FirstOrDefault();
             if (installedVersionString == null || Version.TryParse(installedVersionString, out var installedVersion) && installedVersion < requiredSdkVersion)
@@ -41,11 +40,11 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        public static bool IsCliPathInvalid(string? customDotNetCliPath, BenchmarkCase benchmarkCase, [NotNullWhen(true)] out ValidationError? validationError)
+        public static bool IsCliPathInvalid(FileInfo? customDotNetCliPath, BenchmarkCase benchmarkCase, [NotNullWhen(true)] out ValidationError? validationError)
         {
             validationError = null;
 
-            if (string.IsNullOrEmpty(customDotNetCliPath) && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
+            if (customDotNetCliPath is null && !HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled())
             {
                 validationError = new ValidationError(true,
                     $"BenchmarkDotNet requires dotnet SDK to be installed or path to local dotnet cli provided in explicit way using `--cli` argument, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
@@ -54,7 +53,7 @@ namespace BenchmarkDotNet.Validators
                 return true;
             }
 
-            if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
+            if (customDotNetCliPath is { Exists: false })
             {
                 validationError = new ValidationError(true,
                     $"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
@@ -66,9 +65,9 @@ namespace BenchmarkDotNet.Validators
             return false;
         }
 
-        private static IEnumerable<Version> GetInstalledDotNetSdks(string? customDotNetCliPath)
+        private static IEnumerable<Version> GetInstalledDotNetSdks(FileInfo? customDotNetCliPath)
         {
-            string dotnetExecutable = string.IsNullOrEmpty(customDotNetCliPath) ? "dotnet" : customDotNetCliPath!;
+            string dotnetExecutable = customDotNetCliPath?.FullName ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             var startInfo = new ProcessStartInfo(dotnetExecutable, "--list-sdks")
             {
                 RedirectStandardOutput = true,
