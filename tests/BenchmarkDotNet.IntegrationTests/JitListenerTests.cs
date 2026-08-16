@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -410,9 +411,9 @@ public class JitListenerTests
         var measurements = stage.GetMeasurementList();
         while (stage.GetShouldRunIteration(measurements, out var data))
         {
-            data.setupAction().WaitValueTaskCompletion();
-            data.workloadAction(data.invokeCount / data.unrollFactor, null!).WaitValueTaskCompletion();
-            data.cleanupAction().WaitValueTaskCompletion();
+            data.setupAction().GetResult();
+            data.workloadAction(data.invokeCount / data.unrollFactor, null!).GetResult();
+            data.cleanupAction().GetResult();
             // A zero-time measurement keeps the stage out of its "long-running benchmark" early-exit
             // (iterationTime / 0 == Infinity, and Infinity < 1.5 is false).
             measurements.Add(new Measurement(1, data.mode, data.stage, data.index, data.invokeCount, 0d));
@@ -532,32 +533,5 @@ public class JitListenerTests
         public void ReportResults(RunResults runResults) { }
         public ValueTask SendSignalAsync(HostSignal hostSignal) => new();
         public ValueTask Yield() => new();
-    }
-}
-
-file static class ExtensionMethods
-{
-    // Helper method to suppress CA2012 analyzer message.
-    // ValueTask is not guaranteed to block until the operation completed when using GetAwaiter().GetResult().
-    public static void WaitValueTaskCompletion(this ValueTask valueTask)
-    {
-        var awaiter = valueTask.GetAwaiter();
-
-        if (awaiter.IsCompleted)
-        {
-            awaiter.GetResult();
-            return;
-        }
-
-        valueTask.AsTask().GetAwaiter().GetResult();
-    }
-
-    public static T WaitValueTaskCompletion<T>(this ValueTask<T> valueTask)
-    {
-        var awaiter = valueTask.GetAwaiter();
-
-        return awaiter.IsCompleted
-            ? awaiter.GetResult()
-            : valueTask.AsTask().GetAwaiter().GetResult();
     }
 }
