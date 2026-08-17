@@ -187,15 +187,15 @@ Now, the default settings are: `WarmupCount=1` but you might still overwrite it 
 dotnet run -c Release -- --warmupCount 2
 ```
 
-## Benchmark profiles
+## Filtering by job Id
 
 Most of the console arguments describe a *single* job, so they can not express "run these benchmarks
 for this particular combination of settings, and that other combination too". Instead of trying to
 spell such combinations out on the command line, you can define them in code, give each of them an
-`Id`, and then select them from the command line with `--profile`:
+`Id`, and then select them from the command line with `--filterJobId`:
 
-* `--profile` - runs only the jobs whose `Id` matches. Glob patterns are supported and the matching
-is case insensitive. Not to be confused with `--profiler`.
+* `--filterJobId` - runs only the jobs whose `Id` matches. Glob patterns are supported and the
+matching is case insensitive.
 
 ```cs
 static void Main(string[] args)
@@ -213,14 +213,14 @@ static IConfig GetGlobalConfig()
 Example: run the benchmarks in process, which is handy when you want to debug them.
 
 ```log
-dotnet run -c Release -- --filter '*JsonSerialization*' --profile debug
+dotnet run -c Release -- --filter '*JsonSerialization*' --filterJobId debug
 ```
 
 Example: compare .NET 8.0 with .NET 9.0, without running the `debug` job. Just like `--filter`,
-`--profile` accepts more than one value, separated by spaces.
+`--filterJobId` accepts more than one value, separated by spaces.
 
 ```log
-dotnet run -c Release -- --filter '*' --profile net8 net9
+dotnet run -c Release -- --filter '*' --filterJobId net8 net9
 ```
 
 The very same thing works for the jobs that are defined via attributes, because `[SimpleJob]` accepts
@@ -232,10 +232,10 @@ an `id` argument:
 public class JsonSerialization { /* ... */ }
 ```
 
-`--profile` narrows down what the other filters have selected, so it can be freely combined with
+`--filterJobId` narrows down what the other filters have selected, so it can be freely combined with
 `--filter`, `--allCategories`, `--anyCategories` and `--attribute`. Jobs that were given no explicit
 `Id` are still selectable by their generated one (`DefaultJob`, or `Job-XXXXXX`); if nothing matches,
-the list of available profiles is printed for you.
+the list of available job Ids is printed for you.
 
 ## Response files support
 
@@ -303,7 +303,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * Hide Mean and Ratio columns (use double quotes for multi-word columns: "Alloc Ratio"):
     `-h Mean Ratio`
 * Run only the jobs whose Id is 'net8' or 'net9' (Ids are assigned in code, e.g. Job.Default.WithId("net8")):
-    `--filter * --profile net8 net9`
+    `--filter * --filterJobId net8 net9`
 
 ## More
 
@@ -316,7 +316,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `-d, --disasm`              (Default: false) Gets disassembly of benchmarked code
 * `-p, --profiler`            Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory
 * `-f, --filter`              Glob patterns
-* `--profile`                 Runs only the jobs with matching Id(s). Ids are assigned in code via Job.WithId(...) or the 'id' argument of [SimpleJob]. Glob patterns are supported. Not to be confused with --profiler.
+* `--filterJobId`            Runs only the jobs with matching Id(s). Ids are assigned in code via Job.WithId(...) or the 'id' argument of [SimpleJob]. Glob patterns are supported.
 * `-h, --hide`                Hides columns by name
 * `-i, --inProcess`           (Default: false) Run benchmarks in Process
 * `-a, --artifacts`           Valid path to accessible directory
