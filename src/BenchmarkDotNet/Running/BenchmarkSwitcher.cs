@@ -4,6 +4,7 @@ using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
@@ -18,6 +19,8 @@ namespace BenchmarkDotNet.Running
 {
     public class BenchmarkSwitcher
     {
+        private const int MaxDisplayedJobIds = 40;
+
         private readonly IUserInteraction userInteraction = new UserInteraction();
         private readonly List<Type> types = [];
         private readonly List<Assembly> assemblies = [];
@@ -165,11 +168,39 @@ namespace BenchmarkDotNet.Running
 
             if (filteredBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, [.. options.Filters]);
+                if (!TryPrintWrongJobIdInfo(effectiveConfig, logger, options))
+                    userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, [.. options.Filters]);
                 return [];
             }
 
             return await BenchmarkRunnerClean.Run(filteredBenchmarks, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// explains that it was --filterJobId which returned 0 benchmarks, so that the user is not shown
+        /// benchmark name suggestions for what is actually a mistyped job id.
+        /// </summary>
+        /// <returns>true if the job id filter was the reason why nothing was left to run</returns>
+        private static bool TryPrintWrongJobIdInfo(IConfig effectiveConfig, ILogger logger, CommandLineOptions options)
+        {
+            var requestedJobIds = options.FilterJobIds.ToArray();
+            if (requestedJobIds.IsEmpty())
+                return false;
+
+            var jobIdFilter = effectiveConfig.GetFilters().OfType<JobIdFilter>().FirstOrDefault();
+            if (jobIdFilter == null || jobIdFilter.ObservedJobIds.IsEmpty() || !jobIdFilter.MatchedJobIds.IsEmpty())
+                return false; // either no job was ever checked, or some did match, so --filterJobId is not to blame
+
+            logger.WriteLineError($"{(requestedJobIds.Length == 1 ? "The job Id" : "Job Ids")} '{string.Join("', '", requestedJobIds)}' that you have provided returned 0 benchmarks.");
+            logger.WriteLineInfo("Please remember that --filterJobId is applied to the Id of the job, which is assigned in code via Job.WithId(...) or the 'id' argument of [SimpleJob].");
+            logger.WriteLineInfo("Available job Ids:");
+
+            foreach (string jobId in jobIdFilter.ObservedJobIds.OrderBy(id => id, StringComparer.OrdinalIgnoreCase).Take(MaxDisplayedJobIds))
+                logger.WriteLineInfo($"\t{jobId}");
+
+            logger.WriteLineInfo("To learn more about filtering use `--help`.");
+
+            return true;
         }
 
         private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)

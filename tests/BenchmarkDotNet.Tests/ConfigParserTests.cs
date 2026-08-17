@@ -12,6 +12,7 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.OpenMetrics;
 using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -904,6 +905,40 @@ namespace BenchmarkDotNet.Tests
 
             var runtime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
             Assert.Equal("dummyFile.js", runtime.MainJsTemplate?.Name);
+        }
+
+        [Fact]
+        public void NoJobIdFilterIsAddedWhenFilterJobIdIsNotSpecified()
+        {
+            var config = ConfigParser.Parse(["--filter", "*"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Empty(config.GetFilters().OfType<JobIdFilter>());
+        }
+
+        [Theory]
+        [InlineData("--filterJobId", "net8")]
+        [InlineData("--filterJobId", "net8", "net9")]
+        [InlineData("--FILTERJOBID", "net8")] // case insensitive
+        public void UserCanSpecifyJobIds(params string[] args)
+        {
+            var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Single(config.GetFilters().OfType<JobIdFilter>());
+        }
+
+        [Fact]
+        public void JobIdFilterIsNotUnionedWithTheOtherFilters()
+        {
+            // --filterJobId must narrow down what --filter has selected, so it must be a filter of its own
+            var config = ConfigParser.Parse(["--filter", "*", "--filterJobId", "net8"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            var filters = config.GetFilters().ToArray();
+            Assert.Equal(2, filters.Length);
+            Assert.Single(filters.OfType<GlobFilter>());
+            Assert.Single(filters.OfType<JobIdFilter>());
         }
 
         [Theory]
