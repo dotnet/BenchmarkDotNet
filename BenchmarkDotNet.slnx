@@ -39,8 +39,12 @@
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.FSharp/BenchmarkDotNet.IntegrationTests.FSharp.fsproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.ManualRunning/BenchmarkDotNet.IntegrationTests.ManualRunning.csproj" />
-    <Project Path="tests/BenchmarkDotNet.IntegrationTests.MonoBenchmarks/BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj" />
-    <Project Path="tests/BenchmarkDotNet.IntegrationTests.SharedDiagnosers/BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.MonoBenchmarks/BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj">
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.SharedDiagnosers/BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj">
+      <Build Solution="Release|*" Project="false" />
+    </Project>
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.Static/BenchmarkDotNet.IntegrationTests.Static.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.VisualBasic/BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj" />
