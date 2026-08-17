@@ -908,7 +908,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void NoProfileFilterIsAddedWhenProfileIsNotSpecified()
+        public void NoJobIdFilterIsAddedWhenFilterJobIdIsNotSpecified()
         {
             var config = ConfigParser.Parse(["--filter", "*"], new OutputLogger(Output)).config;
 
@@ -917,10 +917,10 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("--profile", "net8")]
-        [InlineData("--profile", "net8", "net9")]
-        [InlineData("--PROFILE", "net8")] // case insensitive
-        public void UserCanSpecifyProfiles(params string[] args)
+        [InlineData("--filterJobId", "net8")]
+        [InlineData("--filterJobId", "net8", "net9")]
+        [InlineData("--FILTERJOBID", "net8")] // case insensitive
+        public void UserCanSpecifyJobIds(params string[] args)
         {
             var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
 
@@ -929,10 +929,10 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void ProfileFilterIsNotUnionedWithTheOtherFilters()
+        public void JobIdFilterIsNotUnionedWithTheOtherFilters()
         {
-            // --profile must narrow down what --filter has selected, so it must be a filter of its own
-            var config = ConfigParser.Parse(["--filter", "*", "--profile", "net8"], new OutputLogger(Output)).config;
+            // --filterJobId must narrow down what --filter has selected, so it must be a filter of its own
+            var config = ConfigParser.Parse(["--filter", "*", "--filterJobId", "net8"], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             var filters = config.GetFilters().ToArray();
