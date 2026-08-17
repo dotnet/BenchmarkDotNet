@@ -51,8 +51,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
         public IEnumerable<string> Filters { get; set; } = [];
 
-        [Option("profile", Required = false, HelpText = "Runs only the jobs with matching Id(s). Ids are assigned in code via Job.WithId(...) or the 'id' argument of [SimpleJob]. Glob patterns are supported. Not to be confused with --profiler.")]
-        public IEnumerable<string> Profiles { get; set; } = [];
+        [Option("filterJobId", Required = false, HelpText = "Runs only the jobs with matching Id(s). Ids are assigned in code via Job.WithId(...) or the 'id' argument of [SimpleJob]. Glob patterns are supported.")]
+        public IEnumerable<string> FilterJobIds { get; set; } = [];
 
         [Option('h', "hide", Required = false, HelpText = "Hides columns by name")]
         public IEnumerable<string> HiddenColumns { get; set; } = [];
@@ -274,7 +274,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
                     new CommandLineOptions { EnvironmentVariables = ["ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2"] });
                 yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = ["Mean", "Ratio"], });
-                yield return new Example("Run only the jobs whose Id is 'net8' or 'net9' (Ids are assigned in code, e.g. Job.Default.WithId(\"net8\"))", longName, new CommandLineOptions { Filters = [Escape("*")], Profiles = ["net8", "net9"] });
+                yield return new Example("Run only the jobs whose Id is 'net8' or 'net9' (Ids are assigned in code, e.g. Job.Default.WithId(\"net8\"))", longName, new CommandLineOptions { Filters = [Escape("*")], FilterJobIds = ["net8", "net9"] });
             }
         }
 

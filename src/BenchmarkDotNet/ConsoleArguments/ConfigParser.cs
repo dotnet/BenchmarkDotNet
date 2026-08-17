@@ -433,10 +433,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
-            // the profile filter selects jobs, not benchmarks, so it's added separately to make sure
+            // the job id filter selects jobs, not benchmarks, so it's added separately to make sure
             // that it's always combined with the filters above rather than being one of them
-            if (options.Profiles.Any())
-                config.AddFilter(new JobIdFilter([.. options.Profiles]));
+            if (options.FilterJobIds.Any())
+                config.AddFilter(new JobIdFilter([.. options.FilterJobIds]));
 
             config.HideColumns(options.HiddenColumns.ToArray());
 
