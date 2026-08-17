@@ -1,0 +1,15 @@
+PowerGetActiveScheme
+PowerSetActiveScheme
+PowerReadFriendlyName
+GetConsoleWindow
+GetConsoleMode
+GetStdHandle
+SetConsoleMode
+CloseHandle
+PowerCreateRequest
+PowerClearRequest
+PowerSetRequest
+PowerGetActiveScheme
+LocalFree
+GlobalMemoryStatusEx
+GetLogicalProcessorInformationEx

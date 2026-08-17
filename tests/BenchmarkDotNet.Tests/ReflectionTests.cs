@@ -126,6 +126,34 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void GetDisambiguatedDisplayNamesQualifiesCollidingNamesWithNamespace()
+        {
+            var types = new[]
+            {
+                typeof(Foo.Fixture),
+                typeof(Bar.Fixture),
+                typeof(ReflectionTests),
+            };
+
+            var displayNames = types.GetDisambiguatedDisplayNames();
+
+            Assert.Equal("BenchmarkDotNet.Tests.Foo.Fixture", displayNames[0]);
+            Assert.Equal("BenchmarkDotNet.Tests.Bar.Fixture", displayNames[1]);
+            Assert.Equal("ReflectionTests", displayNames[2]);
+        }
+
+        [Fact]
+        public void GetDisambiguatedDisplayNamesLeavesUniqueNamesUnqualified()
+        {
+            var types = new[] { typeof(Foo.Fixture), typeof(ReflectionTests) };
+
+            var displayNames = types.GetDisambiguatedDisplayNames();
+
+            Assert.Equal("Fixture", displayNames[0]);
+            Assert.Equal("ReflectionTests", displayNames[1]);
+        }
+
+        [Fact]
         public void OnlyClosedGenericsWithPublicParameterlessCtorsAreSupported()
         {
             Assert.False(typeof(Generic<>).ContainsRunnableBenchmarks());
@@ -175,4 +203,14 @@ namespace BenchmarkDotNet.Tests
                 => new StackOnlyStruct<T> { Span = instance.Array };
         }
     }
+}
+
+namespace BenchmarkDotNet.Tests.Foo
+{
+    public class Fixture { }
+}
+
+namespace BenchmarkDotNet.Tests.Bar
+{
+    public class Fixture { }
 }

@@ -8,6 +8,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.ComponentModel;
 
@@ -64,6 +65,14 @@ namespace BenchmarkDotNet.Diagnosers
         public const string ResultsKey = $"{HeaderKey}Results";
 
         public IReadOnlyList<IInProcessDiagnoser> InProcessDiagnosers { get; } = inProcessDiagnosers;
+
+        private readonly ConcurrentDictionary<BenchmarkCase, IReadOnlyList<InProcessDiagnoserHandlerData>> handlerDataByBenchmark = new();
+
+        // The handler data is queried while building a benchmark (code generation, the Roslyn reference set, build-error
+        // explanation). This composite is shared across the benchmark cases of a run info, so memoize per benchmark case -
+        // each diagnoser's GetHandlerData (which may do real work) then runs at most once per benchmark.
+        public IReadOnlyList<InProcessDiagnoserHandlerData> GetHandlerData(BenchmarkCase benchmarkCase)
+            => handlerDataByBenchmark.GetOrAdd(benchmarkCase, bc => [.. InProcessDiagnosers.Select(diagnoser => diagnoser.GetHandlerData(bc))]);
 
         public void DeserializeResults(int index, BenchmarkCase benchmarkCase, string results)
             => InProcessDiagnosers[index].DeserializeResults(benchmarkCase, results);

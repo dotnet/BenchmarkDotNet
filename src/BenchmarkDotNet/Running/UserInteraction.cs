@@ -21,11 +21,12 @@ namespace BenchmarkDotNet.Running
         public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             var selectedTypes = new List<Type>();
-            string benchmarkCaptionExample = allTypes.First().GetDisplayName();
+            var displayNames = allTypes.GetDisambiguatedDisplayNames();
+            string benchmarkCaptionExample = displayNames[0];
 
             while (selectedTypes.Count == 0 && !consoleCancelKeyPressed)
             {
-                PrintAvailable(allTypes, logger);
+                PrintAvailable(allTypes, displayNames, logger);
 
                 if (consoleCancelKeyPressed)
                     break;
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
-                selectedTypes.AddRange(GetMatching(allTypes, userInput.Split([' '], StringSplitOptions.RemoveEmptyEntries)));
+                selectedTypes.AddRange(GetMatching(allTypes, displayNames, userInput.Split([' '], StringSplitOptions.RemoveEmptyEntries)));
                 logger.WriteLine();
             }
 
@@ -77,11 +78,11 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineInfo($"\t{displayName}");
             }
 
-            logger.WriteLineInfo("To print all available benchmarks use `--list flat` or `--list tree`.");
+            logger.WriteLineInfo("To print all available benchmarks use `--list flat` or `--list tree` or `--list json`.");
             logger.WriteLineInfo("To learn more about filtering use `--help`.");
         }
 
-        private static IEnumerable<Type> GetMatching(IReadOnlyList<Type> allTypes, string[] userInput)
+        private static IEnumerable<Type> GetMatching(IReadOnlyList<Type> allTypes, string[] displayNames, string[] userInput)
         {
             if (userInput.IsEmpty())
                 yield break;
@@ -93,7 +94,7 @@ namespace BenchmarkDotNet.Running
             {
                 var type = allTypes[i];
 
-                if (stringInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
+                if (stringInput.Any(arg => displayNames[i].ContainsWithIgnoreCase(arg))
                     || stringInput.Contains($"#{i}")
                     || integerInput.Contains($"{i}")
                     || stringInput.Contains("*"))
@@ -105,13 +106,13 @@ namespace BenchmarkDotNet.Running
             static bool IsInteger(string str) => int.TryParse(str, out _);
         }
 
-        private static void PrintAvailable(IReadOnlyList<Type> allTypes, ILogger logger)
+        private static void PrintAvailable(IReadOnlyList<Type> allTypes, string[] displayNames, ILogger logger)
         {
             logger.WriteLineHelp($"Available Benchmark{(allTypes.Count > 1 ? "s" : "")}:");
 
             int numberWidth = allTypes.Count.ToString().Length;
             for (int i = 0; i < allTypes.Count && !consoleCancelKeyPressed; i++)
-                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), allTypes[i].GetDisplayName()));
+                logger.WriteLineHelp(string.Format(CultureInfo.InvariantCulture, "  #{0} {1}", i.ToString().PadRight(numberWidth), displayNames[i]));
 
             if (!consoleCancelKeyPressed)
             {

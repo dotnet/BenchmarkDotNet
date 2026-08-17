@@ -20,9 +20,8 @@ public struct InProcessDiagnoserRouter
         return handler;
     }
 
-    internal static InProcessDiagnoserRouter Create(IInProcessDiagnoser diagnoser, BenchmarkCase benchmarkCase, int index)
+    internal static InProcessDiagnoserRouter Create(IInProcessDiagnoser diagnoser, InProcessDiagnoserHandlerData data, BenchmarkCase benchmarkCase, int index)
     {
-        var data = diagnoser.GetHandlerData(benchmarkCase);
         if (data.HandlerType is null)
         {
             return default;

@@ -14,9 +14,6 @@
     <!-- Disable parallel tests between TargetFrameworks -->
     <TestTfmsInParallel>false</TestTfmsInParallel>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
-    <Reference Include="System.Reflection" />
-  </ItemGroup>
   <PropertyGroup>
     <!-- Use 13.0.1< as baseline package for IntroNuGet -->
     <NewtonsoftJsonVersion Condition="'$(NewtonsoftJsonVersion)' == ''">13.0.1</NewtonsoftJsonVersion>

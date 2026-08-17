@@ -31,6 +31,10 @@ namespace BenchmarkDotNet.Running
     {
         internal const string DateTimeFormat = "yyyyMMdd-HHmmss";
 
+        // the artifacts of a run are named "{title}{suffix}", where the longest suffix we produce is
+        // "-{DateTimeFormat}.log" for the log file and "-report-full-compressed.json" for the exported results
+        private const int MaxArtifactNameSuffixLength = 32;
+
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
         internal static async ValueTask<Summary[]> Run(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken)
@@ -57,13 +61,13 @@ namespace BenchmarkDotNet.Running
             var artifactsToCleanup = new List<string>();
 
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
-            var maxTitleLength = OsDetector.IsWindows()
-                ? 254 - rootArtifactsFolderPath.Length
-                : int.MaxValue;
-            var title = GetTitle(benchmarkRunInfos, maxTitleLength);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
-            var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
-            var idToResume = GetIdToResume(rootArtifactsFolderPath, title, benchmarkRunInfos);
+            var maxTitleLength = GetMaxTitleLength(rootArtifactsFolderPath, resultsFolderPath);
+            var title = TitleHelper.GetRunTitle(benchmarkRunInfos, maxTitleLength);
+            // in contrary to the exported results, every run gets its own log file, so that --resume can find the previous one
+            var logFileName = $"{title}-{DateTime.Now.ToString(DateTimeFormat)}";
+            var logFilePath = Path.Combine(rootArtifactsFolderPath, logFileName + ".log");
+            var idToResume = GetIdToResume(rootArtifactsFolderPath, title, logFileName, benchmarkRunInfos);
 
             using var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath));
             var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
@@ -153,8 +157,9 @@ namespace BenchmarkDotNet.Running
                     }
 
                     eventProcessor.OnStartRunBenchmarksInType(benchmarkRunInfo.Type, benchmarkRunInfo.BenchmarksCases);
+                    var summaryTitle = TitleHelper.GetSummaryTitle(benchmarkRunInfo, supportedBenchmarks.Length == 1, maxTitleLength);
                     (var summary, benchmarksToRunCount) = await Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, eventProcessor, artifactsToCleanup,
-                        resultsFolderPath, logFilePath, totalBenchmarkCount, runsChronometer, benchmarksToRunCount,
+                        summaryTitle, resultsFolderPath, logFilePath, totalBenchmarkCount, runsChronometer, benchmarksToRunCount,
                         taskbarProgress, cancellationToken).ConfigureAwait();
                     eventProcessor.OnEndRunBenchmarksInType(benchmarkRunInfo.Type, summary);
 
@@ -172,9 +177,10 @@ namespace BenchmarkDotNet.Running
 
                 if (supportedBenchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
                 {
-                    var joinedSummary = Summary.Join(results, runsChronometer.GetElapsed());
+                    var joinConfig = supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config;
+                    var joinedSummary = Summary.Join(results, runsChronometer.GetElapsed(), TitleHelper.GetJoinedSummaryTitle(joinConfig.Title, maxTitleLength));
 
-                    await PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary, cancellationToken).ConfigureAwait();
+                    await PrintSummary(compositeLogger, joinConfig, joinedSummary, cancellationToken).ConfigureAwait();
 
                     results.Clear();
                     results.Add(joinedSummary);
@@ -211,6 +217,7 @@ namespace BenchmarkDotNet.Running
             ILogger logger,
             EventProcessor eventProcessor,
             List<string> artifactsToCleanup,
+            string title,
             string resultsFolderPath,
             string logFilePath,
             int totalBenchmarkCount,
@@ -226,7 +233,6 @@ namespace BenchmarkDotNet.Running
             var config = benchmarkRunInfo.Config;
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
-            string title = GetTitle([benchmarkRunInfo]);
             using var consoleTitler = new ConsoleTitler($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining");
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
@@ -278,7 +284,7 @@ namespace BenchmarkDotNet.Running
 
                         if (buildResult.GenerateException != null)
                             logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException}");
-                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string? reason))
+                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(benchmarkRunInfo.CompositeInProcessDiagnoser.GetInProcessDiagnoserHandlerTypes(benchmark), out string? reason))
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
@@ -447,7 +453,7 @@ namespace BenchmarkDotNet.Running
             {
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
                 {
-                    if (!buildResults[buildPartition].TryToExplainFailureReason(out _))
+                    if (!buildResults[buildPartition].TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out _))
                         buildResults[buildPartition] = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait();
 
                     eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
@@ -757,32 +763,13 @@ namespace BenchmarkDotNet.Running
             return customPath != default ? customPath.CreateIfNotExists() : defaultPath;
         }
 
-        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos, int desiredMaxLength = int.MaxValue)
-        {
-            // few types might have the same name: A.Name and B.Name will both report "Name"
-            // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Descriptor.Type)).Distinct().ToArray();
-
-            var fileNamePrefix = (uniqueTargetTypes.Length == 1)
-                ? FolderNameHelper.ToFolderName(uniqueTargetTypes[0])
-                : "BenchmarkRun";
-            string dateTimeSuffix = DateTime.Now.ToString(DateTimeFormat);
-
-            int maxFileNamePrefixLength = desiredMaxLength - dateTimeSuffix.Length - 1;
-            if (maxFileNamePrefixLength <= 2)
-                return dateTimeSuffix;
-
-            if (fileNamePrefix.Length > maxFileNamePrefixLength)
-            {
-                int length1 = maxFileNamePrefixLength / 2;
-                int length2 = maxFileNamePrefixLength - length1 - 1;
-                fileNamePrefix = fileNamePrefix.Substring(0, length1) +
-                                 "-" +
-                                 fileNamePrefix.Substring(fileNamePrefix.Length - length2, length2);
-            }
-
-            return $"{fileNamePrefix}-{dateTimeSuffix}";
-        }
+        /// <summary>
+        /// the budget left for the title once the folder and the suffix that the artifacts are named after are accounted for
+        /// </summary>
+        private static int GetMaxTitleLength(string rootArtifactsFolderPath, string resultsFolderPath)
+            => OsDetector.IsWindows()
+                ? 254 - Math.Max(rootArtifactsFolderPath.Length, resultsFolderPath.Length) - MaxArtifactNameSuffixLength
+                : int.MaxValue;
 
         private static string GetResultsFolderPath(string rootArtifactsFolderPath, BenchmarkRunInfo[] benchmarkRunInfos)
         {
@@ -865,13 +852,14 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static int GetIdToResume(string rootArtifactsFolderPath, string currentLogFileName, BenchmarkRunInfo[] benchmarkRunInfos)
+        private static int GetIdToResume(string rootArtifactsFolderPath, string title, string currentLogFileName, BenchmarkRunInfo[] benchmarkRunInfos)
         {
             if (benchmarkRunInfos.Any(benchmark => benchmark.Config.Options.IsSet(ConfigOptions.Resume)))
             {
                 var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
+                // the log files of the previous runs of the same benchmarks are named "{title}-{timestamp}.log"
                 var logFilesExceptCurrent = directoryInfo
-                    .GetFiles($"{currentLogFileName.Split('-')[0]}*")
+                    .GetFiles($"{title}-*.log")
                     .Where(file => Path.GetFileNameWithoutExtension(file.Name) != currentLogFileName)
                     .ToArray();
 

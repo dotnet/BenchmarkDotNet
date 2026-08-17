@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/deterministic");
             list.Add("/platform:" + buildPartition.Platform.ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.EscapeCommandLine());
-            var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.EscapeCommandLine());
+            var references = GetAllReferences(buildPartition.Benchmarks[0]).Select(assembly => assembly.Location.EscapeCommandLine());
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 
@@ -46,17 +47,17 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             ).ConfigureAwait(false);
         }
 
-        internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase)
-            => benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
+        internal static IEnumerable<Assembly> GetAllReferences(BenchmarkBuildInfo buildInfo)
+            => buildInfo.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
-                .Concat(
-                [
-                    benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                    typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
-                    typeof(System.Threading.Tasks.ValueTask).Assembly, // TaskExtensions
-                    typeof(Perfolizer.Horology.IClock).Assembly // Perfolizer
-                ])
+                .Append(buildInfo.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly) // This assembly does not have to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet)
+                .Concat(BenchmarkDotNetReferences.Assemblies) // BenchmarkDotNet + Perfolizer
+                .Concat(BenchmarkDotNetReferences.Types.Select(type => type.GetTypeInfo().Assembly)) // TaskExtensions (ValueTask)
+                // In-process diagnoser handlers
+                .Concat(buildInfo.CompositeInProcessDiagnoser.GetHandlerData(buildInfo.BenchmarkCase)
+                    .Select(handlerData => handlerData.HandlerType?.GetTypeInfo().Assembly)
+                    .WhereNotNull())
                 .Distinct();
     }
 }

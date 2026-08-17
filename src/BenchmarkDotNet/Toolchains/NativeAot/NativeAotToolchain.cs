@@ -8,50 +8,37 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
     public class NativeAotToolchain : Toolchain
     {
         /// <summary>
-        /// compiled as net6.0, targets experimental 6.0.0-* NativeAOT build from the https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json
-        /// </summary>
-        public static readonly IToolchain Net60 = CreateBuilder()
-            .UseNuGet("6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
-            .TargetFrameworkMoniker("net6.0")
-            .ToToolchain();
-
-        /// <summary>
-        /// compiled as net7.0, targets latest NativeAOT build from the NuGet.org feed
+        /// compiled as net7.0.
         /// </summary>
         public static readonly IToolchain Net70 = CreateBuilder()
-            .UseNuGet("", "https://api.nuget.org/v3/index.json")
             .TargetFrameworkMoniker("net7.0")
             .ToToolchain();
 
         /// <summary>
-        /// compiled as net8.0, targets latest NativeAOT build from the NuGet.org feed
+        /// compiled as net8.0.
         /// </summary>
         public static readonly IToolchain Net80 = CreateBuilder()
-            .UseNuGet("", "https://api.nuget.org/v3/index.json")
             .TargetFrameworkMoniker("net8.0")
             .ToToolchain();
 
         /// <summary>
-        /// compiled as net9.0, targets latest NativeAOT build from the NuGet.org feed
+        /// compiled as net9.0.
         /// </summary>
         public static readonly IToolchain Net90 = CreateBuilder()
-            .UseNuGet("", "https://api.nuget.org/v3/index.json")
             .TargetFrameworkMoniker("net9.0")
             .ToToolchain();
 
         /// <summary>
-        /// compiled as net10.0, targets latest NativeAOT build from the NuGet.org feed
+        /// compiled as net10.0.
         /// </summary>
         public static readonly IToolchain Net10_0 = CreateBuilder()
-            .UseNuGet("", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet10/nuget/v3/index.json")
             .TargetFrameworkMoniker("net10.0")
             .ToToolchain();
 
         /// <summary>
-        /// compiled as net11.0, targets latest NativeAOT build from the .NET 11 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json
+        /// compiled as net11.0.
         /// </summary>
         public static readonly IToolchain Net11_0 = CreateBuilder()
-            .UseNuGet("", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json")
             .TargetFrameworkMoniker("net11.0")
             .ToToolchain();
 

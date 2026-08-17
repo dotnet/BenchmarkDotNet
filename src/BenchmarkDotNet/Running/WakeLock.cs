@@ -2,26 +2,35 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
+using System.Runtime.Versioning;
+using Windows.Win32.System.Power;
 
 namespace BenchmarkDotNet.Running;
 
 internal partial class WakeLock
 {
     public static WakeLockType GetWakeLockType(BenchmarkRunInfo[] benchmarkRunInfos) =>
-        benchmarkRunInfos.Length == 0 ? WakeLockType.None : benchmarkRunInfos.Select(static i => i.Config.WakeLock).Max();
+        benchmarkRunInfos.Length == 0 ? WakeLockType.None : benchmarkRunInfos.Max(static i => i.Config.WakeLock);
 
-    private static readonly bool OsVersionIsSupported =
+    public static IDisposable? Request(WakeLockType wakeLockType, string reason, ILogger logger)
+    {
+        if (wakeLockType == WakeLockType.None)
+            return null;
+
         // Must be windows 7 or greater
-        OsDetector.IsWindows() && Environment.OSVersion.Version >= new Version(6, 1);
+        if (!OsDetector.IsWindows7OrLater())
+            return null;
 
-    public static IDisposable? Request(WakeLockType wakeLockType, string reason, ILogger logger) =>
-        wakeLockType == WakeLockType.None || !OsVersionIsSupported ? null : new WakeLockSentinel(wakeLockType, reason, logger);
+        return new WakeLockSentinel(wakeLockType, reason, logger);
+    }
 
+    [SupportedOSPlatform("windows6.1")]
     private class WakeLockSentinel : DisposeAtProcessTermination
     {
         private readonly WakeLockType wakeLockType;
-        private readonly SafePowerHandle? safePowerHandle;
+        private readonly SafeFileHandle? safePowerHandle;
         private readonly ILogger logger;
 
         public WakeLockSentinel(WakeLockType wakeLockType, string reason, ILogger logger)
@@ -30,11 +39,11 @@ internal partial class WakeLock
             this.logger = logger;
             try
             {
-                safePowerHandle = PInvoke.PowerCreateRequest(reason);
-                PInvoke.PowerSetRequest(safePowerHandle, PInvoke.POWER_REQUEST_TYPE.PowerRequestSystemRequired);
+                safePowerHandle = PowerCreateRequest(reason);
+                PowerSetRequest(safePowerHandle, POWER_REQUEST_TYPE.PowerRequestSystemRequired);
                 if (wakeLockType == WakeLockType.Display)
                 {
-                    PInvoke.PowerSetRequest(safePowerHandle, PInvoke.POWER_REQUEST_TYPE.PowerRequestDisplayRequired);
+                    PowerSetRequest(safePowerHandle, POWER_REQUEST_TYPE.PowerRequestDisplayRequired);
                 }
             }
             catch (Win32Exception ex)
@@ -51,9 +60,9 @@ internal partial class WakeLock
                 {
                     if (wakeLockType == WakeLockType.Display)
                     {
-                        PInvoke.PowerClearRequest(safePowerHandle, PInvoke.POWER_REQUEST_TYPE.PowerRequestDisplayRequired);
+                        PowerClearRequest(safePowerHandle, POWER_REQUEST_TYPE.PowerRequestDisplayRequired);
                     }
-                    PInvoke.PowerClearRequest(safePowerHandle, PInvoke.POWER_REQUEST_TYPE.PowerRequestSystemRequired);
+                    PowerClearRequest(safePowerHandle, POWER_REQUEST_TYPE.PowerRequestSystemRequired);
                 }
                 catch (Win32Exception ex)
                 {

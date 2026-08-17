@@ -15,54 +15,81 @@ namespace BenchmarkDotNet.Running
     public static class BenchmarkRunner
     {
         [PublicAPI]
-        public static Summary Run<T>(IConfig? config = null, string[]? args = null)
+        public static Summary Run<T>(
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync<T>(config, args));
+            return context.ExecuteUntilComplete(
+                RunAsync<T>(config, args, cancellationToken));
         }
 
         [PublicAPI]
-        public static Summary Run(Type type, IConfig? config = null, string[]? args = null)
+        public static Summary Run(
+            Type type,
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(type, config, args));
+            return context.ExecuteUntilComplete(
+                RunAsync(type, config, args, cancellationToken));
         }
 
         [PublicAPI]
-        public static Summary[] Run(Type[] types, IConfig? config = null, string[]? args = null)
+        public static Summary[] Run(
+            Type[] types,
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(types, config, args));
+            return context.ExecuteUntilComplete(
+                RunAsync(types, config, args, cancellationToken));
         }
 
         [PublicAPI]
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig? config = null)
+        public static Summary Run(
+            Type type,
+            MethodInfo[] methods,
+            IConfig? config = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(type, methods, config));
+            return context.ExecuteUntilComplete(
+                RunAsync(type, methods, config, cancellationToken));
         }
 
         [PublicAPI]
-        public static Summary[] Run(Assembly assembly, IConfig? config = null, string[]? args = null)
+        public static Summary[] Run(
+            Assembly assembly,
+            IConfig? config = null,
+            string[]? args = null,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(assembly, config, args));
+            return context.ExecuteUntilComplete(
+                RunAsync(assembly, config, args, cancellationToken));
         }
 
         [PublicAPI]
-        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo)
+        public static Summary Run(BenchmarkRunInfo benchmarkRunInfo, CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(benchmarkRunInfo));
+            return context.ExecuteUntilComplete(
+                RunAsync(benchmarkRunInfo, cancellationToken));
         }
 
         [PublicAPI]
-        public static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
+        public static Summary[] Run(
+            BenchmarkRunInfo[] benchmarkRunInfos,
+            CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(benchmarkRunInfos));
+            return context.ExecuteUntilComplete(
+                RunAsync(benchmarkRunInfos, cancellationToken));
         }
-
         [PublicAPI]
         public static ValueTask<Summary> RunAsync<T>(IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
             => RunAsync(typeof(T), config, args, cancellationToken);
@@ -102,10 +129,13 @@ namespace BenchmarkDotNet.Running
                 return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args, cancellationToken)).ConfigureAwait(false);
             }
         }
-
         [PublicAPI]
-        public static async ValueTask<Summary> RunAsync(BenchmarkRunInfo benchmarkRunInfo)
-            => (await RunAsync([benchmarkRunInfo]).ConfigureAwait(false)).Single();
+        public static async ValueTask<Summary> RunAsync(
+            BenchmarkRunInfo benchmarkRunInfo,
+            CancellationToken cancellationToken = default)
+            => (await RunAsync([benchmarkRunInfo], cancellationToken)
+                .ConfigureAwait(false))
+                .Single();
 
         [PublicAPI]
         public static async ValueTask<Summary[]> RunAsync(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken = default)

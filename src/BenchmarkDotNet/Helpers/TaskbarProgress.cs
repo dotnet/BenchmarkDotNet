@@ -1,5 +1,7 @@
 using BenchmarkDotNet.Detectors;
 using System.Runtime.InteropServices;
+using Windows.Win32.System.Console;
+using Windows.Win32;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -15,9 +17,7 @@ namespace BenchmarkDotNet.Helpers
 
     internal class TaskbarProgress : DisposeAtProcessTermination
     {
-        private static readonly bool OsVersionIsSupported = OsDetector.IsWindows()
-            // Must be windows 7 or greater
-            && Environment.OSVersion.Version >= new Version(6, 1);
+        private static readonly bool OsVersionIsSupported = OsDetector.IsWindows7OrLater();
 
         private Com? com;
         private Terminal? terminal;
@@ -97,9 +97,6 @@ namespace BenchmarkDotNet.Helpers
             [ComImport]
             private class TaskbarInstance { }
 
-            [DllImport("kernel32.dll")]
-            private static extern IntPtr GetConsoleWindow();
-
             private readonly ITaskbarList3 taskbarInstance;
             private readonly IntPtr consoleWindowHandle;
 
@@ -113,7 +110,7 @@ namespace BenchmarkDotNet.Helpers
             {
                 try
                 {
-                    IntPtr handle = GetConsoleWindow();
+                    IntPtr handle = PInvoke.GetConsoleWindow();
                     if (handle == IntPtr.Zero)
                     {
                         return null;
@@ -142,49 +139,21 @@ namespace BenchmarkDotNet.Helpers
 
         private sealed class Terminal
         {
-            [Flags]
-            private enum ConsoleModes : uint
-            {
-                ENABLE_PROCESSED_INPUT = 0x0001,
-                ENABLE_LINE_INPUT = 0x0002,
-                ENABLE_ECHO_INPUT = 0x0004,
-                ENABLE_WINDOW_INPUT = 0x0008,
-                ENABLE_MOUSE_INPUT = 0x0010,
-                ENABLE_INSERT_MODE = 0x0020,
-                ENABLE_QUICK_EDIT_MODE = 0x0040,
-                ENABLE_EXTENDED_FLAGS = 0x0080,
-                ENABLE_AUTO_POSITION = 0x0100,
-
-                ENABLE_PROCESSED_OUTPUT = 0x0001,
-                ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002,
-                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004,
-                DISABLE_NEWLINE_AUTO_RETURN = 0x0008,
-                ENABLE_LVB_GRID_WORLDWIDE = 0x0010
-            }
-
-            [DllImport("kernel32.dll", SetLastError = true)]
-            private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out ConsoleModes lpMode);
-            [DllImport("kernel32.dll", SetLastError = true)]
-            private static extern bool SetConsoleMode(IntPtr hConsoleHandle, ConsoleModes dwMode);
-            [DllImport("kernel32.dll", SetLastError = true)]
-            private static extern IntPtr GetStdHandle(int nStdHandle);
-            private const int STD_OUTPUT_HANDLE = -11;
-
-            private readonly IntPtr consoleHandle;
+            private readonly SafeHandle consoleHandle;
             private uint currentProgress;
 
-            private Terminal(IntPtr handle)
+            private Terminal(SafeHandle handle)
                 => consoleHandle = handle;
 
             internal static Terminal? MaybeCreateInstanceAndSetInitialState(TaskbarProgressState initialTaskbarState)
             {
-                IntPtr handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                if (handle == IntPtr.Zero)
+                var handle = PInvoke.GetStdHandle_SafeHandle(STD_HANDLE.STD_OUTPUT_HANDLE);
+                if (handle.IsInvalid)
                 {
                     return null;
                 }
-                if (!GetConsoleMode(handle, out ConsoleModes previousConsoleMode)
-                    || !SetConsoleMode(handle, ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING | ConsoleModes.ENABLE_PROCESSED_OUTPUT))
+                if (!PInvoke.GetConsoleMode(handle, out CONSOLE_MODE previousConsoleMode)
+                    || !PInvoke.SetConsoleMode(handle, CONSOLE_MODE.ENABLE_VIRTUAL_TERMINAL_PROCESSING | CONSOLE_MODE.ENABLE_PROCESSED_OUTPUT))
                 {
                     // If we failed to set virtual terminal processing mode, it is likely due to an older Windows version that does not support it,
                     // or legacy console. In either case the TaskbarProgressCom will take care of the progress. See https://stackoverflow.com/a/44574463/5703407.
@@ -193,16 +162,16 @@ namespace BenchmarkDotNet.Helpers
                 }
                 var terminal = new Terminal(handle);
                 terminal.WriteStateSequence(initialTaskbarState);
-                SetConsoleMode(handle, previousConsoleMode);
+                PInvoke.SetConsoleMode(handle, previousConsoleMode);
                 return terminal;
             }
 
             internal void SetState(TaskbarProgressState taskbarState)
             {
-                GetConsoleMode(consoleHandle, out ConsoleModes previousConsoleMode);
-                SetConsoleMode(consoleHandle, ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING | ConsoleModes.ENABLE_PROCESSED_OUTPUT);
+                PInvoke.GetConsoleMode(consoleHandle, out CONSOLE_MODE previousConsoleMode);
+                PInvoke.SetConsoleMode(consoleHandle, CONSOLE_MODE.ENABLE_VIRTUAL_TERMINAL_PROCESSING | CONSOLE_MODE.ENABLE_PROCESSED_OUTPUT);
                 WriteStateSequence(taskbarState);
-                SetConsoleMode(consoleHandle, previousConsoleMode);
+                PInvoke.SetConsoleMode(consoleHandle, previousConsoleMode);
             }
 
             private void WriteStateSequence(TaskbarProgressState taskbarState)
@@ -238,10 +207,10 @@ namespace BenchmarkDotNet.Helpers
             {
                 currentProgress = progressValue;
                 // Write progress sequence to console for Windows Terminal (https://github.com/microsoft/terminal/discussions/14268).
-                GetConsoleMode(consoleHandle, out ConsoleModes previousConsoleMode);
-                SetConsoleMode(consoleHandle, ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING | ConsoleModes.ENABLE_PROCESSED_OUTPUT);
+                PInvoke.GetConsoleMode(consoleHandle, out CONSOLE_MODE previousConsoleMode);
+                PInvoke.SetConsoleMode(consoleHandle, CONSOLE_MODE.ENABLE_VIRTUAL_TERMINAL_PROCESSING | CONSOLE_MODE.ENABLE_PROCESSED_OUTPUT);
                 WriteProgressSequence(progressValue);
-                SetConsoleMode(consoleHandle, previousConsoleMode);
+                PInvoke.SetConsoleMode(consoleHandle, previousConsoleMode);
             }
 
             private static void WriteProgressSequence(uint progressValue)

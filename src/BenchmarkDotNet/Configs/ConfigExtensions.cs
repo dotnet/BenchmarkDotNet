@@ -42,6 +42,11 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithSummaryStyle(this IConfig config, SummaryStyle summaryStyle) => config.With(c => c.WithSummaryStyle(summaryStyle));
 
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
+
+        /// <summary>
+        /// sets the title of the produced summaries and the base name of the result files exported for them
+        /// </summary>
+        [PublicAPI] public static ManualConfig WithTitle(this IConfig config, string title) => config.With(m => m.WithTitle(title));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
         [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
 

@@ -15,6 +15,11 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
         /// <summary>
         /// Prints tree of the available full benchmark names.
         /// </summary>
-        Tree
+        Tree,
+
+        /// <summary>
+        /// Prints JSON of the available benchmark information.
+        /// </summary>
+        Json,
     }
 }

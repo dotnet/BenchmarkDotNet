@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<EventProcessor> uniqueEventProcessors,
             ConfigUnionRule unionRule,
             string artifactsPath,
+            string? title,
             CultureInfo cultureInfo,
             IOrderer orderer,
             ICategoryDiscoverer categoryDiscoverer,
@@ -70,6 +71,7 @@ namespace BenchmarkDotNet.Configs
             eventProcessors = uniqueEventProcessors;
             UnionRule = unionRule;
             ArtifactsPath = artifactsPath;
+            Title = title;
             CultureInfo = cultureInfo;
             Orderer = orderer;
             CategoryDiscoverer = categoryDiscoverer;
@@ -82,6 +84,7 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule { get; }
         public string ArtifactsPath { get; }
+        public string? Title { get; }
         public CultureInfo CultureInfo { get; }
         public ConfigOptions Options { get; }
         public IOrderer Orderer { get; }

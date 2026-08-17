@@ -6,6 +6,8 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.OpenMetrics;
@@ -85,6 +87,69 @@ namespace BenchmarkDotNet.Tests
 
             Assert.NotNull(config);
             Assert.Equal(expectedExporters, config.GetExporters().ToArray());
+        }
+
+        [Fact]
+        public void CustomExporterIsResolvedFromAssemblyQualifiedTypeName()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", typeof(CustomExporter).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.True(isSuccess);
+            Assert.NotNull(config);
+            Assert.Single(config.GetExporters());
+            Assert.IsType<CustomExporter>(config.GetExporters().Single());
+        }
+
+        [Fact]
+        public void BuiltInAndCustomExportersCanBeCombined()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", "json", typeof(CustomExporter).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.True(isSuccess);
+            Assert.NotNull(config);
+            Assert.Contains(JsonExporter.Default, config.GetExporters());
+            Assert.Contains(config.GetExporters(), e => e is CustomExporter);
+        }
+
+        [Fact]
+        public void UnknownExporterNameFailsParsing()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", "does-not-exist"], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+        }
+
+        [Fact]
+        public void CustomExporterThatDoesNotImplementIExporterFailsParsing()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", typeof(NotAnExporter).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+        }
+
+        [Fact]
+        public void CustomExporterWithoutParameterlessConstructorFailsParsing()
+        {
+            var (isSuccess, config, _) = ConfigParser.Parse(["--exporters", typeof(ExporterWithoutParameterlessCtor).AssemblyQualifiedName!], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+        }
+
+        public class CustomExporter : ExporterBase
+        {
+            public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken) => new();
+        }
+
+        public class NotAnExporter { }
+
+        public class ExporterWithoutParameterlessCtor : ExporterBase
+        {
+            public ExporterWithoutParameterlessCtor(int _) { }
+
+            public override ValueTask ExportAsync(Summary summary, CancelableStreamWriter writer, CancellationToken cancellationToken) => new();
         }
 
         [Fact]
@@ -319,7 +384,7 @@ namespace BenchmarkDotNet.Tests
         public void IlCompilerPathParsedCorrectly()
         {
             var fakePath = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
-            var config = ConfigParser.Parse(["-r", "nativeaot60", "--ilcPackages", fakePath.FullName], new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", fakePath.FullName], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
             Assert.Single(config.GetJobs());
@@ -398,6 +463,24 @@ namespace BenchmarkDotNet.Tests
 
             Assert.NotNull(config);
             Assert.Equal(ConfigOptions.Default, config.Options);
+        }
+
+        [Fact]
+        public void TitleParsedCorrectly()
+        {
+            var config = ConfigParser.Parse(["--title", "MyCustomTitle"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal("MyCustomTitle", config.Title);
+        }
+
+        [Fact]
+        public void WhenTitleIsNotSpecifiedItIsNull()
+        {
+            var config = ConfigParser.Parse([], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Null(config.Title);
         }
 
         [Fact]
@@ -518,7 +601,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0"],
+            var config = ConfigParser.Parse(["--runtimes", "net462", "MONO", "netcoreapp2.0", "nativeaot8.0", "nativeAOT9.0", "nativeAOT10.0"],
                 new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
@@ -529,14 +612,14 @@ namespace BenchmarkDotNet.Tests
                 job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp2.0" &&
                 coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp20);
             Assert.Single(config.GetJobs(), job =>
-                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60);
-            Assert.Single(config.GetJobs(), job =>
-                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" &&
-                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70);
-            Assert.Single(config.GetJobs(), job =>
                 job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" &&
                 nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80);
+            Assert.Single(config.GetJobs(), job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net9.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot90);
+            Assert.Single(config.GetJobs(), job =>
+                job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net10.0" &&
+                nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot10_0);
         }
 
         [Theory]

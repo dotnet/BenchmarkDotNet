@@ -41,6 +41,14 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         string? ArtifactsPath { get; }
 
+        /// <summary>
+        /// the title of the produced summaries and the base name of the result files exported for them;
+        /// when the run reports more than one summary, the name of the benchmarked type is appended to keep
+        /// their files apart. When not specified, the name of the benchmarked type is used
+        /// (or "BenchmarkRun-joined" when <see cref="ConfigOptions.JoinSummary"/> is set)
+        /// </summary>
+        string? Title { get; }
+
         CultureInfo? CultureInfo { get; }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!")]
         public IEnumerable<string> Runtimes { get; set; } = [];
 
-        [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics")]
+        [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics. A custom IExporter can also be selected by its assembly-qualified type name, e.g. \"My.Namespace.MyExporter, MyAssembly\".")]
         public IEnumerable<string> Exporters { get; set; } = [];
 
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
@@ -83,6 +83,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("join", Required = false, Default = false, HelpText = "Prints single table with results for all benchmarks")]
         public bool Join { get; set; }
+
+        [Option("title", Required = false, HelpText = "Custom title for the produced summaries and the base name of the result files exported for them")]
+        public string? Title { get; set; }
 
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
@@ -159,7 +162,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("apples", Required = false, Default = false, HelpText = "Runs apples-to-apples comparison for specified Jobs.")]
         public bool ApplesToApples { get; set; }
 
-        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
+        [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree/JSON")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 
         [Option("disasmDepth", Required = false, Default = DefaultDisassemblerRecursiveDepth, HelpText = "Sets the recursive depth for the disassembler.")]

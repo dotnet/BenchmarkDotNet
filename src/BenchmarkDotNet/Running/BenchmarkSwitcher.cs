@@ -55,27 +55,27 @@ namespace BenchmarkDotNet.Running
         /// Run all available benchmarks.
         /// </summary>
         [PublicAPI]
-        public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
+        public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAllAsync(config, args));
+            return context.ExecuteUntilComplete(RunAllAsync(config, args, cancellationToken));
         }
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
         [PublicAPI]
-        public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
+        public Summary RunAllJoined(IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAllJoinedAsync(config, args));
+            return context.ExecuteUntilComplete(RunAllJoinedAsync(config, args, cancellationToken));
         }
 
         [PublicAPI]
-        public IEnumerable<Summary> Run(string[]? args = null, IConfig? config = null)
+        public IEnumerable<Summary> Run(string[]? args = null, IConfig? config = null, CancellationToken cancellationToken = default)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-            return context.ExecuteUntilComplete(RunAsync(args, config));
+            return context.ExecuteUntilComplete(RunAsync(args, config, cancellationToken));
         }
 
         /// <summary>
@@ -207,12 +207,11 @@ namespace BenchmarkDotNet.Running
         {
             var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
 
-            var testNames = TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                .SelectMany(p => p.BenchmarksCases)
-                .Select(p => p.Descriptor.GetFilterName())
-                .Distinct();
+            var benchmarkCases = TypeFilter
+                .Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+                .SelectMany(p => p.BenchmarksCases);
 
-            printer.Print(testNames, nonNullLogger);
+            printer.Print(benchmarkCases, nonNullLogger);
         }
 
         private async ValueTask<IEnumerable<Summary>> ApplesToApples(ImmutableConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options, CancellationToken cancellationToken)
