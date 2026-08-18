@@ -1,5 +1,8 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -8,6 +11,9 @@ namespace BenchmarkDotNet.Samples
         HardwareCounter.BranchInstructions)]
     public class IntroHardwareCounters
     {
+        public static void Run() =>
+            BenchmarkRunner.Run<IntroHardwareCounters>(DefaultConfig.Instance.AddJob(Job.Dry));
+
         private const int N = 32767;
         private readonly int[] sorted, unsorted;
 
