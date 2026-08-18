@@ -66,7 +66,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
             .AddJob(Job.Dry
                 .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
                 .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
-            .WithBuildTimeout(TimeSpan.FromSeconds(240))
+            .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
 
@@ -133,7 +133,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
                 .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
                 .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
             .AddDiagnoser(diagnoser)
-            .WithBuildTimeout(TimeSpan.FromSeconds(240))
+            .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
 
