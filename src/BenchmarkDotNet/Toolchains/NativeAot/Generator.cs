@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
             await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger), cancellationToken).ConfigureAwait(false);
 
-            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+            // Generate `bdn_generated.rd.xml`
             await GenerateReflectionFileAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
         }
 
@@ -158,7 +158,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
                 <StackTraceSupport>{ilcGenerateStackTraceData}</StackTraceSupport>
                 <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
-                <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
                 <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
                 {GetInstructionSetSettings(buildPartition)}
               </PropertyGroup>

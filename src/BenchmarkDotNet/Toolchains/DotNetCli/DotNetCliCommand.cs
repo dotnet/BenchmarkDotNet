@@ -67,32 +67,29 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return result.ToBuildResult(GenerateResult);
             }
 
-            // On our CI, Integration tests take too much time, because each benchmark run rebuilds BenchmarkDotNet itself.
-            // To reduce the total duration of the CI workflows, we build all the projects without dependencies
+            // Run `dotnet restore` and `dotnet build` command.
             if (BuildPartition.ForcedNoDependenciesForIntegrationTests)
             {
-                var restoreResult = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-dependencies", "restore-no-deps", excludeOutput: true)),
-                    cancellationToken).ConfigureAwait(false);
+                // On our CI, Integration tests take too much time, because each benchmark run rebuilds BenchmarkDotNet itself.
+                // To reduce the total duration of the CI workflows, we build all the projects without dependencies
+
+                // Run `dotnet restore` command with `--no-dependency`.
+                var restoreResult = await RestoreNoDependenciesAsync(cancellationToken).ConfigureAwait(false);
                 if (!restoreResult.IsSuccess)
                     return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-                var result = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(
-                        GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps", excludeOutput: true)
-                    ),
-                    cancellationToken).ConfigureAwait(false);
-
-                return result.ToBuildResult(GenerateResult);
+                // Run `dotnet build` command with `--no-restore --no-dependency`.
+                var buildResult = await BuildNoRestoreNoDependenciesAsync(cancellationToken).ConfigureAwait(false);
+                return buildResult.ToBuildResult(GenerateResult);
             }
             else
             {
+                // Run `dotnet restore` command.
                 var restoreResult = await RestoreAsync(cancellationToken).ConfigureAwait(false);
                 if (!restoreResult.IsSuccess)
                     return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-                // We no longer retry with --no-dependencies, because it fails with --output set at the same time,
-                // and the artifactsPaths.BinariesDirectoryPath is set before we try to build, so we cannot overwrite it.
+                // Run `dotnet build` command with `--no-restore` command.
                 var result = await BuildNoRestoreAsync(cancellationToken).ConfigureAwait(false);
                 return result.ToBuildResult(GenerateResult);
             }
@@ -112,18 +109,48 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return result.ToBuildResult(GenerateResult);
             }
 
-            var restoreResult = await RestoreAsync(cancellationToken).ConfigureAwait(false);
-            if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
+            if (BuildPartition.ForcedNoDependenciesForIntegrationTests)
+            {
+                // Run `dotnet restore` command with `--no-dependencies`.
+                var restoreResult = await RestoreNoDependenciesAsync(cancellationToken).ConfigureAwait(false);
+                if (!restoreResult.IsSuccess)
+                    return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-            // We use the implicit build in the publish command. We stopped doing a separate build step because we set the --output.
-            var publishResult = await PublishNoRestoreAsync(cancellationToken).ConfigureAwait(false);
-            return publishResult.ToBuildResult(GenerateResult);
+                // Run `dotnet build` command with `--no-restore --no-dependencies`.
+                var buildResult = await BuildNoRestoreNoDependenciesAsync(cancellationToken).ConfigureAwait(false);
+                if (!buildResult.IsSuccess)
+                    return BuildResult.Failure(GenerateResult, buildResult.AllInformation);
+
+                // Run `dotnet publish` command with `--no-build`.
+                var publishResult = await PublishNoBuildAsync(cancellationToken).ConfigureAwait(false);
+                return publishResult.ToBuildResult(GenerateResult);
+            }
+            else
+            {
+                // Run `dotnet restore` command.
+                var restoreResult = await RestoreAsync(cancellationToken).ConfigureAwait(false);
+                if (!restoreResult.IsSuccess)
+                    return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
+
+                // Run `dotnet build` command with `--no-restore`.
+                var buildResult = await BuildNoRestoreAsync(cancellationToken).ConfigureAwait(false);
+                if (!buildResult.IsSuccess)
+                    return BuildResult.Failure(GenerateResult, buildResult.AllInformation);
+
+                // Run `dotnet publish` command with `--no-build`.
+                var publishResult = await PublishNoBuildAsync(cancellationToken).ConfigureAwait(false);
+                return publishResult.ToBuildResult(GenerateResult);
+            }
         }
 
         public Task<DotNetCliCommandResult> RestoreAsync(CancellationToken cancellationToken = default)
             => DotNetCliCommandExecutor.ExecuteAsync(
                 WithArguments(GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, Arguments, "restore")),
+                cancellationToken);
+
+        public Task<DotNetCliCommandResult> RestoreNoDependenciesAsync(CancellationToken cancellationToken = default)
+            => DotNetCliCommandExecutor.ExecuteAsync(
+                WithArguments(GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-dependencies", "restore-no-deps")),
                 cancellationToken);
 
         public Task<DotNetCliCommandResult> BuildAsync(CancellationToken cancellationToken = default)
@@ -136,64 +163,81 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 WithArguments(GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "build-no-restore")),
                 cancellationToken);
 
+        public Task<DotNetCliCommandResult> BuildNoRestoreNoDependenciesAsync(CancellationToken cancellationToken = default)
+            => DotNetCliCommandExecutor.ExecuteAsync(
+                WithArguments(GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps")),
+                cancellationToken);
+
         public Task<DotNetCliCommandResult> PublishAsync(CancellationToken cancellationToken = default)
             => DotNetCliCommandExecutor.ExecuteAsync(
                 WithArguments(GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "publish")),
                 cancellationToken);
 
-        // PublishNoBuildAndNoRestore was removed because we set --output in the build step. We use the implicit build included in the publish command.
-        public Task<DotNetCliCommandResult> PublishNoRestoreAsync(CancellationToken cancellationToken = default)
+        public Task<DotNetCliCommandResult> PublishNoBuildAsync(CancellationToken cancellationToken = default)
             => DotNetCliCommandExecutor.ExecuteAsync(
-                WithArguments(GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "publish-no-restore")),
+                WithArguments(GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-build", "publish-no-build")),
                 cancellationToken);
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string? extraArguments = null, string? binLogSuffix = null)
             => new StringBuilder(256)
                 .AppendArgument("restore")
-                .AppendArgument($"\"{filePath.ToRelativePath(artifactsPaths)}\"")
+                .AppendArgument(filePath.ToRelativePath(artifactsPaths).QuoteIfNeeded())
                 // restore doesn't support -f argument.
-                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument(GetArtifactsPathArguments(buildPartition))
+                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages {artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}")
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendExtraArguments(artifactsPaths, isRestore: true, excludeOutput: excludeOutput)
+                .AppendArgument(GetMsBuildBinLogArgument(buildPartition, filePath, binLogSuffix))
                 .ToString();
 
-        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null, bool excludeOutput = false)
+        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null)
             => new StringBuilder(256)
                 .AppendArgument("build")
-                .AppendArgument($"\"{filePath.ToRelativePath(artifactsPaths)}\"")
+                .AppendArgument(filePath.ToRelativePath(artifactsPaths).QuoteIfNeeded())
                 .AppendArgument($"-f {tfm}")
                 .AppendArgument($"-c {buildPartition.BuildConfiguration}")
+                .AppendArgument(GetArtifactsPathArguments(buildPartition))
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
-                .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendExtraArguments(artifactsPaths, isBuild: true, excludeOutput: excludeOutput)
+                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot={artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}")
+                .AppendArgument(GetMsBuildBinLogArgument(buildPartition, filePath, binLogSuffix))
                 .ToString();
 
         internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string filePath, string tfm, string? extraArguments = null, string? binLogSuffix = null)
             => new StringBuilder(256)
                 .AppendArgument("publish")
-                .AppendArgument($"\"{filePath.ToRelativePath(artifactsPaths)}\"")
+                .AppendArgument(filePath.ToRelativePath(artifactsPaths).QuoteIfNeeded())
                 .AppendArgument($"-f {tfm}")
                 .AppendArgument($"-c {buildPartition.BuildConfiguration}")
+                .AppendArgument(GetArtifactsPathArguments(buildPartition))
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
-                .AppendArgument(GetMsBuildBinLogArgument(buildPartition, binLogSuffix))
-                .MaybeAppendExtraArguments(artifactsPaths, isPublish: true)
+                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot={artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}")
+                .AppendArgument(GetMsBuildBinLogArgument(buildPartition, filePath, binLogSuffix))
                 .ToString();
 
-        private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string? suffix)
+        private static string GetArtifactsPathArguments(BuildPartition buildPartition)
+        {
+            // Don't use `--artifacts-path` for integration tests. Because it build with `no-dependencies`.
+            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
+                return "";
+
+            var artifactsPath = ".artifacts";
+            return $"--artifacts-path {artifactsPath}";
+        }
+
+        private static string GetMsBuildBinLogArgument(BuildPartition buildPartition, string projectPath, string? suffix)
         {
             if (!buildPartition.GenerateMSBuildBinLog || suffix.IsBlank())
                 return string.Empty;
 
-            return $"-bl:\"{buildPartition.ProgramName}-{suffix}.binlog\"";
+            var projectName = Path.GetFileNameWithoutExtension(projectPath);
+
+            var fileName = $"{projectName}-{suffix}.binlog".QuoteIfNeeded();
+            return $"-bl:{fileName}";
         }
 
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -222,36 +266,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
     }
 
-    internal static class DotNetCliCommandExtensions
+    file static class DotNetCliCommandExtensions
     {
-        // Fix #1377 (see comments in #1773).
-        // We force the project to output binaries to a new directory.
-        // Specifying --output and --no-dependencies breaks the build (because the previous build was not done using the custom output path),
-        // so we don't include it if we're building no-deps (only supported for integration tests).
-        internal static StringBuilder MaybeAppendExtraArguments(
-            this StringBuilder stringBuilder,
-            ArtifactsPaths artifactsPaths,
-            bool isRestore = false,
-            bool isBuild = false,
-            bool isPublish = false,
-            bool excludeOutput = false)
-        {
-            if (!excludeOutput)
-            {
-                // Use a subdirectory for ArtifactsPath so that DefaultItemExcludes (which the SDK
-                // sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
-                stringBuilder.AppendArgument($"--artifacts-path .artifacts");
-
-                if (!isRestore)
-                    stringBuilder.AppendArgument($"--output \"{artifactsPaths.BinariesDirectoryPath.ToRelativePath(artifactsPaths)}\"");
-            }
-
-            if (isPublish)
-                stringBuilder.AppendArgument($"/p:PublishDir=\"{artifactsPaths.PublishDirectoryPath}\"");
-
-            return stringBuilder;
-        }
-
         internal static string ToRelativePath(this string path, ArtifactsPaths artifactsPaths)
         {
             var buildArtifactsDirectoryPath = $"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.DirectorySeparatorChar}";
@@ -259,6 +275,46 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return path.Substring(buildArtifactsDirectoryPath.Length);
 
             return path;
+        }
+
+        internal static string QuoteIfNeeded(this string commandArg)
+        {
+            ArgumentNullException.ThrowIfNull(commandArg);
+
+            if (commandArg.Length == 0)
+                return "\"\"";
+
+            if (!commandArg.Any(char.IsWhiteSpace) && !commandArg.Contains('"'))
+                return commandArg;
+
+            var builder = new StringBuilder(commandArg.Length + 2);
+            builder.Append('"');
+
+            var backslashCount = 0;
+            foreach (var c in commandArg)
+            {
+                switch (c)
+                {
+                    case '\\':
+                        backslashCount++;
+                        continue;
+                    case '"':
+                        builder.Append('\\', backslashCount * 2 + 1);
+                        builder.Append('"');
+                        break;
+                    default:
+                        builder.Append('\\', backslashCount);
+                        builder.Append(c);
+                        break;
+                }
+
+                backslashCount = 0;
+            }
+
+            builder.Append('\\', backslashCount * 2);
+            builder.Append('"');
+
+            return builder.ToString();
         }
     }
 }

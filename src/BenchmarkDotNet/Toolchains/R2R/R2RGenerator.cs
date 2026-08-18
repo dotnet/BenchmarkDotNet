@@ -46,8 +46,6 @@ namespace BenchmarkDotNet.Toolchains.R2R
                 .ToString();
 
             await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
-
-            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
