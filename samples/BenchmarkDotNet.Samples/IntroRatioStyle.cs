@@ -6,6 +6,7 @@ using BenchmarkDotNet.Reports;
 namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob, Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroRatioStyle
     {
         [Benchmark(Baseline = true)]
