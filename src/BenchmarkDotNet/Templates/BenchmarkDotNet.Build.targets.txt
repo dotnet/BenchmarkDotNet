@@ -1,2 +1,9 @@
 <Project>
+  <!-- Custom MSBuild target for DllGatherer. -->
+  <Target Name="BdnWriteOutputPath" Condition="'$(MSBuildProjectFile)' == '$DLLGATHERER_PROJ$'" AfterTargets="Build">
+    <WriteLinesToFile
+      File="$(MSBuildThisFileDirectory)DllGatherer.txt"
+      Lines="$(OutputPath)"
+      Overwrite="true" />
+  </Target>
 </Project>

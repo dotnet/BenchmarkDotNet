@@ -86,6 +86,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             .ToString();
 
             await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
+
+            // Integration tests are built without dependencies, so we skip gathering dlls.
+            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
+                return;
+
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         protected async ValueTask GenerateMainJS(FileInfo? mainJsTemplate, string targetMainJsPath, CancellationToken cancellationToken)

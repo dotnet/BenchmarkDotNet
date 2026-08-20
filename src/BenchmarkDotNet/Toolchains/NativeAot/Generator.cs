@@ -133,6 +133,12 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
             // Generate `bdn_generated.rd.xml`
             await GenerateReflectionFileAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
+
+            // Integration tests are built without dependencies, so we skip gathering dlls.
+            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
+                return;
+
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $"""

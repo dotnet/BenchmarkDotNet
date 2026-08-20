@@ -51,6 +51,12 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 .ToString();
 
             await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
+
+            // Integration tests are built without dependencies, so we skip gathering dlls.
+            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
+                return;
+
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         protected override string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
