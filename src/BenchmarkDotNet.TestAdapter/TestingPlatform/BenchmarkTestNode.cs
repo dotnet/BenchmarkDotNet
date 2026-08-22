@@ -70,7 +70,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             // keeps the same identity across processes and across tools. The job is only part of the display name
             // when it actually adds information.
             var uid = benchmarkCase.GetUniqueId();
-            var displayName = $"{fullClassName}.{parametrizedMethodName}" + (includeJobInName ? $" [{jobDisplayInfo}]" : "");
+
+            // Microsoft.Testing.Platform keeps the display name and the identity apart, so the name is free to be the
+            // [Benchmark(Description = ...)] the author chose. GetMethodDisplayName falls back to the method name when
+            // no description is set. The path keeps the method name, so that a filter still matches what
+            // BenchmarkDotNet's own --filter matches.
+            var displayMethodName = FullNameProvider.GetMethodDisplayName(benchmarkCase);
+            var displayName = $"{fullClassName}.{displayMethodName}" + (includeJobInName ? $" [{jobDisplayInfo}]" : "");
 
             var properties = new List<IProperty>
             {
