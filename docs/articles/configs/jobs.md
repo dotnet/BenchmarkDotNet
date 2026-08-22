@@ -15,6 +15,36 @@ There are several categories of characteristics which you can specify. Let's con
 
 It's a single string characteristic. It allows to name your job. This name will be used in logs and a part of a folder name with generated files for this job. `Id` doesn't affect benchmark results, but it can be useful for diagnostics. If you don't specify `Id`, random value will be chosen based on other characteristics
 
+### Categories
+
+Job categories are the job equivalent of `[BenchmarkCategory]`: they allow you to group jobs so that you can select which ones to run. A job can belong to any number of categories, and the comparison is case insensitive.
+
+```cs
+var config = DefaultConfig.Instance
+    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80).WithCategories("runtimes", "net8"))
+    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core90).WithCategories("runtimes", "net9"))
+    .AddJob(Job.Dry.WithCategory("debug"));
+```
+
+`WithCategories` overrides the categories of the job, `WithCategory` adds to them.
+
+You can also use the `[JobCategory]` attribute, which adds its categories to every job defined for the given class or assembly:
+
+```cs
+[JobCategory("runtimes")]
+[SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net90)]
+public class Benchmarks { /* ... */ }
+```
+
+Categories don't affect how a job is executed: they are not a part of the job `Id`, the folder names, nor the summary.
+
+To run only the jobs which belong to given categories, use `JobCategoryFilter`:
+
+```cs
+var config = DefaultConfig.Instance.AddFilter(new JobCategoryFilter(["net8"]));
+```
+
 ### Environment
 
 `Environment` specifies an environment of the job. You can specify the following characteristics:
