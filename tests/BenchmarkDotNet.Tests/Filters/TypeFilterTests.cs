@@ -7,7 +7,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using JetBrains.Annotations;
 using TypeFilter = BenchmarkDotNet.Running.TypeFilter;
 
-namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests.Filters
 {
     public class TypeFilterTests
     {
