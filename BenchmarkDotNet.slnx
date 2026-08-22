@@ -42,9 +42,7 @@
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.MonoBenchmarks/BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.SharedDiagnosers/BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.Static/BenchmarkDotNet.IntegrationTests.Static.csproj" />
-    <Project Path="tests/BenchmarkDotNet.IntegrationTests.TestingPlatform/BenchmarkDotNet.IntegrationTests.TestingPlatform.csproj">
-      <Build Solution="Release|*" Project="false" />
-    </Project>
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.TestingPlatform/BenchmarkDotNet.IntegrationTests.TestingPlatform.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.VisualBasic/BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj" />
     <Project Path="tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj" />
