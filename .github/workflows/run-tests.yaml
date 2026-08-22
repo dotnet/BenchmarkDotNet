@@ -21,6 +21,7 @@ jobs:
       matrix:
         os: [windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 720
     steps:
       # Checkout
       - uses: actions/checkout@v7
@@ -64,6 +65,7 @@ jobs:
       matrix:
         os: [windows-latest, windows-11-arm]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 720
     steps:
       # Checkout
       - uses: actions/checkout@v7
@@ -107,6 +109,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 720
     steps:
       - uses: actions/checkout@v7
       # Setup additional tools
@@ -141,6 +144,7 @@ jobs:
   test-macos:
     name: test-macos (${{ matrix.os.arch }})
     runs-on: ${{ matrix.os.runs-on }}
+    timeout-minutes: 720
     strategy:
       matrix:
         os:
