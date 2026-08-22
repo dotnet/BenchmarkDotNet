@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.TestingPlatform</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.TestingPlatform</AssemblyName>
+    <RootNamespace>BenchmarkDotNet.IntegrationTests.TestingPlatform</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj" />
+  </ItemGroup>
+
+  <!-- Manually import the package's build files, since they are not picked up through a ProjectReference. -->
+  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter\build\BenchmarkDotNet.TestAdapter.props" />
+  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter\build\BenchmarkDotNet.TestAdapter.targets" />
+
+  <Import Project="..\..\build\common.targets" />
+</Project>

@@ -48,8 +48,16 @@ namespace BenchmarkDotNet.TestAdapter
             };
 #endif
 
-            var assembly = Assembly.LoadFrom(assemblyPath);
+            return GetBenchmarksFromAssembly(Assembly.LoadFrom(assemblyPath));
+        }
 
+        /// <summary>
+        /// Returns all the BenchmarkRunInfo objects from an already loaded assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly of the benchmark project.</param>
+        /// <returns>The benchmarks inside the assembly.</returns>
+        public static BenchmarkRunInfo[] GetBenchmarksFromAssembly(Assembly assembly)
+        {
             var isDebugAssembly = assembly.IsJitOptimizationDisabled() ?? false;
 
             return GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks())
@@ -59,7 +67,7 @@ namespace BenchmarkDotNet.TestAdapter
                     if (isDebugAssembly)
                     {
                         // If the assembly is a debug assembly, then only display them if they will run in-process
-                        // This will allow people to debug their benchmarks using VSTest if they wish.
+                        // This will allow people to debug their benchmarks from a test runner if they wish.
                         benchmarkRunInfo = new BenchmarkRunInfo(
                             benchmarkRunInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
                             benchmarkRunInfo.Type,

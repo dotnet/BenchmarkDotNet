@@ -99,6 +99,22 @@ namespace BenchmarkDotNet.Exporters
             return name.ToString();
         }
 
+        /// <summary>
+        /// Gets the method name to show to a user, which is the [Benchmark(Description = ...)] when one is set and
+        /// the method name otherwise, followed by the parameters.
+        /// </summary>
+        /// <param name="benchmarkCase">The benchmark case.</param>
+        /// <returns>The method name to display.</returns>
+        internal static string GetMethodDisplayName(BenchmarkCase benchmarkCase)
+        {
+            var name = new StringBuilder(benchmarkCase.Descriptor.WorkloadMethodDisplayInfo);
+
+            if (benchmarkCase.HasParameters)
+                name.Append(GetBenchmarkParameters(benchmarkCase.Descriptor.WorkloadMethod, benchmarkCase.Parameters));
+
+            return name.ToString();
+        }
+
         private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters)
         {
             var methodArguments = method.GetParameters();
