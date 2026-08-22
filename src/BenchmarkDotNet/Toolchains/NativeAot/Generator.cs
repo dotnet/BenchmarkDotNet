@@ -131,12 +131,19 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
             await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger), cancellationToken).ConfigureAwait(false);
 
-            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+            // Generate `bdn_generated.rd.xml`
             await GenerateReflectionFileAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
+
+            // Integration tests are built without dependencies, so we skip gathering dlls.
+            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
+                return;
+
+            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
         private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $"""
             <Project Sdk="Microsoft.NET.Sdk">
+              <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
               <PropertyGroup>
                 <OutputType>Exe</OutputType>
                 <TargetFrameworks>{TargetFrameworkMoniker}</TargetFrameworks>
@@ -157,7 +164,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
                 <StackTraceSupport>{ilcGenerateStackTraceData}</StackTraceSupport>
                 <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
-                <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
                 <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
                 {GetInstructionSetSettings(buildPartition)}
               </PropertyGroup>
@@ -177,6 +183,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
               <PropertyGroup>
                 <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '8.0')">latest</LangVersion>
               </PropertyGroup>
+              <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
             </Project>
             """;
 
