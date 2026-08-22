@@ -116,7 +116,7 @@ internal class PowerRequestsParser
             {
                 yield return new Token(TokenType.RequestType, line.Substring(0, line.Length - 1).ToString());
             }
-            else if (string.Equals(line, "None.", StringComparison.InvariantCulture))
+            else if (IsNoneToken(line))
             {
                 yield return new Token(TokenType.None, line);
             }
@@ -162,6 +162,27 @@ internal class PowerRequestsParser
         }
 
         public void Dispose() => tokens.Dispose();
+    }
+
+    private static bool IsNoneToken(string line)
+    {
+        // Note: This mapping don't cover all available Windows UI Language.
+        switch (line)
+        {
+            case "None.":    // English
+            case "Keine.":   // German
+            case "Aucune.":  // French
+            case "Ninguna.": // Spanish
+            case "Nessuna.": // Italian
+            case "Geen.":    // Dutch
+            case "Brak.":    // Polish
+            case "なし。":    // Japanese
+            case "无。":      // Simplified Chinese
+            case "無。":      // Traditional Chinese
+                return true;
+            default:
+                return false;
+        }
     }
 
     private enum TokenType
