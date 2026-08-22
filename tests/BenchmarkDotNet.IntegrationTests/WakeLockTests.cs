@@ -13,7 +13,7 @@ public class WakeLockTests : BenchmarkTestExecutor
 {
     private const string PingEventName = @"Global\WakeLockTests-ping";
     private const string PongEventName = @"Global\WakeLockTests-pong";
-    private static readonly TimeSpan testTimeout = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan testTimeout = TimeSpan.FromMinutes(5); // Set 5 minutes for running tests with `ForcedNoDependenciesForIntegrationTests=false`
     private readonly OutputLogger logger;
 
     public WakeLockTests(ITestOutputHelper output) : base(output)
