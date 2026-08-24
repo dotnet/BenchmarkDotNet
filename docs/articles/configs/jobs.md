@@ -28,12 +28,11 @@ var config = DefaultConfig.Instance
 
 `WithCategories` overrides the categories of the job, `WithCategory` adds to them.
 
-You can also use the `[JobCategory]` attribute, which adds its categories to every job defined for the given class or assembly:
+Every job attribute has a `Categories` property, so the same thing can be expressed with attributes:
 
 ```cs
-[JobCategory("runtimes")]
-[SimpleJob(RuntimeMoniker.Net80)]
-[SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.Net80, Categories = ["runtimes", "net8"])]
+[SimpleJob(RuntimeMoniker.Net90, Categories = ["runtimes", "net9"])]
 public class Benchmarks { /* ... */ }
 ```
 
