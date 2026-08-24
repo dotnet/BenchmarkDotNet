@@ -118,26 +118,59 @@ namespace BenchmarkDotNet.Tests.Jobs
         }
 
         [Fact]
-        public void TheAttributeAddsItsCategoriesToEveryJob()
+        public void EachJobAttributeCarriesItsOwnCategories()
         {
-            var jobs = BenchmarkConverter.TypeToBenchmarks(typeof(WithTwoJobsAndACategory))
+            var jobs = BenchmarkConverter.TypeToBenchmarks(typeof(WithTwoCategorizedJobs))
                 .BenchmarksCases
                 .Select(benchmarkCase => benchmarkCase.Job)
-                .ToArray();
+                .ToDictionary(job => job.ResolvedId);
 
-            Assert.Equal(2, jobs.Length);
-            Assert.All(jobs, job => Assert.True(job.Meta.HasCategory("fromAttribute")));
+            Assert.Equal(2, jobs.Count);
+
+            Assert.True(jobs["first"].Meta.HasCategory("runtimes"));
+            Assert.True(jobs["first"].Meta.HasCategory("net8"));
+            Assert.False(jobs["first"].Meta.HasCategory("net9"));
+
+            Assert.True(jobs["second"].Meta.HasCategory("runtimes"));
+            Assert.True(jobs["second"].Meta.HasCategory("net9"));
+            Assert.False(jobs["second"].Meta.HasCategory("net8"));
         }
 
         [Fact]
-        public void TheAttributeDoesNotDropTheCategoriesDefinedInCode()
+        public void CategoriesAreAvailableOnEveryJobAttribute()
         {
-            var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithCategory("fromCode"));
+            var job = BenchmarkConverter.TypeToBenchmarks(typeof(WithACategorizedDryJob)).BenchmarksCases.Single().Job;
 
-            var job = BenchmarkConverter.TypeToBenchmarks(typeof(WithACategoryAttribute), config).BenchmarksCases.Single().Job;
+            Assert.True(job.Meta.HasCategory("debug"));
+        }
 
-            Assert.True(job.Meta.HasCategory("fromCode"));
-            Assert.True(job.Meta.HasCategory("fromAttribute"));
+        [Fact]
+        public void AJobAttributeWithoutCategoriesProducesAJobWithoutCategories()
+        {
+            var job = BenchmarkConverter.TypeToBenchmarks(typeof(WithAnUncategorizedJob)).BenchmarksCases.Single().Job;
+
+            Assert.Empty(job.Meta.Categories);
+        }
+
+        [Fact]
+        public void TheCategoriesOfAJobAttributeAreNotPartOfItsId()
+        {
+            var categorized = BenchmarkConverter.TypeToBenchmarks(typeof(WithACategorizedDryJob)).BenchmarksCases.Single().Job;
+            var uncategorized = BenchmarkConverter.TypeToBenchmarks(typeof(WithAnUncategorizedJob)).BenchmarksCases.Single().Job;
+
+            Assert.Equal(uncategorized.ResolvedId, categorized.ResolvedId);
+        }
+
+        [Fact]
+        public void TheFilterSelectsBenchmarksByTheCategoriesOfAJobAttribute()
+        {
+            var benchmarkCases = BenchmarkConverter.TypeToBenchmarks(typeof(WithTwoCategorizedJobs)).BenchmarksCases;
+
+            var matched = benchmarkCases
+                .Where(benchmarkCase => new JobCategoryFilter(["net9"]).Predicate(benchmarkCase))
+                .ToArray();
+
+            Assert.Equal("second", Assert.Single(matched).Job.ResolvedId);
         }
 
         [Theory]
@@ -182,16 +215,21 @@ namespace BenchmarkDotNet.Tests.Jobs
             [Benchmark] public void TheBenchmark() { }
         }
 
-        [JobCategory("fromAttribute")]
-        [SimpleJob(launchCount: 1, warmupCount: 1, iterationCount: 1, id: "first")]
-        [SimpleJob(launchCount: 2, warmupCount: 1, iterationCount: 1, id: "second")]
-        public class WithTwoJobsAndACategory
+        [SimpleJob(launchCount: 1, warmupCount: 1, iterationCount: 1, id: "first", Categories = ["runtimes", "net8"])]
+        [SimpleJob(launchCount: 2, warmupCount: 1, iterationCount: 1, id: "second", Categories = ["runtimes", "net9"])]
+        public class WithTwoCategorizedJobs
         {
             [Benchmark] public void TheBenchmark() { }
         }
 
-        [JobCategory("fromAttribute")]
-        public class WithACategoryAttribute
+        [DryJob(Categories = ["debug"])]
+        public class WithACategorizedDryJob
+        {
+            [Benchmark] public void TheBenchmark() { }
+        }
+
+        [DryJob]
+        public class WithAnUncategorizedJob
         {
             [Benchmark] public void TheBenchmark() { }
         }
