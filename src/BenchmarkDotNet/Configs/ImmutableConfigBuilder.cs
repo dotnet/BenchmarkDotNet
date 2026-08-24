@@ -240,16 +240,7 @@ namespace BenchmarkDotNet.Configs
                 for (int i = 0; i < result.Count; i++)
                 {
                     var copy = result[i].UnfreezeCopy();
-
-                    // Apply overrides the characteristics, but the job categories are additive:
-                    // a mutator (eg [JobCategory]) must not drop the categories that the job already has
-                    var ownCategories = copy.Meta.Categories;
-
                     copy.Apply(mutatorJob);
-
-                    if (ownCategories.Count > 0)
-                        copy.Meta.AddCategories(ownCategories);
-
                     result[i] = copy.Freeze();
                 }
             }
