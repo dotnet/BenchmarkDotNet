@@ -3,7 +3,7 @@ using Microsoft.Diagnostics.Runtime;
 
 namespace BenchmarkDotNet.Disassemblers;
 
-internal struct RegisterValueAccumulator
+internal struct Arm64RegisterValueAccumulator
 {
     private enum State
     {

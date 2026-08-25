@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Disassemblers
                 // disassembled binary code.
                 disassembler.EnableInstructionDetails = true;
                 disassembler.DisassembleSyntax = Map(syntax);
-                RegisterValueAccumulator accumulator = new RegisterValueAccumulator();
+                Arm64RegisterValueAccumulator accumulator = new();
                 accumulator.Init(state.Runtime);
 
                 Arm64Instruction[] instructions = disassembler.Disassemble(code, (long)startAddress);
@@ -193,7 +193,7 @@ namespace BenchmarkDotNet.Disassemblers
             return true;
         }
 
-        private static bool TryGetReferencedAddress(Arm64Instruction instruction, RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
+        private static bool TryGetReferencedAddress(Arm64Instruction instruction, Arm64RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
         {
             if ((instruction.Id == Arm64InstructionId.ARM64_INS_BR || instruction.Id == Arm64InstructionId.ARM64_INS_BLR) && instruction.Details.Operands[0].Register.Id == accumulator.RegisterId && accumulator.HasValue)
             {
