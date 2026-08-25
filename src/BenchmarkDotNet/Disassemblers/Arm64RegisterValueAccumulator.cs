@@ -1,5 +1,5 @@
 using Gee.External.Capstone.Arm64;
-using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 
 namespace BenchmarkDotNet.Disassemblers;
 
@@ -17,9 +17,9 @@ internal struct Arm64RegisterValueAccumulator
     private long _value;
     private int _expectedMovkShift;
     private Arm64RegisterId _registerId;
-    private ClrRuntime _runtime;
+    private IClrRuntime _runtime;
 
-    public void Init(ClrRuntime runtime)
+    public void Init(IClrRuntime runtime)
     {
         _state = State.LookingForPattern;
         _expectedMovkShift = 0;
