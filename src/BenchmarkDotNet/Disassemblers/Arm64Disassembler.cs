@@ -2,6 +2,7 @@ using BenchmarkDotNet.Diagnosers;
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -19,9 +20,9 @@ namespace BenchmarkDotNet.Disassemblers
         private long _value;
         private int _expectedMovkShift;
         private Arm64RegisterId _registerId;
-        private ClrRuntime _runtime;
+        private IClrRuntime _runtime;
 
-        public void Init(ClrRuntime runtime)
+        public void Init(IClrRuntime runtime)
         {
             _state = State.LookingForPattern;
             _expectedMovkShift = 0;
@@ -138,7 +139,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Arm64Disassembler : ClrMdDisassembler
     {
-        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
+        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax)
         {
             const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
             using (CapstoneArm64Disassembler disassembler = CapstoneDisassembler.CreateArm64Disassembler(disassembleMode))

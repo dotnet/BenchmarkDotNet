@@ -1,12 +1,13 @@
 using BenchmarkDotNet.Diagnosers;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 
 namespace BenchmarkDotNet.Disassemblers
 {
     internal class IntelDisassembler : ClrMdDisassembler
     {
-        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
+        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax)
         {
             var reader = new ByteArrayCodeReader(code);
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);

@@ -1,7 +1,7 @@
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
-using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -218,18 +218,18 @@ public static class DisassemblerConstants
 
 internal sealed class State
 {
-    internal State(ClrRuntime runtime, string targetFrameworkMoniker)
+    internal State(IClrRuntime runtime, string targetFrameworkMoniker)
     {
         Runtime = runtime;
         Todo = new Queue<MethodInfo>();
-        HandledMethods = new HashSet<ClrMethod>(new ClrMethodComparer());
+        HandledMethods = new HashSet<IClrMethod>(new IClrMethodComparer());
         AddressToNameMapping = [];
         RuntimeVersion = ParseVersion(targetFrameworkMoniker);
     }
 
-    internal ClrRuntime Runtime { get; }
+    internal IClrRuntime Runtime { get; }
     internal Queue<MethodInfo> Todo { get; }
-    internal HashSet<ClrMethod> HandledMethods { get; }
+    internal HashSet<IClrMethod> HandledMethods { get; }
     internal Dictionary<ulong, string> AddressToNameMapping { get; }
     internal Version RuntimeVersion { get; }
 
@@ -258,9 +258,9 @@ internal sealed class State
         return Version.Parse(versionToParse);
     }
 
-    private sealed class ClrMethodComparer : IEqualityComparer<ClrMethod>
+    private sealed class IClrMethodComparer : IEqualityComparer<IClrMethod>
     {
-        public bool Equals(ClrMethod? x, ClrMethod? y)
+        public bool Equals(IClrMethod? x, IClrMethod? y)
         {
             if (ReferenceEquals(x, y))
                 return true;
@@ -271,16 +271,16 @@ internal sealed class State
             return x.NativeCode == y.NativeCode;
         }
 
-        public int GetHashCode(ClrMethod obj) => (int)obj.NativeCode;
+        public int GetHashCode(IClrMethod obj) => (int)obj.NativeCode;
     }
 }
 
 internal readonly struct MethodInfo // I am not using ValueTuple here (would be perfect) to keep the number of dependencies as low as possible
 {
-    internal ClrMethod Method { get; }
+    internal IClrMethod Method { get; }
     internal int Depth { get; }
 
-    internal MethodInfo(ClrMethod method, int depth)
+    internal MethodInfo(IClrMethod method, int depth)
     {
         Method = method;
         Depth = depth;
