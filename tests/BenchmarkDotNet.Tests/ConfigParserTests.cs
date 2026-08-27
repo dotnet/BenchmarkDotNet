@@ -496,6 +496,26 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void UserCanSpecifyAffinity()
+        {
+            const long affinity = 0b1010;
+            var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(new IntPtr(affinity), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [Fact]
+        public void UserCanSpecifyAffinityBeyondThirtyTwoProcessors()
+        {
+            const long affinity = 1L << 40;
+            var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(new IntPtr(affinity), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [Fact]
         public void UserCanSpecifyBuildTimeout()
         {
             const int timeoutInSeconds = 10;

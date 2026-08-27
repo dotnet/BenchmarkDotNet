@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public OutlierMode Outliers { get; set; }
 
         [Option("affinity", Required = false, HelpText = "Affinity mask to set for the benchmark process")]
-        public int? Affinity { get; set; }
+        public long? Affinity { get; set; }
 
         [Option("allStats", Required = false, Default = false, HelpText = "Displays all statistics (min, max & more)")]
         public bool DisplayAllStatistics { get; set; }
