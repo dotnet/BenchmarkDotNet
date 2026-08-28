@@ -22,14 +22,21 @@ namespace BenchmarkDotNet.Attributes
         /// The categories of the job defined by this attribute. Categories are metadata used to select which jobs are
         /// executed (see <see cref="BenchmarkDotNet.Filters.JobCategoryFilter"/>), they don't affect how the job is executed.
         /// </summary>
-        [PublicAPI] public string[] Categories { get; set; } = [];
+        /// <remarks>
+        /// It is init-only because <see cref="Config"/> is built once and then kept: a later assignment would be
+        /// silently ignored. Attribute named arguments are allowed to set init-only properties.
+        /// </remarks>
+        [PublicAPI] public string[]? Categories { get; init; }
 
         // Named attribute properties are assigned after the constructor has run, so the config cannot be built there:
         // Categories would still be empty. It is read long after the attribute is constructed, so building it lazily
         // is enough to see the categories the user has set.
         public IConfig Config => config ??= job == null
             ? ManualConfig.CreateEmpty()
-            : ManualConfig.CreateEmpty().AddJob(Categories.Length == 0 ? job : job.WithCategories(Categories).Freeze());
+            : ManualConfig.CreateEmpty().AddJob(
+                // `Categories = null` is what an attribute argument of an array type is allowed to be, so it must not
+                // be dereferenced without a check.
+                Categories is not { Length: > 0 } categories ? job : job.WithCategories(categories).Freeze());
 
         protected static Job GetJob(Job sourceJob, RuntimeMoniker runtimeMoniker, Jit? jit, Platform? platform)
         {
