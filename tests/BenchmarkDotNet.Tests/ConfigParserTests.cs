@@ -505,7 +505,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(new IntPtr(affinity), config.GetJobs().Single().Environment.Affinity);
         }
 
-        [Fact]
+        [FactEnvSpecific("A mask with a bit above 32 does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
         public void UserCanSpecifyAffinityBeyondThirtyTwoProcessors()
         {
             const long affinity = 1L << 40;
@@ -513,6 +513,18 @@ namespace BenchmarkDotNet.Tests
 
             Assert.NotNull(config);
             Assert.Equal(new IntPtr(affinity), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [FactEnvSpecific("A mask with the top bit set does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
+        public void UserCanSpecifyAffinityForTheSixtyFourthProcessor()
+        {
+            // the top bit is the 64th cpu, which is the last one FixAffinity supports without
+            // cpu groups. as a mask it reads 0x8000000000000000, which only fits in a signed
+            // long as the negative value, so this is the spelling that reaches that processor
+            var config = ConfigParser.Parse(["--affinity", long.MinValue.ToString()], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(unchecked((IntPtr)long.MinValue), config.GetJobs().Single().Environment.Affinity);
         }
 
         [Fact]
