@@ -48,6 +48,12 @@ namespace BenchmarkDotNet.Jobs
 
             foreach (var characteristic in x.GetAllCharacteristics())
             {
+                // Categories say which jobs the user wants to select, they are not a part of what a job *is*.
+                // Comparing them would let two jobs that differ only by category survive the deduplication done by
+                // ImmutableConfigBuilder, which would run the same job twice under two identical names.
+                if (characteristic == MetaMode.CategoriesCharacteristic)
+                    continue;
+
                 if (!x.HasValue(characteristic))
                 {
                     if (y.HasValue(characteristic))
