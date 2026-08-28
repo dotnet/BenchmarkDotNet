@@ -470,7 +470,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)
-                baseJob = baseJob.WithAffinity((IntPtr)options.Affinity.Value);
+                baseJob = baseJob.WithAffinity(new IntPtr(unchecked((long)options.Affinity.Value)));
 
             if (options.LaunchCount.HasValue)
                 baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);

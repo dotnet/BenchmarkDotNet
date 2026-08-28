@@ -498,33 +498,33 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UserCanSpecifyAffinity()
         {
-            const long affinity = 0b1010;
+            const ulong affinity = 0b1010;
             var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
-            Assert.Equal(new IntPtr(affinity), config.GetJobs().Single().Environment.Affinity);
+            Assert.Equal(new IntPtr((long)affinity), config.GetJobs().Single().Environment.Affinity);
         }
 
         [FactEnvSpecific("A mask with a bit above 32 does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
         public void UserCanSpecifyAffinityBeyondThirtyTwoProcessors()
         {
-            const long affinity = 1L << 40;
+            const ulong affinity = 1UL << 40;
             var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
-            Assert.Equal(new IntPtr(affinity), config.GetJobs().Single().Environment.Affinity);
+            Assert.Equal(new IntPtr((long)affinity), config.GetJobs().Single().Environment.Affinity);
         }
 
         [FactEnvSpecific("A mask with the top bit set does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
         public void UserCanSpecifyAffinityForTheSixtyFourthProcessor()
         {
-            // the top bit is the 64th cpu, which is the last one FixAffinity supports without
-            // cpu groups. as a mask it reads 0x8000000000000000, which only fits in a signed
-            // long as the negative value, so this is the spelling that reaches that processor
-            var config = ConfigParser.Parse(["--affinity", long.MinValue.ToString()], new OutputLogger(Output)).config;
+            // the top bit is the 64th cpu, the last one FixAffinity supports without cpu groups.
+            // as an unsigned option it is written the way the mask reads
+            const ulong affinity = 1UL << 63;
+            var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
 
             Assert.NotNull(config);
-            Assert.Equal(unchecked((IntPtr)long.MinValue), config.GetJobs().Single().Environment.Affinity);
+            Assert.Equal(new IntPtr(unchecked((long)affinity)), config.GetJobs().Single().Environment.Affinity);
         }
 
         [Fact]
