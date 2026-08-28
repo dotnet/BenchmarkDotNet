@@ -50,7 +50,12 @@ namespace BenchmarkDotNet.Jobs
         public IReadOnlyList<string> Categories
         {
             get => CategoriesCharacteristic[this] ?? [];
-            set => CategoriesCharacteristic[this] = Unique(value);
+
+            // Assigning null removes the characteristic (see CharacteristicObject.SetValueCore), which is what an
+            // empty set of categories has to do: a job that was given no categories must stay indistinguishable from
+            // one that was never given any, otherwise `WithCategories(selection)` on an empty selection would mark
+            // the job as changed.
+            set => CategoriesCharacteristic[this] = Unique(value) is { Count: > 0 } unique ? unique : null!;
         }
 
         /// <summary>
