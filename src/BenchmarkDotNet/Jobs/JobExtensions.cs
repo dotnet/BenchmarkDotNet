@@ -340,7 +340,14 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="categories">The categories of the new job</param>
         /// <returns>The new job with overriden categories</returns>
-        public static Job WithCategories(this Job job, params string[] categories) => job.WithCore(j => j.Meta.Categories = categories);
+        public static Job WithCategories(this Job job, params string[] categories)
+        {
+            // Without this the failure surfaces as an ArgumentNullException for `source`, thrown out of the Distinct
+            // call which removes the duplicates.
+            ArgumentNullException.ThrowIfNull(categories);
+
+            return job.WithCore(j => j.Meta.Categories = categories);
+        }
 
         internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {
