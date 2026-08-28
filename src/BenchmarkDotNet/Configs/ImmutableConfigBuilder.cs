@@ -223,7 +223,10 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         private static IReadOnlyList<Job> GetRunnableJobs(IEnumerable<Job> jobs)
         {
-            var unique = jobs.Distinct(JobComparer.Default).ToArray();
+            // JobComparer ignores the categories, so jobs that differ only by category collapse into one here. Their
+            // categories are merged into the survivor, otherwise selecting by the categories of the collapsed jobs
+            // would silently match nothing.
+            var unique = jobs.GroupBy(job => job, JobComparer.Default).Select(MergeCategories).ToArray();
             var result = new List<Job>();
 
             foreach (var standardJob in unique.Where(job => !job.Meta.IsMutator && !job.Meta.IsDefault))
@@ -240,12 +243,27 @@ namespace BenchmarkDotNet.Configs
                 for (int i = 0; i < result.Count; i++)
                 {
                     var copy = result[i].UnfreezeCopy();
+
                     copy.Apply(mutatorJob);
+
                     result[i] = copy.Freeze();
                 }
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns the first job of a group of jobs which are equal except for their categories,
+        /// carrying the categories of all of them.
+        /// </summary>
+        private static Job MergeCategories(IGrouping<Job, Job> equalJobs)
+        {
+            var first = equalJobs.Key;
+            var merged = equalJobs.SelectMany(job => job.Meta.Categories).ToArray();
+
+            // The common case is a group of one, where there is nothing to merge and the job can be returned as it is.
+            return merged.Length == first.Meta.Categories.Count ? first : first.WithCategories(merged).Freeze();
         }
 
         private class TypeComparer<TInterface> : IEqualityComparer<TInterface>
