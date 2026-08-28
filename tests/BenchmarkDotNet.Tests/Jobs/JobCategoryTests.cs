@@ -106,15 +106,54 @@ namespace BenchmarkDotNet.Tests.Jobs
         }
 
         [Fact]
-        public void JobsWhichDifferOnlyByCategoriesAreNotConsideredDuplicates()
+        public void JobsWhichDifferOnlyByCategoriesAreDeduplicatedIntoOne()
         {
+            // Categories are not a part of a job's identity: keeping both would run the same job twice and produce
+            // two summary rows with the same name.
             var mutable = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry.WithCategory("net8"))
                 .AddJob(Job.Dry.WithCategory("net9"));
 
-            var final = ImmutableConfigBuilder.Create(mutable);
+            var job = Assert.Single(ImmutableConfigBuilder.Create(mutable).GetJobs());
 
-            Assert.Equal(2, final.GetJobs().Count());
+            // The survivor carries the categories of all of them, so selecting by either one still matches.
+            Assert.True(job.Meta.HasCategory("net8"));
+            Assert.True(job.Meta.HasCategory("net9"));
+        }
+
+        [Fact]
+        public void CategoriesAreNotComparedWhenJobsAreOrdered()
+        {
+            Assert.Equal(0, JobComparer.Default.Compare(Job.Dry.WithCategory("a"), Job.Dry.WithCategory("b")));
+            Assert.Equal(0, JobComparer.Default.Compare(Job.Dry, Job.Dry.WithCategory("a")));
+        }
+
+        [Fact]
+        public void AnEmptySetOfCategoriesLeavesTheJobUnchanged()
+        {
+            var job = Job.Default.WithCategories();
+
+            // Setting the characteristic to an empty list would mark the job as changed, so a `WithCategories(list)`
+            // where the list happens to be empty would run the benchmark a second time.
+            Assert.Empty(job.Meta.Categories);
+            Assert.False(job.HasValue(MetaMode.CategoriesCharacteristic));
+
+            var config = ManualConfig.CreateEmpty().AddJob(Job.Default).AddJob(Job.Default.WithCategories());
+            Assert.Single(ImmutableConfigBuilder.Create(config).GetJobs());
+        }
+
+        [Fact]
+        public void AnEmptySetOfCategoriesClearsTheCategoriesTheJobAlreadyHad()
+        {
+            Assert.Empty(Job.Dry.WithCategory("a").WithCategories().Meta.Categories);
+        }
+
+        [Fact]
+        public void WithCategoriesNamesTheArgumentItRejects()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => Job.Default.WithCategories(null!));
+
+            Assert.Equal("categories", exception.ParamName);
         }
 
         [Fact]
@@ -148,6 +187,16 @@ namespace BenchmarkDotNet.Tests.Jobs
         public void AJobAttributeWithoutCategoriesProducesAJobWithoutCategories()
         {
             var job = BenchmarkConverter.TypeToBenchmarks(typeof(WithAnUncategorizedJob)).BenchmarksCases.Single().Job;
+
+            Assert.Empty(job.Meta.Categories);
+        }
+
+        [Fact]
+        public void ANullCategoriesArgumentIsTreatedAsNoCategories()
+        {
+            // `Categories = null` is legal C# for an attribute argument of an array type, so discovery must not
+            // throw a NullReferenceException on it.
+            var job = BenchmarkConverter.TypeToBenchmarks(typeof(WithNullCategories)).BenchmarksCases.Single().Job;
 
             Assert.Empty(job.Meta.Categories);
         }
@@ -230,6 +279,12 @@ namespace BenchmarkDotNet.Tests.Jobs
 
         [DryJob]
         public class WithAnUncategorizedJob
+        {
+            [Benchmark] public void TheBenchmark() { }
+        }
+
+        [DryJob(Categories = null!)]
+        public class WithNullCategories
         {
             [Benchmark] public void TheBenchmark() { }
         }
