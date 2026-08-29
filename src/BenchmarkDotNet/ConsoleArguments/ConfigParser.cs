@@ -287,7 +287,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 if (!Runtime.TryParse(runtime, out _))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Expected one of:");
+                    foreach (string form in KnownRuntimeMonikerForms)
+                        logger.WriteLineError($"  {form}");
                     return false;
                 }
             }
@@ -520,10 +522,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 yield return Attributes.InProcessAttribute.GetJob(baseJob, Attributes.InProcessToolchainType.Auto, true);
             }
-            else if (options.CliPath != null && options.Runtimes.IsEmpty() && options.CoreRunPaths.IsEmpty())
-            {
-                yield return CreateCoreJobWithCli(baseJob, options);
-            }
+            // --cli and --packages configure a toolchain without selecting one, so with no --runtimes or --corerun to
+            // attach them to they are ignored. Creating a job for the host runtime instead would either add a run
+            // nobody asked for or override the one the benchmark declares.
             else
             {
                 // in case both --runtimes and --corerun are specified, the first one is returned first and becomes a baseline job
@@ -626,12 +627,23 @@ namespace BenchmarkDotNet.ConsoleArguments
                     DisplayName = GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath),
                 }));
 
-        private static Job CreateCoreJobWithCli(Job baseJob, CommandLineOptions options)
-        {
-            var runtime = (CoreRuntime)RuntimeInformation.GetCurrentRuntime();
-            return baseJob
-                .WithToolchain(CsProjCoreToolchain.From(runtime, new NetCoreAppSettings(options)));
-        }
+        /// <summary>
+        /// The moniker forms <see cref="Runtime.TryParse" /> accepts, for the "invalid runtime" error. Listed in the
+        /// same order as its prefix dispatch, so the two can be compared at a glance.
+        /// </summary>
+        private static readonly string[] KnownRuntimeMonikerForms =
+        [
+            "net<version>              e.g. net472, net8.0, net8.0-windows (.NET 5.0+ only)",
+            "netcoreapp<version>       e.g. netcoreapp3.1",
+            "nativeaot<version>        e.g. nativeaot8.0",
+            "r2r<version>              e.g. r2r8.0",
+            "mono                      classic Mono",
+            "mono<version>             .NET on the Mono VM, e.g. mono8.0",
+            "monoaot                   legacy Mono AOT, versionless",
+            "monowasm<version>         e.g. monowasm8.0",
+            "monowasmaot<version>      e.g. monowasmaot8.0",
+            "corewasm<version>         e.g. corewasm11.0",
+        ];
 
         /// <summary>
         /// we have a limited amount of space when printing the output to the console, so we try to keep things small and simple

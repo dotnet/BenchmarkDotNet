@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Environments
         public static readonly R2RRuntime Net10_0 = new(new(10, 0));
         public static readonly R2RRuntime Net11_0 = new(new(11, 0));
 
-        private R2RRuntime(Version version) => Version = version;
+        private R2RRuntime(Version version) => Version = ToRuntimeVersion(version);
 
         public override string Name => "R2R";
 

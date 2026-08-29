@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Environments
         public override string Name => ".NET Framework";
         public override Version Version { get; }
 
-        private ClrRuntime(Version version) => Version = version;
+        private ClrRuntime(Version version) => Version = ToRuntimeVersion(version, keepBuild: true);
 
         internal static ClrRuntime GetCurrentVersion()
         {

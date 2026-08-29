@@ -18,7 +18,7 @@ public sealed class MonoCoreRuntime : Runtime
     public static readonly MonoCoreRuntime Net10_0 = new(new(10, 0));
     public static readonly MonoCoreRuntime Net11_0 = new(new(11, 0));
 
-    private MonoCoreRuntime(Version version) => Version = version;
+    private MonoCoreRuntime(Version version) => Version = ToRuntimeVersion(version);
 
     public override string Name => "Mono with .NET";
 

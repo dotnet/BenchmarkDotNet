@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Environments
 {
     public abstract class WasmRuntime(Version version) : Runtime
     {
-        public override Version Version { get; } = version;
+        public override Version Version { get; } = ToRuntimeVersion(version);
 
         // Resolves the concrete WebAssembly runtime for the current process. CoreCLR vs Mono is detected reliably via
         // RuntimeInformation.IsMono; the version comes from Environment.Version like the other Mono-based runtimes.

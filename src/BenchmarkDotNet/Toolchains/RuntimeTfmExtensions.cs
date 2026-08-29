@@ -19,6 +19,8 @@ internal static class RuntimeTfmExtensions
     internal static string GetTfm(this CoreRuntime runtime)
         // .NET Core < 5 uses the netcoreappX.Y moniker; 5+ never has a non-zero minor version.
         => runtime.Version.Major < 5 ? $"netcoreapp{runtime.Version.Major}.{runtime.Version.Minor}"
+         // The platform is passed through as given: it carries a version that selects a different platform surface
+         // (net10.0-windows10.0.19041.0), and the SDK canonicalizes the case itself.
          : runtime.IsPlatformSpecific ? $"net{runtime.Version.Major}.0-{runtime.Platform}"
          : $"net{runtime.Version.Major}.0";
 

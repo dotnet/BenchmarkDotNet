@@ -368,7 +368,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
     internal static class Helpers
     {
-        private static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.Ordinal)
+        private static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.OrdinalIgnoreCase)
         {
             ".git",
             ".vs",
@@ -376,7 +376,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             "obj",
         };
 
-        private static readonly HashSet<string> ProjectExtensions = new(StringComparer.Ordinal)
+        private static readonly HashSet<string> ProjectExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
             ".csproj",
             ".fsproj",

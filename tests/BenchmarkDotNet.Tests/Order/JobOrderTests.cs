@@ -49,25 +49,29 @@ public class JobOrderTests
     public void TestJobOrders_ByRuntime()
     {
         // Arrange
+        // Deliberately not in sorted order: with sorted input a comparer that returned 0 for every pair would still
+        // pass, because OrderBy is stable.
         Job[] jobs =
         [
+            Job.Dry.WithRuntime(CoreRuntime.Core10_0),
             Job.Dry.WithRuntime(CoreRuntime.Core80),
             Job.Dry.WithRuntime(CoreRuntime.Core90),
-            Job.Dry.WithRuntime(CoreRuntime.Core10_0),
         ];
 
         // Act
         // Verify jobs are sorted by Runtime name order.
+        // ToString(), not Name: Name is the runtime family (".NET") and is identical for every version here, which
+        // would make the assertion hold no matter how the jobs were ordered.
         var results = jobs.OrderBy(d => d, JobComparer.Default)
-                          .Select(x => x.GetRuntime().Name)
+                          .Select(x => x.GetRuntime().ToString())
                           .ToArray();
 
         // Assert
         var expected = new[]
         {
-            CoreRuntime.Core80.Name,
-            CoreRuntime.Core90.Name,
-            CoreRuntime.Core10_0.Name
+            CoreRuntime.Core80.ToString(),
+            CoreRuntime.Core90.ToString(),
+            CoreRuntime.Core10_0.ToString()
         };
         Assert.Equal(expected, results);
     }

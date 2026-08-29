@@ -36,11 +36,9 @@ namespace BenchmarkDotNet.Environments
 
         private CoreRuntime(Version version, string? platform = null)
         {
-            Version = version;
+            Version = ToRuntimeVersion(version);
             this.platform = platform;
-            Name = version.Major < 5 ? ".NET Core"
-                : platform.IsNotBlank() ? $".NET {platform}"
-                : ".NET";
+            Name = version.Major < 5 ? ".NET Core" : ".NET";
         }
 
         public override string Name { get; }
@@ -51,10 +49,68 @@ namespace BenchmarkDotNet.Environments
 
         public string? Platform => platform;
 
+        // The base compares Name and Version, which no longer carry the platform, so a net8.0-windows job would
+        // otherwise deduplicate against a plain net8.0 one. Compared as given, like everywhere else the platform is
+        // used: "net8.0-Windows" and "net8.0-windows" are two runtimes, and deduplicating them is the caller's call.
+        public override bool Equals(object? obj)
+            => base.Equals(obj) && platform == ((CoreRuntime) obj!).platform;
+
+        public override int GetHashCode()
+            => HashCode.Combine(base.GetHashCode(), platform);
+
+        /// <summary>Appends the target platform, when there is one, so platform-specific jobs are distinguishable.</summary>
+        public override string ToString() => IsPlatformSpecific ? $"{base.ToString()} ({platform})" : base.ToString();
+
+        /// <summary>
+        /// Whether the string is shaped like a target platform: a name, optionally followed by a version
+        /// ("windows", "windows10.0.19041.0").
+        /// </summary>
+        /// <remarks>
+        /// It ends up verbatim in the generated project's TargetFrameworks, where a stray '&lt;' would produce
+        /// malformed XML and a ';' a second target framework. The shape is checked rather than the value matched
+        /// against known platforms, which would need updating for every new one.
+        /// </remarks>
+        internal static bool IsValidPlatform(string platform)
+        {
+            int index = 0;
+            while (index < platform.Length && char.IsLetter(platform[index]))
+                index++;
+
+            if (index == 0) // has to start with a platform name
+                return false;
+
+            // Optionally followed by a version. Every dot has to separate two digits - a leading, trailing or doubled
+            // one produces a moniker MSBuild rejects.
+            for (; index < platform.Length; index++)
+            {
+                if (platform[index] == '.')
+                {
+                    bool separatesDigits = index > 0 && char.IsDigit(platform[index - 1])
+                        && index + 1 < platform.Length && char.IsDigit(platform[index + 1]);
+                    if (!separatesDigits)
+                        return false;
+                }
+                else if (!char.IsDigit(platform[index]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         /// <summary>Returns a runtime for the given version and optional platform.</summary>
+        /// <exception cref="ArgumentException">
+        /// The platform is not shaped like a target platform identifier, or the version predates platform-specific
+        /// monikers, which would leave the platform in the runtime but absent from the moniker built from it.
+        /// </exception>
         public static CoreRuntime From(Version version, string? platform = null)
             => platform.IsNotBlank()
-                ? new CoreRuntime(version, platform)
+                ? version.Major >= 5 && IsValidPlatform(platform!)
+                    ? new CoreRuntime(version, platform)
+                    : throw new ArgumentException(
+                        $"'{platform}' is not a valid target platform for .NET {version.Major}.{version.Minor}. It has to be a platform name, optionally followed by a version, for example \"windows\" or \"windows10.0.19041.0\", and only .NET 5.0 and later have platform-specific target frameworks.",
+                        nameof(platform))
                 : (version.Major, version.Minor) switch
                 {
                     (2, 0) => Core20,
@@ -248,7 +304,7 @@ namespace BenchmarkDotNet.Environments
 
         private static CoreRuntime GetPlatformSpecific(Version version, Assembly? assembly)
             => TryGetTargetPlatform(assembly, out var platform)
-                ? new(version, platform)
+                ? From(version, platform)
                 : version.Major switch
                 {
                     5 => Core50,
@@ -282,7 +338,17 @@ namespace BenchmarkDotNet.Environments
                 return false;
 
             platform = platformNameProperty.GetValue(attributeInstance) as string;
-            return platform.IsNotBlank();
+
+            // Read off the entry assembly, so it is not ours to trust. A malformed value is treated as no platform
+            // rather than left to throw out of From(): this runs inside a static initializer, where it would surface
+            // as a TypeInitializationException.
+            if (platform.IsBlank() || !IsValidPlatform(platform!))
+            {
+                platform = null;
+                return false;
+            }
+
+            return true;
         }
 
         public override IToolchain GetDefaultToolchain(BenchmarkCase benchmarkCase)

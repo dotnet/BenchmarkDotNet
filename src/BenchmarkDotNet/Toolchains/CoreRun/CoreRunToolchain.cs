@@ -23,8 +23,12 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             // The build components receive the resolved settings (target framework moniker filled in); the original
             // `settings` is stored in Settings for equality and the settings column.
             var resolvedSettings = Resolve(settings, DefaultTargetFrameworkMoniker);
-            var version = Version.Parse(resolvedSettings.TargetFrameworkMoniker.Replace("netcoreapp", "").Replace("net", ""));
-            Runtime = CoreRuntime.From(version);
+            // Parsed rather than picked apart by hand: neither a platform suffix (net10.0-windows) nor a
+            // netcoreappX.Y survives stripping "net" and calling Version.Parse.
+            Runtime = Environments.Runtime.TryParse(resolvedSettings.TargetFrameworkMoniker, out var parsed) && parsed is CoreRuntime coreRuntime
+                ? coreRuntime
+                : throw new NotSupportedException(
+                    $"CoreRun can only run .NET (Core) benchmarks, but '{resolvedSettings.TargetFrameworkMoniker}' does not describe a .NET (Core) target framework.");
             Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, resolvedSettings);
             Builder = new CoreRunPublisher(resolvedSettings, CopyCoreRun);
             Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll"

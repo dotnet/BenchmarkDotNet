@@ -21,6 +21,21 @@ namespace BenchmarkDotNet.Environments
         public abstract Version? Version { get; }
 
         /// <summary>
+        /// Drops the components past the ones that identify a release, which are servicing detail - Environment.Version
+        /// reports 8.0.30 - and would otherwise reach the Runtime column, job ids and artifact file names and change
+        /// with every OS patch. Also what makes 8.0, 8.0.0 and 8.0.0.0 one runtime rather than three.
+        /// </summary>
+        /// <param name="version">The version to normalize.</param>
+        /// <param name="keepBuild">
+        /// For .NET Framework, whose releases are identified by Major.Minor.Build (4.8.1 is not 4.8), leaving only the
+        /// revision as servicing detail.
+        /// </param>
+        private protected static Version ToRuntimeVersion(Version version, bool keepBuild = false)
+            => keepBuild && version.Build > 0
+                ? new(version.Major, version.Minor, version.Build)
+                : new(version.Major, version.Minor);
+
+        /// <summary>
         /// Determines whether the specified object is a <see cref="Runtime" /> of the same type with equal <see cref="Name" /> and <see cref="Version" />.
         /// Concrete runtimes override this to also compare any additional state; this is the single equality entry point,
         /// so all comparison paths (including <see cref="System.Collections.Generic.EqualityComparer{T}" />) go through it.
@@ -75,13 +90,17 @@ namespace BenchmarkDotNet.Environments
 
             string s = moniker.Trim();
 
-            // Split off a target-platform suffix (e.g. "net8.0-windows"); it applies to .NET (Core) runtimes.
+            // Split off a target-platform suffix (e.g. "net8.0-windows"); only net5.0+ has them. Everything
+            // CoreRuntime.From would throw on is reported as "not a runtime" instead, here and below.
             string? platform = null;
             int dash = s.IndexOf('-');
             if (dash >= 0)
             {
                 platform = s[(dash + 1)..];
                 s = s[..dash];
+
+                if (!CoreRuntime.IsValidPlatform(platform))
+                    return false;
             }
 
             // Prefixes, most-specific first (so "monowasmaot"/"monoaot" beat "monowasm"/bare "mono", and "netcoreapp"
@@ -110,7 +129,12 @@ namespace BenchmarkDotNet.Environments
             else if (TryStripPrefix(s, "net", out rest) && TryParseVersion(rest, out version))
                 runtime = version.Major == 4
                     ? ClrRuntime.FromVersion(version)
-                    : CoreRuntime.From(version, platform);
+                    : CoreRuntime.From(version, version.Major >= 5 ? platform : null);
+
+            // Every branch above except net5.0+ ignores the platform. Silently dropping it would benchmark something
+            // other than what was asked for, so a suffix that did not take effect rejects the moniker.
+            if (platform != null && (runtime as CoreRuntime)?.IsPlatformSpecific != true)
+                runtime = null;
 
             return runtime != null;
 

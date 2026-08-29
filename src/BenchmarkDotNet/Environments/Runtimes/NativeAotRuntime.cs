@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static readonly NativeAotRuntime Net11_0 = new(new(11, 0));
 
-        private NativeAotRuntime(Version version) => Version = version;
+        private NativeAotRuntime(Version version) => Version = ToRuntimeVersion(version);
 
         public override string Name => "NativeAOT";
 
