@@ -13,11 +13,26 @@
         * GenerateProgramFile, which is how a project says it already has an entry point of its own, typically one
           that calls BenchmarkSwitcher. Generating a second one would not compile.
     -->
-    <IsTestingPlatformApplication Condition="'$(IsTestingPlatformApplication)' == '' and '$(BenchmarkDotNetUseVSTest)' != 'true' and '$(GenerateProgramFile)' != 'false'">true</IsTestingPlatformApplication>
-    <IsTestingPlatformApplication Condition="'$(IsTestingPlatformApplication)' == ''">false</IsTestingPlatformApplication>
+    <!--
+      The opt-out has to overwrite the property rather than fill in a blank one. Microsoft.Testing.Platform.MSBuild
+      defaults IsTestingPlatformApplication to true in its own .targets, which a real package consumer imports before
+      this file, so a condition on it being empty never fires and every opt-out is ignored. This is the same shape
+      MSTest.TestAdapter.targets uses to turn the platform off when EnableMSTestRunner is not set.
+    -->
+    <IsTestingPlatformApplication Condition="'$(BenchmarkDotNetUseVSTest)' == 'true' or '$(GenerateProgramFile)' == 'false'">false</IsTestingPlatformApplication>
+    <IsTestingPlatformApplication Condition="'$(IsTestingPlatformApplication)' == ''">true</IsTestingPlatformApplication>
 
     <!-- Required for `dotnet test` to route to Microsoft.Testing.Platform on SDKs older than .NET 10. -->
     <TestingPlatformDotnetTestSupport Condition="'$(TestingPlatformDotnetTestSupport)' == '' and '$(IsTestingPlatformApplication)' == 'true'">true</TestingPlatformDotnetTestSupport>
+
+    <!--
+      A project that also references Microsoft.NET.Test.Sdk gets a generated stub Main from it, and the compiler
+      prefers that synchronous entry point over the async one Microsoft.Testing.Platform.MSBuild generates (CS8892,
+      an error under TreatWarningsAsErrors). The application then starts and exits without running anything. The
+      target which generates the stub is gated on this property, so clearing it leaves the platform entry point.
+      This is read above before it is written, so it still works as the "I have my own entry point" opt-out.
+    -->
+    <GenerateProgramFile Condition="'$(IsTestingPlatformApplication)' == 'true'">false</GenerateProgramFile>
   </PropertyGroup>
 
   <!--
