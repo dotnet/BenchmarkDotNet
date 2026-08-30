@@ -370,8 +370,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     {
         private static readonly HashSet<string> IgnoredDirectoryNames = new(StringComparer.OrdinalIgnoreCase)
         {
-            ".git",
-            ".vs",
             "bin",
             "obj",
         };
@@ -382,6 +380,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             ".fsproj",
             ".vbproj"
         };
+
+        private static bool ShouldIgnoreDirectory(DirectoryInfo directory)
+            => IgnoredDirectoryNames.Contains(directory.Name)
+            || directory.Name.StartsWith(".", StringComparison.Ordinal)
+#if NETSTANDARD2_0
+            || directory.Attributes.HasFlag(FileAttributes.Hidden)
+            || directory.Attributes.HasFlag(FileAttributes.ReparsePoint)
+#endif
+            ;
 
         public static FileInfo FindProjectFile(DirectoryInfo rootDirectory, string projectName)
         {
@@ -425,13 +432,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // 2. Handle sub directories.
                 foreach (var dir in subDirectories)
                 {
-                    if (IgnoredDirectoryNames.Contains(dir.Name) || dir.Name.StartsWith(".", StringComparison.Ordinal))
+                    if (ShouldIgnoreDirectory(dir))
                         continue;
-#if NETSTANDARD2_0
-                    // Ignore reparse point / symlink to avoid infinite loops, and hidden directories
-                    if (dir.Attributes.HasFlag(FileAttributes.ReparsePoint) || dir.Attributes.HasFlag(FileAttributes.Hidden))
-                        continue;
-#endif
                     stack.Push(dir);
                 }
             }
