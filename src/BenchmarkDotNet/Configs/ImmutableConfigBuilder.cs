@@ -244,7 +244,15 @@ namespace BenchmarkDotNet.Configs
                 {
                     var copy = result[i].UnfreezeCopy();
 
+                    // Apply overwrites the characteristics, but the categories are additive: a mutator that carries
+                    // categories (eg [SimpleJob(Categories = ...)] on a method) adds them to every job it mutates
+                    // instead of replacing the ones that job already has. Dropping them would make selecting by the
+                    // categories of the mutated job silently match nothing.
+                    var ownCategories = copy.Meta.Categories;
+
                     copy.Apply(mutatorJob);
+
+                    copy.Meta.Categories = [.. ownCategories, .. copy.Meta.Categories];
 
                     result[i] = copy.Freeze();
                 }
