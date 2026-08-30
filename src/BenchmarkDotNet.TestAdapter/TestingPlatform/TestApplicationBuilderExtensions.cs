@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 _ => new TestFrameworkCapabilities(),
                 (capabilities, serviceProvider) => new BenchmarkTestFramework(capabilities, serviceProvider, assembly));
 
-            // Opts into the tree node filter, which is what backs `--filter "/*/*/MyBenchmarks/*"`.
+            // Opts into the tree node filter, which is what backs `--treenode-filter "/*/*/MyBenchmarks/*"`.
 #pragma warning disable TPEXP // The tree node filter is still marked as experimental by the platform.
             builder.AddTreeNodeFilterService(new BenchmarkDotNetExtension());
 #pragma warning restore TPEXP
