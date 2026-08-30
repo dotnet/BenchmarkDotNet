@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
     /// Identifies BenchmarkDotNet to Microsoft.Testing.Platform.
     /// </summary>
     /// <remarks>
-    /// Several platform services, such as the tree node filter behind <c>--filter</c>, are registered on behalf of an
+    /// Several platform services, such as the tree node filter behind <c>--treenode-filter</c>, are registered on behalf of an
     /// extension rather than of the test framework itself, so the identity lives in its own type.
     /// </remarks>
     internal sealed class BenchmarkDotNetExtension : IExtension
