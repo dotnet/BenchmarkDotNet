@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
         /// <summary>
         /// Gets the properties a <see cref="Microsoft.Testing.Platform.Requests.TreeNodeFilter"/> can match against,
-        /// which is what makes `--filter "/*/*/*/*[Category=Fast]"` work.
+        /// which is what makes `--treenode-filter "/*/*/*/*[Category=Fast]"` work.
         /// </summary>
         /// <returns>The filterable properties.</returns>
         public PropertyBag GetFilterableProperties() => new PropertyBag(staticProperties);
