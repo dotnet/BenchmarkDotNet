@@ -38,11 +38,22 @@ public class Benchmarks { /* ... */ }
 
 Categories don't affect how a job is executed: they are not a part of the job `Id`, the folder names, nor the summary.
 
-To run only the jobs which belong to given categories, use `JobCategoryFilter`:
+To run only the jobs which belong to given categories, use `JobCategoryFilter`, `[JobCategoryFilter]` or the `--jobCategories` console argument:
 
 ```cs
 var config = DefaultConfig.Instance.AddFilter(new JobCategoryFilter(["net8"]));
 ```
+
+```cs
+[JobCategoryFilter("net8")]
+public class Benchmarks { /* ... */ }
+```
+
+```log
+dotnet run -c Release -- --jobCategories net8
+```
+
+Like `--anyCategories` and `--allCategories`, the filter is inclusion only: a job with no categories belongs to none of the requested ones, so it is filtered out. If your config mixes categorized and uncategorized jobs, selecting a category also removes the uncategorized jobs, so give a category to every job you may want to keep.
 
 ### Environment
 
