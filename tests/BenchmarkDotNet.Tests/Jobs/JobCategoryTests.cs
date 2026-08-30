@@ -1,8 +1,10 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Tests.Jobs
@@ -121,6 +123,44 @@ namespace BenchmarkDotNet.Tests.Jobs
             Assert.True(job.Meta.HasCategory("net9"));
         }
 
+        // Apply overwrites the characteristics, but the categories are additive, so ImmutableConfigBuilder merges
+        // them explicitly: a mutator that carries categories must not wipe the categories of the job it mutates
+        [Fact]
+        public void AMutatorAddsItsCategoriesToTheJobsItMutates()
+        {
+            const int warmupCount = 2;
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithCategory("keep"))
+                .AddJob(Job.Default.WithWarmupCount(warmupCount).WithCategory("mutator").AsMutator());
+
+            var job = Assert.Single(ImmutableConfigBuilder.Create(config).GetJobs());
+
+            Assert.Equal(warmupCount, job.Run.WarmupCount); // the mutator was applied
+            Assert.True(job.Meta.HasCategory("keep"));      // ...without dropping what the job already had
+            Assert.True(job.Meta.HasCategory("mutator"));
+        }
+
+        [Fact]
+        public void AMutatorWithoutCategoriesLeavesTheCategoriesOfTheJobsItMutates()
+        {
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithCategory("keep"))
+                .AddJob(Job.Default.WithWarmupCount(2).AsMutator());
+
+            var job = Assert.Single(ImmutableConfigBuilder.Create(config).GetJobs());
+
+            Assert.Equal(["keep"], job.Meta.Categories);
+        }
+
+        // UnfreezeCopy is built on Apply, so marking the characteristic as ignored on apply (which would be the
+        // obvious way to make the categories additive) would silently drop them on every WithXxx call
+        [Fact]
+        public void CategoriesSurviveCopyingTheJob()
+        {
+            Assert.Equal(["net8"], Job.Dry.WithCategory("net8").UnfreezeCopy().Meta.Categories);
+            Assert.Equal(["net8", "slow"], Job.Dry.WithCategory("net8").WithLaunchCount(2).WithCategory("slow").Meta.Categories);
+        }
+
         [Fact]
         public void CategoriesAreNotComparedWhenJobsAreOrdered()
         {
@@ -148,12 +188,26 @@ namespace BenchmarkDotNet.Tests.Jobs
             Assert.Empty(Job.Dry.WithCategory("a").WithCategories().Meta.Categories);
         }
 
+        // the guard lives in MetaMode rather than in the WithCategory/WithCategories extensions, because the
+        // property and AddCategories are public too and would otherwise report a null `source` out of Distinct
         [Fact]
-        public void WithCategoriesNamesTheArgumentItRejects()
+        public void ANullSetOfCategoriesIsRejectedWhicheverWayItIsPassed()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => Job.Default.WithCategories(null!));
+            var job = new Job();
 
-            Assert.Equal("categories", exception.ParamName);
+            Assert.Equal("categories", Assert.Throws<ArgumentNullException>(() => Job.Default.WithCategories(null!)).ParamName);
+            Assert.Equal("categories", Assert.Throws<ArgumentNullException>(() => job.Meta.Categories = null!).ParamName);
+            Assert.Equal("categories", Assert.Throws<ArgumentNullException>(() => job.Meta.AddCategories(null!)).ParamName);
+        }
+
+        // a null category matches nothing, survives the merging done when jobs are deduplicated, and only fails
+        // once something formats it, so it is rejected where it is introduced
+        [Fact]
+        public void ANullCategoryIsRejected()
+        {
+            Assert.Equal("categories", Assert.Throws<ArgumentException>(() => Job.Default.WithCategory(null!)).ParamName);
+            Assert.Equal("categories", Assert.Throws<ArgumentException>(() => Job.Default.WithCategories("first", null!)).ParamName);
+            Assert.Equal("categories", Assert.Throws<ArgumentException>(() => new Job().Meta.AddCategories([null!])).ParamName);
         }
 
         [Fact]
@@ -259,7 +313,53 @@ namespace BenchmarkDotNet.Tests.Jobs
             Assert.Equal(["net8", "net9"], matched.Select(benchmarkCase => benchmarkCase.Job.ResolvedId).OrderBy(id => id));
         }
 
+        // every category filter is inclusion only, so a job without categories belongs to none of the requested
+        // ones. This is the documented behaviour: a config mixing categorized and uncategorized jobs loses the
+        // uncategorized ones as soon as a category is selected.
+        [Fact]
+        public void TheFilterExcludesJobsWithoutCategories()
+        {
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithId("net8").WithCategory("net8"))
+                .AddJob(Job.Dry.WithId("baseline"));
+
+            var benchmarkCases = BenchmarkConverter.TypeToBenchmarks(typeof(WithSingleBenchmark), config).BenchmarksCases;
+            var filter = new JobCategoryFilter(["net8"]);
+
+            Assert.Equal("net8", Assert.Single(benchmarkCases, filter.Predicate).Job.ResolvedId);
+        }
+
+        [Fact]
+        public void TheFilterIsAvailableAsAnAttribute()
+        {
+            var benchmarkCase = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(WithAFilteredJobCategory)).BenchmarksCases);
+
+            Assert.Equal("second", benchmarkCase.Job.ResolvedId);
+        }
+
+        [Fact]
+        public void TheFilterIsAvailableAsAConsoleArgument()
+        {
+            var (isSuccess, config, options) = ConfigParser.Parse(["--jobCategories", "net8", "runtimes"], NullLogger.Instance);
+
+            Assert.True(isSuccess);
+            Assert.True(options!.UserProvidedFilters);
+
+            var filter = Assert.Single(config!.GetFilters().OfType<JobCategoryFilter>());
+            var benchmarkCases = BenchmarkConverter.TypeToBenchmarks(typeof(WithTwoCategorizedJobs)).BenchmarksCases;
+
+            Assert.Equal(2, benchmarkCases.Count(filter.Predicate)); // both jobs are in "runtimes"
+        }
+
         public class WithSingleBenchmark
+        {
+            [Benchmark] public void TheBenchmark() { }
+        }
+
+        [SimpleJob(launchCount: 1, warmupCount: 1, iterationCount: 1, id: "first", Categories = ["net8"])]
+        [SimpleJob(launchCount: 2, warmupCount: 1, iterationCount: 1, id: "second", Categories = ["net9"])]
+        [JobCategoryFilter("net9")]
+        public class WithAFilteredJobCategory
         {
             [Benchmark] public void TheBenchmark() { }
         }
