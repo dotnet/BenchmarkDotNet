@@ -25,6 +25,11 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         private readonly Dictionary<string, PendingResult> pendingResults = [];
         private readonly HashSet<string> publishedResults = [];
 
+        // BenchmarkDotNet builds the partitions in parallel and raises OnBuildComplete from each of the build tasks,
+        // so that callback can run on several threads at once. The others cannot: every build is awaited before the
+        // first benchmark runs, and the benchmarks themselves run one after another.
+        private readonly object buildCompleteGate = new();
+
         public BenchmarkEventProcessor(IReadOnlyDictionary<string, BenchmarkTestNode> nodes, Action<TestNode> publish)
         {
             this.nodes = nodes;
@@ -60,21 +65,24 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             if (buildResult.IsBuildSuccess)
                 return;
 
-            foreach (var benchmarkBuildInfo in buildPartition.Benchmarks)
+            lock (buildCompleteGate)
             {
-                var node = nodes[benchmarkBuildInfo.BenchmarkCase.GetUniqueId()];
-                var pending = GetOrCreatePendingResult(node);
+                foreach (var benchmarkBuildInfo in buildPartition.Benchmarks)
+                {
+                    var node = nodes[benchmarkBuildInfo.BenchmarkCase.GetUniqueId()];
+                    var pending = GetOrCreatePendingResult(node);
 
-                if (buildResult.GenerateException != null)
-                    pending.ErrorMessages.Add($"// Generate Exception: {buildResult.GenerateException.Message}");
-                else if (buildResult.TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out string? reason))
-                    pending.ErrorMessages.Add($"// Build Error: {reason}");
-                else if (buildResult.ErrorMessage != null)
-                    pending.ErrorMessages.Add($"// Build Error: {buildResult.ErrorMessage}");
+                    if (buildResult.GenerateException != null)
+                        pending.ErrorMessages.Add($"// Generate Exception: {buildResult.GenerateException.Message}");
+                    else if (buildResult.TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out string? reason))
+                        pending.ErrorMessages.Add($"// Build Error: {reason}");
+                    else if (buildResult.ErrorMessage != null)
+                        pending.ErrorMessages.Add($"// Build Error: {buildResult.ErrorMessage}");
 
-                // A benchmark that failed to build will never run, so the result can be published immediately.
-                publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance));
-                PublishResult(node, pending, new FailedTestNodeStateProperty(pending.GetErrorMessage() ?? "The benchmark failed to build."));
+                    // A benchmark that failed to build will never run, so the result can be published immediately.
+                    publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance));
+                    PublishResult(node, pending, new FailedTestNodeStateProperty(pending.GetErrorMessage() ?? "The benchmark failed to build."));
+                }
             }
         }
 
