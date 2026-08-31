@@ -43,6 +43,7 @@
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.SharedDiagnosers/BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.Static/BenchmarkDotNet.IntegrationTests.Static.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.TestingPlatform/BenchmarkDotNet.IntegrationTests.TestingPlatform.csproj" />
+    <Project Path="tests/BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures/BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures.csproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests.VisualBasic/BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <Project Path="tests/BenchmarkDotNet.IntegrationTests/BenchmarkDotNet.IntegrationTests.csproj" />
     <Project Path="tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj" />
