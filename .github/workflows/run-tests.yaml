@@ -185,6 +185,11 @@ jobs:
       - uses: actions/checkout@v7
       - name: Run task 'pack'
         run: ./build.cmd pack
+      # Nothing in the solution consumes BenchmarkDotNet.TestAdapter as a package, so nothing else exercises the
+      # order in which NuGet imports its build files relative to Microsoft.Testing.Platform.MSBuild's.
+      - name: Smoke test the packed BenchmarkDotNet.TestAdapter
+        shell: pwsh
+        run: ./build/smoke-tests/test-adapter-consumer.ps1
 
   spellcheck-docs:
     runs-on: ubuntu-latest
