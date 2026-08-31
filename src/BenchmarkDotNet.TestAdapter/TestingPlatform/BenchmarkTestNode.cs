@@ -150,7 +150,11 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 .ToString();
         }
 
-        // Benchmark parameters are stringified user values, so they can contain the path separator.
-        private static string Escape(string segment) => segment.Replace("/", "\\/");
+        // Benchmark parameters are stringified user values, so they can contain the path separator. A '/' cannot be
+        // escaped into a segment: Microsoft.Testing.Platform splits the path on every '/' without ever unescaping it,
+        // and TreeNodeFilter rejects a filter whose segment contains one, so a raw '/' would both deepen the tree and
+        // leave the benchmark unmatchable. Percent encoding keeps the path four levels deep and the segment
+        // addressable, at the price of a filter having to spell the separator as '%2F'.
+        private static string Escape(string segment) => segment.Replace("%", "%25").Replace("/", "%2F");
     }
 }
