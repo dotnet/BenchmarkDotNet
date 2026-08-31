@@ -132,6 +132,10 @@ dotnet run -c Release -- --treenode-filter "/*/*/*/*[Category=Fast]"
 
 The tree node filter path is `/<assembly>/<namespace>/<class>/<benchmark>`,
   and `[BenchmarkCategory]` attributes are exposed as a `Category` trait that the filter can match on.
+Because the platform separates the levels of that path with `/`, a benchmark parameter whose value contains one is
+  percent encoded in the path: a parameter value of `a/b` is written `a%2Fb` in a filter, and a literal `%` is
+  written `%25`.
+This affects the filter only; the name the benchmark is displayed under is unchanged.
 
 ## Keeping your own entry point
 
