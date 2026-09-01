@@ -22,7 +22,8 @@ namespace BenchmarkDotNet.Disassemblers
                 FormatInstructionPointer(instruction, formatterOptions, pointerSize, output);
             }
 
-            output.Append(instruction.Mnemonic.ToString().PadRight(formatterOptions.FirstOperandCharIndex));
+            var padRight = Math.Max(formatterOptions.FirstOperandCharIndex, instruction.Mnemonic.Length + 1);
+            output.Append(instruction.Mnemonic.PadRight(padRight));
 
             if (asm.ReferencedAddress.HasValue && !asm.IsReferencedAddressIndirect && symbols.TryGetValue(asm.ReferencedAddress.Value, out var name))
             {
