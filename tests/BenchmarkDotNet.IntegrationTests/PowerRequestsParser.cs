@@ -106,29 +106,36 @@ internal class PowerRequestsParser
         // return an empty string when CR is followed by LF.
         StringReader reader = new StringReader(input);
         string? line;
+        TokenType previousTokenType = TokenType.None;
         while ((line = reader.ReadLine()) != null)
         {
             if (line.Length == 0)
             {
                 yield return new Token(TokenType.EmptyLine, "");
+                previousTokenType = TokenType.EmptyLine;
             }
             else if (line[line.Length - 1] == ':')
             {
                 yield return new Token(TokenType.RequestType, line.Substring(0, line.Length - 1).ToString());
-            }
-            else if (IsNoneToken(line))
-            {
-                yield return new Token(TokenType.None, line);
+                previousTokenType = TokenType.RequestType;
             }
             else if (line[0] == '[')
             {
                 int pos = line.IndexOf(']');
                 yield return new Token(TokenType.RequesterType, line.Substring(1, pos - 1));
                 yield return new Token(TokenType.RequesterName, line.Substring(pos + 2));
+                previousTokenType = TokenType.RequesterName;
+            }
+            else if (previousTokenType == TokenType.RequestType)
+            {
+                // Any single line directly after a request type header is the localized "None."
+                yield return new Token(TokenType.None, line);
+                previousTokenType = TokenType.None;
             }
             else
             {
                 yield return new Token(TokenType.Reason, line);
+                previousTokenType = TokenType.Reason;
             }
         }
     }
@@ -162,27 +169,6 @@ internal class PowerRequestsParser
         }
 
         public void Dispose() => tokens.Dispose();
-    }
-
-    private static bool IsNoneToken(string line)
-    {
-        // Note: This mapping don't cover all available Windows UI Language.
-        switch (line)
-        {
-            case "None.":    // English
-            case "Keine.":   // German
-            case "Aucune.":  // French
-            case "Ninguna.": // Spanish
-            case "Nessuna.": // Italian
-            case "Geen.":    // Dutch
-            case "Brak.":    // Polish
-            case "なし。":    // Japanese
-            case "无。":      // Simplified Chinese
-            case "無。":      // Traditional Chinese
-                return true;
-            default:
-                return false;
-        }
     }
 
     private enum TokenType
