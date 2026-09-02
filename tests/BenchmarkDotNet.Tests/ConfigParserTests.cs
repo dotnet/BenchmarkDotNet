@@ -1167,7 +1167,7 @@ namespace BenchmarkDotNet.Tests
                   --runOncePerIteration                                                               Run the benchmark exactly once per iteration.
                   --info                                                                              Print environment information.
                   --apples                                                                            Runs apples-to-apples comparison for specified Jobs.
-                  --list <Disabled|Flat|Tree>                                                         Prints all of the available benchmark names. Flat/Tree [default: Disabled]
+                  --list <Disabled|Flat|Json|Tree>                                                    Prints all of the available benchmark names. Flat/Json/Tree [default: Disabled]
                   --disasmDepth <disasmDepth>                                                         Sets the recursive depth for the disassembler. [default: 1]
                   --disasmFilter <disasmFilter>                                                       Glob patterns applied to full method signatures by the disassembler.
                   --disasmDiff                                                                        Generates diff reports for the disassembler.

@@ -305,7 +305,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public static readonly Option<ListBenchmarkCaseMode> ListBenchmarkCaseModeOption = new("--list")
         {
             DefaultValueFactory = _ => ListBenchmarkCaseMode.Disabled,
-            Description = "Prints all of the available benchmark names. Flat/Tree",
+            Description = "Prints all of the available benchmark names. Flat/Json/Tree",
         };
 
         public int DisassemblerRecursiveDepth { get; set; }
