@@ -1,10 +1,6 @@
 using AsmArm64;
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
-using Microsoft.Diagnostics.Runtime.Interfaces;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -13,9 +9,6 @@ public partial class Arm64DisassemblerTests
     private static readonly MockClrMethod DummyMethodNotUsed = default!;
     private static readonly MockClrMethod DummyCurrentMethod = new("DummyCurrentMethod", 0x10000, "DummyCurrentMethodSignature", new MockClrType("DummyCurrentMethodType"));
     private static readonly MockClrMethod DummyTargetMethod = new("DummyTargetMethod", 0x20000, "DummyTargetMethodSignature", new MockClrType("DummyTargetMethodType"));
-
-    private const ulong Address1 = 0x10000;
-    private const ulong Address2 = 0x20000;
 
     /// <summary>
     /// When GetJitHelperFunctionName returns non-empty name.
@@ -219,7 +212,7 @@ public partial class Arm64DisassemblerTests
             return address switch
             {
                 Address1 => null,
-                Address2 => DummyTargetMethod,
+                Address1 + 0x10000 => DummyTargetMethod,
                 _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}")
             };
         };
