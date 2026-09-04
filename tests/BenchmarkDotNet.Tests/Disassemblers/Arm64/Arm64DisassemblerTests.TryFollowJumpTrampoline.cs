@@ -72,7 +72,7 @@ public partial class Arm64DisassemblerTests
 
         var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
-            return 0x30000;
+            return ExpectedResultAddress;
         });
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;
@@ -83,7 +83,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        target.Should().Be(0x30000);
+        target.Should().Be(ExpectedResultAddress);
     }
 
     [Fact]
@@ -94,14 +94,14 @@ public partial class Arm64DisassemblerTests
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
             Arm64InstructionFactory.LDR(X11, 0x10000), // ldr x11, #0x10000
-            Arm64InstructionFactory.BR(X11),         // br x11
+            Arm64InstructionFactory.BR(X11),           // br x11
             Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
         };
         PrintInstructions(rawInstructions);
 
         var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
-            return 0x20000;
+            return ExpectedResultAddress;
         });
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;
@@ -112,7 +112,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        target.Should().Be(0x20000);
+        target.Should().Be(ExpectedResultAddress);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public partial class Arm64DisassemblerTests
 
         var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
-            return 0x30000;
+            return ExpectedResultAddress;
         });
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;
@@ -141,7 +141,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        target.Should().Be(0x30000);
+        target.Should().Be(ExpectedResultAddress);
     }
 
     // TryFollowJumTrampoline seems not support FixupPrecode with pre-backpatch form.
@@ -160,7 +160,7 @@ public partial class Arm64DisassemblerTests
 
         var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
-            return 0x30000;
+            return ExpectedResultAddress;
         });
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;
@@ -187,7 +187,7 @@ public partial class Arm64DisassemblerTests
 
         var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
-            return 0x10000;
+            return ExpectedResultAddress;
         });
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;

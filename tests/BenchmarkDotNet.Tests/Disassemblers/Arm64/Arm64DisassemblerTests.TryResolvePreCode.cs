@@ -14,7 +14,6 @@ public partial class Arm64DisassemblerTests
         // Arrange
         const int JumpAddress = 0x10000;
         const int MdOffset = 0x20000; // This value is not used for test.
-
         var rawInstructions = new[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
@@ -28,11 +27,11 @@ public partial class Arm64DisassemblerTests
         {
             // Validate address value
             var parseBase = DummyBaseAddress + 4; // Skip `dmb ishld` instruction
-            ulong mdSlot = parseBase + 4 + MdOffset;
+            ulong mdSlot = parseBase + 4 + (ulong)MdOffset;
             address.Should().Be(mdSlot);
 
-            // Return resolved address (It must be greater than or equals to 65536)
-            return 0x30000;
+            // Return resolved address
+            return ExpectedResultAddress;
         });
 
         ulong address = DummyBaseAddress;
@@ -42,7 +41,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        address.Should().Be(0x30000);
+        address.Should().Be(ExpectedResultAddress);
         isPrestubMd.Should().BeTrue();
     }
 
@@ -57,14 +56,13 @@ public partial class Arm64DisassemblerTests
             Arm64InstructionFactory.BR(X11),           // br x11
             Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
         };
-
         PrintInstructions(rawInstructions);
 
         var dataReader = CreateMockDataReader(rawInstructions, getPointer: (ulong address) =>
         {
             const int mdLdrOffset = 12;
             address.Should().Be(DummyBaseAddress + mdLdrOffset + 0x20000);
-            return 0x10000; // Must be greater than or equals to 65536
+            return ExpectedResultAddress;
         });
 
         ulong address = DummyBaseAddress;
@@ -74,7 +72,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        address.Should().Be(0x10000);
+        address.Should().Be(ExpectedResultAddress);
         isPrestubMd.Should().BeTrue();
     }
 
@@ -84,6 +82,7 @@ public partial class Arm64DisassemblerTests
         // Arrange
         const int MdOffset = 0x10000;
         const int JumpAddress = 0x20000; // This value is not used.
+
         var rawInstructions = new uint[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
@@ -100,8 +99,8 @@ public partial class Arm64DisassemblerTests
             ulong mdAddress = unchecked(parseBase + MdOffset);
             address.Should().Be(mdAddress);
 
-            // Return resolved address (It must be greater than or equals to 65536)
-            return 0x30000;
+            // Return resolved address
+            return ExpectedResultAddress;
         });
 
         // Act
@@ -110,7 +109,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        address.Should().Be(0x30000);
+        address.Should().Be(ExpectedResultAddress);
         isPrestubMd.Should().BeTrue();
     }
 
@@ -135,8 +134,8 @@ public partial class Arm64DisassemblerTests
             ulong countSlot = unchecked(parseBase + RemainingCallCount);
             address.Should().Be(countSlot + 8);
 
-            // Return resolved address (It must be greater than or equals to 65536)
-            return 0x20000;
+            // Return resolved address
+            return ExpectedResultAddress;
         });
 
         // Act
@@ -145,7 +144,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        address.Should().Be(0x20000);
+        address.Should().Be(ExpectedResultAddress);
         isPrestubMd.Should().BeFalse();
     }
 }
