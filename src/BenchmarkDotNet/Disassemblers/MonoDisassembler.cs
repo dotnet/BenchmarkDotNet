@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Disassemblers
                     if (TryParseInstruction(line, out var instruction))
                         instructions.Add(instruction);
 
-                while (instructions.Any() && instructions.Last().Text == "nop")
+                while (instructions.Count != 0 && instructions.Last().Text == "nop")
                     instructions.RemoveAt(instructions.Count - 1);
 
                 return new DisassemblyResult

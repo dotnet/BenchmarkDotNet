@@ -287,7 +287,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames<RuntimeMoniker>().Select(name => name.ToLower()))}.");
                     return false;
                 }
                 else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
@@ -353,7 +353,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (var counterName in options.HardwareCounters)
                 if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
                 {
-                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames(typeof(HardwareCounter)))}.");
+                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames<HardwareCounter>())}.");
                     return false;
                 }
 

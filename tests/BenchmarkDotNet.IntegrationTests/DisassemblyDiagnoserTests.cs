@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private void AssertDisassemblyResult(DisassemblyResult result, string methodSignature)
         {
             Assert.Contains(methodSignature, result.Methods.Select(m => m.Name.Split('.').Last()).ToArray());
-            Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Any());
+            Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Length != 0);
         }
     }
 }

@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void DisplayResults(ILogger resultLogger)
         {
-            if (!benchmarkToTraceFile.Any())
+            if (benchmarkToTraceFile.Count == 0)
                 return;
 
             resultLogger.WriteLineInfo($"Exported {benchmarkToTraceFile.Count} trace file(s). Example:");

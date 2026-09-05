@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Helpers
                                                               .Select(x => x.GenericTypeArguments)
                                                               .ToArray();
 
-            if (typeArguments.Any())
+            if (typeArguments.Length != 0)
                 return BuildGenericTypes(type, typeArguments);
 
             return [(true, type)];

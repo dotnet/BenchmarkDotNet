@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Reports
                 Index = index;
                 Header = table.FullHeader[index];
                 Content = table.FullContent.Select(line => line[index]).ToArray();
-                Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
+                Width = Math.Max(Header.Length, Content.Length != 0 ? Content.Max(line => line.Length) : 0) + 1;
                 IsDefault = table.IsDefault[index];
                 OriginalColumn = column;
 

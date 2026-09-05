@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Running
         public static BenchmarkRunInfo[] Filter(IConfig effectiveConfig, IEnumerable<Type> types)
             => types
                 .Select(type => BenchmarkConverter.TypeToBenchmarks(type, effectiveConfig))
-                .Where(info => info.BenchmarksCases.Any())
+                .Where(info => info.BenchmarksCases.Length != 0)
                 .ToArray();
     }
 }

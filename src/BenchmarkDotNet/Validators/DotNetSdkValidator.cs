@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Validators
                     {
                         var lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
-                        var versions = new List<Version>(lines.Count());
+                        var versions = new List<Version>(lines.Length);
                         foreach (var line in lines)
                         {
                             // Version.TryParse does not handle things like 3.0.0-WORD, so this will get just the 3.0.0 part

@@ -260,7 +260,7 @@ namespace BenchmarkDotNet.Running
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {
-            if (methodInfo.GetParameters().Any() && !methodInfo.HasAttribute<ArgumentsAttribute>() && !methodInfo.HasAttribute<ArgumentsSourceAttribute>())
+            if (methodInfo.GetParameters().Length != 0 && !methodInfo.HasAttribute<ArgumentsAttribute>() && !methodInfo.HasAttribute<ArgumentsSourceAttribute>())
                 throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
 
