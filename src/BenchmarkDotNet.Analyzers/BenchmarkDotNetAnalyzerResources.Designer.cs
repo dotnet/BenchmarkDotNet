@@ -1080,5 +1080,32 @@ namespace BenchmarkDotNet.Analyzers {
                 return ResourceManager.GetString("General_AwaitableAsyncEnumerable_AmbiguousReturnType_Description", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Setting both Runtime and Toolchain on a job is order-dependent.
+        /// </summary>
+        internal static string General_Job_RuntimeAndToolchainBothSet_Title {
+            get {
+                return ResourceManager.GetString("General_Job_RuntimeAndToolchainBothSet_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This job sets both a Runtime and a Toolchain. They are coupled, so whichever is assigned last takes effect and the other is silently discarded....
+        /// </summary>
+        internal static string General_Job_RuntimeAndToolchainBothSet_MessageFormat {
+            get {
+                return ResourceManager.GetString("General_Job_RuntimeAndToolchainBothSet_MessageFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The runtime and toolchain characteristics of a job are coupled....
+        /// </summary>
+        internal static string General_Job_RuntimeAndToolchainBothSet_Description {
+            get {
+                return ResourceManager.GetString("General_Job_RuntimeAndToolchainBothSet_Description", resourceCulture);
+            }
+        }
     }
 }

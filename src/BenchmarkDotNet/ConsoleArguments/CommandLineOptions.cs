@@ -4,7 +4,6 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -23,7 +22,10 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('j', "job", Required = false, Default = "Default", HelpText = "Dry/Short/Medium/Long or Default")]
         public string BaseJob { get; set; } = "";
 
-        [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!")]
+        [Option('r', "runtimes", Required = false, HelpText =
+            "Full target framework moniker for (Core)CLR (e.g. 'net481', 'net8.0', 'net10.0-windows'). For legacy Mono just 'Mono' or 'MonoAot'." +
+            " Other supported runtimes: 'monoX.0' (.NET on MonoVM), 'nativeaotX.0', 'r2rX.0', 'monowasmX.0', 'monowasmaotX.0', 'corewasmX.0'." +
+            " First one will be marked as baseline!")]
         public IEnumerable<string> Runtimes { get; set; } = [];
 
         [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics. A custom IExporter can also be selected by its assembly-qualified type name, e.g. \"My.Namespace.MyExporter, MyAssembly\".")]
@@ -104,9 +106,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("monoPath", Required = false, HelpText = "Optional path to Mono which should be used for running benchmarks.")]
         public FileInfo? MonoPath { get; set; }
-
-        [Option("clrVersion", Required = false, HelpText = "Optional version of private CLR build used as the value of COMPLUS_Version env var.")]
-        public string? ClrVersion { get; set; }
 
         [Option("ilCompilerVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: \"7.0.0-preview.3.22123.2\"")]
         public string? ILCompilerVersion { get; set; }
@@ -213,17 +212,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("wasmMainJsTemplate", Required = false, HelpText = "Path to main.mjs template.")]
         public FileInfo? WasmMainJsTemplate { get; set; }
 
-        [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
-        public string? CustomRuntimePack { get; set; }
+        [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for ReadyToRun (R2R) currently.")]
+        public DirectoryInfo? CustomRuntimePack { get; set; }
 
-        [Option("AOTCompilerPath", Required = false, HelpText = "Path to Mono AOT compiler, used for MonoAotLLVM.")]
+        [Option("AOTCompilerPath", Required = false, HelpText = "Path to the crossgen2 compiler, used for ReadyToRun (R2R) benchmarks.")]
         public FileInfo? AOTCompilerPath { get; set; }
-
-        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini', 'llvm', or 'wasm'")]
-        public MonoAotCompilerMode AOTCompilerMode { get; set; }
-
-        [Option("wasmRuntimeFlavor", Required = false, Default = Environments.RuntimeFlavor.Mono, HelpText = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.")]
-        public Environments.RuntimeFlavor WasmRuntimeFlavor { get; set; }
 
         [Option("wasmProcessTimeout", Required = false, Default = 10, HelpText = "Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.")]
         public int WasmProcessTimeoutMinutes { get; set; }

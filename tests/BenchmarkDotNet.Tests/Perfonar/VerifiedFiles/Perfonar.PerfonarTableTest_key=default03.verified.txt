@@ -1,7 +1,7 @@
 ﻿BenchmarkDotNet v0.1729.0-mock, Microsoft Windows NT 10.0.x.mock
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 
-Type = Bench, Runtime = Net70, Jit = RyuJit
+Type = Bench, Runtime = net7.0, Jit = RyuJit
 
 | Method | Center | Spread |
 |:-------|-------:|-------:|
@@ -36,8 +36,10 @@ Type = Bench, Runtime = Net70, Jit = RyuJit
   "nested": [
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net70",
           "jit": "ryuJit"
         }
       },

@@ -3,8 +3,8 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Hashing;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -69,9 +69,34 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetFilePath(string fileName, DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension)
         {
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net462 vs net8.0 etc
-            if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
+            // Disambiguate output file names across the config's jobs (JobComparer has already made them distinct),
+            // so a benchmark that runs under more than one job doesn't produce colliding files. If the jobs differ
+            // in runtime, tag every file with its runtime; expand to the toolchain when jobs sharing a runtime
+            // configure different toolchains (jobs that don't configure one resolve to the same default for a given
+            // runtime); and finally fall back to the job index (always unique) when neither separates this job from
+            // another (e.g. jobs differing only by toolchain settings or some other characteristic).
+            var jobs = details.Config.GetJobs().ToArray();
+            if (jobs.Length > 1)
+            {
+                bool runtimesDiffer = jobs.Select(job => job.GetRuntime()).Distinct().Count() > 1;
+                bool toolchainsDiffer = jobs
+                    .GroupBy(job => job.GetRuntime())
+                    .Any(group => group.Select(job => job.Infrastructure.TryGetToolchain(out var toolchain) ? toolchain.ToString() : null).Distinct().Count() > 1);
+
+                string Disambiguator(Job job)
+                {
+                    string result = runtimesDiffer ? $"-{job.GetRuntime()}" : string.Empty;
+                    if (toolchainsDiffer && job.Infrastructure.TryGetToolchain(out var toolchain))
+                        result += $"-{toolchain}";
+                    return result;
+                }
+
+                string suffix = Disambiguator(details.BenchmarkCase.Job);
+                fileName += suffix;
+
+                if (jobs.Count(job => Disambiguator(job) == suffix) > 1)
+                    fileName += $"-{Array.IndexOf(jobs, details.BenchmarkCase.Job)}";
+            }
 
             if (creationTime.HasValue)
                 fileName += $"-{creationTime.Value.ToString(BenchmarkRunnerClean.DateTimeFormat)}";

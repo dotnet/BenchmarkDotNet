@@ -2,7 +2,6 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Models;
-using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
@@ -11,7 +10,6 @@ namespace BenchmarkDotNet.Jobs
     {
         public static readonly Characteristic<Platform> PlatformCharacteristic = CreateCharacteristic<Platform>(nameof(Platform));
         public static readonly Characteristic<Jit> JitCharacteristic = CreateCharacteristic<Jit>(nameof(Jit));
-        public static readonly Characteristic<Runtime> RuntimeCharacteristic = CreateCharacteristic<Runtime>(nameof(Runtime));
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
 
@@ -28,9 +26,6 @@ namespace BenchmarkDotNet.Jobs
 
         [PublicAPI]
         public EnvironmentMode() : this(id: "") { }
-
-        [PublicAPI]
-        public EnvironmentMode(Runtime runtime) : this(runtime.ToString()) => Runtime = runtime;
 
         [PublicAPI]
         public EnvironmentMode(string id, Jit jit, Platform platform) : this(id)
@@ -61,15 +56,6 @@ namespace BenchmarkDotNet.Jobs
         {
             get { return JitCharacteristic[this]; }
             set { JitCharacteristic[this] = value; }
-        }
-
-        /// <summary>
-        /// Runtime
-        /// </summary>
-        public Runtime? Runtime
-        {
-            get { return RuntimeCharacteristic[this]; }
-            set { RuntimeCharacteristic[this] = value; }
         }
 
         /// <summary>
@@ -137,17 +123,9 @@ namespace BenchmarkDotNet.Jobs
             EnvironmentVariables = newVariables;
         }
 
-        internal Runtime GetRuntime()
-        {
-            return HasValue(RuntimeCharacteristic) && Runtime != null
-                ? Runtime
-                : RuntimeInformation.GetCurrentRuntime();
-        }
-
         internal BdnEnvironment ToPerfonar() => new()
         {
             Jit = HasValue(JitCharacteristic) ? Jit : null,
-            Runtime = HasValue(RuntimeCharacteristic) ? Runtime?.RuntimeMoniker : null,
             Affinity = HasValue(AffinityCharacteristic) ? (long)Affinity : null
         };
     }
