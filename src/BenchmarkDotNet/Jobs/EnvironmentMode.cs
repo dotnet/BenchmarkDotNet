@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Jobs
         {
             Jit = HasValue(JitCharacteristic) ? Jit : null,
             Runtime = HasValue(RuntimeCharacteristic) ? Runtime?.RuntimeMoniker : null,
-            Affinity = HasValue(AffinityCharacteristic) ? (int)Affinity : null
+            Affinity = HasValue(AffinityCharacteristic) ? (long)Affinity : null
         };
     }
 }

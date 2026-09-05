@@ -145,7 +145,7 @@ public class PerfonarTests(ITestOutputHelper output)
         ]
     };
 
-    private static EntryInfo Job(RuntimeMoniker? runtime = null, Jit? jit = null, int? affinity = null) => new EntryInfo
+    private static EntryInfo Job(RuntimeMoniker? runtime = null, Jit? jit = null, long? affinity = null) => new EntryInfo
     {
         Job = new JobInfo
         {
