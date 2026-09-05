@@ -29,11 +29,17 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string[] expected =
             [
+                "CategoryProbe.Identity",
+
                 // The description of a [Benchmark(Description = ...)] is what a user recognises it by, so it is used
                 // instead of the method name. Without one the method name is used, and the parameters are appended to
                 // both.
                 "DescribedProbe.'A described benchmark'(Size: 1)",
                 "DescribedProbe.Undescribed(Size: 1)",
+
+                "DisposableProbe.Identity(Value: tracked-1)",
+                "DisposableProbe.Identity(Value: tracked-2)",
+                "DisposableProbe.Identity(Value: tracked-3)",
 
                 // A generic benchmark is named after the type arguments it was closed over.
                 "GenericProbe<System.Char>.Create",
@@ -94,6 +100,41 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void ATreeNodeFilterMatchesTheCategoriesOfACustomCategoryDiscoverer()
+        {
+            // The node has to carry the categories the config resolved, not the ones the default discoverer finds:
+            // this category is produced by an ICategoryDiscoverer and exists on no [BenchmarkCategory] anywhere.
+            var discovered = Discover(PassingProbes, "--treenode-filter", "/*/*/*/*[Category=DiscoveredIdentity]");
+
+            Assert.Equal(
+                new[] { "CategoryProbe.Identity" },
+                discovered.Select(test => test.DisplayName.Substring(PassingProbes.Length + 1)));
+        }
+
+        [Fact]
+        public void ParameterValuesAreDisposedWhenBenchmarksAreOnlyListed()
+        {
+            // Listing runs nothing, so BenchmarkDotNet disposes nothing: every value the enumeration created is the
+            // adapter's to dispose.
+            Assert.Equal("created=3 disposed=3", ReadDisposalReport(() => Discover(PassingProbes)));
+        }
+
+        [Fact]
+        public void ParameterValuesAreDisposedWhenOnlyOneBenchmarkOfASetIsRun()
+        {
+            // BenchmarkDotNet only disposes the case it was handed, so the two that were filtered out would leak. A
+            // value shared with the case that runs must not be disposed early either, which the count would catch as
+            // a disposal too many.
+            var uid = Discover(PassingProbes)
+                .Single(test => test.DisplayName.EndsWith("DisposableProbe.Identity(Value: tracked-1)", StringComparison.Ordinal))
+                .Uid;
+
+            var report = ReadDisposalReport(() => RunAndSummarize(PassingProbes, "--filter-uid", uid));
+
+            Assert.Equal("created=3 disposed=3", report);
+        }
+
+        [Fact]
         public void ATreeNodeFilterMatchesTheClassAndTheMethodOfABenchmark()
         {
             var discovered = Discover(PassingProbes, "--treenode-filter", "/*/*/SampleBenchmarks/Multiply*");
@@ -148,6 +189,41 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(1, summary.Total);
             Assert.Equal(1, summary.Failed);
             Assert.Contains("2 benchmarks are identified as", standardOutput, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void BenchmarksSharingAUidThroughTheirDescriptionAreReportedWithTheirMethodNames()
+        {
+            // Nothing here is parameterized: what collides is the description of one benchmark against the method
+            // name of the other, so the message has to name the two methods and point at the description.
+            var (summary, standardOutput) = Run(FailingProbes, "--treenode-filter", "/*/*/DescriptionCollisionProbe/*");
+
+            Assert.Equal(1, summary.Total);
+            Assert.Equal(1, summary.Failed);
+            Assert.Contains("none of them were run: Described, Twin.", standardOutput, StringComparison.Ordinal);
+            Assert.Contains("[Benchmark(Description = \"...\")]", standardOutput, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Runs the probe application and reads back what it reported about the disposal of its parameter values.
+        /// </summary>
+        /// <remarks>
+        /// The counts are written to a file rather than to the output, because the discovery output is parsed as json.
+        /// </remarks>
+        /// <param name="execute">The way the probe application is driven.</param>
+        /// <returns>The counts the probe reported when it exited.</returns>
+        private static string ReadDisposalReport(Action execute)
+        {
+            // The probe projects are referenced with ReferenceOutputAssembly="false", so the name is repeated here
+            // rather than taken from DisposableProbe.ReportFileName.
+            var report = Path.Combine(Path.GetDirectoryName(GetProbeApplication(PassingProbes))!, "disposable-probe.txt");
+
+            File.Delete(report);
+            execute();
+
+            Assert.True(File.Exists(report), $"The probe application did not write '{report}'.");
+
+            return File.ReadAllText(report);
         }
 
         private IReadOnlyList<DiscoveredTest> Discover(string project, params string[] arguments)
