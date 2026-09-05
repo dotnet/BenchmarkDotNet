@@ -326,6 +326,24 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job AsDefault(this Job job, bool value = true) => job.WithCore(j => j.Meta.IsDefault = value);
 
+        /// <summary>
+        /// Creates a new job based on the given job with the given category added to <see cref="MetaMode.Categories"/>.
+        /// <remarks>categories are metadata used to select which jobs are executed, they don't affect how the job is executed</remarks>
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="category">The category which should be added to the new job</param>
+        /// <returns>The new job with the additional category</returns>
+        public static Job WithCategory(this Job job, string category) => job.WithCore(j => j.Meta.AddCategories([category]));
+
+        /// <summary>
+        /// Creates a new job based on the given job with the given categories.
+        /// <remarks>the categories of the original job are not preserved, use <see cref="WithCategory"/> if you want to add to them</remarks>
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="categories">The categories of the new job</param>
+        /// <returns>The new job with overriden categories</returns>
+        public static Job WithCategories(this Job job, params string[] categories) => job.WithCore(j => j.Meta.Categories = categories);
+
         internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {
             // users expect that if IterationSetup is configured, it should be run before every benchmark invocation https://github.com/dotnet/BenchmarkDotNet/issues/730

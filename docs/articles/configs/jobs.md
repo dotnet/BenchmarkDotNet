@@ -15,6 +15,48 @@ There are several categories of characteristics which you can specify. Let's con
 
 It's a single string characteristic. It allows to name your job. This name will be used in logs and a part of a folder name with generated files for this job. `Id` doesn't affect benchmark results, but it can be useful for diagnostics. If you don't specify `Id`, random value will be chosen based on other characteristics
 
+### Categories
+
+Job categories are the job equivalent of `[BenchmarkCategory]`: they allow you to group jobs so that you can select which ones to run. A job can belong to any number of categories, and the comparison is case insensitive.
+
+```cs
+var config = DefaultConfig.Instance
+    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80).WithCategories("runtimes", "net8"))
+    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core90).WithCategories("runtimes", "net9"))
+    .AddJob(Job.Dry.WithCategory("debug"));
+```
+
+`WithCategories` overrides the categories of the job, `WithCategory` adds to them.
+
+The attributes that define a job (`[SimpleJob]`, `[DryJob]`, `[ShortRunJob]`, `[InProcess]` and the other attributes deriving from `JobConfigBaseAttribute`) have a `Categories` property, so the same thing can be expressed with attributes:
+
+```cs
+[SimpleJob(RuntimeMoniker.Net80, Categories = ["runtimes", "net8"])]
+[SimpleJob(RuntimeMoniker.Net90, Categories = ["runtimes", "net9"])]
+public class Benchmarks { /* ... */ }
+```
+
+The mutator attributes (`[WarmupCount]`, `[IterationCount]`, `[RunOncePerIteration]` and the others deriving from `JobMutatorConfigBaseAttribute`) don't define a job of their own, so they have no `Categories` property. A mutator that carries categories has to be built with the fluent api: `Job.Default.WithWarmupCount(3).WithCategory("ci").AsMutator()`.
+
+Categories don't affect how a job is executed: they are not a part of the job `Id`, the folder names, nor the summary.
+
+To run only the jobs which belong to given categories, use `JobCategoryFilter`, `[JobCategoryFilter]` or the `--jobCategories` console argument:
+
+```cs
+var config = DefaultConfig.Instance.AddFilter(new JobCategoryFilter(["net8"]));
+```
+
+```cs
+[JobCategoryFilter("net8")]
+public class Benchmarks { /* ... */ }
+```
+
+```log
+dotnet run -c Release -- --jobCategories net8
+```
+
+Like `--anyCategories` and `--allCategories`, the filter is inclusion only: a job with no categories belongs to none of the requested ones, so it is filtered out. If your config mixes categorized and uncategorized jobs, selecting a category also removes the uncategorized jobs, so give a category to every job you may want to keep.
+
 ### Environment
 
 `Environment` specifies an environment of the job. You can specify the following characteristics:

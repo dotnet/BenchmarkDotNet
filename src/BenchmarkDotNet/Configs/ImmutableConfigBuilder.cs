@@ -223,7 +223,10 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         private static IReadOnlyList<Job> GetRunnableJobs(IEnumerable<Job> jobs)
         {
-            var unique = jobs.Distinct(JobComparer.Default).ToArray();
+            // JobComparer ignores the categories, so jobs that differ only by category collapse into one here. Their
+            // categories are merged into the survivor, otherwise selecting by the categories of the collapsed jobs
+            // would silently match nothing.
+            var unique = jobs.GroupBy(job => job, JobComparer.Default).Select(MergeCategories).ToArray();
             var result = new List<Job>();
 
             foreach (var standardJob in unique.Where(job => !job.Meta.IsMutator && !job.Meta.IsDefault))
@@ -241,18 +244,31 @@ namespace BenchmarkDotNet.Configs
                 {
                     var copy = result[i].UnfreezeCopy();
 
+                    // Apply overwrites the characteristics, but the categories are additive: a mutator that carries
+                    // categories adds them to every job it mutates instead of replacing the ones that job already
+                    // has. Dropping them would make selecting by the categories of the mutated job silently match
+                    // nothing. Only the fluent api can produce such a mutator (eg Job.Default.WithWarmupCount(2)
+                    // .WithCategory("ci").AsMutator()): the mutator attributes derive from
+                    // JobMutatorConfigBaseAttribute, which has no Categories property.
+                    var ownCategories = copy.Meta.Categories;
+
                     copy.Apply(mutatorJob);
                     ApplyCouplingFromMutator(copy, mutatorJob);
+
+                    copy.Meta.Categories = [.. ownCategories, .. copy.Meta.Categories];
 
                     result[i] = copy.Freeze();
                 }
             }
 
             // Deduplicated again: the pass at the top of this method runs before the mutators are merged, so it
-            // cannot see jobs that only become identical here.
+            // cannot see jobs that only become identical here. The categories are merged rather than dropped for
+            // the same reason as in the first pass: the comparer ignores them, so the jobs collapsed here can carry
+            // categories the survivor does not have, and selecting by one of those would then match nothing.
             return result
                 .Select(ReconcileRuntimeAndToolchain)
-                .Distinct(JobComparer.Default)
+                .GroupBy(job => job, JobComparer.Default)
+                .Select(MergeCategories)
                 .ToArray();
         }
 
@@ -289,6 +305,32 @@ namespace BenchmarkDotNet.Configs
             var copy = job.UnfreezeCopy();
             InfrastructureMode.RuntimeCharacteristic[copy.Infrastructure] = toolchain.Runtime;
             return copy.Freeze();
+        }
+
+        /// <summary>
+        /// Returns the first job of a group of jobs which are equal except for their categories,
+        /// carrying the categories of all of them.
+        /// </summary>
+        private static Job MergeCategories(IGrouping<Job, Job> equalJobs)
+        {
+            var first = equalJobs.Key;
+
+            // The categories are deduplicated the same way the Meta.Categories setter does it, so that the count
+            // below compares like with like: without it a group whose jobs carry the very same categories (or the
+            // same ones in a different casing) would look like it had something to merge and take the copying path.
+            var merged = equalJobs.SelectMany(job => job.Meta.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+
+            // The merged set always contains the categories of the first job, so an equal count means it contains
+            // nothing else and the job can be returned as it is. This is the common case: a group of one.
+            if (merged.Length == first.Meta.Categories.Count)
+                return first;
+
+            // WithCategories copies the job through Apply, which skips the characteristics that are ignored on apply.
+            // IsMutator is one of them, so it has to be restored explicitly: a mutator that loses the flag here is
+            // added to the config as an extra standalone job and is never applied to the jobs it was meant to mutate.
+            var mergedJob = first.WithCategories(merged);
+
+            return (first.Meta.IsMutator ? mergedJob.AsMutator() : mergedJob).Freeze();
         }
 
         private class TypeComparer<TInterface> : IEqualityComparer<TInterface>

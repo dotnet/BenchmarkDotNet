@@ -103,6 +103,7 @@ You can also filter the benchmarks by categories:
 
 * `--anyCategories` - runs all benchmarks that belong to **any** of the provided categories
 * `--allCategories`- runs all benchmarks that belong to **all** provided categories
+* `--jobCategories` - runs all benchmarks whose job belongs to **any** of the provided job categories. Jobs without categories are excluded
 
 ## Diagnosers
 
@@ -272,6 +273,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--allStats`                (Default: false) Displays all statistics (min, max & more)
 * `--allCategories`           Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
 * `--anyCategories`           Any Categories to run
+* `--jobCategories`           Job categories to run. Only the benchmarks which belong to a job that has any of them are going to be executed
 * `--attribute`               Run all methods with given attribute (applied to class or method)
 * `--join`                    (Default: false) Prints single table with results for all benchmarks
 * `--title`                   Custom title for the produced summaries and the base name of the result files exported for them

@@ -77,6 +77,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("anyCategories", Required = false, HelpText = "Any Categories to run")]
         public IEnumerable<string> AnyCategories { get; set; } = [];
 
+        [Option("jobCategories", Required = false, HelpText = "Job categories to run. Only the benchmarks which belong to a job that has any of them are going to be executed")]
+        public IEnumerable<string> JobCategories { get; set; } = [];
+
         [Option("attribute", Required = false, HelpText = "Run all methods with given attribute (applied to class or method)")]
         public IEnumerable<string> AttributeNames { get; set; } = [];
 
@@ -233,7 +236,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("resume", Required = false, Default = false, HelpText = "Continue the execution if the last run was stopped.")]
         public bool Resume { get; set; }
 
-        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
+        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any() || JobCategories.Any();
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]
