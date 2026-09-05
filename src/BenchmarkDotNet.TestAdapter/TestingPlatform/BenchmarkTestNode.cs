@@ -99,7 +99,11 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 properties.Add(new TestFileLocationProperty(benchmarkAttribute.SourceCodeFile, new LinePositionSpan(position, position)));
             }
 
-            foreach (var category in DefaultCategoryDiscoverer.Instance.GetCategories(benchmarkMethod))
+            // The categories come from the descriptor rather than from DefaultCategoryDiscoverer, because
+            // BenchmarkConverter has already resolved them through the config's ICategoryDiscoverer. Rediscovering
+            // them here would hide the categories of a custom discoverer from --treenode-filter, even though
+            // BenchmarkDotNet's own --anyCategories and the summary do see them.
+            foreach (var category in benchmarkCase.Descriptor.Categories)
                 properties.Add(new TestMetadataProperty("Category", category));
 
             var path = BuildPath(type.Assembly, type.Namespace, fullClassName, parametrizedMethodName, jobDisplayInfo);

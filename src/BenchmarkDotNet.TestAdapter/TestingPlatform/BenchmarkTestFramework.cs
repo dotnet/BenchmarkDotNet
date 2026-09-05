@@ -9,6 +9,7 @@ using Microsoft.Testing.Platform.Requests;
 using Microsoft.Testing.Platform.Services;
 using Microsoft.Testing.Platform.TestHost;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Channels;
 
@@ -84,17 +85,27 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
         private async Task DiscoverAsync(DiscoverTestExecutionRequest request, ExecuteRequestContext context)
         {
-            foreach (var benchmarks in GetMatchingBenchmarks(request.Filter))
+            var enumeration = GetMatchingBenchmarks(request.Filter);
+
+            try
             {
-                context.CancellationToken.ThrowIfCancellationRequested();
+                foreach (var benchmarks in enumeration.Matches)
+                {
+                    context.CancellationToken.ThrowIfCancellationRequested();
 
-                // Exactly one node per uid: publishing a colliding uid twice would leave the platform with two nodes
-                // it cannot tell apart. The collision itself is reported when the benchmarks are run.
-                var message = new TestNodeUpdateMessage(
-                    request.Session.SessionUid,
-                    benchmarks[0].Node.ToTestNode(DiscoveredTestNodeStateProperty.CachedInstance));
+                    // Exactly one node per uid: publishing a colliding uid twice would leave the platform with two
+                    // nodes it cannot tell apart. The collision itself is reported when the benchmarks are run.
+                    var message = new TestNodeUpdateMessage(
+                        request.Session.SessionUid,
+                        benchmarks[0].Node.ToTestNode(DiscoveredTestNodeStateProperty.CachedInstance));
 
-                await context.MessageBus.PublishAsync(this, message).ConfigureAwait(false);
+                    await context.MessageBus.PublishAsync(this, message).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                // Discovery runs nothing, so every value the enumeration created is this method's to dispose.
+                DisposeUnusedParameterValues(enumeration.All, []);
             }
         }
 
@@ -104,13 +115,18 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             var cancellationToken = context.CancellationToken;
 
             var runnable = new List<Match>();
-            foreach (var benchmarks in GetMatchingBenchmarks(request.Filter))
+            var enumeration = GetMatchingBenchmarks(request.Filter);
+            foreach (var benchmarks in enumeration.Matches)
             {
                 if (benchmarks.Count == 1)
                     runnable.Add(benchmarks[0]);
                 else
                     await PublishCollisionAsync(context, sessionUid, benchmarks).ConfigureAwait(false);
             }
+
+            // A benchmark that was filtered out or that collided is never handed to BenchmarkDotNet, so nothing else
+            // would dispose the values the enumeration created for it.
+            DisposeUnusedParameterValues(enumeration.All, runnable.Select(match => match.Node.BenchmarkCase));
 
             if (runnable.Count == 0)
                 return;
@@ -168,9 +184,16 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     {
                         try
                         {
-                            // Benchmarks that never reported a result still need one, unless the run was cancelled:
-                            // the platform expects an OperationCanceledException in that case, and publishing results
-                            // afterwards would contradict it.
+                            // Benchmarks that never reported a result still need one, unless the run was cancelled.
+                            // Two things make the cancelled run the exception:
+                            //
+                            //  * The platform's contract for a cancelled request is an OperationCanceledException,
+                            //    not a terminal state per node. CancelledTestNodeStateProperty is obsolete for
+                            //    exactly this reason, so a node left in progress is the shape it asks for.
+                            //    BenchmarkDotNet rethrows the cancellation, and awaiting the run task below surfaces
+                            //    it out of the request.
+                            //  * The token is also cancelled when publishing itself failed. Nothing drains the queue
+                            //    at that point, so results published here would be dropped anyway.
                             if (!runCancellation.IsCancellationRequested)
                                 eventProcessor.PublishOutstandingResults();
 
@@ -236,10 +259,18 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         private async Task PublishCollisionAsync(ExecuteRequestContext context, SessionUid sessionUid, List<Match> collision)
         {
             var node = collision[0].Node;
+
+            // The colliding benchmarks share every string the uid is built from, so the method names are the only
+            // thing left that can tell them apart. They are the same name when it is the parameters that collide.
+            var methodNames = string.Join(", ", collision
+                .Select(match => match.Node.BenchmarkCase.Descriptor.WorkloadMethod.Name)
+                .Distinct(StringComparer.Ordinal));
             var error =
-                $"{collision.Count} benchmarks are identified as '{node.Uid}', so they cannot be told apart and none " +
-                "of them were run. Benchmarks are identified by the string representation of their parameters: give " +
-                "the colliding values distinct ToString() results.";
+                $"{collision.Count} benchmarks are identified as '{node.Uid}' and cannot be told apart, so none of " +
+                $"them were run: {methodNames}. The identity is built from the type, the benchmark name " +
+                "([Benchmark(Description = \"...\")] when set, the method name otherwise), the job, and the string " +
+                "representation of the parameters. Give the colliding benchmarks distinct descriptions, distinct " +
+                "jobs, or distinct parameter ToString() results.";
 
             await context.MessageBus.PublishAsync(
                 this,
@@ -255,15 +286,16 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// </summary>
         /// <param name="filter">The filter of the request.</param>
         /// <returns>
-        /// The matching benchmarks in enumeration order, grouped by uid. A group holding more than one benchmark is a
-        /// uid collision.
+        /// The matching benchmarks in enumeration order and grouped by uid, together with everything the assembly
+        /// declares. A group holding more than one benchmark is a uid collision.
         /// </returns>
-        private List<List<Match>> GetMatchingBenchmarks(ITestExecutionFilter filter)
+        private Enumeration GetMatchingBenchmarks(ITestExecutionFilter filter)
         {
             var matches = new List<List<Match>>();
             var matchesByUid = new Dictionary<string, List<Match>>(StringComparer.Ordinal);
+            var runInfos = BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly);
 
-            foreach (var runInfo in BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly))
+            foreach (var runInfo in runInfos)
             {
                 // The job only earns a place in the display name when the benchmark actually runs under several jobs.
                 // This is computed before filtering so that a benchmark keeps the same name however it was selected.
@@ -286,8 +318,40 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 }
             }
 
-            return matches;
+            return new Enumeration(matches, runInfos);
         }
+
+        /// <summary>
+        /// Disposes the parameter values of the benchmarks that were enumerated but will not be run.
+        /// </summary>
+        /// <remarks>
+        /// Enumerating an assembly instantiates the values of every [Params] and [ArgumentsSource], and BenchmarkDotNet
+        /// only disposes the ones belonging to the benchmarks it was handed. The values are matched by reference
+        /// instead of being disposed case by case, because BenchmarkConverter gives the same ParameterInstance to
+        /// every job and every argument set of a benchmark: disposing a filtered out case wholesale would take down
+        /// values that a benchmark which is about to run still owns.
+        /// </remarks>
+        /// <param name="enumerated">Everything the assembly declares.</param>
+        /// <param name="retained">The benchmarks that are going to be run, if any.</param>
+        private static void DisposeUnusedParameterValues(BenchmarkRunInfo[] enumerated, IEnumerable<BenchmarkCase> retained)
+        {
+            var unused = new HashSet<IDisposable>(ReferenceComparer.Instance);
+
+            foreach (var value in GetDisposableParameterValues(enumerated.SelectMany(runInfo => runInfo.BenchmarksCases)))
+                unused.Add(value);
+
+            foreach (var value in GetDisposableParameterValues(retained))
+                unused.Remove(value);
+
+            foreach (var value in unused)
+                value.Dispose();
+        }
+
+        private static IEnumerable<IDisposable> GetDisposableParameterValues(IEnumerable<BenchmarkCase> benchmarkCases)
+            => benchmarkCases
+                .SelectMany(benchmarkCase => benchmarkCase.Parameters.Items)
+                .Select(parameter => parameter.Value)
+                .OfType<IDisposable>();
 
 #pragma warning disable TPEXP // The tree node filter is still marked as experimental by the platform.
         private static bool Matches(ITestExecutionFilter filter, BenchmarkTestNode node) => filter switch
@@ -299,6 +363,40 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             _ => true
         };
 #pragma warning restore TPEXP
+
+        /// <summary>
+        /// The result of enumerating the assembly for a request.
+        /// </summary>
+        private sealed class Enumeration
+        {
+            public Enumeration(List<List<Match>> matches, BenchmarkRunInfo[] all)
+            {
+                Matches = matches;
+                All = all;
+            }
+
+            /// <summary>
+            /// Gets the benchmarks the request asked for, grouped by uid.
+            /// </summary>
+            public List<List<Match>> Matches { get; }
+
+            /// <summary>
+            /// Gets every benchmark the assembly declares, matching or not.
+            /// </summary>
+            public BenchmarkRunInfo[] All { get; }
+        }
+
+        /// <summary>
+        /// Compares by reference, so that a parameter value which overrides Equals is still disposed once per instance.
+        /// </summary>
+        private sealed class ReferenceComparer : IEqualityComparer<IDisposable>
+        {
+            public static readonly ReferenceComparer Instance = new ReferenceComparer();
+
+            public bool Equals(IDisposable? x, IDisposable? y) => ReferenceEquals(x, y);
+
+            public int GetHashCode(IDisposable obj) => RuntimeHelpers.GetHashCode(obj);
+        }
 
         /// <summary>
         /// A benchmark that matched the request, together with the run info it belongs to.
