@@ -152,6 +152,45 @@ namespace BenchmarkDotNet.Tests.Jobs
             Assert.Equal(["keep"], job.Meta.Categories);
         }
 
+        // The mutator jobs are deduplicated like any other, and merging their categories must not cost them their
+        // IsMutator flag: WithCategories copies the job through Apply, which skips the characteristics that are
+        // ignored on apply. A mutator which loses the flag is added to the config as an extra standalone job and is
+        // never applied to the jobs it was meant to mutate.
+        [Fact]
+        public void DeduplicatedMutatorsWhichCarryDifferentCategoriesAreStillMutators()
+        {
+            const int warmupCount = 2;
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithId("base"))
+                .AddJob(Job.Default.WithWarmupCount(warmupCount).WithCategory("first").AsMutator())
+                .AddJob(Job.Default.WithWarmupCount(warmupCount).WithCategory("second").AsMutator());
+
+            var job = Assert.Single(ImmutableConfigBuilder.Create(config).GetJobs());
+
+            Assert.Equal("base", job.Id);
+            Assert.Equal(warmupCount, job.Run.WarmupCount);
+            Assert.True(job.Meta.HasCategory("first"));
+            Assert.True(job.Meta.HasCategory("second"));
+        }
+
+        // The categories of a group are deduplicated before they are compared to the ones the survivor already has,
+        // so a group whose jobs carry the very same categories is recognized as having nothing to merge.
+        [Fact]
+        public void DeduplicatedMutatorsWhichCarryTheSameCategoriesAreStillMutators()
+        {
+            const int warmupCount = 2;
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithId("base"))
+                .AddJob(Job.Default.WithWarmupCount(warmupCount).WithCategory("mutator").AsMutator())
+                .AddJob(Job.Default.WithWarmupCount(warmupCount).WithCategory("mutator").AsMutator());
+
+            var job = Assert.Single(ImmutableConfigBuilder.Create(config).GetJobs());
+
+            Assert.Equal("base", job.Id);
+            Assert.Equal(warmupCount, job.Run.WarmupCount);
+            Assert.Equal(["mutator"], job.Meta.Categories);
+        }
+
         // UnfreezeCopy is built on Apply, so marking the characteristic as ignored on apply (which would be the
         // obvious way to make the categories additive) would silently drop them on every WithXxx call
         [Fact]
@@ -230,7 +269,7 @@ namespace BenchmarkDotNet.Tests.Jobs
         }
 
         [Fact]
-        public void CategoriesAreAvailableOnEveryJobAttribute()
+        public void CategoriesAreAvailableOnTheAttributesWhichDefineAJob()
         {
             var job = BenchmarkConverter.TypeToBenchmarks(typeof(WithACategorizedDryJob)).BenchmarksCases.Single().Job;
 
