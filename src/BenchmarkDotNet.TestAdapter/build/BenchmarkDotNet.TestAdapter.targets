@@ -14,9 +14,9 @@
           that calls BenchmarkSwitcher. Generating a second one would not compile.
     -->
     <!--
-      The opt-out has to overwrite the property rather than fill in a blank one. Microsoft.Testing.Platform.MSBuild
-      defaults IsTestingPlatformApplication to true in its own .targets, which a real package consumer imports before
-      this file, so a condition on it being empty never fires and every opt-out is ignored. This is the same shape
+      The opt-out has to overwrite the property rather than fill in a blank one. IsTestingPlatformApplication may
+      already have been set to true by the project itself or by another package imported before this file, and a
+      condition on it being empty would then never fire, silently ignoring the opt-out. This is the same shape
       MSTest.TestAdapter.targets uses to turn the platform off when EnableMSTestRunner is not set.
     -->
     <IsTestingPlatformApplication Condition="'$(BenchmarkDotNetUseVSTest)' == 'true' or '$(GenerateProgramFile)' == 'false'">false</IsTestingPlatformApplication>
