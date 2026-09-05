@@ -5,10 +5,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 using System.Reflection;
 
@@ -61,18 +58,18 @@ namespace BenchmarkDotNet.Running
         [PublicAPI]
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
-        public bool IsNativeAot => RepresentativeBenchmarkCase.Job.IsNativeAOT();
+        public bool IsNetFramework => Runtime is ClrRuntime;
 
-        public bool IsNetFramework => Runtime is ClrRuntime
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
-
-        public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.GetRuntime();
+        public Runtime Runtime => RepresentativeBenchmarkCase.GetRuntime();
 
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
 
-        public TimeSpan Timeout => IsNativeAot && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
-            ? TimeSpan.FromMinutes(5) // downloading all NativeAOT dependencies can take a LOT of time
-            : RepresentativeBenchmarkCase.Config.BuildTimeout;
+        public TimeSpan Timeout =>
+            // Known slow builds
+            RepresentativeBenchmarkCase.Job.GetRuntime() is NativeAotRuntime or R2RRuntime or WasmRuntime
+            && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
+                ? TimeSpan.FromMinutes(5)
+                : RepresentativeBenchmarkCase.Config.BuildTimeout;
 
         public bool LogBuildOutput { get; }
 
@@ -119,11 +116,10 @@ namespace BenchmarkDotNet.Running
                 if (!XUnitHelper.IsIntegrationTest.Value || !RuntimeInformation.IsNetCore)
                     return false;
 
-                var job = RepresentativeBenchmarkCase.Job;
-                if (job.GetToolchain().Builder is not DotNetCliBuilder)
+                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not DotNetCliBuilder)
                     return false;
 
-                return !job.HasDynamicBuildCharacteristic();
+                return !RepresentativeBenchmarkCase.Job.HasDynamicBuildCharacteristic();
             }
         }
     }

@@ -2,7 +2,8 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.Framework;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Tests.Configs
@@ -389,7 +390,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
             a = InfrastructureMode.ToolchainCharacteristic;
             // will not throw:
-            a[j] = CsProjClassicNetToolchain.Net472;
+            a[j] = CsProjFrameworkToolchain.Net472;
             a[j] = null;
             a[j] = Characteristic.EmptyValue;
             Assert.Throws<ArgumentException>(() => a[j] = new EnvironmentMode()); // not assignable;
@@ -412,7 +413,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.True(copy.HasValue(RunMode.MaxIterationCountCharacteristic));
             Assert.Equal(20, copy.Run.MaxIterationCount);
             Assert.False(jobBefore.HasValue(RunMode.MaxIterationCountCharacteristic));
-            Assert.True(copy.Environment.Runtime is CoreRuntime);
+            Assert.True(copy.GetRuntime() is CoreRuntime);
             Assert.False(copy.Meta.IsMutator); // the job does not became a mutator itself, this config should not be copied
         }
 

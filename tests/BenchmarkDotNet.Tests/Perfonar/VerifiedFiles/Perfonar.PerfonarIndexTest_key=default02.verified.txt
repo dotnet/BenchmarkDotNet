@@ -25,7 +25,8 @@
   .iterationIndex
   .job
   .job.environment
-  .job.environment.runtime
+  .job.infrastructure
+  .job.infrastructure.runtime
   .unit
   .value
 
@@ -56,7 +57,8 @@
   .iterationIndex = 0
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net481
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net481
   .unit = ns
   .value = 10
 [Entry1]
@@ -86,7 +88,8 @@
   .iterationIndex = 1
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net481
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net481
   .unit = ns
   .value = 11
 [Entry2]
@@ -116,7 +119,8 @@
   .iterationIndex = 2
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net481
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net481
   .unit = ns
   .value = 12
 [Entry3]
@@ -146,7 +150,8 @@
   .iterationIndex = 0
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net481
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net481
   .unit = ns
   .value = 20
 [Entry4]
@@ -176,7 +181,8 @@
   .iterationIndex = 1
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net481
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net481
   .unit = ns
   .value = 21
 [Entry5]
@@ -206,7 +212,8 @@
   .iterationIndex = 2
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net481
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net481
   .unit = ns
   .value = 22
 [Entry6]
@@ -236,7 +243,8 @@
   .iterationIndex = 0
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net70
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net7.0
   .unit = ns
   .value = 30
 [Entry7]
@@ -266,7 +274,8 @@
   .iterationIndex = 1
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net70
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net7.0
   .unit = ns
   .value = 31
 [Entry8]
@@ -296,7 +305,8 @@
   .iterationIndex = 2
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net70
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net7.0
   .unit = ns
   .value = 32
 [Entry9]
@@ -326,7 +336,8 @@
   .iterationIndex = 0
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net70
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net7.0
   .unit = ns
   .value = 40
 [Entry10]
@@ -356,7 +367,8 @@
   .iterationIndex = 1
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net70
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net7.0
   .unit = ns
   .value = 41
 [Entry11]
@@ -386,6 +398,7 @@
   .iterationIndex = 2
   .job = <object>
   .job.environment = <object>
-  .job.environment.runtime = Net70
+  .job.infrastructure = <object>
+  .job.infrastructure.runtime = net7.0
   .unit = ns
   .value = 42

@@ -7,7 +7,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -84,7 +83,7 @@ namespace BenchmarkDotNet.Diagnosers
                 maxDepth: Config.MaxDepth,
                 filters: Config.Filters,
                 syntax: Config.Syntax.ToString(),
-                tfm: benchmarkCase.Job.Environment.GetRuntime().MsBuildMoniker
+                runtimeVersion: benchmarkCase.GetRuntime().Version!
             );
 
         public async ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
@@ -100,7 +99,7 @@ namespace BenchmarkDotNet.Diagnosers
                     );
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
-                    var result = await monoDisassembler.Disassemble(benchmark, (MonoRuntime)benchmark.Job.Environment.Runtime!, cancellationToken).ConfigureAwait(false);
+                    var result = await monoDisassembler.Disassemble(benchmark, cancellationToken).ConfigureAwait(false);
                     results.Add(benchmark, result);
                     break;
             }
@@ -117,13 +116,13 @@ namespace BenchmarkDotNet.Diagnosers
             var currentPlatform = RuntimeInformation.GetCurrentPlatform();
             if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64))
             {
-                yield return new ValidationError(true, $"DisassemblyDiagnoser does not support {currentPlatform}");
+                yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support {currentPlatform}");
                 yield break;
             }
 
             if (currentPlatform == Platform.Arm64 && OsDetector.IsWindows())
             {
-                yield return new ValidationError(true, $"DisassemblyDiagnoser does not support Arm on Windows");
+                yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support Arm on Windows");
                 yield break;
             }
 
@@ -135,29 +134,27 @@ namespace BenchmarkDotNet.Diagnosers
 
             foreach (var benchmark in validationParameters.Benchmarks)
             {
+                var runtime = benchmark.GetRuntime();
                 if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is InProcessNoEmitToolchain)
                 {
-                    yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
+                    yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support {nameof(InProcessNoEmitToolchain)}", benchmark);
                 }
-                else if (benchmark.Job.IsNativeAOT())
+                else if (runtime is not (CoreRuntime or R2RRuntime or ClrRuntime or LegacyMonoRuntime))
                 {
-                    yield return new ValidationError(true, "Currently NativeAOT has no DisassemblyDiagnoser support", benchmark);
+                    yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)}  does not support {runtime}", benchmark);
                 }
-
-                if (ShouldUseClrMdDisassembler(benchmark))
+                else if (ShouldUseClrMdDisassembler(benchmark))
                 {
                     if (Config.RunInHost && toolchain?.IsInProcess != true && !PlatformsMatch(currentPlatform, benchmark.Job.Environment.Platform))
                     {
-                        yield return new ValidationError(true, "DisassemblyDiagnoser cannot run in host for a job that targets a different platform", benchmark);
+                        yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} cannot run in host for a job that targets a different platform", benchmark);
                     }
 
                     if (OsDetector.IsLinux())
                     {
-                        var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance)!;
-
-                        if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                        if (runtime is CoreRuntime core && core.Version.Major < 3 && !Config.RunInHost)
                         {
-                            yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                            yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET (Core) 3.0+ with RunInHost option, but the job targets {runtime}", benchmark);
                         }
 
                         if (ptrace_scope.Value == "2")
@@ -172,7 +169,7 @@ namespace BenchmarkDotNet.Diagnosers
                 }
                 else if (!ShouldUseMonoDisassembler(benchmark))
                 {
-                    yield return new ValidationError(true, $"Only Windows and Linux are supported in DisassemblyDiagnoser without Mono. Current OS is {System.Runtime.InteropServices.RuntimeInformation.OSDescription}");
+                    yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support this OS ({System.Runtime.InteropServices.RuntimeInformation.OSDescription}) without legacy Mono");
                 }
             }
         }
@@ -190,8 +187,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
-            => benchmarkCase.Job.Environment.Runtime is MonoRuntime
-            || (RuntimeInformation.IsMono && benchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain.IsInProcess);
+            => benchmarkCase.GetRuntime() is LegacyMonoRuntime;
 
         private static bool ShouldUseClrMdDisassembler(BenchmarkCase benchmarkCase)
             => !ShouldUseMonoDisassembler(benchmarkCase) && (OsDetector.IsWindows() || OsDetector.IsLinux() || OsDetector.IsMacOS());

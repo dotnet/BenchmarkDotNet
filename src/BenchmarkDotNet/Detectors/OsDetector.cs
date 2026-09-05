@@ -170,6 +170,12 @@ public class OsDetector
         RuntimeInformation.IsOSPlatform(OSPlatform.Create("TVOS"));
 #endif
 
+    /// <summary>
+    /// Mobile OSes where BenchmarkDotNet can't spawn a child process to build/run benchmarks out of process,
+    /// so benchmarks have to be executed in-process regardless of the runtime.
+    /// </summary>
+    internal static bool IsMobile() => IsAndroid() || IsIOS() || IsTvOS();
+
     [SupportedOSPlatformGuard("windows6.1")]
     internal static bool IsWindows7OrLater() =>
 #if NET6_0_OR_GREATER
