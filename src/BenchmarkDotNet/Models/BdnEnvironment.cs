@@ -6,5 +6,5 @@ namespace BenchmarkDotNet.Models;
 internal class BdnEnvironment : EnvironmentInfo
 {
     public Jit? Jit { get; set; }
-    public int? Affinity { get; set; }
+    public long? Affinity { get; set; }
 }

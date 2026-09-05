@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Jobs
         internal BdnEnvironment ToPerfonar() => new()
         {
             Jit = HasValue(JitCharacteristic) ? Jit : null,
-            Affinity = HasValue(AffinityCharacteristic) ? (int)Affinity : null
+            Affinity = HasValue(AffinityCharacteristic) ? (long)Affinity : null
         };
     }
 }

@@ -512,6 +512,67 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void UserCanSpecifyAffinity()
+        {
+            const ulong affinity = 0b1010;
+            var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(new IntPtr((long)affinity), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [FactEnvSpecific("A mask with a bit above 32 does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
+        public void UserCanSpecifyAffinityBeyondThirtyTwoProcessors()
+        {
+            const ulong affinity = 1UL << 40;
+            var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(new IntPtr((long)affinity), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [FactEnvSpecific("A mask with the top bit set does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
+        public void UserCanSpecifyAffinityForTheSixtyFourthProcessor()
+        {
+            // the top bit is the 64th cpu, the last one FixAffinity supports without cpu groups.
+            // as an unsigned option it is written the way the mask reads
+            const ulong affinity = 1UL << 63;
+            var config = ConfigParser.Parse(["--affinity", affinity.ToString()], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Equal(new IntPtr(unchecked((long)affinity)), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [Theory]
+        [InlineData(0b1010UL)]
+        [InlineData(1UL << 31)]
+        [InlineData(uint.MaxValue)]
+        public void AffinityThatFitsThirtyTwoBitsIsAcceptedByAThirtyTwoBitProcess(ulong affinity)
+        {
+            Assert.True(ConfigParser.TryConvertAffinity(affinity, pointerSize: 4, out var converted));
+            Assert.Equal(new IntPtr(unchecked((int)affinity)), converted);
+        }
+
+        [Theory]
+        [InlineData(1UL << 32)]
+        [InlineData(1UL << 40)]
+        [InlineData(1UL << 63)]
+        public void AffinityWiderThanThirtyTwoBitsIsRejectedByAThirtyTwoBitProcess(ulong affinity)
+        {
+            Assert.False(ConfigParser.TryConvertAffinity(affinity, pointerSize: 4, out _));
+        }
+
+        [Theory]
+        [InlineData(0b1010UL)]
+        [InlineData(1UL << 40)]
+        [InlineData(1UL << 63)]
+        public void AffinityOfAnyWidthIsAcceptedByASixtyFourBitProcess(ulong affinity)
+        {
+            Assert.True(ConfigParser.TryConvertAffinity(affinity, pointerSize: 8, out var converted));
+            Assert.Equal(new IntPtr(unchecked((long)affinity)), converted);
+        }
+
+        [Fact]
         public void UserCanSpecifyBuildTimeout()
         {
             const int timeoutInSeconds = 10;

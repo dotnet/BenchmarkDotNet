@@ -145,7 +145,7 @@ public class PerfonarTests(ITestOutputHelper output)
         ]
     };
 
-    private static EntryInfo Job(string? runtime = null, Jit? jit = null, int? affinity = null) => new()
+    private static EntryInfo Job(string? runtime = null, Jit? jit = null, long? affinity = null) => new()
     {
         // The runtime lives under Infrastructure (mirroring Job.Infrastructure), not Environment.
         Job = new BdnJob
