@@ -6,7 +6,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -141,7 +141,7 @@ internal static class InProcessEmitRunner
         // Inject CancellationToken into properties/fields marked with [BenchmarkCancellation]
         var targetType = benchmarkCase.Descriptor.Type;
 
-        foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy))
         {
             if (property.PropertyType == typeof(System.Threading.CancellationToken) &&
                 property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
@@ -155,7 +155,7 @@ internal static class InProcessEmitRunner
             }
         }
 
-        foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy))
         {
             if (field.FieldType == typeof(System.Threading.CancellationToken) &&
                 field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))

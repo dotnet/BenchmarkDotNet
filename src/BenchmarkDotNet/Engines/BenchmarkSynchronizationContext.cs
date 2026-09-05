@@ -36,6 +36,15 @@ public readonly ref struct BenchmarkSynchronizationContext : IDisposable
 
     public T ExecuteUntilComplete<T>(ValueTask<T> valueTask)
         => context.ExecuteUntilComplete(valueTask);
+
+    public void ExecuteUntilComplete(ValueTask valueTask)
+        => context.ExecuteUntilComplete(WithResult(valueTask));
+
+    private static async ValueTask<bool> WithResult(ValueTask valueTask)
+    {
+        await valueTask.ConfigureAwait(false);
+        return true;
+    }
 }
 
 // We implement a specialized context that does not inherit from SynchronizationContext, because we never install a SynchronizationContext.Current.

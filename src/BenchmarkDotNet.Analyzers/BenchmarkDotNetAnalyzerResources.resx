@@ -234,9 +234,6 @@
   <data name="Attributes_ParamsAllValuesAttribute_NotAllowedOnFlagsEnumPropertyOrFieldType_Description" xml:space="preserve">
     <value>The [ParamsAllValues] attribute cannot be applied to a field or property of an enum type marked with the [Flags] attribute. Use this attribute only with non-flags enum types, as [Flags] enums support bitwise combinations that cannot be exhaustively enumerated.</value>
   </data>
-  <data name="Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Description" xml:space="preserve">
-    <value>A property annotated with a parameter attribute must have a public, assignable setter i.e. { set; }</value>
-  </data>
   <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty_Description" xml:space="preserve">
     <value>Parameter attributes are mutually exclusive; only one of the attributes [Params], [ParamsSource] or [ParamsAllValues] can be applied to a property at any one time</value>
   </data>
@@ -285,8 +282,95 @@
   <data name="Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty_Description" xml:space="preserve">
     <value>ParamsSource references a write-only property (a property with only a setter and no getter). Write-only properties cannot be read at runtime and will cause a NullReferenceException. Use a property with a getter or a method instead.</value>
   </data>
-  <data name="Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_MessageFormat" xml:space="preserve">
-    <value>Property '{0}' annotated with [{1}] cannot be init-only</value>
+  <data name="Attributes_ParamsSourceAttribute_MustReturnEnumerable_Title" xml:space="preserve">
+    <value>ParamsSource must return a generic enumerable or async enumerable</value>
+  </data>
+  <data name="Attributes_ParamsSourceAttribute_MustReturnEnumerable_MessageFormat" xml:space="preserve">
+    <value>ParamsSource '{0}' must return IEnumerable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;, but returns '{1}'.</value>
+  </data>
+  <data name="Attributes_ParamsSourceAttribute_MustReturnEnumerable_Description" xml:space="preserve">
+    <value>The member referenced by ParamsSource must return IEnumerable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;. The non-generic IEnumerable is not enough on its own: BenchmarkDotNet's generated code infers the element type from the source, so the return type has to name it. The await-foreach pattern without the IAsyncEnumerable&lt;T&gt; interface, and other return types such as Task&lt;IEnumerable&lt;T&gt;&gt;, are not supported either.</value>
+  </data>
+  <data name="General_ReservedMemberName_Title" xml:space="preserve">
+    <value>Parameter member name is reserved by code generation</value>
+  </data>
+  <data name="General_ReservedMemberName_MessageFormat" xml:space="preserve">
+    <value>'{0}' is a reserved name used by BenchmarkDotNet's code generation and cannot be used for a member with {1}. Please, rename the member.</value>
+  </data>
+  <data name="General_ReservedMemberName_Description" xml:space="preserve">
+    <value>BenchmarkDotNet generates a runnable type that derives from the benchmark type and assigns each [Params]/[ParamsSource]/[ParamsAllValues] member through an object initializer. A parameter member whose name matches one of the generated members (e.g. __GlobalSetup, __WorkloadActionUnroll) binds to the generated member instead and makes the generated program fail to compile. Rename the member.</value>
+  </data>
+  <data name="General_BenchmarkClass_RequiredMemberCannotBeSet_Title" xml:space="preserve">
+    <value>Required member cannot be set by BenchmarkDotNet</value>
+  </data>
+  <data name="General_BenchmarkClass_RequiredMemberCannotBeSet_MessageFormat" xml:space="preserve">
+    <value>'{0}' is a required member that BenchmarkDotNet cannot set. Only [Params]/[ParamsSource]/[ParamsAllValues] and [BenchmarkCancellation] members are set when the benchmark is constructed. Please, remove the 'required' modifier or apply one of those attributes.</value>
+  </data>
+  <data name="General_BenchmarkClass_RequiredMemberCannotBeSet_Description" xml:space="preserve">
+    <value>BenchmarkDotNet constructs the benchmark type and can only set required members at construction time: [Params]/[ParamsSource]/[ParamsAllValues] members and an instance [BenchmarkCancellation] member. A required member set later (e.g. in [GlobalSetup]) or not set at all makes the generated program fail to compile. Remove the 'required' modifier or apply one of the supported attributes.</value>
+  </data>
+  <data name="General_BenchmarkClass_ConstructorMustNotSetRequiredMembers_Title" xml:space="preserve">
+    <value>Benchmark constructor must not be annotated with [SetsRequiredMembers]</value>
+  </data>
+  <data name="General_BenchmarkClass_ConstructorMustNotSetRequiredMembers_MessageFormat" xml:space="preserve">
+    <value>The constructor of '{0}' is annotated with [SetsRequiredMembers], which BenchmarkDotNet's generated constructor cannot honor. Please, remove the attribute and set each required member with [Params]/[ParamsSource]/[ParamsAllValues] or [BenchmarkCancellation].</value>
+  </data>
+  <data name="General_BenchmarkClass_ConstructorMustNotSetRequiredMembers_Description" xml:space="preserve">
+    <value>BenchmarkDotNet generates a runnable type deriving from the benchmark type, whose constructor chains to the benchmark type's constructor. C# requires that constructor to repeat [SetsRequiredMembers] (CS9039), which would suppress all required-member checking and silently hide required members BenchmarkDotNet cannot set. Remove the attribute and set each required member with [Params]/[ParamsSource]/[ParamsAllValues] or [BenchmarkCancellation].</value>
+  </data>
+  <data name="General_Source_AmbiguousEnumerableShape_Title" xml:space="preserve">
+    <value>Source must not have more than one enumerable shape</value>
+  </data>
+  <data name="General_Source_AmbiguousEnumerableShape_MessageFormat" xml:space="preserve">
+    <value>The source '{0}' returns '{1}', which has more than one enumerable shape, so BenchmarkDotNet cannot tell which one to read the values from. Please, return a single IEnumerable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;.</value>
+  </data>
+  <data name="General_Source_AmbiguousEnumerableShape_Description" xml:space="preserve">
+    <value>A [ParamsSource]/[ArgumentsSource] member whose return type offers several candidate shapes is ambiguous - both IEnumerable&lt;T&gt; and IAsyncEnumerable&lt;T&gt;, or several instantiations of either one, such as IEnumerable&lt;int&gt; together with IEnumerable&lt;string&gt;. BenchmarkDotNet's generated code infers the element type from the source, and type inference requires a unique candidate, so the generated code fails to compile. This holds even when one element type converts to the other. Return a single enumerable or async enumerable.</value>
+  </data>
+  <data name="General_Source_MethodMustNotBeGeneric_Title" xml:space="preserve">
+    <value>A source method must not be generic</value>
+  </data>
+  <data name="General_Source_MethodMustNotBeGeneric_MessageFormat" xml:space="preserve">
+    <value>Source '{0}' resolves only to a generic method, which BenchmarkDotNet cannot invoke. Please, make the method non-generic, or add a non-generic overload taking no required parameters.</value>
+  </data>
+  <data name="General_Source_MethodMustNotBeGeneric_Description" xml:space="preserve">
+    <value>BenchmarkDotNet invokes a source method directly, and nothing supplies a generic method's type arguments - there is no call site to infer them from. Invoking one fails inside reflection with a message that says nothing about the benchmark, so the declaration is reported instead. A non-generic overload whose parameters are all optional, or a property with a public getter, serves as the source where one exists.</value>
+  </data>
+  <data name="General_Source_ElementMustNotBeByRefLike_Title" xml:space="preserve">
+    <value>A source must not yield a ref struct</value>
+  </data>
+  <data name="General_Source_ElementMustNotBeByRefLike_MessageFormat" xml:space="preserve">
+    <value>Source '{0}' is declared to yield '{1}', which {2}. BenchmarkDotNet reads a source's values through reflection, which cannot carry one. Please, yield a type the values can be built from - an array for a Span parameter - and let the benchmark take the ref struct.</value>
+  </data>
+  <data name="General_Source_ElementMustNotBeByRefLike_Description" xml:space="preserve">
+    <value>BenchmarkDotNet reads a source's values into an object[] during discovery, so every value has to survive being boxed, and a ref struct cannot be. Since .NET 10 the framework's IEnumerable&lt;T&gt; allows a ref struct type argument, so such a source compiles and then fails inside reflection with a message that says nothing about the benchmark. A source yielding a type parameter constrained with 'allows ref struct' is reported the same way: an open declaration is judged on what every type argument guarantees, and that constraint guarantees nothing about boxing. A ref struct parameter is supported and remains so: declare the source to yield what the value is built from, such as IEnumerable&lt;byte[]&gt; for a ReadOnlySpan&lt;byte&gt; parameter, which the generated code converts.</value>
+  </data>
+  <data name="General_Source_ElementMayBeByRefLike_Title" xml:space="preserve">
+    <value>A source may yield a ref struct</value>
+  </data>
+  <data name="General_Source_ElementMayBeByRefLike_MessageFormat" xml:space="preserve">
+    <value>Source '{0}' is declared to yield '{1}', which {2}. A type argument that is not by-ref-like reads normally; one that is fails while BenchmarkDotNet reads the values. Please, yield a type the values can be built from - an array for a Span parameter - and let the benchmark take the ref struct.</value>
+  </data>
+  <data name="General_Source_ElementMayBeByRefLike_Description" xml:space="preserve">
+    <value>BenchmarkDotNet reads a source's values into an object[] during discovery, so every value has to survive being boxed, and a ref struct cannot be. A source yielding a type parameter constrained with 'allows ref struct' says nothing about whether any particular type argument is one: closed to int it reads like any other value type, and closed to a ref struct it fails while the values are read, which BenchmarkDotNet reports naming the element. The compiler cannot tell which type arguments a benchmark will be given, so this is a warning rather than an error - unlike BDN1311, which reports a ref struct it can see. A ref struct parameter is supported and remains so: declare the source to yield what the value is built from, such as IEnumerable&lt;byte[]&gt; for a ReadOnlySpan&lt;byte&gt; parameter, which the generated code converts.</value>
+  </data>
+  <data name="General_Source_MethodMustNotHaveRequiredParameters_Title" xml:space="preserve">
+    <value>Source method must not have required parameters</value>
+  </data>
+  <data name="General_Source_MethodMustNotHaveRequiredParameters_MessageFormat" xml:space="preserve">
+    <value>The source '{0}' has required parameters. A [ParamsSource]/[ArgumentsSource] source method must be parameterless or have only optional parameters. Please, make its parameters optional.</value>
+  </data>
+  <data name="General_Source_MethodMustNotHaveRequiredParameters_Description" xml:space="preserve">
+    <value>A method referenced by [ParamsSource] or [ArgumentsSource] is invoked by BenchmarkDotNet with no arguments (optional parameters, such as an [EnumeratorCancellation] token, receive their defaults). A source method with a required parameter cannot be invoked and is not recognized as a source. Make its parameters optional or remove them.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_Title" xml:space="preserve">
+    <value>ArgumentsSource must return a generic enumerable or async enumerable</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_MessageFormat" xml:space="preserve">
+    <value>ArgumentsSource '{0}' must return IEnumerable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;, but returns '{1}'.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_Description" xml:space="preserve">
+    <value>The member referenced by ArgumentsSource must return IEnumerable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;. The non-generic IEnumerable is not enough on its own: BenchmarkDotNet's generated code infers the element type from the source, so the return type has to name it. The await-foreach pattern without the IAsyncEnumerable&lt;T&gt; interface, and other return types such as Task&lt;IEnumerable&lt;T&gt;&gt;, are not supported either.</value>
   </data>
   <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty_MessageFormat" xml:space="preserve">
     <value>Duplicate parameter attribute on property '{0}'</value>
@@ -323,9 +407,6 @@
   </data>
   <data name="Attributes_ParamsAllValuesAttribute_PropertyOrFieldTypeMustBeEnumOrBool_Title" xml:space="preserve">
     <value>The [ParamsAllValues] attribute is only valid on fields or properties of enum or bool type and nullable type for another allowed type</value>
-  </data>
-  <data name="Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Title" xml:space="preserve">
-    <value>Properties annotated with a parameter attribute cannot have an init-only setter</value>
   </data>
   <data name="Attributes_GeneralParameterAttributes_MutuallyExclusiveOnProperty_Title" xml:space="preserve">
     <value>Only one parameter attribute can be applied to a property</value>

@@ -131,7 +131,8 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        var genericTypeArgumentsAttributes = AnalyzerHelper.GetAttributes("BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute", context.Compilation, classDeclarationSyntax.AttributeLists, context.SemanticModel);
+        var genericTypeArgumentsAttributeTypeSymbol = context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute");
+        var genericTypeArgumentsAttributes = AnalyzerHelper.GetAttributes(genericTypeArgumentsAttributeTypeSymbol, classDeclarationSyntax.AttributeLists, context.SemanticModel);
         if (genericTypeArgumentsAttributes.Length > 0)
         {
             foreach (var genericTypeArgumentsAttribute in genericTypeArgumentsAttributes)
@@ -140,7 +141,11 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                 {
                     context.ReportDiagnostic(Diagnostic.Create(ClassWithGenericTypeArgumentsAttributeMustBeGenericRule, genericTypeArgumentsAttribute.GetLocation()));
                 }
-                else if (genericTypeArgumentsAttribute.ArgumentList is { Arguments.Count: > 0 })
+                // Only [GenericTypeArguments] itself is guaranteed to carry the type arguments in its own constructor
+                // arguments. A derived attribute declares whatever constructor it likes and may hand them to base(...),
+                // where they are invisible here, so its arguments are not the ones to count.
+                else if (genericTypeArgumentsAttribute.ArgumentList is { Arguments.Count: > 0 }
+                    && SymbolEqualityComparer.Default.Equals(context.SemanticModel.GetTypeInfo(genericTypeArgumentsAttribute).Type, genericTypeArgumentsAttributeTypeSymbol))
                 {
                     if (genericTypeArgumentsAttribute.ArgumentList.Arguments.Count != classDeclarationSyntax.TypeParameterList.Parameters.Count)
                     {
@@ -190,12 +195,22 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
                             continue;
                         }
 
-                        if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkAttributeTypeSymbol))
+                        if (AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, benchmarkAttributeTypeSymbol))
                         {
                             benchmarkAttributeUsages.Add(attributeSyntax);
                         }
-                        else if (SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
+                        else if (AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
                         {
+                            // Only [BenchmarkCategory] itself carries the categories in its own arguments; a derived
+                            // attribute may hand them to base(...), where they are invisible. Harvesting its own
+                            // arguments would report the wrong category set rather than an unknown one.
+                            if (!SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
+                            {
+                                hasBenchmarkCategoryCompilerDiagnostics = true;
+
+                                continue;
+                            }
+
                             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })
                             {
                                 // Check if this is an explicit params array creation
@@ -435,12 +450,23 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
 
                                 foreach (var attribute in methodAttributes)
                                 {
-                                    if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkAttributeTypeSymbol))
+                                    if (AnalyzerHelper.IsOrDerivesFrom(attribute.AttributeClass, benchmarkAttributeTypeSymbol))
                                     {
                                         benchmarkAttributeUsages.Add(attribute);
                                     }
-                                    else if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkCategoryAttributeTypeSymbol))
+                                    else if (AnalyzerHelper.IsOrDerivesFrom(attribute.AttributeClass, benchmarkCategoryAttributeTypeSymbol))
                                     {
+                                        // Only [BenchmarkCategory] itself is guaranteed to carry the categories in its own
+                                        // constructor arguments; a derived attribute may hand them to base(...), where they
+                                        // are invisible here. The categories are then unknown rather than absent, so treat
+                                        // the method as unanalyzable instead of as uncategorized.
+                                        if (!SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkCategoryAttributeTypeSymbol))
+                                        {
+                                            hasBenchmarkCategoryCompilerDiagnostics = true;
+
+                                            break;
+                                        }
+
                                         foreach (var benchmarkCategoriesArray in attribute.ConstructorArguments)
                                         {
                                             if (!benchmarkCategoriesArray.IsNull)
@@ -532,6 +558,8 @@ public class BenchmarkClassAnalyzer : DiagnosticAnalyzer
         var benchmarkCategoryAttributeTypeSymbol = GetBenchmarkCategoryAttributeTypeSymbol(context.Compilation);
 
         var attributeTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
+        // Only [BenchmarkCategory] itself: this rule is about a null *category*, and a derived attribute's single
+        // argument is whatever its own constructor takes - reporting on it flags an argument that is not a category.
         if (SymbolEqualityComparer.Default.Equals(attributeTypeSymbol, benchmarkCategoryAttributeTypeSymbol))
         {
             if (attributeSyntax.ArgumentList is { Arguments.Count: 1 })

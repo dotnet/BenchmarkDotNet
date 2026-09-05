@@ -13,13 +13,11 @@ namespace BenchmarkDotNet.Validators
 
         private ParamsAllValuesValidator() { }
 
-        private const BindingFlags ReflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input) =>
             input.Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
-                .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(ReflectionFlags))
+                .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(ReflectionExtensions.ParameterMemberFlags))
                 .Distinct()
                 .Select(member => GetErrorOrDefault(member.ParameterType))
                 .WhereNotNull()

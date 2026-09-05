@@ -134,8 +134,6 @@ namespace BenchmarkDotNet.Exporters
             {
                 case null:
                     return "null";
-                case IParam iparam:
-                    return GetArgument(iparam.Value, argumentType);
                 case object[] array when array.Length == 1:
                     return GetArgument(array[0], argumentType);
                 case string text:

@@ -11,6 +11,7 @@ using JetBrains.Annotations;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -55,8 +56,22 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        // Written out rather than composed with async LINQ - see CompositeValidator.ValidateAsync for why.
         public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
-            => diagnosers.ToAsyncEnumerable().SelectMany(diagnoser => diagnoser.ValidateAsync(validationParameters));
+            => ValidateAsyncCore(validationParameters);
+
+        private async IAsyncEnumerable<ValidationError> ValidateAsyncCore(ValidationParameters validationParameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            foreach (var diagnoser in diagnosers)
+            {
+#pragma warning disable CA2007
+                await foreach (var error in diagnoser.ValidateAsync(validationParameters).ConfigureAwait(cancellationToken))
+#pragma warning restore CA2007
+                {
+                    yield return error;
+                }
+            }
+        }
     }
 
     public sealed class CompositeInProcessDiagnoser(IReadOnlyList<IInProcessDiagnoser> inProcessDiagnosers)

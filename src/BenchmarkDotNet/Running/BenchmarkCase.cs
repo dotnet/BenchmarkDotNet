@@ -6,7 +6,7 @@ using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable
+    public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable, IAsyncDisposable
     {
         public Descriptor Descriptor { get; }
         public Job Job { get; }
@@ -29,6 +29,8 @@ namespace BenchmarkDotNet.Running
         public Runtime GetRuntime() => Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? Job.Environment.Runtime!
                 : RuntimeInformation.GetTargetOrCurrentRuntime(Descriptor.Type.Assembly);
+
+        public ValueTask DisposeAsync() => Parameters.DisposeAsync();
 
         public void Dispose() => Parameters.Dispose();
 

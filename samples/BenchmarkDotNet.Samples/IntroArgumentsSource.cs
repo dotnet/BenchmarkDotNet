@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
@@ -19,6 +20,21 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         [ArgumentsSource(typeof(BenchmarkArguments), nameof(BenchmarkArguments.TimeSpans))] // when the arguments come from a different type, specify that type here
         public void SingleArgument(TimeSpan time) => Thread.Sleep(time);
+
+        [Benchmark]
+        [ArgumentsSource(nameof(NumbersAsync))]
+        public double AsyncSourcedArguments(double x, double y) => Math.Pow(x, y);
+
+        // the source may be an IAsyncEnumerable, which BenchmarkDotNet awaits, so the values can be produced
+        // asynchronously without resorting to blocking sync-over-async in the source. It may take an optional
+        // [EnumeratorCancellation] CancellationToken, which receives the benchmark's cancellation token while
+        // the values are enumerated.
+        public static async IAsyncEnumerable<object[]> NumbersAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            await Task.Delay(10, cancellationToken);
+            yield return new object[] { 1.0, 1.0 };
+            yield return new object[] { 2.0, 2.0 };
+        }
     }
 
     public static class BenchmarkArguments

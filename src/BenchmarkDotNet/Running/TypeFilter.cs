@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -61,9 +62,21 @@ namespace BenchmarkDotNet.Running
         }
 
         public static BenchmarkRunInfo[] Filter(IConfig effectiveConfig, IEnumerable<Type> types)
-            => types
-                .Select(type => BenchmarkConverter.TypeToBenchmarks(type, effectiveConfig))
-                .Where(info => info.BenchmarksCases.Any())
-                .ToArray();
+        {
+            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+            return context.ExecuteUntilComplete(FilterAsync(effectiveConfig, types, CancellationToken.None));
+        }
+
+        public static async ValueTask<BenchmarkRunInfo[]> FilterAsync(IConfig effectiveConfig, IEnumerable<Type> types, CancellationToken cancellationToken)
+        {
+            var result = new List<BenchmarkRunInfo>();
+            foreach (var type in types)
+            {
+                var info = await BenchmarkConverter.TypeToBenchmarksAsync(type, effectiveConfig, cancellationToken).ConfigureAwait();
+                if (info.BenchmarksCases.Any())
+                    result.Add(info);
+            }
+            return result.ToArray();
+        }
     }
 }

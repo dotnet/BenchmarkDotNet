@@ -1,5 +1,7 @@
+using BenchmarkDotNet.Analyzers;
 using BenchmarkDotNet.Analyzers.Attributes;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
@@ -81,6 +83,29 @@ public class ArgumentsAttributeAnalyzerTests
     {
         public RequiresBenchmarkAttribute() : base(ArgumentsAttributeAnalyzer.RequiresBenchmarkAttributeRule) { }
 
+        [Fact]
+        public async Task A_method_annotated_with_a_derived_benchmark_attribute_should_not_trigger_diagnostic()
+        {
+            // BenchmarkDotNet resolves [Benchmark] with GetCustomAttributes, which matches derived types, so this
+            // method is a benchmark and its [Arguments] is legitimate.
+            const string testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class CustomBenchmarkAttribute : BenchmarkAttribute { }
+
+                public class BenchmarkClass
+                {
+                    [CustomBenchmark]
+                    [Arguments(1)]
+                    public void Run(int value) { }
+                }
+                """;
+
+            TestCode = testCode;
+
+            await RunAsync();
+        }
+
         [Theory]
         [MemberData(nameof(ArgumentAttributeUsagesListLength))]
         public async Task A_method_annotated_with_at_least_one_arguments_attribute_together_with_the_benchmark_attribute_should_not_trigger_diagnostic(int argumentAttributeUsagesListLength)
@@ -144,6 +169,55 @@ public class ArgumentsAttributeAnalyzerTests
     public class MustHaveMatchingValueCount : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
     {
         public MustHaveMatchingValueCount() : base(ArgumentsAttributeAnalyzer.MustHaveMatchingValueCountRule) { }
+
+        [Fact]
+        public async Task A_derived_attribute_passing_values_to_the_base_constructor_does_not_report_error()
+        {
+            // The values reach ArgumentsAttribute through base(...), where this analyzer cannot see them, so the
+            // usage's own empty argument list must not be read as "no values".
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class OneAndTwoAttribute : ArgumentsAttribute
+                {
+                    public OneAndTwoAttribute() : base(1, 2) { }
+                }
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [OneAndTwo]
+                    public void Run(int a, int b) { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task A_derived_attribute_with_its_own_constructor_shape_does_not_report_error()
+        {
+            // A scalar constructor argument is not the base's object[] of values; reading it as one throws.
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class UpToAttribute : ArgumentsAttribute
+                {
+                    public UpToAttribute(int max) : base(0, max) { }
+                }
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [UpTo(5)]
+                    public void Run(int a, int b) { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
 
         [Fact]
         public async Task A_method_not_annotated_with_any_arguments_attributes_should_not_trigger_diagnostic()
@@ -1413,6 +1487,431 @@ public class ArgumentsAttributeAnalyzerTests
                     }
                 }
             }
+        }
+    }
+
+    public class SourceElementMustNotBeByRefLike : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public SourceElementMustNotBeByRefLike() : base(AnalyzerHelper.SourceElementMustNotBeByRefLikeRule) { }
+
+        [Fact]
+        public async Task ASourceYieldingARefStruct_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<Span<int>> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(Span<int> a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "System.Span<int>", "is a ref struct");
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+
+        // On the derived type the argument is fixed, so the constraint stops deciding anything.
+        [Fact]
+        public async Task ASourceClosedByTheDerivedTypeToAValueType_ShouldNotReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public abstract class BaseClass<T> where T : allows ref struct
+                {
+                    public static IEnumerable<T> Values() => null;
+                }
+
+                public class BenchmarkClass : BaseClass<int>
+                {
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task ASourceClosedByTheDerivedTypeToARefStruct_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public abstract class BaseClass<T> where T : allows ref struct
+                {
+                    public static IEnumerable<T> Values() => null;
+                }
+
+                public class BenchmarkClass : BaseClass<ReadOnlySpan<byte>>
+                {
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(ReadOnlySpan<byte> a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "System.ReadOnlySpan<byte>", "is a ref struct");
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        // A ref struct *parameter* stays supported, fed from what the value is built from.
+        [Fact]
+        public async Task ARefStructParameterFedFromAnArray_ShouldNotReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<byte[]> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(ReadOnlySpan<byte> a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+    }
+
+    public class SourceElementMayBeByRefLike : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public SourceElementMayBeByRefLike() : base(AnalyzerHelper.SourceElementMayBeByRefLikeRule) { }
+
+        // Read where the attribute is: on the open type the element is the type parameter, and a constraint
+        // admitting a ref struct guarantees nothing about boxing.
+        [Fact]
+        // A constraint that admits a ref struct does not say this source fails - the substitution decides, and one
+        // that is not by-ref-like reads fine at run time. The compiler cannot see which, so this warns rather than
+        // refusing code that runs; a concrete ref struct stays an error.
+        public async Task ASourceYieldingAParameterAdmittingARefStruct_ShouldReportWarning()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public abstract class BaseClass<T> where T : allows ref struct
+                {
+                    public static IEnumerable<T> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(T a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Warning, "Values", "T", "admits a ref struct");
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+    }
+
+    public class SourceMethodMustNotBeGeneric : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public SourceMethodMustNotBeGeneric() : base(AnalyzerHelper.SourceMethodMustNotBeGenericRule) { }
+
+        [Fact]
+        public async Task AGenericSourceMethod_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<TItem> Values<TItem>() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values");
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task AGenericSourceMethodWithANonGenericOverload_ShouldNotReportError()
+        {
+            // The runtime invokes the non-generic overload, so there is nothing to report.
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<TItem> Values<TItem>() => null;
+
+                    public static IEnumerable<int> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+    }
+
+    public class ArgumentsSourceMustReturnEnumerable : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public ArgumentsSourceMustReturnEnumerable() : base(ArgumentsAttributeAnalyzer.ArgumentsSourceMustReturnEnumerableRule) { }
+
+        [Theory]
+        [InlineData("System.Collections.Generic.IEnumerable<object[]> Values() => null;")]
+        [InlineData("System.Collections.Generic.IEnumerable<object> Values() => null;")]
+        [InlineData("object[][] Values() => null;")]
+        [InlineData("System.Collections.Generic.IAsyncEnumerable<object[]> Values() => null;")]
+        public async Task SupportedReturnType_ShouldNotReportError(string sourceMember)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static {{sourceMember}}
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task NonEnumerableReturnType_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static int Values() => 0;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "int");
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task A_derived_attribute_naming_its_source_through_the_base_constructor_does_not_report_error()
+        {
+            // The runtime reads the Name property, which base(...) set. This usage's own argument is a label that
+            // happens to match a real member, so reading it as the source name resolves the wrong one and reports
+            // against a member the benchmark never uses.
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class LabelledArgumentsSourceAttribute : ArgumentsSourceAttribute
+                {
+                    public LabelledArgumentsSourceAttribute(string label) : base("Values") { }
+                }
+
+                public class BenchmarkClass
+                {
+                    public int Label => 0;
+
+                    public static IEnumerable<int> Values() => null;
+
+                    [Benchmark]
+                    [LabelledArgumentsSource("Label")]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task NonGenericEnumerableReturnType_ShouldReportError()
+        {
+            // The generated code infers the element type from the source, so a type that only implements the
+            // non-generic IEnumerable gives inference nothing to bind to and fails to compile (CS0411).
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static System.Collections.IEnumerable Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "System.Collections.IEnumerable");
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task NonEnumerableReturnType_FromBaseClass_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class BaseClass
+                {
+                    public static int Values() => 0;
+                }
+
+                public class BenchmarkClass : BaseClass
+                {
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "int");
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task EnumerableReturnType_FromBaseClass_ShouldNotReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BaseClass
+                {
+                    public static IEnumerable<object> Values() => null;
+                }
+
+                public class BenchmarkClass : BaseClass
+                {
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task NonEnumerableReturnType_FromOtherType_ShouldReportError()
+        {
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class Source
+                {
+                    public static int Values() => 0;
+                }
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [ArgumentsSource(typeof(Source), {|#0:nameof(Source.Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "int");
+
+            await RunAsync();
+        }
+    }
+
+    public class ArgumentsSourceMethodRequiresOptionalParameters : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public ArgumentsSourceMethodRequiresOptionalParameters() : base(AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule) { }
+
+        [Fact]
+        public async Task A_source_method_with_a_required_parameter_reports_error()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object[]> Values(int count) => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+            TestCode = testCode;
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values");
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task A_source_method_with_only_optional_parameters_does_not_report_error()
+        {
+            var testCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object[]> Values(int count = 1) => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(int a) { }
+                }
+                """;
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
         }
     }
 }

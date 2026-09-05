@@ -1,56 +1,98 @@
-using BenchmarkDotNet.Code;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using System.Globalization;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstance : IDisposable
+    public class ParameterInstance : IDisposable, IAsyncDisposable
     {
         public const string NullParameterTextRepresentation = "?";
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
-        private readonly object? value;
+        /// <summary>
+        /// The value bound to this benchmark case, and the description a toolchain uses to re-create it in
+        /// generated code. The toolchain owns the generated syntax; this describes the value only.
+        /// </summary>
+        public ParameterValue ParameterValue { get; }
+
         private readonly int maxParameterColumnWidthFromConfig;
 
-        public ParameterInstance(ParameterDefinition definition, object? value, SummaryStyle? summaryStyle)
+        public ParameterInstance(ParameterDefinition definition, ParameterValue parameterValue, SummaryStyle? summaryStyle)
         {
             Definition = definition;
-            this.value = value;
+            ParameterValue = parameterValue;
             maxParameterColumnWidthFromConfig = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
 
-        public void Dispose() => (Value as IDisposable)?.Dispose();
+        /// <summary>Convenience overload for a value the toolchain can embed directly.</summary>
+        internal ParameterInstance(ParameterDefinition definition, object? value, SummaryStyle? summaryStyle)
+            : this(definition, new ParameterValue.Constant(value, definition.ParameterType), summaryStyle)
+        {
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            switch (Value)
+            {
+                case IAsyncDisposable asyncDisposable:
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+                    break;
+
+                case IDisposable disposable:
+                    disposable.Dispose();
+                    break;
+            }
+        }
+
+        public void Dispose()
+        {
+            switch (Value)
+            {
+                // Intentionally flipped the order from DisposeAsync to avoid sync-over-async if the value already supports sync dispose.
+                case IDisposable disposable:
+                    disposable.Dispose();
+                    break;
+                case IAsyncDisposable asyncDisposable:
+                {
+                    using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+                    context.ExecuteUntilComplete(asyncDisposable.DisposeAsync());
+                    break;
+                }
+            }
+        }
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;
         public bool IsArgument => Definition.IsArgument;
 
-        public object? Value => value is IParam parameter ? parameter.Value : value;
-
-        public string ToSourceCode()
-            => value is IParam parameter
-                ? parameter.ToSourceCode()
-                : SourceCodeHelper.ToSourceCode(value);
+        public object? Value => ParameterValue.Value;
 
         private string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return NullParameterTextRepresentation;
-                case IParam parameter:
-                    return Trim(parameter.DisplayText, maxParameterColumnWidth).EscapeSpecialCharacters(false);
+                case Array array:
+                    return Trim(ArrayDisplay.GetDisplayString(array), maxParameterColumnWidth).EscapeSpecialCharacters(false);
+                // An enum declared in F# is erased to its underlying type in attribute metadata, so the declared
+                // type is what names the member (dotnet/fsharp#995). Matched on that underlying type exactly,
+                // because a source can yield anything: any other value is a mismatch for someone else to report,
+                // not something to crash Enum.ToObject on while rendering a display name.
+                case var _ when Definition.ParameterType is { IsEnum: true }
+                                && !Value!.GetType().IsEnum
+                                && Value.GetType() == Enum.GetUnderlyingType(Definition.ParameterType):
+                    return Trim(Enum.ToObject(Definition.ParameterType, Value).ToString()!, maxParameterColumnWidth).EscapeSpecialCharacters(false);
                 case IFormattable formattable:
                     return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth).EscapeSpecialCharacters(false);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type)!.GetDisplayName()}?" : type.GetDisplayName();
                 default:
-                    return Trim(value.ToString()!, maxParameterColumnWidth).EscapeSpecialCharacters(false);
+                    return Trim(Value.ToString()!, maxParameterColumnWidth).EscapeSpecialCharacters(false);
             }
         }
 

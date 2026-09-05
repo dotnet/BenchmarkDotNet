@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
@@ -96,7 +97,7 @@ namespace BenchmarkDotNet.Disassemblers
             // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
             var filteredMethods = disassembledMethods.Length == 1
                 ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
-                : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+                : disassembledMethods.Where(method => !method.Name.Contains(RunnableConstants.ForDisassemblyDiagnoserMethodName)).ToArray();
 
             return new DisassemblyResult
             {

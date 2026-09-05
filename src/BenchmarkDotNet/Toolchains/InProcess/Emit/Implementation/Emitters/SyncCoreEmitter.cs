@@ -3,7 +3,7 @@ using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Reflection;
 using System.Reflection.Emit;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 

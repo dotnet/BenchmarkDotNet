@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
@@ -28,14 +29,14 @@ namespace BenchmarkDotNet.Validators
                 {
                     continue;
                 }
-                if (await TryToCallSetupOrCleanup<GlobalSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalSetupMethod, errors, cancellationToken).ConfigureAwait())
+                if (await TryToCallSetupOrCleanup<GlobalSetupAttribute>(benchmark, benchmarkTypeInstance, benchmark.Descriptor.GlobalSetupMethod, errors, cancellationToken).ConfigureAwait())
                 {
-                    if (await TryToCallSetupOrCleanup<IterationSetupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationSetupMethod, errors, cancellationToken).ConfigureAwait())
+                    if (await TryToCallSetupOrCleanup<IterationSetupAttribute>(benchmark, benchmarkTypeInstance, benchmark.Descriptor.IterationSetupMethod, errors, cancellationToken).ConfigureAwait())
                     {
                         await ExecuteBenchmarkAsync(benchmarkTypeInstance, benchmark, args, errors, cancellationToken).ConfigureAwait();
-                        await TryToCallSetupOrCleanup<IterationCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.IterationCleanupMethod, errors, cancellationToken).ConfigureAwait();
+                        await TryToCallSetupOrCleanup<IterationCleanupAttribute>(benchmark, benchmarkTypeInstance, benchmark.Descriptor.IterationCleanupMethod, errors, cancellationToken).ConfigureAwait();
                     }
-                    await TryToCallSetupOrCleanup<GlobalCleanupAttribute>(benchmarkTypeInstance, benchmark.Descriptor.GlobalCleanupMethod, errors, cancellationToken).ConfigureAwait();
+                    await TryToCallSetupOrCleanup<GlobalCleanupAttribute>(benchmark, benchmarkTypeInstance, benchmark.Descriptor.GlobalCleanupMethod, errors, cancellationToken).ConfigureAwait();
                 }
             }
 
@@ -50,9 +51,14 @@ namespace BenchmarkDotNet.Validators
             try
             {
                 var workloadMethod = benchmark.Descriptor.WorkloadMethod;
-                var result = workloadMethod.Invoke(benchmarkTypeInstance, args);
+                if (workloadMethod.ReturnType.WithoutRefModifier().IsByRefLike())
+                {
+                    errors.Add(new ValidationError(false, $"Benchmark '{benchmark.DisplayInfo}' returns by-ref-like value, skipping execution validation.", benchmark));
+                    return;
+                }
                 if (workloadMethod.ReturnType.IsAwaitable(out var awaitableInfo))
                 {
+                    var result = workloadMethod.Invoke(benchmarkTypeInstance, args);
                     if (result is null)
                     {
                         errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Awaitable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
@@ -62,12 +68,27 @@ namespace BenchmarkDotNet.Validators
                 }
                 else if (workloadMethod.ReturnType.IsAsyncEnumerable(out var asyncEnumerableInfo))
                 {
+                    if (asyncEnumerableInfo.CurrentProperty.PropertyType.IsByRefLike())
+                    {
+                        errors.Add(new ValidationError(false, $"Async enumerable benchmark '{benchmark.DisplayInfo}' yields by-ref-like elements, skipping execution validation.", benchmark));
+                        return;
+                    }
+                    var result = workloadMethod.Invoke(benchmarkTypeInstance, args);
                     if (result is null)
                     {
                         errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Async enumerable benchmark '{benchmark.DisplayInfo}' returned null", benchmark));
                         return;
                     }
-                    await DynamicAwaitHelper.DrainAsyncEnumerableAsync(result, asyncEnumerableInfo).ConfigureAwait(false);
+                    // Mirrors real benchmark execution.
+                    await foreach (var item in DynamicAwaitHelper.EnumerateBenchmarkAsync(result, asyncEnumerableInfo).ConfigureAwait(false))
+                    {
+                        DeadCodeEliminationHelper.KeepAliveWithoutBoxing(item);
+                    }
+                }
+                else
+                {
+                    var result = workloadMethod.Invoke(benchmarkTypeInstance, args);
+                    DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
                 }
             }
             catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))

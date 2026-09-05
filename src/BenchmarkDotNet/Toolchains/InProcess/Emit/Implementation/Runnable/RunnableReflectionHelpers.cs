@@ -1,8 +1,9 @@
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Reflection;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             return owner.GetMethods(BindingFlagsPublicStatic)
                 .FirstOrDefault(m =>
-                    m.Name == OpImplicitMethodName
+                    m.Name == ReflectionExtensions.OpImplicitMethodName
                     && m.ReturnType == to
                     && m.GetParameters().Single().ParameterType == from);
         }
@@ -76,17 +77,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var bindingFlags = paramInfo.IsStatic ? BindingFlagsAllStatic : BindingFlagsAllInstance;
             var type = instance.GetType();
 
-            if (type.GetProperty(paramInfo.Name, bindingFlags) is var p && p != null)
+            switch (type.GetParameterMember(paramInfo.Name, paramInfo.Definition.ParameterType, bindingFlags))
             {
-                p.SetValue(instanceArg, TryChangeType(paramInfo.Value, p.PropertyType));
-            }
-            else if (type.GetField(paramInfo.Name, bindingFlags) is var f && f != null)
-            {
-                f.SetValue(instanceArg, TryChangeType(paramInfo.Value, f.FieldType));
-            }
-            else
-            {
-                throw new InvalidOperationException($"Can't find a member {paramInfo.ToDisplayText()}.");
+                case PropertyInfo p:
+                    p.SetValue(instanceArg, TryChangeType(paramInfo.Value, p.PropertyType));
+                    break;
+
+                case FieldInfo f:
+                    f.SetValue(instanceArg, TryChangeType(paramInfo.Value, f.FieldType));
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Can't find a member {paramInfo.ToDisplayText()}.");
             }
         }
 

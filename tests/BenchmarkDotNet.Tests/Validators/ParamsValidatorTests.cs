@@ -33,6 +33,18 @@ namespace BenchmarkDotNet.Tests.Validators
                 Assert.Contains(messagePart, validationErrors.Single().Message);
         }
 
+        private async ValueTask CheckNoErrors<T>()
+        {
+            var typeToBenchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(T));
+            Assert.NotEmpty(typeToBenchmarks.BenchmarksCases);
+
+            var validationErrors = await ParamsValidator.FailOnError.ValidateAsync(typeToBenchmarks).ToArrayAsync();
+            foreach (var error in validationErrors)
+                output.WriteLine("* " + error.Message);
+
+            Assert.Empty(validationErrors);
+        }
+
         private const string P = "[Params]";
         private const string Pa = "[ParamsAllValues]";
         private const string Ps = "[ParamsSource]";
@@ -66,6 +78,8 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact] public async Task InternalProp1Test() => await Check<InternalProp1>(nameof(InternalProp1.Input), "setter is not public", P);
         [Fact] public async Task InternalProp2Test() => await Check<InternalProp2>(nameof(InternalProp2.Input), "setter is not public", Pa);
         [Fact] public async Task InternalProp3Test() => await Check<InternalProp3>(nameof(InternalProp3.Input), "setter is not public", Ps);
+        [Fact] public async Task ReservedName1Test() => await Check<ReservedName1>("__GlobalSetup", "reserved", P);
+        [Fact] public async Task ReservedName2Test() => await Check<ReservedName2>("__WorkloadActionUnroll", "reserved", Ps);
 
         public class Base
         {
@@ -74,6 +88,22 @@ namespace BenchmarkDotNet.Tests.Validators
 
             public static IEnumerable<bool> Source() => [false, true];
         }
+
+        // A parameter member named like a generated member is rejected (the runnable's object initializer would bind to
+        // the generated member). Only [Params*] members collide - sources/arguments/non-parameter members don't.
+#pragma warning disable BDN1208
+        public class ReservedName1 : Base
+        {
+            [Params(1)]
+            public int __GlobalSetup { get; set; }
+        }
+
+        public class ReservedName2 : Base
+        {
+            [ParamsSource(nameof(Base.Source))]
+            public bool __WorkloadActionUnroll { get; set; }
+        }
+#pragma warning restore BDN1208
 
 #pragma warning disable BDN1205
         public class Const1 : Base
@@ -319,33 +349,28 @@ namespace BenchmarkDotNet.Tests.Validators
 
 #if NET5_0_OR_GREATER
 
-        [Fact] public async Task InitOnly1Test() => await Check<InitOnly1>(nameof(InitOnly1.Input), "init-only", P);
-        [Fact] public async Task InitOnly2Test() => await Check<InitOnly2>(nameof(InitOnly2.Input), "init-only", Pa);
-        [Fact] public async Task InitOnly3Test() => await Check<InitOnly3>(nameof(InitOnly3.Input), "init-only", Ps);
+        // An init-only setter is assignable from the runnable's object initializer, so it is supported.
+        [Fact] public async Task InitOnly1Test() => await CheckNoErrors<InitOnly1>();
+        [Fact] public async Task InitOnly2Test() => await CheckNoErrors<InitOnly2>();
+        [Fact] public async Task InitOnly3Test() => await CheckNoErrors<InitOnly3>();
 
-#pragma warning disable BDN1206
         public class InitOnly1 : Base
         {
             [Params(false, true)]
             public bool Input { get; init; }
         }
-#pragma warning restore BDN1206
 
-#pragma warning disable BDN1206
         public class InitOnly2 : Base
         {
             [ParamsAllValues]
             public bool Input { get; init; }
         }
-#pragma warning restore BDN1206
 
-#pragma warning disable BDN1206
         public class InitOnly3 : Base
         {
             [ParamsSource(nameof(Source))]
             public bool Input { get; init; }
         }
-#pragma warning restore BDN1206
 
 #endif
     }

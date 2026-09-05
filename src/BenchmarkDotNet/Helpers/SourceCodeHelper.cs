@@ -8,6 +8,16 @@ namespace BenchmarkDotNet.Helpers
 {
     public static class SourceCodeHelper
     {
+        /// <summary>
+        /// Renders a value as a C# expression, using <paramref name="declaredType"/> to disambiguate the value.
+        /// An enum declared in F# is erased to its underlying type in attribute metadata, so the value alone
+        /// would render as a plain number (dotnet/fsharp#995).
+        /// </summary>
+        public static string ToSourceCode(object? value, Type declaredType)
+            => value != null && declaredType.IsEnum && !value.GetType().IsEnum
+                ? ToSourceCode(Enum.ToObject(declaredType, value))
+                : ToSourceCode(value);
+
         public static string ToSourceCode(object? value)
         {
             switch (value)
@@ -65,7 +75,7 @@ namespace BenchmarkDotNet.Helpers
             return value.ToString()!;
         }
 
-        public static bool IsCompilationTimeConstant(object value)
+        public static bool IsCompilationTimeConstant(object? value)
             => value == null || IsCompilationTimeConstant(value.GetType());
 
         public static bool IsCompilationTimeConstant(Type type)

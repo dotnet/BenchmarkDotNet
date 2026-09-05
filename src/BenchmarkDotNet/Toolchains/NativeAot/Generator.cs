@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
               {GetCustomProperties(buildPartition, logger)}
               <!-- Set LangVersion after copied settings so it overrides any LangVersion copied from the benchmarks project -->
               <PropertyGroup>
-                <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '8.0')">latest</LangVersion>
+                <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '9.0')">latest</LangVersion>
               </PropertyGroup>
             </Project>
             """;

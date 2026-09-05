@@ -10,8 +10,17 @@ In case you want to use a lot of values, you should use
 You can mark one or several fields or properties in your class by the
   [`[ArgumentsSource]`](xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute) attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
-  (something that implements `IEnumerable`).
+  (something that implements `IEnumerable<T>` or `IAsyncEnumerable<T>`).
+The element type has to be named: a source declared to return only the non-generic `IEnumerable` is rejected,
+  because the generated code has nothing to infer the argument's type from.
 The source may be instance or static. If the source is not in the same type as the benchmark, the type containing the source must be specified in the attribute constructor.
+
+A source returning `IAsyncEnumerable<T>` is awaited while the values are read, so they can be produced
+  asynchronously without resorting to blocking sync-over-async in the source, and such a source method may take
+  an optional [`[EnumeratorCancellation]`](xref:System.Runtime.CompilerServices.EnumeratorCancellationAttribute)
+  `CancellationToken` parameter. Starting the run from a thread that carries a single-threaded
+  `SynchronizationContext` needs the asynchronous entry points - see
+  @BenchmarkDotNet.Samples.IntroParamsSource, where the same applies to `[ParamsSource]`.
 
 ### Source code
 

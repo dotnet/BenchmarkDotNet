@@ -30,6 +30,8 @@ namespace BenchmarkDotNet.Configs
             DeferredExecutionValidator.DontFailOnError,
             ParamsAllValuesValidator.FailOnError,
             ParamsValidator.FailOnError,
+            RequiredMemberValidator.FailOnError,
+            SourceReturnTypeValidator.FailOnError,
             BenchmarkCancellationValidator.FailOnError
         };
 

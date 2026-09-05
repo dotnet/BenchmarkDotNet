@@ -75,7 +75,7 @@ public class AsyncBenchmarkAnalyzer : DiagnosticAnalyzer
                     {
                         var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
                         if (attributeSyntaxTypeSymbol != null &&
-                            SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkAttributeTypeSymbol))
+                            AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, benchmarkAttributeTypeSymbol))
                         {
                             hasBenchmarkAttribute = true;
                             break;
@@ -112,7 +112,7 @@ public class AsyncBenchmarkAnalyzer : DiagnosticAnalyzer
                 {
                     foreach (var attribute in member.GetAttributes())
                     {
-                        if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, benchmarkCancellationAttributeTypeSymbol))
+                        if (AnalyzerHelper.IsOrDerivesFrom(attribute.AttributeClass, benchmarkCancellationAttributeTypeSymbol))
                         {
                             hasCancellationTokenMember = true;
                             break;

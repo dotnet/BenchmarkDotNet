@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -29,19 +28,24 @@ namespace BenchmarkDotNet.Code
 
                 var declarationsProvider = GetDeclarationsProvider(benchmark);
                 var extraFields = declarationsProvider.GetExtraFields();
+                var parameterRenderer = CSharpParameterRenderer.Create(benchmark);
 
                 string benchmarkTypeCode = declarationsProvider
                     .ReplaceTemplate(new SmartStringBuilder(benchmarkTypeTemplate))
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
-                    .Replace("$ParamsContent$", GetParamsContent(benchmark))
+                    .Replace("$SourceOutParameters$", parameterRenderer.RenderSourceOutParameters())
+                    .Replace("$SourceOutArguments$", parameterRenderer.RenderSourceOutParameters())
+                    .Replace("$SourceCaptures$", parameterRenderer.RenderSourceCaptures())
+                    .Replace("$ParamsInitializer$", GetParamsInitializer(benchmark, parameterRenderer))
                     .Replace("$CancellationTokenAssignment$", GetCancellationTokenAssignment(benchmark))
+                    .Replace("$CancellationTokenInitializer$", GetCancellationTokenInitializer(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareFieldsContainer$", GetDeclareFieldsContainer(benchmark, buildInfo.Id, extraFields))
-                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
+                    .Replace("$StaticParamsAndArgsContent$", GetStaticParamsAndArgsContent(benchmark, parameterRenderer))
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$RunExtraIteration$", buildInfo.Config.HasExtraIterationDiagnoser(benchmark) ? "true" : "false")
-                    .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
+                    .Replace("$DisassemblerEntryMethodName$", RunnableConstants.ForDisassemblyDiagnoserMethodName)
                     .Replace("$InProcessDiagnoserRouters$", GetInProcessDiagnoserRouters(buildInfo))
                     .ToString();
 
@@ -137,46 +141,96 @@ namespace BenchmarkDotNet.Code
         }
 
         // internal for tests
+        internal static string GetParamsInitializer(BenchmarkCase benchmarkCase)
+            => GetParamsInitializer(benchmarkCase, CSharpParameterRenderer.Create(benchmarkCase));
 
-        internal static string GetParamsContent(BenchmarkCase benchmarkCase)
+        private static string GetParamsInitializer(BenchmarkCase benchmarkCase, CSharpParameterRenderer renderer)
             => string.Join(
-                string.Empty,
+                $",{Environment.NewLine}                ",
                 benchmarkCase.Parameters.Items
-                    .Where(parameter => !parameter.IsArgument)
-                    .Select(parameter => $"{(parameter.IsStatic ? benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName() : "base")}.{parameter.Name} = {parameter.ToSourceCode()};"));
+                    .Where(parameter => !parameter.IsArgument && !parameter.IsStatic)
+                    .Select(parameter => $"{parameter.Name} = {renderer.Render(parameter.ParameterValue)}"));
 
+        // Static [BenchmarkCancellation] members only - instance members are set by the object initializer
+        // (GetCancellationTokenInitializer), so emitting them here too would assign them twice.
         internal static string GetCancellationTokenAssignment(BenchmarkCase benchmarkCase)
         {
             var targetType = benchmarkCase.Descriptor.Type;
-            var cancellationTokenMembers = new System.Collections.Generic.List<string>();
+            List<string> cancellationTokenMembers = [];
             var typeFullName = targetType.GetCorrectCSharpTypeName();
 
+            // As in GetCancellationTokenInitializer: one entry per name. Here a repeat compiles, since these are
+            // statements, but `Type.Name` binds to the most derived member both times - so it would assign that
+            // one twice and the member hiding it never.
+            HashSet<string> emitted = new(StringComparer.Ordinal);
+
+            // FlattenHierarchy reaches a base type's statics, which reflection otherwise withholds - the same set
+            // BenchmarkCancellationValidator reports on, so it cannot accept a member this never assigns.
             // Check properties
-            foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+            foreach (var property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
             {
-                if (property.PropertyType == typeof(System.Threading.CancellationToken) &&
+                if (property.PropertyType == typeof(CancellationToken) &&
                     property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false) &&
                     property.CanWrite &&
-                    property.GetSetMethod() is { } setter)
+                    property.GetSetMethod() is { IsStatic: true } &&
+                    emitted.Add(property.Name))
                 {
-                    var target = setter.IsStatic ? typeFullName : "base";
-                    cancellationTokenMembers.Add($"            {target}.{property.Name} = cancellationToken;");
+                    cancellationTokenMembers.Add($"            {typeFullName}.{property.Name} = cancellationToken;");
                 }
             }
 
             // Check fields
-            foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+            foreach (var field in targetType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
             {
-                if (field.FieldType == typeof(System.Threading.CancellationToken) &&
-                    field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
+                if (field.FieldType == typeof(CancellationToken) &&
+                    field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false) &&
+                    emitted.Add(field.Name))
                 {
-                    var target = field.IsStatic ? typeFullName : "base";
-                    cancellationTokenMembers.Add($"            {target}.{field.Name} = cancellationToken;");
+                    cancellationTokenMembers.Add($"            {typeFullName}.{field.Name} = cancellationToken;");
                 }
             }
 
             return cancellationTokenMembers.Count > 0
-                ? string.Join(System.Environment.NewLine, cancellationTokenMembers) + System.Environment.NewLine
+                ? string.Join(Environment.NewLine, cancellationTokenMembers) + Environment.NewLine
+                : string.Empty;
+        }
+
+        private static string GetCancellationTokenInitializer(BenchmarkCase benchmarkCase)
+        {
+            var targetType = benchmarkCase.Descriptor.Type;
+            List<string> entries = [];
+
+            // One entry per name. GetFields hands back a hidden base field alongside the `new` one that hides it -
+            // GetProperties does not, which is why only fields reach this - and the same name twice in an object
+            // initializer is CS1912. The name binds to the most derived member either way, so the second entry
+            // could only ever repeat the first.
+            HashSet<string> emitted = new(StringComparer.Ordinal);
+
+            foreach (var property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (property.PropertyType == typeof(CancellationToken) &&
+                    property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false) &&
+                    property.CanWrite &&
+                    property.GetSetMethod() is { IsStatic: false } &&
+                    emitted.Add(property.Name))
+                {
+                    entries.Add($"{property.Name} = cancellationToken,");
+                }
+            }
+
+            foreach (var field in targetType.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (field.FieldType == typeof(CancellationToken) &&
+                    field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false) &&
+                    !field.IsStatic &&
+                    emitted.Add(field.Name))
+                {
+                    entries.Add($"{field.Name} = cancellationToken,");
+                }
+            }
+
+            return entries.Count > 0
+                ? string.Join($"{Environment.NewLine}                ", entries)
                 : string.Empty;
         }
 
@@ -184,12 +238,12 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index}"));
+                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} {RunnableConstants.ArgParamPrefix}{index}"));
 
         private static string GetDeclareFieldsContainer(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, string[] extraFields)
         {
             var fields = benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} argField{index};")
+                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} {RunnableConstants.ArgFieldPrefix}{index};")
                 .Concat(extraFields)
                 .ToArray();
 
@@ -200,9 +254,9 @@ namespace BenchmarkDotNet.Code
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine("""
+            sb.AppendLine($$"""
                     [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
-                    private struct FieldsContainer
+                    private struct {{RunnableConstants.FieldsContainerTypeName}}
                     {
             """);
             foreach (var field in fields)
@@ -211,28 +265,38 @@ namespace BenchmarkDotNet.Code
             }
             sb.AppendLine("            }");
             sb.AppendLine();
-            sb.AppendLine($"        private global::BenchmarkDotNet.Autogenerated.Runnable_{benchmarkId.Value}.FieldsContainer __fieldsContainer;");
+            sb.AppendLine($"        private global::{RunnableConstants.EmittedTypePrefix}{benchmarkId.Value}.{RunnableConstants.FieldsContainerTypeName} {RunnableConstants.FieldsContainerName};");
             return sb.ToString();
         }
 
         /*
-         
+
         [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
-        private unsafe struct FieldsContainer
+        private unsafe struct __FieldsContainer
         {
             $DeclareArgumentFields$
             $ExtraFields$
         }
 
-        private global::BenchmarkDotNet.Autogenerated.Runnable_$ID$.FieldsContainer __fieldsContainer;
-        
+        private global::BenchmarkDotNet.Autogenerated.Runnable_$ID$.__FieldsContainer __fieldsContainer;
+
          */
 
-        private static string GetInitializeArgumentFields(BenchmarkCase benchmarkCase)
-            => string.Join(
-                Environment.NewLine,
-                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"this.__fieldsContainer.argField{index} = {benchmarkCase.Parameters.GetArgument(parameter.Name!).ToSourceCode()};")); // we init the fields in ctor to provoke all possible allocations and overhead of other type
+        // Assigned after the instance is created: argument fields live on it, and a static parameter may draw its
+        // value from an instance source, which the constructor captures.
+        private static string GetStaticParamsAndArgsContent(BenchmarkCase benchmarkCase, CSharpParameterRenderer renderer)
+        {
+            var staticParams = benchmarkCase.Parameters.Items
+                .Where(parameter => !parameter.IsArgument && parameter.IsStatic)
+                .Select(parameter => $"{benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName()}.{parameter.Name} = {renderer.Render(parameter.ParameterValue)};");
+
+            var argumentFields = benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
+                .Select((parameter, index) => $"instance.{RunnableConstants.FieldsContainerName}.{RunnableConstants.ArgFieldPrefix}{index} = {renderer.Render(benchmarkCase.Parameters.GetArgument(parameter.Name!).ParameterValue)};");
+
+            return string.Join(
+                $"{Environment.NewLine}            ",
+                renderer.RenderStatementReads().Concat(staticParams).Concat(argumentFields));
+        }
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {
@@ -407,10 +471,10 @@ namespace BenchmarkDotNet.Code
             if (runCallType == CodeGenBenchmarkRunCallType.Reflection)
             {
                 // Use reflection to call benchmark's Run method indirectly.
-                return """
+                return $$"""
                 await ((global::System.Threading.Tasks.ValueTask) typeof(global::BenchmarkDotNet.Autogenerated.UniqueProgramName).Assembly
-                                    .GetType($"BenchmarkDotNet.Autogenerated.Runnable_{id}")
-                                    .GetMethod("Run", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.Static)
+                                    .GetType($"{{RunnableConstants.EmittedTypePrefix}}{id}")
+                                    .GetMethod("{{RunnableConstants.RunMethodName}}", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.Static)
                                     .Invoke(null, new global::System.Object[] { host, benchmarkName, diagnoserRunMode }))
                                     .ConfigureAwait(false);
                 """;
@@ -422,7 +486,7 @@ namespace BenchmarkDotNet.Code
 
             foreach (var buildInfo in buildPartition.Benchmarks)
             {
-                @switch.AppendLine($"case {buildInfo.Id.Value}: await BenchmarkDotNet.Autogenerated.Runnable_{buildInfo.Id.Value}.Run(host, benchmarkName, diagnoserRunMode); break;");
+                @switch.AppendLine($"case {buildInfo.Id.Value}: await {RunnableConstants.EmittedTypePrefix}{buildInfo.Id.Value}.{RunnableConstants.RunMethodName}(host, benchmarkName, diagnoserRunMode); break;");
             }
 
             @switch.AppendLine("default: throw new System.NotSupportedException(\"invalid benchmark id\");");
@@ -433,9 +497,9 @@ namespace BenchmarkDotNet.Code
 
         private static Type GetFieldType(Type argumentType, ParameterInstance argument)
         {
-            // #774 we can't store Span in a field, so we store an array (which is later casted to Span when we load the arguments)
-            if (argumentType.IsStackOnlyWithImplicitCast(argument.Value))
-                return argument.Value.GetType();
+            // #774 we can't store ByRefLike in a field, so we store what the value is cast to (which is later converted back to the ByRefLike when we load the arguments).
+            if (argumentType.WithoutRefModifier().IsByRefLike() && argument.Value is { } value)
+                return value.GetType();
 
             return argumentType;
         }
