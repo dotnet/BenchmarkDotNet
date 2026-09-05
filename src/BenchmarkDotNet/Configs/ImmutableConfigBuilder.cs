@@ -245,9 +245,11 @@ namespace BenchmarkDotNet.Configs
                     var copy = result[i].UnfreezeCopy();
 
                     // Apply overwrites the characteristics, but the categories are additive: a mutator that carries
-                    // categories (eg [SimpleJob(Categories = ...)] on a method) adds them to every job it mutates
-                    // instead of replacing the ones that job already has. Dropping them would make selecting by the
-                    // categories of the mutated job silently match nothing.
+                    // categories adds them to every job it mutates instead of replacing the ones that job already
+                    // has. Dropping them would make selecting by the categories of the mutated job silently match
+                    // nothing. Only the fluent api can produce such a mutator (eg Job.Default.WithWarmupCount(2)
+                    // .WithCategory("ci").AsMutator()): the mutator attributes derive from
+                    // JobMutatorConfigBaseAttribute, which has no Categories property.
                     var ownCategories = copy.Meta.Categories;
 
                     copy.Apply(mutatorJob);
@@ -268,10 +270,23 @@ namespace BenchmarkDotNet.Configs
         private static Job MergeCategories(IGrouping<Job, Job> equalJobs)
         {
             var first = equalJobs.Key;
-            var merged = equalJobs.SelectMany(job => job.Meta.Categories).ToArray();
 
-            // The common case is a group of one, where there is nothing to merge and the job can be returned as it is.
-            return merged.Length == first.Meta.Categories.Count ? first : first.WithCategories(merged).Freeze();
+            // The categories are deduplicated the same way the Meta.Categories setter does it, so that the count
+            // below compares like with like: without it a group whose jobs carry the very same categories (or the
+            // same ones in a different casing) would look like it had something to merge and take the copying path.
+            var merged = equalJobs.SelectMany(job => job.Meta.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+
+            // The merged set always contains the categories of the first job, so an equal count means it contains
+            // nothing else and the job can be returned as it is. This is the common case: a group of one.
+            if (merged.Length == first.Meta.Categories.Count)
+                return first;
+
+            // WithCategories copies the job through Apply, which skips the characteristics that are ignored on apply.
+            // IsMutator is one of them, so it has to be restored explicitly: a mutator that loses the flag here is
+            // added to the config as an extra standalone job and is never applied to the jobs it was meant to mutate.
+            var mergedJob = first.WithCategories(merged);
+
+            return (first.Meta.IsMutator ? mergedJob.AsMutator() : mergedJob).Freeze();
         }
 
         private class TypeComparer<TInterface> : IEqualityComparer<TInterface>
