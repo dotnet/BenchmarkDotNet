@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
@@ -38,10 +37,10 @@ namespace BenchmarkDotNet.Attributes
                 // be dereferenced without a check.
                 Categories is not { Length: > 0 } categories ? job : job.WithCategories(categories).Freeze());
 
-        protected static Job GetJob(Job sourceJob, RuntimeMoniker runtimeMoniker, Jit? jit, Platform? platform)
+        protected static Job GetJob(Job sourceJob, string runtimeMoniker, Jit? jit, Platform? platform)
         {
-            var runtime = runtimeMoniker.GetRuntime();
-            var baseJob = sourceJob.WithRuntime(runtime).WithId($"{sourceJob.Id}-{runtime.Name}");
+            var runtime = Runtime.Parse(runtimeMoniker);
+            var baseJob = sourceJob.WithRuntime(runtime).WithId($"{sourceJob.Id}-{runtime}");
             var id = baseJob.Id;
 
             if (jit.HasValue)

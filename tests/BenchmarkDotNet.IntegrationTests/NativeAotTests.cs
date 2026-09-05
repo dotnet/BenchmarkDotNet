@@ -24,11 +24,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private ManualConfig GetConfig()
         {
-            var toolchain = NativeAotToolchain.CreateBuilder().UseNuGet().IlcInstructionSet(IsAvx2Supported() ? "avx2" : "").ToToolchain();
+            // we test against latest version for current TFM to make sure we avoid issues like #1055
+            var toolchain = CsProjNativeAotToolchain.From(NativeAotRuntime.GetCurrentVersion(),
+                new NativeAotSettings { InstructionSet = IsAvx2Supported() ? "avx2" : "" });
 
             return ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithRuntime(NativeAotRuntime.GetCurrentVersion()) // we test against latest version for current TFM to make sure we avoid issues like #1055
                     .WithToolchain(toolchain)
                     .WithEnvironmentVariable(NativeAotBenchmark.EnvVarKey, IsAvx2Supported().ToString().ToLower()));
         }

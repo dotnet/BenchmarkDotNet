@@ -451,4 +451,13 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   <data name="General_AwaitableAsyncEnumerable_AmbiguousReturnType_Description" xml:space="preserve">
     <value>When a benchmark or setup/cleanup return type satisfies both the awaitable pattern (a public GetAwaiter) and the async-enumerable pattern (a public GetAsyncEnumerator), BenchmarkDotNet treats it as awaitable — the iterator's body is never executed. Pick one shape so the intent is unambiguous: drop GetAwaiter if you want it consumed as an async enumerable, or drop GetAsyncEnumerator if you want it awaited.</value>
   </data>
+  <data name="General_Job_RuntimeAndToolchainBothSet_Title" xml:space="preserve">
+    <value>Setting both Runtime and Toolchain on a job is order-dependent</value>
+  </data>
+  <data name="General_Job_RuntimeAndToolchainBothSet_MessageFormat" xml:space="preserve">
+    <value>This job sets both a Runtime and a Toolchain. They are coupled, so whichever is assigned last takes effect and the other is silently discarded. Keep only the Toolchain (which determines the runtime); the fix removes the Runtime assignment</value>
+  </data>
+  <data name="General_Job_RuntimeAndToolchainBothSet_Description" xml:space="preserve">
+    <value>The runtime and toolchain characteristics of a job are coupled: setting the toolchain overwrites the runtime with the one the toolchain targets, and setting the runtime clears any explicitly set toolchain. When both are set on the same job, whichever assignment comes last wins and the other is silently discarded — so the outcome depends on ordering rather than on anything visible at the call site. Prefer setting only the Toolchain, which already determines the runtime; the default fix removes the Runtime assignment. If you instead intended the Runtime to win, remove the Toolchain.</value>
+  </data>
 </root>

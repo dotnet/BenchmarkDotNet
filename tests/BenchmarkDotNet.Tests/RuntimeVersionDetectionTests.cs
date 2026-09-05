@@ -1,34 +1,35 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Tests
 {
     public class RuntimeVersionDetectionTests
     {
         [Theory]
-        [InlineData(".NETCoreApp,Version=v2.0", RuntimeMoniker.NetCoreApp20, "netcoreapp2.0")]
-        [InlineData(".NETCoreApp,Version=v2.1", RuntimeMoniker.NetCoreApp21, "netcoreapp2.1")]
-        [InlineData(".NETCoreApp,Version=v2.2", RuntimeMoniker.NetCoreApp22, "netcoreapp2.2")]
-        [InlineData(".NETCoreApp,Version=v3.0", RuntimeMoniker.NetCoreApp30, "netcoreapp3.0")]
-        [InlineData(".NETCoreApp,Version=v3.1", RuntimeMoniker.NetCoreApp31, "netcoreapp3.1")]
-        [InlineData(".NETCoreApp,Version=v5.0", RuntimeMoniker.Net50, "net5.0")]
-        [InlineData(".NETCoreApp,Version=v6.0", RuntimeMoniker.Net60, "net6.0")]
-        [InlineData(".NETCoreApp,Version=v7.0", RuntimeMoniker.Net70, "net7.0")]
-        [InlineData(".NETCoreApp,Version=v8.0", RuntimeMoniker.Net80, "net8.0")]
-        [InlineData(".NETCoreApp,Version=v9.0", RuntimeMoniker.Net90, "net9.0")]
-        [InlineData(".NETCoreApp,Version=v10.0", RuntimeMoniker.Net10_0, "net10.0")]
-        [InlineData(".NETCoreApp,Version=v11.0", RuntimeMoniker.Net11_0, "net11.0")]
-        [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "net123.0")]
-        public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
+        [InlineData(".NETCoreApp,Version=v2.0", 2, 0, "netcoreapp2.0")]
+        [InlineData(".NETCoreApp,Version=v2.1", 2, 1, "netcoreapp2.1")]
+        [InlineData(".NETCoreApp,Version=v2.2", 2, 2, "netcoreapp2.2")]
+        [InlineData(".NETCoreApp,Version=v3.0", 3, 0, "netcoreapp3.0")]
+        [InlineData(".NETCoreApp,Version=v3.1", 3, 1, "netcoreapp3.1")]
+        [InlineData(".NETCoreApp,Version=v5.0", 5, 0, "net5.0")]
+        [InlineData(".NETCoreApp,Version=v6.0", 6, 0, "net6.0")]
+        [InlineData(".NETCoreApp,Version=v7.0", 7, 0, "net7.0")]
+        [InlineData(".NETCoreApp,Version=v8.0", 8, 0, "net8.0")]
+        [InlineData(".NETCoreApp,Version=v9.0", 9, 0, "net9.0")]
+        [InlineData(".NETCoreApp,Version=v10.0", 10, 0, "net10.0")]
+        [InlineData(".NETCoreApp,Version=v11.0", 11, 0, "net11.0")]
+        [InlineData(".NETCoreApp,Version=v123.0", 123, 0, "net123.0")]
+        public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, int expectedMajor, int expectedMinor, string expectedTfm)
         {
             Assert.True(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName, out var version));
 
-            var runtime = CoreRuntime.FromVersion(version);
+            var runtime = CoreRuntime.From(version);
 
-            Assert.Equal(expectedTfm, runtime.RuntimeMoniker);
-            Assert.Equal(expectedMsBuildMoniker, runtime.MsBuildMoniker);
+            Assert.Equal(expectedMajor, runtime.Version.Major);
+            Assert.Equal(expectedMinor, runtime.Version.Minor);
+            Assert.Equal(expectedTfm, runtime.GetTfm());
         }
 
         [Theory]
@@ -42,20 +43,21 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", "Microsoft .NET Framework", "4.6.27817.01 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.1 @SrcCode: https://github.com/dotnet/coreclr/tree/6f78fbb3f964b4f407a2efb713a186384a167e5c")]
-        [InlineData(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", "Microsoft .NET Framework", "4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7")]
-        [InlineData(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", "Microsoft .NET Core", "3.0.0-preview8-28379-12")]
-        [InlineData(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", "Microsoft .NET Core", "3.1.0-something")]
-        [InlineData(RuntimeMoniker.Net50, "net5.0", "Microsoft .NET Core", "5.0.0-alpha1.19415.3")]
-        [InlineData(RuntimeMoniker.NotRecognized, "net123.0", "Microsoft .NET Core", "123.0.0-future")]
-        public void TryGetVersionFromProductInfoHandlesValidInput(RuntimeMoniker expectedTfm, string expectedMsBuildMoniker, string productName, string productVersion)
+        [InlineData(2, 1, "netcoreapp2.1", "Microsoft .NET Framework", "4.6.27817.01 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.1 @SrcCode: https://github.com/dotnet/coreclr/tree/6f78fbb3f964b4f407a2efb713a186384a167e5c")]
+        [InlineData(2, 2, "netcoreapp2.2", "Microsoft .NET Framework", "4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7")]
+        [InlineData(3, 0, "netcoreapp3.0", "Microsoft .NET Core", "3.0.0-preview8-28379-12")]
+        [InlineData(3, 1, "netcoreapp3.1", "Microsoft .NET Core", "3.1.0-something")]
+        [InlineData(5, 0, "net5.0", "Microsoft .NET Core", "5.0.0-alpha1.19415.3")]
+        [InlineData(123, 0, "net123.0", "Microsoft .NET Core", "123.0.0-future")]
+        public void TryGetVersionFromProductInfoHandlesValidInput(int expectedMajor, int expectedMinor, string expectedTfm, string productName, string productVersion)
         {
             Assert.True(CoreRuntime.TryGetVersionFromProductInfo(productVersion, productName, out var version));
 
-            var runtime = CoreRuntime.FromVersion(version);
+            var runtime = CoreRuntime.From(version);
 
-            Assert.Equal(expectedTfm, runtime.RuntimeMoniker);
-            Assert.Equal(expectedMsBuildMoniker, runtime.MsBuildMoniker);
+            Assert.Equal(expectedMajor, runtime.Version.Major);
+            Assert.Equal(expectedMinor, runtime.Version.Minor);
+            Assert.Equal(expectedTfm, runtime.GetTfm());
         }
 
         [Theory]
@@ -72,24 +74,25 @@ namespace BenchmarkDotNet.Tests
         {
             string directoryPrefix = Path.GetTempPath(); // this test runs on Unix, it can not be hardcoded due to / \ difference
 
-            yield return new object[] { Path.Combine(directoryPrefix, "2.0.9") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp20, "netcoreapp2.0" };
-            yield return new object[] { Path.Combine(directoryPrefix, "2.1.12") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp21, "netcoreapp2.1" };
-            yield return new object[] { Path.Combine(directoryPrefix, "2.2.6") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp22, "netcoreapp2.2" };
-            yield return new object[] { Path.Combine(directoryPrefix, "3.0.0-preview8-28379-12") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp30, "netcoreapp3.0" };
-            yield return new object[] { Path.Combine(directoryPrefix, "5.0.0-alpha1.19422.13") + Path.DirectorySeparatorChar, RuntimeMoniker.Net50, "net5.0" };
-            yield return new object[] { Path.Combine(directoryPrefix, "123.0.0") + Path.DirectorySeparatorChar, RuntimeMoniker.NotRecognized, "net123.0" };
+            yield return new object[] { Path.Combine(directoryPrefix, "2.0.9") + Path.DirectorySeparatorChar, 2, 0, "netcoreapp2.0" };
+            yield return new object[] { Path.Combine(directoryPrefix, "2.1.12") + Path.DirectorySeparatorChar, 2, 1, "netcoreapp2.1" };
+            yield return new object[] { Path.Combine(directoryPrefix, "2.2.6") + Path.DirectorySeparatorChar, 2, 2, "netcoreapp2.2" };
+            yield return new object[] { Path.Combine(directoryPrefix, "3.0.0-preview8-28379-12") + Path.DirectorySeparatorChar, 3, 0, "netcoreapp3.0" };
+            yield return new object[] { Path.Combine(directoryPrefix, "5.0.0-alpha1.19422.13") + Path.DirectorySeparatorChar, 5, 0, "net5.0" };
+            yield return new object[] { Path.Combine(directoryPrefix, "123.0.0") + Path.DirectorySeparatorChar, 123, 0, "net123.0" };
         }
 
         [Theory]
         [MemberData(nameof(FromNetCoreAppVersionHandlesValidInputArguments))]
-        public void TryGetVersionFromRuntimeDirectoryHandlesValidInput(string runtimeDirectory, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
+        public void TryGetVersionFromRuntimeDirectoryHandlesValidInput(string runtimeDirectory, int expectedMajor, int expectedMinor, string expectedTfm)
         {
             Assert.True(CoreRuntime.TryGetVersionFromRuntimeDirectory(runtimeDirectory, out var version));
 
-            var runtime = CoreRuntime.FromVersion(version);
+            var runtime = CoreRuntime.From(version);
 
-            Assert.Equal(expectedTfm, runtime.RuntimeMoniker);
-            Assert.Equal(expectedMsBuildMoniker, runtime.MsBuildMoniker);
+            Assert.Equal(expectedMajor, runtime.Version.Major);
+            Assert.Equal(expectedMinor, runtime.Version.Minor);
+            Assert.Equal(expectedTfm, runtime.GetTfm());
         }
 
         public static IEnumerable<object[]> TryGetVersionFromRuntimeDirectoryInvalidInputArguments()
@@ -114,13 +117,13 @@ namespace BenchmarkDotNet.Tests
 
 #if NETFRAMEWORK
             if (OsDetector.IsWindows())
-                Assert.True(runtime is ClrRuntime, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
+                Assert.True(runtime is ClrRuntime, $"Actual runtime: {runtime}");
             else
-                Assert.True(runtime is MonoRuntime, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
+                Assert.True(runtime is MonoRuntime, $"Actual runtime: {runtime}");
 #elif NET10_0_OR_GREATER
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net10_0, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.Version.Major == 10, $"Actual runtime: {runtime}");
 #else
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.Net80, $"Actual runtime: {runtime}, tfm: {runtime.MsBuildMoniker}, moniker: {runtime.RuntimeMoniker}");
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.Version.Major == 8, $"Actual runtime: {runtime}");
 #endif
         }
     }

@@ -1,9 +1,9 @@
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -19,7 +19,8 @@ namespace BenchmarkDotNet.Jobs
         // Env
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
 
-        public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
+        // Runtime and toolchain are coupled; the coupling is enforced by the InfrastructureMode property setters.
+        public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Infrastructure.Runtime = runtime);
 
         /// <summary>
         /// ProcessorAffinity for the benchmark process.
@@ -203,6 +204,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithJitTieringMode(this Job job, JitTieringMode mode) => job.WithCore(j => j.Run.JitTieringMode = mode);
 
         // Infrastructure
+        // Runtime and toolchain are coupled; the coupling is enforced by the InfrastructureMode property setters.
         public static Job WithToolchain(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
 
         [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
@@ -355,10 +357,14 @@ namespace BenchmarkDotNet.Jobs
             return job;
         }
 
+        // The runtime is kept in sync with the toolchain by the InfrastructureMode setters, so we can read it directly.
+        internal static Runtime GetRuntime(this Job job)
+            => job.Infrastructure.HasValue(InfrastructureMode.RuntimeCharacteristic)
+                ? job.Infrastructure.Runtime!
+                : RuntimeInformation.GetCurrentRuntime();
+
         internal static bool IsNativeAOT(this Job job)
-            => job.Environment.GetRuntime() is NativeAotRuntime
-            // given job can have NativeAOT toolchain set, but Runtime == default
-            || (job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
+            => job.GetRuntime() is NativeAotRuntime;
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {

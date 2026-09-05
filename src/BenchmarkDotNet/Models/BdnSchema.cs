@@ -12,6 +12,7 @@ internal class BdnSchema : PerfonarSchema
         Add<BdnHostInfo>();
         Add<BdnBenchmark>();
         Add<BdnEnvironment>();
+        Add<BdnInfrastructure>();
         Add<BdnExecution>();
     }
 }

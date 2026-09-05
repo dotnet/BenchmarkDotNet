@@ -3,7 +3,6 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -50,11 +49,16 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
-
-                if (runtime != null && runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                var runtime = benchmark.GetRuntime();
+                bool supported = runtime switch
                 {
-                    yield return new ValidationError(true, $"{nameof(ThreadingDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                    CoreRuntime core => core.Version.Major >= 3,
+                    NativeAotRuntime or R2RRuntime or MonoCoreRuntime or WasmRuntime => true,
+                    _ => false,
+                };
+                if (!supported)
+                {
+                    yield return new ValidationError(true, $"{nameof(ThreadingDiagnoser)} supports only .NET (Core) 3.0+, but the job targets {runtime}", benchmark);
                 }
             }
         }

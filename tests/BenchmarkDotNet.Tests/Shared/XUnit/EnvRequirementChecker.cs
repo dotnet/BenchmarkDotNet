@@ -20,6 +20,7 @@ public static class EnvRequirementChecker
         EnvRequirement.FullFrameworkOnly => BdnRuntimeInformation.IsFullFramework ? null : "Full .NET Framework-only test",
         EnvRequirement.NonFullFramework => !BdnRuntimeInformation.IsFullFramework ? null : "Non-Full .NET Framework test",
         EnvRequirement.DotNetCoreOnly => BdnRuntimeInformation.IsNetCore ? null : ".NET/.NET Core-only test",
+        EnvRequirement.Platform64BitOnly => BdnRuntimeInformation.Is64BitPlatform() ? null : "64 bit platform-only test",
         EnvRequirement.NeedsPrivilegedProcess => IsPrivilegedProcess() ? null : "Needs authorization to perform security-relevant functions",
         EnvRequirement.NonGitHubDraftPR => !IsGitHubDraftPR() ? null : "GitHub draft PR",
         _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, "Unknown value")

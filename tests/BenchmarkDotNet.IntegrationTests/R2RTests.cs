@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
@@ -19,8 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 var config = ManualConfig.CreateEmpty()
                     .AddJob(Job.Dry
-                        .WithRuntime(R2RRuntime.Net10_0)
-                        .WithToolchain(R2RToolchain.NetCoreApp10_0))
+                        .WithToolchain(CsProjR2RToolchain.R2R10_0))
                     .WithBuildTimeout(TimeSpan.FromSeconds(360));
                 var summary = CanExecute<R2RBenchmark>(config);
 

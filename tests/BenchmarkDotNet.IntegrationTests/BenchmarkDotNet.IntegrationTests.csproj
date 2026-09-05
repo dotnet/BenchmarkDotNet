@@ -36,6 +36,7 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.MonoBenchmarks\BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.WasmBenchmarks\BenchmarkDotNet.IntegrationTests.WasmBenchmarks.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SharedDiagnosers\BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
@@ -55,7 +56,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.9" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.11" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />

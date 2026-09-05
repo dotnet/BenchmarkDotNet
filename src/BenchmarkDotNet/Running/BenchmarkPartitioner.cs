@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Running
 {
@@ -28,8 +27,6 @@ namespace BenchmarkDotNet.Running
                 var jobX = x.Job;
                 var jobY = y.Job;
 
-                if (AreDifferent(x.GetRuntime(), y.GetRuntime())) // Mono vs .NET vs Core
-                    return false;
                 if (AreDifferent(x.GetToolchain(), y.GetToolchain())) // Mono vs .NET vs Core vs InProcess
                     return false;
                 if (jobX.Environment.Jit != jobY.Environment.Jit) // Jit is set per exe in .config file
@@ -59,7 +56,6 @@ namespace BenchmarkDotNet.Running
             {
                 var hashCode = new HashCode();
                 hashCode.Add(obj.GetToolchain());
-                hashCode.Add(obj.GetRuntime());
                 hashCode.Add(obj.Descriptor.Type.Assembly.Location);
                 hashCode.Add(obj.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any());
                 var job = obj.Job;

@@ -331,7 +331,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var config = new ManualConfig()
                 .AddJob(Job.Dry
-                    .WithToolchain(new InProcessNoEmitToolchain(new InProcessNoEmitSettings { ExecuteOnSeparateThread = false }))
+                    .WithToolchain(InProcessNoEmitToolchain.From(new InProcessNoEmitSettings { ExecuteOnSeparateThread = false }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
                 .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
@@ -360,7 +360,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var factory = new YieldAwaitableBenchmarkActionFactory();
             var config = new ManualConfig()
                 .AddJob(Job.Dry
-                    .WithToolchain(new InProcessNoEmitToolchain(new InProcessNoEmitSettings { BenchmarkActionFactory = factory }))
+                    .WithToolchain(InProcessNoEmitToolchain.From(new InProcessNoEmitSettings { BenchmarkActionFactory = factory }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
                 .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)

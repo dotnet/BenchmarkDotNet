@@ -12,8 +12,9 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.Framework;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -31,9 +32,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (RuntimeInformation.IsFullFramework)
             {
-                yield return [Jit.LegacyJit, Platform.X86, CsProjClassicNetToolchain.Net472]; // 32bit LegacyJit for desktop .NET
-                yield return [Jit.LegacyJit, Platform.X64, CsProjClassicNetToolchain.Net472]; // 64bit LegacyJit for desktop .NET
-                yield return [Jit.RyuJit, Platform.X64, CsProjClassicNetToolchain.Net472]; // RyuJit for desktop .NET
+                yield return [Jit.LegacyJit, Platform.X86, CsProjFrameworkToolchain.Net472]; // 32bit LegacyJit for desktop .NET
+                yield return [Jit.LegacyJit, Platform.X64, CsProjFrameworkToolchain.Net472]; // 64bit LegacyJit for desktop .NET
+                yield return [Jit.RyuJit, Platform.X64, CsProjFrameworkToolchain.Net472]; // RyuJit for desktop .NET
             }
             else if (RuntimeInformation.IsNetCore)
             {

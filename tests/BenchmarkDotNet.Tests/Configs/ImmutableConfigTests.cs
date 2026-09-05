@@ -5,6 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
@@ -253,8 +254,8 @@ namespace BenchmarkDotNet.Tests.Configs
                 var runnableJobs = added.GetJobs();
 
                 Assert.Equal(2, runnableJobs.Count());
-                Assert.Single(runnableJobs, job => job.Environment.Runtime is ClrRuntime);
-                Assert.Single(runnableJobs, job => job.Environment.Runtime is CoreRuntime);
+                Assert.Single(runnableJobs, job => job.GetRuntime() is ClrRuntime);
+                Assert.Single(runnableJobs, job => job.GetRuntime() is CoreRuntime);
             }
         }
 
@@ -273,8 +274,8 @@ namespace BenchmarkDotNet.Tests.Configs
 
                 Assert.Equal(2, runnableJobs.Count());
                 Assert.All(runnableJobs, job => Assert.Equal(warmupCount, job.Run.WarmupCount));
-                Assert.Single(runnableJobs, job => job.Environment.Runtime is ClrRuntime);
-                Assert.Single(runnableJobs, job => job.Environment.Runtime is CoreRuntime);
+                Assert.Single(runnableJobs, job => job.GetRuntime() is ClrRuntime);
+                Assert.Single(runnableJobs, job => job.GetRuntime() is CoreRuntime);
             }
         }
 

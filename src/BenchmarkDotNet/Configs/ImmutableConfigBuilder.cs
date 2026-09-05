@@ -253,6 +253,7 @@ namespace BenchmarkDotNet.Configs
                     var ownCategories = copy.Meta.Categories;
 
                     copy.Apply(mutatorJob);
+                    ApplyCouplingFromMutator(copy, mutatorJob);
 
                     copy.Meta.Categories = [.. ownCategories, .. copy.Meta.Categories];
 
@@ -260,7 +261,47 @@ namespace BenchmarkDotNet.Configs
                 }
             }
 
-            return result;
+            // Deduplicated again: the pass at the top of this method runs before the mutators are merged, so it
+            // cannot see jobs that only become identical here.
+            return result
+                .Select(ReconcileRuntimeAndToolchain)
+                .Distinct(JobComparer.Default)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Re-applies the Runtime/Toolchain coupling in the direction the mutator asked for.
+        /// </summary>
+        /// <remarks>
+        /// <c>Apply</c> writes characteristics directly, past the <see cref="InfrastructureMode" /> setters that keep
+        /// the pair in sync, so a merged job can end up with the two disagreeing. The mutator is the later and more
+        /// specific instruction, so whichever of them it set wins - as it would through the setters.
+        /// </remarks>
+        private static void ApplyCouplingFromMutator(Job job, Job mutatorJob)
+        {
+            if (mutatorJob.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic))
+                InfrastructureMode.RuntimeCharacteristic[job.Infrastructure] = job.Infrastructure.Toolchain?.Runtime;
+            else if (mutatorJob.Infrastructure.HasValue(InfrastructureMode.RuntimeCharacteristic))
+                InfrastructureMode.ToolchainCharacteristic[job.Infrastructure] = null;
+        }
+
+        /// <summary>
+        /// Keeps a job's Runtime in sync with an explicitly set Toolchain, where nothing says which was meant to win.
+        /// </summary>
+        /// <remarks>
+        /// The public characteristic indexers write past the setters too. With no mutator to say which assignment came
+        /// later, the toolchain wins: it is what builds and runs the benchmark, so a stale runtime would report one
+        /// nothing ran on.
+        /// </remarks>
+        private static Job ReconcileRuntimeAndToolchain(Job job)
+        {
+            var toolchain = job.Infrastructure.Toolchain;
+            if (toolchain == null || Equals(job.Infrastructure.Runtime, toolchain.Runtime))
+                return job;
+
+            var copy = job.UnfreezeCopy();
+            InfrastructureMode.RuntimeCharacteristic[copy.Infrastructure] = toolchain.Runtime;
+            return copy.Freeze();
         }
 
         /// <summary>
