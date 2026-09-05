@@ -107,6 +107,24 @@ namespace BenchmarkDotNet.Tests.Jobs
                 CharacteristicSetPresenter.SourceCode.ToPresentation(job.WithCategories("net8")));
         }
 
+        // Applying a mutator can make two jobs identical, so they are deduplicated once more afterwards. That pass
+        // has to merge the categories as well, otherwise the ones carried only by the jobs it drops are lost and
+        // selecting by them matches nothing.
+        [Fact]
+        public void CategoriesSurviveTheDeduplicationDoneAfterTheMutatorsAreApplied()
+        {
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Default.WithWarmupCount(1).WithCategory("first"))
+                .AddJob(Job.Default.WithWarmupCount(3).WithCategory("second"))
+                .AddJob(Job.Default.WithWarmupCount(5).AsMutator());
+
+            var job = Assert.Single(ImmutableConfigBuilder.Create(config).GetJobs());
+
+            Assert.Equal(5, job.Run.WarmupCount);
+            Assert.True(job.Meta.HasCategory("first"));
+            Assert.True(job.Meta.HasCategory("second"));
+        }
+
         [Fact]
         public void JobsWhichDifferOnlyByCategoriesAreDeduplicatedIntoOne()
         {

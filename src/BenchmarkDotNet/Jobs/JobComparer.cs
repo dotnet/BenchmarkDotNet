@@ -97,6 +97,12 @@ namespace BenchmarkDotNet.Jobs
                 if (characteristic.HasChildCharacteristics)
                     continue;
 
+                // Categories are skipped for the same reason as in Compare: they say which jobs the user wants to
+                // select, not what a job *is*. This is the overload that GroupBy and Distinct use, so comparing them
+                // here is what would actually let two jobs differing only by category run twice under one name.
+                if (characteristic == MetaMode.CategoriesCharacteristic)
+                    continue;
+
                 bool xHasValue = x.HasValue(characteristic);
                 if (xHasValue != y.HasValue(characteristic))
                     return false;

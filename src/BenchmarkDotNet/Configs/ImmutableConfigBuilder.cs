@@ -262,10 +262,13 @@ namespace BenchmarkDotNet.Configs
             }
 
             // Deduplicated again: the pass at the top of this method runs before the mutators are merged, so it
-            // cannot see jobs that only become identical here.
+            // cannot see jobs that only become identical here. The categories are merged rather than dropped for
+            // the same reason as in the first pass: the comparer ignores them, so the jobs collapsed here can carry
+            // categories the survivor does not have, and selecting by one of those would then match nothing.
             return result
                 .Select(ReconcileRuntimeAndToolchain)
-                .Distinct(JobComparer.Default)
+                .GroupBy(job => job, JobComparer.Default)
+                .Select(MergeCategories)
                 .ToArray();
         }
 
