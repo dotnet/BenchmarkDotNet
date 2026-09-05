@@ -28,13 +28,15 @@ var config = DefaultConfig.Instance
 
 `WithCategories` overrides the categories of the job, `WithCategory` adds to them.
 
-Every job attribute has a `Categories` property, so the same thing can be expressed with attributes:
+The attributes that define a job (`[SimpleJob]`, `[DryJob]`, `[ShortRunJob]`, `[InProcess]` and the other attributes deriving from `JobConfigBaseAttribute`) have a `Categories` property, so the same thing can be expressed with attributes:
 
 ```cs
 [SimpleJob(RuntimeMoniker.Net80, Categories = ["runtimes", "net8"])]
 [SimpleJob(RuntimeMoniker.Net90, Categories = ["runtimes", "net9"])]
 public class Benchmarks { /* ... */ }
 ```
+
+The mutator attributes (`[WarmupCount]`, `[IterationCount]`, `[RunOncePerIteration]` and the others deriving from `JobMutatorConfigBaseAttribute`) don't define a job of their own, so they have no `Categories` property. A mutator that carries categories has to be built with the fluent api: `Job.Default.WithWarmupCount(3).WithCategory("ci").AsMutator()`.
 
 Categories don't affect how a job is executed: they are not a part of the job `Id`, the folder names, nor the summary.
 
