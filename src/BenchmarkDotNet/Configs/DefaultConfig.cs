@@ -82,7 +82,6 @@ namespace BenchmarkDotNet.Configs
             yield return RequiredMemberValidator.FailOnError;
             yield return SourceReturnTypeValidator.FailOnError;
             yield return BenchmarkCancellationValidator.FailOnError;
-            yield return RuntimeValidator.DontFailOnError;
         }
 
         public IOrderer? Orderer => null;
@@ -105,9 +104,9 @@ namespace BenchmarkDotNet.Configs
             get
             {
                 string root;
-                if (OsDetector.IsAndroid() || OsDetector.IsIOS())
+                if (OsDetector.IsMobile())
                 {
-                    // On mobile platforms (Android, iOS, and Mac Catalyst), use a writable location
+                    // On mobile platforms (Android, iOS, tvOS), use a writable location
                     // because the app bundle and current directory are read-only due to sandboxing
                     root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 }

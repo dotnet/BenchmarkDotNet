@@ -200,7 +200,7 @@ public class AsyncEnumerableParamsSourceTests(ITestOutputHelper output) : Benchm
         SynchronizationContext.SetSynchronizationContext(recording);
         try
         {
-            Run(benchmarkType, new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }));
+            Run(benchmarkType, InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }));
         }
         finally
         {

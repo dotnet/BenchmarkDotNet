@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("4.8.9032.0", "4.8.1")]
         public void ServicingVersionsAreMappedToCorrespondingReleaseVersions(string servicingVersion, string expectedReleaseVersion)
         {
-            Assert.Equal(expectedReleaseVersion, FrameworkVersionHelper.MapToReleaseVersion(servicingVersion));
+            Assert.Equal(new Version(expectedReleaseVersion), FrameworkVersionHelper.MapToReleaseVersion(servicingVersion));
         }
     }
 }

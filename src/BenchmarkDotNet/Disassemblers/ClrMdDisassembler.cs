@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
 
-            var state = new State(runtime, args.TargetFrameworkMoniker);
+            var state = new State(runtime, args.RuntimeVersion);
 
             if (args.Filters.Length > 0)
             {

@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -12,13 +11,14 @@ using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Text;
 
 namespace BenchmarkDotNet.Toolchains
 {
     [PublicAPI("Used by some of our Superusers that implement their own Toolchains (e.g. Kestrel team)")]
     public class Executor : IExecutor
     {
+        public static readonly Executor Instance = new();
+
         public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains
                     executeParameters.DiagnoserRunMode, cancellationToken).ConfigureAwait(false);
         }
 
-        private static async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+        private async ValueTask<ExecuteResult> Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static async ValueTask<ExecuteResult> ExecuteCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+        private async ValueTask<ExecuteResult> ExecuteCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
             IDiagnoser diagnoser, CompositeInProcessDiagnoser compositeInProcessDiagnoser, IResolver resolver, int launchIndex,
             Diagnosers.RunMode diagnoserRunMode, CancellationToken cancellationToken)
         {
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains
                 results = broker.Results;
                 prefixedOutput = broker.PrefixedOutput;
 
-                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
                 }
@@ -112,10 +112,13 @@ namespace BenchmarkDotNet.Toolchains
                 launchIndex);
         }
 
-        private static ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
+        [PublicAPI]
+        protected virtual ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
         {
             var start = new ProcessStartInfo
             {
+                FileName = artifactsPaths.ExecutablePath,
+                Arguments = args,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = false,
@@ -123,61 +126,8 @@ namespace BenchmarkDotNet.Toolchains
                 CreateNoWindow = true,
                 WorkingDirectory = null // by default it's null
             };
-
             start.SetEnvironmentVariables(benchmarkCase, resolver);
-
-            string exePath = artifactsPaths.ExecutablePath;
-
-            var runtime = benchmarkCase.GetRuntime();
-
-            switch (runtime)
-            {
-                case ClrRuntime _:
-                case CoreRuntime _:
-                case NativeAotRuntime _:
-                case R2RRuntime _:
-                    start.FileName = exePath;
-                    start.Arguments = args;
-                    break;
-                case MonoRuntime mono:
-                    start.FileName = mono.CustomPath.IsNotBlank() ? mono.CustomPath : "mono";
-                    start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
-                    break;
-                case MonoAotLLVMRuntime _:
-                    start.FileName = exePath;
-                    start.Arguments = args;
-                    start.WorkingDirectory = Path.Combine(artifactsPaths.BinariesDirectoryPath, "publish");
-                    break;
-                case CustomRuntime _:
-                    start.FileName = exePath;
-                    start.Arguments = args;
-                    break;
-                default:
-                    throw new NotSupportedException("Runtime = " + runtime);
-            }
             return start;
-        }
-
-        private static string GetMonoArguments(Job job, string exePath, string args, IResolver resolver)
-        {
-            var arguments = job.HasValue(InfrastructureMode.ArgumentsCharacteristic)
-                ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver)!.OfType<MonoArgument>().ToArray()
-                : [];
-
-            // from mono --help: "Usage is: mono [options] program [program-options]"
-            var builder = new StringBuilder(30);
-
-            builder.Append(job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.Llvm ? "--llvm" : "--nollvm");
-
-            foreach (var argument in arguments)
-            {
-                builder.Append($" {argument.TextRepresentation}");
-            }
-
-            builder.Append($" \"{exePath}\" ");
-            builder.Append(args);
-
-            return builder.ToString();
         }
     }
 }

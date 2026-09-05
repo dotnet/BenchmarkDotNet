@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal struct ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, string tfm, string[] filters, string resultsPath = "")
+    internal struct ClrMdArgs(int processId, string typeName, string methodName, bool printSource, int maxDepth, string syntax, Version runtimeVersion, string[] filters, string resultsPath = "")
     {
         [JsonIgnore]
         internal int ProcessId = processId;
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal string Syntax = syntax;
 
         [JsonInclude]
-        internal string TargetFrameworkMoniker = tfm;
+        internal Version RuntimeVersion = runtimeVersion;
 
         [JsonInclude]
         internal string ResultsPath = resultsPath;
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Disassemblers
                 maxDepth: int.Parse(args[4]),
                 resultsPath: args[5],
                 syntax: args[6],
-                tfm: args[7],
+                runtimeVersion: Version.Parse(args[7]),
                 filters: [.. args.Skip(8)]
             );
     }

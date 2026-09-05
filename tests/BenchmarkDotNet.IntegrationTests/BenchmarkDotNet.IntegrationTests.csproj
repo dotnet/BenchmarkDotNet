@@ -36,6 +36,7 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.MonoBenchmarks\BenchmarkDotNet.IntegrationTests.MonoBenchmarks.csproj" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.WasmBenchmarks\BenchmarkDotNet.IntegrationTests.WasmBenchmarks.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SharedDiagnosers\BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>

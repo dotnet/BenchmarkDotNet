@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.Tests.Jobs;
 
@@ -19,9 +19,8 @@ public class JobIdGeneratorTests
 
     public static TheoryData<string, Job> GetTheoryData() => new TheoryData<string, Job>()
     {
-        {"Job-OOTPKI", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp80) },
-        {"Job-QAODSR", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp90) },
-        {"Job-KHMDUZ", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp80).WithRuntime(CoreRuntime.Core80) },
-        {"Job-JMDAGQ", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0) },
+        {"Job-GUNERI", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp90) },
+        {"Job-HQSRPM", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0) },
+        {"Job-GVKUBM", Job.Default.WithRuntime(CoreRuntime.Core10_0) },
     };
 }
