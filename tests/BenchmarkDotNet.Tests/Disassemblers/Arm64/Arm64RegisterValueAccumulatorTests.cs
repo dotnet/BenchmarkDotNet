@@ -6,8 +6,6 @@ namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public partial class Arm64RegisterValueAccumulatorTests : Arm64DisassemblerTestBase
 {
-    private static readonly IClrRuntime DummyClrRuntime = CreateMockClrRuntime(0);
-
     public Arm64RegisterValueAccumulatorTests(ITestOutputHelper output) : base(output)
     {
     }

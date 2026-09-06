@@ -6,10 +6,6 @@ namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public partial class Arm64DisassemblerTests
 {
-    private static readonly MockClrMethod DummyMethodNotUsed = default!;
-    private static readonly MockClrMethod DummyCurrentMethod = new("DummyCurrentMethod", 0x10000, "DummyCurrentMethodSignature", new MockClrType("DummyCurrentMethodType"));
-    private static readonly MockClrMethod DummyTargetMethod = new("DummyTargetMethod", 0x20000, "DummyTargetMethodSignature", new MockClrType("DummyTargetMethodType"));
-
     /// <summary>
     /// When GetJitHelperFunctionName returns non-empty name.
     /// It's added to AddressToNameMapping. and no further processing is done.

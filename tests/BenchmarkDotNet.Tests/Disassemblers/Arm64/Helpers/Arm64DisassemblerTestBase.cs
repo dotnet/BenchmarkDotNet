@@ -1,4 +1,5 @@
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 using System.Buffers.Binary;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
