@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Running;
 using Perfolizer.Mathematics.OutlierDetection;
 
@@ -136,8 +137,8 @@ namespace BenchmarkDotNet.Tests.Running
 
             Assert.Equal(2, info.BenchmarksCases.Length);
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
-            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is ClrRuntime);
-            Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is CoreRuntime);
+            Assert.Single(info.BenchmarksCases, benchmark => benchmark.GetRuntime() is ClrRuntime);
+            Assert.Single(info.BenchmarksCases, benchmark => benchmark.GetRuntime() is CoreRuntime);
             Assert.All(info.BenchmarksCases, benchmark => Assert.False(benchmark.Job.Meta.IsMutator)); // the job does not became a mutator itself, this config should not be copied
         }
 
@@ -166,7 +167,7 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmark = info.BenchmarksCases.Single();
 
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
-            Assert.True(benchmark.Job.Environment.Runtime is CoreRuntime);
+            Assert.True(benchmark.GetRuntime() is CoreRuntime);
             Assert.False(benchmark.Job.Meta.IsMutator);
         }
 

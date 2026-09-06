@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.WasmBenchmarks</AssemblyTitle>
+    <AssemblyName>$(AssemblyTitle)</AssemblyName>
+    <!-- The WASM benchmarks live in their own project (like the Mono benchmarks) so the WASM toolchain builds/AOT-compiles
+         only BenchmarkDotNet + the benchmark, without pulling the xunit test framework into the app (which fails Mono AOT).
+         net472 is only there so the (Windows) net472 build of the IntegrationTests project can reference this project;
+         the WASM benchmarks themselves are built for the wasm runtime's TFM (net10.0) by the toolchain. -->
+    <TargetFrameworks>net472;net10.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <!-- The in-process diagnoser handler used by the WASM diagnoser test is compiled into the benchmark, so it must be reachable here. -->
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SharedDiagnosers\BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
+</Project>

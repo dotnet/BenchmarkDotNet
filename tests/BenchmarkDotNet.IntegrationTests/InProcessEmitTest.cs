@@ -10,7 +10,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using BenchmarkDotNet.Toolchains.Roslyn;
+using BenchmarkDotNet.Toolchains.Framework;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         .WithConsumeTasksSynchronously(consumeTasksSynchronously))
                 .AddJob(
                     Job.Dry
-                        .WithToolchain(new RoslynToolchain())
+                        .WithToolchain(RoslynFrameworkToolchain.Default)
                         .WithInvocationCount(4)
                         .WithUnrollFactor(4)
                         .WithConsumeTasksSynchronously(consumeTasksSynchronously))
@@ -412,7 +412,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var config = new ManualConfig()
                 .AddJob(Job.Dry
-                    .WithToolchain(new InProcessEmitToolchain(new InProcessEmitSettings { ExecuteOnSeparateThread = false }))
+                    .WithToolchain(InProcessEmitToolchain.From(new InProcessEmitSettings { ExecuteOnSeparateThread = false }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
                 .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)

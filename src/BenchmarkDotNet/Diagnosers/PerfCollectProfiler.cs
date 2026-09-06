@@ -10,9 +10,9 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -207,14 +207,14 @@ namespace BenchmarkDotNet.Diagnosers
                 return; // it's not needed for a local build of dotnet runtime
             }
 
-            string cliPath = parameters.BenchmarkCase.GetToolchain() switch
+            FileInfo? cliPath = parameters.BenchmarkCase.GetToolchain() switch
             {
-                CsProjCoreToolchain core => core.CustomDotNetCliPath,
-                NativeAotToolchain nativeAot => nativeAot.CustomDotNetCliPath,
-                _ => DotNetCliCommandExecutor.DefaultDotNetCliPath.Value
+                CsProjCoreToolchain core => core.Settings.CliPath,
+                CsProjNativeAotToolchain nativeAot => nativeAot.Settings.CliPath,
+                _ => null
             };
 
-            if (!cliPathWithSymbolsInstalled.Add(cliPath))
+            if (!cliPathWithSymbolsInstalled.Add(cliPath?.FullName ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value))
             {
                 return;
             }
@@ -255,7 +255,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             await DotNetCliCommandExecutor.ExecuteAsync(cliCommand
-                .WithCliPath(Path.Combine(toolPath, "dotnet-symbol"))
+                .WithCliPath(new FileInfo(Path.Combine(toolPath, "dotnet-symbol")))
                 .WithArguments($"--recurse-subdirectories --symbols \"{dotnetPath}/dotnet\" \"{dotnetPath}/lib*.so\""),
                 cancellationToken)
                 .ConfigureAwait(false);

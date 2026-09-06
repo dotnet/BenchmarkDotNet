@@ -15,7 +15,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         //      private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
         private const string RyuJitNotAvailable = "// ERROR:  RyuJIT is requested but it is not available in current environment";
-        private const string ToolchainSupportsOnlyRyuJit = "Currently dotnet cli toolchain supports only RyuJit";
+        // The CsProj toolchains prefix this with their concrete type name (e.g. "CsProjCoreToolchain supports only RyuJit").
+        private const string ToolchainSupportsOnlyRyuJit = "supports only RyuJit";
 
         [TheoryEnvSpecific("CLR is a valid job only on Windows", EnvRequirement.WindowsOnly)]
         [InlineData(Jit.LegacyJit, Platform.X86, null)]

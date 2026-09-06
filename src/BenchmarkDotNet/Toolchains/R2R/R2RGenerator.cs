@@ -2,24 +2,21 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.Text;
 using System.Xml;
 
 namespace BenchmarkDotNet.Toolchains.R2R
 {
-    public class R2RGenerator : CsProjGenerator
+    internal sealed class R2RGenerator : CsProjGenerator
     {
-        private readonly string CustomRuntimePack;
-        private readonly string Crossgen2Pack;
+        private readonly R2RSettings settings;
 
-        public R2RGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string crossgen2Pack)
-            : base(targetFrameworkMoniker, cliPath, packagesPath)
+        public R2RGenerator(R2RSettings settings) : base(settings)
         {
-            CustomRuntimePack = customRuntimePack;
-            Crossgen2Pack = crossgen2Pack;
+            this.settings = settings;
             BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
@@ -36,13 +33,13 @@ namespace BenchmarkDotNet.Toolchains.R2R
                 .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
                 .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
                 .Replace("$CSPROJPATH$", projectFile.FullName)
-                .Replace("$TFM$", TargetFrameworkMoniker)
+                .Replace("$TFM$", Settings.TargetFrameworkMoniker)
                 .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
                 .Replace("$COPIEDSETTINGS$", customProperties)
                 .Replace("$SDKNAME$", sdkName)
-                .Replace("$RUNTIMEPACK$", CustomRuntimePack)
-                .Replace("$CROSSGEN2PACK$", Crossgen2Pack)
-                .Replace("$RUNTIMEIDENTIFIER$", CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
+                .Replace("$RUNTIMEPACK$", settings.CustomRuntimePack?.FullName)
+                .Replace("$CROSSGEN2PACK$", settings.Crossgen2Pack?.FullName)
+                .Replace("$RUNTIMEIDENTIFIER$", RuntimeInformation.GetPortableRuntimeIdentifier())
                 .ToString();
 
             await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
@@ -57,6 +54,6 @@ namespace BenchmarkDotNet.Toolchains.R2R
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier(), "publish");
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, Settings.TargetFrameworkMoniker, RuntimeInformation.GetPortableRuntimeIdentifier(), "publish");
     }
 }

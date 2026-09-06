@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using System.Diagnostics;
@@ -38,7 +37,6 @@ namespace BenchmarkDotNet.Toolchains
 
             var runtimeElement = GetOrCreateRuntimeElement(configurationElement);
 
-            ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
             ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
 
             GenerateJitSettings(runtimeElement, job.Environment);
@@ -99,20 +97,6 @@ namespace BenchmarkDotNet.Toolchains
                     toRemove ??= new List<XElement>();
                     toRemove.Add(child);
                 }
-            }
-            toRemove?.ForEach(e => e.Remove());
-        }
-
-        private static void ClearStartupSettingsForCustomClr(XElement configurationElement, Runtime? runtime)
-        {
-            if (!(runtime is ClrRuntime clrRuntime) || clrRuntime.Version.IsBlank())
-                return;
-
-            List<XElement>? toRemove = null;
-            foreach (var child in configurationElement.Elements("startup"))
-            {
-                toRemove ??= new List<XElement>();
-                toRemove.Add(child);
             }
             toRemove?.ForEach(e => e.Remove());
         }

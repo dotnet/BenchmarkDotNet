@@ -11,11 +11,9 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
-using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests;
@@ -57,15 +55,13 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
     [InlineData("node")]
     public void BenchmarkWithCancellationTokenProperty_ReceivesToken_Wasm(string javaScriptEngine)
     {
-        var dotnetVersion = "net10.0";
         var logger = new OutputLogger(Output);
-        var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: MonoAotCompilerMode.mini);
+        var wasmSettings = new WasmSettings { JavaScriptEngine = javaScriptEngine };
 
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
-                .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
+                .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
             .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
@@ -123,15 +119,13 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         var cts = new CancellationTokenSource();
         var diagnoser = new CancelAfterFirstIterationDiagnoser(cts);
 
-        var dotnetVersion = "net10.0";
         var logger = new OutputLogger(Output);
-        var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: MonoAotCompilerMode.mini);
+        var wasmSettings = new WasmSettings { JavaScriptEngine = javaScriptEngine };
 
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
-                .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
+                .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
             .AddDiagnoser(diagnoser)
             .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)

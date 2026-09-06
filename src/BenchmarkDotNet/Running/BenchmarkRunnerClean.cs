@@ -282,7 +282,7 @@ namespace BenchmarkDotNet.Running
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
-                        if (!benchmark.Job.GetToolchain().IsInProcess)
+                        if (!benchmark.GetToolchain().IsInProcess)
                         {
                             logger.WriteLine();
                             logger.WriteLineError($"// BenchmarkDotNet has failed to build the auto-generated boilerplate code.");

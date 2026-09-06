@@ -1,7 +1,10 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -9,43 +12,121 @@ using System.Runtime.Versioning;
 
 namespace BenchmarkDotNet.Environments
 {
-    public class CoreRuntime : Runtime
+    /// <summary>
+    /// Represents a specific version of the .NET (Core) runtime.
+    /// </summary>
+    public sealed class CoreRuntime : Runtime
     {
-        public static readonly CoreRuntime Core20 = new(RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
-        public static readonly CoreRuntime Core21 = new(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
-        public static readonly CoreRuntime Core22 = new(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
-        public static readonly CoreRuntime Core30 = new(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
-        public static readonly CoreRuntime Core31 = new(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
-        public static readonly CoreRuntime Core50 = new(RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
-        public static readonly CoreRuntime Core60 = new(RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
-        public static readonly CoreRuntime Core70 = new(RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
-        public static readonly CoreRuntime Core80 = new(RuntimeMoniker.Net80, "net8.0", ".NET 8.0");
-        public static readonly CoreRuntime Core90 = new(RuntimeMoniker.Net90, "net9.0", ".NET 9.0");
-        public static readonly CoreRuntime Core10_0 = new(RuntimeMoniker.Net10_0, "net10.0", ".NET 10.0");
-        public static readonly CoreRuntime Core11_0 = new(RuntimeMoniker.Net11_0, "net11.0", ".NET 11.0");
+        public static readonly CoreRuntime Core20 = new(new(2, 0));
+        public static readonly CoreRuntime Core21 = new(new(2, 1));
+        public static readonly CoreRuntime Core22 = new(new(2, 2));
+        public static readonly CoreRuntime Core30 = new(new(3, 0));
+        public static readonly CoreRuntime Core31 = new(new(3, 1));
+        public static readonly CoreRuntime Core50 = new(new(5, 0));
+        public static readonly CoreRuntime Core60 = new(new(6, 0));
+        public static readonly CoreRuntime Core70 = new(new(7, 0));
+        public static readonly CoreRuntime Core80 = new(new(8, 0));
+        public static readonly CoreRuntime Core90 = new(new(9, 0));
+        public static readonly CoreRuntime Core10_0 = new(new(10, 0));
+        public static readonly CoreRuntime Core11_0 = new(new(11, 0));
 
         public static CoreRuntime Latest => Core11_0; // when dotnet/runtime branches for 12.0, this will need to get updated
 
-        private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
-            : base(runtimeMoniker, msBuildMoniker, displayName)
+        private readonly string? platform;
+
+        private CoreRuntime(Version version, string? platform = null)
         {
+            Version = ToRuntimeVersion(version);
+            this.platform = platform;
+            Name = version.Major < 5 ? ".NET Core" : ".NET";
         }
 
-        public bool IsPlatformSpecific => MsBuildMoniker.IndexOf('-') > 0;
+        public override string Name { get; }
+
+        public override Version Version { get; }
+
+        public bool IsPlatformSpecific => platform.IsNotBlank();
+
+        public string? Platform => platform;
+
+        // The base compares Name and Version, which no longer carry the platform, so a net8.0-windows job would
+        // otherwise deduplicate against a plain net8.0 one. Compared as given, like everywhere else the platform is
+        // used: "net8.0-Windows" and "net8.0-windows" are two runtimes, and deduplicating them is the caller's call.
+        public override bool Equals(object? obj)
+            => base.Equals(obj) && platform == ((CoreRuntime) obj!).platform;
+
+        public override int GetHashCode()
+            => HashCode.Combine(base.GetHashCode(), platform);
+
+        /// <summary>Appends the target platform, when there is one, so platform-specific jobs are distinguishable.</summary>
+        public override string ToString() => IsPlatformSpecific ? $"{base.ToString()} ({platform})" : base.ToString();
 
         /// <summary>
-        /// use this method if you want to target .NET version not supported by current version of BenchmarkDotNet. Example: .NET 10
+        /// Whether the string is shaped like a target platform: a name, optionally followed by a version
+        /// ("windows", "windows10.0.19041.0").
         /// </summary>
-        /// <param name="msBuildMoniker">msbuild moniker, example: net10.0</param>
-        /// <param name="displayName">display name used by BDN to print the results</param>
-        /// <returns>new runtime information</returns>
-        public static CoreRuntime CreateForNewVersion(string msBuildMoniker, string displayName)
+        /// <remarks>
+        /// It ends up verbatim in the generated project's TargetFrameworks, where a stray '&lt;' would produce
+        /// malformed XML and a ';' a second target framework. The shape is checked rather than the value matched
+        /// against known platforms, which would need updating for every new one.
+        /// </remarks>
+        internal static bool IsValidPlatform(string platform)
         {
-            if (string.IsNullOrEmpty(msBuildMoniker)) throw new ArgumentNullException(nameof(msBuildMoniker));
-            if (string.IsNullOrEmpty(displayName)) throw new ArgumentNullException(nameof(displayName));
+            int index = 0;
+            while (index < platform.Length && char.IsLetter(platform[index]))
+                index++;
 
-            return new CoreRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
+            if (index == 0) // has to start with a platform name
+                return false;
+
+            // Optionally followed by a version. Every dot has to separate two digits - a leading, trailing or doubled
+            // one produces a moniker MSBuild rejects.
+            for (; index < platform.Length; index++)
+            {
+                if (platform[index] == '.')
+                {
+                    bool separatesDigits = index > 0 && char.IsDigit(platform[index - 1])
+                        && index + 1 < platform.Length && char.IsDigit(platform[index + 1]);
+                    if (!separatesDigits)
+                        return false;
+                }
+                else if (!char.IsDigit(platform[index]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
+
+        /// <summary>Returns a runtime for the given version and optional platform.</summary>
+        /// <exception cref="ArgumentException">
+        /// The platform is not shaped like a target platform identifier, or the version predates platform-specific
+        /// monikers, which would leave the platform in the runtime but absent from the moniker built from it.
+        /// </exception>
+        public static CoreRuntime From(Version version, string? platform = null)
+            => platform.IsNotBlank()
+                ? version.Major >= 5 && IsValidPlatform(platform!)
+                    ? new CoreRuntime(version, platform)
+                    : throw new ArgumentException(
+                        $"'{platform}' is not a valid target platform for .NET {version.Major}.{version.Minor}. It has to be a platform name, optionally followed by a version, for example \"windows\" or \"windows10.0.19041.0\", and only .NET 5.0 and later have platform-specific target frameworks.",
+                        nameof(platform))
+                : (version.Major, version.Minor) switch
+                {
+                    (2, 0) => Core20,
+                    (2, 1) => Core21,
+                    (2, 2) => Core22,
+                    (3, 0) => Core30,
+                    (3, 1) => Core31,
+                    (5, 0) => Core50,
+                    (6, 0) => Core60,
+                    (7, 0) => Core70,
+                    (8, 0) => Core80,
+                    (9, 0) => Core90,
+                    (10, 0) => Core10_0,
+                    (11, 0) => Core11_0,
+                    _ => new CoreRuntime(version),
+                };
 
         internal static CoreRuntime GetTargetOrCurrentVersion(Assembly? assembly)
             // Try to determine the version that the assembly was compiled for.
@@ -66,25 +147,19 @@ namespace BenchmarkDotNet.Environments
                 throw new NotSupportedException("Unable to recognize .NET Core version, please report a bug at https://github.com/dotnet/BenchmarkDotNet");
             }
 
-            return FromVersion(version, null);
+            return FromVersion(version, Assembly.GetEntryAssembly());
         }
 
-        internal static CoreRuntime FromVersion(Version version, Assembly? assembly = null) => version switch
-        {
-            { Major: 2, Minor: 0 } => Core20,
-            { Major: 2, Minor: 1 } => Core21,
-            { Major: 2, Minor: 2 } => Core22,
-            { Major: 3, Minor: 0 } => Core30,
-            { Major: 3, Minor: 1 } => Core31,
-            { Major: 5 } => GetPlatformSpecific(Core50, assembly),
-            { Major: 6 } => GetPlatformSpecific(Core60, assembly),
-            { Major: 7 } => GetPlatformSpecific(Core70, assembly),
-            { Major: 8 } => GetPlatformSpecific(Core80, assembly),
-            { Major: 9 } => GetPlatformSpecific(Core90, assembly),
-            { Major: 10 } => GetPlatformSpecific(Core10_0, assembly),
-            { Major: 11 } => GetPlatformSpecific(Core11_0, assembly),
-            _ => CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}"),
-        };
+        private static CoreRuntime FromVersion(Version version, Assembly? assembly)
+            => (version.Major, version.Minor) switch
+            {
+                (2, 0) => Core20,
+                (2, 1) => Core21,
+                (2, 2) => Core22,
+                (3, 0) => Core30,
+                (3, 1) => Core31,
+                _ => GetPlatformSpecific(version, assembly),
+            };
 
         internal static bool TryGetVersion([NotNullWhen(true)] out Version? version)
         {
@@ -153,7 +228,7 @@ namespace BenchmarkDotNet.Environments
             // .NET 10.0.0-preview.5.25277.114 -> 10.0.0-preview.5.25277.114
             // .NET Core 3.1.32 -> 3.1.32
             string frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
-            return new string(frameworkDescription.SkipWhile(c => !char.IsDigit(c)).ToArray());
+            return new([.. frameworkDescription.SkipWhile(c => !char.IsDigit(c))]);
         }
 
         // sample input:
@@ -180,7 +255,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (productVersion.IsNotBlank() && productName.IsNotBlank())
             {
-                if (productName.IndexOf(".NET Core", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (productName.Contains(".NET Core", StringComparison.OrdinalIgnoreCase))
                 {
                     string parsableVersion = GetParsableVersionPart(productVersion);
                     if (Version.TryParse(productVersion, out version) || Version.TryParse(parsableVersion, out version))
@@ -190,13 +265,13 @@ namespace BenchmarkDotNet.Environments
                 }
 
                 // yes, .NET Core 2.X has a product name == .NET Framework...
-                if (productName.IndexOf(".NET Framework", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (productName.Contains(".NET Framework", StringComparison.OrdinalIgnoreCase))
                 {
                     const string releaseVersionPrefix = "release/";
                     int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix, StringComparison.Ordinal);
                     if (releaseVersionIndex > 0)
                     {
-                        string releaseVersion = GetParsableVersionPart(productVersion.Substring(releaseVersionIndex + releaseVersionPrefix.Length));
+                        string releaseVersion = GetParsableVersionPart(productVersion[(releaseVersionIndex + releaseVersionPrefix.Length)..]);
 
                         return Version.TryParse(releaseVersion, out version);
                     }
@@ -215,7 +290,7 @@ namespace BenchmarkDotNet.Environments
             const string versionPrefix = ".NETCoreApp,Version=v";
             if (frameworkName.IsNotBlank() && frameworkName.StartsWith(versionPrefix))
             {
-                string frameworkVersion = GetParsableVersionPart(frameworkName.Substring(versionPrefix.Length));
+                string frameworkVersion = GetParsableVersionPart(frameworkName[versionPrefix.Length..]);
 
                 return Version.TryParse(frameworkVersion, out version);
             }
@@ -225,12 +300,22 @@ namespace BenchmarkDotNet.Environments
         }
 
         // Version.TryParse does not handle thing like 3.0.0-WORD
-        internal static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
+        internal static string GetParsableVersionPart(string fullVersionName) => new([.. fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.')]);
 
-        private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback, Assembly? assembly)
-            => TryGetTargetPlatform(assembly ?? Assembly.GetEntryAssembly(), out var platform)
-                ? new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platform}", fallback.Name)
-                : fallback;
+        private static CoreRuntime GetPlatformSpecific(Version version, Assembly? assembly)
+            => TryGetTargetPlatform(assembly, out var platform)
+                ? From(version, platform)
+                : version.Major switch
+                {
+                    5 => Core50,
+                    6 => Core60,
+                    7 => Core70,
+                    8 => Core80,
+                    9 => Core90,
+                    10 => Core10_0,
+                    11 => Core11_0,
+                    _ => new(version),
+                };
 
         private static bool TryGetTargetPlatform(Assembly? assembly, [NotNullWhen(true)] out string? platform)
         {
@@ -253,7 +338,25 @@ namespace BenchmarkDotNet.Environments
                 return false;
 
             platform = platformNameProperty.GetValue(attributeInstance) as string;
-            return platform.IsNotBlank();
+
+            // Read off the entry assembly, so it is not ours to trust. A malformed value is treated as no platform
+            // rather than left to throw out of From(): this runs inside a static initializer, where it would surface
+            // as a TypeInitializationException.
+            if (platform.IsBlank() || !IsValidPlatform(platform!))
+            {
+                platform = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        public override IToolchain GetDefaultToolchain(BenchmarkCase benchmarkCase)
+        {
+            if (benchmarkCase.Descriptor.Type.Assembly.IsLinqPad())
+                return InProcessEmitToolchain.Default;
+
+            return CsProjCoreToolchain.From(this, NetCoreAppSettings.Default);
         }
     }
 }

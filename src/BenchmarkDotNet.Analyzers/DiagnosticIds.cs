@@ -42,4 +42,5 @@ public static class DiagnosticIds
     public const string General_AsyncBenchmark_ShouldHaveCancellationToken = "BDN1605";
     public const string Attributes_SetupCleanup_MustNotReturnAsyncEnumerable = "BDN1700";
     public const string General_AwaitableAsyncEnumerable_AmbiguousReturnType = "BDN1701";
+    public const string General_Job_RuntimeAndToolchainBothSet = "BDN1800";
 }

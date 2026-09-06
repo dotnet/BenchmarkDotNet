@@ -11,6 +11,7 @@ BDN1604  |  Usage   | Error    | Properties annotated with [BenchmarkCancellatio
 BDN1605  |  Usage   | Info     | Async benchmarks should have a [BenchmarkCancellation] property for cancellation support
 BDN1700  |  Usage   | Error    | [GlobalSetup]/[GlobalCleanup]/[IterationSetup]/[IterationCleanup] method must not return an async enumerable
 BDN1701  |  Usage   | Warning  | Benchmark/setup/cleanup return type is both awaitable and an async enumerable; the iterator is never enumerated
+BDN1800  |  Usage   | Warning  | Setting both Runtime and Toolchain on a job is order-dependent; they are coupled and the last assignment wins while the other is discarded
 
 
 ### Removed Rules
