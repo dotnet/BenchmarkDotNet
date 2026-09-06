@@ -69,15 +69,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override async ValueTask GenerateCustomBuildHooksAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
-            var benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var benchmarkProjectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
-
             var buildArtifactsDirectoryPath = artifactsPaths.BuildArtifactsDirectoryPath;
 
-            // Trim tfm part from binariesDirectoryPath on IntegrationTests. (When ArtifactsPath is not used, it's appended automatically)
-            var binariesDirectoryPath = buildPartition.ForcedNoDependenciesForIntegrationTests
-                ? artifactsPaths.BinariesDirectoryPath.Substring(0, artifactsPaths.BinariesDirectoryPath.Length - Settings.TargetFrameworkMoniker.Length - 1)
-                : artifactsPaths.BinariesDirectoryPath;
+            // The generator already puts the moniker (and for some toolchains the RID) into these
+            // paths, so MSBuild must not append it a second time. It does that whenever the
+            // artifacts layout is not in use, which is the case for our own integration tests.
+            var binariesDirectoryPath = artifactsPaths.BinariesDirectoryPath;
 
             var propsPath = Path.Combine(buildArtifactsDirectoryPath, "BenchmarkDotNet.Build.props");
             var props = GetTemplateContent("BenchmarkDotNet.Build.props.txt");

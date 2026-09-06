@@ -62,11 +62,13 @@ namespace BenchmarkDotNet.Toolchains
             => buildArtifactsDirectoryPath;
 
         /// <summary>
-        /// returns a path where the publish directory should be found after the build (usually \publish)
+        /// returns a path where `dotnet publish` should write its output. It has to contain the
+        /// executable that <see cref="GetExecutablePath"/> points at, so by default it matches the
+        /// binaries directory.
         /// </summary>
         [PublicAPI]
         protected virtual string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "publish");
+            => GetBinariesDirectoryPath(buildArtifactsDirectoryPath, configuration);
 
         /// <summary>
         /// returns OS-specific executable extension
