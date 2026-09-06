@@ -147,6 +147,19 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .ToString();
         }
 
+        private static bool IsManagedAssembly(string file)
+        {
+            try
+            {
+                System.Reflection.AssemblyName.GetAssemblyName(file);
+                return true;
+            }
+            catch (BadImageFormatException)
+            {
+                return false;
+            }
+        }
+
         private static string GetDllGathererPath(string filePath)
             => Path.Combine(Path.GetDirectoryName(filePath)!, $"{Path.GetFileNameWithoutExtension(DllGathererProjectName)}{Path.GetExtension(filePath)}");
 
@@ -216,6 +229,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             doc.Root!.Add(itemGroup);
             foreach (var assemblyFile in Directory.GetFiles(binDirectory, "*.dll"))
             {
+                // The directory holds the native libraries the benchmark project depends on as well, and
+                // referencing one of those as an assembly is what MSB3246 reports.
+                if (!IsManagedAssembly(assemblyFile))
+                    continue;
+
                 itemGroup.Add(new XElement("Reference",
                     new XAttribute("Include", Path.GetFileNameWithoutExtension(assemblyFile)),
                     new XElement("HintPath", assemblyFile)
