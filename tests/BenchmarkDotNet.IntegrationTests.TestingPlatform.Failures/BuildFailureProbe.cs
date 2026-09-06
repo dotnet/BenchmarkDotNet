@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -25,7 +26,12 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures
         private class FailingBuildConfig : ManualConfig
         {
             public FailingBuildConfig()
-                => AddJob(Job.Dry.WithToolchain(new Toolchain("FailingBuild", new NoopGenerator(), new FailingBuilder(), new UnreachableExecutor())));
+                => AddJob(Job.Dry.WithToolchain(new FailingBuildToolchain()));
+        }
+
+        private sealed class FailingBuildToolchain()
+            : Toolchain("FailingBuild", UnknownRuntime.Instance, new NoopGenerator(), new FailingBuilder(), new UnreachableExecutor())
+        {
         }
 
         private sealed class NoopGenerator : IGenerator
