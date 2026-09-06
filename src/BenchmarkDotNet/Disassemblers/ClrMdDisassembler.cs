@@ -111,9 +111,9 @@ namespace BenchmarkDotNet.Disassemblers
         {
             Regex[] filters = GlobFilter.ToRegex(args.Filters);
 
-            foreach (ClrModule module in state.Runtime.EnumerateModules())
-                foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).WhereNotNull())
-                    foreach (ClrMethod method in type.Methods.Where(method => method.Signature.IsNotBlank()))
+            foreach (var module in state.Runtime.EnumerateModules())
+                foreach (var type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).WhereNotNull())
+                    foreach (var method in type.Methods.Where(method => method.Signature.IsNotBlank()))
                     {
                         if (method.NativeCode > 0)
                         {

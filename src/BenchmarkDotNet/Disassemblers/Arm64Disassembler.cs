@@ -138,11 +138,11 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
-        // .NET 10 prefixes some AArch64 precode/stub shapes with `DMB ISH` for concurrent
+        // .NET 10 prefixes some AArch64 precode/stub shapes with `DMB ISHLD` for concurrent
         // stub-patching safety. Detect and skip the barrier so the existing 3-instruction pattern
         // match still works, and return the effective PC of the first real stub instruction so
         // LDR-literal offsets are calculated relative to it.
-        // Encoding: DMB ISH = 0xD50339BF.
+        // Encoding: DMB ISHLD = 0xD50339BF.
         private const uint DmbIshInstr = 0xD50339BFu;
 
         private static bool TryReadStubHead(IDataReader reader, ulong address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2)

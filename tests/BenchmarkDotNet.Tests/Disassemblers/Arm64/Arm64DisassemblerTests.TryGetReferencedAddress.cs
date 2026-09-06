@@ -11,6 +11,8 @@ public partial class Arm64DisassemblerTests
     private Arm64RegisterValueAccumulator CreateValueAccumulator(ushort initialValue)
     {
         var valueAccumulator = new Arm64RegisterValueAccumulator();
+        valueAccumulator.Init(DummyClrRuntime);
+
         valueAccumulator.Feed(Arm64TestInstructions.Movz(X0, initialValue));
 
         valueAccumulator.HasValue.Should().BeTrue();
@@ -20,7 +22,7 @@ public partial class Arm64DisassemblerTests
     }
 
     [Fact]
-    public void TryGetReferencedAddress_With_BL()
+    public void TryGetReferencedAddress_With_BR()
     {
         // Arrange
         var rawInstruction = Arm64InstructionFactory.BR(X0);
