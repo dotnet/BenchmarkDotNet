@@ -177,6 +177,6 @@ internal static class ExtensionMethods
     public static void ValidateMultipleOf8(this Arm64LabelOffset label)
     {
         if (label.Value % 8 != 0)
-            throw new ArgumentException("Arm64LabelOffset value must be multiple of 4");
+            throw new ArgumentException("Arm64LabelOffset value must be multiple of 8");
     }
 }
