@@ -212,6 +212,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             File.Delete(Path.Combine(binDirectory, $"{artifactsPaths.ProgramName}.dll"));
 
             doc = XDocument.Load(artifactsPaths.ProjectFilePath);
+
+            // The gathered references below already cover the benchmark project and everything it
+            // brings in, so the ProjectReference that produced them only duplicates them (MSB3243)
+            // and forces the same project to be built a second time.
+            foreach (var projectReference in doc.Root!.Descendants("ProjectReference").ToArray())
+                projectReference.Remove();
+
             var itemGroup = new XElement("ItemGroup");
             doc.Root!.Add(itemGroup);
             foreach (var assemblyFile in Directory.GetFiles(binDirectory, "*.dll"))
