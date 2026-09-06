@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Disassemblers;
@@ -78,7 +79,7 @@ namespace BenchmarkDotNet.Diagnosers
             => new(
                 processId: processId,
                 typeName: typeName,
-                methodName: DisassemblerConstants.DisassemblerEntryMethodName,
+                methodName: RunnableConstants.ForDisassemblyDiagnoserMethodName,
                 printSource: Config.PrintSource,
                 maxDepth: Config.MaxDepth,
                 filters: Config.Filters,

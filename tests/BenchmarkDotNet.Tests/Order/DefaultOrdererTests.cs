@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Tests.Order
             new Job(),
             new ParameterInstances(
             [
-                new ParameterInstance(new ParameterDefinition("P", false, [], false, parameterType: null!, 0), parameter, SummaryStyle.Default)
+                new ParameterInstance(new ParameterDefinition("P", isStatic: false, isArgument: false, parameterType: null!, 0), parameter, SummaryStyle.Default)
             ]),
             DefaultConfig.Instance.AddLogicalGroupRules(rules).CreateImmutableConfig()
         );

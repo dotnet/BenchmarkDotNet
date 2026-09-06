@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Code;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -71,15 +72,6 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter_Description)));
 
-    internal static readonly DiagnosticDescriptor PropertyCannotBeInitOnlyRule = new(
-        DiagnosticIds.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly,
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Title)),
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_MessageFormat)),
-        "Usage",
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_GeneralParameterAttributes_PropertyCannotBeInitOnly_Description)));
-
     internal static readonly DiagnosticDescriptor ParamsSourceCannotUseWriteOnlyPropertyRule = new(
         DiagnosticIds.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty,
         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty_Title)),
@@ -89,6 +81,24 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_CannotUseWriteOnlyProperty_Description)));
 
+    internal static readonly DiagnosticDescriptor ParamsSourceMustReturnEnumerableRule = new(
+        DiagnosticIds.Attributes_ParamsSourceAttribute_MustReturnEnumerable,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_MustReturnEnumerable_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_MustReturnEnumerable_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_MustReturnEnumerable_Description)));
+
+    internal static readonly DiagnosticDescriptor ReservedMemberNameRule = new(
+        DiagnosticIds.General_ReservedMemberName,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_ReservedMemberName_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_ReservedMemberName_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_ReservedMemberName_Description)));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
         MutuallyExclusiveOnFieldRule,
@@ -97,9 +107,15 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         PropertyMustBePublic,
         NotValidOnReadonlyFieldRule,
         NotValidOnConstantFieldRule,
-        PropertyCannotBeInitOnlyRule,
         PropertyMustHavePublicSetterRule,
         ParamsSourceCannotUseWriteOnlyPropertyRule,
+        ParamsSourceMustReturnEnumerableRule,
+        ReservedMemberNameRule,
+        AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule,
+        AnalyzerHelper.SourceMethodMustNotBeGenericRule,
+        AnalyzerHelper.SourceMustNotBeAmbiguouslyEnumerableRule,
+        AnalyzerHelper.SourceElementMustNotBeByRefLikeRule,
+        AnalyzerHelper.SourceElementMayBeByRefLikeRule,
     }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
@@ -136,9 +152,9 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         if (attributeSyntaxTypeSymbol == null
             || attributeSyntaxTypeSymbol.TypeKind == TypeKind.Error
             ||
-                   (!SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsAttributeTypeSymbol)
-                 && !SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsSourceAttributeTypeSymbol)
-                 && !SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsAllValuesAttributeTypeSymbol)))
+                   (!AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, paramsAttributeTypeSymbol)
+                 && !AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, paramsSourceAttributeTypeSymbol)
+                 && !AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, paramsAllValuesAttributeTypeSymbol)))
         {
             return;
         }
@@ -154,9 +170,12 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         Location? fieldConstModifierLocation = null;
         Location? fieldReadonlyModifierLocation = null;
         string fieldOrPropertyIdentifier;
-        Location? propertyInitAccessorKeywordLocation = null;
         Location fieldOrPropertyIdentifierLocation;
+        // One field declaration can declare several names - `[Params] public int a, b;` applies the attribute to
+        // both - and each is a member the runnable's object initializer has to bind.
+        ImmutableArray<(string Name, Location Location)> declaredNames;
         bool propertyIsMissingAssignableSetter = false;
+        bool fieldOrPropertyIsStatic;
         DiagnosticDescriptor fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule;
         DiagnosticDescriptor fieldOrPropertyMustBePublicDiagnosticRule;
 
@@ -164,6 +183,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         {
             declaredAttributes = fieldDeclarationSyntax.AttributeLists.SelectMany(als => als.Attributes).ToImmutableArray();
             fieldOrPropertyIsPublic = fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.PublicKeyword);
+            fieldOrPropertyIsStatic = fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword);
 
             var fieldConstModifierIndex = fieldDeclarationSyntax.Modifiers.IndexOf(SyntaxKind.ConstKeyword);
             fieldConstModifierLocation = fieldConstModifierIndex >= 0 ? fieldDeclarationSyntax.Modifiers[fieldConstModifierIndex].GetLocation() : null;
@@ -173,6 +193,8 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
 
             fieldOrPropertyIdentifier = fieldDeclarationSyntax.Declaration.Variables[0].Identifier.ToString();
             fieldOrPropertyIdentifierLocation = fieldDeclarationSyntax.Declaration.Variables[0].Identifier.GetLocation();
+            declaredNames = ImmutableArray.CreateRange(fieldDeclarationSyntax.Declaration.Variables
+                .Select(variable => (variable.Identifier.ToString(), variable.Identifier.GetLocation())));
             fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule = MutuallyExclusiveOnFieldRule;
             fieldOrPropertyMustBePublicDiagnosticRule = FieldMustBePublic;
         }
@@ -180,17 +202,19 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         {
             declaredAttributes = propertyDeclarationSyntax.AttributeLists.SelectMany(als => als.Attributes).ToImmutableArray();
             fieldOrPropertyIsPublic = propertyDeclarationSyntax.Modifiers.Any(SyntaxKind.PublicKeyword);
+            fieldOrPropertyIsStatic = propertyDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword);
             fieldOrPropertyIdentifier = propertyDeclarationSyntax.Identifier.ToString();
 
+            // `init` counts: the runnable assigns parameters through an object initializer.
+            var propertyAccessors = propertyDeclarationSyntax.AccessorList?.Accessors;
+            propertyIsMissingAssignableSetter = !HasAssignableAccessor(propertyAccessors, SyntaxKind.SetAccessorDeclaration)
 #if CODE_ANALYSIS_3_8
-            var propertyInitAccessorIndex = propertyDeclarationSyntax.AccessorList?.Accessors.IndexOf(SyntaxKind.InitAccessorDeclaration);
-            propertyInitAccessorKeywordLocation = propertyInitAccessorIndex >= 0 ? propertyDeclarationSyntax.AccessorList!.Accessors[propertyInitAccessorIndex.Value].Keyword.GetLocation() : null;
+                && !HasAssignableAccessor(propertyAccessors, SyntaxKind.InitAccessorDeclaration)
 #endif
-
-            var propertySetAccessorIndex = propertyDeclarationSyntax.AccessorList?.Accessors.IndexOf(SyntaxKind.SetAccessorDeclaration);
-            propertyIsMissingAssignableSetter = !propertySetAccessorIndex.HasValue || propertySetAccessorIndex.Value < 0 || propertyDeclarationSyntax.AccessorList!.Accessors[propertySetAccessorIndex.Value].Modifiers.Any();
+                ;
 
             fieldOrPropertyIdentifierLocation = propertyDeclarationSyntax.Identifier.GetLocation();
+            declaredNames = ImmutableArray.Create((fieldOrPropertyIdentifier, fieldOrPropertyIdentifierLocation));
             fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule = MutuallyExclusiveOnPropertyRule;
             fieldOrPropertyMustBePublicDiagnosticRule = PropertyMustBePublic;
         }
@@ -209,9 +233,10 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             fieldConstModifierLocation,
             fieldReadonlyModifierLocation,
             fieldOrPropertyIdentifier,
-            propertyInitAccessorKeywordLocation,
             propertyIsMissingAssignableSetter,
+            fieldOrPropertyIsStatic,
             fieldOrPropertyIdentifierLocation,
+            declaredNames,
             fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule,
             fieldOrPropertyMustBePublicDiagnosticRule,
             attributeSyntax,
@@ -228,21 +253,24 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         Location? fieldConstModifierLocation,
         Location? fieldReadonlyModifierLocation,
         string fieldOrPropertyIdentifier,
-        Location? propertyInitAccessorKeywordLocation,
         bool propertyIsMissingAssignableSetter,
+        bool fieldOrPropertyIsStatic,
         Location fieldOrPropertyIdentifierLocation,
+        ImmutableArray<(string Name, Location Location)> declaredNames,
         DiagnosticDescriptor fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule,
         DiagnosticDescriptor fieldOrPropertyMustBePublicDiagnosticRule,
         AttributeSyntax attributeSyntax,
         SyntaxNode attributeTarget)
     {
-        ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols =
-        [
+        ImmutableArray<INamedTypeSymbol> applicableParameterAttributeTypeSymbols = ImmutableArray.Create(
             paramsAttributeTypeSymbol,
             paramsSourceAttributeTypeSymbol,
-            paramsAllValuesAttributeTypeSymbol
-        ];
+            paramsAllValuesAttributeTypeSymbol);
 
+        // Counted by the attribute *class* written on the member, not by the parameter attribute it maps onto: a
+        // derived attribute maps to the base it derives from, so two different classes deriving from the same one
+        // are still two usages, matching how the runtime resolves them.
+        var declaredParameterAttributeTypeSymbols = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         var parameterAttributeTypeSymbols = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var declaredAttributeSyntax in declaredAttributes)
@@ -252,23 +280,33 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var applicableParameterAttributeTypeSymbol in applicableParameterAttributeTypeSymbols)
                 {
-                    if (SymbolEqualityComparer.Default.Equals(declaredAttributeTypeSymbol, applicableParameterAttributeTypeSymbol))
+                    if (AnalyzerHelper.IsOrDerivesFrom(declaredAttributeTypeSymbol, applicableParameterAttributeTypeSymbol))
                     {
-                        if (!parameterAttributeTypeSymbols.Add(applicableParameterAttributeTypeSymbol))
+                        // Only the very same class applied twice is CS0579's to report, and repeating it here
+                        // would say it twice. Two different classes in one family are not CS0579 - the compiler
+                        // is silent about them - so they must reach the duplicate rule below instead of ending
+                        // the analysis and taking every other diagnostic for this member with them.
+                        if (!declaredParameterAttributeTypeSymbols.Add(declaredAttributeTypeSymbol))
                         {
                             return;
                         }
+
+                        parameterAttributeTypeSymbols.Add(applicableParameterAttributeTypeSymbol);
+
+                        // At most one family per attribute; the three are siblings today, and breaking keeps the
+                        // count right if one ever derives from another.
+                        break;
                     }
                 }
             }
         }
 
-        if (parameterAttributeTypeSymbols.Count == 0)
+        if (declaredParameterAttributeTypeSymbols.Count == 0)
         {
             return;
         }
 
-        if (parameterAttributeTypeSymbols.Count != 1)
+        if (declaredParameterAttributeTypeSymbols.Count != 1)
         {
             context.ReportDiagnostic(Diagnostic.Create(fieldOrPropertyCannotHaveMoreThanOneParameterAttributeAppliedDiagnosticRule,
                 attributeSyntax.GetLocation(),
@@ -276,6 +314,27 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             );
 
             return;
+        }
+
+        // The runnable derives from the benchmark type and assigns each instance parameter member through an object
+        // initializer, which binds the member name unqualified. A parameter member named like a generated member (all
+        // __-prefixed) therefore binds to the generated member and fails to compile. (Static parameters, sources,
+        // arguments, and non-parameter members are reached via type-qualification/`base`/hiding and don't collide, so
+        // only instance parameter members are checked.)
+        // Every declared name, not only the first: the runtime reports each parameter member it cannot assign.
+        if (!fieldOrPropertyIsStatic)
+        {
+            foreach (var (name, location) in declaredNames)
+            {
+                if (RunnableConstants.ReservedInstanceMemberNames.Contains(name))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(ReservedMemberNameRule,
+                        location,
+                        name,
+                        attributeSyntax.Name.ToString())
+                    );
+                }
+            }
         }
 
         if (fieldConstModifierLocation != null)
@@ -306,15 +365,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             );
         }
 
-        if (propertyInitAccessorKeywordLocation != null)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(PropertyCannotBeInitOnlyRule,
-                propertyInitAccessorKeywordLocation,
-                fieldOrPropertyIdentifier,
-                attributeSyntax.Name.ToString())
-            );
-        }
-        else if (propertyIsMissingAssignableSetter)
+        if (propertyIsMissingAssignableSetter)
         {
             context.ReportDiagnostic(Diagnostic.Create(PropertyMustHavePublicSetterRule,
                 fieldOrPropertyIdentifierLocation,
@@ -350,6 +401,15 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             .FirstOrDefault(attr => attr.ApplicationSyntaxReference?.GetSyntax() == attributeSyntax);
 
         if (attributeData == null)
+        {
+            return;
+        }
+
+        // These rules need the source's name, and the name is only in this usage's own constructor arguments when
+        // [ParamsSource] itself was applied. A derived attribute may hand it to base(...), where the runtime still
+        // reads it off the Name property but nothing here can see it - guessing from whatever arguments the derived
+        // constructor happens to take would resolve some other member, or none.
+        if (!SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, context.Compilation.GetTypeByMetadataName("BenchmarkDotNet.Attributes.ParamsSourceAttribute")))
         {
             return;
         }
@@ -404,30 +464,89 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var referencedMember = targetType.GetMembers(sourceName!).FirstOrDefault();
+        var referencedMember = AnalyzerHelper.FindSourceMember(targetType, sourceName!);
+
+        Location location = attributeData.GetSourceNameLocation();
+
         if (referencedMember is IPropertySymbol propertySymbol
             && propertySymbol.SetMethod != null
             && propertySymbol.GetMethod == null)
         {
-            Location? location = null;
-            if (attributeSyntax.ArgumentList != null)
-            {
-                if (attributeData.ConstructorArguments.Length == 1 && attributeSyntax.ArgumentList.Arguments.Count > 0)
-                {
-                    location = attributeSyntax.ArgumentList.Arguments[0].Expression.GetLocation();
-                }
-                else if (attributeData.ConstructorArguments.Length == 2 && attributeSyntax.ArgumentList.Arguments.Count > 1)
-                {
-                    location = attributeSyntax.ArgumentList.Arguments[1].Expression.GetLocation();
-                }
-            }
-            location ??= attributeSyntax.GetLocation();
-
             context.ReportDiagnostic(Diagnostic.Create(
                 ParamsSourceCannotUseWriteOnlyPropertyRule,
                 location,
                 sourceName));
+            return;
         }
+
+        if (AnalyzerHelper.SourceResolvesOnlyToGenericMethod(targetType, sourceName!))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                AnalyzerHelper.SourceMethodMustNotBeGenericRule,
+                location,
+                sourceName));
+            return;
+        }
+
+        if (AnalyzerHelper.SourceResolvesOnlyToRequiredParameterMethod(targetType, sourceName!))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule,
+                location,
+                sourceName));
+            return;
+        }
+
+        ITypeSymbol? returnType = referencedMember switch
+        {
+            IMethodSymbol method => method.ReturnType,
+            IPropertySymbol property => property.Type,
+            _ => null
+        };
+
+        if (returnType == null || returnType.TypeKind == TypeKind.Error)
+        {
+            return;
+        }
+
+        if (AsyncTypeShapes.IsAmbiguouslyEnumerable(context.Compilation, returnType))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                AnalyzerHelper.SourceMustNotBeAmbiguouslyEnumerableRule,
+                location,
+                sourceName,
+                returnType.ToDisplayString()));
+        }
+        else if (!AsyncTypeShapes.IsSupportedSourceReturnType(context.Compilation, returnType))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                ParamsSourceMustReturnEnumerableRule,
+                location,
+                sourceName,
+                returnType.ToDisplayString()));
+        }
+        else if (AsyncTypeShapes.TryGetSourceElementType(context.Compilation, returnType, out var elementType)
+            && AnalyzerHelper.MayBeRefLike(elementType!))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                AnalyzerHelper.ByRefLikeRule(elementType!),
+                location,
+                sourceName,
+                elementType!.ToDisplayString(),
+                AnalyzerHelper.ByRefLikeClause(elementType!)));
+        }
+    }
+
+    // An accessor that an object initializer can assign through: `set` or `init`, without an accessibility
+    // modifier (a non-public one can't be reached from the generated runnable).
+    private static bool HasAssignableAccessor(SyntaxList<AccessorDeclarationSyntax>? accessors, SyntaxKind kind)
+    {
+        if (accessors is not { } list)
+        {
+            return false;
+        }
+        int index = list.IndexOf(kind);
+        return index >= 0 && !list[index].Modifiers.Any();
     }
 
     private static string? ExtractNameFromExpression(ExpressionSyntax expression, SemanticModel semanticModel)

@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
-            string programName = buildPartition.ProgramName + RunnableConstants.DynamicAssemblySuffix;
+            string programName = $"{buildPartition.ProgramName}Emitted";
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition);
             string binariesDirectoryPath =
                 GetBinariesDirectoryPath(buildArtifactsDirectoryPath);

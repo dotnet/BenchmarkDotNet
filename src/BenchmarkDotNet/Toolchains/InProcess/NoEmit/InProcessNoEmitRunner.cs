@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -75,35 +76,35 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             // Fill parameter values
             foreach (var parameter in benchmarkCase.Parameters.Items)
             {
-                var flags = BindingFlags.Public;
-                flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
+                if (parameter.IsArgument)
+                    continue;
 
-                var paramProperty = targetType.GetProperty(parameter.Name, flags);
+                var flags = BindingFlags.Public | BindingFlags.FlattenHierarchy
+                    | (parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance);
 
-                if (paramProperty == null)
+                switch (targetType.GetParameterMember(parameter.Name, parameter.Definition.ParameterType, flags))
                 {
-                    var paramField = targetType.GetField(parameter.Name, flags);
-                    if (paramField == null)
+                    case FieldInfo paramField:
+                        paramField.SetValue(paramField.IsStatic ? null : instance, parameter.Value);
+                        break;
+
+                    case PropertyInfo paramProperty:
+                        var setter = paramProperty.GetSetMethod();
+                        if (setter == null)
+                            throw new InvalidOperationException(
+                                $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+
+                        setter.Invoke(setter.IsStatic ? null : instance, [parameter.Value]);
+                        break;
+
+                    default:
                         throw new InvalidOperationException(
                             $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
-
-                    var callInstance = paramField.IsStatic ? null : instance;
-                    paramField.SetValue(callInstance, parameter.Value);
-                }
-                else
-                {
-                    var setter = paramProperty.GetSetMethod();
-                    if (setter == null)
-                        throw new InvalidOperationException(
-                            $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
-
-                    var callInstance = setter.IsStatic ? null : instance;
-                    setter.Invoke(callInstance, [parameter.Value]);
                 }
             }
 
             // Inject CancellationToken into properties/fields marked with [BenchmarkCancellation]
-            foreach (var property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (var property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy))
             {
                 if (property.PropertyType == typeof(CancellationToken) &&
                     property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
@@ -117,7 +118,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 }
             }
 
-            foreach (var field in targetType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+            foreach (var field in targetType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy))
             {
                 if (field.FieldType == typeof(CancellationToken) &&
                     field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))

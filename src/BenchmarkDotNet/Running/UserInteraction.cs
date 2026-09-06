@@ -50,9 +50,9 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters)
+        public async ValueTask PrintWrongFilterInfoAsync(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters, CancellationToken cancellationToken)
         {
-            var correctionSuggester = new CorrectionsSuggester(allTypes);
+            var correctionSuggester = await CorrectionsSuggester.CreateAsync(allTypes, cancellationToken).ConfigureAwait();
 
             var filterToNames = userFilters
                 .Select(userFilter => (userFilter: userFilter, suggestedBenchmarkNames: correctionSuggester.SuggestFor(userFilter)))

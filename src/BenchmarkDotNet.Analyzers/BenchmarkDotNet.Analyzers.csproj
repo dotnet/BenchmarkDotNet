@@ -1,39 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <IsPackable>false</IsPackable>
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>BenchmarkDotNet.Analyzers</PackageId>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <!-- Default version used by local builds. This is overridden by the build script. -->
-    <MccVersion>5.0</MccVersion>
-    <OutputPath>bin\$(Configuration)\roslyn$(MccVersion)\cs</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <DefineConstants Condition="'$(MccVersion)' >= '3.8'">$(DefineConstants);CODE_ANALYSIS_3_8</DefineConstants>
-    <DefineConstants Condition="'$(MccVersion)' >= '4.8'">$(DefineConstants);CODE_ANALYSIS_4_8</DefineConstants>
-    <DefineConstants Condition="'$(MccVersion)' >= '5.0'">$(DefineConstants);CODE_ANALYSIS_5_0</DefineConstants>
+  </PropertyGroup>
+  <Import Project="..\..\build\roslynBands.props" />
+  <PropertyGroup>
     <!-- Formatting in AnalyzerReleases.Unshipped.md -->
     <NoWarn>$(NoWarn);RS2007</NoWarn>
     <!-- Suppress false positives due to a bug in v3.8.0. -->
     <NoWarn Condition="'$(MccVersion)' == '3.8'">$(NoWarn);RS2002</NoWarn>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <!-- We multi-target for different compiler versions. https://github.com/dotnet/roslyn/discussions/81256#discussioncomment-14975130, https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md#versioning -->
-    <!-- C# 7.3 (min version we support) -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[2.8.0]" Condition="'$(MccVersion)' == '2.8'" />
-    <!-- C# 9 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[3.8.0]" Condition="'$(MccVersion)' == '3.8'" />
-    <!-- C# 12 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.8.0]" Condition="'$(MccVersion)' == '4.8'" />
-    <!-- C# 14 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[5.0.0,)" Condition="'$(MccVersion)' == '5.0'" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MccPackageVersion)" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- RunnableConstants (the code generator's member names + ReservedInstanceMemberNames, the subset that can
+         collide with a [Params*] member), shared with the runtime ParamsValidator so the checks can't drift. -->
+    <Compile Include="..\BenchmarkDotNet\Code\RunnableConstants.cs" Link="Shared\RunnableConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="BenchmarkDotNetAnalyzerResources.Designer.cs">

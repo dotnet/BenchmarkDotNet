@@ -59,7 +59,7 @@ public class ParamsAllValuesAttributeAnalyzer : DiagnosticAnalyzer
         var paramsAllValuesAttributeTypeSymbol = GetParamsAllValuesAttributeTypeSymbol(context.Compilation);
 
         var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
-        if (!SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, paramsAllValuesAttributeTypeSymbol))
+        if (!AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, paramsAllValuesAttributeTypeSymbol))
         {
             return;
         }

@@ -97,7 +97,7 @@ public class BenchmarkCancellationAttributeAnalyzer : DiagnosticAnalyzer
         var attributeSyntaxTypeSymbol = context.SemanticModel.GetTypeInfo(attributeSyntax).Type;
         if (attributeSyntaxTypeSymbol == null
             || attributeSyntaxTypeSymbol.TypeKind == TypeKind.Error
-            || !SymbolEqualityComparer.Default.Equals(attributeSyntaxTypeSymbol, benchmarkCancellationAttributeTypeSymbol))
+            || !AnalyzerHelper.IsOrDerivesFrom(attributeSyntaxTypeSymbol, benchmarkCancellationAttributeTypeSymbol))
         {
             return;
         }

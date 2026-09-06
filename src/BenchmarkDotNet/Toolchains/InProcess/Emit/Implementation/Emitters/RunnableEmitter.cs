@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
@@ -271,12 +271,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (parameters.Length + GetExtraFieldsCount() > 0)
             {
                 /*
-                    private unsafe struct FieldsContainer
+                    private unsafe struct __FieldsContainer
                     {
                     }
                 */
                 var fieldsContainerBuilder = runnableBuilder.DefineNestedType(
-                    "FieldsContainer",
+                    FieldsContainerTypeName,
                     TypeAttributes.NestedPrivate | TypeAttributes.AutoLayout | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
                     typeof(ValueType));
                 nestedTypeBuilders.Add(fieldsContainerBuilder);

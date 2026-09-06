@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Running
 
             var (supportedBenchmarks, validationErrors) = await GetSupportedBenchmarks(benchmarkRunInfos, resolver).ConfigureAwait();
 
-            validationErrors.AddRange(await Validate(supportedBenchmarks).ConfigureAwait());
+            validationErrors.AddRange(await Validate(supportedBenchmarks, cancellationToken).ConfigureAwait());
 
             foreach (var validationError in validationErrors)
                 eventProcessor.OnValidationError(validationError);
@@ -122,10 +122,10 @@ namespace BenchmarkDotNet.Running
 #pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
                 await foreach (var (buildPartition, buildResult) in
                     BuildSequential(compositeLogger, rootArtifactsFolderPath, sequentialBuildPartitions, globalChronometer, eventProcessor, cancellationToken).ConfigureAwait())
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
                 {
                     buildResults.Add(buildPartition, buildResult);
                 }
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
             }
 
             var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
@@ -197,10 +197,7 @@ namespace BenchmarkDotNet.Running
                 // some benchmarks might be using parameters that have locking finalizers
                 // so we need to dispose them after we are done running the benchmarks
                 // see https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
-                foreach (var benchmarkInfo in benchmarkRunInfos)
-                {
-                    benchmarkInfo.Dispose();
-                }
+                await benchmarkRunInfos.DisposeAllAsync().ConfigureAwait();
 
                 compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                 Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
@@ -332,7 +329,7 @@ namespace BenchmarkDotNet.Running
                     logFilePath,
                     runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                     cultureInfo,
-                    [.. await Validate(benchmarkRunInfo).ConfigureAwait(false)], // validate them once again, but don't print the output
+                    [.. await Validate([benchmarkRunInfo], cancellationToken).ConfigureAwait(false)], // validate them once again, but don't print the output
                     [.. config.GetColumnHidingRules()]
                 ),
                 benchmarksToRunCount
@@ -402,11 +399,24 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** BenchmarkRunner: End *****");
         }
 
-        private static async ValueTask<IEnumerable<ValidationError>> Validate(params BenchmarkRunInfo[] benchmarks)
-            => await benchmarks
-                .ToAsyncEnumerable()
-                .SelectMany(benchmark => benchmark.Config.GetCompositeValidator().ValidateAsync(new ValidationParameters(benchmark.BenchmarksCases, benchmark.Config)))
-                .ToArrayAsync().ConfigureAwait(false);
+        // Written out rather than composed with async LINQ - see CompositeValidator.ValidateAsync for why.
+        private static async ValueTask<IEnumerable<ValidationError>> Validate(BenchmarkRunInfo[] benchmarks, CancellationToken cancellationToken)
+        {
+            var errors = new List<ValidationError>();
+
+            foreach (var benchmark in benchmarks)
+            {
+                var validationParameters = new ValidationParameters(benchmark.BenchmarksCases, benchmark.Config);
+#pragma warning disable CA2007
+                await foreach (var error in benchmark.Config.GetCompositeValidator().ValidateAsync(validationParameters).ConfigureAwait(cancellationToken))
+#pragma warning restore CA2007
+                {
+                    errors.Add(error);
+                }
+            }
+
+            return errors;
+        }
 
         private static async ValueTask<Dictionary<BuildPartition, BuildResult>> BuildInParallel(
             ILogger logger,
@@ -720,26 +730,29 @@ namespace BenchmarkDotNet.Running
                     continue;
                 }
 
-                var validBenchmarks = await benchmarkRunInfo.BenchmarksCases
-                    .ToAsyncEnumerable()
-                    .Where(async (benchmark, _) =>
+                // Written out rather than composed with async LINQ - see CompositeValidator.ValidateAsync for why.
+                var validBenchmarks = new List<BenchmarkCase>();
+                foreach (var benchmark in benchmarkRunInfo.BenchmarksCases)
+                {
+                    var errors = new List<ValidationError>();
+#pragma warning disable CA2007
+                    await foreach (var error in benchmark.GetToolchain().ValidateAsync(benchmark, resolver).ConfigureAwait())
+#pragma warning restore CA2007
                     {
+                        errors.Add(error);
+                    }
 
-                        var errors = await benchmark.GetToolchain()
-                            .ValidateAsync(benchmark, resolver)
-                            .ToArrayAsync()
-                            .ConfigureAwait();
+                    validationErrors.AddRange(errors);
 
-                        validationErrors.AddRange(errors);
-
-                        return !errors.Any(error => error.IsCritical);
-                    })
-                    .ToArrayAsync()
-                    .ConfigureAwait();
+                    if (!errors.Any(error => error.IsCritical))
+                    {
+                        validBenchmarks.Add(benchmark);
+                    }
+                }
 
                 runInfos.Add(
                     new BenchmarkRunInfo(
-                        validBenchmarks,
+                        validBenchmarks.ToArray(),
                         benchmarkRunInfo.Type,
                         benchmarkRunInfo.Config,
                         benchmarkRunInfo.CompositeInProcessDiagnoser

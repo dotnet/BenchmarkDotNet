@@ -92,7 +92,7 @@ public class AwaitableAsyncEnumerableAmbiguityAnalyzer : DiagnosticAnalyzer
         {
             foreach (var candidate in captured.AttributeSymbols)
             {
-                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, candidate))
+                if (AnalyzerHelper.IsOrDerivesFrom(attributeData.AttributeClass, candidate))
                 {
                     matchedAttribute = candidate;
                     break;

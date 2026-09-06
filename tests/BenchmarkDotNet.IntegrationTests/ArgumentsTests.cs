@@ -133,6 +133,88 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("Incorrect values were passed");
             }
         }
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void ArgumentsFromSourceInAClosedGenericClassArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsSourceInAClosedGenericClass>(toolchain);
+
+        public class WithArgumentsSourceInAClosedGenericClass
+        {
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalGenericArgumentsSource<int>), nameof(ExternalGenericArgumentsSource<int>.SingleValue))]
+            public void SingleValue(int number)
+            {
+                if (number != 3)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(typeof(ExternalGenericArgumentsSource<int>), nameof(ExternalGenericArgumentsSource<int>.ArgumentList))]
+            public void ArgumentList(int number, string text)
+            {
+                if (number != 3 || text != "three")
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void ArgumentsTakenWholeByAnImplicitConversionArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsTakenWholeByConversion>(toolchain);
+
+        // A parameter is handed the element only where it is declared as the element type, or is by-ref-like and
+        // built from it by a conversion no declaration expresses. ReadOnlySpan is the second; `ref byte[]` is the
+        // first, a ref modifier changing nothing. ReadOnlyMemory is the third case: it declares a conversion from
+        // byte[] and is not by-ref-like, so it has to name a source yielding what it takes. Memory and
+        // ArraySegment stand in the same place and would only repeat it with another type name.
+        public class WithArgumentsTakenWholeByConversion
+        {
+            public static IEnumerable<byte[]> Values()
+            {
+                yield return [1, 2, 3];
+            }
+
+            public static IEnumerable<ReadOnlyMemory<byte>> ReadOnlyMemoryValues()
+            {
+                yield return new byte[] { 1, 2, 3 };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void Span(ReadOnlySpan<byte> a)
+            {
+                if (a.Length != 3)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(ReadOnlyMemoryValues))]
+            public void ReadOnlyMemory(ReadOnlyMemory<byte> a)
+            {
+                if (a.Length != 3)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void RefArray(ref byte[] a)
+            {
+                if (a.Length != 3)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+        }
+
+        // The attribute closes the type, so what the source yields is fixed before anything reads it. The generated
+        // code has to name the closed type to call back into it.
+        public static class ExternalGenericArgumentsSource<T>
+        {
+            public static IEnumerable<T> SingleValue()
+            {
+                yield return (T)(object)3;
+            }
+
+            public static IEnumerable<object[]> ArgumentList()
+            {
+                yield return new object[] { 3, "three" };
+            }
+        }
+
         public static class ExternalClassWithArgumentsSource
         {
             public static IEnumerable<int> OnePrimitiveType()

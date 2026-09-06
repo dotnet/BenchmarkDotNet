@@ -54,8 +54,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
 
-        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
-            => HardwareCounters.Validate(validationParameters, mandatory: false).ToAsyncEnumerable();
+        // Iterated here rather than through BenchmarkDotNet's ToAsyncEnumerable polyfill: that one is internal to
+        // BenchmarkDotNet and compiled out of its .NET 10 asset, while this assembly is netstandard2.0 and would
+        // bind the netstandard asset's copy - which a .NET 10 host then cannot load.
+        public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+        {
+            foreach (var error in HardwareCounters.Validate(validationParameters, mandatory: false))
+            {
+                yield return error;
+            }
+        }
 
         public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
         {

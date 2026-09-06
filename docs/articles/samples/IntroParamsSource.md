@@ -7,10 +7,29 @@ uid: BenchmarkDotNet.Samples.IntroParamsSource
 In case you want to use a lot of values, you should use
   [`[ParamsSource]`](xref:BenchmarkDotNet.Attributes.ParamsSourceAttribute)
 You can mark one or several fields or properties in your class by the
-  [`[Params]`](xref:BenchmarkDotNet.Attributes.ParamsAttribute) attribute.
+  [`[ParamsSource]`](xref:BenchmarkDotNet.Attributes.ParamsSourceAttribute) attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
-  (something that implements `IEnumerable`).
+  (something that implements `IEnumerable<T>` or `IAsyncEnumerable<T>`).
+The element type has to be named: a source declared to return only the non-generic `IEnumerable` is rejected,
+  because the generated code has nothing to infer the parameter's type from.
 The source may be instance or static. If the source is not in the same type as the benchmark, the type containing the source must be specified in the attribute constructor.
+A static source declared on a base type is used just as one declared on the benchmark type itself.
+
+A source returning `IAsyncEnumerable<T>` is awaited while the values are read, so they can be produced
+  asynchronously - loaded from a database or a remote service, say - without resorting to blocking
+  sync-over-async in the source. Such a source method may take an optional
+  [`[EnumeratorCancellation]`](xref:System.Runtime.CompilerServices.EnumeratorCancellationAttribute)
+  `CancellationToken` parameter, which receives the benchmark's cancellation token while the values are
+  enumerated, so the asynchronous work can be cancelled.
+
+If you start the run from a thread that carries a single-threaded `SynchronizationContext` - a WPF or
+  WinForms UI thread, or legacy ASP.NET - use the asynchronous entry points
+  ([`BenchmarkRunner.RunAsync`](xref:BenchmarkDotNet.Running.BenchmarkRunner) or
+  [`BenchmarkConverter.TypeToBenchmarksAsync`](xref:BenchmarkDotNet.Running.BenchmarkConverter)) and await
+  them. The synchronous ones block the calling thread while the values are read, so an `await` inside your
+  own source captures that context and its continuation cannot run until the call it is blocking returns.
+  Awaiting the asynchronous entry point leaves the thread free to run it. Writing the source's own awaits as
+  `ConfigureAwait(false)` avoids the capture as well.
 
 ### Source code
 
@@ -29,10 +48,7 @@ The source may be instance or static. If the source is not in the same type as t
 
 ### Remarks
 
-**A remark about IParam.**
-
-You don't need to use `IParam` anymore since `0.11.0`.
-Just use complex types as you wish and override `ToString` method to change the display names used in the results.
+Use complex types as you wish and override the `ToString` method to change the display names used in the results.
 
 
 ### Links
