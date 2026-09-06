@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures</AssemblyName>
+    <RootNamespace>BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures</RootNamespace>
+
+    <!--
+      BenchmarkEnumerator hides out-of-process benchmarks when the assembly is not optimized, so that they can be
+      debugged from a test runner. This project has to present the same benchmarks in every configuration, otherwise
+      the tests driving it would only see the out-of-process ones in a Release build.
+    -->
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj" />
+  </ItemGroup>
+
+  <!--
+    Manually import the package's build files, since they are not picked up through a ProjectReference. MSBuild reads
+    these while it reads the project file, which is before nuget.g.targets, so in this repository they land before
+    Microsoft.Testing.Platform.MSBuild's targets - the reverse of the order a package consumer gets. That order is
+    covered by build/smoke-tests/test-adapter-consumer.ps1 instead.
+  -->
+  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter\build\BenchmarkDotNet.TestAdapter.props" />
+  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter\build\BenchmarkDotNet.TestAdapter.targets" />
+
+  <Import Project="..\..\build\common.targets" />
+</Project>

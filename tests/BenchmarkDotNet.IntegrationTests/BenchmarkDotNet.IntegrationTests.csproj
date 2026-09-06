@@ -40,6 +40,15 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SharedDiagnosers\BenchmarkDotNet.IntegrationTests.SharedDiagnosers.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
+  <!--
+    The Microsoft.Testing.Platform probe applications that TestingPlatformAdapterTests drives. They are separate
+    processes, never referenced code, so only the build order matters. They are single targeted, which is also why
+    those tests are compiled for .NET only.
+  -->
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.TestingPlatform\BenchmarkDotNet.IntegrationTests.TestingPlatform.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures\BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.Tests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
