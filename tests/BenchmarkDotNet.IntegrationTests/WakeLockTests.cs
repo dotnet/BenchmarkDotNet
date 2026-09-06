@@ -99,8 +99,14 @@ public class WakeLockTests : BenchmarkTestExecutor
         async Task WaitForBenchmarkRunningAndGetPowerRequests()
         {
             await AsTask(ping, testTimeout);
-            pwrRequests = GetPowerRequests("BenchmarkDotNet Running Benchmarks");
-            pong.Set();
+            try
+            {
+                pwrRequests = GetPowerRequests("BenchmarkDotNet Running Benchmarks");
+            }
+            finally
+            {
+                pong.Set();
+            }
         }
     }
 
