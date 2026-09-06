@@ -51,6 +51,7 @@ namespace BenchmarkDotNet.Configs
             CultureInfo cultureInfo,
             IOrderer orderer,
             ICategoryDiscoverer categoryDiscoverer,
+            IHardwareCounterProfile hardwareCounterProfile,
             SummaryStyle summaryStyle,
             ConfigOptions options,
             TimeSpan buildTimeout,
@@ -75,6 +76,7 @@ namespace BenchmarkDotNet.Configs
             CultureInfo = cultureInfo;
             Orderer = orderer;
             CategoryDiscoverer = categoryDiscoverer;
+            HardwareCounterProfile = hardwareCounterProfile;
             SummaryStyle = summaryStyle;
             Options = options;
             BuildTimeout = buildTimeout;
@@ -89,6 +91,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigOptions Options { get; }
         public IOrderer Orderer { get; }
         public ICategoryDiscoverer CategoryDiscoverer { get; }
+        public IHardwareCounterProfile HardwareCounterProfile { get; }
         public SummaryStyle SummaryStyle { get; }
         public TimeSpan BuildTimeout { get; }
         public WakeLockType WakeLock { get; }
