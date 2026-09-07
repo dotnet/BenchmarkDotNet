@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes.CompilerServices;
+﻿using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Loggers;
 using Mono.Cecil;
@@ -25,8 +25,10 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         private static readonly HashSet<string> IgnoredRunnableMethodNames =
         [
-            RunnableConstants.RunMethodName,
-            ".ctor"
+            ".ctor",
+            // Hands Runner_<id> a reference to the fields container. The emitter has no counterpart: it assigns the
+            // argument fields by reflection instead.
+            RunnableConstants.FieldsContainerGetterName
         ];
 
         private static readonly IReadOnlyDictionary<OpCode, OpCode> AltOpCodes = new Dictionary<OpCode, OpCode>()
@@ -76,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         private static bool AreSameSignature(MethodReference left, MethodReference right)
         {
-            return (left.Name == right.Name || (left.Name.StartsWith("<.ctor>") && right.Name == "__Workload"))
+            return left.Name == right.Name
                 && AreSameTypeIgnoreNested(left.ReturnType, right.ReturnType)
                 && left.Parameters.Count == right.Parameters.Count
                 && left.Parameters
@@ -333,7 +335,12 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             {
                 logger.WriteStatistic($"Diff {type1.FullName}");
 
-                if (IgnoredTypeNames.Contains(type1.FullName) && type2 == null)
+                // Runner_<id> carries Run, which the in-process emitter has no counterpart for - it drives the
+                // runnable from InProcessEmitRunner instead of emitting an entry point.
+                if ((IgnoredTypeNames.Contains(type1.FullName)
+                        || type1.FullName.StartsWith(RunnableConstants.RunnerTypePrefix, StringComparison.Ordinal)
+                        || type1.FullName.StartsWith(RunnableConstants.FieldsRefTypePrefix, StringComparison.Ordinal))
+                    && type2 == null)
                 {
                     logger.WriteLineInfo(" SKIPPED.");
                     return;

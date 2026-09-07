@@ -1,10 +1,9 @@
-### New Rules
+﻿### New Rules
 
 Rule ID  | Category | Severity | Notes
 ---------|----------|----------|--------------------
 BDN1109  |  Usage   | Error    | Required member cannot be set by BenchmarkDotNet
 BDN1110  |  Usage   | Error    | Benchmark constructor must not be annotated with [SetsRequiredMembers]
-BDN1208  |  Usage   | Error    | [Params(Source\|AllValues)] member name is reserved by code generation
 BDN1305  |  Usage   | Error    | [ParamsSource] cannot reference write-only property
 BDN1306  |  Usage   | Error    | [ParamsSource] must return a generic enumerable or async enumerable
 BDN1307  |  Usage   | Error    | [ParamsSource]/[ArgumentsSource] source method must not have required parameters

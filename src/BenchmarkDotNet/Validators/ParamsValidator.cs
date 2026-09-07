@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using System.Reflection;
@@ -41,14 +41,6 @@ namespace BenchmarkDotNet.Validators
 
                 string name = $"{type.Name}.{memberInfo.Name}";
                 string attributeString = string.Join(", ", attributes.Select(attribute => $"[{attribute.GetType().Name.Replace(nameof(Attribute), "")}]"));
-
-                // The runnable derives from the benchmark type and assigns each instance parameter member through an
-                // object initializer, which binds the member name unqualified. A parameter member named like a
-                // generated member (all __-prefixed) binds to the generated member instead and fails to compile.
-                // Static members are assigned fully type-qualified, so they cannot collide.
-                if (!IsStatic(memberInfo) && RunnableConstants.ReservedInstanceMemberNames.Contains(memberInfo.Name))
-                    yield return new ValidationError(TreatsWarningsAsErrors,
-                        $"Unable to use {name} with {attributeString} because '{memberInfo.Name}' is a reserved name used by BenchmarkDotNet's code generation. Please, rename the member.");
 
                 if (attributes.Count > 1)
                     yield return new ValidationError(TreatsWarningsAsErrors,

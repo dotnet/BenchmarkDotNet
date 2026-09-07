@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -57,7 +57,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var argValue = benchmarkCase.Parameters.GetArgument(argInfo.Name!)
                 ?? throw new InvalidOperationException($"Can't find arg member for {argInfo.Name}.");
 
-            var containerField = instance.GetType().GetField(FieldsContainerName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+            // DeclaredOnly: the benchmark the runnable derives from may declare a field of this name too.
+            var containerField = instance.GetType().GetField(FieldsContainerName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 ?? throw new InvalidOperationException("FieldsContainer field not found on runnable instance.");
 
             var container = containerField.GetValue(instance)!;
@@ -104,9 +105,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private static TDelegate GetDelegateCore<TDelegate>(object instance, string memberName)
         {
+            // DeclaredOnly: memberName always names a method the runnable declares, and the benchmark it derives from
+            // may well declare its own of that name - GlobalSetup and IterationSetup are what an attributed method is
+            // usually called - which an overload of would otherwise make an ambiguous match.
             var result = instance.GetType().GetMethod(
                 memberName,
-                BindingFlagsAllInstance);
+                BindingFlagsAllInstance | BindingFlags.DeclaredOnly);
             if (result == null)
                 throw new InvalidOperationException($"Can't find a member {memberName}.");
 

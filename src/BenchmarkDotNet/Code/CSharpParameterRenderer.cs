@@ -69,12 +69,12 @@ internal sealed class CSharpParameterRenderer
         }
     }
 
-    /// <summary>`out IEnumerable&lt;T&gt; source0, ...` - the ctor's parameter list, and the `new` call's argument list.</summary>
+    /// <summary>`, out IEnumerable&lt;T&gt; source0, ...` - appended to the ctor's parameter list, and to the `new` call's argument list.</summary>
     /// <remarks>`out T x` parses both as a parameter declaration and as an out-variable declaration expression,
     /// so the same text serves the declaration and the call site.</remarks>
     public string RenderSourceOutParameters()
-        => string.Join(", ", instanceReads.Select(read =>
-            $"out {ReturnType(read.Read.Source).GetCorrectCSharpTypeName()} {read.Local}"));
+        => string.Concat(instanceReads.Select(read =>
+            $", out {ReturnType(read.Read.Source).GetCorrectCSharpTypeName()} {read.Local}"));
 
     /// <summary>`source0 = base.Values();` - the ctor body statements that read the instance sources.</summary>
     public string RenderSourceCaptures()

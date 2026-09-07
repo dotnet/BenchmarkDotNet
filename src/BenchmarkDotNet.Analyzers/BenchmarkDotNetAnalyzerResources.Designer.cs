@@ -515,24 +515,6 @@ namespace BenchmarkDotNet.Analyzers {
             }
         }
 
-        internal static string General_ReservedMemberName_Title {
-            get {
-                return ResourceManager.GetString("General_ReservedMemberName_Title", resourceCulture);
-            }
-        }
-
-        internal static string General_ReservedMemberName_MessageFormat {
-            get {
-                return ResourceManager.GetString("General_ReservedMemberName_MessageFormat", resourceCulture);
-            }
-        }
-
-        internal static string General_ReservedMemberName_Description {
-            get {
-                return ResourceManager.GetString("General_ReservedMemberName_Description", resourceCulture);
-            }
-        }
-
         internal static string General_BenchmarkClass_RequiredMemberCannotBeSet_Title {
             get {
                 return ResourceManager.GetString("General_BenchmarkClass_RequiredMemberCannotBeSet_Title", resourceCulture);

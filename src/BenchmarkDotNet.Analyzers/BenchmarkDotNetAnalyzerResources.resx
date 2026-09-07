@@ -291,15 +291,6 @@
   <data name="Attributes_ParamsSourceAttribute_MustReturnEnumerable_Description" xml:space="preserve">
     <value>The member referenced by ParamsSource must return IEnumerable&lt;T&gt; or IAsyncEnumerable&lt;T&gt;. The non-generic IEnumerable is not enough on its own: BenchmarkDotNet's generated code infers the element type from the source, so the return type has to name it. The await-foreach pattern without the IAsyncEnumerable&lt;T&gt; interface, and other return types such as Task&lt;IEnumerable&lt;T&gt;&gt;, are not supported either.</value>
   </data>
-  <data name="General_ReservedMemberName_Title" xml:space="preserve">
-    <value>Parameter member name is reserved by code generation</value>
-  </data>
-  <data name="General_ReservedMemberName_MessageFormat" xml:space="preserve">
-    <value>'{0}' is a reserved name used by BenchmarkDotNet's code generation and cannot be used for a member with {1}. Please, rename the member.</value>
-  </data>
-  <data name="General_ReservedMemberName_Description" xml:space="preserve">
-    <value>BenchmarkDotNet generates a runnable type that derives from the benchmark type and assigns each [Params]/[ParamsSource]/[ParamsAllValues] member through an object initializer. A parameter member whose name matches one of the generated members (e.g. __GlobalSetup, __WorkloadActionUnroll) binds to the generated member instead and makes the generated program fail to compile. Rename the member.</value>
-  </data>
   <data name="General_BenchmarkClass_RequiredMemberCannotBeSet_Title" xml:space="preserve">
     <value>Required member cannot be set by BenchmarkDotNet</value>
   </data>

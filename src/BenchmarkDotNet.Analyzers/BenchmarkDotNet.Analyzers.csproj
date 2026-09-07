@@ -19,9 +19,6 @@
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
   <ItemGroup>
-    <!-- RunnableConstants (the code generator's member names + ReservedInstanceMemberNames, the subset that can
-         collide with a [Params*] member), shared with the runtime ParamsValidator so the checks can't drift. -->
-    <Compile Include="..\BenchmarkDotNet\Code\RunnableConstants.cs" Link="Shared\RunnableConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="BenchmarkDotNetAnalyzerResources.Designer.cs">

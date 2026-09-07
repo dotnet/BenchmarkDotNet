@@ -1,9 +1,10 @@
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using System.Reflection;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
 using static BenchmarkDotNet.Code.RunnableConstants;
@@ -57,7 +58,11 @@ internal static class InProcessEmitRunner
     {
         var benchmarkCase = parameters.BenchmarkCase;
 
-        var instance = Activator.CreateInstance(runnableType)!;
+        // The constructor hands out the JIT-trick delegate through an out parameter, so nothing here binds a
+        // generated member by name on a type the benchmark also contributes members to.
+        var constructorArguments = new object?[1];
+        var instance = runnableType.GetConstructors().Single().Invoke(constructorArguments);
+        var trickTheJit = (Action) constructorArguments[0]!;
         FillMembers(instance, benchmarkCase, host.CancellationToken);
 
         host.WriteLine();
@@ -116,7 +121,7 @@ internal static class InProcessEmitRunner
             .ConfigureAwait();
         host.ReportResults(results);
 
-        runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
+        trickTheJit();
 
         await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken).ConfigureAwait(false);
     }

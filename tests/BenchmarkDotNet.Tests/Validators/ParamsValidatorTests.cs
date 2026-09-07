@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using System.Diagnostics.CodeAnalysis;
@@ -78,8 +78,6 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact] public async Task InternalProp1Test() => await Check<InternalProp1>(nameof(InternalProp1.Input), "setter is not public", P);
         [Fact] public async Task InternalProp2Test() => await Check<InternalProp2>(nameof(InternalProp2.Input), "setter is not public", Pa);
         [Fact] public async Task InternalProp3Test() => await Check<InternalProp3>(nameof(InternalProp3.Input), "setter is not public", Ps);
-        [Fact] public async Task ReservedName1Test() => await Check<ReservedName1>("__GlobalSetup", "reserved", P);
-        [Fact] public async Task ReservedName2Test() => await Check<ReservedName2>("__WorkloadActionUnroll", "reserved", Ps);
 
         public class Base
         {
@@ -88,22 +86,6 @@ namespace BenchmarkDotNet.Tests.Validators
 
             public static IEnumerable<bool> Source() => [false, true];
         }
-
-        // A parameter member named like a generated member is rejected (the runnable's object initializer would bind to
-        // the generated member). Only [Params*] members collide - sources/arguments/non-parameter members don't.
-#pragma warning disable BDN1208
-        public class ReservedName1 : Base
-        {
-            [Params(1)]
-            public int __GlobalSetup { get; set; }
-        }
-
-        public class ReservedName2 : Base
-        {
-            [ParamsSource(nameof(Base.Source))]
-            public bool __WorkloadActionUnroll { get; set; }
-        }
-#pragma warning restore BDN1208
 
 #pragma warning disable BDN1205
         public class Const1 : Base

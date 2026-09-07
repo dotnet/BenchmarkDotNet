@@ -6,6 +6,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -28,6 +29,7 @@ namespace BenchmarkDotNet.Code
 
                 var declarationsProvider = GetDeclarationsProvider(benchmark);
                 var extraFields = declarationsProvider.GetExtraFields();
+                var fieldsContainerFields = GetFieldsContainerFields(benchmark, extraFields);
                 var parameterRenderer = CSharpParameterRenderer.Create(benchmark);
 
                 string benchmarkTypeCode = declarationsProvider
@@ -41,7 +43,10 @@ namespace BenchmarkDotNet.Code
                     .Replace("$CancellationTokenAssignment$", GetCancellationTokenAssignment(benchmark))
                     .Replace("$CancellationTokenInitializer$", GetCancellationTokenInitializer(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
-                    .Replace("$DeclareFieldsContainer$", GetDeclareFieldsContainer(benchmark, buildInfo.Id, extraFields))
+                    .Replace("$DeclareFieldsContainerType$", GetDeclareFieldsContainerType(buildInfo.Id, fieldsContainerFields))
+                    .Replace("$DeclareFieldsContainer$", GetDeclareFieldsContainer(buildInfo.Id, fieldsContainerFields))
+                    .Replace("$FieldsRefOutParameter$", GetFieldsRefOutParameter(buildInfo.Id, fieldsContainerFields))
+                    .Replace("$FieldsRefCapture$", GetFieldsRefCapture(fieldsContainerFields))
                     .Replace("$StaticParamsAndArgsContent$", GetStaticParamsAndArgsContent(benchmark, parameterRenderer))
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$RunExtraIteration$", buildInfo.Config.HasExtraIterationDiagnoser(benchmark) ? "true" : "false")
@@ -240,13 +245,14 @@ namespace BenchmarkDotNet.Code
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} {parameter.ParameterType.GetCorrectCSharpTypeName()} {RunnableConstants.ArgParamPrefix}{index}"));
 
-        private static string GetDeclareFieldsContainer(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, string[] extraFields)
-        {
-            var fields = benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
+        private static string[] GetFieldsContainerFields(BenchmarkCase benchmarkCase, string[] extraFields)
+            => benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                 .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} {RunnableConstants.ArgFieldPrefix}{index};")
                 .Concat(extraFields)
                 .ToArray();
 
+        private static string GetDeclareFieldsContainerType(BenchmarkId benchmarkId, string[] fields)
+        {
             // Prevent CS0169
             if (fields.Length == 0)
             {
@@ -254,36 +260,53 @@ namespace BenchmarkDotNet.Code
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine($$"""
-                    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
-                    private struct {{RunnableConstants.FieldsContainerTypeName}}
-                    {
-            """);
+            sb.AppendLine("    [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]");
+            sb.AppendLine($"    internal struct {FieldsContainerTypeName(benchmarkId)}");
+            sb.AppendLine("    {");
             foreach (var field in fields)
             {
-                sb.AppendLine($"            {field}");
+                sb.AppendLine($"        {field}");
             }
-            sb.AppendLine("            }");
+            sb.AppendLine("    }");
             sb.AppendLine();
-            sb.AppendLine($"        private global::{RunnableConstants.EmittedTypePrefix}{benchmarkId.Value}.{RunnableConstants.FieldsContainerTypeName} {RunnableConstants.FieldsContainerName};");
+            sb.AppendLine($"    internal delegate ref global::{RunnableConstants.FieldsContainerTypePrefix}{benchmarkId.Value} {FieldsRefTypeName(benchmarkId)}();");
             return sb.ToString();
         }
 
-        /*
-
-        [global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Auto)]
-        private unsafe struct __FieldsContainer
+        private static string GetDeclareFieldsContainer(BenchmarkId benchmarkId, string[] fields)
         {
-            $DeclareArgumentFields$
-            $ExtraFields$
+            if (fields.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            string containerType = $"global::{RunnableConstants.FieldsContainerTypePrefix}{benchmarkId.Value}";
+            return $$"""
+                    private {{containerType}} {{RunnableConstants.FieldsContainerName}};
+
+                    private ref {{containerType}} {{RunnableConstants.FieldsContainerGetterName}}()
+                    {
+                        return ref {{RunnableConstants.FieldsContainerName}};
+                    }
+            """;
         }
 
-        private global::BenchmarkDotNet.Autogenerated.Runnable_$ID$.__FieldsContainer __fieldsContainer;
+        private static string GetFieldsRefOutParameter(BenchmarkId benchmarkId, string[] fields)
+            => fields.Length == 0
+                ? string.Empty
+                : $", out global::{RunnableConstants.FieldsRefTypePrefix}{benchmarkId.Value} fieldsContainerRef";
 
-         */
+        private static string GetFieldsRefCapture(string[] fields)
+            => fields.Length == 0
+                ? string.Empty
+                : $"fieldsContainerRef = {RunnableConstants.FieldsContainerGetterName};";
 
-        // Assigned after the instance is created: argument fields live on it, and a static parameter may draw its
-        // value from an instance source, which the constructor captures.
+        private static string FieldsRefTypeName(BenchmarkId benchmarkId)
+            => RunnableConstants.FieldsRefTypePrefix.Substring(RunnableConstants.FieldsRefTypePrefix.LastIndexOf('.') + 1) + benchmarkId.Value;
+
+        private static string FieldsContainerTypeName(BenchmarkId benchmarkId)
+            => RunnableConstants.FieldsContainerTypePrefix.Substring(RunnableConstants.FieldsContainerTypePrefix.LastIndexOf('.') + 1) + benchmarkId.Value;
+
         private static string GetStaticParamsAndArgsContent(BenchmarkCase benchmarkCase, CSharpParameterRenderer renderer)
         {
             var staticParams = benchmarkCase.Parameters.Items
@@ -291,7 +314,7 @@ namespace BenchmarkDotNet.Code
                 .Select(parameter => $"{benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName()}.{parameter.Name} = {renderer.Render(parameter.ParameterValue)};");
 
             var argumentFields = benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                .Select((parameter, index) => $"instance.{RunnableConstants.FieldsContainerName}.{RunnableConstants.ArgFieldPrefix}{index} = {renderer.Render(benchmarkCase.Parameters.GetArgument(parameter.Name!).ParameterValue)};");
+                .Select((parameter, index) => $"fieldsContainerRef().{RunnableConstants.ArgFieldPrefix}{index} = {renderer.Render(benchmarkCase.Parameters.GetArgument(parameter.Name!).ParameterValue)};");
 
             return string.Join(
                 $"{Environment.NewLine}            ",
@@ -473,7 +496,7 @@ namespace BenchmarkDotNet.Code
                 // Use reflection to call benchmark's Run method indirectly.
                 return $$"""
                 await ((global::System.Threading.Tasks.ValueTask) typeof(global::BenchmarkDotNet.Autogenerated.UniqueProgramName).Assembly
-                                    .GetType($"{{RunnableConstants.EmittedTypePrefix}}{id}")
+                                    .GetType($"{{RunnableConstants.RunnerTypePrefix}}{id}")
                                     .GetMethod("{{RunnableConstants.RunMethodName}}", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.Static)
                                     .Invoke(null, new global::System.Object[] { host, benchmarkName, diagnoserRunMode }))
                                     .ConfigureAwait(false);
@@ -486,7 +509,7 @@ namespace BenchmarkDotNet.Code
 
             foreach (var buildInfo in buildPartition.Benchmarks)
             {
-                @switch.AppendLine($"case {buildInfo.Id.Value}: await {RunnableConstants.EmittedTypePrefix}{buildInfo.Id.Value}.{RunnableConstants.RunMethodName}(host, benchmarkName, diagnoserRunMode); break;");
+                @switch.AppendLine($"case {buildInfo.Id.Value}: await {RunnableConstants.RunnerTypePrefix}{buildInfo.Id.Value}.{RunnableConstants.RunMethodName}(host, benchmarkName, diagnoserRunMode); break;");
             }
 
             @switch.AppendLine("default: throw new System.NotSupportedException(\"invalid benchmark id\");");

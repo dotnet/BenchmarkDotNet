@@ -1,4 +1,4 @@
-namespace BenchmarkDotNet.Analyzers;
+﻿namespace BenchmarkDotNet.Analyzers;
 
 public static class DiagnosticIds
 {
@@ -24,7 +24,6 @@ public static class DiagnosticIds
     public const string Attributes_GeneralParameterAttributes_NotValidOnReadonlyField = "BDN1204";
     public const string Attributes_GeneralParameterAttributes_NotValidOnConstantField = "BDN1205";
     public const string Attributes_GeneralParameterAttributes_PropertyMustHavePublicSetter = "BDN1207";
-    public const string General_ReservedMemberName = "BDN1208";
     public const string Attributes_ParamsAttribute_MustHaveValues = "BDN1300";
     public const string Attributes_ParamsAttribute_MustHaveMatchingValueType = "BDN1301";
     public const string Attributes_ParamsAttribute_UnnecessarySingleValuePassedToAttribute = "BDN1302";

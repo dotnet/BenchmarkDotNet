@@ -1,4 +1,3 @@
-using BenchmarkDotNet.Code;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -90,15 +89,6 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ParamsSourceAttribute_MustReturnEnumerable_Description)));
 
-    internal static readonly DiagnosticDescriptor ReservedMemberNameRule = new(
-        DiagnosticIds.General_ReservedMemberName,
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_ReservedMemberName_Title)),
-        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_ReservedMemberName_MessageFormat)),
-        "Usage",
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_ReservedMemberName_Description)));
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
         MutuallyExclusiveOnFieldRule,
@@ -110,7 +100,6 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
         PropertyMustHavePublicSetterRule,
         ParamsSourceCannotUseWriteOnlyPropertyRule,
         ParamsSourceMustReturnEnumerableRule,
-        ReservedMemberNameRule,
         AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule,
         AnalyzerHelper.SourceMethodMustNotBeGenericRule,
         AnalyzerHelper.SourceMustNotBeAmbiguouslyEnumerableRule,
@@ -314,27 +303,6 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             );
 
             return;
-        }
-
-        // The runnable derives from the benchmark type and assigns each instance parameter member through an object
-        // initializer, which binds the member name unqualified. A parameter member named like a generated member (all
-        // __-prefixed) therefore binds to the generated member and fails to compile. (Static parameters, sources,
-        // arguments, and non-parameter members are reached via type-qualification/`base`/hiding and don't collide, so
-        // only instance parameter members are checked.)
-        // Every declared name, not only the first: the runtime reports each parameter member it cannot assign.
-        if (!fieldOrPropertyIsStatic)
-        {
-            foreach (var (name, location) in declaredNames)
-            {
-                if (RunnableConstants.ReservedInstanceMemberNames.Contains(name))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(ReservedMemberNameRule,
-                        location,
-                        name,
-                        attributeSyntax.Name.ToString())
-                    );
-                }
-            }
         }
 
         if (fieldConstModifierLocation != null)

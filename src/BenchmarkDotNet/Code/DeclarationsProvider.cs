@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -379,7 +379,7 @@ namespace BenchmarkDotNet.Code
                     {
                         this.{{RunnableConstants.FieldsContainerName}}.{{RunnableConstants.InvokeCountFieldName}} = invokeCount;
                         this.{{RunnableConstants.FieldsContainerName}}.{{RunnableConstants.ClockFieldName}} = clock;
-                        // The source is allocated and the workload loop started in __GlobalSetup,
+                        // The source is allocated and the workload loop started in GlobalSetup,
                         // so this hot path is branchless and allocation-free.
                         return this.{{RunnableConstants.FieldsContainerName}}.{{RunnableConstants.WorkloadValueTaskSourceFieldName}}.Continue();
                     }
