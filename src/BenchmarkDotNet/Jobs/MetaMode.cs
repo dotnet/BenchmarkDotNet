@@ -53,12 +53,7 @@ namespace BenchmarkDotNet.Jobs
         public IReadOnlyList<string> Categories
         {
             get => CategoriesCharacteristic[this] ?? [];
-
-            // Assigning null removes the characteristic (see CharacteristicObject.SetValueCore), which is what an
-            // empty set of categories has to do: a job that was given no categories must stay indistinguishable from
-            // one that was never given any, otherwise `WithCategories(selection)` on an empty selection would mark
-            // the job as changed.
-            set => CategoriesCharacteristic[this] = Unique(value) is { Count: > 0 } unique ? unique : null!;
+            set => SetCategories(value, nameof(value));
         }
 
         /// <summary>
@@ -67,9 +62,10 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public void AddCategories(IEnumerable<string> categories)
         {
+            // the spread below enumerates it before SetCategories gets the chance to report it
             ArgumentNullException.ThrowIfNull(categories);
 
-            Categories = [.. Categories, .. categories];
+            SetCategories([.. Categories, .. categories], nameof(categories));
         }
 
         /// <summary>
@@ -78,23 +74,31 @@ namespace BenchmarkDotNet.Jobs
         public bool HasCategory(string category) => Categories.Contains(category, StringComparer.OrdinalIgnoreCase);
 
         // Every category assigned to a job goes through here, which is why the arguments are validated here rather
-        // than in the WithCategory/WithCategories extensions: the property and AddCategories are public too, and
+        // than only in the WithCategory/WithCategories extensions: the property and AddCategories are public too, and
         // guarding only the extensions would leave `job.Meta.Categories = null` reported as a null `source` thrown
         // out of Distinct, and would let a null category be stored and only fail much later.
-        private static IReadOnlyList<string> Unique(IEnumerable<string> categories)
+        // The caller names its own parameter, so that the exception points at the argument the user has written
+        // rather than at whatever this method happens to call it.
+        internal void SetCategories(IEnumerable<string> categories, string paramName)
         {
-            ArgumentNullException.ThrowIfNull(categories);
+            ArgumentNullException.ThrowIfNull(categories, paramName);
 
             var all = categories.ToArray();
 
             // A null category can never be selected and it survives the merging done when jobs are deduplicated,
             // so it would surface far away from the call that introduced it.
             if (all.Any(category => category is null))
-                throw new ArgumentException("A job category must not be null.", nameof(categories));
+                throw new ArgumentException("A job category must not be null.", paramName);
 
             // the categories are used to select jobs, so we don't want the users to end up with the same category
             // twice just because they have used a different casing
-            return [.. all.Distinct(StringComparer.OrdinalIgnoreCase)];
+            var unique = all.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+
+            // Assigning null removes the characteristic (see CharacteristicObject.SetValueCore), which is what an
+            // empty set of categories has to do: a job that was given no categories must stay indistinguishable from
+            // one that was never given any, otherwise `WithCategories(selection)` on an empty selection would mark
+            // the job as changed.
+            CategoriesCharacteristic[this] = unique.Length > 0 ? unique : null!;
         }
     }
 }

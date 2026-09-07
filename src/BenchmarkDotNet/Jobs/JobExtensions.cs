@@ -333,7 +333,14 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="category">The category which should be added to the new job</param>
         /// <returns>The new job with the additional category</returns>
-        public static Job WithCategory(this Job job, string category) => job.WithCore(j => j.Meta.AddCategories([category]));
+        public static Job WithCategory(this Job job, string category)
+        {
+            // validated here so that the exception names this method's parameter rather than the one of the
+            // MetaMode member it delegates to
+            ArgumentNullException.ThrowIfNull(category);
+
+            return job.WithCore(j => j.Meta.AddCategories([category]));
+        }
 
         /// <summary>
         /// Creates a new job based on the given job with the given categories.
@@ -342,7 +349,10 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="categories">The categories of the new job</param>
         /// <returns>The new job with overriden categories</returns>
-        public static Job WithCategories(this Job job, params string[] categories) => job.WithCore(j => j.Meta.Categories = categories);
+        // the name of this method's parameter is handed over, so that a bad argument is not reported as the `value`
+        // of the MetaMode property this delegates to
+        public static Job WithCategories(this Job job, params string[] categories)
+            => job.WithCore(j => j.Meta.SetCategories(categories, nameof(categories)));
 
         internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {
