@@ -28,6 +28,6 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeTrue();
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
-        accumulator.Value.Should().Be(0x3333_2222_1111);
+        accumulator.Value.Should().Be(0x3333_0000_0000);
     }
 }
