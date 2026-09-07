@@ -36,11 +36,13 @@ The attributes that define a job (`[SimpleJob]`, `[DryJob]`, `[ShortRunJob]`, `[
 public class Benchmarks { /* ... */ }
 ```
 
+`Categories` is a plain settable property, so the collection expression above can be written as `new[] { "runtimes", "net9" }` on the older language versions (C# 7.3 is still the default for `net472` and `netstandard2.0` projects).
+
 The mutator attributes (`[WarmupCount]`, `[IterationCount]`, `[RunOncePerIteration]` and the others deriving from `JobMutatorConfigBaseAttribute`) don't define a job of their own, so they have no `Categories` property. A mutator that carries categories has to be built with the fluent api: `Job.Default.WithWarmupCount(3).WithCategory("ci").AsMutator()`.
 
 Categories don't affect how a job is executed: they are not a part of the job `Id`, the folder names, nor the summary.
 
-To run only the jobs which belong to given categories, use `JobCategoryFilter`, `[JobCategoryFilter]` or the `--jobCategories` console argument:
+To run only the jobs which belong to given categories, use `JobCategoryFilter`, `[JobCategoryFilter]` or the `--anyJobCategories` console argument:
 
 ```cs
 var config = DefaultConfig.Instance.AddFilter(new JobCategoryFilter(["net8"]));
@@ -52,7 +54,7 @@ public class Benchmarks { /* ... */ }
 ```
 
 ```log
-dotnet run -c Release -- --jobCategories net8
+dotnet run -c Release -- --anyJobCategories net8
 ```
 
 Like `--anyCategories` and `--allCategories`, the filter is inclusion only: a job with no categories belongs to none of the requested ones, so it is filtered out. If your config mixes categorized and uncategorized jobs, selecting a category also removes the uncategorized jobs, so give a category to every job you may want to keep.
