@@ -9,7 +9,6 @@ using Microsoft.Testing.Platform.Requests;
 using Microsoft.Testing.Platform.Services;
 using Microsoft.Testing.Platform.TestHost;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Channels;
 
@@ -105,7 +104,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             finally
             {
                 // Discovery runs nothing, so every value the enumeration created is this method's to dispose.
-                DisposeUnusedParameterValues(enumeration.All, []);
+                ParameterValueDisposer.DisposeUnused(enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases), []);
             }
         }
 
@@ -126,7 +125,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             // A benchmark that was filtered out or that collided is never handed to BenchmarkDotNet, so nothing else
             // would dispose the values the enumeration created for it.
-            DisposeUnusedParameterValues(enumeration.All, runnable.Select(match => match.Node.BenchmarkCase));
+            ParameterValueDisposer.DisposeUnused(
+                enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases),
+                runnable.Select(match => match.Node.BenchmarkCase));
 
             if (runnable.Count == 0)
                 return;
@@ -321,38 +322,6 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             return new Enumeration(matches, runInfos);
         }
 
-        /// <summary>
-        /// Disposes the parameter values of the benchmarks that were enumerated but will not be run.
-        /// </summary>
-        /// <remarks>
-        /// Enumerating an assembly instantiates the values of every [Params] and [ArgumentsSource], and BenchmarkDotNet
-        /// only disposes the ones belonging to the benchmarks it was handed. The values are matched by reference
-        /// instead of being disposed case by case, because BenchmarkConverter gives the same ParameterInstance to
-        /// every job and every argument set of a benchmark: disposing a filtered out case wholesale would take down
-        /// values that a benchmark which is about to run still owns.
-        /// </remarks>
-        /// <param name="enumerated">Everything the assembly declares.</param>
-        /// <param name="retained">The benchmarks that are going to be run, if any.</param>
-        private static void DisposeUnusedParameterValues(BenchmarkRunInfo[] enumerated, IEnumerable<BenchmarkCase> retained)
-        {
-            var unused = new HashSet<IDisposable>(ReferenceComparer.Instance);
-
-            foreach (var value in GetDisposableParameterValues(enumerated.SelectMany(runInfo => runInfo.BenchmarksCases)))
-                unused.Add(value);
-
-            foreach (var value in GetDisposableParameterValues(retained))
-                unused.Remove(value);
-
-            foreach (var value in unused)
-                value.Dispose();
-        }
-
-        private static IEnumerable<IDisposable> GetDisposableParameterValues(IEnumerable<BenchmarkCase> benchmarkCases)
-            => benchmarkCases
-                .SelectMany(benchmarkCase => benchmarkCase.Parameters.Items)
-                .Select(parameter => parameter.Value)
-                .OfType<IDisposable>();
-
 #pragma warning disable TPEXP // The tree node filter is still marked as experimental by the platform.
         private static bool Matches(ITestExecutionFilter filter, BenchmarkTestNode node) => filter switch
         {
@@ -384,18 +353,6 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             /// Gets every benchmark the assembly declares, matching or not.
             /// </summary>
             public BenchmarkRunInfo[] All { get; }
-        }
-
-        /// <summary>
-        /// Compares by reference, so that a parameter value which overrides Equals is still disposed once per instance.
-        /// </summary>
-        private sealed class ReferenceComparer : IEqualityComparer<IDisposable>
-        {
-            public static readonly ReferenceComparer Instance = new ReferenceComparer();
-
-            public bool Equals(IDisposable? x, IDisposable? y) => ReferenceEquals(x, y);
-
-            public int GetHashCode(IDisposable obj) => RuntimeHelpers.GetHashCode(obj);
         }
 
         /// <summary>

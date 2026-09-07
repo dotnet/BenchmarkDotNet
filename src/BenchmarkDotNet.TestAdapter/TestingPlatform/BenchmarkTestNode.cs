@@ -72,10 +72,16 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             var uid = benchmarkCase.GetUniqueId();
 
             // Microsoft.Testing.Platform keeps the display name and the identity apart, so the name is free to be the
-            // [Benchmark(Description = ...)] the author chose. GetMethodDisplayName falls back to the method name when
-            // no description is set. The path keeps the method name, so that a filter still matches what
-            // BenchmarkDotNet's own --filter matches.
-            var displayMethodName = FullNameProvider.GetMethodDisplayName(benchmarkCase);
+            // [Benchmark(Description = ...)] the author chose, spelled the way it was written: Descriptor's
+            // WorkloadMethodDisplayInfo is the console table form, which quotes a description containing a space or a
+            // bracket so that BenchmarkDotNet's own --filter can delimit it, and an IDE label does not want that. It
+            // is still the fallback, so that a hand-built Descriptor with no attribute keeps its name. The path keeps
+            // the method name, so that a filter still matches what --filter matches.
+            var benchmarkAttribute = benchmarkMethod.ResolveAttribute<BenchmarkAttribute>();
+            var benchmarkName = string.IsNullOrEmpty(benchmarkAttribute?.Description)
+                ? benchmarkCase.Descriptor.WorkloadMethodDisplayInfo
+                : benchmarkAttribute!.Description!;
+            var displayMethodName = FullNameProvider.GetMethodDisplayName(benchmarkCase, benchmarkName);
             var displayName = $"{fullClassName}.{displayMethodName}" + (includeJobInName ? $" [{jobDisplayInfo}]" : "");
 
             var properties = new List<IProperty>
@@ -83,14 +89,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 new TestMethodIdentifierProperty(
                     type.Assembly.FullName,
                     type.Namespace ?? string.Empty,
-                    type.GetCorrectCSharpTypeName(prefixWithGlobal: false, includeNamespace: false),
+                    GetEcmaTypeName(type),
                     benchmarkMethod.Name,
                     benchmarkMethod.IsGenericMethodDefinition ? benchmarkMethod.GetGenericArguments().Length : 0,
                     benchmarkMethod.GetParameters().Select(p => p.ParameterType.FullName ?? p.ParameterType.Name).ToArray(),
                     benchmarkMethod.ReturnType.FullName ?? benchmarkMethod.ReturnType.Name),
             };
 
-            var benchmarkAttribute = benchmarkMethod.ResolveAttribute<BenchmarkAttribute>();
             if (benchmarkAttribute?.SourceCodeFile != null)
             {
                 // BenchmarkAttribute captures the line of the attribute itself, and the platform expects 0-based lines.
@@ -139,6 +144,28 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// <returns>The filterable properties.</returns>
         public PropertyBag GetFilterableProperties() => new PropertyBag(staticProperties);
 
+        /// <summary>
+        /// Gets the name of a type in the form Microsoft.Testing.Platform documents for
+        /// <see cref="TestMethodIdentifierProperty"/>, which is the ECMA-335 one rather than the C# one.
+        /// </summary>
+        /// <remarks>
+        /// A generic type is named after its arity, `GenericProbe`1`, and its type arguments are no part of the name -
+        /// they belong to the display name, which carries them. A nested type is qualified by its declaring types,
+        /// separated by '+'; the namespace is left out, because the property carries it separately.
+        /// </remarks>
+        /// <param name="type">The type declaring the benchmark.</param>
+        /// <returns>The ECMA-335 name of the type.</returns>
+        private static string GetEcmaTypeName(Type type)
+        {
+            // Type.Name is already the arity form, for an open and for a closed generic type alike.
+            var name = type.Name;
+
+            for (var declaringType = type.DeclaringType; declaringType != null; declaringType = declaringType.DeclaringType)
+                name = declaringType.Name + "+" + name;
+
+            return name;
+        }
+
         private static string BuildPath(Assembly assembly, string? @namespace, string fullClassName, string methodName, string jobDisplayInfo)
         {
             // The convention followed by the other test frameworks is /<assembly>/<namespace>/<class>/<test>.
@@ -154,11 +181,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 .ToString();
         }
 
-        // Benchmark parameters are stringified user values, so they can contain the path separator. A '/' cannot be
-        // escaped into a segment: Microsoft.Testing.Platform splits the path on every '/' without ever unescaping it,
-        // and TreeNodeFilter rejects a filter whose segment contains one, so a raw '/' would both deepen the tree and
-        // leave the benchmark unmatchable. Percent encoding keeps the path four levels deep and the segment
-        // addressable, at the price of a filter having to spell the separator as '%2F'.
-        private static string Escape(string segment) => segment.Replace("%", "%25").Replace("/", "%2F");
+        // Benchmark parameters are stringified user values, and the leaf ends in the job between brackets, so a
+        // segment can contain the characters TreeNodeFilter gives a meaning to. None of them can be escaped into a
+        // segment: Microsoft.Testing.Platform splits the path on every '/' without ever unescaping it, and
+        // TreeNodeFilter rejects a filter whose segment contains one, so a raw '/' would both deepen the tree and
+        // leave the benchmark unmatchable; '[' and ']' delimit a property filter, so a filter spelling a leaf out in
+        // full would have its ' [Dry]' parsed as one instead of matched. Percent encoding keeps the path four levels
+        // deep and every segment addressable, at the price of a filter having to spell those characters as '%2F',
+        // '%5B' and '%5D'.
+        private static string Escape(string segment)
+            => segment.Replace("%", "%25").Replace("/", "%2F").Replace("[", "%5B").Replace("]", "%5D");
     }
 }
