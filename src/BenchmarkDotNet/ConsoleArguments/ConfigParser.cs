@@ -611,11 +611,24 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
         {
             if (options.Filters.Any())
-                yield return new GlobFilter(options.Filters.ToArray());
+            {
+                // Filter by UID when specified filter can be parsed as GUID.
+                var uids = options.Filters.Where(x => Guid.TryParse(x, out _)).ToArray();
+                if (uids.Length > 0)
+                    yield return new UidFilter(uids);
+
+                // Use GlobFilter for remaining filters.
+                var globFilters = options.Filters.Except(uids).ToArray();
+                if (globFilters.Length > 0)
+                    yield return new GlobFilter(globFilters);
+            }
+
             if (options.AllCategories.Any())
                 yield return new AllCategoriesFilter(options.AllCategories.ToArray());
+
             if (options.AnyCategories.Any())
                 yield return new AnyCategoriesFilter(options.AnyCategories.ToArray());
+
             if (options.AttributeNames.Any())
                 yield return new AttributesFilter(options.AttributeNames.ToArray());
         }
