@@ -98,9 +98,9 @@ public class WakeLockTests : BenchmarkTestExecutor
 
         async Task WaitForBenchmarkRunningAndGetPowerRequests()
         {
-            await AsTask(ping, testTimeout);
             try
             {
+                await AsTask(ping, testTimeout);
                 pwrRequests = GetPowerRequests("BenchmarkDotNet Running Benchmarks");
             }
             finally
