@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Running
             {
                 if (type.ContainsRunnableBenchmarks())
                 {
-                    validRunnableTypes.AddRange(GenericBenchmarksBuilder.BuildGenericsIfNeeded(type).Where(tuple => tuple.isSuccess).Select(tuple => tuple.result));
+                    validRunnableTypes.AddRange(GenericBenchmarksBuilder.BuildGenericsIfNeeded(type).Where(built => built.IsSuccess).Select(built => built.Type));
                 }
                 else
                 {

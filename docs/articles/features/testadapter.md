@@ -131,11 +131,19 @@ dotnet run -c Release -- --treenode-filter "/*/*/*/*[Category=Fast]"
 ```
 
 The tree node filter path is `/<assembly>/<namespace>/<class>/<benchmark>`,
-  and `[BenchmarkCategory]` attributes are exposed as a `Category` trait that the filter can match on.
-Because the platform separates the levels of that path with `/`, a benchmark parameter whose value contains one is
-  percent encoded in the path: a parameter value of `a/b` is written `a%2Fb` in a filter, and a literal `%` is
-  written `%25`.
+  and the categories of a benchmark are exposed as a `Category` trait that the filter can match on.
+The last level ends with the job between brackets, as in `MyBenchmark(Size: 1) [Dry]`.
+
+The characters the filter itself gives a meaning to are percent encoded in that path:
+  `/`, which separates the levels, is written `%2F`;
+  `[` and `]`, which delimit a property filter, are written `%5B` and `%5D`;
+  and a literal `%` is written `%25`.
+So a parameter value of `a/b` is spelled `a%2Fb` in a filter, and the `[Dry]` above is spelled `%5BDry%5D`.
+The parentheses around the parameters are not encoded - escape them with a backslash in the filter instead.
 This affects the filter only; the name the benchmark is displayed under is unchanged.
+
+A benchmark is displayed under its `[Benchmark(Description = "...")]` when it has one, and under the name of its
+  method otherwise, followed by its parameters.
 
 ## Keeping your own entry point
 

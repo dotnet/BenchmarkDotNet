@@ -16,8 +16,8 @@ namespace BenchmarkDotNet.Validators
                 .Distinct()
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)
-                .Where(result => !result.isSuccess)
-                .Select(result => new ValidationError(false, $"Generic type {result.result.Name} failed to build due to wrong type argument or arguments count, ignoring."))
+                .Where(built => !built.IsSuccess)
+                .Select(built => new ValidationError(false, built.Error!))
                 .ToAsyncEnumerable();
     }
 }
