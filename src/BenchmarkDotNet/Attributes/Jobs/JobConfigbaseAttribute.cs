@@ -22,10 +22,12 @@ namespace BenchmarkDotNet.Attributes
         /// executed (see <see cref="BenchmarkDotNet.Filters.JobCategoryFilter"/>), they don't affect how the job is executed.
         /// </summary>
         /// <remarks>
-        /// It is init-only because <see cref="Config"/> is built once and then kept: a later assignment would be
-        /// silently ignored. Attribute named arguments are allowed to set init-only properties.
+        /// It is a plain settable property rather than an init-only one so that the attribute stays usable from
+        /// projects compiled with C# 7.3, the default for net472 and netstandard2.0.
+        /// Every named argument is assigned before anything reads <see cref="Config"/>, which is built lazily,
+        /// so the two behave identically here.
         /// </remarks>
-        [PublicAPI] public string[]? Categories { get; init; }
+        [PublicAPI] public string[]? Categories { get; set; }
 
         // Named attribute properties are assigned after the constructor has run, so the config cannot be built there:
         // Categories would still be empty. It is read long after the attribute is constructed, so building it lazily
