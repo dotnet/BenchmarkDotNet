@@ -58,27 +58,31 @@ namespace BenchmarkDotNet.TestAdapter
         /// <returns>The benchmarks inside the assembly.</returns>
         public static BenchmarkRunInfo[] GetBenchmarksFromAssembly(Assembly assembly)
         {
-            var isDebugAssembly = assembly.IsJitOptimizationDisabled() ?? false;
+            var all = GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks())
+                .Select(type => BenchmarkConverter.TypeToBenchmarks(type))
+                .ToArray();
 
-            return GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks())
-                .Select(type =>
-                {
-                    var benchmarkRunInfo = BenchmarkConverter.TypeToBenchmarks(type);
-                    if (isDebugAssembly)
-                    {
-                        // If the assembly is a debug assembly, then only display them if they will run in-process
-                        // This will allow people to debug their benchmarks from a test runner if they wish.
-                        benchmarkRunInfo = new BenchmarkRunInfo(
-                            benchmarkRunInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
-                            benchmarkRunInfo.Type,
-                            benchmarkRunInfo.Config,
-                            benchmarkRunInfo.CompositeInProcessDiagnoser);
-                    }
+            if (!(assembly.IsJitOptimizationDisabled() ?? false))
+                return all.Where(runInfo => runInfo.BenchmarksCases.Length > 0).ToArray();
 
-                    return benchmarkRunInfo;
-                })
+            // If the assembly is a debug assembly, then only display the benchmarks that will run in-process. This
+            // will allow people to debug their benchmarks from a test runner if they wish.
+            var runnable = all
+                .Select(runInfo => new BenchmarkRunInfo(
+                    runInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
+                    runInfo.Type,
+                    runInfo.Config,
+                    runInfo.CompositeInProcessDiagnoser))
                 .Where(runInfo => runInfo.BenchmarksCases.Length > 0)
                 .ToArray();
+
+            // BenchmarkConverter has already constructed every parameter value by now, and a case hidden here is never
+            // handed to BenchmarkDotNet by either adapter, so nothing downstream can dispose what is dropped.
+            ParameterValueDisposer.DisposeUnused(
+                all.SelectMany(runInfo => runInfo.BenchmarksCases),
+                runnable.SelectMany(runInfo => runInfo.BenchmarksCases));
+
+            return runnable;
         }
     }
 }
