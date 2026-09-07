@@ -17,8 +17,9 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private const string PassingProbes = "BenchmarkDotNet.IntegrationTests.TestingPlatform";
         private const string FailingProbes = "BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures";
+        private const string UnoptimizedProbes = "BenchmarkDotNet.IntegrationTests.TestingPlatform.Unoptimized";
 
-        // Both probe projects are single targeted, see their .csproj files.
+        // Every probe project is single targeted, see their .csproj files.
         private const string ProbeTargetFramework = "net10.0";
 
         // A run that has to build a benchmark pays for a restore and a build of the generated project.
@@ -29,12 +30,15 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string[] expected =
             [
+                "BracketProbe.Length(Value: \"[Dry]\")",
                 "CategoryProbe.Identity",
 
-                // The description of a [Benchmark(Description = ...)] is what a user recognises it by, so it is used
-                // instead of the method name. Without one the method name is used, and the parameters are appended to
-                // both.
-                "DescribedProbe.'A described benchmark'(Size: 1)",
+                // The description of a [Benchmark(Description = ...)] is what a user recognises it by, so it is
+                // used instead of the method name, and spelled the way it was written. Descriptor quotes a
+                // description containing a space so that BenchmarkDotNet's own --filter can delimit it, which an IDE
+                // label has no use for. Without a description the method name is used, and the parameters are
+                // appended to both.
+                "DescribedProbe.A described benchmark(Size: 1)",
                 "DescribedProbe.Undescribed(Size: 1)",
 
                 "DisposableProbe.Identity(Value: tracked-1)",
@@ -46,6 +50,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 "GenericProbe<System.Collections.Generic.List<System.String>>.Create",
                 "GenericProbe<System.Int32>.Create",
 
+                "NestedProbe.Inner.Identity",
                 "OutOfProcessProbe.Add",
                 "SampleBenchmarks.Add(Size: 1)",
                 "SampleBenchmarks.Add(Size: 2)",
@@ -56,12 +61,35 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var discovered = Discover(PassingProbes);
 
+            // InvalidConfigProbe's benchmarks are deliberately absent: their [Config] cannot be constructed, and a
+            // type whose attributes cannot be read is dropped rather than allowed to abort the whole discovery.
             Assert.Equal(
                 expected,
                 discovered.Select(test => test.DisplayName.Substring(PassingProbes.Length + 1)).OrderBy(name => name, StringComparer.Ordinal));
 
             // The platform identifies a node by its uid, so two benchmarks sharing one cannot be told apart.
             Assert.Equal(discovered.Count, discovered.Select(test => test.Uid).Distinct().Count());
+        }
+
+        [Fact]
+        public void TheTypeOfABenchmarkIsIdentifiedByItsEcmaName()
+        {
+            // Microsoft.Testing.Platform documents TestMethodIdentifierProperty as ECMA-335, which is the form a
+            // test runner - Visual Studio's Test Explorer above all - matches a type by. A generic type is named
+            // after its arity there, and its arguments are no part of it.
+            var generic = Discover(PassingProbes, "--treenode-filter", "/*/*/GenericProbe*/*");
+
+            Assert.Equal(3, generic.Count);
+            Assert.All(generic, test => Assert.Equal("GenericProbe`1", test.TypeName));
+
+            // The arguments are still what tells one closed generic from another, in the name the user reads.
+            Assert.Equal(3, generic.Select(test => test.DisplayName).Distinct(StringComparer.Ordinal).Count());
+
+            // A nested type is qualified by its declaring types rather than by its namespace, which the property
+            // carries separately.
+            var nested = Discover(PassingProbes, "--treenode-filter", "/*/*/NestedProbe*/*");
+
+            Assert.Equal("NestedProbe+Inner", Assert.Single(nested).TypeName);
         }
 
         [Fact]
@@ -116,7 +144,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Listing runs nothing, so BenchmarkDotNet disposes nothing: every value the enumeration created is the
             // adapter's to dispose.
-            Assert.Equal("created=3 disposed=3", ReadDisposalReport(() => Discover(PassingProbes)));
+            Assert.Equal(
+                "created=3 disposed=3",
+                ReadDisposalReport(PassingProbes, "disposable-probe.txt", () => Discover(PassingProbes)));
         }
 
         [Fact]
@@ -129,9 +159,37 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Single(test => test.DisplayName.EndsWith("DisposableProbe.Identity(Value: tracked-1)", StringComparison.Ordinal))
                 .Uid;
 
-            var report = ReadDisposalReport(() => RunAndSummarize(PassingProbes, "--filter-uid", uid));
+            var report = ReadDisposalReport(
+                PassingProbes,
+                "disposable-probe.txt",
+                () => RunAndSummarize(PassingProbes, "--filter-uid", uid));
 
             Assert.Equal("created=3 disposed=3", report);
+        }
+
+        [Fact]
+        public void OutOfProcessBenchmarksAreHiddenWhenTheAssemblyIsNotOptimized()
+        {
+            // The point of the unoptimized probe application: a benchmark that would leave the process is hidden, so
+            // that it can be debugged from a test runner. DroppedProbe has no other job and disappears entirely,
+            // SharedValueProbe keeps its in-process cases - which is also why the job is no part of their names.
+            var discovered = Discover(UnoptimizedProbes);
+
+            Assert.Equal(
+                new[] { "SharedValueProbe.Length(Value: shared-1)", "SharedValueProbe.Length(Value: shared-2)" },
+                discovered.Select(test => test.DisplayName.Substring(UnoptimizedProbes.Length + 1)).OrderBy(name => name, StringComparer.Ordinal));
+        }
+
+        [Fact]
+        public void ParameterValuesAreDisposedWhenBenchmarksAreHiddenByAnUnoptimizedAssembly()
+        {
+            // The benchmarks hidden above are never handed to BenchmarkDotNet by either adapter, so the values they
+            // own are the enumeration's to dispose: the two of DroppedProbe are unreachable from anything that
+            // survives. The two of SharedValueProbe are shared with cases that do survive, so disposing them here
+            // would be a disposal too many, which the count catches just as well as a leak.
+            var report = ReadDisposalReport(UnoptimizedProbes, "unoptimized-probe.txt", () => Discover(UnoptimizedProbes));
+
+            Assert.Equal("created=4 disposed=4", report);
         }
 
         [Fact]
@@ -153,6 +211,25 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Single(discovered);
             Assert.Contains("SeparatorProbe.Length(Value: \"a/b\")", discovered[0].DisplayName, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void ABenchmarkIsAddressableWhenItsPathContainsAPropertyFilterDelimiter()
+        {
+            // A TreeNodeFilter reads '[' and ']' as the delimiters of a property filter, so a segment carrying them
+            // has to be encoded rather than left to be parsed - unlike the parentheses around the parameters, which a
+            // filter escapes with a backslash. That is true of a parameter that contains them...
+            var byParameter = Discover(PassingProbes, "--treenode-filter", @"/*/*/BracketProbe/Length\(Value: ""%5BDry%5D""\)*");
+
+            Assert.Single(byParameter);
+            Assert.Contains("BracketProbe.Length(Value: \"[Dry]\")", byParameter[0].DisplayName, StringComparison.Ordinal);
+
+            // ...and of the job that every leaf ends in, which is what an exact path would otherwise trip over. The
+            // trailing wildcard stands in for the job name, so that this does not pin how a job is displayed.
+            var byJob = Discover(PassingProbes, "--treenode-filter", @"/*/*/BracketProbe/Length\(Value: ""%5BDry%5D""\) %5B*");
+
+            Assert.Single(byJob);
+            Assert.Equal(byParameter[0].Uid, byJob[0].Uid);
         }
 
         [Fact]
@@ -210,13 +287,15 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <remarks>
         /// The counts are written to a file rather than to the output, because the discovery output is parsed as json.
         /// </remarks>
+        /// <param name="project">The probe application that writes the counts.</param>
+        /// <param name="reportFileName">The name of the file the probe writes them to.</param>
         /// <param name="execute">The way the probe application is driven.</param>
         /// <returns>The counts the probe reported when it exited.</returns>
-        private static string ReadDisposalReport(Action execute)
+        private static string ReadDisposalReport(string project, string reportFileName, Action execute)
         {
-            // The probe projects are referenced with ReferenceOutputAssembly="false", so the name is repeated here
-            // rather than taken from DisposableProbe.ReportFileName.
-            var report = Path.Combine(Path.GetDirectoryName(GetProbeApplication(PassingProbes))!, "disposable-probe.txt");
+            // The probe projects are referenced with ReferenceOutputAssembly="false", so the names are repeated here
+            // rather than taken from the ReportFileName constants of the probes themselves.
+            var report = Path.Combine(Path.GetDirectoryName(GetProbeApplication(project))!, reportFileName);
 
             File.Delete(report);
             execute();
@@ -236,7 +315,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             return document.RootElement.GetProperty("tests")
                 .EnumerateArray()
-                .Select(test => new DiscoveredTest(test.GetProperty("uid").GetString()!, test.GetProperty("displayName").GetString()!))
+                .Select(test => new DiscoveredTest(
+                    test.GetProperty("uid").GetString()!,
+                    test.GetProperty("displayName").GetString()!,
+                    test.GetProperty("type").GetProperty("typeName").GetString()!))
                 .ToArray();
         }
 
@@ -310,7 +392,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return path;
         }
 
-        private sealed record DiscoveredTest(string Uid, string DisplayName);
+        private sealed record DiscoveredTest(string Uid, string DisplayName, string TypeName);
 
         private sealed record TestRunSummary(int Total, int Failed, int Succeeded, int Skipped)
         {
