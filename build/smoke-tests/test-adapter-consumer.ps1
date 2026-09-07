@@ -27,7 +27,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$PSNativeCommandUseErrorActionPreference = $true
+
+# Invoke-Dotnet checks $LASTEXITCODE itself, and prints the log before it throws. Leaving this on would make a failing
+# `dotnet` throw at the call itself on PowerShell Core - which is what the workflow runs - so the log would never be
+# printed and a broken restore or build would report nothing at all.
+$PSNativeCommandUseErrorActionPreference = $false
 
 $project = [System.IO.Path]::Combine($PSScriptRoot, 'TestAdapterConsumer', 'TestAdapterConsumer.csproj')
 $targetFramework = 'net10.0'
@@ -41,12 +45,28 @@ if (-not (Test-Path $dotnet)) {
     $dotnet = 'dotnet'
 }
 
-$package = Get-ChildItem -Path $ArtifactsDirectory -Filter 'BenchmarkDotNet.TestAdapter.*.nupkg' |
-    Where-Object { $_.Name -notlike '*.symbols.nupkg' } |
-    Select-Object -First 1
+if (-not (Test-Path -LiteralPath $ArtifactsDirectory)) {
+    throw "The artifacts directory '$ArtifactsDirectory' does not exist. Run 'build.cmd pack' first."
+}
 
-if ($null -eq $package) {
+# Both the package this reads the version from and the source the restore below resolves it through, so it has to be
+# the same absolute path in both: a relative one would otherwise be resolved against the consuming project.
+$ArtifactsDirectory = (Resolve-Path -LiteralPath $ArtifactsDirectory).ProviderPath
+
+# `build.cmd pack` never cleans, so the folder can hold several versions. The newest is the one that was just packed,
+# which is the one worth smoke testing.
+$packages = @(Get-ChildItem -Path $ArtifactsDirectory -Filter 'BenchmarkDotNet.TestAdapter.*.nupkg' |
+    Where-Object { $_.Name -notlike '*.symbols.nupkg' } |
+    Sort-Object -Property LastWriteTime -Descending)
+
+if ($packages.Count -eq 0) {
     throw "No BenchmarkDotNet.TestAdapter package was found in '$ArtifactsDirectory'. Run 'build.cmd pack' first."
+}
+
+$package = $packages[0]
+
+if ($packages.Count -gt 1) {
+    Write-Output "'$ArtifactsDirectory' holds $($packages.Count) BenchmarkDotNet.TestAdapter packages, taking the most recently written one."
 }
 
 $version = $package.BaseName -replace '^BenchmarkDotNet\.TestAdapter\.', ''
@@ -84,8 +104,20 @@ function Assert-Property {
     Write-Output "  OK: $Name is '$Expected' $description"
 }
 
+# The project restores into this folder rather than into the global one, see its .csproj. NuGet never re-extracts a
+# version it already has, and the version does not change between runs, so the packages this repository produces are
+# dropped before the restore; everything else in there is an ordinary cache and is left alone.
+$packagesDirectory = [System.IO.Path]::Combine($PSScriptRoot, 'packages')
+if (Test-Path -LiteralPath $packagesDirectory) {
+    Get-ChildItem -Path $packagesDirectory -Directory -Filter 'benchmarkdotnet*' | Remove-Item -Recurse -Force
+}
+
 Write-Output '##[group]Restoring the consuming project'
-Invoke-Dotnet restore $project "-p:BenchmarkDotNetVersion=$version" '-tl:off' | Write-Output
+# The project assigns RestoreAdditionalProjectSources too, but a global property wins over that assignment, which is
+# what makes a custom -ArtifactsDirectory restore from the folder the version was read off. Only the restore needs it:
+# nuget.g.props bakes the result in for every later invocation.
+Invoke-Dotnet restore $project "-p:BenchmarkDotNetVersion=$version" `
+    "-p:RestoreAdditionalProjectSources=$ArtifactsDirectory" '-tl:off' | Write-Output
 Write-Output '##[endgroup]'
 
 Write-Output 'Checking how the packaged build files resolve the test platform:'
