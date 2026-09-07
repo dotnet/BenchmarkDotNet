@@ -245,16 +245,19 @@ namespace BenchmarkDotNet.Tests.Jobs
             Assert.Empty(Job.Dry.WithCategory("a").WithCategories().Meta.Categories);
         }
 
-        // the guard lives in MetaMode rather than in the WithCategory/WithCategories extensions, because the
-        // property and AddCategories are public too and would otherwise report a null `source` out of Distinct
+        // the guard covers the property and AddCategories too, not just the WithCategory/WithCategories extensions,
+        // as they are public as well and would otherwise report a null `source` out of Distinct
         [Fact]
         public void ANullSetOfCategoriesIsRejectedWhicheverWayItIsPassed()
         {
             var job = new Job();
 
             Assert.Equal("categories", Assert.Throws<ArgumentNullException>(() => Job.Default.WithCategories(null!)).ParamName);
-            Assert.Equal("categories", Assert.Throws<ArgumentNullException>(() => job.Meta.Categories = null!).ParamName);
             Assert.Equal("categories", Assert.Throws<ArgumentNullException>(() => job.Meta.AddCategories(null!)).ParamName);
+
+            // the property has no `categories` parameter, so naming one would send the user looking for an argument
+            // they never passed
+            Assert.Equal("value", Assert.Throws<ArgumentNullException>(() => job.Meta.Categories = null!).ParamName);
         }
 
         // a null category matches nothing, survives the merging done when jobs are deduplicated, and only fails
@@ -262,9 +265,14 @@ namespace BenchmarkDotNet.Tests.Jobs
         [Fact]
         public void ANullCategoryIsRejected()
         {
-            Assert.Equal("categories", Assert.Throws<ArgumentException>(() => Job.Default.WithCategory(null!)).ParamName);
+            var job = new Job();
+
             Assert.Equal("categories", Assert.Throws<ArgumentException>(() => Job.Default.WithCategories("first", null!)).ParamName);
-            Assert.Equal("categories", Assert.Throws<ArgumentException>(() => new Job().Meta.AddCategories([null!])).ParamName);
+            Assert.Equal("categories", Assert.Throws<ArgumentException>(() => job.Meta.AddCategories([null!])).ParamName);
+            Assert.Equal("value", Assert.Throws<ArgumentException>(() => job.Meta.Categories = ["first", null!]).ParamName);
+
+            // WithCategory takes a single `category`, so that is the parameter the exception has to name
+            Assert.Equal("category", Assert.Throws<ArgumentNullException>(() => Job.Default.WithCategory(null!)).ParamName);
         }
 
         [Fact]
@@ -397,7 +405,7 @@ namespace BenchmarkDotNet.Tests.Jobs
         [Fact]
         public void TheFilterIsAvailableAsAConsoleArgument()
         {
-            var (isSuccess, config, options) = ConfigParser.Parse(["--jobCategories", "net8", "runtimes"], NullLogger.Instance);
+            var (isSuccess, config, options) = ConfigParser.Parse(["--anyJobCategories", "net8", "runtimes"], NullLogger.Instance);
 
             Assert.True(isSuccess);
             Assert.True(options!.UserProvidedFilters);
