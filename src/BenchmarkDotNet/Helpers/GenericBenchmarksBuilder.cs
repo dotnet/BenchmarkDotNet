@@ -6,16 +6,25 @@ namespace BenchmarkDotNet.Helpers
     internal static class GenericBenchmarksBuilder
     {
         internal static Type[] GetRunnableBenchmarks(IEnumerable<Type> types)
-            => types.Where(type => type.ContainsRunnableBenchmarks())
-                    .SelectMany(BuildGenericsIfNeeded)
+            => BuildRunnableBenchmarks(types)
                     .Where(x => x.IsSuccess)
                     .Select(x => x.Type)
                     .ToArray();
 
+        /// <summary>
+        /// Builds the benchmark types of the given types, keeping the ones that could not be built so that a caller
+        /// with somewhere to report them can.
+        /// </summary>
+        /// <param name="types">The types to consider.</param>
+        /// <returns>Every type that was built, and every one that was rejected.</returns>
+        internal static IEnumerable<GenericBenchmarkType> BuildRunnableBenchmarks(IEnumerable<Type> types)
+            => types.Where(type => type.ContainsRunnableBenchmarks())
+                    .SelectMany(BuildGenericsIfNeeded);
+
         internal static IEnumerable<GenericBenchmarkType> BuildGenericsIfNeeded(Type type)
         {
             if (!TryGetGenericTypeArguments(type, out var typeArguments, out var error))
-                return [GenericBenchmarkType.Failed(type, error)];
+                return [GenericBenchmarkType.Unreadable(type, error)];
 
             if (typeArguments.Length > 0)
                 return BuildGenericTypes(type, typeArguments);
