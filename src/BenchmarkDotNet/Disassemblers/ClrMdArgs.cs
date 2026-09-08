@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Code;
 using System.Text.Json.Serialization;
 
 namespace BenchmarkDotNet.Disassemblers
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal bool PrintSource = printSource;
 
         [JsonInclude]
-        internal int MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
+        internal int MaxDepth = methodName == RunnableConstants.ForDisassemblyDiagnoserMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
 
         [JsonInclude]
         internal string[] Filters = filters;

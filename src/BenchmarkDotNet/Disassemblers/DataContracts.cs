@@ -211,11 +211,6 @@ public sealed class DisassemblyResult
     public Dictionary<ulong, string> AddressToNameMapping { get; set; } = [];
 }
 
-public static class DisassemblerConstants
-{
-    public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
-}
-
 internal sealed class State
 {
     internal State(ClrRuntime runtime, Version runtimeVersion)

@@ -4,6 +4,7 @@ using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
@@ -148,7 +149,7 @@ namespace BenchmarkDotNet.Running
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
-                PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                await PrintListAsync(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options, cancellationToken).ConfigureAwait();
                 return [];
             }
 
@@ -161,23 +162,22 @@ namespace BenchmarkDotNet.Running
                 return await ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options, cancellationToken).ConfigureAwait(false);
             }
 
-            var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
+            var filteredBenchmarks = await TypeFilter.FilterAsync(effectiveConfig, benchmarksToFilter, cancellationToken).ConfigureAwait();
 
             if (filteredBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, [.. options.Filters]);
+                await userInteraction.PrintWrongFilterInfoAsync(benchmarksToFilter, logger, [.. options.Filters], cancellationToken).ConfigureAwait();
                 return [];
             }
 
             return await BenchmarkRunnerClean.Run(filteredBenchmarks, cancellationToken).ConfigureAwait(false);
         }
 
-        private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
+        private static async ValueTask PrintListAsync(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options, CancellationToken cancellationToken)
         {
             var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
 
-            var benchmarkCases = TypeFilter
-                .Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+            var benchmarkCases = (await TypeFilter.FilterAsync(effectiveConfig, allAvailableTypesWithRunnableBenchmarks, cancellationToken).ConfigureAwait())
                 .SelectMany(p => p.BenchmarksCases);
 
             printer.Print(benchmarkCases, nonNullLogger);
@@ -213,10 +213,10 @@ namespace BenchmarkDotNet.Running
             invocationCountConfig.RemoveAllDiagnosers();
             invocationCountConfig.AddJob(invocationCountJob);
 
-            var invocationCountBenchmarks = TypeFilter.Filter(invocationCountConfig, benchmarksToFilter);
+            var invocationCountBenchmarks = await TypeFilter.FilterAsync(invocationCountConfig, benchmarksToFilter, cancellationToken).ConfigureAwait();
             if (invocationCountBenchmarks.IsEmpty())
             {
-                userInteraction.PrintWrongFilterInfo(benchmarksToFilter, logger, [.. options.Filters]);
+                await userInteraction.PrintWrongFilterInfoAsync(benchmarksToFilter, logger, [.. options.Filters], cancellationToken).ConfigureAwait();
                 return [];
             }
 
@@ -230,7 +230,7 @@ namespace BenchmarkDotNet.Running
                     report => report.AllMeasurements.Single(measurement => measurement.IsWorkload() && measurement.IterationStage == Engines.IterationStage.Actual));
 
             int iterationCount = baselineJob.Run.IterationCount;
-            BenchmarkRunInfo[] benchmarksWithoutInvocationCount = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
+            BenchmarkRunInfo[] benchmarksWithoutInvocationCount = await TypeFilter.FilterAsync(effectiveConfig, benchmarksToFilter, cancellationToken).ConfigureAwait();
             BenchmarkRunInfo[] benchmarksWithInvocationCount = benchmarksWithoutInvocationCount
                 .Select(benchmarkInfo => new BenchmarkRunInfo(
                     benchmarkInfo.BenchmarksCases.Select(benchmark =>

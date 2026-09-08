@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
 using System.Reflection;
 
@@ -62,7 +62,7 @@ public abstract class BenchmarkActionBase : IBenchmarkAction
         return (TDelegate)Delegate.Combine(delegates)!;
     }
 
-    // must be kept in sync with Runnable_X.__Overhead
+    // must be kept in sync with Runnable_X.Overhead
     internal static void OverheadStatic() { }
     private void OverheadInstance() { }
 }

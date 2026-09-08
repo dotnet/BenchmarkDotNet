@@ -10,7 +10,7 @@ using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 namespace BenchmarkDotNet.Running
 {
-    public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable
+    public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable, IAsyncDisposable
     {
         public Descriptor Descriptor { get; }
         public Job Job { get; }
@@ -47,6 +47,8 @@ namespace BenchmarkDotNet.Running
 
             return GetRuntime().GetDefaultToolchain(this);
         }
+
+        public ValueTask DisposeAsync() => Parameters.DisposeAsync();
 
         public void Dispose() => Parameters.Dispose();
 

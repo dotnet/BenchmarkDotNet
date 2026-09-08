@@ -337,5 +337,85 @@ namespace BenchmarkDotNet.Tests.Validators
 
             return validationErrors;
         }
-    }
+    
+        [Fact]
+        public async Task ARefStructCurrentIsLeftOutOfTheComparisonRatherThanRefused()
+        {
+            // Comparing return values means holding every element, which a ref struct cannot be - so this benchmark
+            // has no comparable value. That leaves it out of the comparison; it must not fail it.
+            var validationErrors = await ReturnValueValidator.FailOnError
+                .ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(RefStructCurrentBenchmark)))
+                .ToArrayAsync();
+
+            var skipped = Assert.Single(validationErrors);
+            Assert.Contains("yields by-ref-like elements", skipped.Message);
+            Assert.False(skipped.IsCritical);
+        }
+
+        [Fact]
+        public async Task ARefStructParameterIsLeftOutOfTheComparisonRatherThanRefused()
+        {
+            var validationErrors = await ReturnValueValidator.FailOnError
+                .ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(RefStructParameterBenchmark)))
+                .ToArrayAsync();
+
+            var skipped = Assert.Single(validationErrors);
+            Assert.Contains("by-ref-like parameter", skipped.Message);
+            Assert.False(skipped.IsCritical);
+        }
+
+        // The generated code passes a by-ref-like argument natively and runs; reflection cannot box one into the
+        // args array, so the validator can only skip - it must not refuse.
+        public class RefStructParameterBenchmark
+        {
+            public static IEnumerable<object> Values() { yield return new byte[] { 1, 2, 3 }; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public int Run(ReadOnlySpan<byte> bytes) => bytes.Length;
+        }
+
+        [Fact]
+        public async Task ARefStructReturnIsLeftOutOfTheComparisonRatherThanRefused()
+        {
+            var validationErrors = await ReturnValueValidator.FailOnError
+                .ValidateAsync(BenchmarkConverter.TypeToBenchmarks(typeof(RefStructReturnBenchmark)))
+                .ToArrayAsync();
+
+            var skipped = Assert.Single(validationErrors);
+            Assert.Contains("returns by-ref-like value", skipped.Message);
+            Assert.False(skipped.IsCritical);
+        }
+
+        // Reflection cannot box a ref struct to hand it back, so the method cannot even be invoked - the guard has
+        // to come before the call, not around the result.
+        public class RefStructReturnBenchmark
+        {
+            [Benchmark]
+            public ReadOnlySpan<byte> Run() => default;
+        }
+
+        // Both validators read Current through reflection, which cannot hand back a ref struct - so neither can
+        // validate this benchmark, and neither may refuse to run it. Its generated code reads Current strongly
+        // typed and works.
+        public class RefStructCurrentBenchmark
+        {
+            [Benchmark]
+            public SpanEnumerable Enumerating() => default;
+
+            public readonly struct SpanEnumerable
+            {
+                public SpanEnumerator GetAsyncEnumerator(CancellationToken cancellationToken = default) => new();
+            }
+
+            public struct SpanEnumerator
+            {
+                private int index;
+
+                public ReadOnlySpan<byte> Current => default;
+
+                public ValueTask<bool> MoveNextAsync() => new(index++ < 2);
+            }
+        }
+}
 }

@@ -39,7 +39,7 @@ public abstract class ExecutionValidatorBase : IValidator
         }
     }
 
-    protected async ValueTask<bool> TryToCallSetupOrCleanup<T>(object benchmarkTypeInstance, MethodInfo? method, List<ValidationError> errors, CancellationToken cancellationToken)
+    protected async ValueTask<bool> TryToCallSetupOrCleanup<T>(BenchmarkCase benchmark, object benchmarkTypeInstance, MethodInfo? method, List<ValidationError> errors, CancellationToken cancellationToken)
     {
         if (method is null)
         {
@@ -53,7 +53,7 @@ public abstract class ExecutionValidatorBase : IValidator
             {
                 if (result is null)
                 {
-                    errors.Add(new ValidationError(TreatsWarningsAsErrors, $"[{GetAttributeName(typeof(T))}] for {benchmarkTypeInstance.GetType().Name} returned null"));
+                    errors.Add(new ValidationError(TreatsWarningsAsErrors, $"[{GetAttributeName(typeof(T))}] for '{benchmark.DisplayInfo}' returned null", benchmark));
                     return false;
                 }
                 await DynamicAwaitHelper.AwaitResult(result, awaitableInfo).ConfigureAwait(false);
@@ -61,9 +61,8 @@ public abstract class ExecutionValidatorBase : IValidator
         }
         catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
         {
-            errors.Add(new ValidationError(
-                TreatsWarningsAsErrors,
-                $"Failed to execute [{GetAttributeName(typeof(T))}] for {benchmarkTypeInstance.GetType().Name}, exception was {GetDisplayExceptionMessage(ex)}"));
+            errors.Add(new ValidationError(TreatsWarningsAsErrors,
+                $"Failed to execute [{GetAttributeName(typeof(T))}] for '{benchmark.DisplayInfo}', exception was {GetDisplayExceptionMessage(ex)}", benchmark));
 
             return false;
         }
@@ -86,11 +85,9 @@ public abstract class ExecutionValidatorBase : IValidator
         {
             if (!param.IsArgument)
                 continue;
-            if (param.Definition.ParameterType.IsByRefLike())
+            if (param.Definition.ParameterType.WithoutRefModifier().IsByRefLike())
             {
-                errors.Add(new ValidationError(
-                    TreatsWarningsAsErrors,
-                    $"{GetType().Name} cannot execute benchmark with ref struct parameter {benchmark.Descriptor.Type.Name}.{benchmark.Descriptor.WorkloadMethodDisplayInfo}"));
+                errors.Add(new ValidationError(false, $"Benchmark '{benchmark.DisplayInfo}' contains a by-ref-like parameter, skipping validation.", benchmark));
                 args = null;
                 return false;
             }
@@ -102,9 +99,7 @@ public abstract class ExecutionValidatorBase : IValidator
         }
         catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
         {
-            errors.Add(new ValidationError(
-                TreatsWarningsAsErrors,
-                $"Failed to set parameters for {benchmark.Descriptor.Type.Name}, exception was: {GetDisplayExceptionMessage(ex)}"));
+            errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Failed to set parameters for {benchmark.Descriptor.Type.Name}, exception was: {GetDisplayExceptionMessage(ex)}", benchmark));
             args = null;
             return false;
         }

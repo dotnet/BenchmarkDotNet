@@ -41,6 +41,59 @@ public class ParamsAttributeAnalyzerTests
     {
         public MustHaveValues() : base(ParamsAttributeAnalyzer.MustHaveValuesRule) { }
 
+        [Fact]
+        public async Task A_derived_attribute_passing_values_to_the_base_constructor_does_not_report_error()
+        {
+            // The values reach ParamsAttribute through base(...), where this analyzer cannot see them, so the
+            // usage's own empty argument list must not be read as "no values".
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class BoolParamsAttribute : ParamsAttribute
+                {
+                    public BoolParamsAttribute() : base(true, false) { }
+                }
+
+                public class BenchmarkClass
+                {
+                    [BoolParams]
+                    public bool Value { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task A_derived_attribute_with_its_own_constructor_shape_does_not_report_error()
+        {
+            // A scalar constructor argument is not the base's object[] of values; reading it as one throws.
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class RangeParamsAttribute : ParamsAttribute
+                {
+                    public RangeParamsAttribute(int max) : base(0, max) { }
+                }
+
+                public class BenchmarkClass
+                {
+                    [RangeParams(5)]
+                    public int Value { get; set; }
+
+                    [Benchmark]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
+
         [Theory, CombinatorialData]
         public async Task Providing_one_or_more_values_should_not_trigger_diagnostic(
             [CombinatorialMemberData(nameof(FieldOrPropertyDeclarations))] string fieldOrPropertyDeclaration,

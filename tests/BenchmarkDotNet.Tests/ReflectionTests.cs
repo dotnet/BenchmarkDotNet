@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -201,6 +202,55 @@ namespace BenchmarkDotNet.Tests
 
             public static implicit operator StackOnlyStruct<T>(WithImplicitCastToStackOnlyStruct<T> instance)
                 => new StackOnlyStruct<T> { Span = instance.Array };
+        }
+        // The declared-type and cross-kind assertions below all fail without their part of the lookup. The
+        // same-kind most-derived ones cannot: reflection is documented as returning members in no particular
+        // order, but every runtime tested yields the derived member first, so a first match passes here too.
+        // Those are asserted to pin the intent, not because this test can catch their absence.
+        [Fact]
+        public void GetParameterMemberPrefersTheMostDerivedOfAHiddenPair()
+        {
+            const BindingFlags Instance = BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+            const BindingFlags Static = BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy;
+
+            Assert.Equal(typeof(HidingMembers), typeof(HidingMembers).GetParameterMember("Field", typeof(string), Instance)?.DeclaringType);
+            Assert.Equal(typeof(HidingMembers), typeof(HidingMembers).GetParameterMember("StaticField", typeof(string), Static)?.DeclaringType);
+
+            // A field hiding a property and a property hiding a field: looking either kind up first finds the base
+            // member of that kind, which is not the parameter.
+            Assert.IsAssignableFrom<FieldInfo>(typeof(HidingMembers).GetParameterMember("PropertyHiddenByField", typeof(string), Instance));
+            Assert.IsAssignableFrom<FieldInfo>(typeof(HidingMembers).GetParameterMember("StaticPropertyHiddenByField", typeof(string), Static));
+            Assert.IsAssignableFrom<PropertyInfo>(typeof(HidingMembers).GetParameterMember("FieldHiddenByProperty", typeof(string), Instance));
+
+            // The declared type still selects: only the base declares an int of that name.
+            Assert.Equal(typeof(HiddenMembers), typeof(HidingMembers).GetParameterMember("Typed", typeof(int), Instance)?.DeclaringType);
+            Assert.Equal(typeof(HidingMembers), typeof(HidingMembers).GetParameterMember("Typed", typeof(string), Instance)?.DeclaringType);
+
+            // An indexer takes arguments and is never a parameter member.
+            Assert.Null(typeof(HidingMembers).GetParameterMember("Item", typeof(string), Instance));
+            Assert.Null(typeof(HidingMembers).GetParameterMember("Field", typeof(int), Instance));
+        }
+
+        public class HiddenMembers
+        {
+            public string Field = "";
+            public static string StaticField = "";
+            public int Typed;
+            public string PropertyHiddenByField { get; set; } = "";
+            public static string StaticPropertyHiddenByField { get; set; } = "";
+            public string FieldHiddenByProperty = "";
+        }
+
+        public class HidingMembers : HiddenMembers
+        {
+            public new string Field = "";
+            public static new string StaticField = "";
+            public new string Typed = "";
+            public new string PropertyHiddenByField = "";
+            public static new string StaticPropertyHiddenByField = "";
+            public new string FieldHiddenByProperty { get; set; } = "";
+
+            public string this[int index] => "";
         }
     }
 }
