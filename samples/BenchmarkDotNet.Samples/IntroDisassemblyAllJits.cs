@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(MultipleJits))]
+    [UseLocalJobOnly]
     public class IntroDisassemblyAllJits
     {
         public class MultipleJits : ManualConfig

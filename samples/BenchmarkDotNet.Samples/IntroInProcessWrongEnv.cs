@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]
     public class IntroInProcessWrongEnv

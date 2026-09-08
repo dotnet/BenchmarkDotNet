@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Samples
 {
     [MemoryDiagnoser]
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroLargeAddressAware
     {
         private class Config : ManualConfig
