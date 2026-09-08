@@ -16,7 +16,8 @@ namespace BenchmarkDotNet.Validators
                 .Distinct()
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)
-                .Where(built => !built.IsSuccess)
+                // An unreadable type is reported by TypeFilter, which sees it even when nothing else survives.
+                .Where(built => !built.IsSuccess && !built.IsUnreadable)
                 .Select(built => new ValidationError(false, built.Error!))
                 .ToAsyncEnumerable();
     }
