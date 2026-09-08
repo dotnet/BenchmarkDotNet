@@ -124,11 +124,17 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     continue;
 
                 var pending = GetOrCreatePendingResult(node);
-                var errorMessage = pending.GetErrorMessage();
 
-                TestNodeStateProperty state = errorMessage != null
-                    ? new FailedTestNodeStateProperty(errorMessage)
-                    : SkippedTestNodeStateProperty.CachedInstance;
+                // A benchmark that reported a start and never an end did not finish: the run was torn down under it
+                // by something this processor was never told about, such as BenchmarkRunnerClean throwing. Only a
+                // benchmark that never started at all was really never run.
+                TestNodeStateProperty state = (pending.GetErrorMessage(), pending.StartTime) switch
+                {
+                    (string errorMessage, _) => new FailedTestNodeStateProperty(errorMessage),
+                    (null, not null) => new FailedTestNodeStateProperty(
+                        "The benchmark started but never reported a result, so the run did not complete."),
+                    (null, null) => SkippedTestNodeStateProperty.CachedInstance
+                };
 
                 publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance));
                 PublishResult(node, pending, state);

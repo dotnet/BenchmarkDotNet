@@ -96,7 +96,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     benchmarkMethod.ReturnType.FullName ?? benchmarkMethod.ReturnType.Name),
             };
 
-            if (benchmarkAttribute?.SourceCodeFile != null)
+            // SourceCodeFile is a non-nullable string that a [CallerFilePath] fills in, so it is empty rather than
+            // null on an attribute built without caller information - by an analyzer, or by hand. Publishing a
+            // location of "" at line 0 would send an IDE to a file that does not exist.
+            if (benchmarkAttribute != null && !string.IsNullOrEmpty(benchmarkAttribute.SourceCodeFile))
             {
                 // BenchmarkAttribute captures the line of the attribute itself, and the platform expects 0-based lines.
                 var line = Math.Max(0, benchmarkAttribute.SourceCodeLineNumber - 1);

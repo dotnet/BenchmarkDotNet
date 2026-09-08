@@ -35,9 +35,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
 
+            // The platform builds a test framework per request but this once, which is what makes it able to hold
+            // the parameter values of one request until the whole application is done. See ParameterValueLifetime.
+            var parameterValues = new ParameterValueLifetime();
+
             builder.RegisterTestFramework(
                 _ => new TestFrameworkCapabilities(),
-                (capabilities, serviceProvider) => new BenchmarkTestFramework(capabilities, serviceProvider, assembly));
+                (capabilities, serviceProvider) => new BenchmarkTestFramework(capabilities, serviceProvider, assembly, parameterValues));
+
+            builder.TestHost.AddTestHostApplicationLifetime(_ => parameterValues);
 
             // Opts into the tree node filter, which is what backs `--treenode-filter "/*/*/MyBenchmarks/*"`.
 #pragma warning disable TPEXP // The tree node filter is still marked as experimental by the platform.

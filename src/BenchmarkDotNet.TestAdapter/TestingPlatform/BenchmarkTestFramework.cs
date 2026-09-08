@@ -22,12 +22,18 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         private readonly BenchmarkDotNetExtension extension = new();
         private readonly IServiceProvider serviceProvider;
         private readonly Assembly assembly;
+        private readonly ParameterValueLifetime parameterValues;
 
-        public BenchmarkTestFramework(ITestFrameworkCapabilities capabilities, IServiceProvider serviceProvider, Assembly assembly)
+        public BenchmarkTestFramework(
+            ITestFrameworkCapabilities capabilities,
+            IServiceProvider serviceProvider,
+            Assembly assembly,
+            ParameterValueLifetime parameterValues)
         {
             Capabilities = capabilities;
             this.serviceProvider = serviceProvider;
             this.assembly = assembly;
+            this.parameterValues = parameterValues;
         }
 
         /// <inheritdoc />
@@ -103,8 +109,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             }
             finally
             {
-                // Discovery runs nothing, so every value the enumeration created is this method's to dispose.
-                ParameterValueDisposer.DisposeUnused(enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases), []);
+                // Discovery runs nothing, so every value the enumeration created is unused - but not necessarily for
+                // good: under server mode a run request follows in this same process, so the disposal waits until the
+                // application is done rather than happening here.
+                parameterValues.Track(enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases), []);
             }
         }
 
@@ -124,8 +132,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             }
 
             // A benchmark that was filtered out or that collided is never handed to BenchmarkDotNet, so nothing else
-            // would dispose the values the enumeration created for it.
-            ParameterValueDisposer.DisposeUnused(
+            // would dispose the values the enumeration created for it. As in DiscoverAsync, a later request of the
+            // same application may still enumerate and run them, so the disposal waits for the end of the run.
+            parameterValues.Track(
                 enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases),
                 runnable.Select(match => match.Node.BenchmarkCase));
 
@@ -294,7 +303,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         {
             var matches = new List<List<Match>>();
             var matchesByUid = new Dictionary<string, List<Match>>(StringComparer.Ordinal);
-            var runInfos = BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly);
+            var runInfos = BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly, parameterValues.TrackHidden);
 
             foreach (var runInfo in runInfos)
             {
@@ -327,9 +336,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         {
             TestNodeUidListFilter uidListFilter => uidListFilter.TestNodeUids.Any(uid => uid.Value == node.Uid),
             TreeNodeFilter treeNodeFilter => treeNodeFilter.MatchesFilter(node.Path, node.GetFilterableProperties()),
+            NopFilter => true,
 
-            // NopFilter, and anything the platform adds later, means "everything".
-            _ => true
+            // A filter the platform adds later has to be implemented here before it can be honoured. Falling back to
+            // "everything" would run the whole assembly instead of the subset that was asked for, which is a wrong
+            // answer rather than a visible failure.
+            _ => throw new NotSupportedException(
+                $"BenchmarkDotNet.TestAdapter does not support the '{filter.GetType().FullName}' test execution " +
+                "filter, and will not run every benchmark in its place. Please report this at " +
+                "https://github.com/dotnet/BenchmarkDotNet/issues.")
         };
 #pragma warning restore TPEXP
 
