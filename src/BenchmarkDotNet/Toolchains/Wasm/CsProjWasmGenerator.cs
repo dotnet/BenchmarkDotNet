@@ -3,13 +3,14 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
-using System.Text;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.Wasm
 {
     public class CsProjWasmGenerator : CsProjGenerator
     {
+        private const string LinkDescriptionFileName = "WasmLinkerDescription.xml";
+
         private readonly WasmSettings settings;
         private readonly bool aot;
         private readonly bool useCoreClrRuntime;
@@ -25,72 +26,108 @@ namespace BenchmarkDotNet.Toolchains.Wasm
 
         protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
-            var targetMainJsPath = GetExecutablePath(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "");
-
+            // The project points at both of these, so they have to exist before it is built to gather references.
             if (aot)
             {
-                await GenerateProjectFileAsync(buildPartition, artifactsPaths, aot: true, logger, targetMainJsPath, cancellationToken).ConfigureAwait(false);
-
-                var linkDescriptionFileName = "WasmLinkerDescription.xml";
                 await File.WriteAllTextAsync(
-                    Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, linkDescriptionFileName),
-                    await ResourceHelper.LoadTemplateAsync(linkDescriptionFileName, cancellationToken).ConfigureAwait(false),
+                    Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, LinkDescriptionFileName),
+                    await ResourceHelper.LoadTemplateAsync(LinkDescriptionFileName, cancellationToken).ConfigureAwait(false),
                     cancellationToken).ConfigureAwait(false);
             }
-            else
-            {
-                await GenerateProjectFileAsync(buildPartition, artifactsPaths, aot: false, logger: logger, targetMainJsPath, cancellationToken).ConfigureAwait(false);
-            }
 
-            await GenerateMainJS(settings.MainJsTemplate, targetMainJsPath, cancellationToken).ConfigureAwait(false);
+            await GenerateMainJS(settings.MainJsTemplate, GetMainJsPath(artifactsPaths), cancellationToken).ConfigureAwait(false);
+
+            await base.GenerateProjectAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
-        protected async ValueTask GenerateProjectFileAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, bool aot, ILogger logger, string targetMainJsPath, CancellationToken cancellationToken)
+        protected override string GetSdkName(string benchmarkProjectSdkName) => "Microsoft.NET.Sdk.WebAssembly";
+
+        protected override void AddEarlyProperties(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
         {
-            BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
+            base.AddEarlyProperties(project, buildPartition, artifactsPaths, projectFile);
 
-            var xmlDoc = new XmlDocument();
-            xmlDoc.Load(projectFile.FullName);
-            var (customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
-            string sdkName = "Microsoft.NET.Sdk.WebAssembly";
+            project.Add(new XElement("PropertyGroup",
+                new XElement("OriginalCSProjPath", projectFile.FullName),
+                new XElement("WasmPropsPath", "$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.props'))"),
+                new XElement("WasmTargetsPath", "$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.targets'))"),
+                new XElement("WasmMainJSPath", GetMainJsPath(artifactsPaths))));
 
-            // For CoreCLR WASM:
-            // - UseMonoRuntime=false: resolves CoreCLR runtime pack instead of Mono
-            // - WasmBuildNative=false: avoids requiring wasm-tools workload
-            // - WasmEnableWebcil=false: CoreCLR doesn't support webcil format
-            string coreclrOverrides = !useCoreClrRuntime
-                ? string.Empty
-                : """
-                  <!-- CoreCLR overrides: use CoreCLR runtime instead of Mono -->
-                  <PropertyGroup>
-                    <UseMonoRuntime>false</UseMonoRuntime>
-                    <WasmBuildNative>false</WasmBuildNative>
-                    <WasmEnableWebcil>false</WasmEnableWebcil>
-                  </PropertyGroup>
+            project.Add(new XElement("Import",
+                new XAttribute("Project", "$(WasmPropsPath)"),
+                new XAttribute("Condition", "Exists($(WasmPropsPath))")));
 
-                """;
+            if (useCoreClrRuntime)
+            {
+                project.Add(new XComment(" CoreCLR overrides: use the CoreCLR runtime instead of Mono "));
+                project.Add(new XElement("PropertyGroup",
+                    // Resolves the CoreCLR runtime pack instead of the Mono one.
+                    new XElement("UseMonoRuntime", "false"),
+                    // Avoids requiring the wasm-tools workload.
+                    new XElement("WasmBuildNative", "false"),
+                    // CoreCLR does not support the webcil format.
+                    new XElement("WasmEnableWebcil", "false")));
+            }
+        }
 
-            string content = new StringBuilder(await ResourceHelper.LoadTemplateAsync("WasmCsProj.txt", cancellationToken).ConfigureAwait(false))
-                .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
-                .Replace("$RUN_AOT$", aot.ToString().ToLower())
-                .Replace("$CSPROJPATH$", projectFile.FullName)
-                .Replace("$TFM$", Settings.TargetFrameworkMoniker)
-                .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
-                .Replace("$COPIEDSETTINGS$", customProperties)
-                .Replace("$SDKNAME$", sdkName)
-                .Replace("$MAINJS$", targetMainJsPath)
-                .Replace("$CORECLR_OVERRIDES$", coreclrOverrides)
-                .ToString();
+        protected override void AddProjectContent(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
+        {
+            project.Add(new XElement("PropertyGroup",
+                new XElement("OutputType", "Exe"),
+                new XElement("TreatWarningsAsErrors", "False"),
+                new XElement("MSBuildTreatWarningsAsErrors", "false"),
+                new XElement("RunAnalyzers", "false"),
+                new XElement("RuntimeConfig", "Release"),
+                new XElement("EnableDefaultCompileItems", "false"),
+                new XElement("TargetFrameworks", Settings.TargetFrameworkMoniker),
+                new XElement("AllowUnsafeBlocks", "true"),
+                new XElement("AppDir", "$(PublishDir)"),
+                new XElement("AssemblyName", artifactsPaths.ProgramName),
+                new XElement("RuntimeIdentifier", "browser-wasm"),
+                new XElement("SuppressTrimAnalysisWarnings", "true"),
+                new XElement("RunAOTCompilation", aot.ToString().ToLowerInvariant()),
+                new XElement("PublishTrimmed", "$(RunAOTCompilation)"),
+                new XElement("ValidateExecutableReferencesMatchSelfContained", "false"),
+                new XElement("EnableDefaultWasmAssembliesToBundle", "false"),
+                new XElement("StartupObject", "BenchmarkDotNet.Autogenerated.UniqueProgramName"),
+                new XComment(" Shorten obj path to work around windows long path issue. https://github.com/dotnet/runtime/issues/103625. "),
+                new XElement("IntermediateOutputPath", "$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))")));
 
-            await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
+            AddCompileItems(project, artifactsPaths);
 
-            // Integration tests are built without dependencies, so we skip gathering dlls.
-            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
-                return;
+            project.Add(new XElement("ItemGroup",
+                new XElement("TrimmerRootDescriptor",
+                    new XAttribute("Include", LinkDescriptionFileName),
+                    new XAttribute("Condition", "'$(RunAOTCompilation)' == 'true'")),
+                new XElement("Content",
+                    new XAttribute("Update", @"wwwroot\**"),
+                    new XAttribute("CopyToOutputDirectory", "PreserveNewest"))));
 
-            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+            project.Add(new XElement("ItemGroup",
+                new XElement("ProjectReference", new XAttribute("Include", "$(OriginalCSProjPath)"))));
+        }
+
+        protected override void AddLateProperties(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
+        {
+            base.AddLateProperties(project, buildPartition, artifactsPaths, projectFile);
+
+            project.Add(new XElement("PropertyGroup",
+                new XElement("WasmBuildAppAfterThisTarget", "PrepareForWasmBuild")));
+
+            project.Add(new XElement("Target",
+                new XAttribute("Name", "PrepareForWasmBuild"),
+                new XAttribute("AfterTargets", "Publish"),
+                new XElement("ItemGroup",
+                    new XElement("WasmAssembliesToBundle",
+                        new XAttribute("Include", "$(PublishDir)*.dll"),
+                        new XAttribute("Condition", "'$(RunAOTCompilation)' != 'true'")),
+                    new XElement("WasmAssembliesToBundle",
+                        new XAttribute("Include", "$(PublishDir)*.dll"),
+                        new XAttribute("Exclude", "$(PublishDir)KernelTraceControl.dll"),
+                        new XAttribute("Condition", "'$(RunAOTCompilation)' == 'true'")))));
+
+            project.Add(new XElement("Import",
+                new XAttribute("Project", "$(WasmTargetsPath)"),
+                new XAttribute("Condition", "Exists($(WasmTargetsPath))")));
         }
 
         protected async ValueTask GenerateMainJS(FileInfo? mainJsTemplate, string targetMainJsPath, CancellationToken cancellationToken)
@@ -102,6 +139,11 @@ namespace BenchmarkDotNet.Toolchains.Wasm
             targetMainJsPath.EnsureFolderExists();
             await File.WriteAllTextAsync(targetMainJsPath, content, cancellationToken).ConfigureAwait(false);
         }
+
+        private string GetMainJsPath(ArtifactsPaths artifactsPaths)
+            => GetExecutablePath(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "");
+
+        protected override bool PublishesOutput => true;
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "wwwroot", "main.mjs");
 

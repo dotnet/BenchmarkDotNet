@@ -1,12 +1,8 @@
 using BenchmarkDotNet.Detectors;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
-using System.Text;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.R2R
 {
@@ -20,36 +16,41 @@ namespace BenchmarkDotNet.Toolchains.R2R
             BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
         }
 
-        protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
+        protected override void AddProjectContent(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
         {
-            BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
-            var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
+            base.AddProjectContent(project, buildPartition, artifactsPaths, projectFile);
 
-            var xmlDoc = new XmlDocument();
-            xmlDoc.Load(projectFile.FullName);
-            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+            project.Add(new XElement("PropertyGroup",
+                new XComment(" Shorten obj path to work around https://github.com/dotnet/runtime/issues/103625. "),
+                new XElement("IntermediateOutputPath", "$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))"),
+                new XElement("SelfContained", "true"),
+                new XElement("RuntimeIdentifier", RuntimeInformation.GetPortableRuntimeIdentifier()),
+                new XElement("PublishReadyToRun", "true"),
+                new XElement("PublishReadyToRunComposite", "true")));
 
-            string content = new StringBuilder(await ResourceHelper.LoadTemplateAsync("R2RCsProj.txt", cancellationToken).ConfigureAwait(false))
-                .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
-                .Replace("$CSPROJPATH$", projectFile.FullName)
-                .Replace("$TFM$", Settings.TargetFrameworkMoniker)
-                .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
-                .Replace("$COPIEDSETTINGS$", customProperties)
-                .Replace("$SDKNAME$", sdkName)
-                .Replace("$RUNTIMEPACK$", settings.CustomRuntimePack?.FullName)
-                .Replace("$CROSSGEN2PACK$", settings.Crossgen2Pack?.FullName)
-                .Replace("$RUNTIMEIDENTIFIER$", RuntimeInformation.GetPortableRuntimeIdentifier())
-                .ToString();
-
-            await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, content, cancellationToken).ConfigureAwait(false);
-
-            // Integration tests are built without dependencies, so we skip gathering dlls.
-            if (buildPartition.ForcedNoDependenciesForIntegrationTests)
-                return;
-
-            await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+            project.Add(new XElement("ItemGroup",
+                new XComment(" Temporary fix until https://github.com/dotnet/sdk/pull/52296 is resolved "),
+                new XElement("PublishReadyToRunCompositeExclusions", new XAttribute("Include", "Dia2Lib.dll")),
+                new XElement("PublishReadyToRunCompositeExclusions", new XAttribute("Include", "TraceReloggerLib.dll"))));
         }
+
+        protected override void AddLateProperties(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
+        {
+            base.AddLateProperties(project, buildPartition, artifactsPaths, projectFile);
+
+            // The point of this project is to publish the app with r2r composite using a custom runtime pack
+            // and a custom crossgen2, both built locally.
+            project.Add(new XElement("Target",
+                new XAttribute("Name", "TrickRuntimePackLocation"),
+                new XAttribute("AfterTargets", "ProcessFrameworkReferences"),
+                new XElement("ItemGroup",
+                    new XElement("RuntimePack",
+                        new XElement("PackageDirectory", settings.CustomRuntimePack?.FullName)),
+                    new XElement("Crossgen2Pack",
+                        new XElement("PackageDirectory", settings.Crossgen2Pack?.FullName)))));
+        }
+
+        protected override bool PublishesOutput => true;
 
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 

@@ -103,7 +103,14 @@ namespace BenchmarkDotNet.Running
             var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
             eventProcessor.OnStartBuildStage(buildPartitions);
 
-            var sequentialBuildPartitions = buildPartitions.Where(partition => partition.Benchmarks.Any(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild))).ToArray();
+            var sequentialBuildPartitions = buildPartitions.Where(partition =>
+                    partition.Benchmarks.Any(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild))
+                    // .Net SDK 8+ supports ArtifactsPath for proper parallel builds.
+                    // Older SDKs may produce builds with incorrect bindings if more than 1 partition is built in parallel.
+                    || (partition.RepresentativeBenchmarkCase.GetToolchain().Generator is DotNetCliGenerator
+                        && partition.RepresentativeBenchmarkCase.GetRuntime().Version?.Major < 8)
+                )
+                .ToArray();
             var parallelBuildPartitions = buildPartitions.Except(sequentialBuildPartitions).ToArray();
 
             Dictionary<BuildPartition, BuildResult> buildResults = parallelBuildPartitions.Length > 0

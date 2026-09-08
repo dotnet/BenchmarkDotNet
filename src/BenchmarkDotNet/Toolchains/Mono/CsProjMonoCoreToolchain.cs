@@ -22,7 +22,7 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
     private CsProjMonoCoreToolchain(MonoCoreRuntime runtime, MonoCoreSettings settings, MonoCoreSettings resolved)
         : base("Mono", runtime, settings,
             new CsProjMonoGenerator(resolved),
-            new MonoPublisher(resolved),
+            new DotNetCliPublisher(resolved),
             new DotNetCliExecutor(settings.CliPath))
     {
     }

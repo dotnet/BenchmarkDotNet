@@ -8,7 +8,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.Text;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot;
 
@@ -41,21 +41,7 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
     protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
         => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, Settings.TargetFrameworkMoniker, settings.RuntimeIdentifier, "publish");
 
-    protected override ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
-    {
-        string projectFilePath = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, NullLogger.Instance).FullName;
-        string extraArguments = CsProjNativeAotToolchain.GetExtraArguments(settings.RuntimeIdentifier);
-
-        string cli = Settings.CliPath?.FullName ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
-        var content = new StringBuilder(300)
-            .AppendLine($"call {cli} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, projectFilePath, extraArguments)}")
-            .AppendLine($"call {cli} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, projectFilePath, Settings.TargetFrameworkMoniker, extraArguments)}")
-            .AppendLine($"call {cli} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, extraArguments)}")
-            .AppendLine($"call {cli} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, Settings.TargetFrameworkMoniker, extraArguments)}")
-            .ToString();
-
-        return new(File.WriteAllTextAsync(artifactsPaths.BuildScriptFilePath, content, cancellationToken));
-    }
+    protected override bool PublishesOutput => true;
 
     // We always want to have a new directory for NuGet packages restore.
     // Some of the packages are going to contain source code, so they can not be in the subfolder of current solution
@@ -101,96 +87,57 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
 
     protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
     {
-        var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName;
-
-        await File.WriteAllTextAsync(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(projectFile, buildPartition, artifactsPaths, logger), cancellationToken).ConfigureAwait(false);
-
-        // Generate `bdn_generated.rd.xml`
+        // The project points at this file, so it has to exist before it is built to gather references.
         await GenerateReflectionFileAsync(artifactsPaths, cancellationToken).ConfigureAwait(false);
 
-        // Integration tests are built without dependencies, so we skip gathering dlls.
-        if (buildPartition.ForcedNoDependenciesForIntegrationTests)
-            return;
-
-        await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
+        await base.GenerateProjectAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
     }
 
-    private string GenerateProjectForNuGetBuild(string projectFilePath, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $"""
-    <Project Sdk="Microsoft.NET.Sdk">
-      <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.props" />
-      <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFrameworks>{Settings.TargetFrameworkMoniker}</TargetFrameworks>
-        <RuntimeIdentifier>{settings.RuntimeIdentifier}</RuntimeIdentifier>
-        <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
-        <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
-        <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-        <MSBuildTreatWarningsAsErrors>false</MSBuildTreatWarningsAsErrors>
-        <DebugSymbols>false</DebugSymbols>
-        <RunAnalyzers>false</RunAnalyzers>
-        <PublishAot>true</PublishAot>
-        <IlcOptimizationPreference>{settings.OptimizationPreference}</IlcOptimizationPreference>
-        <OptimizationPreference>{settings.OptimizationPreference}</OptimizationPreference>
-        <IlcGenerateStackTraceData>{settings.GenerateStackTraceData}</IlcGenerateStackTraceData>
-        <StackTraceSupport>{settings.GenerateStackTraceData}</StackTraceSupport>
-        <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
-        <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-        <!-- Shorten obj path to work around https://github.com/dotnet/runtime/issues/103625. -->
-        <IntermediateOutputPath>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))</IntermediateOutputPath>
-        {GetInstructionSetSettings(buildPartition)}
-      </PropertyGroup>
-      {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
-      <ItemGroup>
-        <Compile Include="{Path.GetFileName(artifactsPaths.ProgramCodePath)}" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
-      </ItemGroup>
-      <ItemGroup>
-        {GetILCompilerPackageReference()}
-        <ProjectReference Include="{projectFilePath}" />
-      </ItemGroup>
-      <ItemGroup>
-        {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
-      </ItemGroup>
-      {GetCustomProperties(buildPartition, logger)}
-      <!-- Set LangVersion after copied settings so it overrides any LangVersion copied from the benchmarks project -->
-      <PropertyGroup>
-        <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '9.0')">latest</LangVersion>
-      </PropertyGroup>
-      <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Build.targets" />
-    </Project>
-    """;
-
-    private string GetCustomProperties(BuildPartition buildPartition, ILogger logger)
+    protected override void AddProjectContent(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
     {
-        var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
-        var xmlDoc = new XmlDocument();
-        xmlDoc.Load(projectFile.FullName);
+        base.AddProjectContent(project, buildPartition, artifactsPaths, projectFile);
 
-        (string customProperties, _) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
-        return customProperties;
+        project.Add(new XElement("PropertyGroup",
+            new XElement("RuntimeIdentifier", settings.RuntimeIdentifier),
+            new XElement("PublishAot", "true"),
+            new XElement("IlcOptimizationPreference", settings.OptimizationPreference),
+            new XElement("OptimizationPreference", settings.OptimizationPreference),
+            new XElement("IlcGenerateStackTraceData", settings.GenerateStackTraceData),
+            new XElement("StackTraceSupport", settings.GenerateStackTraceData),
+            new XComment(" workaround for 'This runtime may not be supported by .NET Core.' error "),
+            new XElement("EnsureNETCoreAppRuntime", "false"),
+            new XComment(" Shorten obj path to work around https://github.com/dotnet/runtime/issues/103625. "),
+            new XElement("IntermediateOutputPath", "$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))"),
+            GetInstructionSetSettings(buildPartition)));
+
+        if (settings.IlCompilerVersion.IsNotBlank())
+        {
+            project.Add(new XElement("ItemGroup",
+                new XElement("PackageReference",
+                    new XAttribute("Include", "Microsoft.DotNet.ILCompiler"),
+                    new XAttribute("Version", settings.IlCompilerVersion))));
+        }
+
+        project.Add(new XElement("ItemGroup",
+            GetRdXmlFiles(projectFile)
+                .Select(file => new XElement("RdXmlFile", new XAttribute("Include", file)))));
     }
 
-
-    private string GetILCompilerPackageReference()
-        => settings.IlCompilerVersion.IsBlank() ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{settings.IlCompilerVersion}"" />";
-
-    private string GetInstructionSetSettings(BuildPartition buildPartition)
+    private XElement? GetInstructionSetSettings(BuildPartition buildPartition)
     {
         string instructionSet = settings.InstructionSet.IsBlank()
             ? GetCurrentInstructionSet(buildPartition.Platform)
             : settings.InstructionSet;
 
         return instructionSet.IsNotBlank()
-            ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>"
-            : "";
+            ? new XElement("IlcInstructionSet", instructionSet)
+            : null;
     }
 
-    public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
+    public IEnumerable<string> GetRdXmlFiles(FileInfo projectFile)
     {
         yield return GeneratedRdXmlFileName;
 
-        var projectFile = GetProjectFilePath(benchmarkTarget, logger);
         var projectFileFolder = projectFile.DirectoryName!;
         var rdXml = Path.Combine(projectFileFolder, "rd.xml");
         if (File.Exists(rdXml))
