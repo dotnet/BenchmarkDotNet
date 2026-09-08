@@ -17,6 +17,8 @@ public sealed class CsProjNativeAotToolchain : CsProjNetToolchain
     public static readonly CsProjNativeAotToolchain Net10_0 = new(NativeAotRuntime.Net10_0, NativeAotSettings.Default);
     /// <summary>compiled as net11.0</summary>
     public static readonly CsProjNativeAotToolchain Net11_0 = new(NativeAotRuntime.Net11_0, NativeAotSettings.Default);
+    /// <summary>compiled as net12.0</summary>
+    public static readonly CsProjNativeAotToolchain Net12_0 = new(NativeAotRuntime.Net12_0, NativeAotSettings.Default);
 
     private CsProjNativeAotToolchain(NativeAotRuntime runtime, NativeAotSettings settings)
         : this(runtime, settings, Resolve(settings, runtime)) { }
@@ -49,6 +51,7 @@ public sealed class CsProjNativeAotToolchain : CsProjNetToolchain
             9 => Net90,
             10 => Net10_0,
             11 => Net11_0,
+            12 => Net12_0,
             _ => new CsProjNativeAotToolchain(runtime, settings),
         };
     }

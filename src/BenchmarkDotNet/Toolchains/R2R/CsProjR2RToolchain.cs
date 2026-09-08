@@ -11,6 +11,7 @@ public sealed class CsProjR2RToolchain : CsProjNetToolchain
     public static readonly CsProjR2RToolchain R2R90 = new(R2RRuntime.Net90, R2RSettings.Default);
     public static readonly CsProjR2RToolchain R2R10_0 = new(R2RRuntime.Net10_0, R2RSettings.Default);
     public static readonly CsProjR2RToolchain R2R11_0 = new(R2RRuntime.Net11_0, R2RSettings.Default);
+    public static readonly CsProjR2RToolchain R2R12_0 = new(R2RRuntime.Net12_0, R2RSettings.Default);
 
     private CsProjR2RToolchain(R2RRuntime runtime, R2RSettings settings)
         : this(runtime, settings, Resolve(settings, runtime)) { }
@@ -42,6 +43,7 @@ public sealed class CsProjR2RToolchain : CsProjNetToolchain
             9 => R2R90,
             10 => R2R10_0,
             11 => R2R11_0,
+            12 => R2R12_0,
             _ => new CsProjR2RToolchain(runtime, settings),
         };
     }

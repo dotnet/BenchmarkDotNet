@@ -29,6 +29,7 @@ using BenchmarkDotNet.Toolchains.Framework;
 using Perfolizer.Horology;
 using System.Reflection;
 using BenchmarkDotNet.Toolchains.NetCoreApp;
+using BenchmarkDotNet.Toolchains.R2R;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -281,7 +282,7 @@ namespace BenchmarkDotNet.Tests
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net11.0", generator.Settings.TargetFrameworkMoniker);
+            Assert.Equal("net12.0", generator.Settings.TargetFrameworkMoniker);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -396,6 +397,31 @@ namespace BenchmarkDotNet.Tests
             Assert.IsType(expectedToolchain, config.GetJobs().Single().GetToolchain());
         }
 
+        [Theory]
+        [InlineData(RuntimeMoniker.Net12_0, typeof(CsProjCoreToolchain))]
+        [InlineData(RuntimeMoniker.NativeAot12_0, typeof(CsProjNativeAotToolchain))]
+        [InlineData(RuntimeMoniker.Mono12_0, typeof(CsProjMonoCoreToolchain))]
+        [InlineData(RuntimeMoniker.R2R12_0, typeof(CsProjR2RToolchain))]
+        [InlineData(RuntimeMoniker.MonoWasm12_0, typeof(CsProjMonoWasmToolchain))]
+        [InlineData(RuntimeMoniker.MonoWasmAot12_0, typeof(CsProjMonoWasmAotToolchain))]
+        [InlineData("corewasm12.0", typeof(CsProjCoreWasmToolchain))]
+        public void Net12RuntimesResolveToTheirToolchains(string moniker, Type expectedToolchain)
+        {
+            string[] args = moniker.Contains("wasm")
+                ? ["-r", moniker, GetDummyWasmEngine()]
+                : ["-r", moniker];
+            var (isSuccess, config, _) = ConfigParser.Parse(args, new OutputLogger(Output));
+
+            Assert.True(isSuccess);
+            Assert.NotNull(config);
+            var job = Assert.Single(config.GetJobs());
+            var toolchain = job.GetToolchain();
+            Assert.IsType(expectedToolchain, toolchain);
+            Assert.Equal(Runtime.Parse(moniker), job.GetRuntime());
+            var generator = Assert.IsAssignableFrom<DotNetCliGenerator>(toolchain.Generator);
+            Assert.Equal("net12.0", generator.Settings.TargetFrameworkMoniker);
+        }
+
         [Fact]
         public void IlCompilerPathParsedCorrectly()
         {
@@ -407,6 +433,7 @@ namespace BenchmarkDotNet.Tests
             CsProjNativeAotToolchain? toolchain = config.GetJobs().Single().GetToolchain() as CsProjNativeAotToolchain;
             Assert.NotNull(toolchain);
             Assert.Equal(fakePath.FullName, ((NativeAotSettings)toolchain.Settings).LocalIlcPackages?.FullName);
+            Assert.Equal("12.0.0-dev", ((NativeAotSettings)toolchain.Settings).IlCompilerVersion);
         }
 
         [Theory]
@@ -650,6 +677,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net10.0", "net10.0")]
         [InlineData("net11_0", "net11.0")]
         [InlineData("net11.0", "net11.0")]
+        [InlineData("net12_0", "net12.0")]
+        [InlineData("net12.0", "net12.0")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm, string expectedTfm)
         {
             var config = ConfigParser.Parse(["-r", tfm], new OutputLogger(Output)).config;

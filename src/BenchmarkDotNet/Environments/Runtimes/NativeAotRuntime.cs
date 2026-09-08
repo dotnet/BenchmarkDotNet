@@ -28,6 +28,11 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static readonly NativeAotRuntime Net11_0 = new(new(11, 0));
 
+        /// <summary>
+        /// NativeAOT compiled as net12.0
+        /// </summary>
+        public static readonly NativeAotRuntime Net12_0 = new(new(12, 0));
+
         private NativeAotRuntime(Version version) => Version = ToRuntimeVersion(version);
 
         public override string Name => "NativeAOT";
@@ -53,6 +58,7 @@ namespace BenchmarkDotNet.Environments
                 9 => Net90,
                 10 => Net10_0,
                 11 => Net11_0,
+                12 => Net12_0,
                 _ => new(version),
             };
 

@@ -19,7 +19,7 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
 {
     internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
     private const string DefaultNuGetFeed = "https://api.nuget.org/v3/index.json";
-    private const string LocalBuildDotNetFeed = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet11/nuget/v3/index.json";
+    private const string LocalBuildDotNetFeed = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet12/nuget/v3/index.json";
     internal const string GeneratedRdXmlFileName = "bdn_generated.rd.xml";
 
     private readonly NativeAotSettings settings;
@@ -95,7 +95,7 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
 
     // The ILCompiler is restored either from a NuGet feed, or from a local runtime build (which also needs the dotnet nightly feed).
     private KeyValuePair<string, string>[] GetFeeds()
-        => settings.LocalIlcPackages is not null ? [new("local", settings.LocalIlcPackages.FullName), new("dotnet11", LocalBuildDotNetFeed)]
+        => settings.LocalIlcPackages is not null ? [new("local", settings.LocalIlcPackages.FullName), new("dotnet12", LocalBuildDotNetFeed)]
         : settings.NuGetFeedUrl.IsNotBlank() ? [new(NativeAotNuGetFeed, settings.NuGetFeedUrl!)]
         : [];
 
