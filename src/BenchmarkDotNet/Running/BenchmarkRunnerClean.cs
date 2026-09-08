@@ -199,6 +199,21 @@ namespace BenchmarkDotNet.Running
                 // see https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
                 await benchmarkRunInfos.DisposeAllAsync().ConfigureAwait();
 
+                // Output additional information to console.
+                var logFileEnabled = benchmarkRunInfos.All(info => !info.Config.Options.IsSet(ConfigOptions.DisableLogFile));
+                if (logFileEnabled)
+                {
+                    var artifactDirectoryFullPath = Path.GetFullPath(rootArtifactsFolderPath);
+                    var logFileFullPath = Path.GetFullPath(logFilePath);
+                    var logFileRelativePath = PathHelper.GetRelativePath(artifactDirectoryFullPath, logFileFullPath);
+
+                    compositeLogger.WriteLine();
+                    compositeLogger.WriteLineHeader("// * Benchmark LogFile *");
+                    compositeLogger.WriteLineLink(artifactDirectoryFullPath);
+                    compositeLogger.WriteLineLink(logFileFullPath, linkCaption: logFileRelativePath, prefixText: "  ");
+                    compositeLogger.WriteLine();
+                }
+
                 compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                 Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
                 compositeLogger.WriteLineInfo("Artifacts cleanup is finished");
