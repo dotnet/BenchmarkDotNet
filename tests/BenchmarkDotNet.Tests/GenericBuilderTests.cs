@@ -147,6 +147,20 @@ namespace BenchmarkDotNet.Tests
             var failure = Assert.Single(built);
             Assert.False(failure.IsSuccess);
             Assert.Contains(nameof(BenchmarkWithAbstractConfig), failure.Error);
+
+            // Told apart from a [GenericTypeArguments] that did not fit, because only this kind has to be reported
+            // by whoever drops it: GenericBenchmarksValidator needs a surviving benchmark before it ever runs.
+            Assert.True(failure.IsUnreadable);
+        }
+
+        [Fact]
+        public void TestGenericTypeThatFailedToBuildIsNotReportedAsUnreadable()
+        {
+            var built = GenericBenchmarksBuilder.BuildGenericsIfNeeded(typeof(GenericBenchmarkWithConstraintsWrongArgs<,>)).ToArray();
+
+            var failure = Assert.Single(built, candidate => !candidate.IsSuccess);
+            Assert.False(failure.IsUnreadable);
+            Assert.Contains("wrong type argument", failure.Error);
         }
 
         [Config(typeof(DebugConfig))] // abstract, so ConfigAttribute's constructor throws

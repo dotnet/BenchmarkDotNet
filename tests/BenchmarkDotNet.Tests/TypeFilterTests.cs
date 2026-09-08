@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
@@ -207,6 +208,23 @@ namespace BenchmarkDotNet.Tests
             Assert.Contains("SomeGeneric<Int32>.Create", benchmarks);
         }
 
+        [Fact]
+        public void ReportsATypeWhoseAttributesCannotBeRead()
+        {
+            // The [Config] of this type throws while reflection constructs it, so the type is dropped rather than
+            // allowed to abort the whole run - but it has to be said out loud, because GenericBenchmarksValidator
+            // never gets to report it when nothing of the assembly survives, and "No benchmarks were found" on its
+            // own sends the user looking in the wrong place.
+            var logger = new AccumulationLogger();
+
+            var benchmarks = Filter([typeof(ClassWithUnreadableConfig), typeof(ClassA)], ["--filter", "*"], logger);
+
+            Assert.Equal(2, benchmarks.Count);
+            Assert.Contains("ClassA.Method1", benchmarks);
+            Assert.DoesNotContain("ClassWithUnreadableConfig.Method1", benchmarks);
+            Assert.Contains(nameof(ClassWithUnreadableConfig), logger.GetLog(), StringComparison.Ordinal);
+        }
+
         private HashSet<string> Filter(Type[] types, string[] args, ILogger? logger = null)
         {
             var nonNullLogger = logger ?? new OutputLogger(Output);
@@ -249,6 +267,18 @@ namespace BenchmarkDotNet.Tests
 
         [Benchmark]
         public void Method3() { }
+    }
+
+    [Config(typeof(AbstractConfig))]
+    public class ClassWithUnreadableConfig
+    {
+        [Benchmark]
+        public void Method1() { }
+    }
+
+    // ConfigAttribute instantiates the type it is given, and an abstract one cannot be instantiated.
+    public abstract class AbstractConfig : ManualConfig
+    {
     }
 
     public class ClassC
