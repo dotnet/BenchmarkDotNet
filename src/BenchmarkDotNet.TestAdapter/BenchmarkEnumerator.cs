@@ -57,6 +57,22 @@ namespace BenchmarkDotNet.TestAdapter
         /// <param name="assembly">The assembly of the benchmark project.</param>
         /// <returns>The benchmarks inside the assembly.</returns>
         public static BenchmarkRunInfo[] GetBenchmarksFromAssembly(Assembly assembly)
+            => GetBenchmarksFromAssembly(assembly, ParameterValueDisposer.DisposeUnused);
+
+        /// <summary>
+        /// Returns all the BenchmarkRunInfo objects from an already loaded assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly of the benchmark project.</param>
+        /// <param name="disposeHidden">
+        /// What to do with the parameter values of the benchmarks that are hidden here, given everything the assembly
+        /// declares and the benchmarks that are kept. Disposing them right away is only right when nothing will
+        /// enumerate the assembly again: a host that serves several requests from one process hides the same
+        /// benchmarks every time, and a cached source hands back the same values, so it takes the disposal over.
+        /// </param>
+        /// <returns>The benchmarks inside the assembly.</returns>
+        internal static BenchmarkRunInfo[] GetBenchmarksFromAssembly(
+            Assembly assembly,
+            Action<IEnumerable<BenchmarkCase>, IEnumerable<BenchmarkCase>> disposeHidden)
         {
             var all = GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks())
                 .Select(type => BenchmarkConverter.TypeToBenchmarks(type))
@@ -77,8 +93,8 @@ namespace BenchmarkDotNet.TestAdapter
                 .ToArray();
 
             // BenchmarkConverter has already constructed every parameter value by now, and a case hidden here is never
-            // handed to BenchmarkDotNet by either adapter, so nothing downstream can dispose what is dropped.
-            ParameterValueDisposer.DisposeUnused(
+            // handed to BenchmarkDotNet by either adapter, so nothing downstream will ever dispose what is dropped.
+            disposeHidden(
                 all.SelectMany(runInfo => runInfo.BenchmarksCases),
                 runnable.SelectMany(runInfo => runInfo.BenchmarksCases));
 

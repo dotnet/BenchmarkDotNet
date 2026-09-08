@@ -1,3 +1,6 @@
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using System.Runtime.CompilerServices;
 
@@ -14,46 +17,60 @@ namespace BenchmarkDotNet.TestAdapter
     /// </remarks>
     internal static class ParameterValueDisposer
     {
+        /// <inheritdoc cref="DisposeUnusedAsync"/>
+        internal static void DisposeUnused(IEnumerable<BenchmarkCase> enumerated, IEnumerable<BenchmarkCase> retained)
+        {
+            using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+            context.ExecuteUntilComplete(DisposeUnusedAsync(enumerated, retained));
+        }
+
         /// <summary>
         /// Disposes every value that the enumerated benchmarks own and the retained ones do not.
         /// </summary>
         /// <remarks>
         /// The values are matched by reference instead of being disposed case by case, because BenchmarkConverter
         /// gives the same ParameterInstance to every job and every argument set of a benchmark: disposing a dropped
-        /// case wholesale would take down values that a benchmark which is about to run still owns.
+        /// case wholesale would take down values that a benchmark which is about to run still owns. Disposal goes
+        /// through ParameterInstance so that a value which is only IAsyncDisposable is disposed as well.
         /// </remarks>
         /// <param name="enumerated">Everything the assembly declares.</param>
         /// <param name="retained">The benchmarks that are kept, if any.</param>
-        internal static void DisposeUnused(IEnumerable<BenchmarkCase> enumerated, IEnumerable<BenchmarkCase> retained)
+        internal static ValueTask DisposeUnusedAsync(IEnumerable<BenchmarkCase> enumerated, IEnumerable<BenchmarkCase> retained)
         {
-            var unused = new HashSet<IDisposable>(ReferenceComparer.Instance);
+            var unused = new Dictionary<object, ParameterInstance>(ReferenceComparer.Instance);
 
-            foreach (var value in GetDisposableParameterValues(enumerated))
-                unused.Add(value);
+            foreach (var parameter in GetDisposableParameters(enumerated))
+                unused[parameter.Value!] = parameter;
 
-            foreach (var value in GetDisposableParameterValues(retained))
-                unused.Remove(value);
+            foreach (var parameter in GetDisposableParameters(retained))
+                unused.Remove(parameter.Value!);
 
-            foreach (var value in unused)
-                value.Dispose();
+            return unused.Values.DisposeAllAsync();
         }
 
-        private static IEnumerable<IDisposable> GetDisposableParameterValues(IEnumerable<BenchmarkCase> benchmarkCases)
-            => benchmarkCases
-                .SelectMany(benchmarkCase => benchmarkCase.Parameters.Items)
-                .Select(parameter => parameter.Value)
-                .OfType<IDisposable>();
+        /// <summary>
+        /// Compares values by reference, so that a parameter value which overrides Equals is still disposed once per
+        /// instance.
+        /// </summary>
+        internal static IEqualityComparer<object> ByReference => ReferenceComparer.Instance;
 
         /// <summary>
-        /// Compares by reference, so that a parameter value which overrides Equals is still disposed once per instance.
+        /// Gets the parameters of the given benchmarks whose value needs disposing.
         /// </summary>
-        private sealed class ReferenceComparer : IEqualityComparer<IDisposable>
+        /// <param name="benchmarkCases">The benchmarks to read the parameters of.</param>
+        /// <returns>The parameters holding a disposable value.</returns>
+        internal static IEnumerable<ParameterInstance> GetDisposableParameters(IEnumerable<BenchmarkCase> benchmarkCases)
+            => benchmarkCases
+                .SelectMany(benchmarkCase => benchmarkCase.Parameters.Items)
+                .Where(parameter => parameter.Value is IDisposable or IAsyncDisposable);
+
+        private sealed class ReferenceComparer : IEqualityComparer<object>
         {
             public static readonly ReferenceComparer Instance = new ReferenceComparer();
 
-            public bool Equals(IDisposable? x, IDisposable? y) => ReferenceEquals(x, y);
+            public new bool Equals(object? x, object? y) => ReferenceEquals(x, y);
 
-            public int GetHashCode(IDisposable obj) => RuntimeHelpers.GetHashCode(obj);
+            public int GetHashCode(object obj) => RuntimeHelpers.GetHashCode(obj);
         }
     }
 }
