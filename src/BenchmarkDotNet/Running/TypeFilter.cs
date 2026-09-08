@@ -39,11 +39,28 @@ namespace BenchmarkDotNet.Running
                 return (false, Array.Empty<Type>());
             }
 
+            // A type whose attributes cannot be read at all - [Config(typeof(SomeAbstractConfig))], say, where the
+            // attribute throws while reflection constructs it - is dropped rather than allowed to abort the run, but
+            // that has to be said out loud: GenericBenchmarksValidator never gets to report it, because it only runs
+            // once at least one benchmark of the assembly survived, and "No benchmarks were found" on its own sends
+            // the user looking in the wrong place. A type that failed on its [GenericTypeArguments] is left to the
+            // validator, which is where that has always been reported.
+            void AddRunnable(IEnumerable<GenericBenchmarkType> built)
+            {
+                foreach (var candidate in built)
+                {
+                    if (candidate.IsSuccess)
+                        validRunnableTypes.Add(candidate.Type);
+                    else if (candidate.IsUnreadable)
+                        logger.WriteLineError(candidate.Error!);
+                }
+            }
+
             foreach (var type in types)
             {
                 if (type.ContainsRunnableBenchmarks())
                 {
-                    validRunnableTypes.AddRange(GenericBenchmarksBuilder.BuildGenericsIfNeeded(type).Where(built => built.IsSuccess).Select(built => built.Type));
+                    AddRunnable(GenericBenchmarksBuilder.BuildGenericsIfNeeded(type));
                 }
                 else
                 {
@@ -55,7 +72,7 @@ namespace BenchmarkDotNet.Running
 
             foreach (var assembly in assemblies)
             {
-                validRunnableTypes.AddRange(GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks()));
+                AddRunnable(GenericBenchmarksBuilder.BuildRunnableBenchmarks(assembly.GetRunnableBenchmarks()));
             }
 
             return (true, validRunnableTypes);
