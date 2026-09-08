@@ -30,6 +30,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string[] expected =
             [
+                // The values of this one are IAsyncDisposable and not IDisposable, which is what an async
+                // [ParamsSource] can produce since #3248.
+                "AsyncDisposableProbe.Identity(Value: async-1)",
+                "AsyncDisposableProbe.Identity(Value: async-2)",
+
                 "BracketProbe.Length(Value: \"[Dry]\")",
                 "CategoryProbe.Identity",
 
@@ -147,6 +152,61 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(
                 "created=3 disposed=3",
                 ReadDisposalReport(PassingProbes, "disposable-probe.txt", () => Discover(PassingProbes)));
+        }
+
+        [Fact]
+        public void ParameterValuesThatAreOnlyAsyncDisposableAreDisposedToo()
+        {
+            // An async [ParamsSource] can hand back a value that implements IAsyncDisposable and not IDisposable.
+            // Disposal goes through ParameterInstance, which knows both, rather than casting the value to
+            // IDisposable - which would drop these on the floor and leave them to the finalizer.
+            Assert.Equal(
+                "created=2 disposed=2",
+                ReadDisposalReport(PassingProbes, "async-disposable-probe.txt", () => Discover(PassingProbes)));
+        }
+
+        [Fact]
+        public void ParameterValuesSurviveADiscoveryWhenTheSameProcessRunsThemAfterwards()
+        {
+            // Server mode is how Visual Studio and the Visual Studio Code Test Explorer drive the platform: one
+            // process serves the discovery and then the runs. Every request enumerates the assembly again, and a
+            // source backed by a cached collection hands back the very same values, so disposing them when the
+            // discovery request ends would leave the run executing against disposed objects - which DisposableProbe
+            // turns into an ObjectDisposedException rather than letting it pass unnoticed.
+            IReadOnlyList<TestingPlatformServerModeSession.ServerNode> discovered = [];
+            IReadOnlyList<TestingPlatformServerModeSession.ServerNode> ran = [];
+
+            var report = ReadDisposalReport(
+                PassingProbes,
+                "disposable-probe.txt",
+                () => (discovered, ran) = TestingPlatformServerModeSession.DiscoverThenRun(
+                    GetProbeApplication(PassingProbes),
+                    "DisposableProbe.Identity(Value: tracked",
+                    Timeout));
+
+            Assert.NotEmpty(discovered);
+            Assert.Equal(3, ran.Count);
+            Assert.All(ran, node => Assert.Equal("passed", node.ExecutionState));
+
+            // Once each: BenchmarkDotNet disposes what it ran, and the adapter must not have done so beforehand.
+            Assert.Equal("created=3 disposed=3", report);
+        }
+
+        [Fact]
+        public void ParameterValuesOfBenchmarksNoRequestRanAreDisposedWhenTheApplicationEnds()
+        {
+            // The mirror image of the test above: the values of every benchmark that neither request ran are the
+            // adapter's to dispose, and holding them for the application rather than for the request must not turn
+            // into either a leak or a second disposal.
+            var report = ReadDisposalReport(
+                PassingProbes,
+                "async-disposable-probe.txt",
+                () => TestingPlatformServerModeSession.DiscoverThenRun(
+                    GetProbeApplication(PassingProbes),
+                    "DisposableProbe.Identity(Value: tracked",
+                    Timeout));
+
+            Assert.Equal("created=2 disposed=2", report);
         }
 
         [Fact]
