@@ -34,18 +34,30 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform
         {
             private static int disposed;
 
+            private readonly int number;
+
+            private bool isDisposed;
+
             static Tracked() =>
                 AppDomain.CurrentDomain.ProcessExit += (_, _) => File.WriteAllText(
                     Path.Combine(AppContext.BaseDirectory, ReportFileName),
                     $"created={Instances.Length} disposed={Volatile.Read(ref disposed)}");
 
-            public Tracked(int number) => Number = number;
+            public Tracked(int number) => this.number = number;
 
-            public int Number { get; }
+            /// <summary>
+            /// Reading this after the value was disposed is the failure a run that executes against the values a
+            /// discovery already disposed would otherwise get away with, so it is made loud rather than counted.
+            /// </summary>
+            public int Number => isDisposed ? throw new ObjectDisposedException(ToString()) : number;
 
-            public void Dispose() => Interlocked.Increment(ref disposed);
+            public void Dispose()
+            {
+                isDisposed = true;
+                Interlocked.Increment(ref disposed);
+            }
 
-            public override string ToString() => $"tracked-{Number}";
+            public override string ToString() => $"tracked-{number}";
         }
 
         private class FastConfig : ManualConfig
