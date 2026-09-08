@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Disassemblers
         // match still works, and return the effective PC of the first real stub instruction so
         // LDR-literal offsets are calculated relative to it.
         // Encoding: DMB ISHLD = 0xD50339BF.
-        private const uint DmbIshInstr = 0xD50339BFu;
+        private const uint DmbIshLdInstr = 0xD50339BFu;
 
         private static bool TryReadStubHead(IDataReader reader, ulong address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2)
         {
@@ -157,7 +157,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             int offset = 0;
             uint first = ReadInstr(buffer, 0);
-            if (first == DmbIshInstr)
+            if (first == DmbIshLdInstr)
             {
                 if (read < 16)
                     return false;

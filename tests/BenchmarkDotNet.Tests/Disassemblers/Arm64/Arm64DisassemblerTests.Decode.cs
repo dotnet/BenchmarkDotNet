@@ -25,8 +25,8 @@ public partial class Arm64DisassemblerTests
         // Arrange
         var rawInstructions = new[]
         {
-            Arm64InstructionFactory.MOVZ(X1, 0x1234),             // movz x0, #0x1234
-            Arm64InstructionFactory.MOVK(X1, 0x5678, amount: 16), // movk x0, #0x5678, lsl #16
+            Arm64InstructionFactory.MOVZ(X1, 0x1234),             // movz x1, #0x1234
+            Arm64InstructionFactory.MOVK(X1, 0x5678, amount: 16), // movk x1, #0x5678, lsl #16
             Arm64InstructionFactory.BR(X1),                       // br x1
         };
         PrintInstructions(rawInstructions);
@@ -36,9 +36,9 @@ public partial class Arm64DisassemblerTests
         var clrRuntime = CreateMockClrRuntime(
             [
                 Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
-                Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x11, #0x10000
+                Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x10, #0x10000
                 Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
-                Arm64InstructionFactory.BR(X10),           // br x11
+                Arm64InstructionFactory.BR(X10),           // br x10
             ],
             address =>
             {
@@ -60,7 +60,7 @@ public partial class Arm64DisassemblerTests
         // Assert
         results.Length.Should().Be(rawInstructions.Length);
 
-        // movz x1, #0x1000
+        // movz x1, #0x1234
         results[0].Should().BeEquivalentTo(new Arm64Asm
         {
             InstructionPointer = baseAddress,
@@ -71,7 +71,7 @@ public partial class Arm64DisassemblerTests
             IsReferencedAddressIndirect = false,
         }, ConfigureCustomEquivalency);
 
-        // movk x1, #0x1
+        // movk x1, #0x5678, lsl #16
         results[1].Should().BeEquivalentTo(new Arm64Asm
         {
             InstructionPointer = baseAddress + 4,

@@ -94,7 +94,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_NoAlignedAddress()
     {
-        const ulong NonAlignedAddress = 0x10004;
+        const ulong NonAlignedAddress = Address1 + 4;
         var clrRuntime = CreateMockClrRuntime();
         clrRuntime.GetJitHelperFunctionNameFunc = address => null;
         clrRuntime.GetMethodByInstructionPointerFunc = address =>

@@ -52,7 +52,7 @@ internal class MockDataReader : IDataReader
         return 0;
     }
 
-    // It's used by TryResolvePrecode
+    // It's used by TryReadStubHead
     public int Read(ulong address, Span<byte> buffer)
         => _read(address, buffer);
 

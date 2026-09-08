@@ -113,11 +113,11 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
             "FF01097000D0 mov       w0, w1",
             "FF01097000D4 ldp       x29, x30, [sp], #0x10",
             "FF01097000D8 ret       ",
-        ]);
+        ], options => options.WithStrictOrdering());
     }
 
     private static Arm64Asm[] GetArm64Asms(uint[] rawInstructions, ulong baseAddress, Dictionary<ulong, string> symbols)
-    {      
+    {
         var clrRuntime = CreateMockClrRuntime(0);
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         foreach (var symbol in symbols)
@@ -139,7 +139,6 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
             { Arm64InstructionFactory.MOVZ(W0, 0x8),              "movz w0, #0x8"},
             { Arm64InstructionFactory.MOVZ(X0, 0x100),            "movz x0, #0x100"},
             { Arm64InstructionFactory.MOVZ(X0, 0xFFF),            "movz x0, #0xfff"},
-            { Arm64InstructionFactory.MOVZ(X0, 0x100),            "movz x0, #0x100"},
             { Arm64InstructionFactory.MOVZ(X0, 0x100, amount:16), "movz x0, #0x100, lsl #16"},
 
             // TODO: `Gee.External.Capstone` seems not support negative label offset and wrong text is outputted. 
